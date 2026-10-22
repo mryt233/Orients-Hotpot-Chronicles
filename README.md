@@ -1,5 +1,3 @@
-<!-- （2026-10-22，按 promo/GitHub编写手册.md 编写，对应 0.1.0-alpha.1）。由 放到仓库根目录。 -->
-
 <div align="center">
 
 <img src="src/main/resources/assets/orients_hotpot_chronicles/icon.png" width="128" alt="icon">
@@ -185,47 +183,21 @@ All recipes use a crafting table except Cooked Tripe. "空 / empty" means leave 
 
 ## 许可证 · License
 
-**保留所有权利（All Rights Reserved），源码公开。** 本模组不是开源软件，源码公开只是方便大家查看和学习。
+《之晗的火锅物语》（Orient's Hotpot Chronicles）采用双许可证：
 
-可以直接做（不用问作者）：
-- 自己玩；
-- 放进免费整合包：注明作者和下载页，只放未修改的官方 jar；
-- 在免费服务器上使用：注明作者和下载页；
-- 做视频、直播，可以有收益；
-- 看源码学习；
-- 做联动模组或附属模组（不复制本模组的代码和素材）；
-- 做材质包、翻译包（只放你自己做的文件）。
+- **源代码 / Source code**：[MIT License](LICENSE) — 允许按照 MIT 条款使用、修改、移植和分发代码，包括商业使用；须保留版权和许可证声明。
+- **原创非代码资源 / Original non-code assets**：[CC BY-NC-SA 4.0](ASSETS_LICENSE) — 原创贴图、模型、音效等允许依照协议非商业分享和改编，须署名并遵守相同方式共享条款。
 
-要先取得作者书面同意：
-- 移植到其他加载器或其他 Minecraft 版本；
-- 修改后再发布；
-- 在其他项目里使用本模组的代码或素材；
-- 出售，或放进付费内容（包括付费整合包）；
-- 在收费服务器上使用。
+编译后的 Mod JAR 可能同时包含代码和资源，两类内容分别受对应许可证约束。Minecraft 原版及第三方素材不属于本项目可自行授权的范围，仍遵循原权利人的条款。
 
-以上只是要点，以 [LICENSE](LICENSE) 原文为准。
+The project uses separate licenses:
 
----
+- **Source code:** [MIT License](LICENSE). Use, modification, ports, redistribution, and commercial use are permitted subject to the MIT terms, including retention of copyright and license notices.
+- **Original non-code assets:** [CC BY-NC-SA 4.0](ASSETS_LICENSE). Original textures, models, sounds, and other creative assets may be shared and adapted for noncommercial purposes under its attribution and ShareAlike terms.
 
-**All Rights Reserved, source available.** This mod is not open source. The source is public for reference and learning.
+A compiled mod JAR may contain both code and assets; each part retains its applicable license. Minecraft and third-party materials are excluded from these grants and remain under their respective owners' terms.
 
-You may, without asking:
-- play it yourself;
-- include it in free modpacks: credit the author and the download page, and include only the unmodified official jar;
-- use it on free servers: credit the author and the download page;
-- make videos and streams, including monetized ones;
-- read the source to learn from it;
-- make integration mods or add-ons (without copying this mod's code or assets);
-- make resource packs and translation packs (containing only files you made).
-
-You need the author's written permission to:
-- port it to another loader or Minecraft version;
-- distribute a modified version;
-- use its code or assets in another project;
-- sell it or include it in paid content (including paid modpacks);
-- use it on a paid server.
-
-This is only a summary. The [LICENSE](LICENSE) file is the binding text.
+Copyright © 2026 蘧白川 / Orient (GitHub: [mryt233](https://github.com/mryt233)).
 
 ## 反馈 · Feedback
 
@@ -248,9 +220,3 @@ Found a bug, or have a question or an idea? Let me know:
 ## 作者 · Credits
 
 蘧白川 / Orient · GitHub：[@mryt233](https://github.com/mryt233)
-
-<!-- 2026-10-22 按用户要求补充 AI 协作致谢，保留上方原作者署名。 -->
-
-### AI 协作致谢 · AI assistance
-
-
