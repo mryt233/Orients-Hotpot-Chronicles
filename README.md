@@ -234,14 +234,14 @@ This is only a summary. The [LICENSE](LICENSE) file is the binding text.
 - **GitHub Issues**：[提交反馈](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)（有报 bug、提建议、提问三种表单）
 - **B 站**：蘧白川
 - **邮箱**：orientcheung233@gmail.com
-- **QQ 交流群**：248314791
+- **QQ 交流群**：248314791（作者没回就是在睡觉）
 
 Found a bug, or have a question or an idea? Let me know:
 
 - **GitHub Issues**: [open an issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose) (bug report, suggestion, or question)
 - **Bilibili**: 蘧白川
 - **Email**: orientcheung233@gmail.com
-- **QQ group**: 248314791
+- **QQ group**: 248314791（If I’m not replying, I’m probably asleep）
 
 <!-- 其他下载平台：Modrinth / CurseForge / MC百科 上架后在这里补链接 -->
 
