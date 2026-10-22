@@ -1,134 +1,21 @@
-之晗的火锅物语（Orient's Hotpot Chronicles）许可协议
-版权所有 © 2026 蘧白川 / Orient（GitHub：mryt233）。保留所有权利。
+MIT License
 
-本模组的源代码公开，供大家查看和学习，但这不代表放弃版权。
-本协议所称「本模组」包括源代码、编译后的 jar 文件、贴图、模型、音效和语言文件。
+Copyright (c) 2026 蘧白川 / Orient (GitHub: mryt233)
 
-一、无需申请即可：
-  1. 在自己的游戏里使用本模组。
-  2. 将本模组收录进整合包。须在整合包介绍中注明模组名称和作者，
-     并附上官方下载页面链接；整合包内只能放未经修改的原版 jar。
-  3. 在不向玩家收取任何费用的服务器上使用本模组。须在服务器介绍或模组列表中
-     注明模组名称和作者，并附上官方下载页面链接。收费服务器见第二条第 5 款。
-  4. 录制视频、直播、写图文介绍或教程，并可以从中获得收益。
-  5. 阅读源代码学习。看懂原理后用自己的代码重新实现，不需要申请；
-     复制本模组的代码（哪怕改了变量名）则属于第二条第 3 款。
-  6. 制作与本模组联动的模组或附属模组：在自己的模组里依赖、调用本模组，
-     引用本模组的物品 / 方块 ID、标签，或通过本模组提供的接口注册内容。
-     前提是不复制本模组的代码和素材，也不把本模组的 jar 打包进自己的模组。
-  7. 制作材质包、汉化包或其他语言的翻译资源包，替换本模组的贴图、模型或文字。
-     资源包里只能放你自己制作的文件，不能直接放本模组的原始素材。
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-二、须事先取得作者书面同意：
-  1. 将本模组移植到 Forge、NeoForge 或其他加载器，或移植到其他 Minecraft 版本。
-  2. 修改本模组后发布。
-  3. 在其他模组或项目中使用本模组的代码、贴图、模型或其他素材。
-  4. 以任何形式出售本模组，或把本模组作为付费内容的一部分（包括付费整合包）。
-  5. 在收费服务器上使用本模组。收费服务器指以任何方式向玩家收钱的服务器，包括但不限于：
-     进服收费、出售会员 / VIP / 特权、出售游戏内道具或货币、以「赞助」名义收钱并给予游戏内回报。
-     取得同意后，同样须按第一条第 3 款注明作者和链接。
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-  「书面同意」指作者通过下列任一渠道给出的明确答复（私信、邮件、留言均可，口头不算）。
-  同意只对申请时说明的人和用途有效，不能转让给他人。
-
-三、禁止：
-  1. 把本模组的 jar 或源代码转载、重新上传到官方渠道以外的任何网站或平台。
-  2. 冒充作者，或去掉、修改作者署名。
-
-四、违反本协议
-  违反本协议任何一条，即自动失去本协议给予的全部许可（包括第一条的各项），
-  须停止使用和传播本模组；作者另行书面恢复许可的除外。
-
-五、向本模组贡献代码或素材
-  通过 GitHub 提交代码（Pull Request）、提交贴图、翻译或其他内容，即表示你：
-  1. 确认提交的内容是你自己制作的，或你有权提交；
-  2. 同意作者按本协议（以及作者今后为本模组采用的任何协议）使用、修改和发布这些内容，
-     不另付报酬。贡献者会在更新说明或致谢中署名。
-
-六、联系作者
-  B站：蘧白川
-  邮箱：orientcheung233@gmail.com
-  GitHub：mryt233（本模组项目页面 https://github.com/mryt233/Orients-Hotpot-Chronicles）
-  QQ 交流群：248314791
-
-官方渠道：GitHub、MC百科、Modrinth、CurseForge 上由作者本人发布的页面。
-
-Minecraft 属于 Mojang Studios / Microsoft；Fabric Loader、Fabric API 以及其他第三方组件
-遵循各自的许可协议，不受本协议约束。
-
-本模组按「现状」提供，不附带任何形式的保证。因使用本模组造成的任何损失（包括存档损坏），
-作者不承担责任。
-
-------------------------------------------------------------------------
-
-Orient's Hotpot Chronicles - License
-Copyright © 2026 蘧白川 / Orient (GitHub: mryt233). All Rights Reserved.
-
-The source code of this mod is published for reference and learning. Publishing it does not
-waive copyright. "The mod" in this license means the source code, compiled jar files,
-textures, models, sounds and language files.
-
-1. You MAY, without asking:
-   a. Use the mod in your own game.
-   b. Include the mod in modpacks. The modpack description must credit the mod name and author
-      and link to an official download page. Only the unmodified official jar may be included.
-   c. Use the mod on servers that do not charge players anything. The server description or mod
-      list must credit the mod name and author and link to an official download page. For paid
-      servers, see 2e.
-   d. Make videos, streams, articles or tutorials featuring the mod, including monetized ones.
-   e. Read the source code to learn from it. Re-implementing an idea in your own code after
-      understanding it needs no permission; copying the mod's code (even with renamed variables)
-      falls under 2c.
-   f. Make mods that integrate with this mod, or add-ons for it: depend on it, call it, reference
-      its item / block IDs and tags, or register content through the interfaces it provides -
-      as long as you do not copy its code or assets and do not bundle its jar inside your mod.
-   g. Make resource packs that retexture, remodel or translate the mod. The pack may only
-      contain files you made yourself, not the mod's original assets.
-
-2. You MUST get the author's written permission before you:
-   a. Port the mod to Forge, NeoForge or any other loader, or to another Minecraft version.
-   b. Distribute a modified version of the mod.
-   c. Use the mod's code, textures, models or other assets in another mod or project.
-   d. Sell the mod in any form, or include it as part of paid content (including paid modpacks).
-   e. Use the mod on a paid server. A paid server is any server that takes money from players in
-      any way, including but not limited to: paid access, selling ranks / VIP / perks, selling
-      in-game items or currency, or accepting "donations" in exchange for in-game rewards.
-      With permission, the credit and link requirements of 1c still apply.
-
-   "Written permission" means an explicit reply from the author through one of the channels in
-   section 6 (a private message, email or comment; verbal agreement does not count). Permission
-   applies only to the person and purpose stated in the request and cannot be transferred.
-
-3. You may NOT:
-   a. Re-upload or redistribute the mod's jar or source code anywhere other than the official
-      channels.
-   b. Impersonate the author, or remove or alter the author credit.
-
-4. Breach
-   Breaking any part of this license automatically ends every permission it grants you
-   (including those in section 1). You must stop using and distributing the mod unless the
-   author restores your permission in writing.
-
-5. Contributions
-   By submitting code (pull requests), textures, translations or any other content, you:
-   a. confirm that you made it yourself or have the right to submit it;
-   b. agree that the author may use, modify and distribute it under this license (and under any
-      license the author adopts for the mod in the future), without payment. Contributors are
-      credited in the changelog or acknowledgements.
-
-6. Contacting the author
-   Bilibili: 蘧白川
-   Email: orientcheung233@gmail.com
-   GitHub: mryt233 (project page: https://github.com/mryt233/Orients-Hotpot-Chronicles)
-   QQ group: 248314791
-
-Official channels: the pages published by the author on GitHub, MC百科 (mcmod.cn), Modrinth
-and CurseForge.
-
-Minecraft is owned by Mojang Studios / Microsoft. Fabric Loader, Fabric API and other
-third-party components are covered by their own licenses, not by this one.
-
-The mod is provided "as is", without warranty of any kind. The author is not liable for any
-damage arising from its use, including world corruption.
-
-If the Chinese and English texts differ, the Chinese text prevails.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
