@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "orients_hotpot_chronicles:block/copper_plate_2x2"
+    },
+    "axis=z": {
+      "model": "orients_hotpot_chronicles:block/copper_plate_2x2",
+      "y": 90
+    }
+  }
+}

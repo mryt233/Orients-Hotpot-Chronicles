@@ -1,0 +1,1 @@
+A block face texture that fills the full square. The outer 1-pixel ring uses the base material so it connects with neighbouring blocks.

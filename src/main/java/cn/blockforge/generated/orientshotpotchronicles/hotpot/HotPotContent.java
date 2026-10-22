@@ -1,0 +1,299 @@
+package cn.blockforge.generated.orientshotpotchronicles.hotpot;
+
+import cn.blockforge.generated.orientshotpotchronicles.GeneratedMod;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.component.ComponentType;
+import net.minecraft.component.type.NbtComponent;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.Registries;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.Rarity;
+import net.minecraft.util.math.BlockPos;
+
+/** 注册中心：灶台、锅、筷子、方块实体、屏幕与独立创造标签页。 */
+public final class HotPotContent {
+    /** 灶台本身就是组合方块的宿主；锅放上去只改变 POT 状态。 */
+    public static final StoveBlock STOVE = Registry.register(Registries.BLOCK,
+        GeneratedMod.id("stove"), new StoveBlock());
+
+    /** 高灶台：配 1.5 格高火锅桌，灶口、锅、汤整体抬高 {@link StoveBlock#TALL_LIFT} 像素，灶膛还在最下面。 */
+    public static final StoveBlock TALL_STOVE = Registry.register(Registries.BLOCK,
+        GeneratedMod.id("tall_stove"), new StoveBlock(StoveBlock.TALL_LIFT));
+    /** 高灶台的「上半截」：看不见，让伸进上面一格的锅也点得到（没有物品）。 */
+    public static final StoveTopBlock STOVE_TOP = Registry.register(Registries.BLOCK,
+        GeneratedMod.id("tall_stove_top"), new StoveTopBlock());
+
+    public static final HotPotBlock COPPER_HOT_POT = Registry.register(Registries.BLOCK,
+        GeneratedMod.id(HotPotMaterial.COPPER.idPath()), new HotPotBlock(HotPotMaterial.COPPER));
+
+    public static final HotPotBlock IRON_HOT_POT = Registry.register(Registries.BLOCK,
+        GeneratedMod.id(HotPotMaterial.IRON.idPath()), new HotPotBlock(HotPotMaterial.IRON));
+
+    /** 每种原版木板一种火锅桌（顺序同原版木板），围着灶台拼成 3x3 的大桌，顶面和灶台台面齐平。 */
+    public static final java.util.List<String> TABLE_WOODS = java.util.List.of(
+        "oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped");
+    public static final java.util.List<HotPotTableBlock> HOTPOT_TABLES = new java.util.ArrayList<>();
+    public static final java.util.List<BlockItem> HOTPOT_TABLE_ITEMS = new java.util.ArrayList<>();
+    /** 板凳（矮）：同样每种原版木板一种，能坐。 */
+    public static final java.util.List<BenchBlock> BENCHES = new java.util.ArrayList<>();
+    public static final java.util.List<BlockItem> BENCH_ITEMS = new java.util.ArrayList<>();
+    /** 1.5 格高的火锅桌和一格高的条凳（配高灶台），同样每种原版木板一种。 */
+    public static final java.util.List<TallHotPotTableBlock> TALL_TABLES = new java.util.ArrayList<>();
+    public static final java.util.List<BlockItem> TALL_TABLE_ITEMS = new java.util.ArrayList<>();
+    public static final java.util.List<BenchBlock> TALL_BENCHES = new java.util.ArrayList<>();
+    public static final java.util.List<BlockItem> TALL_BENCH_ITEMS = new java.util.ArrayList<>();
+
+    /** 盘子：5 种材质 × 6 种大小（顺序：材质在外层）。 */
+    public static final java.util.List<String> PLATE_MATERIALS = java.util.List.of(
+        "quartz", "bamboo", "terracotta", "copper", "iron");
+    public static final java.util.List<PlateBlock> PLATES = new java.util.ArrayList<>();
+    public static final java.util.List<PlateItem> PLATE_ITEMS = new java.util.ArrayList<>();
+    /** 筷子上夹着的那一样食物。 */
+    public static final net.minecraft.component.ComponentType<ItemStack> HELD_FOOD = Registry.register(
+        Registries.DATA_COMPONENT_TYPE, GeneratedMod.id("held_food"),
+        net.minecraft.component.ComponentType.<ItemStack>builder()
+            .codec(ItemStack.CODEC)
+            .packetCodec(ItemStack.PACKET_CODEC)
+            .build());
+
+    static {
+        for (String material : PLATE_MATERIALS) {
+            net.minecraft.block.MapColor color = switch (material) {
+                case "quartz" -> net.minecraft.block.MapColor.OFF_WHITE;
+                case "bamboo" -> net.minecraft.block.MapColor.PALE_YELLOW;
+                case "terracotta" -> net.minecraft.block.MapColor.ORANGE;
+                case "copper" -> net.minecraft.block.MapColor.ORANGE;
+                default -> net.minecraft.block.MapColor.IRON_GRAY;
+            };
+            net.minecraft.sound.BlockSoundGroup sounds = switch (material) {
+                case "quartz", "terracotta" -> net.minecraft.sound.BlockSoundGroup.DECORATED_POT;
+                case "bamboo" -> net.minecraft.sound.BlockSoundGroup.BAMBOO_WOOD;
+                case "copper" -> net.minecraft.sound.BlockSoundGroup.COPPER;
+                default -> net.minecraft.sound.BlockSoundGroup.METAL;
+            };
+            for (PlateSize size : PlateSize.values()) {
+                String id = material + "_plate_" + size.id();
+                PlateBlock plate = Registry.register(Registries.BLOCK, GeneratedMod.id(id),
+                    new PlateBlock(material, size, color, sounds));
+                PLATES.add(plate);
+                PLATE_ITEMS.add(Registry.register(Registries.ITEM, GeneratedMod.id(id),
+                    new PlateItem(plate, new Item.Settings().maxCount(16))));
+            }
+        }
+    }
+
+    /** 摆盘子的那一格：一格里能摆好几个盘子。 */
+    public static final PlateHolderBlock PLATE_HOLDER = Registry.register(Registries.BLOCK,
+        GeneratedMod.id("plates"), new PlateHolderBlock());
+    public static final BlockEntityType<PlateHolderBlockEntity> PLATE_HOLDER_BE = Registry.register(
+        Registries.BLOCK_ENTITY_TYPE, GeneratedMod.id("plates"),
+        FabricBlockEntityTypeBuilder.create(PlateHolderBlockEntity::new, PLATE_HOLDER).build());
+
+    /** 坐条凳时骑的看不见的座位实体。 */
+    public static final net.minecraft.entity.EntityType<SeatEntity> SEAT = Registry.register(
+        Registries.ENTITY_TYPE, GeneratedMod.id("seat"),
+        net.minecraft.entity.EntityType.Builder.<SeatEntity>create(SeatEntity::new, net.minecraft.entity.SpawnGroup.MISC)
+            .dimensions(0.25F, 0.01F)
+            .disableSaving()
+            .disableSummon()
+            .maxTrackingRange(10)
+            .build());
+
+    static {
+        for (String wood : TABLE_WOODS) {
+            net.minecraft.block.Block planks = Registries.BLOCK.get(Identifier.ofVanilla(wood + "_planks"));
+            HotPotTableBlock table = Registry.register(Registries.BLOCK,
+                GeneratedMod.id(wood + "_hotpot_table"), new HotPotTableBlock(planks));
+            HOTPOT_TABLES.add(table);
+            HOTPOT_TABLE_ITEMS.add(Registry.register(Registries.ITEM,
+                GeneratedMod.id(wood + "_hotpot_table"), new BlockItem(table, new Item.Settings())));
+        }
+        for (String wood : TABLE_WOODS) {
+            net.minecraft.block.Block planks = Registries.BLOCK.get(Identifier.ofVanilla(wood + "_planks"));
+            BenchBlock bench = Registry.register(Registries.BLOCK,
+                GeneratedMod.id(wood + "_bench"), new BenchBlock(planks));
+            BENCHES.add(bench);
+            BENCH_ITEMS.add(Registry.register(Registries.ITEM,
+                GeneratedMod.id(wood + "_bench"), new BlockItem(bench, new Item.Settings())));
+        }
+        for (String wood : TABLE_WOODS) {
+            net.minecraft.block.Block planks = Registries.BLOCK.get(Identifier.ofVanilla(wood + "_planks"));
+            TallHotPotTableBlock table = Registry.register(Registries.BLOCK,
+                GeneratedMod.id(wood + "_tall_hotpot_table"), new TallHotPotTableBlock(planks));
+            TALL_TABLES.add(table);
+            TALL_TABLE_ITEMS.add(Registry.register(Registries.ITEM,
+                GeneratedMod.id(wood + "_tall_hotpot_table"), new BlockItem(table, new Item.Settings())));
+            BenchBlock bench = Registry.register(Registries.BLOCK,
+                GeneratedMod.id(wood + "_tall_bench"), new BenchBlock(planks, true));
+            TALL_BENCHES.add(bench);
+            TALL_BENCH_ITEMS.add(Registry.register(Registries.ITEM,
+                GeneratedMod.id(wood + "_tall_bench"), new BlockItem(bench, new Item.Settings())));
+        }
+        // 旧版只有一种火锅桌（hotpot_table），老存档里的桌子和物品变成橡木火锅桌
+        Registries.BLOCK.addAlias(GeneratedMod.id("hotpot_table"), GeneratedMod.id("oak_hotpot_table"));
+        Registries.ITEM.addAlias(GeneratedMod.id("hotpot_table"), GeneratedMod.id("oak_hotpot_table"));
+    }
+
+    public static final BlockItem STOVE_ITEM = Registry.register(Registries.ITEM,
+        GeneratedMod.id("stove"), new BlockItem(STOVE, new Item.Settings()));
+
+    public static final BlockItem TALL_STOVE_ITEM = Registry.register(Registries.ITEM,
+        GeneratedMod.id("tall_stove"), new BlockItem(TALL_STOVE, new Item.Settings()));
+
+    public static final BlockItem COPPER_HOT_POT_ITEM = Registry.register(Registries.ITEM,
+        GeneratedMod.id(HotPotMaterial.COPPER.idPath()),
+        new BlockItem(COPPER_HOT_POT, new Item.Settings()));
+
+    public static final BlockItem IRON_HOT_POT_ITEM = Registry.register(Registries.ITEM,
+        GeneratedMod.id(HotPotMaterial.IRON.idPath()),
+        new BlockItem(IRON_HOT_POT, new Item.Settings()));
+
+    /** 毛肚（牛掉落，r93）：生的回 2 点饥饿；熟的回 5 点。熔炉 / 烟熏炉 / 营火都能烤，锅里涮得比牛肉快一半（熔炉配方 100 tick）。 */
+    public static final Item RAW_TRIPE = Registry.register(Registries.ITEM, GeneratedMod.id("tripe"),
+        new Item(new Item.Settings().food(new net.minecraft.component.type.FoodComponent.Builder()
+            .nutrition(2).saturationModifier(0.3F).build())));
+    public static final Item COOKED_TRIPE = Registry.register(Registries.ITEM, GeneratedMod.id("cooked_tripe"),
+        new Item(new Item.Settings().food(new net.minecraft.component.type.FoodComponent.Builder()
+            .nutrition(5).saturationModifier(0.6F).build())));
+
+    public static final Item CHOPSTICKS = Registry.register(Registries.ITEM,
+        GeneratedMod.id("chopsticks"),
+        new Item(new Item.Settings().maxCount(1).rarity(Rarity.COMMON)));
+
+    /** 装着东西的锅物品：汤底、食材、熟度原样打包（格式同锅方块实体存档）。 */
+    public static final ComponentType<NbtComponent> POT_CONTENTS = Registry.register(
+        Registries.DATA_COMPONENT_TYPE, GeneratedMod.id("pot_contents"),
+        ComponentType.<NbtComponent>builder()
+            .codec(NbtComponent.CODEC)
+            .packetCodec(NbtComponent.PACKET_CODEC)
+            .build());
+
+    /** 独立锅方块仍保留，兼容未放在灶台上的旧世界与自由摆放。 */
+    public static final BlockEntityType<HotPotBlockEntity> HOT_POT_BE = Registry.register(
+        Registries.BLOCK_ENTITY_TYPE, GeneratedMod.id("hot_pot"),
+        FabricBlockEntityTypeBuilder.create(HotPotBlockEntity::new,
+            COPPER_HOT_POT, IRON_HOT_POT).build());
+
+    /** 组合灶台方块实体：燃料、锅库存和烹饪数据全部在同一个位置。 */
+    public static final BlockEntityType<StoveBlockEntity> STOVE_BE = Registry.register(
+        Registries.BLOCK_ENTITY_TYPE, GeneratedMod.id("stove"),
+        FabricBlockEntityTypeBuilder.create(StoveBlockEntity::new, STOVE, TALL_STOVE).build());
+
+    /** 条凳的方块实体（只用来画斜腿）。 */
+    public static final BlockEntityType<BenchBlockEntity> BENCH_BE = Registry.register(
+        Registries.BLOCK_ENTITY_TYPE, GeneratedMod.id("tall_bench"),
+        FabricBlockEntityTypeBuilder.create(BenchBlockEntity::new,
+            TALL_BENCHES.toArray(new net.minecraft.block.Block[0])).build());
+
+    public static final ExtendedScreenHandlerType<HotPotScreenHandler, BlockPos> HOT_POT_SCREEN =
+        Registry.register(Registries.SCREEN_HANDLER, GeneratedMod.id("hot_pot"),
+            new ExtendedScreenHandlerType<>(HotPotScreenHandler::new, BlockPos.PACKET_CODEC));
+
+    /** 灶台底座的灶膛燃料界面。 */
+    public static final ExtendedScreenHandlerType<StoveScreenHandler, BlockPos> STOVE_SCREEN =
+        Registry.register(Registries.SCREEN_HANDLER, GeneratedMod.id("stove_fuel"),
+            new ExtendedScreenHandlerType<>(
+                (syncId, playerInventory, pos) -> new StoveScreenHandler(syncId, playerInventory, pos),
+                BlockPos.PACKET_CODEC));
+
+    /** 本模组专属分类：使用 Fabric 的追加式标签页，自动排在原版标签页之后并进入后续页面。 */
+    public static final RegistryKey<ItemGroup> ITEM_GROUP_KEY = RegistryKey.of(
+        RegistryKeys.ITEM_GROUP, GeneratedMod.id("hotpot"));
+
+    public static final ItemGroup ITEM_GROUP = Registry.register(Registries.ITEM_GROUP,
+        ITEM_GROUP_KEY,
+        FabricItemGroup.builder()
+            .displayName(Text.translatable("itemGroup." + GeneratedMod.MOD_ID))
+            .icon(HotPotContent::tabIcon)
+            .entries((context, entries) -> {
+                entries.add(STOVE_ITEM);
+                entries.add(TALL_STOVE_ITEM);
+                entries.add(IRON_HOT_POT_ITEM);
+                entries.add(COPPER_HOT_POT_ITEM);
+                entries.add(CHOPSTICKS);
+                entries.add(RAW_TRIPE);
+                entries.add(COOKED_TRIPE);
+                HOTPOT_TABLE_ITEMS.forEach(entries::add);
+                BENCH_ITEMS.forEach(entries::add);
+                TALL_TABLE_ITEMS.forEach(entries::add);
+                TALL_BENCH_ITEMS.forEach(entries::add);
+                PLATE_ITEMS.forEach(entries::add);
+            })
+            .build());
+
+    private HotPotContent() {
+    }
+
+    /** 在模组初始化阶段调用，确保注册顺序完成后输出一条可追踪日志。 */
+    public static void register() {
+        // 触碰静态字段，明确让物品组在客户端和服务端都完成初始化。
+        ITEM_GROUP.getDisplayName();
+        TripeLoot.register();
+        // 下界木（绯红、诡异）不可燃，其余和原版木板一样会着火
+        for (int i = 0; i < TABLE_WOODS.size(); i++) {
+            String wood = TABLE_WOODS.get(i);
+            if (!wood.equals("crimson") && !wood.equals("warped")) {
+                net.fabricmc.fabric.api.registry.FlammableBlockRegistry.getDefaultInstance()
+                    .add(HOTPOT_TABLES.get(i), 5, 20);
+                net.fabricmc.fabric.api.registry.FlammableBlockRegistry.getDefaultInstance()
+                    .add(BENCHES.get(i), 5, 20);
+                net.fabricmc.fabric.api.registry.FlammableBlockRegistry.getDefaultInstance()
+                    .add(TALL_BENCHES.get(i), 5, 20);
+            }
+        }
+        // 灶上有锅时，对着锅挖只挖下锅（连汤带菜打包掉落），灶台留着；对着灶身挖才挖整个灶台
+        net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.BEFORE.register(
+            (world, player, pos, state, blockEntity) -> {
+                if (blockEntity instanceof StoveBlockEntity stove && StoveBlock.aimsAtPot(state, pos, player)) {
+                    stove.breakPot(player);
+                    return false;
+                }
+                // 盘子格：只挖准星对着的那一个盘子（连菜掉出来），别的盘子留着（r87，Claude）
+                if (blockEntity instanceof PlateHolderBlockEntity holder) {
+                    PlateHolderBlock.breakOne(world, pos, holder, player);
+                    return false;
+                }
+                // 挖高灶台的「上半截」时对着锅：同样只挖锅
+                if (state.isOf(STOVE_TOP) && world.getBlockEntity(pos.down()) instanceof StoveBlockEntity stove
+                    && StoveBlock.aimsAtPot(world.getBlockState(pos.down()), pos.down(), player)) {
+                    stove.breakPot(player);
+                    return false;
+                }
+                return true;
+            });
+        GeneratedMod.LOGGER.info("[Orient的火锅物语] 内容已注册（组合灶台 + 铜锅 + 铁锅 + 独立分类）");
+    }
+
+    /**
+     * 分类页图标：铁锅 + 沸腾的红汤 + 漂着几样原版食物。用自定义模型数据 1 切到
+     * models/item/iron_hot_pot_tab_icon.json，普通铁锅物品不受影响。
+     */
+    private static ItemStack tabIcon() {
+        ItemStack icon = new ItemStack(IRON_HOT_POT_ITEM);
+        icon.set(net.minecraft.component.DataComponentTypes.CUSTOM_MODEL_DATA,
+            new net.minecraft.component.type.CustomModelDataComponent(1));
+        return icon;
+    }
+
+    public static HotPotBlock blockFor(HotPotMaterial material) {
+        return material == HotPotMaterial.COPPER ? COPPER_HOT_POT : IRON_HOT_POT;
+    }
+
+    public static BlockItem itemFor(HotPotMaterial material) {
+        return material == HotPotMaterial.COPPER ? COPPER_HOT_POT_ITEM : IRON_HOT_POT_ITEM;
+    }
+
+    public static Identifier id(String path) {
+        return GeneratedMod.id(path);
+    }
+}
