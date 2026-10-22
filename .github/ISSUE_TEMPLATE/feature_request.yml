@@ -1,0 +1,32 @@
+# （2026-10-22，按 promo/GitHub编写手册.md 编写）。放到 .github/ISSUE_TEMPLATE/
+name: 提建议（Suggestion）
+description: 想加的食材、汤底、家具、玩法……（New food, broths, furniture, gameplay ideas）
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        想在锅里加点什么？欢迎提！
+        Got an idea for the hotpot? Tell me!
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: 想加什么？（What would you like added?）
+      description: "写得越具体越好，比如它长什么样、怎么用。(The more specific the better: what it looks like, how it works.)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: 为什么想要它？（Why?）
+      description: "比如现实里火锅有这个、玩的时候觉得不方便……(For example: real hotpot has it, or something feels inconvenient in game.)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reference
+    attributes:
+      label: 参考图（Reference images，选填 / optional）
+      description: 可以直接把图片拖进这个框。(You can drag images into this box.)

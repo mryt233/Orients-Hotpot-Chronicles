@@ -1,0 +1,24 @@
+# （2026-10-22，按 promo/GitHub编写手册.md 编写）。放到 .github/ISSUE_TEMPLATE/
+name: 提问（Question）
+description: 不知道怎么用、找不到怎么做……（How do I…? Where is…?）
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提问前可以先看看 [README](https://github.com/mryt233/Orients-Hotpot-Chronicles#readme) 里的「怎么玩」和「合成表」。
+        Please check "How to play" and "Recipes" in the [README](https://github.com/mryt233/Orients-Hotpot-Chronicles#readme) first.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: 你的问题（Your question）
+      description: 写清楚你想做什么、试过什么。(Describe what you want to do and what you have tried.)
+    validations:
+      required: true
+
+  - type: input
+    id: mod_version
+    attributes:
+      label: 模组版本（Mod version，选填 / optional）
+      placeholder: "0.1.0-alpha.1"

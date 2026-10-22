@@ -1,0 +1,10 @@
+# （2026-10-22，按 promo/GitHub编写手册.md 编写）。放到 .github/ISSUE_TEMPLATE/
+blank_issues_enabled: false
+contact_links:
+  - name: B 站：蘧白川（Bilibili）
+    url: https://search.bilibili.com/upuser?keyword=%E8%98%A7%E7%99%BD%E5%B7%9D
+    about: 也可以在 B 站私信、发邮件到 orientcheung233@gmail.com，或加 QQ 交流群 248314791（You can also message on Bilibili, email orientcheung233@gmail.com, or join QQ group 248314791）
+  # 交流群：用户给了 QQ 群号后再加。GitHub 这里只能放网址，可以放 QQ 群的邀请链接。
+  # - name: QQ 交流群（QQ group）
+  #   url: <!-- 交流群邀请链接 -->
+  #   about: 群号 248314791
