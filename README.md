@@ -19,6 +19,10 @@ Minecraft 1.21.1 · Fabric · 作者 / Author：蘧白川 / Orient（GitHub：[@
 
 ## 截图 · Screenshots
 
+![户外火锅聚餐（开发预览） · Outdoor hotpot gathering (development preview)](docs/images/hotpot-outdoor-preview.png)
+
+*开发预览：部分内容尚未包含在 `0.1.0-alpha.1` 中。 · Development preview: some content is not included in `0.1.0-alpha.1`.*
+
 ![一桌火锅：高灶台、高火锅桌、条凳和摆满菜的盘子 · A full hotpot table with a tall stove, tall tables, benches and plates of food](docs/images/hotpot-tall-table.webp)
 
 ![矮火锅桌、板凳、条凳和各种盘子 · Low hotpot table with a stool, a bench and plates](docs/images/hotpot-low-table.webp)
