@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smoking",
+  "category": "food",
+  "ingredient": {
+    "item": "orients_hotpot_chronicles:tripe"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_tripe"
+  },
+  "experience": 0.35,
+  "cookingtime": 50
+}

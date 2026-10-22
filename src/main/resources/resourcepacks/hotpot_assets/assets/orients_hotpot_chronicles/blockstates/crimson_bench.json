@@ -1,0 +1,64 @@
+{
+  "variants": {
+    "facing=north,left=false,right=false": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench"
+    },
+    "facing=east,left=false,right=false": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench",
+      "y": 90
+    },
+    "facing=south,left=false,right=false": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench",
+      "y": 180
+    },
+    "facing=west,left=false,right=false": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench",
+      "y": 270
+    },
+    "facing=north,left=false,right=true": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench_right"
+    },
+    "facing=east,left=false,right=true": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench_right",
+      "y": 90
+    },
+    "facing=south,left=false,right=true": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench_right",
+      "y": 180
+    },
+    "facing=west,left=false,right=true": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench_right",
+      "y": 270
+    },
+    "facing=north,left=true,right=false": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench_left"
+    },
+    "facing=east,left=true,right=false": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench_left",
+      "y": 90
+    },
+    "facing=south,left=true,right=false": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench_left",
+      "y": 180
+    },
+    "facing=west,left=true,right=false": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench_left",
+      "y": 270
+    },
+    "facing=north,left=true,right=true": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench_middle"
+    },
+    "facing=east,left=true,right=true": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench_middle",
+      "y": 90
+    },
+    "facing=south,left=true,right=true": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench_middle",
+      "y": 180
+    },
+    "facing=west,left=true,right=true": {
+      "model": "orients_hotpot_chronicles:block/crimson_bench_middle",
+      "y": 270
+    }
+  }
+}

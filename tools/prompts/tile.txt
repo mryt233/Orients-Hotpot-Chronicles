@@ -1,0 +1,1 @@
+A seamless tileable block face texture. It fills the entire square edge to edge and must tile seamlessly with copies of itself on all four sides. Even, consistent detail across the whole face, no single focal object, no vignette.
