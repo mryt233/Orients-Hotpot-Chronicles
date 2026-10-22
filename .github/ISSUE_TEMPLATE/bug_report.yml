@@ -1,0 +1,96 @@
+# （2026-10-22，按 promo/GitHub编写手册.md 编写）。放到 .github/ISSUE_TEMPLATE/
+name: 报告 bug（Bug report）
+description: 游戏崩溃、功能不正常、显示错误等（Crashes, broken features, visual glitches）
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        谢谢你帮忙找 bug！请尽量写清楚怎么触发，这样才好修。
+        Thanks for reporting! Please describe how to trigger the bug as clearly as you can.
+
+        提交前请先搜一下有没有人报过同样的问题。
+        Please search existing issues before submitting.
+
+  - type: input
+    id: mc_version
+    attributes:
+      label: Minecraft 版本（Minecraft version）
+      placeholder: "1.21.1"
+    validations:
+      required: true
+
+  - type: input
+    id: mod_version
+    attributes:
+      label: 模组版本（Mod version）
+      description: 在游戏的模组列表里能看到，或者看 jar 文件名。(Shown in the mod list, or in the jar file name.)
+      placeholder: "0.1.0-alpha.1"
+    validations:
+      required: true
+
+  - type: input
+    id: fabric_api_version
+    attributes:
+      label: Fabric API 版本（Fabric API version）
+      placeholder: "0.116.14+1.21.1"
+    validations:
+      required: true
+
+  - type: textarea
+    id: other_mods
+    attributes:
+      label: 还装了哪些模组？开了光影吗？（Other mods installed? Shaders?）
+      description: 把 mods 文件夹里的文件名都列出来最好。没有其他模组就写「无」。(Listing the file names in your mods folder is best. Write "none" if there are none.)
+      placeholder: |
+        Fabric API
+        Sodium 0.6.x
+        Iris 1.8.x + Complementary 光影
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 怎么触发的？（Steps to reproduce）
+      description: 一步一步写，别人照着做也能出现同样的问题。(Step by step, so someone else can reproduce it.)
+      placeholder: |
+        1. 把铁锅放到灶台上
+        2. 倒入岩浆桶
+        3. 放入生牛肉
+        4. ……
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 本来应该怎样？（Expected behavior）
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际发生了什么？（Actual behavior）
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 截图或录屏（Screenshots or video，选填 / optional）
+      description: 可以直接把图片拖进这个框。(You can drag images into this box.)
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志（Logs，选填 / optional）
+      description: |
+        游戏日志在 `.minecraft/logs/latest.log`，崩溃报告在 `.minecraft/crash-reports/`。
+        如果启动器（比如 PCL）开了版本隔离，在 `.minecraft/versions/<版本名>/logs/` 和 `.minecraft/versions/<版本名>/crash-reports/` 下面。
+        可以把文件直接拖进这个框上传。
+
+        The game log is at `.minecraft/logs/latest.log`; crash reports are in `.minecraft/crash-reports/`.
+        If your launcher isolates versions, look in `.minecraft/versions/<version name>/` instead.
+        You can drag the file into this box.
