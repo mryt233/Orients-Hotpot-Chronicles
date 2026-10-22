@@ -1,0 +1,1 @@
+Top-down view seen from directly above. Round shapes touch the edges of the square, contents are simple readable blobs of 1-2 pixels, no tiny details.
