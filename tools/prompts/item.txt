@@ -1,0 +1,1 @@
+Minecraft inventory item icon. Single object, centered, filling about 70% of the canvas, bold 1-pixel dark outline around the whole silhouette, transparent background, nothing else in the image, no drop shadow.

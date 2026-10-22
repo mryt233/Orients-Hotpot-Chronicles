@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "cn.blockforge.generated.orientshotpotchronicles.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "EntityRaycastMixin"
+  ],
+  "client": [
+    "ClientPlayerInteractionManagerMixin",
+    "CreativeInventoryScreenAccessor",
+    "CreativeInventoryScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

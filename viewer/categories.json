@@ -1,0 +1,87 @@
+{
+  "hidden": [
+    "plates",
+    "tall_stove_top",
+    "iron_hot_pot_tab_icon",
+    "stove_lit_icon",
+    "plate_with_food",
+    "chopsticks_with_food",
+    "*_hot_pot_clear",
+    "*_hot_pot_milky",
+    "*_hot_pot_mushroom",
+    "*_hot_pot_spicy"
+  ],
+  "categories": [
+    {
+      "id": "cookware",
+      "name": "厨具",
+      "match": [
+        "stove",
+        "tall_stove",
+        "*_hot_pot"
+      ]
+    },
+    {
+      "id": "tableware",
+      "name": "餐具",
+      "match": [
+        "*_plate_*",
+        "chopsticks"
+      ]
+    },
+    {
+      "id": "ingredients",
+      "name": "食物",
+      "match": [
+        "tripe",
+        "cooked_tripe"
+      ]
+    },
+    {
+      "id": "tables",
+      "name": "桌子",
+      "children": [
+        {
+          "id": "tall",
+          "name": "高",
+          "match": [
+            "*_tall_hotpot_table"
+          ]
+        },
+        {
+          "id": "low",
+          "name": "低",
+          "match": [
+            "*_hotpot_table"
+          ],
+          "exclude": [
+            "*_tall_hotpot_table"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seats",
+      "name": "凳子",
+      "children": [
+        {
+          "id": "stool",
+          "name": "板凳",
+          "match": [
+            "*_bench"
+          ],
+          "exclude": [
+            "*_tall_bench"
+          ]
+        },
+        {
+          "id": "bench",
+          "name": "条凳（长凳）",
+          "match": [
+            "*_tall_bench"
+          ]
+        }
+      ]
+    }
+  ]
+}
