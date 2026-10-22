@@ -30,3 +30,8 @@ processResources {
 tasks.withType(JavaCompile).configureEach { options.release = 21; options.encoding = 'UTF-8' }
 java { toolchain.languageVersion = JavaLanguageVersion.of(21); withSourcesJar() }
 base { archivesName = project.archives_base_name }
+
+// Codex 改：代码和原创资源分别授权，成品与源码 JAR 均携带两份许可声明。
+tasks.withType(Jar).configureEach {
+    from('LICENSE', 'ASSETS_LICENSE')
+}

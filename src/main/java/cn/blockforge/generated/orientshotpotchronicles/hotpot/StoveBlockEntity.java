@@ -93,17 +93,18 @@ public class StoveBlockEntity extends HotPotBlockEntity {
             markDirty();
         }
         if (lit && world.getTime() % WARMTH_INTERVAL == 0L && heatedPot() != null) {
-            giveWarmth(world);
+            giveWarmth(world, pos);
         }
         super.serverTick(world);
     }
 
     /** 围锅回血：每 4 秒给范围内玩家续一次生命恢复 I，做法同原版信标（环境效果、粒子很淡）。 */
-    private static final long WARMTH_INTERVAL = 80L;
+    static final long WARMTH_INTERVAL = 80L;
     private static final int WARMTH_RANGE = 6;
     private static final int WARMTH_DURATION = 200;
 
-    private void giveWarmth(World world) {
+    /** 给 pos 周围的玩家续生命恢复；篝火上的独立锅（r102）也用这个。 */
+    static void giveWarmth(World world, BlockPos pos) {
         Box area = new Box(pos).expand(WARMTH_RANGE);
         for (PlayerEntity player : world.getNonSpectatingEntities(PlayerEntity.class, area)) {
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, WARMTH_DURATION, 0, true, true));

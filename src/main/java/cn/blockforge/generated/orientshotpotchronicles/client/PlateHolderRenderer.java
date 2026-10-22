@@ -31,6 +31,23 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
         this.blocks = MinecraftClient.getInstance().getBlockRenderManager();
     }
 
+    /** 画哪个模型：盘子按方向；汤碗按汤底、空瓶换空瓶模型（r99）。 */
+    public static BlockState modelState(PlateHolderBlockEntity.Placed p) {
+        BlockState state = p.plate.getDefaultState().with(PlateBlock.AXIS, p.axis);
+        if (p.plate instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.BowlBlock
+            && p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBowlItem bowl) {
+            state = state.with(cn.blockforge.generated.orientshotpotchronicles.hotpot.BowlBlock.SOUP,
+                cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual.fromBase(bowl.soup()));
+        }
+        if (p.plate instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock) {
+            boolean empty = p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.EmptyBottleItem;
+            cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkKind kind = p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.EmptyBottleItem e ? e.kind()
+                : p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkItem d ? d.kind() : cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkKind.GUOCHENGDUO;
+            state = state.with(cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock.EMPTY, empty).with(cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock.KIND, kind);
+        }
+        return state;
+    }
+
     @Override
     public void render(PlateHolderBlockEntity be, float tickDelta, MatrixStack matrices,
                        VertexConsumerProvider vertexConsumers, int light, int overlay) {
@@ -43,8 +60,7 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
         for (PlateHolderBlockEntity.Placed p : be.plates()) {
             matrices.push();
             matrices.translate((p.x - 8) / 16.0, lift / 16.0, (p.z - 8) / 16.0);
-            blocks.renderBlockAsEntity(p.plate.getDefaultState().with(PlateBlock.AXIS, p.axis),
-                matrices, vertexConsumers, light, OverlayTexture.DEFAULT_UV);
+            blocks.renderBlockAsEntity(modelState(p), matrices, vertexConsumers, light, OverlayTexture.DEFAULT_UV);
             PlateFoodRenderer.render(p.plate.size(), p.axis, p.items, matrices, vertexConsumers, light,
                 be.getWorld(), seed, itemRenderer);
             matrices.pop();

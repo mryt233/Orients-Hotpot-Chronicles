@@ -34,7 +34,7 @@ public class HotPotTableBlock extends Block {
 
     // 与 tools/gen_tables.py 一一对应。
     private static final double TOP_Y0 = 7.0;
-    private static final double TABLE_TOP = 11.0;       // 与灶台台面齐平
+    static final double TABLE_TOP = 11.0;       // 与灶台台面齐平
     /** 桌身朝外一侧收进去的像素（与 gen_tables.py 的 RECESS 一致）。 */
     private static final double RECESS = 4.0;
 

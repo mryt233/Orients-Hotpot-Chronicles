@@ -20,7 +20,8 @@ import java.util.List;
  *   <li>方块标签 {@code orients_hotpot_chronicles:heat_sources}（数据包可加）。带 {@code lit} 属性的方块只有点着时才算。</li>
  *   <li>代码注册 {@link #register(HeatSource)}：例如以后接农夫乐事（Farmer's Delight）的炉灶，判断它是否在烧。</li>
  * </ul>
- * <p>目前只有"冷锅吃了可能反胃"用到它；锅的烹饪仍只认本模组灶台。</p>
+ * <p>用到它的地方：冷锅吃了可能反胃；r102 起独立锅摆在热源上也能煮（篝火、灵魂篝火在标签里，火力同灶台烧煤）、
+ * 沸腾、给周围的人生命恢复。</p>
  */
 public final class HotPotHeat {
     public static final TagKey<net.minecraft.block.Block> HEAT_SOURCES =

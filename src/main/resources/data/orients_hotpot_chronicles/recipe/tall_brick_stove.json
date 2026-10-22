@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "orients_hotpot_chronicles:brick_stove"
+    },
+    {
+      "item": "minecraft:bricks"
+    }
+  ],
+  "result": {
+    "id": "orients_hotpot_chronicles:tall_brick_stove",
+    "count": 1
+  }
+}

@@ -10,9 +10,9 @@ import net.minecraft.sound.BlockSoundGroup;
  */
 public enum HotPotMaterial {
     /** 重庆九宫格铜锅：硬度同原版铜块。 */
-    COPPER("copper_hot_pot", MapColor.ORANGE, BlockSoundGroup.COPPER, 3.0F, NoteBlockInstrument.HARP),
+    COPPER("copper_nine_grid_hotpot", MapColor.ORANGE, BlockSoundGroup.COPPER, 3.0F, NoteBlockInstrument.HARP),
     /** 扎实耐用的铁锅：硬度同原版铁块。 */
-    IRON("iron_hot_pot", MapColor.IRON_GRAY, BlockSoundGroup.METAL, 5.0F, NoteBlockInstrument.IRON_XYLOPHONE);
+    IRON("iron_nine_grid_hotpot", MapColor.IRON_GRAY, BlockSoundGroup.METAL, 5.0F, NoteBlockInstrument.IRON_XYLOPHONE);
 
     private final String idPath;
     private final MapColor mapColor;

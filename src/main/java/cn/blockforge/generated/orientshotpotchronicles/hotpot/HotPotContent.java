@@ -24,14 +24,14 @@ import net.minecraft.util.math.BlockPos;
 public final class HotPotContent {
     /** 灶台本身就是组合方块的宿主；锅放上去只改变 POT 状态。 */
     public static final StoveBlock STOVE = Registry.register(Registries.BLOCK,
-        GeneratedMod.id("stove"), new StoveBlock());
+        GeneratedMod.id("brick_stove"), new StoveBlock());
 
     /** 高灶台：配 1.5 格高火锅桌，灶口、锅、汤整体抬高 {@link StoveBlock#TALL_LIFT} 像素，灶膛还在最下面。 */
     public static final StoveBlock TALL_STOVE = Registry.register(Registries.BLOCK,
-        GeneratedMod.id("tall_stove"), new StoveBlock(StoveBlock.TALL_LIFT));
+        GeneratedMod.id("tall_brick_stove"), new StoveBlock(StoveBlock.TALL_LIFT));
     /** 高灶台的「上半截」：看不见，让伸进上面一格的锅也点得到（没有物品）。 */
     public static final StoveTopBlock STOVE_TOP = Registry.register(Registries.BLOCK,
-        GeneratedMod.id("tall_stove_top"), new StoveTopBlock());
+        GeneratedMod.id("tall_brick_stove_top"), new StoveTopBlock());
 
     public static final HotPotBlock COPPER_HOT_POT = Registry.register(Registries.BLOCK,
         GeneratedMod.id(HotPotMaterial.COPPER.idPath()), new HotPotBlock(HotPotMaterial.COPPER));
@@ -82,7 +82,10 @@ public final class HotPotContent {
                 default -> net.minecraft.sound.BlockSoundGroup.METAL;
             };
             for (PlateSize size : PlateSize.values()) {
-                String id = material + "_plate_" + size.id();
+                if (size == PlateSize.BOWL || size == PlateSize.DRINK) {
+                    continue;   // 碗、果橙多不是盘子（只借用盘子格摆放）
+                }
+                String id = material + "_" + size.itemId();   // ID 和显示名对得上（r102）：quartz_small_dish 等
                 PlateBlock plate = Registry.register(Registries.BLOCK, GeneratedMod.id(id),
                     new PlateBlock(material, size, color, sounds));
                 PLATES.add(plate);
@@ -91,6 +94,13 @@ public final class HotPotContent {
             }
         }
     }
+
+    /** 摆在桌上的碗（只带模型，没有物品；r99）。 */
+    public static final BowlBlock BOWL_BLOCK = Registry.register(Registries.BLOCK,
+        GeneratedMod.id("bowl"), new BowlBlock());
+    /** 摆在桌上的果橙多（只带模型，r99）。 */
+    public static final DrinkBlock DRINK_BLOCK = Registry.register(Registries.BLOCK,
+        GeneratedMod.id("drink"), new DrinkBlock());
 
     /** 摆盘子的那一格：一格里能摆好几个盘子。 */
     public static final PlateHolderBlock PLATE_HOLDER = Registry.register(Registries.BLOCK,
@@ -121,10 +131,10 @@ public final class HotPotContent {
         for (String wood : TABLE_WOODS) {
             net.minecraft.block.Block planks = Registries.BLOCK.get(Identifier.ofVanilla(wood + "_planks"));
             BenchBlock bench = Registry.register(Registries.BLOCK,
-                GeneratedMod.id(wood + "_bench"), new BenchBlock(planks));
+                GeneratedMod.id(wood + "_stool"), new BenchBlock(planks));   // 板凳 = Stool（r102 改 ID）
             BENCHES.add(bench);
             BENCH_ITEMS.add(Registry.register(Registries.ITEM,
-                GeneratedMod.id(wood + "_bench"), new BlockItem(bench, new Item.Settings())));
+                GeneratedMod.id(wood + "_stool"), new BlockItem(bench, new Item.Settings())));
         }
         for (String wood : TABLE_WOODS) {
             net.minecraft.block.Block planks = Registries.BLOCK.get(Identifier.ofVanilla(wood + "_planks"));
@@ -134,10 +144,10 @@ public final class HotPotContent {
             TALL_TABLE_ITEMS.add(Registry.register(Registries.ITEM,
                 GeneratedMod.id(wood + "_tall_hotpot_table"), new BlockItem(table, new Item.Settings())));
             BenchBlock bench = Registry.register(Registries.BLOCK,
-                GeneratedMod.id(wood + "_tall_bench"), new BenchBlock(planks, true));
+                GeneratedMod.id(wood + "_bench"), new BenchBlock(planks, true));   // 条凳 = Bench
             TALL_BENCHES.add(bench);
             TALL_BENCH_ITEMS.add(Registry.register(Registries.ITEM,
-                GeneratedMod.id(wood + "_tall_bench"), new BlockItem(bench, new Item.Settings())));
+                GeneratedMod.id(wood + "_bench"), new BlockItem(bench, new Item.Settings())));
         }
         // 旧版只有一种火锅桌（hotpot_table），老存档里的桌子和物品变成橡木火锅桌
         Registries.BLOCK.addAlias(GeneratedMod.id("hotpot_table"), GeneratedMod.id("oak_hotpot_table"));
@@ -145,10 +155,10 @@ public final class HotPotContent {
     }
 
     public static final BlockItem STOVE_ITEM = Registry.register(Registries.ITEM,
-        GeneratedMod.id("stove"), new BlockItem(STOVE, new Item.Settings()));
+        GeneratedMod.id("brick_stove"), new BlockItem(STOVE, new Item.Settings()));
 
     public static final BlockItem TALL_STOVE_ITEM = Registry.register(Registries.ITEM,
-        GeneratedMod.id("tall_stove"), new BlockItem(TALL_STOVE, new Item.Settings()));
+        GeneratedMod.id("tall_brick_stove"), new BlockItem(TALL_STOVE, new Item.Settings()));
 
     public static final BlockItem COPPER_HOT_POT_ITEM = Registry.register(Registries.ITEM,
         GeneratedMod.id(HotPotMaterial.COPPER.idPath()),
@@ -166,8 +176,28 @@ public final class HotPotContent {
         new Item(new Item.Settings().food(new net.minecraft.component.type.FoodComponent.Builder()
             .nutrition(5).saturationModifier(0.6F).build())));
 
+    /** 一碗汤（r99）：顺序同 SoupBase（清汤、浓汤、菌汤、红汤）。 */
+    public static final java.util.List<SoupBowlItem> SOUP_BOWLS = java.util.Arrays.stream(SoupBase.values())
+        .map(soup -> Registry.register(Registries.ITEM, GeneratedMod.id(soup.bowlId()),
+            new SoupBowlItem(soup)))
+        .toList();
+
+    /** 饮料（r99 果橙多，r101 维二）和喝完的空瓶。 */
+    public static final DrinkItem GUOCHENGDUO = Registry.register(Registries.ITEM,
+        GeneratedMod.id("orange_drink"), new DrinkItem(DrinkKind.GUOCHENGDUO));
+    public static final EmptyBottleItem EMPTY_GUOCHENGDUO = Registry.register(Registries.ITEM,
+        GeneratedMod.id("empty_orange_drink_bottle"), new EmptyBottleItem(DrinkKind.GUOCHENGDUO));
+    public static final DrinkItem WEIER = Registry.register(Registries.ITEM,
+        GeneratedMod.id("plant_protein_drink"), new DrinkItem(DrinkKind.WEIER));
+    public static final EmptyBottleItem EMPTY_WEIER = Registry.register(Registries.ITEM,
+        GeneratedMod.id("empty_plant_protein_drink_bottle"), new EmptyBottleItem(DrinkKind.WEIER));
+
+    public static Item emptyBottle(DrinkKind kind) {
+        return kind == DrinkKind.WEIER ? EMPTY_WEIER : EMPTY_GUOCHENGDUO;
+    }
+
     public static final Item CHOPSTICKS = Registry.register(Registries.ITEM,
-        GeneratedMod.id("chopsticks"),
+        GeneratedMod.id("bamboo_chopsticks"),
         new Item(new Item.Settings().maxCount(1).rarity(Rarity.COMMON)));
 
     /** 装着东西的锅物品：汤底、食材、熟度原样打包（格式同锅方块实体存档）。 */
@@ -191,7 +221,7 @@ public final class HotPotContent {
 
     /** 条凳的方块实体（只用来画斜腿）。 */
     public static final BlockEntityType<BenchBlockEntity> BENCH_BE = Registry.register(
-        Registries.BLOCK_ENTITY_TYPE, GeneratedMod.id("tall_bench"),
+        Registries.BLOCK_ENTITY_TYPE, GeneratedMod.id("bench"),
         FabricBlockEntityTypeBuilder.create(BenchBlockEntity::new,
             TALL_BENCHES.toArray(new net.minecraft.block.Block[0])).build());
 
@@ -223,6 +253,11 @@ public final class HotPotContent {
                 entries.add(CHOPSTICKS);
                 entries.add(RAW_TRIPE);
                 entries.add(COOKED_TRIPE);
+                SOUP_BOWLS.forEach(entries::add);
+                entries.add(GUOCHENGDUO);
+                entries.add(EMPTY_GUOCHENGDUO);
+                entries.add(WEIER);
+                entries.add(EMPTY_WEIER);
                 HOTPOT_TABLE_ITEMS.forEach(entries::add);
                 BENCH_ITEMS.forEach(entries::add);
                 TALL_TABLE_ITEMS.forEach(entries::add);

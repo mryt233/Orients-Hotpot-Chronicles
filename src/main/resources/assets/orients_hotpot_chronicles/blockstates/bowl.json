@@ -1,0 +1,39 @@
+{
+  "variants": {
+    "axis=x,soup=none": {
+      "model": "orients_hotpot_chronicles:block/bowl_b"
+    },
+    "axis=x,soup=clear": {
+      "model": "orients_hotpot_chronicles:block/bowl_b_soup_clear"
+    },
+    "axis=x,soup=milky": {
+      "model": "orients_hotpot_chronicles:block/bowl_b_soup_milky"
+    },
+    "axis=x,soup=mushroom": {
+      "model": "orients_hotpot_chronicles:block/bowl_b_soup_mushroom"
+    },
+    "axis=x,soup=spicy": {
+      "model": "orients_hotpot_chronicles:block/bowl_b_soup_spicy"
+    },
+    "axis=z,soup=none": {
+      "model": "orients_hotpot_chronicles:block/bowl_b",
+      "y": 90
+    },
+    "axis=z,soup=clear": {
+      "model": "orients_hotpot_chronicles:block/bowl_b_soup_clear",
+      "y": 90
+    },
+    "axis=z,soup=milky": {
+      "model": "orients_hotpot_chronicles:block/bowl_b_soup_milky",
+      "y": 90
+    },
+    "axis=z,soup=mushroom": {
+      "model": "orients_hotpot_chronicles:block/bowl_b_soup_mushroom",
+      "y": 90
+    },
+    "axis=z,soup=spicy": {
+      "model": "orients_hotpot_chronicles:block/bowl_b_soup_spicy",
+      "y": 90
+    }
+  }
+}

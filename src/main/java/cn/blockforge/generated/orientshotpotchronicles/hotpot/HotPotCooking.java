@@ -35,8 +35,8 @@ public final class HotPotCooking {
         if (stack.isEmpty() || stack.isOf(HotPotContent.CHOPSTICKS)) {
             return false;
         }
-        if (SoupBase.fromStack(stack) != null) {
-            return false;
+        if (SoupBase.fromStack(stack) != null || PlateItem.placedFor(stack) != null) {
+            return false;   // 汤底原料；碗、汤碗、果橙多这些（r99）
         }
         // 熟牛肉、烤土豆这类已经熟了的东西没有自己的熔炉配方，以前会掉进“无配方兜底”
         // 被当成焯菜再煮一遍（重新读条、还能重复刷经验），这里直接拒收。

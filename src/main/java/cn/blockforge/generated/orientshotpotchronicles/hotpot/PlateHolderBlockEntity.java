@@ -38,6 +38,8 @@ public class PlateHolderBlockEntity extends BlockEntity {
         public double z;
         public Direction.Axis axis;
         public final DefaultedList<ItemStack> items;
+        /** 整件摆上来的东西（汤碗、果橙多、空瓶；r99）：拿起来原样还回去；空 = 盘子 / 装菜的碗。 */
+        public ItemStack self = ItemStack.EMPTY;
 
         Placed(PlateBlock plate, double x, double z, Direction.Axis axis) {
             this.plate = plate;
@@ -88,9 +90,17 @@ public class PlateHolderBlockEntity extends BlockEntity {
             return ItemStack.EMPTY;
         }
 
-        /** 变回手里的盘子物品（带着菜）。 */
+        /** 能不能往里放菜：汤碗、瓶子不行。 */
+        public boolean holdsFood() {
+            return self.isEmpty();
+        }
+
+        /** 变回手里的盘子物品（带着菜）；碗变回原版的碗，整件摆上来的原样还回去。 */
         public ItemStack toItem() {
-            ItemStack stack = new ItemStack(plate);
+            if (!self.isEmpty()) {
+                return self.copy();
+            }
+            ItemStack stack = plate instanceof BowlBlock ? new ItemStack(net.minecraft.item.Items.BOWL) : new ItemStack(plate);
             if (items.stream().anyMatch(s -> !s.isEmpty())) {
                 stack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(items));
             }
@@ -115,6 +125,12 @@ public class PlateHolderBlockEntity extends BlockEntity {
      * 找不到返回 false。
      */
     public boolean tryAdd(PlateBlock plate, Direction.Axis axis, double hitX, double hitZ, ItemStack fromItem) {
+        return tryAdd(plate, axis, hitX, hitZ, fromItem, false);
+    }
+
+    /** keepSelf：整件摆上来（汤碗、果橙多），记着原来那件物品。 */
+    public boolean tryAdd(PlateBlock plate, Direction.Axis axis, double hitX, double hitZ, ItemStack fromItem,
+                          boolean keepSelf) {
         Placed p = new Placed(plate, 8, 8, axis);
         double hx = p.halfX(), hz = p.halfZ();
         List<double[]> spots = new ArrayList<>();
@@ -128,7 +144,11 @@ public class PlateHolderBlockEntity extends BlockEntity {
             if (plates.stream().noneMatch(o -> o.overlaps(s[0], s[1], hx, hz))) {
                 p.x = s[0];
                 p.z = s[1];
-                fromItem.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).copyTo(p.items);
+                if (keepSelf) {
+                    p.self = fromItem.copyWithCount(1);
+                } else {
+                    fromItem.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).copyTo(p.items);
+                }
                 plates.add(p);
                 changed();
                 return true;
@@ -168,8 +188,8 @@ public class PlateHolderBlockEntity extends BlockEntity {
     public VoxelShape shape(double lift) {
         if (shape == null) {
             VoxelShape s = VoxelShapes.empty();
-            double top = PlateSize.FLOOR + PlateSize.RIM_H;
             for (Placed p : plates) {
+                double top = p.plate.size().height();
                 s = VoxelShapes.union(s, Block.createCuboidShape(p.x - p.halfX(), lift, p.z - p.halfZ(),
                     p.x + p.halfX(), lift + top, p.z + p.halfZ()));
             }
@@ -189,6 +209,9 @@ public class PlateHolderBlockEntity extends BlockEntity {
             c.putDouble("Z", p.z);
             c.putString("Axis", p.axis.asString());
             Inventories.writeNbt(c, p.items, registries);
+            if (!p.self.isEmpty()) {
+                c.put("Self", p.self.encode(registries));
+            }
             list.add(c);
         }
         nbt.put("Plates", list);
@@ -208,6 +231,9 @@ public class PlateHolderBlockEntity extends BlockEntity {
             Direction.Axis axis = "z".equals(c.getString("Axis")) ? Direction.Axis.Z : Direction.Axis.X;
             Placed p = new Placed(plate, c.getDouble("X"), c.getDouble("Z"), axis);
             Inventories.readNbt(c, p.items, registries);
+            if (c.contains("Self")) {
+                p.self = ItemStack.fromNbt(registries, c.get("Self")).orElse(ItemStack.EMPTY);
+            }
             plates.add(p);
         }
     }

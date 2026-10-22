@@ -304,6 +304,12 @@ public class StoveBlock extends Block implements BlockEntityProvider {
             }
             return ItemActionResult.SUCCESS;
         }
+        if (stack.isOf(net.minecraft.item.Items.BOWL)) {
+            if (!world.isClient) {
+                stove.serveWithBowl(player, hand, bigCell);
+            }
+            return ItemActionResult.SUCCESS;
+        }
         if (servingTool) {
             if (stack.isOf(HotPotContent.CHOPSTICKS)) {
                 // 筷子上夹着盘子里的菜：放进准星对着的那一格；空筷子开面板（捞取交给碗）
