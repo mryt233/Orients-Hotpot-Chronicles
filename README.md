@@ -13,15 +13,17 @@ Minecraft 1.21.1 · Fabric · 作者 / Author：蘧白川 / Orient（GitHub：[@
 </div>
 
 > [!WARNING]
-> **测试版（alpha）**：这是第一个公开测试版，可能有 bug。请先在新存档里试玩，并备份你的存档。
+> **测试版（alpha）**：现在是 `0.1.1-alpha`，可能有 bug。请先在新存档里试玩，并备份你的存档。
+> **从 0.1.0-alpha.1 升级**：本次有多项不兼容的物品 / 方块 ID 调整，旧存档中本模组的物品和方块可能丢失或发生变化。请备份存档，并在新存档里玩。
 >
-> **Alpha version**: this is the first public test build and may contain bugs. Please try it in a new world first and back up your saves.
+> **Alpha version**: this is `0.1.1-alpha` and may contain bugs. Please try it in a new world first and back up your saves.
+> **Upgrading from 0.1.0-alpha.1**: this version includes incompatible item and block ID changes. This mod's items and blocks in old worlds may be lost or change. Back up your saves and use a new world.
 
 ## 截图 · Screenshots
 
-![户外火锅聚餐（开发预览） · Outdoor hotpot gathering (development preview)](docs/images/hotpot-outdoor-preview.png)
+![户外火锅聚餐 · Outdoor hotpot gathering](docs/images/hotpot-outdoor-preview.png)
 
-*开发预览：部分内容尚未包含在 `0.1.0-alpha.1` 中。 · Development preview: some content is not included in `0.1.0-alpha.1`.*
+*碗、饮料等从 `0.1.1-alpha` 起包含。 · Bowls and drinks are included from `0.1.1-alpha`.*
 
 ![一桌火锅：高灶台、高火锅桌、条凳和摆满菜的盘子 · A full hotpot table with a tall stove, tall tables, benches and plates of food](docs/images/hotpot-tall-table.webp)
 
@@ -39,14 +41,18 @@ Minecraft 1.21.1 · Fabric · 作者 / Author：蘧白川 / Orient（GitHub：[@
 - **四种汤底**：清汤（水桶）、浓汤（牛奶桶）、菌汤（蘑菇煲）、红汤（岩浆桶）。汤底不同，煮的快慢也不同：红汤最快，浓汤最慢。
 - **9×9 = 81 格的九宫格锅**：生食材下锅，按熔炉配方的时间煮熟，熟了拿出来能得到和熔炉一样的经验。
 - **竹筷**：在锅界面里用筷子左键点熟食，直接吃掉；也能从盘子里夹菜、把菜放进锅里。
-- **趁热吃**：锅不在烧着的灶台上就是冷锅，吃冷锅里的东西有概率反胃。
-- **围锅取暖**：灶台烧着火、上面有锅时，6 格内的玩家获得生命恢复 I。
+- **趁热吃**：锅不在烧着的灶台、点燃的篝火或灵魂篝火上时就是冷锅，吃冷锅里的东西有概率反胃。
+- **围锅取暖**：灶台烧着火、上面有锅，或锅放在点燃的篝火、灵魂篝火上时，6 格内的玩家获得生命恢复 I。
 - **不白烧燃料**：只有在煮生食材时才消耗燃料，光烧着保温不耗。
 - **整锅带走**：挖下来的锅连汤带菜，放下来原样都在。
 - **火锅桌**：11 种原版木头，各有矮桌和高桌，互相拼接，也能和灶台拼成一整张大桌。
 - **板凳和条凳**：11 种木头，同方向挨着放会连成长凳，能坐。
 - **盘子**：石英、竹编、红陶、铜、铁 5 种材质 × 6 种大小，摆在桌上放菜，一格能叠 3 样。
 - **毛肚**：牛和哞菇会掉生毛肚，在锅里涮得比牛肉快。
+- **碗**：原版的碗能摆在桌上装菜，能从锅里盛熟菜，锅里没有熟菜时还能盛一碗汤喝：清汤解反胃，浓汤更顶饱，菌汤给生命恢复，红汤给力量（但会有点饿）。
+- **饮料**：橙子饮料、植物蛋白饮料，一瓶喝 4 口，都能解红汤的饥饿；橙子饮料加速，植物蛋白饮料解反胃。能摆在桌上。暂时只能在创造模式拿到。
+- **篝火煮锅**：锅放在点着的篝火、灵魂篝火上也能煮，速度和灶台一样，不耗燃料，也给周围的人回血。
+- **桌面摆件**：灯笼、花盆、蜡烛、蛋糕等小摆件放在火锅桌上会贴住桌面。
 - **10 种语言**：简体中文、繁体中文、英语、日语、韩语、俄语、德语、法语、西班牙语、葡萄牙语（巴西）。
 
 ---
@@ -55,14 +61,18 @@ Minecraft 1.21.1 · Fabric · 作者 / Author：蘧白川 / Orient（GitHub：[@
 - **Four broths**: Clear (water bucket), Milky (milk bucket), Mushroom (mushroom stew), Spicy (lava bucket). Each broth cooks at a different speed: Spicy is the fastest, Milky the slowest.
 - **A 9×9 = 81-slot nine-grid pot**: raw food cooks in the time its furnace recipe takes, and gives the same XP as a furnace.
 - **Bamboo Chopsticks**: in the pot screen, left-click cooked food with the chopsticks to eat it on the spot. They also pick food up from plates and put food into the pot.
-- **Eat it hot**: a pot that is not on a lit stove is a cold pot. Eating from a cold pot may give you Nausea.
-- **Warm up around the pot**: a lit stove with a pot on it gives Regeneration I to players within 6 blocks.
+- **Eat it hot**: a pot that is not on a lit stove, campfire or soul campfire is a cold pot. Eating from a cold pot may give you Nausea.
+- **Warm up around the pot**: a pot on a lit stove, campfire or soul campfire gives Regeneration I to players within 6 blocks.
 - **No wasted fuel**: fuel is only used while raw food is cooking. Keeping the pot hot costs nothing.
 - **Take the whole pot with you**: a mined pot keeps its broth and food. Place it down and everything is still there.
 - **Hotpot tables**: 11 vanilla wood types, each in a low and a tall version. Tables connect to each other and to the stove into one big table.
 - **Stools and benches**: 11 wood types. Placed side by side facing the same way, they join into a long bench you can sit on.
 - **Plates**: 5 materials (quartz, bamboo, terracotta, copper, iron) × 6 sizes. Put them on the table and stack up to 3 foods in each slot.
 - **Tripe**: cows and mooshrooms drop Raw Tripe, which cooks in the pot faster than beef.
+- **Bowls**: vanilla bowls can be placed on tables to hold food, scoop cooked food out of the pot, or, when the pot has no cooked food, scoop a bowl of broth to drink: Clear cures Nausea, Milky is more filling, Mushroom gives Regeneration, Spicy gives Strength (and a little Hunger).
+- **Drinks**: Orange Drink and Plant Protein Drink, 4 sips per bottle. Both cure the Hunger from spicy broth; Orange Drink gives Speed, Plant Protein Drink cures Nausea. They can be placed on tables. Creative-only for now.
+- **Campfire cooking**: a pot on a lit campfire or soul campfire cooks at stove speed, uses no fuel, and also heals nearby players.
+- **Table decorations**: lanterns, flower pots, candles, cakes and other small decorations sit flush on hotpot tables.
 - **10 languages**: English, Simplified Chinese, Traditional Chinese, Japanese, Korean, Russian, German, French, Spanish, Portuguese (Brazil).
 
 ## 版本支持 · Compatibility
@@ -104,7 +114,7 @@ Requires **Java 21**. **Install it on both the client and the server.**
 <summary><b>展开中文玩法</b></summary>
 
 1. **摆灶台、坐锅**：拿锅右键灶台顶面，锅的两只耳朵会朝向你的左右两边。
-2. **倒汤底**：拿着水桶、牛奶桶、蘑菇煲或岩浆桶右键锅。倒进去之后不能直接换，要先用空桶右键把汤舀回来（菌汤用碗舀，而且锅里要先没有菜）。锅里有菜时舀汤，菜会掉出来。
+2. **倒汤底**：拿着水桶、牛奶桶、蘑菇煲或岩浆桶右键锅。换汤底前，先用空桶右键清空旧汤底：清汤、浓汤、红汤会返还对应的桶；菌汤会被倒掉，不返还蘑菇煲，手里仍是空桶。锅里原有的食材会掉出来。用碗盛菜或盛汤不会清空锅中的汤底。
 3. **点火**：打开灶膛放燃料。锅里有汤、灶膛有燃料就会点着、沸腾。只有在煮生食材时才消耗燃料。
 4. **下菜**：
    - 拿食材右键锅；或者用筷子打开锅界面，往 81 格里放；
@@ -113,8 +123,8 @@ Requires **Java 21**. **Install it on both the client and the server.**
 
    能下锅的是生的、能吃的东西，熟了的不能再下锅。
 5. **吃**：在锅界面里把筷子拿到鼠标上，左键点熟食就能吃掉，饱食度和原版一样。空手或拿碗右键锅，也能把熟食捞出来。
-6. **趁热吃**：锅不在烧着的灶台上就是冷锅，吃冷锅里的东西有概率反胃。
-7. **围锅取暖**：灶台烧着火、上面有锅时，6 格内的玩家获得生命恢复 I。
+6. **趁热吃**：锅不在烧着的灶台或篝火上就是冷锅，吃冷锅里的东西有概率反胃。
+7. **围锅取暖**：灶台烧着火、上面有锅时（锅放在点着的篝火上也算），6 格内的玩家获得生命恢复 I。
 8. **整锅带走**：对着锅挖只挖锅，对着灶身挖会挖掉整个灶台。汤和菜都装在锅物品里，放下来原样都在，物品提示里写着汤底和份数。
 9. **盘子**：
    - 拿盘子右键桌面或地面摆上去，一格能摆好几个（比如 5 个小碟、2 个长盘，或者混着摆）；
@@ -125,6 +135,9 @@ Requires **Java 21**. **Install it on both the client and the server.**
    - 装了菜的盘子，物品提示里会像收纳袋一样列出里面的菜。
 10. **坐**：空手右键板凳或条凳坐下，点两块凳子的交界处能坐在中间，潜行起身。两个人之间至少隔一整格。
 11. **毛肚**：打牛或哞菇掉 1～3 个生毛肚（和原版牛肉一样：抢夺能多掉，着火时掉熟的）。
+12. **碗**：空碗右键锅，优先盛准星所指大格的熟菜，不足时继续从其他大格取，每碗最多 3 份。全锅没有熟菜但有汤时，盛一碗汤，对着空气右键就能喝。拿碗右键桌面能摆上去，像盘子一样放菜；装了菜的碗右键锅，会把生菜倒进锅里。
+13. **饮料**：对着空气右键喝一口，一瓶 4 口，喝完剩空瓶。拿饮料右键桌面能摆上去。
+14. **篝火煮锅**：把锅直接放在点着的篝火或灵魂篝火上，倒汤下菜就能煮，不用燃料。
 
 创造模式里有单独的分类页「之晗的火锅物语」，左边能切换子类：全部、厨具、餐具、桌子、凳子、食物。
 
@@ -134,7 +147,7 @@ Requires **Java 21**. **Install it on both the client and the server.**
 <summary><b>How to play (English)</b></summary>
 
 1. **Stove and pot**: right-click the top of a stove with a pot. The pot's two handles face your left and right.
-2. **Broth**: right-click the pot with a water bucket, milk bucket, mushroom stew or lava bucket. You can't swap a broth directly: scoop it out first by right-clicking with an empty bucket (use a bowl for mushroom broth, and only when the pot has no food in it). If you scoop broth while there is food in the pot, the food drops out.
+2. **Broth**: right-click the pot with a water bucket, milk bucket, mushroom stew or lava bucket. Before changing broth, empty the pot with an empty bucket. Clear, Milky and Spicy return the corresponding filled bucket; Mushroom is discarded without returning mushroom stew, and the bucket stays empty. Any food in the pot drops out. Serving food or broth with a bowl does not empty the pot's broth.
 3. **Fire**: open the stove and put in fuel. With broth in the pot and fuel in the stove, it lights and boils. Fuel is only used while raw food is cooking.
 4. **Adding food**:
    - right-click the pot with food, or open the pot screen with chopsticks and put food into the 81 slots;
@@ -143,8 +156,8 @@ Requires **Java 21**. **Install it on both the client and the server.**
 
    Only raw, edible items can go in. Cooked food can't go back in.
 5. **Eating**: in the pot screen, hold the chopsticks on your cursor and left-click cooked food to eat it, with the same hunger and saturation as vanilla. Right-clicking the pot with an empty hand or a bowl also takes cooked food out.
-6. **Eat it hot**: a pot that is not on a lit stove is a cold pot. Eating from a cold pot may give you Nausea.
-7. **Warm up**: a lit stove with a pot on it gives Regeneration I to players within 6 blocks.
+6. **Eat it hot**: a pot that is not on a lit stove or campfire is a cold pot. Eating from a cold pot may give you Nausea.
+7. **Warm up**: a lit stove with a pot on it (or a pot on a lit campfire) gives Regeneration I to players within 6 blocks.
 8. **Take the whole pot**: aim at the pot to mine only the pot; aim at the stove body to mine the whole stove. The broth and food are kept in the pot item and come back when you place it. The tooltip shows the broth and the number of servings.
 9. **Plates**:
    - right-click a table top or the ground with a plate to place it. One block can hold several plates (for example 5 small dishes, 2 long plates, or a mix);
@@ -155,6 +168,9 @@ Requires **Java 21**. **Install it on both the client and the server.**
    - a plate with food lists its contents in the tooltip, like a bundle.
 10. **Sitting**: right-click a stool or bench with an empty hand to sit. Click where two seats meet to sit in the middle. Sneak to stand up. Two players sit at least one full block apart.
 11. **Tripe**: cows and mooshrooms drop 1–3 Raw Tripe (like vanilla beef: Looting adds more, and they drop cooked if on fire).
+12. **Bowls**: right-click the pot with an empty bowl to scoop up to 3 cooked food items, starting with the big cell you are aiming at and continuing through the other cells if needed. If the whole pot has no cooked food but has broth, you get a bowl of broth, which you drink by right-clicking the air. Right-click a table top to place a bowl and put food in it like a plate; right-clicking the pot with a bowl of food pours the raw food in.
+13. **Drinks**: right-click the air to take a sip; 4 sips per bottle, leaving an empty bottle. Right-click a table top to place a drink.
+14. **Campfire cooking**: place the pot directly on a lit campfire or soul campfire, add broth and food, and it cooks without fuel.
 
 In Creative mode, the mod has its own tab, "Orient's Hotpot Chronicles", with sub-categories on the left: All, Cook, Dish, Table, Seat, Food.
 
@@ -219,7 +235,7 @@ Found a bug, or have a question or an idea? Let me know:
 - **Email**: orientcheung233@gmail.com
 - **QQ group**: 248314791（If I’m not replying, I’m probably asleep）
 
-<!-- 其他下载平台：Modrinth / CurseForge / MC百科 上架后在这里补链接 -->
+<!-- Modrinth 尚在审核；通过审核且项目公开可访问后补链接。CurseForge / MC百科 上架后再补链接。 -->
 
 ## 作者 · Credits
 

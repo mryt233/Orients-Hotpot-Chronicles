@@ -98,13 +98,19 @@ public class HotPotBlockEntity extends BlockEntity
         }
         trackSlotChanges();
         StoveBlockEntity stove = stoveBelow();
-        updateStandaloneBoilingVisual(stove != null && stove.burning() && base >= 0);
-        if (!hasPot() || stove == null || !stove.burning() || base < 0) {
+        boolean stoveHeat = stove != null && stove.burning();
+        // r102：独立锅摆在点着的篝火（热源标签）上也能煮，速度同灶台烧煤（用户定「和灶台一样快」），不耗燃料
+        boolean openFire = stove == null && heatSourceBelow();
+        updateStandaloneBoilingVisual((stoveHeat || openFire) && base >= 0);
+        if (!hasPot() || !(stoveHeat || openFire) || base < 0) {
             return;
+        }
+        if (openFire && world.getTime() % StoveBlockEntity.WARMTH_INTERVAL == 0L) {
+            StoveBlockEntity.giveWarmth(world, pos);   // 围锅回血，同灶台（用户要）
         }
         SoupBase soup = SoupBase.byId(base);
         float mul = soup == null ? 1F : soup.speedMul();
-        float power = stove.power();
+        float power = stoveHeat ? stove.power() : OPEN_FIRE_POWER;
         boolean dirty = false;
         for (int i = 0; i < SLOTS; i++) {
             if (cooked[i]) {
@@ -273,6 +279,14 @@ public class HotPotBlockEntity extends BlockEntity
         return state.getBlock() instanceof HotPotBlock pot ? pot.material() : null;
     }
 
+    /** 篝火上煮的火力：同灶台烧煤炭 / 木炭（HotPotFuel.COAL）。 */
+    public static final float OPEN_FIRE_POWER = 1.0F;
+
+    /** 独立锅下面是不是点着的篝火这类热源（{@link HotPotHeat}，标签 heat_sources）。 */
+    public boolean heatSourceBelow() {
+        return world != null && !(this instanceof StoveBlockEntity) && HotPotHeat.isHeatSource(world, pos.down());
+    }
+
     /** 灶火是否正旺。 */
     public boolean hasFire() {
         if (world == null) {
@@ -282,7 +296,7 @@ public class HotPotBlockEntity extends BlockEntity
             return world.getBlockState(pos).get(StoveBlock.LIT);
         }
         StoveBlockEntity stove = stoveBelow();
-        return stove != null && stove.burning();
+        return (stove != null && stove.burning()) || heatSourceBelow();
     }
 
     /** 清空汤底并同步空锅外观，拆锅或重新安装时使用。 */
@@ -340,10 +354,8 @@ public class HotPotBlockEntity extends BlockEntity
      * 而碗平时是捞熟食的，所以只在锅里已经没有食物时才用碗舀菌汤。
      */
     public boolean canScoopWith(ItemStack stack) {
-        if (stack.isOf(net.minecraft.item.Items.BUCKET)) {
-            return true;
-        }
-        return stack.isOf(net.minecraft.item.Items.BOWL) && base == SoupBase.MUSHROOM.ordinal() && filledSlots() == 0;
+        // r99 起碗是盛汤 / 盛熟菜（serveWithBowl），舀走汤底只用空桶；菌汤用桶是倒掉（用户定的）
+        return stack.isOf(net.minecraft.item.Items.BUCKET);
     }
 
     /**
@@ -361,9 +373,13 @@ public class HotPotBlockEntity extends BlockEntity
             return false;
         }
         if (!stack.isOf(soup.remainder())) {
-            // 只有菌汤会走到这里：桶舀不了蘑菇煲
-            player.sendMessage(Text.translatable(key("msg.scoop_need_bowl")), true);
-            return false;
+            // 菌汤：桶装不了蘑菇煲，就是把汤倒掉，桶还是空桶（r99）
+            dropContents();
+            base = -1;
+            updateSoupVisual();
+            world.playSound(null, pos, SoundEvents.ENTITY_GENERIC_SPLASH, SoundCategory.BLOCKS, 0.6F, 1.0F);
+            markDirtyAndSync();
+            return true;
         }
         dropContents();
         base = -1;
@@ -372,6 +388,62 @@ public class HotPotBlockEntity extends BlockEntity
         net.minecraft.sound.SoundEvent sound = soup == SoupBase.SPICY ? SoundEvents.ITEM_BUCKET_FILL_LAVA
             : soup.remainder() == net.minecraft.item.Items.BOWL ? SoundEvents.ITEM_BOTTLE_FILL : SoundEvents.ITEM_BUCKET_FILL;
         world.playSound(null, pos, sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
+        markDirtyAndSync();
+        return true;
+    }
+
+    /**
+     * 拿空碗点锅（r99）：锅里有熟菜就盛进碗里（先盛准星对着那一大格的，最多 3 样，碗变成装着菜的碗）；
+     * 没熟菜但有汤，就盛一碗汤（锅里的汤不会少，用户定的「盛不完」）。
+     */
+    public boolean serveWithBowl(PlayerEntity player, Hand hand, int bigCell) {
+        if (world == null || world.isClient || !hasPot()) {
+            return false;
+        }
+        ItemStack held = player.getStackInHand(hand);
+        java.util.List<ItemStack> scooped = new java.util.ArrayList<>();
+        float xp = 0;
+        java.util.List<Integer> order = new java.util.ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            order.add((bigCell + i) % 9);
+        }
+        outer:
+        for (int cell : order) {
+            int slot;
+            while ((slot = firstCookedSlotInCell(cell)) >= 0) {
+                ItemStack food = ingredients.getStack(slot).copy();
+                xp += xpValue[slot] * food.getCount();
+                ingredients.setStack(slot, ItemStack.EMPTY);
+                resetSlot(slot, ItemStack.EMPTY);
+                // 一格里只有 1 个；万一有多个，多出来的放回去
+                scooped.add(food.copyWithCount(1));
+                if (food.getCount() > 1) {
+                    ingredients.setStack(slot, food.copyWithCount(food.getCount() - 1));
+                }
+                if (scooped.size() >= 3) {
+                    break outer;
+                }
+            }
+        }
+        ItemStack result;
+        if (!scooped.isEmpty()) {
+            result = new ItemStack(net.minecraft.item.Items.BOWL);
+            result.set(net.minecraft.component.DataComponentTypes.CONTAINER,
+                net.minecraft.component.type.ContainerComponent.fromStacks(scooped));
+            PlateItem.syncPlateModel(result);
+            if (xp > 0) {
+                net.minecraft.entity.ExperienceOrbEntity.spawn((net.minecraft.server.world.ServerWorld) world,
+                    Vec3d.ofCenter(pos).add(0, 0.6, 0), Math.max(1, Math.round(xp)));
+            }
+            world.playSound(null, pos, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.35F, 1.2F);
+        } else if (SoupBase.byId(base) != null) {
+            result = new ItemStack(HotPotContent.SOUP_BOWLS.get(base));
+            world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.BLOCKS, 1.0F, 1.0F);
+        } else {
+            player.sendMessage(Text.translatable(key("msg.bowl_nothing")), true);
+            return false;
+        }
+        player.setStackInHand(hand, net.minecraft.item.ItemUsage.exchangeStack(held, player, result));
         markDirtyAndSync();
         return true;
     }
@@ -433,8 +505,8 @@ public class HotPotBlockEntity extends BlockEntity
             return false;
         }
         ItemStack held = player.getStackInHand(hand);
-        if (!(held.getItem() instanceof net.minecraft.item.BlockItem blockItem)
-            || !(blockItem.getBlock() instanceof PlateBlock plateBlock)) {
+        PlateBlock plateBlock = PlateItem.placedFor(held);
+        if (plateBlock == null || PlateItem.keepsSelf(held)) {
             return false;
         }
         net.minecraft.component.type.ContainerComponent contents = held.getOrDefault(
@@ -803,7 +875,9 @@ public class HotPotBlockEntity extends BlockEntity
             : Text.translatable(soup.nameKey());
         StoveBlockEntity stove = stoveBelow();
         Text fireText;
-        if (stove == null) {
+        if (stove == null && heatSourceBelow()) {
+            fireText = Text.translatable(key("heat.open_fire"));
+        } else if (stove == null) {
             fireText = Text.translatable(key("stove.none"));
         } else if (stove.idle()) {
             fireText = Text.translatable(key("fuel.idle"));

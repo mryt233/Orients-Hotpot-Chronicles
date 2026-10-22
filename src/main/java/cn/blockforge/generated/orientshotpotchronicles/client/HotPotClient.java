@@ -97,8 +97,11 @@ public final class HotPotClient implements ClientModInitializer {
             }
             return;
         }
-        if (!(stack.getItem() instanceof net.minecraft.item.BlockItem item)
-            || !(item.getBlock() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateBlock plate)) {
+        // 盘子和装菜的碗（r99）；汤碗、果橙多这种整件的不列菜
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateBlock plate =
+            cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem.placedFor(stack);
+        if (plate == null || cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem.keepsSelf(stack)
+            || (stack.isOf(net.minecraft.item.Items.BOWL) && !stack.contains(net.minecraft.component.DataComponentTypes.CONTAINER))) {
             return;
         }
         net.minecraft.component.type.ContainerComponent contents = stack.getOrDefault(

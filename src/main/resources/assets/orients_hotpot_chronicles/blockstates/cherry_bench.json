@@ -1,63 +1,63 @@
 {
   "variants": {
     "facing=north,left=false,right=false": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench"
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench"
     },
     "facing=east,left=false,right=false": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench",
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench",
       "y": 90
     },
     "facing=south,left=false,right=false": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench",
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench",
       "y": 180
     },
     "facing=west,left=false,right=false": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench",
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench",
       "y": 270
     },
     "facing=north,left=false,right=true": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench_right"
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench_right"
     },
     "facing=east,left=false,right=true": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench_right",
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench_right",
       "y": 90
     },
     "facing=south,left=false,right=true": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench_right",
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench_right",
       "y": 180
     },
     "facing=west,left=false,right=true": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench_right",
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench_right",
       "y": 270
     },
     "facing=north,left=true,right=false": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench_left"
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench_left"
     },
     "facing=east,left=true,right=false": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench_left",
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench_left",
       "y": 90
     },
     "facing=south,left=true,right=false": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench_left",
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench_left",
       "y": 180
     },
     "facing=west,left=true,right=false": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench_left",
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench_left",
       "y": 270
     },
     "facing=north,left=true,right=true": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench_middle"
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench_middle"
     },
     "facing=east,left=true,right=true": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench_middle",
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench_middle",
       "y": 90
     },
     "facing=south,left=true,right=true": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench_middle",
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench_middle",
       "y": 180
     },
     "facing=west,left=true,right=true": {
-      "model": "orients_hotpot_chronicles:block/cherry_bench_middle",
+      "model": "orients_hotpot_chronicles:block/cherry_tall_bench_middle",
       "y": 270
     }
   }

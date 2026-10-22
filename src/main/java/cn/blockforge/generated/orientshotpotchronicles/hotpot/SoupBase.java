@@ -66,6 +66,16 @@ public enum SoupBase {
         return cn.blockforge.generated.orientshotpotchronicles.compat.HotPotCompat.customBase(stack);
     }
 
+    /** 一碗汤的物品 ID，和显示名对得上（r102）：清汤 clear_broth_bowl、浓汤 creamy_broth_bowl …… */
+    public String bowlId() {
+        return switch (this) {
+            case CLEAR -> "clear_broth_bowl";
+            case MILKY -> "creamy_broth_bowl";
+            case MUSHROOM -> "mushroom_broth_bowl";
+            case SPICY -> "spicy_red_broth_bowl";
+        };
+    }
+
     public static SoupBase byId(int id) {
         return id >= 0 && id < BY_ID.length ? BY_ID[id] : null;
     }

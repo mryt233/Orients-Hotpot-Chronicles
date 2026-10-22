@@ -21,7 +21,7 @@ public class TallHotPotTableBlock extends HotPotTableBlock {
 
     // 桌面板 19..23（r83 是 20..24，r84 用户说再低一点，降 1；），与 tools/gen_tall.py 的 TOP0 / TOP1 一致
     private static final double TOP_Y0 = 19.0;
-    private static final double TABLE_TOP = 23.0;
+    static final double TABLE_TOP = 23.0;
     private static final double BAND_Y0 = 16.0;
     private static final VoxelShape[] SHAPES = new VoxelShape[16];
     private static final VoxelShape[] OPEN_SHAPES = new VoxelShape[16];

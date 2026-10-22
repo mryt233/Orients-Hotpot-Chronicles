@@ -78,6 +78,8 @@ public final class CreativeSubTabs {
             return Sub.TABLEWARE;
         }
         if (stack.isOf(HotPotContent.RAW_TRIPE) || stack.isOf(HotPotContent.COOKED_TRIPE)
+            || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkItem
+            || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.EmptyBottleItem
             || (!(stack.getItem() instanceof BlockItem) && stack.contains(DataComponentTypes.FOOD))) {
             return Sub.FOOD;
         }

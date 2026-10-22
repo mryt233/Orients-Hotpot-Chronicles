@@ -41,6 +41,8 @@ public final class HeldFoodItemRenderer {
         for (PlateItem item : HotPotContent.PLATE_ITEMS) {
             BuiltinItemRendererRegistry.INSTANCE.register(item, HeldFoodItemRenderer::renderPlate);
         }
+        // 装着菜的原版碗（r99）：资源包里给 minecraft:item/bowl 加了自定义模型数据 1 → builtin/entity
+        BuiltinItemRendererRegistry.INSTANCE.register(net.minecraft.item.Items.BOWL, HeldFoodItemRenderer::renderBowl);
     }
 
     /** 去掉自定义模型数据的复制品 = 原来的模型。 */
@@ -103,6 +105,18 @@ public final class HeldFoodItemRenderer {
                 light, OverlayTexture.DEFAULT_UV, matrices, consumers, null, 0);
             matrices.pop();
         });
+    }
+
+    /** 装着菜的碗：画立体的碗（和摆在桌上的同一个模型），再把菜叠在碗里；显示变换在 item/bowl_with_food.json。 */
+    private static void renderBowl(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices,
+                                   VertexConsumerProvider consumers, int light, int overlay) {
+        DefaultedList<ItemStack> foods = DefaultedList.ofSize(
+            cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateSize.BOWL.capacity(), ItemStack.EMPTY);
+        stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).copyTo(foods);
+        MinecraftClient.getInstance().getBlockRenderManager().renderBlockAsEntity(
+            HotPotContent.BOWL_BLOCK.getDefaultState(), matrices, consumers, light, overlay);
+        PlateFoodRenderer.render(cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateSize.BOWL,
+            Direction.Axis.X, foods, matrices, consumers, light, null, 0, MinecraftClient.getInstance().getItemRenderer());
     }
 
     private static void renderPlate(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices,

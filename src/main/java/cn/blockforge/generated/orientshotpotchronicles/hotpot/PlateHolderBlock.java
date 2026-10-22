@@ -24,6 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
@@ -53,6 +54,9 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider {
             .sounds(BlockSoundGroup.DECORATED_POT)
             .nonOpaque()
             .dropsNothing()
+            // 形状随方块实体（摆了哪些盘子）变、矮桌上还伸出本格：不让原版提前缓存形状（同潜影盒），
+            // 否则缓存的是空世界里的默认小方块，和真实碰撞对不上，站上去会抽搐
+            .dynamicBounds()
             .pistonBehavior(net.minecraft.block.piston.PistonBehavior.DESTROY));
         setDefaultState(getDefaultState().with(ON_TABLE, false).with(ON_TALL_TABLE, false));
     }
@@ -205,11 +209,14 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider {
             return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         double[] at = local(pos, hit);
-        if (stack.getItem() instanceof PlateItem item) {
+        PlateBlock placing = PlateItem.placedFor(stack);
+        if (placing != null) {
+            // 盘子、碗、汤碗、果橙多：在这一格再摆一个（r99 起碗和瓶子也走这里）
             if (!world.isClient) {
-                if (be.tryAdd(item.plate(), HotPotBlock.handleAxisFor(player.getHorizontalFacing()), at[0], at[1], stack)) {
+                if (be.tryAdd(placing, HotPotBlock.handleAxisFor(player.getHorizontalFacing()), at[0], at[1], stack,
+                    PlateItem.keepsSelf(stack))) {
                     stack.decrementUnlessCreative(1, player);
-                    world.playSound(null, pos, item.plate().getDefaultState().getSoundGroup().getPlaceSound(),
+                    world.playSound(null, pos, placing.getDefaultState().getSoundGroup().getPlaceSound(),
                         SoundCategory.BLOCKS, 1.0F, 1.0F);
                 } else {
                     player.sendMessage(Text.translatable(HotPotBlockEntity.key("msg.plate_no_room")), true);
@@ -220,6 +227,13 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider {
         PlateHolderBlockEntity.Placed plate = be.at(at[0], at[1]);
         if (plate == null) {
             return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (!plate.holdsFood() && (stack.isOf(HotPotContent.CHOPSTICKS) || PlateItem.holdsFood(world, stack))) {
+            // 汤碗、果橙多里放不了菜，也夹不出菜
+            if (!world.isClient) {
+                player.sendMessage(Text.translatable(HotPotBlockEntity.key("msg.cannot_hold_food")), true);
+            }
+            return ItemActionResult.SUCCESS;
         }
         if (stack.isOf(HotPotContent.CHOPSTICKS)) {
             if (!world.isClient) {

@@ -67,7 +67,7 @@ public final class PlateFoodRenderer {
             double y = PlateSize.FLOOR + 0.002;
             float spin = 0F;
             float slope = 0F;
-            if (size == PlateSize.S1X1) {
+            if (size.piles()) {   // 小碟、碗：正叠
                 y += layer * RISE;
                 spin = -15F * layer;
             } else {

@@ -60,7 +60,9 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
             ? (be.hasSoup() ? STOVE_SURFACE : STOVE_FLOOR)
             : (be.hasSoup() ? STANDALONE_SURFACE : STANDALONE_FLOOR));
         float heat = be.clientHeat();
-        float ticks = be.getWorld().getTime() + tickDelta;
+        // 用 double：世界时间从存档创建起一直累加，存成 float 时老存档里（几百万刻以上）
+        // 一刻内的 tickDelta 会被精度吃掉，食材浮动 / 气泡只能每刻跳一下，看起来像锁在 20 帧
+        double ticks = be.getWorld().getTime() + (double) tickDelta;
         if (be.hasSoup() && heat > 0.01F) {
             renderBoilingOverlay(be.soupVisual(), surfaceY + 0.001F, innerMin, innerSize,
                 heat, matrices, vertexConsumers, light);
