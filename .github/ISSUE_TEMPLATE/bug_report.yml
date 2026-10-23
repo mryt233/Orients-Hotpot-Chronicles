@@ -29,13 +29,33 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: loader
+    attributes:
+      label: 加载器（Loader）
+      options:
+        - Fabric
+        - Forge
+        - NeoForge
+    validations:
+      required: true
+
+  - type: input
+    id: loader_version
+    attributes:
+      label: 加载器版本（Loader version）
+      placeholder: "0.19.3 / 47.4.28 / 21.1.264"
+    validations:
+      required: true
+
   - type: input
     id: fabric_api_version
     attributes:
-      label: Fabric API 版本（Fabric API version）
-      placeholder: "0.116.14+1.21.1"
+      label: Fabric API 版本（仅 Fabric / Fabric only）
+      description: Fabric 用户请填写；Forge / NeoForge 用户可留空。(Fill this for Fabric; leave blank for Forge / NeoForge.)
+      placeholder: "0.92.12+1.20.1 / 0.97.3+1.20.4 / 0.116.14+1.21.1"
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: other_mods

@@ -8,7 +8,7 @@
 
 Cook a nine-grid hotpot in Minecraft: build a stove, seat a pot on it, pour in a broth, light the fire, cook your food and eat it with chopsticks.
 
-Minecraft 1.20.1 / 1.20.4 / 1.21.1 · Fabric · 作者 / Author：蘧白川 / Orient（GitHub：[@mryt233](https://github.com/mryt233)）
+Minecraft 1.20.1 / 1.20.4 / 1.21.1 · Fabric / Forge / NeoForge · 作者 / Author：蘧白川 / Orient（GitHub：[@mryt233](https://github.com/mryt233)）
 
 [下载测试版 · Download Alpha](#downloads) · [更新日志 · Changelog](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) · [反馈问题 · Report an Issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
 
@@ -25,21 +25,27 @@ Minecraft 1.20.1 / 1.20.4 / 1.21.1 · Fabric · 作者 / Author：蘧白川 / Or
 
 ## 下载与移植进度 · Downloads and ports
 
-请按 Minecraft 版本下载对应文件，并安装同版本 Fabric API。 / Choose the file matching your Minecraft version and install the matching Fabric API.
+请按 Minecraft 版本和加载器下载对应文件；只有 Fabric 版需要同版本 Fabric API。 / Choose the file matching your Minecraft version and loader; only Fabric builds require the matching Fabric API.
 
 | Minecraft | 加载器 / Loader | Java | 模组版本 / Mod version | 下载 / Download |
 | --- | --- | --- | --- | --- |
 | 1.20.1 | Fabric | 17+ | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.1-fabric) |
 | 1.20.4 | Fabric | 17+ | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) |
 | 1.21.1 | Fabric | 21+ | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha) |
+| 1.20.1 | Forge | 17+ | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.1-forge) |
+| 1.21.1 | NeoForge | 21+ | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.21.1-neoforge) |
 
 > **1.20.1 / 1.20.4 Fabric 移植版**：目前仅做过初步测试，与其他模组的兼容性及潜在 bug 尚未充分验证。建议备份存档，优先在新存档中试玩，欢迎反馈问题。
 >
 > **1.20.1 / 1.20.4 Fabric ports**: Only preliminary testing has been performed. Compatibility with other mods and potential bugs have not been thoroughly verified. Back up your saves, try the mod in a new world first, and report any issues.
 
-**移植中 / In progress**：Minecraft **1.20.1 Forge** 和 **1.21.1 NeoForge** 正在移植中，预计很快发布。
+**移植版已发布 / Ports released**：Minecraft **1.20.1 Forge** 和 **1.21.1 NeoForge** 的 0.1.1-alpha 已作为测试版发布，下载见上表。
 
-Ports for Minecraft **1.20.1 Forge** and **1.21.1 NeoForge** are in progress and expected to be released soon.
+The 0.1.1-alpha ports for Minecraft **1.20.1 Forge** and **1.21.1 NeoForge** are now available as pre-releases. Download the matching build from the table above.
+
+> 目前仅做过初步测试，与其他模组的兼容性及潜在 bug 尚未充分验证。请备份存档，优先在新存档中试玩，欢迎反馈问题。
+>
+> Only preliminary testing has been performed. Compatibility with other mods and potential bugs have not been thoroughly verified. Back up your saves and try this version in a new world first. Bug reports are welcome.
 
 [各版本源码与说明 · Port sources and notes](version-ports/README.md)
 
@@ -101,14 +107,19 @@ Ports for Minecraft **1.20.1 Forge** and **1.21.1 NeoForge** are in progress and
 
 ## 版本支持 · Compatibility
 
-| 项目 · Item | 要求 · Required | 作者测试用的版本 · Tested with |
+| 项目 · Item | 要求 · Required | 现有测试版本 · Recorded tests |
 | --- | --- | --- |
-| Minecraft | **1.20.1 / 1.20.4 / 1.21.1**，分别下载对应文件 · separate downloads | 见上方下载表 · see downloads above |
-| 加载器 · Loader | **Fabric**；Forge / NeoForge 正在移植 · Forge / NeoForge ports in progress | — |
-| Fabric Loader | **0.15.11** 或更新 · or newer | 0.19.3 |
-| Fabric API | 使用对应 Minecraft 版本 · match your Minecraft version | 1.20.1: 0.92.12+1.20.1；1.20.4: 0.97.3+1.20.4；1.21.1: 0.116.14+1.21.1 |
-| Java | 1.20.1 / 1.20.4: **17+**；1.21.1: **21+** | 按对应版本选择 · match the selected version |
-| 安装位置 · Side | **客户端和服务端都要装** · **both client and server** | — |
+| Minecraft / 加载器 · Loader | 按上方版本表选择对应文件 · choose the matching file above | Fabric 1.20.1 / 1.20.4 / 1.21.1；Forge 1.20.1；NeoForge 1.21.1 |
+| Fabric Loader（仅 Fabric） | **0.15.11+** | 0.19.3 |
+| Fabric API（仅 Fabric） | 对应 Minecraft 版本 · match Minecraft version | 0.92.12+1.20.1 / 0.97.3+1.20.4 / 0.116.14+1.21.1 |
+| Forge（仅 1.20.1 Forge） | **47.1+**，建议先使用已测试版本 · prefer the tested version | **47.4.28** |
+| NeoForge（仅 1.21.1 NeoForge） | **21.1.264+** | **21.1.264** |
+| Java | Minecraft 1.20.1 / 1.20.4: **17+**；1.21.1: **21+** | 17 / 21 |
+| 安装位置 · Side | **客户端和服务端都要装 · both client and server** | — |
+
+Forge / NeoForge 两版不需要 Fabric API。1.20.1 Forge 的同一 JAR 另在 NeoForge 1.20.1 / 47.1.106 正式服务端通过初步检查，客户端、联机与其他模组组合仍待验证。
+
+The Forge / NeoForge builds do not require Fabric API. The same 1.20.1 Forge JAR also passed preliminary checks on a NeoForge 1.20.1 / 47.1.106 dedicated server; client, multiplayer and other-mod combinations remain unverified.
 
 ### 和其他模组的兼容性 · Compatibility with other mods
 
@@ -118,19 +129,25 @@ Ports for Minecraft **1.20.1 Forge** and **1.21.1 NeoForge** are in progress and
 
 ## 安装 · Installation
 
-1. 选择 Minecraft **1.20.1、1.20.4 或 1.21.1**，安装对应的 [Fabric Loader](https://fabricmc.net/use/)（Loader 0.15.11 或更新）。
-2. 下载与所选 Minecraft 版本一致的 [Fabric API](https://modrinth.com/mod/fabric-api)，放进 `mods` 文件夹。
-3. 从[上方下载表](#downloads)选择对应版本的本模组 JAR，放进 `mods` 文件夹。
+### Fabric
 
-Minecraft **1.20.1 / 1.20.4 需要 Java 17+**，**1.21.1 需要 Java 21+**。**客户端和服务端都要装。**
+1. 选择对应 Minecraft 版本的 [Fabric Loader](https://fabricmc.net/use/) 和 [Fabric API](https://modrinth.com/mod/fabric-api)。
+2. 从[下载表](#downloads)选择同版本 Fabric JAR，放入客户端和服务端的 `mods` 文件夹。
 
----
+1. Install the [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://modrinth.com/mod/fabric-api) matching your Minecraft version.
+2. Select the matching Fabric JAR from the [download table](#downloads) and put it in the `mods` folder on both client and server.
 
-1. Choose Minecraft **1.20.1, 1.20.4 or 1.21.1** and install the matching [Fabric Loader](https://fabricmc.net/use/) (Loader 0.15.11 or newer).
-2. Download [Fabric API](https://modrinth.com/mod/fabric-api) matching your Minecraft version and put it in your `mods` folder.
-3. Select this mod's matching JAR from the [download table above](#downloads) and put it in your `mods` folder.
+### Forge / NeoForge
 
-Requires **Java 17+ for Minecraft 1.20.1 / 1.20.4**, or **Java 21+ for Minecraft 1.21.1**. **Install it on both the client and the server.**
+1. Minecraft **1.20.1** 使用 [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html)（现有测试版本 **47.4.28**）；Minecraft **1.21.1** 使用 [NeoForge](https://neoforged.net/)（**21.1.264+**）。
+2. 对应预发布公开后，选择匹配加载器与 MC 版本的 JAR，放入客户端和服务端的 `mods` 文件夹。**这两版不需要 Fabric API。**
+
+1. Use [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) for Minecraft **1.20.1** (recorded test: **47.4.28**), or [NeoForge](https://neoforged.net/) **21.1.264+** for Minecraft **1.21.1**.
+2. Once the corresponding pre-release is published, select its matching JAR and put it in the `mods` folder on both client and server. **These builds do not require Fabric API.**
+
+Minecraft **1.20.1 / 1.20.4 使用 Java 17+**，**1.21.1 使用 Java 21+**。
+
+Use **Java 17+ for Minecraft 1.20.1 / 1.20.4**, or **Java 21+ for Minecraft 1.21.1**.
 
 ## 怎么玩 · How to play
 

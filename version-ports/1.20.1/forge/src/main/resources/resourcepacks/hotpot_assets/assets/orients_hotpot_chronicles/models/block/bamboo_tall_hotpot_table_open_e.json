@@ -1,0 +1,118 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "planks": "minecraft:block/bamboo_planks",
+    "particle": "minecraft:block/bamboo_planks"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        19.0,
+        0
+      ],
+      "to": [
+        16,
+        23.0,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "east": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "south": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "west": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "up": {
+          "texture": "#planks"
+        },
+        "down": {
+          "texture": "#planks"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        16,
+        4
+      ],
+      "to": [
+        16,
+        19.0,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            13.0,
+            12,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#planks",
+          "uv": [
+            4,
+            13.0,
+            12,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#planks",
+          "uv": [
+            4,
+            13.0,
+            16,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#planks",
+          "uv": [
+            4,
+            13.0,
+            12,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#planks"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "pack": {
+    "pack_format": 34,
+    "description": {
+      "translate": "resourcePack.orients_hotpot_chronicles.hotpot_assets",
+      "fallback": "Orient's Hotpot Chronicles Built-in Textures"
+    }
+  }
+}

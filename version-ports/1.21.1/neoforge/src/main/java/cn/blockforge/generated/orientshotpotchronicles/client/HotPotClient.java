@@ -1,0 +1,166 @@
+package cn.blockforge.generated.orientshotpotchronicles.client;
+
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import net.minecraft.component.type.NbtComponent;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.util.Formatting;
+import cn.blockforge.generated.orientshotpotchronicles.GeneratedMod;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotScreenHandler;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveScreenHandler;
+import net.minecraft.client.gui.screen.ingame.HandledScreens;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.text.Text;
+
+/** 客户端入口：注册火锅屏幕，并默认启用模组内置材质包。 */
+// 1.21.1 NeoForge 移植：Codex 改；该类只在物理客户端订阅。
+@net.neoforged.fml.common.EventBusSubscriber(modid = GeneratedMod.MOD_ID,
+    value = net.neoforged.api.distmarker.Dist.CLIENT,
+    bus = net.neoforged.fml.common.EventBusSubscriber.Bus.MOD)
+public final class HotPotClient {
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void setup(net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) {
+        event.enqueueWork(HotPotClient::setupClient);
+    }
+
+    private static void setupClient() {
+        CreativeSubTabs.register();
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+            (net.neoforged.neoforge.event.entity.player.ItemTooltipEvent event) -> {
+                appendPotTooltip(event.getItemStack(), event.getToolTip());
+                appendPlateTooltip(event.getItemStack(), event.getToolTip());
+            });
+        // 装着汤的锅物品（掉在地上、物品栏里）显示对应汤面：谓词 = (汤底编号 + 1) / 10，没汤为 0（r94，Claude）
+        for (net.minecraft.item.Item pot : new net.minecraft.item.Item[]{
+            HotPotContent.IRON_HOT_POT_ITEM, HotPotContent.COPPER_HOT_POT_ITEM}) {
+            net.minecraft.client.item.ModelPredicateProviderRegistry.register(pot, GeneratedMod.id("soup"),
+                (stack, world, entity, seed) -> {
+                    NbtComponent data = stack.get(HotPotContent.POT_CONTENTS);
+                    if (data == null) {
+                        return 0F;
+                    }
+                    NbtCompound nbt = data.copyNbt();
+                    SoupBase soup = nbt.contains("Base") ? SoupBase.byId(nbt.getInt("Base")) : null;
+                    return soup == null ? 0F : (soup.ordinal() + 1) / 10F;
+                });
+        }
+        // 鼠标中键选盘子：复制准星对着的那一个（连菜一起），由客户端告诉方块是谁在选
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlock.pickPlayer =
+            () -> net.minecraft.client.MinecraftClient.getInstance().player;
+    }
+
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void registerScreens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) {
+        event.register(HotPotContent.HOT_POT_SCREEN, HotPotScreen::new);
+        event.register(HotPotContent.STOVE_SCREEN, StoveScreen::new);
+    }
+
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void registerRenderers(net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers event) {
+        event.registerBlockEntityRenderer(HotPotContent.HOT_POT_BE, HotPotBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(HotPotContent.STOVE_BE, HotPotBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(HotPotContent.PLATE_HOLDER_BE, PlateHolderRenderer::new);
+        event.registerBlockEntityRenderer(HotPotContent.BENCH_BE, BenchLegsRenderer::new);
+        event.registerEntityRenderer(HotPotContent.SEAT, net.minecraft.client.render.entity.EmptyEntityRenderer::new);
+    }
+
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void registerItemExtensions(net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent event) {
+        HeldFoodItemRenderer.register(event);
+        for (net.minecraft.item.BlockItem item : HotPotContent.TALL_BENCH_ITEMS) {
+            NeoItemRenderers.register(event, item, (stack, mode, matrices, consumers, light, overlay) -> {
+                var state = item.getBlock().getDefaultState();
+                net.minecraft.client.MinecraftClient.getInstance().getBlockRenderManager()
+                    .renderBlockAsEntity(state, matrices, consumers, light, overlay);
+                BenchLegsRenderer.renderLegs(state, matrices, consumers, light);
+            });
+        }
+    }
+
+    /** Codex 改：必选、默认启用，优先级高于模组主资源。 */
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void registerBuiltinPack(net.neoforged.neoforge.event.AddPackFindersEvent event) {
+        event.addPackFinders(GeneratedMod.id("resourcepacks/hotpot_assets"),
+            net.minecraft.resource.ResourceType.CLIENT_RESOURCES,
+            Text.translatable("resourcePack." + GeneratedMod.MOD_ID + ".hotpot_assets"),
+            net.minecraft.resource.ResourcePackSource.BUILTIN, true,
+            net.minecraft.resource.ResourcePackProfile.InsertionPosition.TOP);
+    }
+
+    /** 盘子：装了几样 / 能装几样，下面列出每一样；筷子：夹着什么。 */
+    private static void appendPlateTooltip(ItemStack stack, java.util.List<Text> lines) {
+        if (stack.isOf(HotPotContent.CHOPSTICKS)) {
+            ItemStack held = cn.blockforge.generated.orientshotpotchronicles.hotpot.Chopsticks.held(stack);
+            if (!held.isEmpty()) {
+                lines.add(Text.translatable(HotPotBlockEntity.key("tooltip.chopsticks.holding"), held.getName())
+                    .formatted(Formatting.GRAY));
+            }
+            return;
+        }
+        // 盘子和装菜的碗（r99）；汤碗、果橙多这种整件的不列菜
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateBlock plate =
+            cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem.placedFor(stack);
+        if (plate == null || cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem.keepsSelf(stack)
+            || (stack.isOf(net.minecraft.item.Items.BOWL) && !stack.contains(net.minecraft.component.DataComponentTypes.CONTAINER))) {
+            return;
+        }
+        net.minecraft.component.type.ContainerComponent contents = stack.getOrDefault(
+            net.minecraft.component.DataComponentTypes.CONTAINER, net.minecraft.component.type.ContainerComponent.DEFAULT);
+        java.util.List<ItemStack> foods = contents.streamNonEmpty().toList();
+        lines.add(Text.translatable(HotPotBlockEntity.key("tooltip.plate.count"), foods.size(), plate.size().capacity())
+            .formatted(Formatting.GRAY));
+        // 像原版收纳袋：同样的菜合成一行，后面写数量（r91，Claude）
+        java.util.List<ItemStack> kinds = new java.util.ArrayList<>();
+        java.util.List<Integer> counts = new java.util.ArrayList<>();
+        for (ItemStack food : foods) {
+            int at = -1;
+            for (int k = 0; k < kinds.size(); k++) {
+                if (ItemStack.areItemsAndComponentsEqual(kinds.get(k), food)) {
+                    at = k;
+                    break;
+                }
+            }
+            if (at < 0) {
+                kinds.add(food);
+                counts.add(1);
+            } else {
+                counts.set(at, counts.get(at) + 1);
+            }
+        }
+        for (int k = 0; k < kinds.size(); k++) {
+            Text line = Text.literal(" ").append(kinds.get(k).getName());
+            if (counts.get(k) > 1) {
+                line = line.copy().append(Text.literal(" ×" + counts.get(k)));
+            }
+            lines.add(line.copy().formatted(Formatting.GRAY));
+        }
+    }
+
+    /** 装着东西的锅物品：提示里写汤底和食材份数。 */
+    private static void appendPotTooltip(ItemStack stack, java.util.List<Text> lines) {
+        NbtComponent data = stack.get(HotPotContent.POT_CONTENTS);
+        if (data == null) {
+            return;
+        }
+        NbtCompound nbt = data.copyNbt();
+        SoupBase soup = nbt.contains("Base") ? SoupBase.byId(nbt.getInt("Base")) : null;
+        Text soupName = Text.translatable(soup == null
+            ? HotPotBlockEntity.key("soup.none") : soup.nameKey());
+        lines.add(Text.translatable(HotPotBlockEntity.key("tooltip.pot.soup"), soupName)
+            .formatted(Formatting.GRAY));
+        int food = nbt.getList("Items", NbtElement.COMPOUND_TYPE).size();
+        if (food > 0) {
+            int cooked = 0;
+            for (byte b : nbt.getByteArray("Cooked")) {
+                cooked += b != 0 ? 1 : 0;
+            }
+            lines.add(Text.translatable(HotPotBlockEntity.key("tooltip.pot.food"), food, cooked)
+                .formatted(Formatting.GRAY));
+        }
+        lines.add(Text.translatable(HotPotBlockEntity.key("tooltip.pot.hint"))
+            .formatted(Formatting.DARK_GRAY));
+    }
+}
