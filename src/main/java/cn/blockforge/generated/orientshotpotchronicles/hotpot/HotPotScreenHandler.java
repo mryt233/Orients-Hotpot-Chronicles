@@ -257,6 +257,13 @@ public class HotPotScreenHandler extends ScreenHandler {
         if (!slot.hasStack()) {
             serverBe.onSlotEmptied(index);
         }
+        // 副手拿着蘸料：吃之前自动蘸一口（r103，用户：两种都要）
+        ItemStack offhand = player.getOffHandStack();
+        if (offhand.getItem() instanceof DippingSauceItem && DippingSauceItem.contents(offhand).bites() > 0) {
+            eaten.set(HotPotContent.DIPPED, eaten.getOrDefault(HotPotContent.DIPPED, 0)
+                | DippingSauceItem.contents(offhand).mask());
+            player.setStackInHand(net.minecraft.util.Hand.OFF_HAND, DippingSauceItem.bite(offhand));
+        }
         player.eatFood(world, eaten.copy(), food);
         // 冷锅：没坐在烧着的灶台（或其他热源）上，吃了有概率反胃
         if (!serverBe.isHeated() && world.random.nextFloat() < COLD_NAUSEA_CHANCE) {

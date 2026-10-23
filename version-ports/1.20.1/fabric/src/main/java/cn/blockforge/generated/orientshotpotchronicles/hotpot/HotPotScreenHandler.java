@@ -1,3 +1,4 @@
+// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -255,6 +256,13 @@ public class HotPotScreenHandler extends ScreenHandler {
         serverBe.grantTakeXp(player, index, 1);
         if (!slot.hasStack()) {
             serverBe.onSlotEmptied(index);
+        }
+        // 副手拿着蘸料：吃之前自动蘸一口（r103，用户：两种都要）
+        ItemStack offhand = player.getOffHandStack();
+        if (offhand.getItem() instanceof DippingSauceItem && DippingSauceItem.contents(offhand).bites() > 0) {
+            ItemData.setDipped(eaten, ItemData.dipped(eaten)
+                | DippingSauceItem.contents(offhand).mask());
+            player.setStackInHand(net.minecraft.util.Hand.OFF_HAND, DippingSauceItem.bite(offhand));
         }
         player.eatFood(world, eaten.copy());
         // 冷锅：没坐在烧着的灶台（或其他热源）上，吃了有概率反胃

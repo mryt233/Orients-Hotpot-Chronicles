@@ -41,6 +41,24 @@ public final class HotPotClient implements ClientModInitializer {
             net.minecraft.client.render.entity.EmptyEntityRenderer::new);
         ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> appendPotTooltip(stack, lines));
         CreativeSubTabs.register();
+        // 蘸料（r103）：补货界面、蘸料碗的样子、蘸过的菜在提示里写蘸了什么
+        HandledScreens.register(HotPotContent.SAUCE_STATION_SCREEN, SauceStationScreen::new);
+        SauceRender.register();
+        PartOutlineRenderer.register();
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlock.openOverview =
+            (pos, name) -> net.minecraft.client.MinecraftClient.getInstance().setScreen(new SauceOverviewScreen(pos, name));
+        BlockEntityRendererRegistry.register(HotPotContent.SAUCE_STATION_BE, SauceStationRenderer::new);
+        BlockEntityRendererRegistry.register(HotPotContent.CUTTING_BOARD_BE, CuttingBoardRenderer::new);
+        // 蘸料台的葱花 / 香菜碎末贴图带透明空隙，要走镂空层，否则空隙画成实心
+        net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlocks(net.minecraft.client.render.RenderLayer.getCutout(),
+            HotPotContent.SAUCE_STATIONS.toArray(new net.minecraft.block.Block[0]));
+        ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> {
+            Integer dipped = stack.get(HotPotContent.DIPPED);
+            if (dipped != null && dipped != 0) {
+                lines.add(Text.translatable(HotPotBlockEntity.key("tooltip.dipped"),
+                    cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem.names(dipped)).formatted(Formatting.GOLD));
+            }
+        });
         HeldFoodItemRenderer.register();
         ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> appendPlateTooltip(stack, lines));
         BlockEntityRendererRegistry.register(HotPotContent.PLATE_HOLDER_BE, PlateHolderRenderer::new);

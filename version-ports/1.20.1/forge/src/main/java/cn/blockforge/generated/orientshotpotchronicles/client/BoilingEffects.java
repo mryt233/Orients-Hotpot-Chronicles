@@ -1,3 +1,4 @@
+// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.GeneratedMod;
@@ -30,7 +31,7 @@ final class BoilingEffects {
 
     private static Palette palette(SoupVisual soup) {
         return switch (soup) {
-            case CLEAR -> new Palette(0xD6C79A, 0xFFF6DE);
+            case CLEAR -> new Palette(0xC6CCCA, 0xF4F4EC);   // 2026-10-23 清汤换成清亮的银灰（用户参考图），
             case MILKY -> new Palette(0xF2E7D2, 0xFFFFFF);
             case MUSHROOM -> new Palette(0x9A7048, 0xE8C88A);
             default -> new Palette(0xBE3325, 0xD8553A); // 红汤：比汤底 #B82F23 稍亮，顶面带红油光泽

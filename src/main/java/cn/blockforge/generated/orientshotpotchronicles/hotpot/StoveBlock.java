@@ -33,7 +33,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 /** 同一方块状态中保存彼此独立的灶台底座与可拆锅体。 */
-public class StoveBlock extends Block implements BlockEntityProvider {
+public class StoveBlock extends Block implements PartOutline, BlockEntityProvider {
     public static final BooleanProperty LIT = BooleanProperty.of("lit");
     public static final EnumProperty<StovePot> POT = EnumProperty.of("pot", StovePot.class);
     public static final EnumProperty<SoupVisual> SOUP = EnumProperty.of("soup", SoupVisual.class);
@@ -101,6 +101,19 @@ public class StoveBlock extends Block implements BlockEntityProvider {
         this.baseShape = Block.createCuboidShape(0, 0, 0, 16, 11 + lift, 16);
         this.combinedShape = VoxelShapes.union(baseShape, POT_SHAPE.offset(0, lift / 16.0, 0)).simplify();
         this.combinedShapeZ = VoxelShapes.union(baseShape, POT_SHAPE_Z.offset(0, lift / 16.0, 0)).simplify();
+    }
+
+    /** 选中框只框准星对着的那样：锅（连锅耳朵）或者灶身（PartOutline）。 */
+    @Override
+    public VoxelShape aimedPart(BlockState state, net.minecraft.world.BlockView world, BlockPos pos, PlayerEntity player) {
+        if (!state.get(POT).hasPot()) {
+            return null;
+        }
+        if (aimsAtPot(state, pos, player)) {
+            VoxelShape pot = state.get(POT_AXIS) == Direction.Axis.Z ? POT_SHAPE_Z : POT_SHAPE;
+            return pot.offset(0, lift / 16.0, 0);
+        }
+        return baseShape;
     }
 
     /** 灶台整体抬高的像素（矮灶台 0）。 */
@@ -380,6 +393,17 @@ public class StoveBlock extends Block implements BlockEntityProvider {
         boolean here = at.equals(pos)
             || (at.equals(pos.up()) && player.getWorld().getBlockState(at).isOf(HotPotContent.STOVE_TOP));
         return here && isPotHit(state, pos, blockHit);
+    }
+
+    /** 鼠标中键：对着锅复制锅，对着灶身复制灶台（2026-10-23 用户：锅和灶台是两个独立的东西，）。 */
+    @Override
+    public ItemStack getPickStack(net.minecraft.world.WorldView world, BlockPos pos, BlockState state) {
+        PlayerEntity player = PlateHolderBlock.pickPlayer.get();
+        HotPotMaterial material = state.get(POT).material();
+        if (player != null && material != null && aimsAtPot(state, pos, player)) {
+            return new ItemStack(HotPotContent.blockFor(material));
+        }
+        return super.getPickStack(world, pos, state);
     }
 
     /** 对着锅挖时，用锅自己的硬度和工具要求（铜锅同铜块、铁锅同铁块）。 */

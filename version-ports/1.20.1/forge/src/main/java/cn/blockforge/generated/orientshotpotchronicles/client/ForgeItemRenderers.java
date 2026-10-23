@@ -28,6 +28,10 @@ public final class ForgeItemRenderers {
                                        VertexConsumerProvider consumers, int light, int overlay) {
                         if (stack.isOf(Items.BOWL)) {
                             HeldFoodItemRenderer.renderBowl(stack, mode, matrices, consumers, light, overlay);
+                        } else if (stack.isOf(HotPotContent.DIPPING_SAUCE)) {
+                            client.getBlockRenderManager().renderBlockAsEntity(
+                                HotPotContent.BOWL_BLOCK.getDefaultState(), matrices, consumers, light, overlay);
+                            SauceRender.surface(cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem.contents(stack).mask(), matrices, consumers, light);
                         } else if (stack.isOf(HotPotContent.CHOPSTICKS)) {
                             HeldFoodItemRenderer.renderChopsticks(stack, mode, matrices, consumers, light, overlay);
                         } else if (stack.getItem() instanceof PlateItem) {

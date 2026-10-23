@@ -6,7 +6,8 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "orients_hotpot_chronicles:copper_nine_grid_hotpot"
+          "name": "orients_hotpot_chronicles:copper_nine_grid_hotpot",
+          "functions": []
         }
       ],
       "rolls": 1.0

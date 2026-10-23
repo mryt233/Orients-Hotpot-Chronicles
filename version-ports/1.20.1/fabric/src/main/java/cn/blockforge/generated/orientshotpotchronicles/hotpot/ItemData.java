@@ -1,3 +1,4 @@
+// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import java.util.ArrayList;
@@ -108,5 +109,26 @@ public final class ItemData {
 
     public static void clearModel(ItemStack stack) {
         stack.removeSubNbt(MODEL);
+    }
+    // 1.20.1 中用 NBT 保存蘸料组件，随物品一起同步和持久化。
+    public static SauceContents sauce(ItemStack stack) {
+        NbtCompound nbt = stack.getSubNbt("orients_hotpot_chronicles:sauce");
+        return nbt == null ? null : new SauceContents(nbt.getInt("mask"), nbt.getInt("bites"));
+    }
+
+    public static void setSauce(ItemStack stack, SauceContents sauce) {
+        NbtCompound nbt = new NbtCompound();
+        nbt.putInt("mask", sauce.mask());
+        nbt.putInt("bites", sauce.bites());
+        stack.setSubNbt("orients_hotpot_chronicles:sauce", nbt);
+    }
+
+    public static int dipped(ItemStack stack) {
+        NbtCompound nbt = stack.getNbt();
+        return nbt == null ? 0 : nbt.getInt("orients_hotpot_chronicles:dipped");
+    }
+
+    public static void setDipped(ItemStack stack, int mask) {
+        stack.getOrCreateNbt().putInt("orients_hotpot_chronicles:dipped", mask);
     }
 }

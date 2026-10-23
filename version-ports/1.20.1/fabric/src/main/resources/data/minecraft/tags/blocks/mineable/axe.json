@@ -44,6 +44,18 @@
     "orients_hotpot_chronicles:cherry_bench",
     "orients_hotpot_chronicles:bamboo_bench",
     "orients_hotpot_chronicles:crimson_bench",
-    "orients_hotpot_chronicles:warped_bench"
+    "orients_hotpot_chronicles:warped_bench",
+    "orients_hotpot_chronicles:oak_sauce_station",
+    "orients_hotpot_chronicles:spruce_sauce_station",
+    "orients_hotpot_chronicles:birch_sauce_station",
+    "orients_hotpot_chronicles:jungle_sauce_station",
+    "orients_hotpot_chronicles:acacia_sauce_station",
+    "orients_hotpot_chronicles:dark_oak_sauce_station",
+    "orients_hotpot_chronicles:mangrove_sauce_station",
+    "orients_hotpot_chronicles:cherry_sauce_station",
+    "orients_hotpot_chronicles:bamboo_sauce_station",
+    "orients_hotpot_chronicles:crimson_sauce_station",
+    "orients_hotpot_chronicles:warped_sauce_station",
+    "orients_hotpot_chronicles:cutting_board"
   ]
 }

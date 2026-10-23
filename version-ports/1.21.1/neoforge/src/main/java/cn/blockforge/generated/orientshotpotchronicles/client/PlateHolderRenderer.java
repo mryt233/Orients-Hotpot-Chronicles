@@ -61,6 +61,9 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
             matrices.push();
             matrices.translate((p.x - 8) / 16.0, lift / 16.0, (p.z - 8) / 16.0);
             blocks.renderBlockAsEntity(modelState(p), matrices, vertexConsumers, light, OverlayTexture.DEFAULT_UV);
+            if (p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem) {
+                SauceRender.surface(cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem.contents(p.self).mask(), matrices, vertexConsumers, light);
+            }
             PlateFoodRenderer.render(p.plate.size(), p.axis, p.items, matrices, vertexConsumers, light,
                 be.getWorld(), seed, itemRenderer);
             matrices.pop();

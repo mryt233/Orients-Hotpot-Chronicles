@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "orients_hotpot_chronicles:block/jungle_sauce_station_empty"
+    },
+    "facing=east": {
+      "model": "orients_hotpot_chronicles:block/jungle_sauce_station_empty",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "orients_hotpot_chronicles:block/jungle_sauce_station_empty",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "orients_hotpot_chronicles:block/jungle_sauce_station_empty",
+      "y": 270
+    }
+  }
+}

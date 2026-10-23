@@ -1,3 +1,4 @@
+// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.block.AbstractBlock;
@@ -29,7 +30,7 @@ import net.minecraft.world.WorldView;
  *
  *
  */
-public class StoveTopBlock extends Block {
+public class StoveTopBlock extends Block implements PartOutline {
     public StoveTopBlock() {
         super(AbstractBlock.Settings.create()
             .mapColor(net.minecraft.block.MapColor.RED)
@@ -67,6 +68,17 @@ public class StoveTopBlock extends Block {
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return shapeOf(world, pos);
+    }
+
+    /** 选中框：照下面灶台的规则（锅 / 灶身分开框），挪到这一格的坐标。 */
+    @Override
+    public VoxelShape aimedPart(BlockState state, BlockView world, BlockPos pos, PlayerEntity player) {
+        BlockState below = world.getBlockState(pos.down());
+        if (below.getBlock() instanceof StoveBlock stove) {
+            VoxelShape part = stove.aimedPart(below, world, pos.down(), player);
+            return part == null ? null : part.offset(0, -1, 0);
+        }
+        return null;
     }
 
     @Override
@@ -127,6 +139,7 @@ public class StoveTopBlock extends Block {
 
     @Override
     public ItemStack getPickStack(net.minecraft.world.BlockView world, BlockPos pos, BlockState state) {
-        return new ItemStack(world.getBlockState(pos.down()).getBlock());
+        BlockState below = world.getBlockState(pos.down());
+        return below.getBlock().getPickStack(world, pos.down(), below);   // 对着锅复制锅（同 StoveBlock）
     }
 }

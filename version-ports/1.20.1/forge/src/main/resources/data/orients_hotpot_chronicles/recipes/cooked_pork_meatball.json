@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": {
+    "item": "orients_hotpot_chronicles:pork_meatball"
+  },
+  "result": "orients_hotpot_chronicles:cooked_pork_meatball",
+  "experience": 0.35,
+  "cookingtime": 100
+}

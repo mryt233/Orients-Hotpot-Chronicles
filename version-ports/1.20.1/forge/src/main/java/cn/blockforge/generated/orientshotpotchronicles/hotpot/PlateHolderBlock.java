@@ -1,3 +1,4 @@
+// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.block.AbstractBlock;
@@ -40,7 +41,7 @@ import net.minecraft.world.WorldView;
  * </ul>
  * 挖掉这一格：所有盘子带着菜掉出来。
  */
-public class PlateHolderBlock extends Block implements BlockEntityProvider {
+public class PlateHolderBlock extends Block implements BlockEntityProvider, PartOutline {
     /** 下面是火锅桌（桌面 11/16，盘子下移 5 像素）。 */
     public static final BooleanProperty ON_TABLE = BooleanProperty.of("on_table");
     /** 下面是高火锅桌（桌面 23/16，盘子上移 7 像素）。 */
@@ -162,6 +163,16 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider {
         return ItemStack.EMPTY;
     }
 
+    /** 选中框只框准星对着的那个盘子（连盘里的菜 / 那瓶饮料 / 那只碗）。 */
+    @Override
+    public net.minecraft.util.shape.VoxelShape aimedPart(BlockState state, BlockView world, BlockPos pos, PlayerEntity player) {
+        if (!(world.getBlockEntity(pos) instanceof PlateHolderBlockEntity be) || be.plates().size() < 2) {
+            return null;
+        }
+        PlateHolderBlockEntity.Placed plate = aimed(player, pos, be);
+        return plate == null ? null : PlateHolderBlockEntity.partShape(plate, lift(state));
+    }
+
     /** 准星对着的是这一格里的哪个盘子（服务端和客户端同一套射线）。 */
     @org.jetbrains.annotations.Nullable
     public static PlateHolderBlockEntity.Placed aimed(PlayerEntity player, BlockPos pos, PlateHolderBlockEntity be) {
@@ -228,6 +239,7 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider {
         if (plate == null) {
             return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
+        // （r103 的「筷子夹着菜点桌上的蘸料碗 = 蘸一口」2026-10-23 用户改成只能副手拿蘸料，已去掉；见 Seasoning / ChopsticksItem）
         if (!plate.holdsFood() && (stack.isOf(HotPotContent.CHOPSTICKS) || PlateItem.holdsFood(world, stack))) {
             // 汤碗、果橙多里放不了菜，也夹不出菜
             if (!world.isClient) {

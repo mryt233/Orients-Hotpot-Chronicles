@@ -1,3 +1,4 @@
+// 0.1.2 的 1.20.1 Forge 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.mixin;
 
 import cn.blockforge.generated.orientshotpotchronicles.client.HotPotScreen;

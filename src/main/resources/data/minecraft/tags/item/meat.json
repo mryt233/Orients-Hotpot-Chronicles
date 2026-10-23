@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    "orients_hotpot_chronicles:fatty_beef_roll",
+    "orients_hotpot_chronicles:cooked_fatty_beef_roll",
+    "orients_hotpot_chronicles:mutton_roll",
+    "orients_hotpot_chronicles:cooked_mutton_roll",
+    "orients_hotpot_chronicles:beef_meatball",
+    "orients_hotpot_chronicles:cooked_beef_meatball",
+    "orients_hotpot_chronicles:cilantro_beef_meatball",
+    "orients_hotpot_chronicles:cooked_cilantro_beef_meatball",
+    "orients_hotpot_chronicles:pork_meatball",
+    "orients_hotpot_chronicles:cooked_pork_meatball",
+    "orients_hotpot_chronicles:cilantro_pork_meatball",
+    "orients_hotpot_chronicles:cooked_cilantro_pork_meatball",
+    "orients_hotpot_chronicles:mutton_meatball",
+    "orients_hotpot_chronicles:cooked_mutton_meatball",
+    "orients_hotpot_chronicles:cilantro_mutton_meatball",
+    "orients_hotpot_chronicles:cooked_cilantro_mutton_meatball"
+  ]
+}

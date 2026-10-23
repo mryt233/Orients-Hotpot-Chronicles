@@ -1,0 +1,25 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "orients_hotpot_chronicles:item/iron_kitchen_knife"
+  },
+  "display": {
+    "gui": {
+      "rotation": [
+        180,
+        0,
+        -90
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  }
+}

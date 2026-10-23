@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "minecraft:potato"
+  },
+  "result": "orients_hotpot_chronicles:potato_slice",
+  "count": 3
+}

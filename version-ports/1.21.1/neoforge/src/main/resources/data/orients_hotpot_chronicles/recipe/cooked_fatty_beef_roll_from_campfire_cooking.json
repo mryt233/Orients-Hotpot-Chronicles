@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "ingredient": {
+    "item": "orients_hotpot_chronicles:fatty_beef_roll"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_fatty_beef_roll"
+  },
+  "experience": 0.35,
+  "cookingtime": 300
+}

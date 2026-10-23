@@ -1,3 +1,4 @@
+// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.GeneratedMod;
@@ -230,6 +231,13 @@ public class StoveScreen extends HandledScreen<StoveScreenHandler> {
     }
 
     /** 空燃料槽上悬停：说明能放什么（原先常驻的提示行挪到这里，给背包标签腾位置）。 */
+    /** 原版 HandledScreen.render 不画悬停提示，要子类自己调（漏了这步，格子里的东西指上去看不到名字和属性；2026-10-23 用户报，）。 */
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+        drawMouseoverTooltip(context, mouseX, mouseY);
+    }
+
     @Override
     public void drawMouseoverTooltip(DrawContext context, int mouseX, int mouseY) {
         Slot focused = this.focusedSlot;
