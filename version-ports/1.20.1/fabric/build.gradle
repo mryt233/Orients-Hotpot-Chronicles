@@ -35,3 +35,6 @@ base { archivesName = project.archives_base_name }
 tasks.withType(Jar).configureEach {
     from('LICENSE', 'ASSETS_LICENSE')
 }
+
+// Codex 改：客户端隔离日志与选项，服务端沿用 run。
+loom { runs { client { runDir "run-client" } } }

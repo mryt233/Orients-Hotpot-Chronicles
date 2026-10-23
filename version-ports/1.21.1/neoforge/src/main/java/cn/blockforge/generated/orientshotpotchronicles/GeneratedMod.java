@@ -1,3 +1,4 @@
+// 0.1.2 的 NeoForge 接口迁移：Codex 改。
 package cn.blockforge.generated.orientshotpotchronicles;
 
 import cn.blockforge.generated.orientshotpotchronicles.compat.ModCompat;
@@ -35,6 +36,7 @@ public final class GeneratedMod {
             HotPotContent.register();
             ModCompat.init();
         }));
+        modBus.addListener(cn.blockforge.generated.orientshotpotchronicles.hotpot.OpenSauceRestockPayload::register);
         NeoForge.EVENT_BUS.addListener(HotPotContent::beforeBreak);
     }
 }

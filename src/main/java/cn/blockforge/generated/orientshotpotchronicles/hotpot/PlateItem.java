@@ -61,7 +61,8 @@ public class PlateItem extends BlockItem {
         if (stack.getItem() instanceof PlateItem item) {
             return item.plate();
         }
-        if (stack.isOf(net.minecraft.item.Items.BOWL) || stack.getItem() instanceof SoupBowlItem) {
+        if (stack.isOf(net.minecraft.item.Items.BOWL) || stack.getItem() instanceof SoupBowlItem
+            || stack.getItem() instanceof DippingSauceItem) {
             return HotPotContent.BOWL_BLOCK;
         }
         if (stack.getItem() instanceof DrinkItem || stack.getItem() instanceof EmptyBottleItem) {
@@ -72,7 +73,8 @@ public class PlateItem extends BlockItem {
 
     /** 整件摆上去（拿起来原样还回去）的东西：汤碗、饮料、空瓶。 */
     public static boolean keepsSelf(ItemStack stack) {
-        return stack.getItem() instanceof SoupBowlItem || stack.getItem() instanceof DrinkItem
+        return stack.getItem() instanceof SoupBowlItem || stack.getItem() instanceof DippingSauceItem
+            || stack.getItem() instanceof DrinkItem
             || stack.getItem() instanceof EmptyBottleItem;
     }
 

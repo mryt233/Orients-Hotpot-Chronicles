@@ -1,3 +1,4 @@
+// 0.1.2 的 1.20.1 Forge 接口迁移：Codex 改。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -256,6 +257,13 @@ public class HotPotScreenHandler extends ScreenHandler {
         if (!slot.hasStack()) {
             serverBe.onSlotEmptied(index);
         }
+        // 副手拿着蘸料：吃之前自动蘸一口（r103，用户：两种都要）
+        ItemStack offhand = player.getOffHandStack();
+        if (offhand.getItem() instanceof DippingSauceItem && DippingSauceItem.contents(offhand).bites() > 0) {
+            ItemData.setDipped(eaten, ItemData.dipped(eaten)
+                | DippingSauceItem.contents(offhand).mask());
+            player.setStackInHand(net.minecraft.util.Hand.OFF_HAND, DippingSauceItem.bite(offhand));
+        }
         player.eatFood(world, eaten.copy());
         // 冷锅：没坐在烧着的灶台（或其他热源）上，吃了有概率反胃
         if (!serverBe.isHeated() && world.random.nextFloat() < COLD_NAUSEA_CHANCE) {
@@ -266,7 +274,6 @@ public class HotPotScreenHandler extends ScreenHandler {
         if (!player.getAbilities().creativeMode) {
             ItemStack rest = eaten.getItem() instanceof net.minecraft.item.StewItem
                 || eaten.getItem() instanceof net.minecraft.item.SuspiciousStewItem
-                // Codex 改：Fabric 的带栈余物接口换成 Forge 的同等接口。
                 ? new ItemStack(net.minecraft.item.Items.BOWL) : eaten.getCraftingRemainingItem();
             if (!rest.isEmpty()) {
                 player.getInventory().offerOrDrop(rest);

@@ -25,7 +25,7 @@ body:
     attributes:
       label: 模组版本（Mod version）
       description: 在游戏的模组列表里能看到，或者看 jar 文件名。(Shown in the mod list, or in the jar file name.)
-      placeholder: "0.1.1-alpha"
+      placeholder: "0.1.2-alpha"
     validations:
       required: true
 

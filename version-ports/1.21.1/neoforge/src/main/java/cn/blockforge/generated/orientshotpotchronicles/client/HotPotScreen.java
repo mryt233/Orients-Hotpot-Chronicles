@@ -58,7 +58,8 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
             return NO_SOUP;
         }
         return switch (soup) {
-            case CLEAR -> new Soup(0xFFB9A878, 0xFFFFF6DE, 0xFFD6C79A, new int[]{0xFF6FAF3A, 0xFF8FCF52, 0xFFD04A2A});
+            case CLEAR -> new Soup(0xFFB4BCBC, 0xFFF4F4EC, 0xFFC6CCCA,   // 清汤配色同锅里的新贴图（2026-10-23，Claude 改）
+                new int[]{0xFF6FAF3A, 0xFF8FCF52, 0xFFD04A2A});
             case MILKY -> new Soup(0xFFE3D7BF, 0xFFFFFFFF, 0xFFF2E7D2, new int[]{0xFFFFF8EA, 0xFF6FAF3A, 0xFFD9C9A8});
             case MUSHROOM -> new Soup(0xFF7C5836, 0xFFE8C88A, 0xFF9A7048, new int[]{0xFF4A3220, 0xFFC9A16A, 0xFF5E4026});
             case SPICY -> new Soup(0xFFB32A1E, 0xFFFFB070, 0xFFD94A2E, new int[]{0xFFE8862A, 0xFF7A1408, 0xFF3A1208});
@@ -483,6 +484,13 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
         int w = Math.round(14F * ratio);
         context.fill(sx + 2, sy + 15, sx + 2 + w, sy + 17,
             d >= HotPotCooking.FULL_DONE ? BAR_DONE : mix(0xFFE0A23C, 0xFF9AD04C, ratio));
+    }
+
+    /** 原版 HandledScreen.render 不画悬停提示，要子类自己调（漏了这步，格子里的东西指上去看不到名字和属性；2026-10-23 用户报，Claude 补）。 */
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+        drawMouseoverTooltip(context, mouseX, mouseY);
     }
 
     @Override

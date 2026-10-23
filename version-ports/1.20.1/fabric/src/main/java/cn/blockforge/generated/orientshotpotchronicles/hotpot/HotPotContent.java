@@ -1,3 +1,4 @@
+// 0.1.2 的 1.20.1 Fabric 接口迁移：Codex 改。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import cn.blockforge.generated.orientshotpotchronicles.GeneratedMod;
@@ -163,10 +164,80 @@ public final class HotPotContent {
     /** 毛肚（牛掉落，r93）：生的回 2 点饥饿；熟的回 5 点。熔炉 / 烟熏炉 / 营火都能烤，锅里涮得比牛肉快一半（熔炉配方 100 tick）。 */
     public static final Item RAW_TRIPE = Registry.register(Registries.ITEM, GeneratedMod.id("tripe"),
         new Item(new Item.Settings().food(new net.minecraft.item.FoodComponent.Builder()
-            .hunger(2).saturationModifier(0.3F).build())));
+            .hunger(2).saturationModifier(0.3F).meat().build())));
     public static final Item COOKED_TRIPE = Registry.register(Registries.ITEM, GeneratedMod.id("cooked_tripe"),
         new Item(new Item.Settings().food(new net.minecraft.item.FoodComponent.Builder()
-            .hunger(5).saturationModifier(0.6F).build())));
+            .hunger(5).saturationModifier(0.6F).meat().build())));
+
+    /**
+     * 切菜（2026-10-23 用户定，Claude 加）：生牛肉 / 生羊肉在砧板上用铁菜刀点一下（或切石机）切成 3 卷；
+     * 每卷熟的回 3 饥饿（3 卷 = 9，比整块牛排多一点，算切开涮的奖励），生的回 1；锅里涮得比整块肉快一半（熔炉配方 100 tick）。
+     */
+    public static final Item FATTY_BEEF_ROLL = foodItem("fatty_beef_roll", 1, 0.3F);
+    public static final Item COOKED_FATTY_BEEF_ROLL = foodItem("cooked_fatty_beef_roll", 3, 0.6F);
+    public static final Item MUTTON_ROLL = foodItem("mutton_roll", 1, 0.3F);
+    public static final Item COOKED_MUTTON_ROLL = foodItem("cooked_mutton_roll", 3, 0.6F);
+    /** 铁菜刀：耐久同铁剑（250），切一次掉 1 点；也能当武器，伤害比铁剑低（4）。 */
+    public static final Item KITCHEN_KNIFE = Registry.register(Registries.ITEM, GeneratedMod.id("iron_kitchen_knife"),
+        new KitchenKnifeItem());
+    public static final CuttingBoardBlock CUTTING_BOARD = Registry.register(Registries.BLOCK, GeneratedMod.id("cutting_board"),
+        new CuttingBoardBlock(net.minecraft.block.AbstractBlock.Settings.copy(net.minecraft.block.Blocks.OAK_PLANKS).nonOpaque()
+            .dynamicBounds()));   // 选中框随板上有没有东西变（坑：形状跟着方块实体变就要 dynamicBounds）
+    public static final BlockItem CUTTING_BOARD_ITEM = Registry.register(Registries.ITEM, GeneratedMod.id("cutting_board"),
+        new BlockItem(CUTTING_BOARD, new Item.Settings()));
+    public static final BlockEntityType<CuttingBoardBlockEntity> CUTTING_BOARD_BE = Registry.register(
+        Registries.BLOCK_ENTITY_TYPE, GeneratedMod.id("cutting_board"),
+        FabricBlockEntityTypeBuilder.create(CuttingBoardBlockEntity::new, CUTTING_BOARD).build());
+
+    /**
+     * 土豆片、豆腐（2026-10-23 用户：先做原版有的食材）：原版土豆在砧板上切三下、每下一份「土豆片」（一份贴图上是三片），
+     * 切石机一次出 3 份；熟的每份回 2。黄豆打草掉（GarnishLoot，15%），3 黄豆 + 水桶做一整块豆腐，砧板上一刀切成 3 份豆腐块，熟的每份回 2。
+     */
+    public static final Item POTATO_SLICE = foodItem("potato_slice", 1, 0.3F);
+    public static final Item COOKED_POTATO_SLICE = foodItem("cooked_potato_slice", 2, 0.6F);
+    public static final Item SOYBEAN = foodItem("soybean", 1, 0.1F);
+    public static final Item TOFU = foodItem("tofu", 2, 0.4F);
+    public static final Item TOFU_CUBE = foodItem("tofu_cube", 1, 0.3F);
+    public static final Item COOKED_TOFU_CUBE = foodItem("cooked_tofu_cube", 2, 0.6F);
+
+    /**
+     * 丸子（2026-10-23 用户定）：木棒在砧板上捣三下出 3 个生丸子（Pounding）；熟的每个回 3，香菜版（2 生丸子 + 1 香菜 → 2 个）每个回 4。
+     * 鱼丸用生鳕鱼 / 生鲑鱼。擀面杖（用户：木棒改成擀面杖的样子，名字和 ID 一起改）耐久 120，捣一下掉 1 点。
+     */
+    public static final Item ROLLING_PIN = Registry.register(Registries.ITEM, GeneratedMod.id("rolling_pin"),
+        new Item(new Item.Settings().maxDamage(120)));
+    public static final Item BEEF_MEATBALL = foodItem("beef_meatball", 1, 0.3F);
+    public static final Item PORK_MEATBALL = foodItem("pork_meatball", 1, 0.3F);
+    public static final Item MUTTON_MEATBALL = foodItem("mutton_meatball", 1, 0.3F);
+    public static final Item FISH_BALL = foodItem("fish_ball", 1, 0.3F);
+    public static final Item CILANTRO_BEEF_MEATBALL = foodItem("cilantro_beef_meatball", 1, 0.3F);
+    public static final Item CILANTRO_PORK_MEATBALL = foodItem("cilantro_pork_meatball", 1, 0.3F);
+    public static final Item CILANTRO_MUTTON_MEATBALL = foodItem("cilantro_mutton_meatball", 1, 0.3F);
+    public static final Item CILANTRO_FISH_BALL = foodItem("cilantro_fish_ball", 1, 0.3F);
+    public static final Item COOKED_BEEF_MEATBALL = foodItem("cooked_beef_meatball", 3, 0.6F);
+    public static final Item COOKED_PORK_MEATBALL = foodItem("cooked_pork_meatball", 3, 0.6F);
+    public static final Item COOKED_MUTTON_MEATBALL = foodItem("cooked_mutton_meatball", 3, 0.6F);
+    public static final Item COOKED_FISH_BALL = foodItem("cooked_fish_ball", 3, 0.6F);
+    public static final Item COOKED_CILANTRO_BEEF_MEATBALL = foodItem("cooked_cilantro_beef_meatball", 4, 0.6F);
+    public static final Item COOKED_CILANTRO_PORK_MEATBALL = foodItem("cooked_cilantro_pork_meatball", 4, 0.6F);
+    public static final Item COOKED_CILANTRO_MUTTON_MEATBALL = foodItem("cooked_cilantro_mutton_meatball", 4, 0.6F);
+    public static final Item COOKED_CILANTRO_FISH_BALL = foodItem("cooked_cilantro_fish_ball", 4, 0.6F);
+
+    /** 砧板上捣到一半的肉（捶碎 / 肉浆）：只给砧板渲染器画立体用，不进创造栏；样子按自定义模型数据换（Pounding.display）。 */
+    public static final Item POUNDED_MEAT = Registry.register(Registries.ITEM, GeneratedMod.id("pounded_meat"),
+        new Item(new Item.Settings()));
+
+    private static Item foodItem(String id, int nutrition, float saturation) {
+        return Registry.register(Registries.ITEM, GeneratedMod.id(id),
+            new Item(new Item.Settings().food(foodProperties(id, nutrition, saturation))));
+    }
+
+    // Codex 改：1.20.1 没有 vanilla meat 标签，狼按食物标记判断。
+    private static net.minecraft.item.FoodComponent foodProperties(String id, int nutrition, float saturation) {
+        var builder = new net.minecraft.item.FoodComponent.Builder().hunger(nutrition).saturationModifier(saturation);
+        if (!id.contains("fish") && (id.contains("beef") || id.contains("mutton") || id.contains("pork"))) builder.meat();
+        return builder.build();
+    }
 
     /** 一碗汤（r99）：顺序同 SoupBase（清汤、浓汤、菌汤、红汤）。 */
     public static final java.util.List<SoupBowlItem> SOUP_BOWLS = java.util.Arrays.stream(SoupBase.values())
@@ -189,8 +260,49 @@ public final class HotPotContent {
     }
 
     public static final Item CHOPSTICKS = Registry.register(Registries.ITEM,
-        GeneratedMod.id("bamboo_chopsticks"),
-        new Item(new Item.Settings().maxCount(1).rarity(Rarity.COMMON)));
+        GeneratedMod.id("bamboo_chopsticks"), new ChopsticksItem());
+
+    // ------------------------------------------------------------------ 蘸料（r103，用户定的玩法见 Seasoning / SauceStationBlock）
+    /** 小葱、香菜：打草掉落（各 25%），能吃回 1 点饥饿值；放进蘸料台变成葱花、香菜碎末。 */
+    public static final Item SCALLION = Registry.register(Registries.ITEM, GeneratedMod.id("scallion"),
+        new Item(new Item.Settings().food(new net.minecraft.item.FoodComponent.Builder()
+            .hunger(1).saturationModifier(0.1F).build())));
+    public static final Item CILANTRO = Registry.register(Registries.ITEM, GeneratedMod.id("cilantro"),
+        new Item(new Item.Settings().food(new net.minecraft.item.FoodComponent.Builder()
+            .hunger(1).saturationModifier(0.1F).build())));
+    // Codex 改：sauce / dipped 在 ItemData 中使用 NBT 保存。
+    public static final DippingSauceItem DIPPING_SAUCE = Registry.register(Registries.ITEM,
+        GeneratedMod.id("dipping_sauce"), new DippingSauceItem());
+    /** 蘸料台：11 种原版木头各一个 + 铁的（用户定）；ID = <木头>_sauce_station / iron_sauce_station。 */
+    public static final java.util.List<SauceStationBlock> SAUCE_STATIONS = new java.util.ArrayList<>();
+    public static final java.util.List<BlockItem> SAUCE_STATION_ITEMS = new java.util.ArrayList<>();
+
+    static {
+        java.util.List<String> bodies = new java.util.ArrayList<>(TABLE_WOODS);
+        bodies.add("iron");
+        for (String body : bodies) {
+            boolean iron = body.equals("iron");
+            net.minecraft.block.Block like = iron ? net.minecraft.block.Blocks.IRON_BLOCK
+                : Registries.BLOCK.get(new net.minecraft.util.Identifier("minecraft", body + "_planks"));
+            SauceStationBlock station = Registry.register(Registries.BLOCK, GeneratedMod.id(body + "_sauce_station"),
+                new SauceStationBlock(net.minecraft.block.AbstractBlock.Settings.copy(like).nonOpaque()));
+            SAUCE_STATIONS.add(station);
+            SAUCE_STATION_ITEMS.add(Registry.register(Registries.ITEM, GeneratedMod.id(body + "_sauce_station"),
+                new BlockItem(station, new Item.Settings())));
+        }
+    }
+
+    /** 蘸料台的「上半截」：看不见，占住头顶那一格（没有物品；2026-10-23，Claude）。 */
+    public static final SauceStationTopBlock SAUCE_STATION_TOP = Registry.register(Registries.BLOCK,
+        GeneratedMod.id("sauce_station_top"), new SauceStationTopBlock());
+
+    public static final BlockEntityType<SauceStationBlockEntity> SAUCE_STATION_BE = Registry.register(
+        Registries.BLOCK_ENTITY_TYPE, GeneratedMod.id("sauce_station"),
+        FabricBlockEntityTypeBuilder.create(SauceStationBlockEntity::new,
+            SAUCE_STATIONS.toArray(new net.minecraft.block.Block[0])).build());
+    public static final ExtendedScreenHandlerType<SauceStationScreenHandler> SAUCE_STATION_SCREEN =
+        Registry.register(Registries.SCREEN_HANDLER, GeneratedMod.id("sauce_station"),
+            new ExtendedScreenHandlerType<>(SauceStationScreenHandler::new));
 
     /** 独立锅方块仍保留，兼容未放在灶台上的旧世界与自由摆放。 */
     public static final BlockEntityType<HotPotBlockEntity> HOT_POT_BE = Registry.register(
@@ -237,16 +349,36 @@ public final class HotPotContent {
                 entries.add(CHOPSTICKS);
                 entries.add(RAW_TRIPE);
                 entries.add(COOKED_TRIPE);
+                entries.add(FATTY_BEEF_ROLL);
+                entries.add(COOKED_FATTY_BEEF_ROLL);
+                entries.add(MUTTON_ROLL);
+                entries.add(COOKED_MUTTON_ROLL);
+                entries.add(POTATO_SLICE);
+                entries.add(COOKED_POTATO_SLICE);
+                entries.add(SOYBEAN);
+                entries.add(TOFU);
+                entries.add(TOFU_CUBE);
+                entries.add(COOKED_TOFU_CUBE);
+                for (Item ball : new Item[]{BEEF_MEATBALL, COOKED_BEEF_MEATBALL, CILANTRO_BEEF_MEATBALL, COOKED_CILANTRO_BEEF_MEATBALL, PORK_MEATBALL, COOKED_PORK_MEATBALL, CILANTRO_PORK_MEATBALL, COOKED_CILANTRO_PORK_MEATBALL, MUTTON_MEATBALL, COOKED_MUTTON_MEATBALL, CILANTRO_MUTTON_MEATBALL, COOKED_CILANTRO_MUTTON_MEATBALL, FISH_BALL, COOKED_FISH_BALL, CILANTRO_FISH_BALL, COOKED_CILANTRO_FISH_BALL}) {
+                    entries.add(ball);
+                }
+                entries.add(KITCHEN_KNIFE);
+                entries.add(ROLLING_PIN);
+                entries.add(CUTTING_BOARD_ITEM);
                 SOUP_BOWLS.forEach(entries::add);
                 entries.add(GUOCHENGDUO);
                 entries.add(EMPTY_GUOCHENGDUO);
                 entries.add(WEIER);
                 entries.add(EMPTY_WEIER);
+                entries.add(SCALLION);
+                entries.add(CILANTRO);
+                entries.add(DIPPING_SAUCE);
                 HOTPOT_TABLE_ITEMS.forEach(entries::add);
                 BENCH_ITEMS.forEach(entries::add);
                 TALL_TABLE_ITEMS.forEach(entries::add);
                 TALL_BENCH_ITEMS.forEach(entries::add);
                 PLATE_ITEMS.forEach(entries::add);
+                SAUCE_STATION_ITEMS.forEach(entries::add);
             })
             .build());
 
@@ -258,6 +390,8 @@ public final class HotPotContent {
         // 触碰静态字段，明确让物品组在客户端和服务端都完成初始化。
         ITEM_GROUP.getDisplayName();
         TripeLoot.register();
+        GarnishLoot.register();
+        OpenSauceRestockPayload.register();
         // 下界木（绯红、诡异）不可燃，其余和原版木板一样会着火
         for (int i = 0; i < TABLE_WOODS.size(); i++) {
             String wood = TABLE_WOODS.get(i);
@@ -268,8 +402,17 @@ public final class HotPotContent {
                     .add(BENCHES.get(i), 5, 20);
                 net.fabricmc.fabric.api.registry.FlammableBlockRegistry.getDefaultInstance()
                     .add(TALL_BENCHES.get(i), 5, 20);
+                // 高火锅桌以前漏了，不会着火（Claude 改，2026-10-23，用户要求修；Forge 系移植版已经会着火）
+                net.fabricmc.fabric.api.registry.FlammableBlockRegistry.getDefaultInstance()
+                    .add(TALL_TABLES.get(i), 5, 20);
+                // 木头蘸料台（和 TABLE_WOODS 同序，铁的在最后不登记）也会着火（Claude 改，2026-10-23，用户要求）
+                net.fabricmc.fabric.api.registry.FlammableBlockRegistry.getDefaultInstance()
+                    .add(SAUCE_STATIONS.get(i), 5, 20);
             }
         }
+        // 砧板（橡木）也会着火，数值同桌子（Claude 改，2026-10-23，用户要求）
+        net.fabricmc.fabric.api.registry.FlammableBlockRegistry.getDefaultInstance()
+            .add(CUTTING_BOARD, 5, 20);
         // 灶上有锅时，对着锅挖只挖下锅（连汤带菜打包掉落），灶台留着；对着灶身挖才挖整个灶台
         net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.BEFORE.register(
             (world, player, pos, state, blockEntity) -> {

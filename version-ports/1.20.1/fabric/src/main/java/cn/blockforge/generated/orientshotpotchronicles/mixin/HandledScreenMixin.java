@@ -1,3 +1,4 @@
+// 0.1.2 的 1.20.1 Fabric 接口迁移：Codex 改。
 package cn.blockforge.generated.orientshotpotchronicles.mixin;
 
 import cn.blockforge.generated.orientshotpotchronicles.client.HotPotScreen;

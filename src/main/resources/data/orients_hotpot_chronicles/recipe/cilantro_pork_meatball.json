@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "orients_hotpot_chronicles:pork_meatball"
+    },
+    {
+      "item": "orients_hotpot_chronicles:pork_meatball"
+    },
+    {
+      "item": "orients_hotpot_chronicles:cilantro"
+    }
+  ],
+  "result": {
+    "id": "orients_hotpot_chronicles:cilantro_pork_meatball",
+    "count": 2
+  }
+}

@@ -15,11 +15,11 @@ Minecraft 1.20.1 / 1.20.4 / 1.21.1 · Fabric / Forge / NeoForge · 作者 / Auth
 </div>
 
 > [!WARNING]
-> **测试版（alpha）**：现在是 `0.1.1-alpha`，可能有 bug。请先在新存档里试玩，并备份你的存档。
-> **从 0.1.0-alpha.1 升级**：本次有多项不兼容的物品 / 方块 ID 调整，旧存档中本模组的物品和方块可能丢失或发生变化。请备份存档，并在新存档里玩。
+> **测试版（alpha）**：现在是 `0.1.2-alpha`，可能有 bug。请先在新存档里试玩，并备份你的存档。
+> **旧存档**：1.21.1 Fabric 恢复了部分早期 ID 的识别；其他移植版不转换 0.1.0-alpha.1 存档。请先备份并用新存档试玩，不能据此保证旧存档完整兼容。
 >
-> **Alpha version**: this is `0.1.1-alpha` and may contain bugs. Please try it in a new world first and back up your saves.
-> **Upgrading from 0.1.0-alpha.1**: this version includes incompatible item and block ID changes. This mod's items and blocks in old worlds may be lost or change. Back up your saves and use a new world.
+> **Alpha version**: this is `0.1.2-alpha` and may contain bugs. Please try it in a new world first and back up your saves.
+> **Older worlds**: 1.21.1 Fabric restores recognition of some early IDs; the ports do not convert 0.1.0-alpha.1 worlds. Back up your saves and test in a new world first; complete old-world compatibility is not guaranteed.
 
 <a id="downloads"></a>
 
@@ -27,27 +27,39 @@ Minecraft 1.20.1 / 1.20.4 / 1.21.1 · Fabric / Forge / NeoForge · 作者 / Auth
 
 请按 Minecraft 版本和加载器下载对应文件；只有 Fabric 版需要同版本 Fabric API。 / Choose the file matching your Minecraft version and loader; only Fabric builds require the matching Fabric API.
 
-| Minecraft | 加载器 / Loader | Java | 模组版本 / Mod version | 下载 / Download |
+| Minecraft | 加载器 / Loaders | Java | 模组版本 / Mod version | 下载 / Download |
 | --- | --- | --- | --- | --- |
-| 1.20.1 | Fabric | 17+ | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.1-fabric) |
+| 1.20.1 | Fabric + Forge | 17+ | 0.1.2-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha-mc1.20.1) |
+| 1.21.1 | Fabric + NeoForge | 21+ | 0.1.2-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha-mc1.21.1) |
 | 1.20.4 | Fabric | 17+ | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) |
-| 1.21.1 | Fabric | 21+ | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha) |
-| 1.20.1 | Forge | 17+ | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.1-forge) |
-| 1.21.1 | NeoForge | 21+ | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.21.1-neoforge) |
 
-> **1.20.1 / 1.20.4 Fabric 移植版**：目前仅做过初步测试，与其他模组的兼容性及潜在 bug 尚未充分验证。建议备份存档，优先在新存档中试玩，欢迎反馈问题。
->
-> **1.20.1 / 1.20.4 Fabric ports**: Only preliminary testing has been performed. Compatibility with other mods and potential bugs have not been thoroughly verified. Back up your saves, try the mod in a new world first, and report any issues.
+同一 MC 版本的各加载器共用一个发布页，请下载文件名中加载器与游戏配置一致的 JAR。1.20.4 尚未同步 0.1.2 的蘸料与切菜内容。
 
-**移植版已发布 / Ports released**：Minecraft **1.20.1 Forge** 和 **1.21.1 NeoForge** 的 0.1.1-alpha 已作为测试版发布，下载见上表。
-
-The 0.1.1-alpha ports for Minecraft **1.20.1 Forge** and **1.21.1 NeoForge** are now available as pre-releases. Download the matching build from the table above.
+Builds for the same Minecraft version share a release page. Choose the JAR for your loader. Minecraft 1.20.4 remains on 0.1.1-alpha and does not include the 0.1.2 sauce and food-preparation additions.
 
 > 目前仅做过初步测试，与其他模组的兼容性及潜在 bug 尚未充分验证。请备份存档，优先在新存档中试玩，欢迎反馈问题。
 >
-> Only preliminary testing has been performed. Compatibility with other mods and potential bugs have not been thoroughly verified. Back up your saves and try this version in a new world first. Bug reports are welcome.
+> Only preliminary testing has been performed. Compatibility with other mods and potential bugs have not been thoroughly verified. Back up your saves and try a new world first. Bug reports are welcome.
 
 [各版本源码与说明 · Port sources and notes](version-ports/README.md)
+
+## 0.1.2-alpha 新增 · What's new
+
+以下内容适用于 1.20.1 / 1.21.1 的 0.1.2-alpha，1.20.4 仍为旧版。
+
+- **蘸料台与九种小料**：11 种木头与铁制蘸料台；味精、辣油、酸甜酱、蜂蜜、香油、醋、白糖、葱花、香菜碎末。右键打开总览，再进入补货界面放入对应原料；拿碗点小碗打蘸料，一碗可蘸 9 口。
+- **副手蘸料**：把蘸料碗放在副手，在火锅界面或用筷子吃东西时自动蘸一口。
+- **砧板、菜刀和擀面杖**：切肥牛卷、羊肉卷、土豆片和豆腐块；擀面杖在砧板上捣三下做肉丸，支持牛肉、猪肉、羊肉、鱼肉及香菜版本，切石机也能处理切片配方。
+- **草掉食材**：打草获得小葱、香菜、黄豆；黄豆与水桶合成豆腐。
+- **修复与调整**：改进中键复制、单个物品选中框、界面悬停提示；可燃木材的高桌、木制蘸料台和砧板会燃烧，绯红、诡异与铁制蘸料台不燃。
+
+These additions are included in 0.1.2-alpha for Minecraft 1.20.1 / 1.21.1; Minecraft 1.20.4 stays on the previous release.
+
+- **Sauce stations and nine seasonings**: stations in 11 wood types plus iron. Open the overview, enter the restock screen and add ingredients; use a bowl on a seasoning cup to prepare dipping sauce with 9 bites.
+- **Off-hand dipping sauce**: hold the sauce bowl in your off hand to dip automatically while eating through the hotpot screen or chopsticks.
+- **Cutting board, kitchen knife and rolling pin**: make fatty beef rolls, mutton rolls, potato slices and tofu pieces. Pound meat three times for beef, pork, mutton or fish meatballs, including cilantro variants; slicing recipes also work in the stonecutter.
+- **Ingredients from grass**: scallions, cilantro and soybeans; craft tofu with soybeans and a water bucket.
+- **Fixes and adjustments**: improved pick-block behavior, individual selection outlines and screen tooltips; flammable tall tables, wooden sauce stations and cutting boards can burn, while crimson, warped and iron sauce stations remain nonflammable.
 
 ## 截图 · Screenshots
 
@@ -140,7 +152,7 @@ The Forge / NeoForge builds do not require Fabric API. The same 1.20.1 Forge JAR
 ### Forge / NeoForge
 
 1. Minecraft **1.20.1** 使用 [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html)（现有测试版本 **47.4.28**）；Minecraft **1.21.1** 使用 [NeoForge](https://neoforged.net/)（**21.1.264+**）。
-2. 对应预发布公开后，选择匹配加载器与 MC 版本的 JAR，放入客户端和服务端的 `mods` 文件夹。**这两版不需要 Fabric API。**
+2. 从上方发布页选择匹配加载器与 MC 版本的 JAR，放入客户端和服务端的 `mods` 文件夹。**这两版不需要 Fabric API。**
 
 1. Use [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) for Minecraft **1.20.1** (recorded test: **47.4.28**), or [NeoForge](https://neoforged.net/) **21.1.264+** for Minecraft **1.21.1**.
 2. Once the corresponding pre-release is published, select its matching JAR and put it in the `mods` folder on both client and server. **These builds do not require Fabric API.**
@@ -219,9 +231,9 @@ In Creative mode, the mod has its own tab, "Orient's Hotpot Chronicles", with su
 
 ## 合成表 · Recipes
 
-除了熟毛肚，都在工作台合成。表里的「空」表示那一格不放东西。
+下表列出基础工作台配方；熟食通过烹饪获得，新版切片还可用砧板或切石机加工。表里的「空」表示那一格不放东西。
 
-All recipes use a crafting table except Cooked Tripe. "空 / empty" means leave that slot empty.
+The table lists basic crafting-table recipes. Cook food with heat; newer slicing recipes also use the cutting board or stonecutter. "空 / empty" means leave that slot empty.
 
 | 物品 · Item | 配方 · Recipe | 产出 · Output |
 | --- | --- | --- |

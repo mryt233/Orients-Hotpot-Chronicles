@@ -1,3 +1,4 @@
+// 0.1.2 的 1.20.1 Fabric 接口迁移：Codex 改。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.block.Block;
@@ -106,6 +107,8 @@ public class PlateHolderBlockEntity extends BlockEntity {
 
     private final List<Placed> plates = new ArrayList<>();
     private VoxelShape shape;
+    /** 盘里的菜高出盘子多少像素（选中框 / 碰撞算上它）。 */
+    private static final double FOOD_H = 2.5;
 
     public PlateHolderBlockEntity(BlockPos pos, BlockState state) {
         super(HotPotContent.PLATE_HOLDER_BE, pos, state);
@@ -179,12 +182,24 @@ public class PlateHolderBlockEntity extends BlockEntity {
         }
     }
 
+    /** 一个盘子（连盘里的菜）的形状，选中框只框准星对着的那个时用。 */
+    public static VoxelShape partShape(Placed p, double lift) {
+        double top = p.plate.size().height();
+        if (p.items.stream().anyMatch(i -> !i.isEmpty())) {
+            top += FOOD_H;
+        }
+        return Block.createCuboidShape(p.x - p.halfX(), lift, p.z - p.halfZ(), p.x + p.halfX(), lift + top, p.z + p.halfZ());
+    }
+
     /** 所有盘子的形状拼起来（跟着桌面高低整体上下移）。 */
     public VoxelShape shape(double lift) {
         if (shape == null) {
             VoxelShape s = VoxelShapes.empty();
             for (Placed p : plates) {
                 double top = p.plate.size().height();
+                if (p.items.stream().anyMatch(i -> !i.isEmpty())) {
+                    top += FOOD_H;   // 盘里有菜：菜高出盘沿，准星对着菜也要算选中这个盘子（2026-10-23，Claude）
+                }
                 s = VoxelShapes.union(s, Block.createCuboidShape(p.x - p.halfX(), lift, p.z - p.halfZ(),
                     p.x + p.halfX(), lift + top, p.z + p.halfZ()));
             }

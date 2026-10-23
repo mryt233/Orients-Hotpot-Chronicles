@@ -1,3 +1,4 @@
+// 0.1.2 的 1.20.1 Forge 接口迁移：Codex 改。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.GeneratedMod;

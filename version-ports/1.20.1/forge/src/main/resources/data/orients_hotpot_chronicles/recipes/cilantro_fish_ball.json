@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "orients_hotpot_chronicles:fish_ball"
+    },
+    {
+      "item": "orients_hotpot_chronicles:fish_ball"
+    },
+    {
+      "item": "orients_hotpot_chronicles:cilantro"
+    }
+  ],
+  "result": {
+    "count": 2,
+    "item": "orients_hotpot_chronicles:cilantro_fish_ball"
+  }
+}

@@ -73,14 +73,20 @@ public final class CreativeSubTabs {
         if (stack.isOf(HotPotContent.CHOPSTICKS) || stack.getItem() instanceof PlateItem) {
             return Sub.TABLEWARE;
         }
+        if (stack.isOf(HotPotContent.KITCHEN_KNIFE) || stack.isOf(HotPotContent.CUTTING_BOARD_ITEM)
+            || stack.isOf(HotPotContent.ROLLING_PIN)) {
+            return Sub.COOKWARE;   // 菜刀、砧板算厨具（2026-10-23）
+        }
         if (stack.isOf(HotPotContent.RAW_TRIPE) || stack.isOf(HotPotContent.COOKED_TRIPE)
             || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkItem
             || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.EmptyBottleItem
+            || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem
             || (!(stack.getItem() instanceof BlockItem) && stack.isFood())) {
             return Sub.FOOD;
         }
         if (stack.getItem() instanceof BlockItem item) {
-            if (item.getBlock() instanceof StoveBlock || item.getBlock() instanceof HotPotBlock) {
+            if (item.getBlock() instanceof StoveBlock || item.getBlock() instanceof HotPotBlock
+                || item.getBlock() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlock) {   // 蘸料台算厨具（r103）
                 return Sub.COOKWARE;
             }
             if (item.getBlock() instanceof HotPotTableBlock) {

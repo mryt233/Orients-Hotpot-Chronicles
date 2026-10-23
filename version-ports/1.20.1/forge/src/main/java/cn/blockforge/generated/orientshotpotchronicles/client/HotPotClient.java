@@ -1,3 +1,4 @@
+// 0.1.2 的 1.20.1 Forge 接口迁移：Codex 改。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
@@ -29,10 +30,17 @@ public final class HotPotClient {
         HandledScreens.register(HotPotContent.HOT_POT_SCREEN, HotPotScreen::new);
         HandledScreens.register(HotPotContent.STOVE_SCREEN, StoveScreen::new);
         CreativeSubTabs.register();
+        PartOutlineRenderer.register();
+        HandledScreens.register(HotPotContent.SAUCE_STATION_SCREEN, SauceStationScreen::new);
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlock.openOverview =
+            (pos, name) -> net.minecraft.client.MinecraftClient.getInstance().setScreen(new SauceOverviewScreen(pos, name));
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(
             (net.minecraftforge.event.entity.player.ItemTooltipEvent event) -> {
                 appendPotTooltip(event.getItemStack(), event.getToolTip());
                 appendPlateTooltip(event.getItemStack(), event.getToolTip());
+                int dipped = cn.blockforge.generated.orientshotpotchronicles.hotpot.ItemData.dipped(event.getItemStack());
+                if (dipped != 0) event.getToolTip().add(Text.translatable(HotPotBlockEntity.key("tooltip.dipped"),
+                    cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem.names(dipped)).formatted(Formatting.GOLD));
             });
         // 装着汤的锅物品（掉在地上、物品栏里）显示对应汤面：谓词 = (汤底编号 + 1) / 10，没汤为 0（r94，Claude）
         for (net.minecraft.item.Item pot : new net.minecraft.item.Item[]{
@@ -58,6 +66,8 @@ public final class HotPotClient {
         event.registerBlockEntityRenderer(HotPotContent.STOVE_BE, HotPotBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(HotPotContent.PLATE_HOLDER_BE, PlateHolderRenderer::new);
         event.registerBlockEntityRenderer(HotPotContent.BENCH_BE, BenchLegsRenderer::new);
+        event.registerBlockEntityRenderer(HotPotContent.SAUCE_STATION_BE, SauceStationRenderer::new);
+        event.registerBlockEntityRenderer(HotPotContent.CUTTING_BOARD_BE, CuttingBoardRenderer::new);
         event.registerEntityRenderer(HotPotContent.SEAT, net.minecraft.client.render.entity.EmptyEntityRenderer::new);
     }
 

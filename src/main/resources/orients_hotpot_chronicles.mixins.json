@@ -6,7 +6,10 @@
   "mixins": [
     "BlockStateTableDecorMixin",
     "BowlItemMixin",
-    "EntityRaycastMixin"
+    "EntityRaycastMixin",
+    "LivingEntityEatMixin",
+    "LegacyIdRegistryMixin",
+    "LegacyIdDefaultedRegistryMixin"
   ],
   "client": [
     "ClientPlayerInteractionManagerMixin",

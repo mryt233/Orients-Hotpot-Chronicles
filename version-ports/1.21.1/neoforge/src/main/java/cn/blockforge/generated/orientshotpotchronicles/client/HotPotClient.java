@@ -1,3 +1,4 @@
+// 0.1.2 的 NeoForge 接口迁移：Codex 改。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
@@ -28,10 +29,16 @@ public final class HotPotClient {
 
     private static void setupClient() {
         CreativeSubTabs.register();
+        PartOutlineRenderer.register();
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlock.openOverview =
+            (pos, name) -> net.minecraft.client.MinecraftClient.getInstance().setScreen(new SauceOverviewScreen(pos, name));
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
             (net.neoforged.neoforge.event.entity.player.ItemTooltipEvent event) -> {
                 appendPotTooltip(event.getItemStack(), event.getToolTip());
                 appendPlateTooltip(event.getItemStack(), event.getToolTip());
+                Integer dipped = event.getItemStack().get(HotPotContent.DIPPED);
+                if (dipped != null && dipped != 0) event.getToolTip().add(Text.translatable(
+                    HotPotBlockEntity.key("tooltip.dipped"), cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem.names(dipped)).formatted(Formatting.GOLD));
             });
         // 装着汤的锅物品（掉在地上、物品栏里）显示对应汤面：谓词 = (汤底编号 + 1) / 10，没汤为 0（r94，Claude）
         for (net.minecraft.item.Item pot : new net.minecraft.item.Item[]{
@@ -56,6 +63,7 @@ public final class HotPotClient {
     public static void registerScreens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) {
         event.register(HotPotContent.HOT_POT_SCREEN, HotPotScreen::new);
         event.register(HotPotContent.STOVE_SCREEN, StoveScreen::new);
+        event.register(HotPotContent.SAUCE_STATION_SCREEN, SauceStationScreen::new);
     }
 
     @net.neoforged.bus.api.SubscribeEvent
@@ -64,12 +72,15 @@ public final class HotPotClient {
         event.registerBlockEntityRenderer(HotPotContent.STOVE_BE, HotPotBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(HotPotContent.PLATE_HOLDER_BE, PlateHolderRenderer::new);
         event.registerBlockEntityRenderer(HotPotContent.BENCH_BE, BenchLegsRenderer::new);
+        event.registerBlockEntityRenderer(HotPotContent.SAUCE_STATION_BE, SauceStationRenderer::new);
+        event.registerBlockEntityRenderer(HotPotContent.CUTTING_BOARD_BE, CuttingBoardRenderer::new);
         event.registerEntityRenderer(HotPotContent.SEAT, net.minecraft.client.render.entity.EmptyEntityRenderer::new);
     }
 
     @net.neoforged.bus.api.SubscribeEvent
     public static void registerItemExtensions(net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent event) {
         HeldFoodItemRenderer.register(event);
+        SauceRender.register(event);
         for (net.minecraft.item.BlockItem item : HotPotContent.TALL_BENCH_ITEMS) {
             NeoItemRenderers.register(event, item, (stack, mode, matrices, consumers, light, overlay) -> {
                 var state = item.getBlock().getDefaultState();

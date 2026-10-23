@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "orients_hotpot_chronicles:sauce_station",
+  "category": "misc",
+  "pattern": [
+    "  B",
+    " BP",
+    "BPP"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:bowl"
+    },
+    "P": {
+      "item": "minecraft:dark_oak_planks"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "orients_hotpot_chronicles:dark_oak_sauce_station"
+  }
+}

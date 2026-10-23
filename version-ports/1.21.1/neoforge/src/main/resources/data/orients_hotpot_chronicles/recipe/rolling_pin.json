@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "L",
+    "S"
+  ],
+  "key": {
+    "L": {
+      "tag": "minecraft:logs"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:rolling_pin",
+    "count": 1
+  }
+}

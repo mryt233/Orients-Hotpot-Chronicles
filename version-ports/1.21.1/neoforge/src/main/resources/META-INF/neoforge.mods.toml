@@ -7,7 +7,7 @@ modId="orients_hotpot_chronicles"
 version="${version}"
 displayName="Orient's Hotpot Chronicles"
 authors="Orient; NeoForge 移植：Codex"
-description='之晗的火锅物语：已发布 0.1.1-alpha 的 NeoForge 1.21.1 移植。'
+description='之晗的火锅物语：0.1.2-alpha 的 NeoForge 1.21.1 移植。'
 logoFile="assets/orients_hotpot_chronicles/icon.png"
 [[dependencies.orients_hotpot_chronicles]]
 modId="neoforge"

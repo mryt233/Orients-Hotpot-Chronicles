@@ -1,116 +1,98 @@
 # Orient's Hotpot Chronicles · 之晗的火锅物语
 
-**Minecraft 1.20.1 · Forge · 0.1.1-alpha**
+<!-- 本文件由 version-ports/tools/gen_port_readme.py 生成（Claude）；要改请改脚本里的数据再生成。 -->
 
-[Full guide / 完整玩法](https://github.com/mryt233/Orients-Hotpot-Chronicles#readme) · [Download / 下载](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.1-forge) · [Report an issue / 反馈问题](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
+**Minecraft 1.20.1 · Forge · 0.1.2-alpha**
+
+[Download / 下载](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha-mc1.20.1) · [Full gameplay guide / 完整玩法](https://github.com/mryt233/Orients-Hotpot-Chronicles#readme) · [Report an issue / 反馈问题](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
 
 > **Alpha / 测试版**
-> Only preliminary testing has been performed. Compatibility with other mods and potential bugs have not been thoroughly verified. Back up your saves and try this version in a new world first. Bug reports are welcome.
+> Only preliminary testing has been performed. Compatibility with other mods and potential bugs have not been thoroughly verified. Back up your saves, try it in a new world first, and report any issues.
 >
 > 目前仅做过初步测试，与其他模组的兼容性及潜在 bug 尚未充分验证。请备份存档，优先在新存档中试玩，欢迎反馈问题。
+>
+> Some items, such as the drinks, have no ingredients or crafting recipes yet and are Creative-only.
+>
+> 部分物品（比如饮料）暂时没有原材料和合成配方，只能在创造模式物品栏获取。
 
-## English
+## Requirements · 运行要求
 
-A Forge port of the published **0.1.1-alpha**: brick stoves, iron and copper nine-grid hotpots, four broths, bamboo chopsticks, hotpot tables, stools, benches, plates, tripe, bowls and drinks. Drinks are Creative-only in this version. The later dipping-sauce stations, cutting boards and food-preparation additions are outside this release.
-
-### Requirements
-
-| Item | Requirement | Recorded test version |
+| Item / 项目 | Requirement / 要求 | Tested with / 测试版本 |
 | --- | --- | --- |
-| Minecraft | **1.20.1 only** | 1.20.1 |
-| Loader | **Forge 47.1+** | **47.4.28** |
+| Minecraft | **1.20.1 only / 仅 1.20.1** | 1.20.1 |
+| Loader / 加载器 | **Forge 47.1+** | 47.4.28 |
+| Fabric API | **Not required** / **不需要** | — |
 | Java | **17+** | Java 17 |
-| Installation | **Both client and server** | — |
-| Extra API dependency | Fabric API is not required for this build | — |
+| Installation / 安装位置 | **Both client and server / 客户端和服务端都要装** | — |
 
-### Installation
+## Installation · 安装
 
-1. Install [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) for Minecraft **1.20.1**. The recorded tests used **47.4.28**.
-2. Put `orients_hotpot_chronicles-1.20.1-forge-0.1.1-alpha.jar` into the `mods` folder on both client and server.
-3. Select the Minecraft **1.20.1 Forge** profile and launch with **Java 17 or newer**.
+1. Install [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) for Minecraft **1.20.1** (tested with 47.4.28).
+2. Put `orients_hotpot_chronicles-1.20.1-forge-0.1.2-alpha.jar` into the `mods` folder on both client and server.
+3. Launch the Minecraft **1.20.1 Forge** profile with **Java 17+**.
 
-The same Forge JAR also passed the recorded 15-check smoke test on a **NeoForge 1.20.1 / 47.1.106 dedicated server**. This does not establish full client, multiplayer or modpack compatibility.
+1. 安装 Minecraft **1.20.1** 对应的 [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html)（测试用 47.4.28）。
+2. 把 `orients_hotpot_chronicles-1.20.1-forge-0.1.2-alpha.jar` 放进客户端和服务端的 `mods` 文件夹。
+3. 选择 Minecraft **1.20.1 Forge** 启动配置，用 **Java 17+** 启动。
 
-### Preliminary tests and known differences
+The same JAR also passed preliminary server checks on **NeoForge 1.20.1 (47.1.106)**; client, multiplayer and modpack compatibility on that loader still need testing.
 
-The existing port reports record a successful build, client startup to the main menu, and **15/15 command-driven checks** in both the development and official dedicated-server environments. The checks cover selected block placements, campfire cooking, a dropped pot retaining its contents, and tripe drops.
+同一个 JAR 在 **NeoForge 1.20.1（47.1.106）** 服务端上也通过了初步检查；该加载器下的客户端、多人和整合包仍需测试。
 
-Player-operated interactions, screens, visual effects, multiplayer and other-mod combinations still need broader testing. Registration of custom renderers does not establish that every visual detail is correct.
+## About this port · 移植说明
 
-Compared with the published Fabric 0.1.1-alpha builds:
+This is the **Minecraft 1.20.1 Forge** port of the published **0.1.2-alpha** (originally made for Minecraft 1.21.1 Fabric). It includes: brick stoves, iron and copper nine-grid hotpots, four broths, bamboo chopsticks, hotpot tables, stools, benches, plates, tripe, bowls and drinks; dipping-sauce stations with nine seasonings and bowls of dipping sauce; a cutting board, iron kitchen knife and rolling pin with fatty beef rolls, mutton rolls, potato slices, soybeans, tofu and meatballs; scallions and cilantro from grass.
 
-- Tall hotpot tables made from flammable woods can burn; crimson and warped variants remain nonflammable.
-- Cow and mooshroom drops may still receive tripe when a data pack replaces their loot tables.
-- Pot steam in Minecraft 1.20.1 uses white cloud particles.
+本版是已发布的 **0.1.2-alpha**（原版本为 Minecraft 1.21.1 Fabric）的 **Minecraft 1.20.1 Forge 移植版**，包含：灶台、铁锅 / 铜锅、四种汤底、竹筷、火锅桌、桌凳、盘子、毛肚、碗与饮料；蘸料台、九种小料和蘸料；砧板、铁菜刀、擀面杖，以及肥牛卷、羊肉卷、土豆片、黄豆、豆腐和丸子；草里掉的小葱、香菜。
 
-## 中文
+Differences from the main 1.21.1 Fabric build / 和 1.21.1 Fabric 主版本的差异：
 
-本版是已发布 **0.1.1-alpha** 的 **Minecraft 1.20.1 Forge 移植版**，包含灶台、铁锅 / 铜锅、四种汤底、竹筷、火锅桌、桌凳、盘子、毛肚、碗与饮料。饮料在本版中仍只能通过创造模式获取，后续开发的蘸料台、砧板和切菜等内容不属于本版。
+- Pot steam uses white cloud particles (Minecraft 1.20.1 has no white-smoke particle). / 锅里的热气用白色云粒子（Minecraft 1.20.1 没有白烟粒子）。
+- If a data pack replaces the cow, mooshroom or grass loot tables, tripe, scallions, cilantro and soybeans are still added. / 数据包整个替换牛、哞菇或草的掉落表时，本版仍会加上毛肚、小葱、香菜、黄豆。
+- Worlds from 0.1.0-alpha.1 are not converted (this port starts from 0.1.1-alpha). / 不转换 0.1.0-alpha.1 的旧存档（本移植版从 0.1.1-alpha 开始）。
 
-### 运行要求
+## Test status · 测试范围
 
-- 仅支持 **Minecraft 1.20.1**，使用 **Forge 47.1+**（现有测试版本：**47.4.28**）。
-- 使用 **Java 17 或更新版本**。
-- **客户端与服务端均需安装**，本版**不需要 Fabric API**。
+Build; 27 command checks each on the development server, the official Forge 47.4.28 server and the NeoForge 47.1.106 server; 85 client-side checks (render extensions, flammability, etc.); client startup to the main menu.
 
-### 安装
+构建；开发环境、官方 Forge 47.4.28、NeoForge 47.1.106 服务端各 27 项命令检查；客户端 85 项检查（渲染扩展、可燃等）；客户端启动到主菜单。
 
-1. 安装 Minecraft **1.20.1** 对应的 [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html)；建议先使用已记录测试的 **47.4.28**。
-2. 将 `orients_hotpot_chronicles-1.20.1-forge-0.1.1-alpha.jar` 放入客户端和服务端的 `mods` 文件夹。
-3. 选择 Minecraft **1.20.1 Forge** 配置，用 **Java 17+** 启动。
+Player interactions, screens, visuals, multiplayer and other-mod combinations still need in-game testing.
 
-同一个 Forge JAR 另在 **NeoForge 1.20.1 / 47.1.106 正式服务端**通过了记录中的 15 项初步检查；这不代表客户端、联机或整合包兼容性已全部验证。
-
-### 初步测试与已知差异
-
-现有移植报告记录了构建成功、客户端启动至主菜单，以及开发环境和官方正式服务端各 **15/15 项命令检查通过**。检查覆盖部分方块摆放、篝火烹饪、挖锅保留内容、毛肚掉落。
-
-右键交互、菜单操作、实际渲染、多人联机和其他模组组合仍需进一步实测。渲染器已注册不代表所有视觉细节都已验收。
-
-相较已发布的 Fabric 0.1.1-alpha：
-
-- 可燃木材的高火锅桌现在会燃烧，绯红与诡异木版本仍不可燃。
-- 数据包替换牛 / 哞菇掉落表后，本版仍可能额外加入毛肚掉落。
-- Minecraft 1.20.1 的锅中热气使用白色云粒子。
+右键交互、界面、画面效果、多人联机和其他模组搭配仍需进游戏实测。
 
 ## Other builds · 其他版本
 
-<!-- Claude 改（2026-10-23）：各移植版都已完成，列出全部版本，替换原来的「后续移植」。 -->
+Choose the JAR matching your Minecraft version and loader. Download the one that matches your game from the [Releases](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) page.
 
-Choose the JAR matching your Minecraft version and loader. All builds below are available as alpha pre-releases on the [Releases](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) page.
+请按 Minecraft 版本和加载器选择对应 JAR，请到 [Releases / 发布页](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) 下载和自己游戏对得上的那一个。
 
-请按 Minecraft 版本和加载器选择对应 JAR。下表各版本均已作为 alpha 测试版发布，可到 [Releases / 发布页](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) 下载。
-
-| Minecraft | Loader / 加载器 | File / 文件 | Java | Status / 状态 |
-| --- | --- | --- | --- | --- |
-| 1.21.1 | Fabric（main / 主版本） | `orients_hotpot_chronicles-1.21.1-fabric-0.1.1-alpha.jar` | 21+ | Published alpha / 已发布测试版 |
-| 1.21.1 | NeoForge | `orients_hotpot_chronicles-1.21.1-neoforge-0.1.1-alpha.jar` | 21+ | [Published alpha / 已发布测试版](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.21.1-neoforge) |
-| 1.20.4 | Fabric | `orients_hotpot_chronicles-1.20.4-fabric-0.1.1-alpha.jar` | 17+ | Published alpha / 已发布测试版 |
-| 1.20.1 | Fabric | `orients_hotpot_chronicles-1.20.1-fabric-0.1.1-alpha.jar` | 17+ | Published alpha / 已发布测试版 |
-| 1.20.1 | Forge | `orients_hotpot_chronicles-1.20.1-forge-0.1.1-alpha.jar` | 17+ | [Published alpha / 已发布测试版](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.1-forge) |
+| Minecraft | Loader / 加载器 | File / 文件 | Java |
+| --- | --- | --- | --- |
+| 1.21.1 | Fabric（main / 主版本） | [`orients_hotpot_chronicles-1.21.1-fabric-0.1.2-alpha.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha-mc1.21.1) | 21+ |
+| 1.21.1 | NeoForge | [`orients_hotpot_chronicles-1.21.1-neoforge-0.1.2-alpha.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha-mc1.21.1) | 21+ |
+| 1.20.4 | Fabric | [`orients_hotpot_chronicles-1.20.4-fabric-0.1.1-alpha.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) | 17+ |
+| 1.20.1 | Fabric | [`orients_hotpot_chronicles-1.20.1-fabric-0.1.2-alpha.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha-mc1.20.1) | 17+ |
+| 1.20.1 | Forge | [`orients_hotpot_chronicles-1.20.1-forge-0.1.2-alpha.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha-mc1.20.1) | 17+ |
 
 Fabric builds need [Fabric API](https://modrinth.com/mod/fabric-api) for the same Minecraft version; Forge and NeoForge builds do not.
 
 Fabric 版需要同 Minecraft 版本的 Fabric API；Forge 和 NeoForge 版不需要。
 
-The 1.20.1 Forge JAR also passed preliminary command checks on a NeoForge 1.20.1 / 47.1.106 dedicated server. Client, multiplayer and modpack compatibility on that loader still need testing.
-
-1.20.1 Forge 的同一 JAR 还在 NeoForge 1.20.1 / 47.1.106 正式服务端通过了初步命令检查；该加载器下的客户端、联机和整合包兼容性仍需验证。
-
 ## Release file · 发行文件
 
-`orients_hotpot_chronicles-1.20.1-forge-0.1.1-alpha.jar`
+`orients_hotpot_chronicles-1.20.1-forge-0.1.2-alpha.jar`
 
-SHA-256: `183d4fb75b8a6f44f42cb25c74fd69bcb05562bb432cec4bb55b7cebf1eb4e6c`
+SHA-256: `fde6c52dd52c1a35c5695d65f9c90349058322f54e21e047bdc01c5384ec57b1`
 
 ## Build · 构建
 
-This directory is an independent Architectury Loom project. Use **JDK 17** and run `./gradlew build` on Linux/macOS, or `.\gradlew.bat build` on Windows. Initial builds need dependency downloads.
+This directory is an independent Gradle project: Architectury Loom with Yarn mappings; JDK 17. Run `./gradlew build` (Linux/macOS) or `.\gradlew.bat build` (Windows) here. The first build downloads dependencies.
 
-本目录为独立 Architectury Loom 工程，使用 **JDK 17**，在本目录运行 Windows 的 `.\gradlew.bat build` 或 Linux/macOS 的 `./gradlew build`。首次构建需要下载依赖。公开源码不固定开发机器的 JDK 路径或代理；本地开发环境按移植手册继续使用已配置的固定代理。
+本目录是独立 Gradle 工程：Architectury Loom + Yarn 映射；JDK 17。在本目录运行 `.\gradlew.bat build`（Windows）或 `./gradlew build`（Linux/macOS），首次构建需要下载依赖。
 
 ## License · 许可证
 
-Code / 源代码：[MIT](LICENSE)。Original non-code assets / 原创非代码资源：[CC BY-NC-SA 4.0](ASSETS_LICENSE)。两类内容分别受对应许可约束，Minecraft 原版及第三方素材遵循原权利人的条款。
+Code / 源代码：[MIT](LICENSE)。Original non-code assets / 原创非代码资源：[CC BY-NC-SA 4.0](ASSETS_LICENSE)。Minecraft 原版及第三方素材遵循原权利人的条款。
 
 Author / 作者：蘧白川 / Orient · [mryt233](https://github.com/mryt233)

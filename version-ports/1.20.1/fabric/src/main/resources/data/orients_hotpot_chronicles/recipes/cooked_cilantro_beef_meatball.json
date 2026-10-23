@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": {
+    "item": "orients_hotpot_chronicles:cilantro_beef_meatball"
+  },
+  "result": "orients_hotpot_chronicles:cooked_cilantro_beef_meatball",
+  "experience": 0.35,
+  "cookingtime": 100
+}

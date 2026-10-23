@@ -6,13 +6,14 @@
   "mixins": [
     "BlockStateTableDecorMixin",
     "BowlItemMixin",
-    "EntityRaycastMixin"
+    "EntityRaycastMixin",
+    "LivingEntityEatMixin"
   ],
   "client": [
     "ClientPlayerInteractionManagerMixin",
-    "HandledScreenMixin",
     "CreativeInventoryScreenAccessor",
     "CreativeInventoryScreenMixin",
+    "HandledScreenMixin",
     "BowlClientExtensionsMixin"
   ],
   "injectors": {

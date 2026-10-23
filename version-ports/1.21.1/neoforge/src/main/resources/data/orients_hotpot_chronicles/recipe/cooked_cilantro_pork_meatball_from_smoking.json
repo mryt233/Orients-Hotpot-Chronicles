@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smoking",
+  "category": "food",
+  "ingredient": {
+    "item": "orients_hotpot_chronicles:cilantro_pork_meatball"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_cilantro_pork_meatball"
+  },
+  "experience": 0.35,
+  "cookingtime": 50
+}
