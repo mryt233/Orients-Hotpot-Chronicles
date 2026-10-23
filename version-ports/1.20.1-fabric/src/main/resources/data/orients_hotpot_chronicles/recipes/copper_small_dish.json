@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "orients_hotpot_chronicles:plate_1x1",
+  "pattern": [
+    "MM"
+  ],
+  "key": {
+    "M": {
+      "item": "minecraft:copper_ingot"
+    }
+  },
+  "result": {
+    "item": "orients_hotpot_chronicles:copper_small_dish",
+    "count": 2
+  }
+}

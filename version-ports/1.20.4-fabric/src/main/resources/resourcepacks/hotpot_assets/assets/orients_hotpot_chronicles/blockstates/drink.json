@@ -1,0 +1,32 @@
+{
+  "variants": {
+    "axis=x,empty=false,kind=guochengduo": {
+      "model": "orients_hotpot_chronicles:block/guochengduo"
+    },
+    "axis=x,empty=true,kind=guochengduo": {
+      "model": "orients_hotpot_chronicles:block/guochengduo_empty"
+    },
+    "axis=z,empty=false,kind=guochengduo": {
+      "model": "orients_hotpot_chronicles:block/guochengduo",
+      "y": 90
+    },
+    "axis=z,empty=true,kind=guochengduo": {
+      "model": "orients_hotpot_chronicles:block/guochengduo_empty",
+      "y": 90
+    },
+    "axis=x,empty=false,kind=weier": {
+      "model": "orients_hotpot_chronicles:block/weier"
+    },
+    "axis=x,empty=true,kind=weier": {
+      "model": "orients_hotpot_chronicles:block/weier_empty"
+    },
+    "axis=z,empty=false,kind=weier": {
+      "model": "orients_hotpot_chronicles:block/weier",
+      "y": 90
+    },
+    "axis=z,empty=true,kind=weier": {
+      "model": "orients_hotpot_chronicles:block/weier_empty",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,33 @@
+build/
+.gradle/
+run/
+logs/
+*.class
+tools/out/
+
+# 作者：Codex；2026-10-22 Codex 改：GitHub 发布范围及本地敏感文件排除。
+# 开发记录与发布准备材料仅留本地。
+DEV_LOG.md
+HANDOVER.md
+promo/
+Releases/
+model-previews/
+texture-preview*.png
+
+# 本地环境、依赖缓存与凭据。
+.env
+.env.*
+!.env.example
+!.env.template
+node_modules/
+__pycache__/
+*.py[cod]
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

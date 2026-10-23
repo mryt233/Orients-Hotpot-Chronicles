@@ -8,9 +8,9 @@
 
 Cook a nine-grid hotpot in Minecraft: build a stove, seat a pot on it, pour in a broth, light the fire, cook your food and eat it with chopsticks.
 
-Minecraft 1.21.1 · Fabric · 作者 / Author：蘧白川 / Orient（GitHub：[@mryt233](https://github.com/mryt233)）
+Minecraft 1.20.1 / 1.20.4 / 1.21.1 · Fabric · 作者 / Author：蘧白川 / Orient（GitHub：[@mryt233](https://github.com/mryt233)）
 
-[下载测试版 · Download Alpha](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha) · [更新日志 · Changelog](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) · [反馈问题 · Report an Issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
+[下载测试版 · Download Alpha](#downloads) · [更新日志 · Changelog](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) · [反馈问题 · Report an Issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
 
 </div>
 
@@ -20,6 +20,28 @@ Minecraft 1.21.1 · Fabric · 作者 / Author：蘧白川 / Orient（GitHub：[@
 >
 > **Alpha version**: this is `0.1.1-alpha` and may contain bugs. Please try it in a new world first and back up your saves.
 > **Upgrading from 0.1.0-alpha.1**: this version includes incompatible item and block ID changes. This mod's items and blocks in old worlds may be lost or change. Back up your saves and use a new world.
+
+<a id="downloads"></a>
+
+## 下载与移植进度 · Downloads and ports
+
+请按 Minecraft 版本下载对应文件，并安装同版本 Fabric API。 / Choose the file matching your Minecraft version and install the matching Fabric API.
+
+| Minecraft | 加载器 / Loader | Java | 模组版本 / Mod version | 下载 / Download |
+| --- | --- | --- | --- | --- |
+| 1.20.1 | Fabric | 17+ | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.1-fabric) |
+| 1.20.4 | Fabric | 17+ | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) |
+| 1.21.1 | Fabric | 21+ | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha) |
+
+> **1.20.1 / 1.20.4 Fabric 移植版**：目前仅做过初步测试，与其他模组的兼容性及潜在 bug 尚未充分验证。建议备份存档，优先在新存档中试玩，欢迎反馈问题。
+>
+> **1.20.1 / 1.20.4 Fabric ports**: Only preliminary testing has been performed. Compatibility with other mods and potential bugs have not been thoroughly verified. Back up your saves, try the mod in a new world first, and report any issues.
+
+**移植中 / In progress**：Minecraft **1.20.1 Forge** 和 **1.21.1 NeoForge** 正在移植中，预计很快发布。
+
+Ports for Minecraft **1.20.1 Forge** and **1.21.1 NeoForge** are in progress and expected to be released soon.
+
+[各版本源码与说明 · Port sources and notes](version-ports/README.md)
 
 ## 截图 · Screenshots
 
@@ -81,11 +103,11 @@ Minecraft 1.21.1 · Fabric · 作者 / Author：蘧白川 / Orient（GitHub：[@
 
 | 项目 · Item | 要求 · Required | 作者测试用的版本 · Tested with |
 | --- | --- | --- |
-| Minecraft | 只支持 **1.21.1** · **1.21.1** only | 1.21.1 |
-| 加载器 · Loader | **Fabric**（没有 Forge / NeoForge 版 · no Forge / NeoForge version） | — |
+| Minecraft | **1.20.1 / 1.20.4 / 1.21.1**，分别下载对应文件 · separate downloads | 见上方下载表 · see downloads above |
+| 加载器 · Loader | **Fabric**；Forge / NeoForge 正在移植 · Forge / NeoForge ports in progress | — |
 | Fabric Loader | **0.15.11** 或更新 · or newer | 0.19.3 |
-| Fabric API | **1.21.1 版**，建议 0.116.14+1.21.1 或更新 · for 1.21.1, 0.116.14+1.21.1 or newer recommended | 0.116.14+1.21.1 |
-| Java | **21** 或更新 · or newer | 21 |
+| Fabric API | 使用对应 Minecraft 版本 · match your Minecraft version | 1.20.1: 0.92.12+1.20.1；1.20.4: 0.97.3+1.20.4；1.21.1: 0.116.14+1.21.1 |
+| Java | 1.20.1 / 1.20.4: **17+**；1.21.1: **21+** | 按对应版本选择 · match the selected version |
 | 安装位置 · Side | **客户端和服务端都要装** · **both client and server** | — |
 
 ### 和其他模组的兼容性 · Compatibility with other mods
@@ -96,19 +118,19 @@ Minecraft 1.21.1 · Fabric · 作者 / Author：蘧白川 / Orient（GitHub：[@
 
 ## 安装 · Installation
 
-1. 安装 [Fabric Loader](https://fabricmc.net/use/)（Minecraft 1.21.1，Loader 0.15.11 或更新）。
-2. 下载 [Fabric API](https://modrinth.com/mod/fabric-api)（1.21.1 版），放进 `mods` 文件夹。
-3. 从 [Releases](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) 下载本模组的 jar，放进 `mods` 文件夹。
+1. 选择 Minecraft **1.20.1、1.20.4 或 1.21.1**，安装对应的 [Fabric Loader](https://fabricmc.net/use/)（Loader 0.15.11 或更新）。
+2. 下载与所选 Minecraft 版本一致的 [Fabric API](https://modrinth.com/mod/fabric-api)，放进 `mods` 文件夹。
+3. 从[上方下载表](#downloads)选择对应版本的本模组 JAR，放进 `mods` 文件夹。
 
-需要 **Java 21**。**客户端和服务端都要装。**
+Minecraft **1.20.1 / 1.20.4 需要 Java 17+**，**1.21.1 需要 Java 21+**。**客户端和服务端都要装。**
 
 ---
 
-1. Install [Fabric Loader](https://fabricmc.net/use/) for Minecraft 1.21.1 (Loader 0.15.11 or newer).
-2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `mods` folder.
-3. Download this mod's jar from [Releases](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) and put it in your `mods` folder.
+1. Choose Minecraft **1.20.1, 1.20.4 or 1.21.1** and install the matching [Fabric Loader](https://fabricmc.net/use/) (Loader 0.15.11 or newer).
+2. Download [Fabric API](https://modrinth.com/mod/fabric-api) matching your Minecraft version and put it in your `mods` folder.
+3. Select this mod's matching JAR from the [download table above](#downloads) and put it in your `mods` folder.
 
-Requires **Java 21**. **Install it on both the client and the server.**
+Requires **Java 17+ for Minecraft 1.20.1 / 1.20.4**, or **Java 21+ for Minecraft 1.21.1**. **Install it on both the client and the server.**
 
 ## 怎么玩 · How to play
 
