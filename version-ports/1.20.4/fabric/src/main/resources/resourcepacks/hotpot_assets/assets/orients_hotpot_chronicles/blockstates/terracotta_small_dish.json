@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "orients_hotpot_chronicles:block/terracotta_plate_1x1"
+    },
+    "axis=z": {
+      "model": "orients_hotpot_chronicles:block/terracotta_plate_1x1",
+      "y": 90
+    }
+  }
+}

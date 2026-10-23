@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "cn.blockforge.generated.orientshotpotchronicles.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "BlockStateTableDecorMixin",
+    "BowlItemMixin",
+    "EntityRaycastMixin"
+  ],
+  "client": [
+    "ClientPlayerInteractionManagerMixin",
+    "HandledScreenMixin",
+    "CreativeInventoryScreenAccessor",
+    "CreativeInventoryScreenMixin",
+    "BowlClientExtensionsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "orients_hotpot_chronicles.refmap.json"
+}

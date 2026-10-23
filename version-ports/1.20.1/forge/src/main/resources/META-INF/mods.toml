@@ -1,0 +1,23 @@
+# ；Forge 1.20.1，保留原作者和许可。
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT AND CC-BY-NC-SA-4.0"
+[[mods]]
+modId="orients_hotpot_chronicles"
+version="${version}"
+displayName="Orient's Hotpot Chronicles"
+authors="Orient"
+description='之晗的火锅物语：已发布 0.1.1-alpha 的 Forge 1.20.1 移植。'
+logoFile="assets/orients_hotpot_chronicles/icon.png"
+[[dependencies.orients_hotpot_chronicles]]
+modId="forge"
+mandatory=true
+versionRange="[47.1,)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.orients_hotpot_chronicles]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1]"
+ordering="NONE"
+side="BOTH"

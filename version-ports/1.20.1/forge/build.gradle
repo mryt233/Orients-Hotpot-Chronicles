@@ -1,0 +1,40 @@
+// ；底本 v0.1.1-alpha，仅替换加载器。
+plugins { id 'dev.architectury.loom' version "${loom_version}" }
+version = project.mod_version
+group = project.maven_group
+repositories {
+    maven { url = 'https://maven.architectury.dev/' }
+    maven { url = 'https://maven.minecraftforge.net/releases/' }
+    mavenCentral()
+}
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
+    forge "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+}
+loom {
+    mixin { useLegacyMixinAp = true; defaultRefmapName = 'orients_hotpot_chronicles.refmap.json' }
+    // 客户端与服务端日志分开，便于验收和保留证据。
+    forge { mixinConfig 'orients_hotpot_chronicles.mixins.json' }
+    runs {
+        // 开发运行的是 Yarn 名称；成品 refmap 指向 Forge SRG 名称。
+        // 此参数只影响 runClient/runServer，不写入成品，生产继续使用 refmap。
+        configureEach {
+            vmArg '-Dmixin.env.disableRefMap=true'
+            vmArg '-Dfile.encoding=UTF-8'
+        }
+        client { runDir 'run-client' }
+    }
+}
+processResources {
+    inputs.property 'version', project.version
+    filteringCharset = 'UTF-8'
+    exclude 'fabric.mod.json'
+    filesMatching('META-INF/mods.toml') {
+        filter { line -> line.replace('${version}', project.version.toString()) }
+    }
+}
+tasks.withType(JavaCompile).configureEach { options.release = 17; options.encoding = 'UTF-8' }
+java { toolchain.languageVersion = JavaLanguageVersion.of(17); withSourcesJar() }
+base { archivesName = project.archives_base_name }
+tasks.withType(Jar).configureEach { from('LICENSE', 'ASSETS_LICENSE') }
