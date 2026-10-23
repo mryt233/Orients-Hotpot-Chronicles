@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "orients_hotpot_chronicles:brick_stove",
+    "orients_hotpot_chronicles:copper_nine_grid_hotpot",
+    "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "orients_hotpot_chronicles:tall_brick_stove"
+  ]
+}

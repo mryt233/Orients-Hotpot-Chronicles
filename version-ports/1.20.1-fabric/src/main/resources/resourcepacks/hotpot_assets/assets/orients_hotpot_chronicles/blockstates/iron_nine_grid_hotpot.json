@@ -1,0 +1,93 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/iron_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/iron_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "soup": "clear",
+        "boiling": "false"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_clear"
+      }
+    },
+    {
+      "when": {
+        "soup": "clear",
+        "boiling": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_clear_boiling"
+      }
+    },
+    {
+      "when": {
+        "soup": "milky",
+        "boiling": "false"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_milky"
+      }
+    },
+    {
+      "when": {
+        "soup": "milky",
+        "boiling": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_milky_boiling"
+      }
+    },
+    {
+      "when": {
+        "soup": "mushroom",
+        "boiling": "false"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_mushroom"
+      }
+    },
+    {
+      "when": {
+        "soup": "mushroom",
+        "boiling": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_mushroom_boiling"
+      }
+    },
+    {
+      "when": {
+        "soup": "spicy",
+        "boiling": "false"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_spicy"
+      }
+    },
+    {
+      "when": {
+        "soup": "spicy",
+        "boiling": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_spicy_boiling"
+      }
+    }
+  ]
+}

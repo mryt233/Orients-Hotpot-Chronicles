@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "orients_hotpot_chronicles:plate_1x5",
+  "pattern": [
+    "D D",
+    "DDD"
+  ],
+  "key": {
+    "D": {
+      "item": "orients_hotpot_chronicles:copper_small_dish"
+    }
+  },
+  "result": {
+    "item": "orients_hotpot_chronicles:copper_five_slot_long_plate",
+    "count": 1
+  }
+}

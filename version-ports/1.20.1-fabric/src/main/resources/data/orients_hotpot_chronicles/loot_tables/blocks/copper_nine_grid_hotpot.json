@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "orients_hotpot_chronicles:copper_nine_grid_hotpot"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}
