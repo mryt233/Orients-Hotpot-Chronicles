@@ -29,8 +29,8 @@ Minecraft 1.20.1 / 1.20.4 / 1.21.1 · Fabric / Forge / NeoForge · 作者 / Auth
 
 | Minecraft | 加载器 / Loaders | Java | 模组版本 / Mod version | 下载 / Download |
 | --- | --- | --- | --- | --- |
-| 1.20.1 | Fabric + Forge | 17+ | 0.1.2-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha-mc1.20.1) |
-| 1.21.1 | Fabric + NeoForge | 21+ | 0.1.2-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha-mc1.21.1) |
+| 1.20.1 | Fabric + Forge | 17+ | 0.1.2-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha) |
+| 1.21.1 | Fabric + NeoForge | 21+ | 0.1.2-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha) |
 | 1.20.4 | Fabric | 17+ | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) |
 
 同一 MC 版本的各加载器共用一个发布页，请下载文件名中加载器与游戏配置一致的 JAR。1.20.4 尚未同步 0.1.2 的蘸料与切菜内容。

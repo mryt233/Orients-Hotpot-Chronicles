@@ -7,10 +7,10 @@ Minecraft 1.21.1 Fabric 位于仓库根目录；下列各移植目录是独立 G
 
 | Minecraft | Loader / 加载器 | Mod / 模组 | Java | Source / 源码 | Download / 下载 |
 | --- | --- | --- | --- | --- | --- |
-| 1.21.1 | fabric | 0.1.2-alpha | 21+ | [README](../README.md) | [Release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha-mc1.21.1) |
-| 1.20.1 | fabric | 0.1.2-alpha | 17+ | [README](1.20.1/fabric/README.md) | [Release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha-mc1.20.1) |
-| 1.20.1 | forge | 0.1.2-alpha | 17+ | [README](1.20.1/forge/README.md) | [Release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha-mc1.20.1) |
-| 1.21.1 | neoforge | 0.1.2-alpha | 21+ | [README](1.21.1/neoforge/README.md) | [Release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha-mc1.21.1) |
+| 1.21.1 | fabric | 0.1.2-alpha | 21+ | [README](../README.md) | [Release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha) |
+| 1.20.1 | fabric | 0.1.2-alpha | 17+ | [README](1.20.1/fabric/README.md) | [Release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha) |
+| 1.20.1 | forge | 0.1.2-alpha | 17+ | [README](1.20.1/forge/README.md) | [Release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha) |
+| 1.21.1 | neoforge | 0.1.2-alpha | 21+ | [README](1.21.1/neoforge/README.md) | [Release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha) |
 | 1.20.4 | fabric | 0.1.1-alpha | 17+ | [README](1.20.4/fabric/README.md) | [Release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) |
 
 Fabric requires the matching Fabric API; Forge / NeoForge do not. Both client and server need the mod. Only preliminary testing has been performed; player interactions, multiplayer and other-mod compatibility still need testing.
