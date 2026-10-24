@@ -10,7 +10,7 @@ Cook a nine-grid hotpot in Minecraft: build a stove, seat a pot on it, pour in a
 
 Minecraft 1.20.1 / 1.20.4 / 1.21.1 · Fabric / Forge / NeoForge · 作者 / Author：蘧白川 / Orient（GitHub：[@mryt233](https://github.com/mryt233)）
 
-[中文图文教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/) / [English Guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/) · [下载测试版 · Download Alpha](#downloads) · [更新日志 · Changelog](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) · [反馈问题 · Report an Issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
+[中文图文教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/) / [繁中圖文教學](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-tw/) / [English Guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/) · [下载测试版 · Download Alpha](#downloads) · [更新日志 · Changelog](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) · [反馈问题 · Report an Issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
 
 </div>
 
