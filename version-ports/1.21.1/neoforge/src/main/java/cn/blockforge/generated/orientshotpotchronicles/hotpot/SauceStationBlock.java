@@ -1,4 +1,3 @@
-// 0.1.2 的 NeoForge 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.block.AbstractBlock;
@@ -32,16 +31,16 @@ import net.minecraft.world.World;
 /**
  * 蘸料台（r103，用户定：11 种原版木头各一个 + 铁的）：台面上 3×3 九个白瓷小碗，一个碗一种调料。
  * 拿碗（或一碗没打完的蘸料）右键某个小碗 = 往碗里加一份那种调料；别的情况（空手、拿原料等）右键打开补货界面。
- * 2026-10-23 用户改成阶梯式（照自助调料台照片，）：1.5 格高，三层台阶前低后高，每层一横排 3 个碗；
+ * 2026-10-23 用户改成阶梯式（照自助调料台照片，调整）：1.5 格高，三层台阶前低后高，每层一横排 3 个碗；
  * 有朝向 FACING（正面朝放的人），row 0 = 最后最高那层，col 0 = 站在正面看最左边。和 tools/gen_sauce_station.py 一致。
  * 2026-10-23 用户又改：9 个碗不固定装哪种，空碗放什么原料就是什么（存货见 SauceStationBlockEntity）；
  * 方块状态只剩朝向，碗里的调料面由 client/SauceStationRenderer 按方块实体画（原来的 FILLED 属性去掉了）。
- *
+ * 作者：
  */
-public class SauceStationBlock extends Block implements BlockEntityProvider {
+public class SauceStationBlock extends Block implements PartOutline, BlockEntityProvider {
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     /** 三层台面高度（像素，前 → 后），同 gen_sauce_station.py 的 TIER_TOPS。 */
-    public static final double[] TIER_TOPS = {14, 18, 22};
+    public static final double[] TIER_TOPS = {11, 15, 19};   // 0.1.2-alpha 后用户：整体降 3 像素（一个活板门高），调整
     public static final double BOWL = 5, BOWL_H = 2.5, WALL = 0.75;   // 小碗（a 款直壁碗缩小版），同 gen_sauce_station.py；SauceStationRenderer 也用
     /** 按 FACING.getHorizontal() 排：选中框（台阶 + 小碗）、碰撞（只有台阶）。 */
     private static final VoxelShape[] OUTLINE = new VoxelShape[4];
@@ -137,6 +136,28 @@ public class SauceStationBlock extends Block implements BlockEntityProvider {
         return COLLISION[state.get(FACING).getHorizontal()];
     }
 
+    /** 第 i 个小碗的选中框（按朝向转好）。 */
+    private static VoxelShape bowlShape(Direction facing, int i) {
+        int tier = 2 - i / 3, col = i % 3;
+        double cx = 16 - 16 / 3.0 * (col + 0.5), cz = 16 / 3.0 * (tier + 0.5);
+        return rotated(facing, cx - BOWL / 2, TIER_TOPS[tier], cz - BOWL / 2, cx + BOWL / 2, TIER_TOPS[tier] + BOWL_H, cz + BOWL / 2);
+    }
+
+    /**
+     * 选中框只框准星对着的那个小碗；对着台阶就框台阶（0.1.2-alpha 后用户：判定显示成了一整个，要指哪个碗框哪个碗）。
+     * 头顶那格的 SauceStationTopBlock 也走这里。
+     */
+    @Override
+    public VoxelShape aimedPart(BlockState state, BlockView world, BlockPos pos, PlayerEntity player) {
+        net.minecraft.util.hit.HitResult hit = player.raycast(player.getBlockInteractionRange(), 1.0F, false);
+        if (!(hit instanceof BlockHitResult b) || hit.getType() != net.minecraft.util.hit.HitResult.Type.BLOCK) {
+            return null;
+        }
+        int bowl = aimed(state, pos, b);
+        Direction facing = state.get(FACING);
+        return bowl < 0 ? COLLISION[facing.getHorizontal()] : bowlShape(facing, bowl);
+    }
+
     /** 点到的是第几个小碗（0..8，从最上层到最下层、每层从左到右）：先把点往方块里推一点（点在台阶立面上算后面那层），转回模型坐标，按进深分层、按左右分列；
      * 点在某层台面以下（台身立面）返回 -1。 */
     public static int aimed(BlockState state, BlockPos pos, BlockHitResult hit) {
@@ -194,7 +215,7 @@ public class SauceStationBlock extends Block implements BlockEntityProvider {
         }
         super.onStateReplaced(state, world, pos, newState, moved);
     }
-    // NeoForge 可燃接口；铁、绯红、诡异不燃烧，其余木材原数值5/20。
+    // 调整：NeoForge 可燃接口；铁、绯红、诡异不燃烧，其余木材原数值5/20。
     @Override
     public boolean isFlammable(BlockState state, BlockView world, BlockPos pos, Direction face) {
         return planks != net.minecraft.block.Blocks.IRON_BLOCK

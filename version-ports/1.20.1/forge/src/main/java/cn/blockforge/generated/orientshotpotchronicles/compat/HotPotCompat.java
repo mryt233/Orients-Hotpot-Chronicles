@@ -1,4 +1,3 @@
-// 1.20.1 Forge 移植：。
 package cn.blockforge.generated.orientshotpotchronicles.compat;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotFuel;

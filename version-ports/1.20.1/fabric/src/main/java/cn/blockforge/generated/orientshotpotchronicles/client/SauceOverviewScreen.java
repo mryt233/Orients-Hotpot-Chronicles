@@ -1,4 +1,3 @@
-// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
@@ -22,7 +21,7 @@ import java.util.List;
  * （从最上层到最下层、每层从左到右），看每个碗装的什么、还剩多少；下面「补充蘸料台」按钮进补货界面（SauceStationScreen）。
  * 只读界面，数据直接看客户端的方块实体（存货变了服务端会同步过来）。原版灰色样式，同补货界面。
  * 网页预览 viewer/screens.js 的 sauceOverview 与本类一一对应。
- *
+ * 作者：
  */
 public class SauceOverviewScreen extends Screen {
     public static final int W = 176, H = 176;
@@ -70,7 +69,7 @@ public class SauceOverviewScreen extends Screen {
 
     @Override
     public void render(DrawContext g, int mouseX, int mouseY, float delta) {
-        renderBackground(g); // 1.20.1 Screen.render 不自动绘制背景。
+        renderBackground(g); // 调整：1.20.1 Screen.render 不自动绘制背景。
         super.render(g, mouseX, mouseY, delta);
         SauceStationBlockEntity be = station();
         if (be == null) {

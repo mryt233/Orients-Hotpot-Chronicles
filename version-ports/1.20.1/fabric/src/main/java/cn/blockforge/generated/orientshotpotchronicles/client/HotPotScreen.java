@@ -1,10 +1,10 @@
-// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCooking;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotScreenHandler;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
 import net.minecraft.client.gui.DrawContext;
@@ -41,7 +41,10 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
     private static final int BAR_DONE = 0xFF63D14C;
 
     public HotPotScreen(HotPotScreenHandler handler, PlayerInventory inventory, Text title) {
-        super(handler, inventory, Text.translatable(HotPotBlockEntity.key("screen.title")));
+        // 鸳鸯 / 田字锅标题用锅自己的名字，九宫格锅照旧「九宫格火锅」（调整）
+        super(handler, inventory, handler.layout().multiSoup()
+            ? cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.blockFor(handler.potMaterial()).getName()
+            : Text.translatable(HotPotBlockEntity.key("screen.title")));
         this.backgroundWidth = W;
         this.backgroundHeight = H;
     }
@@ -59,9 +62,9 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
             return NO_SOUP;
         }
         return switch (soup) {
-            case CLEAR -> new Soup(0xFFB4BCBC, 0xFFF4F4EC, 0xFFC6CCCA,   // 清汤配色同锅里的新贴图（2026-10-23，）
+            case CLEAR -> new Soup(0xFFB4BCBC, 0xFFF4F4EC, 0xFFC6CCCA,   // 清汤配色同锅里的新贴图（2026-10-23，调整）
                 new int[]{0xFF6FAF3A, 0xFF8FCF52, 0xFFD04A2A});
-            case MILKY -> new Soup(0xFFE3D7BF, 0xFFFFFFFF, 0xFFF2E7D2, new int[]{0xFFFFF8EA, 0xFF6FAF3A, 0xFFD9C9A8});
+            case RICH_STOCK -> new Soup(0xFFE3D7BF, 0xFFFFFFFF, 0xFFF2E7D2, new int[]{0xFFFFF8EA, 0xFF6FAF3A, 0xFFD9C9A8});
             case MUSHROOM -> new Soup(0xFF7C5836, 0xFFE8C88A, 0xFF9A7048, new int[]{0xFF4A3220, 0xFFC9A16A, 0xFF5E4026});
             case SPICY -> new Soup(0xFFB32A1E, 0xFFFFB070, 0xFFD94A2E, new int[]{0xFFE8862A, 0xFF7A1408, 0xFF3A1208});
         };
@@ -75,7 +78,7 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
     private static final Metal IRON_METAL = new Metal(0xFF101113, 0xFF1C1E21, 0xFF3D3F44, 0xFF5A5D63, 0xFF7A7D84);
 
     private Metal metal() {
-        return handler.potMaterial() == HotPotMaterial.IRON ? IRON_METAL : COPPER_METAL;
+        return handler.potMaterial().metal() == HotPotMaterial.IRON ? IRON_METAL : COPPER_METAL;
     }
 
     private float burnRatio() {
@@ -107,8 +110,10 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
         int gy = HotPotScreenHandler.GRID_Y;
         drawPot(context, gx, gy);
         context.fill(gx - 2, gy - 2, gx + GW + 2, gy + GW + 2, INNER_SHADOW);
-        drawSoup(context, gx, gy, t);
-        drawDividers(context, gx, gy);
+        drawSoups(context, gx, gy, t);
+        if (!handler.layout().multiSoup()) {
+            drawDividers(context, gx, gy);   // 鸳鸯 / 田字锅不画九宫格隔条，隔板就是露出来的锅底金属
+        }
         if (heat() > 0) {
             drawSteam(context, gx, gy, t);
         }
@@ -153,15 +158,49 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
         c.fill(x + 1, y + 1, x + 3, y + 3, m.rivet());
     }
 
-    private void drawSoup(DrawContext c, int gx, int gy, double t) {
-        Soup soup = soup(handler.baseId());
-        c.fill(gx, gy, gx + GW, gy + GW, soup.base());
-        // 越靠锅壁越深
+    /**
+     * 汤面：九宫格锅整锅一种汤；鸳鸯 / 田字锅（用户 2026-10-24 定）先铺锅底金属，每边的汤按 {@link PotLayout#regions}
+     * 填底色（隔板那一圈露出金属），汤面上的高光、配料、气泡只画在各自那边。格子照样 9×9 排满，压到隔板的格子不启用（空着）。
+     */
+    private void drawSoups(DrawContext c, int gx, int gy, double t) {
+        PotLayout layout = handler.layout();
+        if (!layout.multiSoup()) {
+            drawSoup(c, gx, gy, t, handler.baseId(), null);
+            return;
+        }
+        Metal m = metal();
+        c.fill(gx, gy, gx + GW, gy + GW, m.mid());
+        for (int side = 0; side < layout.sides(); side++) {
+            int color = soup(handler.baseOfSide(side)).base();
+            for (float[] r : layout.regions(side)) {
+                c.fill(gx + Math.round(r[0] * GW), gy + Math.round(r[1] * GW),
+                    gx + Math.round(r[2] * GW), gy + Math.round(r[3] * GW), color);
+            }
+        }
         c.fill(gx, gy, gx + GW, gy + 4, 0x30000000);
         c.fill(gx, gy + GW - 4, gx + GW, gy + GW, 0x22000000);
         c.fill(gx, gy, gx + 4, gy + GW, 0x26000000);
         c.fill(gx + GW - 4, gy, gx + GW, gy + GW, 0x1C000000);
-        if (!handler.hasSoup()) {
+        for (int side = 0; side < layout.sides(); side++) {
+            final int sd = side;
+            drawSoup(c, gx, gy, t, handler.baseOfSide(side),
+                (x, y) -> layout.sideAt((x - gx) / GW, (y - gy) / GW) == sd);
+        }
+    }
+
+    /** @param keep 鸳鸯 / 田字锅：只画落在这一边的高光、配料、气泡（界面坐标）；null = 整锅（同时铺底色）。 */
+    private void drawSoup(DrawContext c, int gx, int gy, double t, int soupId,
+                          java.util.function.BiPredicate<Double, Double> keep) {
+        Soup soup = soup(soupId);
+        if (keep == null) {
+            c.fill(gx, gy, gx + GW, gy + GW, soup.base());
+            // 越靠锅壁越深
+            c.fill(gx, gy, gx + GW, gy + 4, 0x30000000);
+            c.fill(gx, gy + GW - 4, gx + GW, gy + GW, 0x22000000);
+            c.fill(gx, gy, gx + 4, gy + GW, 0x26000000);
+            c.fill(gx + GW - 4, gy, gx + GW, gy + GW, 0x1C000000);
+        }
+        if (soupId < 0) {
             return;
         }
         double heat = heat();
@@ -176,6 +215,9 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
             double a = easeInOutSine(u < 0.5 ? u * 2 : 2 - u * 2);
             int x = gx + 8 + (int) Math.floor(hash(i, cyc * 3) * (GW - 30));
             int y = gy + 8 + (int) Math.floor(hash(i, cyc * 3 + 1) * (GW - 16));
+            if (keep != null && !(keep.test((double) x, (double) y) && keep.test(x + 14.0, y + 2.0))) {
+                continue;
+            }
             c.fill(x, y, x + 14, y + 2, alpha(0xFFFFF4D8, 0.13 * a));
             c.fill(x + 3, y + 2, x + 10, y + 3, alpha(0xFFFFF4D8, 0.09 * a));
         }
@@ -189,6 +231,9 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
                 + 0.35 * Math.sin(t * 0.7 + i);
             int x = (int) Math.round(cx + Math.cos(ang) * r);
             int y = (int) Math.round(cy + Math.sin(ang) * r * 0.96);
+            if (keep != null && !keep.test(x + 1.0, y + 0.5)) {
+                continue;
+            }
             c.fill(x, y, x + 2, y + (i % 3 == 0 ? 2 : 1), bits[i % bits.length]);
         }
         // 气泡：整锅随机冒出一簇簇小泡，外加几个单独的大泡；
@@ -202,6 +247,9 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
                 double cc = frac(tt);
                 double kx = gx + 5 + hash(k, cyc * 2) * (GW - 10);
                 double ky = gy + 5 + hash(k, cyc * 2 + 1) * (GW - 10);
+                if (keep != null && !keep.test(kx, ky)) {
+                    continue;
+                }
                 int m = 3 + (int) Math.floor(hash(k, cyc * 3) * 4.99);
                 for (int j = 0; j < m; j++) {
                     double s0 = 0.35 * hash(k * 7 + j, cyc + 31);
@@ -224,6 +272,9 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
                 double u = frac(tt);
                 double x = gx + 7 + hash(i, cyc * 2 + 70) * (GW - 14);
                 double y = gy + 7 + hash(i, cyc * 2 + 71) * (GW - 14);
+                if (keep != null && !keep.test(x, y)) {
+                    continue;
+                }
                 drawBoilBubble(c, gx, gy, x, y, bubbleSize(hash(i, cyc + 72), true), u, soup, 500 + i);
             }
         }
@@ -362,13 +413,34 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
         int x = PANEL_X + 6;
         int right = W - 12;
 
-        // 汤底
-        context.fill(x, 26, x + 9, 35, RIM_LINE);
-        context.fill(x + 1, 27, x + 8, 34, handler.hasSoup() ? soup.base() : 0xFF1B1C20);
-        Text name = soupBase == null
-            ? Text.translatable(HotPotBlockEntity.key("soup.none")).formatted(Formatting.GRAY)
-            : Text.translatable(soupBase.nameKey()).formatted(Formatting.GOLD);
-        context.drawText(textRenderer, name, x + 13, 27, 0xFFFFFFFF, true);
+        // 汤底：鸳鸯 / 田字锅每边一个色块，名字用「/」隔开，放不下就缩小（调整）
+        PotLayout layout = handler.layout();
+        int swatchX = x;
+        for (int side = 0; side < layout.sides(); side++) {
+            int id = handler.baseOfSide(side);
+            int sw = layout.multiSoup() ? 5 : 9;
+            context.fill(swatchX, 26, swatchX + sw, 35, RIM_LINE);
+            context.fill(swatchX + 1, 27, swatchX + sw - 1, 34, id >= 0 ? soup(id).base() : 0xFF1B1C20);
+            swatchX += sw + (layout.multiSoup() ? 1 : 0);
+        }
+        Text name = layout.multiSoup()
+            ? HotPotBlockEntity.soupText(layout, handler::baseOfSide).copy().formatted(handler.hasSoup() ? Formatting.GOLD : Formatting.GRAY)
+            : soupBase == null
+                ? Text.translatable(HotPotBlockEntity.key("soup.none")).formatted(Formatting.GRAY)
+                : Text.translatable(soupBase.nameKey()).formatted(Formatting.GOLD);
+        int nameX = swatchX + 4;
+        int room = right - nameX;
+        int width = textRenderer.getWidth(name);
+        if (width > room && room > 0) {
+            float k = Math.max(0.5F, room / (float) width);
+            context.getMatrices().push();
+            context.getMatrices().translate(nameX, 27 + (1 - k) * 4, 0);
+            context.getMatrices().scale(k, k, 1);
+            context.drawText(textRenderer, name, 0, 0, 0xFFFFFFFF, true);
+            context.getMatrices().pop();
+        } else {
+            context.drawText(textRenderer, name, nameX, 27, 0xFFFFFFFF, true);
+        }
         // 灶火：跳动的小火苗 + 剩余燃料条，不显示数字
         drawFireIcon(context, x + 1, 39, handler.burnTicks() > 0, t);
         context.drawText(textRenderer, Text.translatable(HotPotBlockEntity.key("screen.fire")), x + 13, 41, LABEL, true);
@@ -384,7 +456,11 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
         // 食材计数
         int filled = 0;
         int cooked = 0;
+        int capacity = 0;   // 鸳鸯 / 田字锅压到隔板的格子不算
         for (int i = 0; i < HotPotBlockEntity.SLOTS; i++) {
+            if (handler.slotInUse(i)) {
+                capacity++;
+            }
             if (handler.getSlot(i).hasStack()) {
                 filled++;
                 if (handler.isCooked(i)) {
@@ -393,7 +469,7 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
             }
         }
         int end = context.drawText(textRenderer,
-            Text.translatable(HotPotBlockEntity.key("screen.filled"), filled + "/81"), x, 55, 0xFFE8C88A, true);
+            Text.translatable(HotPotBlockEntity.key("screen.filled"), filled + "/" + capacity), x, 55, 0xFFE8C88A, true);
         if (cooked > 0) {
             context.drawText(textRenderer,
                 Text.translatable(HotPotBlockEntity.key("screen.cooked"), cooked).formatted(Formatting.GREEN),
@@ -442,7 +518,7 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
 
     // ------------------------------------------------------------- 槽位
 
-    /** 1.20.1 移植：1.20.1 的 drawSlot 是 private，由 HandledScreenMixin 在原版画完每个格子后调这里。 */
+    /** 1.20.1 移植（调整）：1.20.1 的 drawSlot 是 private，由 HandledScreenMixin 在原版画完每个格子后调这里。 */
     public void afterDrawSlot(DrawContext context, Slot slot) {
         if (!handler.isPotSlot(slot)) {
             return;
@@ -486,7 +562,7 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
             d >= HotPotCooking.FULL_DONE ? BAR_DONE : mix(0xFFE0A23C, 0xFF9AD04C, ratio));
     }
 
-    /** 原版 HandledScreen.render 不画悬停提示，要子类自己调（漏了这步，格子里的东西指上去看不到名字和属性；2026-10-23 用户报，）。 */
+    /** 原版 HandledScreen.render 不画悬停提示，要子类自己调（漏了这步，格子里的东西指上去看不到名字和属性；2026-10-23 用户报， 补）。 */
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
@@ -503,9 +579,12 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
         int index = focused.getIndex();
         ItemStack stack = focused.getStack();
         int cell = handler.bigCellOf(index);
-        Text location = Text.translatable(HotPotBlockEntity.key("ui.cell"), cell / 3 + 1, cell % 3 + 1);
+        // 鸳鸯 / 田字锅：第几行第几格没意义，改成这一格泡在哪种汤里
+        Text location = handler.layout().multiSoup()
+            ? HotPotBlockEntity.soupName(handler.soupOfSlot(index))
+            : Text.translatable(HotPotBlockEntity.key("ui.cell"), cell / 3 + 1, cell % 3 + 1);
         Text status;
-        if (!handler.hasSoup()) {
+        if (handler.soupOfSlot(index) < 0) {
             status = Text.translatable(HotPotBlockEntity.key("ui.no_soup_yet")).formatted(Formatting.GRAY);
         } else if (handler.isCooked(index)) {
             status = Text.translatable(HotPotBlockEntity.key("ui.cooked")).formatted(Formatting.GREEN);

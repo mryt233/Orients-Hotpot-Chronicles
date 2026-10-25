@@ -1,6 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "orients_hotpot_chronicles:tall_bench",
+  "group": "orients_hotpot_chronicles:bench",
   "pattern": [
     "PPP",
     "S S",

@@ -10,7 +10,7 @@ import java.util.Map;
  * 用擀面杖（原叫木棒，2026-10-23 用户改）在砧板上捣丸子（2026-10-23 用户定，方案 A）：生牛肉 / 生猪排 / 生羊肉 / 生鳕鱼 / 生鲑鱼放砧板上，擀面杖捣三下：
  * 第 1 下捶碎、第 2 下成肉浆（砧板上的样子跟着变，用户要求），第 3 下掉出 3 个生丸子。
  * 进度记在 CuttingBoardBlockEntity 的 cuts 里（捣过的不能再用菜刀切）。阶段贴图 textures/block/pounding/&lt;meat&gt;_&lt;minced|paste&gt;。
- *
+ * 作者：
  */
 public final class Pounding {
     public static final int HITS = 3;

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "orients_hotpot_chronicles:iron_split_yuanyang_hotpot",
+          "functions": []
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

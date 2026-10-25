@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /**
  * 原版的碗点在方块顶面时像盘子一样摆上去（r99，用户要求）。碗是原版的普通物品，没有自己的 useOnBlock，
  * 所以在 Item.useOnBlock 开头接一下：方块自己的右键（箱子、锅……）照常先处理，轮到物品时才摆。
- *
+ * 作者：
  */
 @Mixin(Item.class)
 abstract class BowlItemMixin {

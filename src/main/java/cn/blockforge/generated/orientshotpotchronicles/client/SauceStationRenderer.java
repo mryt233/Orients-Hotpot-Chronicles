@@ -18,11 +18,11 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.RotationAxis;
 
 /**
- * 蘸料台小碗里的调料面（2026-10-23 用户改成碗不固定后，）：每个碗装什么由方块实体决定，方块状态表示不了，
+ * 蘸料台小碗里的调料面（2026-10-23 用户改成碗不固定后，新增）：每个碗装什么由方块实体决定，方块状态表示不了，
  * 所以台身和空碗是方块模型，碗里的调料面在这里画。几何和 tools/gen_sauce_station.py 的物品模型（九种都装满）一致：
  * 液体调料一张面（碗口下 0.5 像素），葱花 / 香菜碎末四层错开的碎末（碗口下 1.3 / 0.95 / 0.6 / 0.25）。
  * 网页预览 viewer/animations.js 的 sauce_station 场景与本类对应。
- *
+ * 作者：
  */
 public class SauceStationRenderer implements BlockEntityRenderer<SauceStationBlockEntity> {
     /** 葱花 / 香菜碎末每一层：高度（碗口往下）、贴图取的范围、贴图转几个 90°。 */

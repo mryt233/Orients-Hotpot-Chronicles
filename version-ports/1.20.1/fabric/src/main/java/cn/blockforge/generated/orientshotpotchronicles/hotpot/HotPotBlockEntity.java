@@ -1,4 +1,3 @@
-// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import cn.blockforge.generated.orientshotpotchronicles.GeneratedMod;
@@ -41,7 +40,8 @@ import net.minecraft.world.World;
  *
  * <p>独立摆放的锅使用本类；坐上灶台后的组合方块由
  * {@link StoveBlockEntity} 继承本类。因此两种形态共用完全相同的 81 格
- * 九宫格、汤底、烹饪进度和经验逻辑。</p>
+ * 食材、汤底、烹饪进度和经验逻辑。81 格怎么分边、每边一种汤由锅的 {@link PotLayout} 决定
+ * （九宫格锅一边；鸳鸯锅两边；田字锅四边，2026-10-23 起）。</p>
  */
 public class HotPotBlockEntity extends BlockEntity
     implements Inventory, ExtendedScreenHandlerFactory {
@@ -50,8 +50,11 @@ public class HotPotBlockEntity extends BlockEntity
     /** 屏幕属性包使用 short，熟食位图每组只占 15 位，避免高位被截断。 */
     public static final int COOKED_WORD_BITS = 15;
     public static final int COOKED_WORDS = (SLOTS + COOKED_WORD_BITS - 1) / COOKED_WORD_BITS;
-    /** 0汤底 1燃料类型 2余燃 3总燃 4..84熟度 85..90熟食位图。 */
-    public static final int PROP_COUNT = 4 + SLOTS + COOKED_WORDS;
+    /** 0汤底 1燃料类型 2余燃 3总燃 4..84熟度 85..90熟食位图 91..93鸳鸯 / 田字锅其余几边的汤底。 */
+    public static final int PROP_EXTRA_BASES = 4 + SLOTS + COOKED_WORDS;
+    public static final int PROP_COUNT = PROP_EXTRA_BASES + PotLayout.MAX_SIDES - 1;
+    /** 存档里每边汤底的字段名（第 0 边沿用老存档的 Base）。 */
+    private static final String[] BASE_KEYS = {"Base", "BaseB", "BaseC", "BaseD"};
 
     private final SimpleInventory ingredients = new SimpleInventory(SLOTS);
     private final int[] doneness = new int[SLOTS];
@@ -60,7 +63,11 @@ public class HotPotBlockEntity extends BlockEntity
     private final boolean[] cooked = new boolean[SLOTS];
     private final ItemStack[] tracked = new ItemStack[SLOTS];
     private float pendingXp = 0F;
-    private int base = -1;
+    /**
+     * 每边一种汤底（-1 = 没汤）：九宫格锅只用第 0 边；鸳鸯锅 0、1；田字锅 0..3（PotLayout）。
+     * 汤底不和格局绑定，任何汤底（包括以后新加的）都能倒进任何一边。调整（原来是单个 base）。
+     */
+    private final int[] bases = {-1, -1, -1, -1};
     /** 客户端缓动热度，用于让食材起伏和蒸汽自然启停。 */
     private float clientHeat = 0F;
     /** 新旧存档首次进入服务端 tick 时修复新增的汤底方块状态。 */
@@ -100,15 +107,13 @@ public class HotPotBlockEntity extends BlockEntity
         boolean stoveHeat = stove != null && stove.burning();
         // r102：独立锅摆在点着的篝火（热源标签）上也能煮，速度同灶台烧煤（用户定「和灶台一样快」），不耗燃料
         boolean openFire = stove == null && heatSourceBelow();
-        updateStandaloneBoilingVisual((stoveHeat || openFire) && base >= 0);
-        if (!hasPot() || !(stoveHeat || openFire) || base < 0) {
+        updateStandaloneBoilingVisual((stoveHeat || openFire) && hasSoup());
+        if (!hasPot() || !(stoveHeat || openFire) || !hasSoup()) {
             return;
         }
         if (openFire && world.getTime() % StoveBlockEntity.WARMTH_INTERVAL == 0L) {
             StoveBlockEntity.giveWarmth(world, pos);   // 围锅回血，同灶台（用户要）
         }
-        SoupBase soup = SoupBase.byId(base);
-        float mul = soup == null ? 1F : soup.speedMul();
         float power = stoveHeat ? stove.power() : OPEN_FIRE_POWER;
         boolean dirty = false;
         for (int i = 0; i < SLOTS; i++) {
@@ -119,6 +124,12 @@ public class HotPotBlockEntity extends BlockEntity
             if (stack.isEmpty()) {
                 continue;
             }
+            // 鸳鸯锅：每格用它那一边的汤；那边还没倒汤就不煮
+            SoupBase soup = soupForSlot(i);
+            if (soup == null) {
+                continue;
+            }
+            float mul = soup.speedMul();
             doneness[i] = Math.min(HotPotCooking.FULL_DONE,
                 doneness[i] + HotPotCooking.progressPerTick(cookDur[i], power, mul));
             dirty = true;
@@ -193,7 +204,7 @@ public class HotPotBlockEntity extends BlockEntity
             for (int i = 0; i < puffs; i++) {
                 double ox = (world.random.nextDouble() - 0.5) * 0.55;
                 double oz = (world.random.nextDouble() - 0.5) * 0.55;
-                // 1.20.1 移植：白烟粒子（white_smoke）1.20.3 才有，换成同样白色上飘的云粒子
+                // 1.20.1 移植（调整）：白烟粒子（white_smoke）1.20.3 才有，换成同样白色上飘的云粒子
                 world.addParticle(net.minecraft.particle.ParticleTypes.CLOUD,
                     pos.getX() + 0.5 + ox, surface + 0.03, pos.getZ() + 0.5 + oz,
                     (world.random.nextDouble() - 0.5) * 0.01, 0.03 + clientHeat * 0.045, (world.random.nextDouble() - 0.5) * 0.01);
@@ -250,21 +261,21 @@ public class HotPotBlockEntity extends BlockEntity
                 if (filledSlots() > 0) {
                     clear();
                 }
-                if (base >= 0) {
+                if (hasSoup()) {
                     clearSoupState();
                 }
                 return;
             }
-            SoupVisual visual = SoupVisual.fromBase(SoupBase.byId(base));
-            if (pot.hasSoup() != visual.hasSoup() || state.get(StoveBlock.SOUP) != visual) {
-                world.setBlockState(pos, state.with(StoveBlock.POT, pot.withSoup(visual.hasSoup()))
+            SoupVisual visual = blockSoupVisual();
+            if (pot.hasSoup() != hasSoup() || state.get(StoveBlock.SOUP) != visual) {
+                world.setBlockState(pos, state.with(StoveBlock.POT, pot.withSoup(hasSoup()))
                     .with(StoveBlock.SOUP, visual), Block.NOTIFY_LISTENERS);
             }
         } else if (state.getBlock() instanceof HotPotBlock) {
-            SoupVisual visual = SoupVisual.fromBase(SoupBase.byId(base));
+            SoupVisual visual = blockSoupVisual();
             if (state.get(HotPotBlock.SOUP) != visual
-                || state.get(HotPotBlock.HAS_SOUP) != visual.hasSoup()) {
-                world.setBlockState(pos, state.with(HotPotBlock.HAS_SOUP, visual.hasSoup())
+                || state.get(HotPotBlock.HAS_SOUP) != hasSoup()) {
+                world.setBlockState(pos, state.with(HotPotBlock.HAS_SOUP, hasSoup())
                     .with(HotPotBlock.SOUP, visual), Block.NOTIFY_LISTENERS);
             }
         }
@@ -301,7 +312,7 @@ public class HotPotBlockEntity extends BlockEntity
 
     /** 清空汤底并同步空锅外观，拆锅或重新安装时使用。 */
     protected void clearSoupState() {
-        base = -1;
+        java.util.Arrays.fill(bases, -1);
         updateSoupVisual();
         markDirtyAndSync();
     }
@@ -311,17 +322,17 @@ public class HotPotBlockEntity extends BlockEntity
         if (world == null) {
             return;
         }
-        SoupVisual visual = SoupVisual.fromBase(SoupBase.byId(base));
+        SoupVisual visual = blockSoupVisual();
         BlockState state = world.getBlockState(pos);
         if (StoveBlock.isStove(state)) {
             StovePot pot = state.get(StoveBlock.POT);
-            BlockState updated = state.with(StoveBlock.POT, pot.withSoup(visual.hasSoup()))
+            BlockState updated = state.with(StoveBlock.POT, pot.withSoup(hasSoup()))
                 .with(StoveBlock.SOUP, visual);
             world.setBlockState(pos, updated, Block.NOTIFY_LISTENERS);
         } else if (state.getBlock() instanceof HotPotBlock) {
-            BlockState updated = state.with(HotPotBlock.HAS_SOUP, visual.hasSoup())
+            BlockState updated = state.with(HotPotBlock.HAS_SOUP, hasSoup())
                 .with(HotPotBlock.SOUP, visual)
-                .with(HotPotBlock.BOILING, hasFire() && visual.hasSoup());
+                .with(HotPotBlock.BOILING, hasFire() && hasSoup());
             world.setBlockState(pos, updated, Block.NOTIFY_LISTENERS);
         }
     }
@@ -348,13 +359,12 @@ public class HotPotBlockEntity extends BlockEntity
         }
     }
 
-    /** 一锅只能有一种汤底。食材可以先放，汤底只决定后续是否加热。 */
     /**
-     * 拿装汤底的空容器能不能舀：空桶舀水/牛奶/岩浆；菌汤是蘑菇煲，要用碗舀，
-     * 而碗平时是捞熟食的，所以只在锅里已经没有食物时才用碗舀菌汤。
+     * 手里的东西能不能把汤底舀走：只认空桶（r99 起碗是盛汤 / 盛熟菜，见 serveWithBowl）。
+     * 舀出水 / 牛奶 / 岩浆还回原来的桶；菌汤桶装不了，就是倒掉（用户定的）。
+     * 每边一种汤（九宫格锅一边；鸳鸯 / 田字锅按准星那边，见 scoopSoup），食材可以先放，汤底只决定那边煮不煮。
      */
     public boolean canScoopWith(ItemStack stack) {
-        // r99 起碗是盛汤 / 盛熟菜（serveWithBowl），舀走汤底只用空桶；菌汤用桶是倒掉（用户定的）
         return stack.isOf(net.minecraft.item.Items.BUCKET);
     }
 
@@ -363,26 +373,34 @@ public class HotPotBlockEntity extends BlockEntity
      * 锅里还有食物的话，先全部掉到地上，再清空汤底。
      */
     public boolean scoopSoup(PlayerEntity player, Hand hand) {
+        return scoopSoup(player, hand, PotLayout.SIDE_A);
+    }
+
+    /** 鸳鸯锅只舀准星那一边的汤（那边的食材掉出来），另一边不动。 */
+    public boolean scoopSoup(PlayerEntity player, Hand hand, int side) {
         if (world == null || world.isClient || !hasPot()) {
             return false;
         }
+        if (!layout().multiSoup()) {
+            side = PotLayout.SIDE_A;
+        }
         ItemStack stack = player.getStackInHand(hand);
-        SoupBase soup = SoupBase.byId(base);
+        SoupBase soup = SoupBase.byId(baseOfSide(side));
         if (soup == null) {
             player.sendMessage(Text.translatable(key("msg.no_soup_to_scoop")), true);
             return false;
         }
         if (!stack.isOf(soup.remainder())) {
             // 菌汤：桶装不了蘑菇煲，就是把汤倒掉，桶还是空桶（r99）
-            dropContents();
-            base = -1;
+            dropContents(side);
+            setBaseOfSide(side, -1);
             updateSoupVisual();
             world.playSound(null, pos, SoundEvents.ENTITY_GENERIC_SPLASH, SoundCategory.BLOCKS, 0.6F, 1.0F);
             markDirtyAndSync();
             return true;
         }
-        dropContents();
-        base = -1;
+        dropContents(side);
+        setBaseOfSide(side, -1);
         updateSoupVisual();
         player.setStackInHand(hand, net.minecraft.item.ItemUsage.exchangeStack(stack, player, new ItemStack(soup.source())));
         net.minecraft.sound.SoundEvent sound = soup == SoupBase.SPICY ? SoundEvents.ITEM_BUCKET_FILL_LAVA
@@ -404,8 +422,13 @@ public class HotPotBlockEntity extends BlockEntity
         java.util.List<ItemStack> scooped = new java.util.ArrayList<>();
         float xp = 0;
         java.util.List<Integer> order = new java.util.ArrayList<>();
+        // 鸳鸯 / 田字锅只盛和准星那一边同一种汤底里的菜（两边汤底一样就都能盛；用户定）
+        int soup = baseOfSide(layout().sideOfCell(Math.max(0, bigCell)));
         for (int i = 0; i < 9; i++) {
-            order.add((bigCell + i) % 9);
+            int cell = (Math.max(0, bigCell) + i) % 9;
+            if (layout().usesCell(cell) && (!layout().multiSoup() || baseOfSide(layout().sideOfCell(cell)) == soup)) {
+                order.add(cell);
+            }
         }
         outer:
         for (int cell : order) {
@@ -435,8 +458,8 @@ public class HotPotBlockEntity extends BlockEntity
                     Vec3d.ofCenter(pos).add(0, 0.6, 0), Math.max(1, Math.round(xp)));
             }
             world.playSound(null, pos, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.35F, 1.2F);
-        } else if (SoupBase.byId(base) != null) {
-            result = new ItemStack(HotPotContent.SOUP_BOWLS.get(base));
+        } else if (SoupBase.byId(bowlSoup(bigCell)) != null) {
+            result = new ItemStack(HotPotContent.SOUP_BOWLS.get(bowlSoup(bigCell)));
             world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.BLOCKS, 1.0F, 1.0F);
         } else {
             player.sendMessage(Text.translatable(key("msg.bowl_nothing")), true);
@@ -448,19 +471,27 @@ public class HotPotBlockEntity extends BlockEntity
     }
 
     public boolean pourSoup(PlayerEntity player, Hand hand) {
+        return pourSoup(player, hand, PotLayout.SIDE_A);
+    }
+
+    /** 鸳鸯锅倒进准星那一边；两边可以是任意两种汤底（也可以一样），以后加的新汤底也一样能倒。 */
+    public boolean pourSoup(PlayerEntity player, Hand hand, int side) {
         if (world == null || world.isClient || !hasPot()) {
             return false;
+        }
+        if (!layout().multiSoup()) {
+            side = PotLayout.SIDE_A;
         }
         ItemStack stack = player.getStackInHand(hand);
         SoupBase soup = SoupBase.fromStack(stack);
         if (soup == null) {
             return false;
         }
-        if (base >= 0) {
+        if (baseOfSide(side) >= 0) {
             player.sendMessage(Text.translatable(key("msg.already_soup")), true);
             return false;
         }
-        base = soup.ordinal();
+        setBaseOfSide(side, soup.ordinal());
         consumeHand(player, hand, soup.remainder());
         updateSoupVisual();
         world.playSound(null, pos, SoundEvents.ITEM_BUCKET_EMPTY,
@@ -469,7 +500,6 @@ public class HotPotBlockEntity extends BlockEntity
         return true;
     }
 
-    /** 从手中直接放入第一个空槽，面板内点击也使用同样的槽位规则。 */
     /** 筷子上夹着的食物放进锅里指定的小格（熟食、汤底原料放不进）。 */
     public boolean insertHeld(PlayerEntity player, ItemStack chopsticks, int slot) {
         if (world == null || world.isClient || !hasPot()) {
@@ -589,24 +619,32 @@ public class HotPotBlockEntity extends BlockEntity
         return delivered > 0;
     }
 
-    /** 双击面板时一次性收集全部同类熟食，超出背包容量的部分安全掉落。 */
-    public int collectMatchingCooked(PlayerEntity player, ItemStack target) {
-        if (world == null || world.isClient || target.isEmpty()) {
-            return 0;
+    /**
+     * 空筷子直接点锅（2026-10-25 用户定，开发计划「筷子新交互」；新增）：从这一格夹一样熟食到筷子上，
+     * 照常结算出锅经验。夹着的菜之后按住右键吃、或放进碗盘 / 另一格，见 ChopsticksItem。
+     */
+    public boolean pickWithChopsticks(PlayerEntity player, ItemStack chopsticks, int slot) {
+        if (world == null || world.isClient || slot < 0 || slot >= SLOTS || !cooked[slot]
+            || !Chopsticks.held(chopsticks).isEmpty()) {
+            return false;
         }
-        ItemStack key = target.copyWithCount(1);
-        int total = 0;
-        for (int slot = 0; slot < SLOTS; slot++) {
-            ItemStack stack = ingredients.getStack(slot);
-            if (cooked[slot] && !stack.isEmpty()
-                && ItemStack.canCombine(stack, key)) {
-                total += transferCookedSlot(player, slot);
-            }
+        ItemStack stored = ingredients.getStack(slot);
+        if (stored.isEmpty()) {
+            return false;
         }
-        if (total > 0) {
-            finishCollection();
+        float slotXp = xpValue[slot];
+        Chopsticks.hold(chopsticks, stored.copyWithCount(1));
+        if (stored.getCount() > 1) {
+            ItemStack rest = stored.copyWithCount(stored.getCount() - 1);
+            ingredients.setStack(slot, rest);
+            tracked[slot] = rest.copy();
+        } else {
+            ingredients.setStack(slot, ItemStack.EMPTY);
+            resetSlot(slot, ItemStack.EMPTY);
         }
-        return total;
+        grantTakeXp(slotXp, 1);
+        finishCollection();
+        return true;
     }
 
     private int transferCookedSlot(PlayerEntity player, int slot) {
@@ -721,19 +759,68 @@ public class HotPotBlockEntity extends BlockEntity
     // ------------------------------------------------------------------ 查询
 
     public int base() {
-        return base;
+        return bases[0];
     }
 
     public SoupVisual soupVisual() {
-        return SoupVisual.fromBase(SoupBase.byId(base));
+        return SoupVisual.fromBase(SoupBase.byId(bases[0]));
     }
 
     public float clientHeat() {
         return clientHeat;
     }
 
+    /** 锅里有没有汤（鸳鸯 / 田字锅任一边有就算）。 */
     public boolean hasSoup() {
-        return base >= 0;
+        for (int id : bases) {
+            if (id >= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 这口锅怎么分格（没有锅时按九宫格）。 */
+    public PotLayout layout() {
+        HotPotMaterial material = potMaterial();
+        return material == null ? PotLayout.NINE_GRID : material.layout();
+    }
+
+    /** 某一边的汤底编号（-1 = 没汤）。 */
+    public int baseOfSide(int side) {
+        return side >= 0 && side < bases.length ? bases[side] : -1;
+    }
+
+    private void setBaseOfSide(int side, int id) {
+        if (side >= 0 && side < bases.length) {
+            bases[side] = id;
+        }
+    }
+
+    /** 这一格泡在哪种汤里（不用的格子 / 那边没汤 = null）。 */
+    public SoupBase soupForSlot(int slot) {
+        int side = layout().sideOfSlot(slot);
+        return side == PotLayout.NONE ? null : SoupBase.byId(baseOfSide(side));
+    }
+
+    /** 拿碗盛汤盛哪边：准星那格那边有汤就盛那边，没有就盛另一边。 */
+    private int bowlSoup(int bigCell) {
+        int side = layout().sideOfCell(bigCell);
+        int id = side == PotLayout.NONE ? -1 : baseOfSide(side);
+        if (id >= 0) {
+            return id;
+        }
+        for (int other : bases) {
+            if (other >= 0) {
+                return other;
+            }
+        }
+        return -1;
+    }
+
+    /** 方块状态里的汤面：九宫格锅照汤底；鸳鸯锅的汤面由渲染器按两边画，方块状态一律空。 */
+    private SoupVisual blockSoupVisual() {
+        return layout().multiSoup() ? SoupVisual.NONE : SoupVisual.fromBase(SoupBase.byId(bases[0]));
     }
 
     public int filledSlots() {
@@ -748,7 +835,7 @@ public class HotPotBlockEntity extends BlockEntity
 
     public int firstEmptySlot() {
         for (int slot = 0; slot < SLOTS; slot++) {
-            if (ingredients.getStack(slot).isEmpty()) {
+            if (ingredients.getStack(slot).isEmpty() && layout().sideOfSlot(slot) != PotLayout.NONE) {
                 return slot;
             }
         }
@@ -763,20 +850,6 @@ public class HotPotBlockEntity extends BlockEntity
             }
         }
         return false;
-    }
-
-    /** 锅里有食物，而且全部都熟了：灶台据此进入保温，不再消耗燃料。 */
-    public boolean onlyCookedFood() {
-        boolean any = false;
-        for (int i = 0; i < SLOTS; i++) {
-            if (!ingredients.getStack(i).isEmpty()) {
-                if (!cooked[i]) {
-                    return false;
-                }
-                any = true;
-            }
-        }
-        return any;
     }
 
     /**
@@ -803,7 +876,17 @@ public class HotPotBlockEntity extends BlockEntity
     }
 
     private int firstSlotInCell(int bigCell, java.util.function.IntPredicate matches) {
-        if (bigCell < 0 || bigCell > 8) {
+        if (bigCell < 0 || bigCell > 8 || !layout().usesCell(bigCell)) {
+            return -1;
+        }
+        PotLayout layout = layout();
+        if (layout.multiSoup()) {
+            // 鸳鸯 / 田字锅：锅里这个位置轮流显示的是归到它的那些小格（PotLayout.spotOfSlot）
+            for (int slot = 0; slot < SLOTS; slot++) {
+                if (layout.spotOfSlot(slot) == bigCell && matches.test(slot)) {
+                    return slot;
+                }
+            }
             return -1;
         }
         int baseRow = (bigCell / 3) * 3;
@@ -819,17 +902,12 @@ public class HotPotBlockEntity extends BlockEntity
         return -1;
     }
 
-    public int donenessOf(int slot) {
-        return slot >= 0 && slot < SLOTS ? doneness[slot] : 0;
-    }
-
-    public boolean isCookedSlot(int slot) {
-        return slot >= 0 && slot < SLOTS && cooked[slot];
-    }
-
     public int propertyAt(int index) {
         if (index == 0) {
-            return base;
+            return bases[0];
+        }
+        if (index >= PROP_EXTRA_BASES && index < PROP_COUNT) {
+            return bases[index - PROP_EXTRA_BASES + 1];
         }
         if (index >= 4 && index < 4 + SLOTS) {
             return doneness[index - 4];
@@ -864,11 +942,26 @@ public class HotPotBlockEntity extends BlockEntity
         return Math.min(15, total * 15 / SLOTS + (total > 0 ? 1 : 0));
     }
 
+    /** 一边汤底的名字（没汤 = 「无汤底」）。 */
+    public static Text soupName(int id) {
+        SoupBase soup = SoupBase.byId(id);
+        return soup == null ? Text.translatable(key("soup.none")) : Text.translatable(soup.nameKey());
+    }
+
+    /** 汤底那一栏：九宫格锅一种；鸳鸯 / 田字锅按边列出来，用「/」隔开。 */
+    public static Text soupText(PotLayout layout, java.util.function.IntUnaryOperator baseOfSide) {
+        net.minecraft.text.MutableText text = Text.empty();
+        for (int side = 0; side < layout.sides(); side++) {
+            if (side > 0) {
+                text.append(Text.literal(" / "));
+            }
+            text.append(soupName(baseOfSide.applyAsInt(side)));
+        }
+        return text;
+    }
+
     public Text statusText() {
-        SoupBase soup = SoupBase.byId(base);
-        Text soupText = soup == null
-            ? Text.translatable(key("soup.none"))
-            : Text.translatable(soup.nameKey());
+        Text soupText = soupText(layout(), this::baseOfSide);
         StoveBlockEntity stove = stoveBelow();
         Text fireText;
         if (stove == null && heatSourceBelow()) {
@@ -901,10 +994,19 @@ public class HotPotBlockEntity extends BlockEntity
 
     /** 掉落所有食材，不改变锅/灶台本体状态。 */
     public void dropContents() {
+        dropContents(PotLayout.NONE);
+    }
+
+    /** 只掉某一边的食材（{@link PotLayout#NONE} = 全部）。鸳鸯锅舀走一边汤时用。 */
+    public void dropContents(int side) {
         if (world == null || world.isClient) {
             return;
         }
+        boolean all = side == PotLayout.NONE || !layout().multiSoup();
         for (int i = 0; i < SLOTS; i++) {
+            if (!all && layout().sideOfSlot(i) != side) {
+                continue;
+            }
             ItemStack stack = ingredients.getStack(i);
             if (!stack.isEmpty()) {
                 Block.dropStack(world, pos, stack);
@@ -918,11 +1020,11 @@ public class HotPotBlockEntity extends BlockEntity
     // ------------------------------------------------------------------ 整锅打包 / 冷热
 
     /** 存进锅物品里的字段名，复制方块（Ctrl+中键）时要从方块实体数据里去掉，免得重复。 */
-    private static final String[] POT_DATA_KEYS = {"Base", "Doneness", "Cooked", "SlotXp", "PendingXp", "Items"};
+    private static final String[] POT_DATA_KEYS = {"Base", "BaseB", "BaseC", "BaseD", "Doneness", "Cooked", "SlotXp", "PendingXp", "Items"};
 
     /** 锅里有没有东西（汤底或食材）。 */
     public boolean hasPotContents() {
-        return base >= 0 || !ingredients.isEmpty();
+        return hasSoup() || !ingredients.isEmpty();
     }
 
     /** 把整锅（汤底 + 食材 + 熟度）打包成一个锅物品；空锅就是普通锅物品。 */
@@ -954,7 +1056,7 @@ public class HotPotBlockEntity extends BlockEntity
             resetSlot(i, ItemStack.EMPTY);
         }
         pendingXp = 0F;
-        base = -1;
+        java.util.Arrays.fill(bases, -1);
         markDirty();
     }
 
@@ -973,7 +1075,7 @@ public class HotPotBlockEntity extends BlockEntity
         return !(this instanceof StoveBlockEntity) && HotPotHeat.isHeatSource(world, pos.down());
     }
 
-    // 1.20.1 移植：1.21 这里用 addComponents / readComponents 让掉落和摆放带着锅里的东西；
+    // 1.20.1 移植（调整）：1.21 这里用 addComponents / readComponents 让掉落和摆放带着锅里的东西；
     // 1.20 没有物品组件，掉落改在 HotPotBlock.getDroppedStacks 调 toPotItem，摆放在 HotPotBlock.onPlaced 调 loadPotContents。
 
     private static void consumeHand(PlayerEntity player, Hand hand, Item remainder) {
@@ -1109,7 +1211,9 @@ public class HotPotBlockEntity extends BlockEntity
 
     /** 锅里的东西（汤底、81 格食材、熟度、经验）；方块存档和"装着东西的锅"物品共用这一份格式。 */
     private void writePotData(NbtCompound nbt) {
-        nbt.putInt("Base", base);
+        for (int side = 0; side < bases.length; side++) {
+            nbt.putInt(BASE_KEYS[side], bases[side]);
+        }
         nbt.putIntArray("Doneness", doneness);
         byte[] cookedBytes = new byte[SLOTS];
         for (int i = 0; i < SLOTS; i++) {
@@ -1138,7 +1242,9 @@ public class HotPotBlockEntity extends BlockEntity
     }
 
     private void readPotData(NbtCompound nbt) {
-        base = nbt.contains("Base") ? nbt.getInt("Base") : -1;
+        for (int side = 0; side < bases.length; side++) {
+            bases[side] = nbt.contains(BASE_KEYS[side]) ? nbt.getInt(BASE_KEYS[side]) : -1;
+        }
         java.util.Arrays.fill(doneness, 0);
         int[] loaded = nbt.getIntArray("Doneness");
         System.arraycopy(loaded, 0, doneness, 0, Math.min(loaded.length, SLOTS));

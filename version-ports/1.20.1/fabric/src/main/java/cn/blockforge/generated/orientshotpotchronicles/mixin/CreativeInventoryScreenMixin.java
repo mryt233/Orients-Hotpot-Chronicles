@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * 本模组分类页按左边的子类按钮（{@link CreativeSubTabs}）筛物品：切换分类页、物品列表重建之后各筛一次，并滚回顶部。
- *
+ * 作者：
  */
 @Mixin(CreativeInventoryScreen.class)
 abstract class CreativeInventoryScreenMixin extends AbstractInventoryScreen<CreativeInventoryScreen.CreativeScreenHandler> {

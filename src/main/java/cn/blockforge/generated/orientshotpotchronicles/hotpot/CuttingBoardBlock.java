@@ -33,7 +33,7 @@ import net.minecraft.world.World;
  * {@code cuttable}（能放上砧板的东西）。台面上放着的东西由 client/CuttingBoardRenderer 平躺着画出来。
  * 交互：拿能切的东西右键 = 放一个上去；拿菜刀右键 = 切（掉出切好的东西，菜刀掉 1 点耐久）；空手右键 = 拿回来。
  * 标签 {@code cut_piece_by_piece} 里的（土豆）一刀只掉 1 份，切满配方的份数才切完（用户：一个土豆切三下）；其他一刀切完。
- *
+ * 作者：
  */
 public class CuttingBoardBlock extends Block implements BlockEntityProvider, PartOutline {
     public static final TagKey<net.minecraft.item.Item> CUTTABLE =
@@ -45,8 +45,32 @@ public class CuttingBoardBlock extends Block implements BlockEntityProvider, Par
     private static final VoxelShape SHAPE = Block.createCuboidShape(2, 0, 2, 14, 3, 14);
     public static final float TOP = 3F / 16F;
 
+    /** 朝向 = 放的人站的那一边（2026-10-23 用户：砧板要有朝向，板上的东西朝着玩家）。 */
+    public static final net.minecraft.state.property.DirectionProperty FACING = net.minecraft.state.property.Properties.HORIZONTAL_FACING;
+
     public CuttingBoardBlock(Settings settings) {
         super(settings);
+        setDefaultState(getStateManager().getDefaultState().with(FACING, net.minecraft.util.math.Direction.SOUTH));
+    }
+
+    @Override
+    protected void appendProperties(net.minecraft.state.StateManager.Builder<net.minecraft.block.Block, BlockState> builder) {
+        builder.add(FACING);
+    }
+
+    @Override
+    public BlockState getPlacementState(net.minecraft.item.ItemPlacementContext ctx) {
+        return getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+    }
+
+    @Override
+    protected BlockState rotate(BlockState state, net.minecraft.util.BlockRotation rotation) {
+        return state.with(FACING, rotation.rotate(state.get(FACING)));
+    }
+
+    @Override
+    protected BlockState mirror(BlockState state, net.minecraft.util.BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
     }
 
     @Override
@@ -73,7 +97,7 @@ public class CuttingBoardBlock extends Block implements BlockEntityProvider, Par
     }
 
     /** 准星对着板上的东西还是砧板本身（看命中点有没有高出板面、在不在东西的范围里）。 */
-    private static boolean aimsAtItem(BlockPos pos, PlayerEntity player) {
+    public static boolean aimsAtItem(BlockPos pos, PlayerEntity player) {
         net.minecraft.util.hit.HitResult hit = player.raycast(player.getBlockInteractionRange(), 1.0F, false);
         if (!(hit instanceof BlockHitResult b) || !b.getBlockPos().equals(pos)) {
             return false;
@@ -151,7 +175,8 @@ public class CuttingBoardBlock extends Block implements BlockEntityProvider, Par
         }
         if (board.item().isEmpty() && (stack.isIn(CUTTABLE) || Pounding.poundable(stack))) {
             if (!world.isClient) {
-                board.setItem(stack.copyWithCount(1));
+                // 食物朝向单独记：放的人站在哪边，食物就朝哪边（和砧板自己的朝向无关，用户要分开）
+                board.setItem(stack.copyWithCount(1), player.getHorizontalFacing().getOpposite());
                 stack.decrementUnlessCreative(1, player);
                 world.playSound(null, pos, SoundEvents.BLOCK_WOOD_PLACE, SoundCategory.BLOCKS, 0.6F, 1.2F);
             }
@@ -184,6 +209,28 @@ public class CuttingBoardBlock extends Block implements BlockEntityProvider, Par
                 pos.getX() + 0.5, pos.getY() + TOP + 0.05, pos.getZ() + 0.5, 6, 0.15, 0.05, 0.15, 0.04);
         }
         return ItemActionResult.SUCCESS;
+    }
+
+    /** 对着板上的东西挖：一下就挖掉（只挖东西，砧板留着，见 HotPotContent 的破坏事件）；否则按砧板自己的硬度。 */
+    @Override
+    protected float calcBlockBreakingDelta(BlockState state, PlayerEntity player, BlockView world, BlockPos pos) {
+        if (hasItem(world, pos) && aimsAtItem(pos, player)) {
+            return 1.0F;
+        }
+        return super.calcBlockBreakingDelta(state, player, world, pos);
+    }
+
+    /** 挖掉板上的东西：掉出来，砧板留着（0.1.2-alpha 后用户报：挖板上的食物把砧板也打掉了）。 */
+    public static void breakItem(World world, BlockPos pos, CuttingBoardBlockEntity board, PlayerEntity player) {
+        ItemStack item = board.item();
+        if (item.isEmpty()) {
+            return;
+        }
+        board.setItem(ItemStack.EMPTY);
+        if (!player.isCreative()) {
+            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + TOP + 0.1, pos.getZ() + 0.5, item);
+        }
+        world.playSound(null, pos, SoundEvents.BLOCK_WOOD_HIT, SoundCategory.BLOCKS, 0.6F, 1.2F);
     }
 
     /** 空手右键：把砧板上的东西拿回来。 */

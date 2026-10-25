@@ -1,4 +1,4 @@
-// ；1.21.1 NeoForge 移植。
+// 作者：；1.21.1 NeoForge 移植。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import java.util.ArrayList;
@@ -22,12 +22,6 @@ final class NeoRegistrations {
 
     static <T, V extends T> V queue(Registry<T> registry, RegistryKey<T> key, V value) {
         return queue(registry, key.getValue(), value);
-    }
-
-    static <T> void alias(Registry<T> registry, Identifier from, Identifier to) {
-        ENTRIES.add(event -> {
-            if (event.getRegistryKey().equals(registry.getKey())) registry.addAlias(from, to);
-        });
     }
 
     static void flush(RegisterEvent event) {

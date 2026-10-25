@@ -21,7 +21,7 @@ import java.util.List;
  * （从最上层到最下层、每层从左到右），看每个碗装的什么、还剩多少；下面「补充蘸料台」按钮进补货界面（SauceStationScreen）。
  * 只读界面，数据直接看客户端的方块实体（存货变了服务端会同步过来）。原版灰色样式，同补货界面。
  * 网页预览 viewer/screens.js 的 sauceOverview 与本类一一对应。
- *
+ * 作者：
  */
 public class SauceOverviewScreen extends Screen {
     public static final int W = 176, H = 176;

@@ -30,8 +30,8 @@ final class BoilingEffects {
 
     private static Palette palette(SoupVisual soup) {
         return switch (soup) {
-            case CLEAR -> new Palette(0xC6CCCA, 0xF4F4EC);   // 2026-10-23 清汤换成清亮的银灰（用户参考图），
-            case MILKY -> new Palette(0xF2E7D2, 0xFFFFFF);
+            case CLEAR -> new Palette(0xC6CCCA, 0xF4F4EC);   // 2026-10-23 清汤换成清亮的银灰（用户参考图），调整
+            case RICH_STOCK -> new Palette(0xF2E7D2, 0xFFFFFF);
             case MUSHROOM -> new Palette(0x9A7048, 0xE8C88A);
             default -> new Palette(0xBE3325, 0xD8553A); // 红汤：比汤底 #B82F23 稍亮，顶面带红油光泽
         };
@@ -49,6 +49,15 @@ final class BoilingEffects {
      */
     static void render(SoupVisual soup, float surfaceY, float innerMin, float innerSize, float heat,
                        double seconds, int salt, MatrixStack matrices, VertexConsumerProvider consumers, int light) {
+        render(soup, surfaceY, innerMin, innerSize, heat, seconds, salt, matrices, consumers, light, null);
+    }
+
+    /**
+     * @param keepAt 鸳鸯锅：只在这一边冒泡（参数是方块坐标 x、z），落在别处的气泡这一轮不画；null = 整锅。新增。
+     */
+    static void render(SoupVisual soup, float surfaceY, float innerMin, float innerSize, float heat,
+                       double seconds, int salt, MatrixStack matrices, VertexConsumerProvider consumers, int light,
+                       java.util.function.BiPredicate<Double, Double> keepAt) {
         if (!soup.hasSoup() || heat < 0.05F) {
             return;
         }
@@ -76,6 +85,9 @@ final class BoilingEffects {
             double keep = sMax * 1.3 + 0.3 * PX;
             double x = Math.min(innerMin + innerSize - keep, Math.max(innerMin + keep, x0));
             double z = Math.min(innerMin + innerSize - keep, Math.max(innerMin + keep, z0));
+            if (keepAt != null && !keepAt.test(x, z)) {
+                continue;
+            }
             double rise = PX * (0.3 + 0.4 * hash(i, cyc * 5 + 1)); // 刚好离开汤面
             double pop = PX * 0.25;
 

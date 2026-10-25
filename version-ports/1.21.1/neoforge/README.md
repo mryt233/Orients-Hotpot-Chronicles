@@ -1,10 +1,10 @@
 # Orient's Hotpot Chronicles · 之晗的火锅物语
 
-<!-- 本文件由 version-ports/tools/gen_port_readme.py 生成；要改请改脚本里的数据再生成。 -->
+<!-- 本文件由 version-ports/tools/gen_port_readme.py 生成（）；要改请改脚本里的数据再生成。 -->
 
-**Minecraft 1.21.1 · NeoForge · 0.1.2-alpha**
+**Minecraft 1.21.1 · NeoForge · 0.1.3-alpha-hotfix1**
 
-[Download / 下载](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha) · [Full gameplay guide / 完整玩法](https://github.com/mryt233/Orients-Hotpot-Chronicles#readme) · [Report an issue / 反馈问题](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
+[Download / 下载](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) · [Full gameplay guide / 完整玩法](https://github.com/mryt233/Orients-Hotpot-Chronicles#readme) · [Report an issue / 反馈问题](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
 
 > **Alpha / 测试版**
 > Only preliminary testing has been performed. Compatibility with other mods and potential bugs have not been thoroughly verified. Back up your saves, try it in a new world first, and report any issues.
@@ -28,29 +28,29 @@
 ## Installation · 安装
 
 1. Install [NeoForge](https://neoforged.net/) for Minecraft **1.21.1** (21.1.264 or newer).
-2. Put `orients_hotpot_chronicles-1.21.1-neoforge-0.1.2-alpha.jar` into the `mods` folder on both client and server.
+2. Put `orients_hotpot_chronicles-1.21.1-neoforge-0.1.3-alpha-hotfix1.jar` into the `mods` folder on both client and server.
 3. Launch the Minecraft **1.21.1 NeoForge** profile with **Java 21+**.
 
 1. 安装 Minecraft **1.21.1** 对应的 [NeoForge](https://neoforged.net/)（21.1.264 或更新）。
-2. 把 `orients_hotpot_chronicles-1.21.1-neoforge-0.1.2-alpha.jar` 放进客户端和服务端的 `mods` 文件夹。
+2. 把 `orients_hotpot_chronicles-1.21.1-neoforge-0.1.3-alpha-hotfix1.jar` 放进客户端和服务端的 `mods` 文件夹。
 3. 选择 Minecraft **1.21.1 NeoForge** 启动配置，用 **Java 21+** 启动。
 
 ## About this port · 移植说明
 
-This is the **Minecraft 1.21.1 NeoForge** port of the published **0.1.2-alpha** (originally made for Minecraft 1.21.1 Fabric). It includes: brick stoves, iron and copper nine-grid hotpots, four broths, bamboo chopsticks, hotpot tables, stools, benches, plates, tripe, bowls and drinks; dipping-sauce stations with nine seasonings and bowls of dipping sauce; a cutting board, iron kitchen knife and rolling pin with fatty beef rolls, mutton rolls, potato slices, soybeans, tofu and meatballs; scallions and cilantro from grass.
+This is the **Minecraft 1.21.1 NeoForge** port of the published **0.1.3-alpha-hotfix1** (originally made for Minecraft 1.21.1 Fabric). It includes: brick stoves; iron and copper nine-grid, S-shaped / O-shaped / split yuanyang and four-grid hotpots (one broth per side); four broths, bamboo chopsticks, hotpot tables, stools, benches, plates, tripe, bowls and drinks; dipping-sauce stations with nine seasonings and bowls of dipping sauce; a cutting board, iron kitchen knife and rolling pin with fatty beef rolls, mutton rolls, beef loin slices, potato slices, soybeans, tofu and meatballs; scallions and cilantro from grass.
 
-本版是已发布的 **0.1.2-alpha**（原版本为 Minecraft 1.21.1 Fabric）的 **Minecraft 1.21.1 NeoForge 移植版**，包含：灶台、铁锅 / 铜锅、四种汤底、竹筷、火锅桌、桌凳、盘子、毛肚、碗与饮料；蘸料台、九种小料和蘸料；砧板、铁菜刀、擀面杖，以及肥牛卷、羊肉卷、土豆片、黄豆、豆腐和丸子；草里掉的小葱、香菜。
+本版是已发布的 **0.1.3-alpha-hotfix1**（原版本为 Minecraft 1.21.1 Fabric）的 **Minecraft 1.21.1 NeoForge 移植版**，包含：灶台；铁 / 铜的九宫格锅、S 形 / O 形 / 直隔鸳鸯锅和田字锅（每边一种汤底）；四种汤底、竹筷、火锅桌、桌凳、盘子、毛肚、碗与饮料；蘸料台、九种小料和蘸料；砧板、铁菜刀、擀面杖，以及肥牛卷、羊肉卷、吊龙、土豆片、黄豆、豆腐和丸子；草里掉的小葱、香菜。
 
 Differences from the main 1.21.1 Fabric build / 和 1.21.1 Fabric 主版本的差异：
 
-- If a data pack replaces the cow, mooshroom or grass loot tables, tripe, scallions, cilantro and soybeans are still added. / 数据包整个替换牛、哞菇或草的掉落表时，本版仍会加上毛肚、小葱、香菜、黄豆。
+- If a data pack replaces the cow, mooshroom or grass loot tables, tripe, beef loin, scallions, cilantro and soybeans are still added. / 数据包整个替换牛、哞菇或草的掉落表时，本版仍会加上毛肚、牛脊肉、小葱、香菜、黄豆。
 - Worlds from 0.1.0-alpha.1 are not converted (this port starts from 0.1.1-alpha). / 不转换 0.1.0-alpha.1 的旧存档（本移植版从 0.1.1-alpha 开始）。
 
 ## Test status · 测试范围
 
-Build; 27 command checks each on the development server and the official NeoForge 21.1.264 server; flammability checked for all 58 material / block combinations; client startup to the main menu.
+Build; 27 command checks (placement, campfire cooking, a dropped pot keeping its contents, tripe / beef loin / grass drops, sauce stations, cutting board); placing all 10 hotpots and saving four broths; campfire pot stands; only food goes into a pot; cutting potatoes, tofu and beef loin; shift-picking up a pot with its contents; reversed benches joining; the new recipes not clashing with vanilla; chopsticks (shift-open, pick, eat, put back, raw food into the pot) and dipping; flammability of every block face; food values; all 151 IDs; client startup to the main menu with the new pot item renderers. Run on the development server and the official NeoForge 21.1.264 server (chopstick interactions judged on the official server).
 
-构建；开发环境和官方 NeoForge 21.1.264 服务端各 27 项命令检查；58 种材质 / 方块组合的可燃检查；客户端启动到主菜单。
+构建；27 项命令检查（摆放、篝火烹饪、挖锅保留内容、毛肚 / 牛脊肉 / 草掉落、蘸料台、砧板）；10 种锅摆放和四种汤底存读；篝火上的锅架；锅只收食物；砧板切土豆、豆腐、牛脊肉；空手 Shift 收锅带内容；条凳反向相连；新配方不和原版冲突；筷子（Shift 开锅、夹菜、吃、放回、生食下锅）和蘸料；所有方块逐面可燃；食物数值；151 个 ID；客户端启动到主菜单、新锅物品图标渲染。开发环境和官方 NeoForge 21.1.264 服务端各跑一遍（筷子交互以正式服为准）。
 
 Player interactions, screens, visuals, multiplayer and other-mod combinations still need in-game testing.
 
@@ -58,17 +58,17 @@ Player interactions, screens, visuals, multiplayer and other-mod combinations st
 
 ## Other builds · 其他版本
 
-Choose the JAR matching your Minecraft version and loader. Download the one that matches your game from the [Releases](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) page.
+Choose the JAR matching your Minecraft version and loader. Download the matching file from the [Releases](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) page.
 
-请按 Minecraft 版本和加载器选择对应 JAR，请到 [Releases / 发布页](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) 下载和自己游戏对得上的那一个。
+请按 Minecraft 版本和加载器选择对应 JAR，到 [Releases / 发布页](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) 下载和自己游戏对得上的那一个。
 
 | Minecraft | Loader / 加载器 | File / 文件 | Java |
 | --- | --- | --- | --- |
-| 1.21.1 | Fabric（main / 主版本） | [`orients_hotpot_chronicles-1.21.1-fabric-0.1.2-alpha.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha) | 21+ |
-| 1.21.1 | NeoForge | [`orients_hotpot_chronicles-1.21.1-neoforge-0.1.2-alpha.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha) | 21+ |
+| 1.21.1 | Fabric（main / 主版本） | [`orients_hotpot_chronicles-1.21.1-fabric-0.1.3-alpha-hotfix1.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) | 21+ |
+| 1.21.1 | NeoForge | [`orients_hotpot_chronicles-1.21.1-neoforge-0.1.3-alpha-hotfix1.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) | 21+ |
 | 1.20.4 | Fabric | [`orients_hotpot_chronicles-1.20.4-fabric-0.1.1-alpha.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) | 17+ |
-| 1.20.1 | Fabric | [`orients_hotpot_chronicles-1.20.1-fabric-0.1.2-alpha.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha) | 17+ |
-| 1.20.1 | Forge | [`orients_hotpot_chronicles-1.20.1-forge-0.1.2-alpha.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha) | 17+ |
+| 1.20.1 | Fabric | [`orients_hotpot_chronicles-1.20.1-fabric-0.1.3-alpha-hotfix1.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) | 17+ |
+| 1.20.1 | Forge | [`orients_hotpot_chronicles-1.20.1-forge-0.1.3-alpha-hotfix1.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) | 17+ |
 
 Fabric builds need [Fabric API](https://modrinth.com/mod/fabric-api) for the same Minecraft version; Forge and NeoForge builds do not.
 
@@ -76,9 +76,9 @@ Fabric 版需要同 Minecraft 版本的 Fabric API；Forge 和 NeoForge 版不�
 
 ## Release file · 发行文件
 
-`orients_hotpot_chronicles-1.21.1-neoforge-0.1.2-alpha.jar`
+`orients_hotpot_chronicles-1.21.1-neoforge-0.1.3-alpha-hotfix1.jar`
 
-SHA-256: `ec5c8b337f17789a402117f2fc97f2804f3c005f104599d0e716a5597b3f8866`
+SHA-256: `b23b7543079909410f32bb478ace4cab2917c9f1ea6a7400a54b76822c9f9a0d`
 
 ## Build · 构建
 

@@ -55,7 +55,7 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider, Part
             .nonOpaque()
             .dropsNothing()
             // 形状随方块实体（摆了哪些盘子）变、矮桌上还伸出本格：不让原版提前缓存形状（同潜影盒），
-            // 否则缓存的是空世界里的默认小方块，和真实碰撞对不上，站上去会抽搐
+            // 否则缓存的是空世界里的默认小方块，和真实碰撞对不上，站上去会抽搐（调整）
             .dynamicBounds()
             .pistonBehavior(net.minecraft.block.piston.PistonBehavior.DESTROY));
         setDefaultState(getDefaultState().with(ON_TABLE, false).with(ON_TALL_TABLE, false));
@@ -173,6 +173,26 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider, Part
         return plate == null ? null : PlateHolderBlockEntity.partShape(plate, lift(state));
     }
 
+    /**
+     * 这个盘子长什么样：盘子按方向；汤碗按汤底、空瓶换空瓶模型（r99）、饮料按种类。渲染和挖掉时的碎屑共用
+     * （调整：以前碎屑用默认状态，植物蛋白饮料挖掉飞出的是橙子饮料的碎屑，用户报）。
+     */
+    public static BlockState modelState(PlateHolderBlockEntity.Placed p) {
+        BlockState state = p.plate.getDefaultState().with(cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateBlock.AXIS, p.axis);
+        if (p.plate instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.BowlBlock
+            && p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBowlItem bowl) {
+            state = state.with(cn.blockforge.generated.orientshotpotchronicles.hotpot.BowlBlock.SOUP,
+                cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual.fromBase(bowl.soup()));
+        }
+        if (p.plate instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock) {
+            boolean empty = p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.EmptyBottleItem;
+            cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkKind kind = p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.EmptyBottleItem e ? e.kind()
+                : p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkItem d ? d.kind() : cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkKind.ORANGE_DRINK;
+            state = state.with(cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock.EMPTY, empty).with(cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock.KIND, kind);
+        }
+        return state;
+    }
+
     /** 准星对着的是这一格里的哪个盘子（服务端和客户端同一套射线）。 */
     @org.jetbrains.annotations.Nullable
     public static PlateHolderBlockEntity.Placed aimed(PlayerEntity player, BlockPos pos, PlateHolderBlockEntity be) {
@@ -193,7 +213,7 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider, Part
         if (plate == null) {
             return;
         }
-        BlockState plateState = plate.plate.getDefaultState();
+        BlockState plateState = modelState(plate);
         world.syncWorldEvent(null, net.minecraft.world.WorldEvents.BLOCK_BROKEN, pos, Block.getRawIdFromState(plateState));
         if (!player.isCreative()) {
             Block.dropStack(world, pos, plate.toItem());
@@ -221,7 +241,7 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider, Part
         double[] at = local(pos, hit);
         PlateBlock placing = PlateItem.placedFor(stack);
         if (placing != null) {
-            // 盘子、碗、汤碗、果橙多：在这一格再摆一个（r99 起碗和瓶子也走这里）
+            // 盘子、碗、汤碗、橙子饮料：在这一格再摆一个（r99 起碗和瓶子也走这里）
             if (!world.isClient) {
                 if (be.tryAdd(placing, HotPotBlock.handleAxisFor(player.getHorizontalFacing()), at[0], at[1], stack,
                     PlateItem.keepsSelf(stack))) {
@@ -238,15 +258,40 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider, Part
         if (plate == null) {
             return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
-        // （r103 的「筷子夹着菜点桌上的蘸料碗 = 蘸一口」2026-10-23 用户改成只能副手拿蘸料，已去掉；见 Seasoning / ChopsticksItem）
+        // 筷子夹着菜点桌上的蘸料碗 = 蘸一口，配料记在菜上，吃的时候生效
+        // （r103 有过，2026-10-23 去掉；2026-10-25 用户在开发计划「筷子新交互」里要回来。调整）
+        if (stack.isOf(HotPotContent.CHOPSTICKS) && plate.self.getItem() instanceof DippingSauceItem) {
+            if (!world.isClient) {
+                ItemStack held = Chopsticks.held(stack);
+                if (held.isEmpty() || !held.contains(net.minecraft.component.DataComponentTypes.FOOD)) {
+                    player.sendMessage(Text.translatable(HotPotBlockEntity.key("msg.dip_need_food")), true);
+                } else {
+                    ItemStack dipped = held.copy();
+                    ItemStack left = DippingSauceItem.dipInto(plate.self, dipped);
+                    // 蘸完最后一口变回空碗：桌上这只碗变成能装菜的普通碗
+                    plate.self = left.getItem() instanceof DippingSauceItem ? left : ItemStack.EMPTY;
+                    Chopsticks.hold(stack, dipped);
+                    be.changed();
+                    world.playSound(null, pos, SoundEvents.BLOCK_HONEY_BLOCK_STEP, SoundCategory.BLOCKS, 0.4F, 1.4F);
+                }
+            }
+            return ItemActionResult.SUCCESS;
+        }
         if (!plate.holdsFood() && (stack.isOf(HotPotContent.CHOPSTICKS) || PlateItem.holdsFood(world, stack))) {
-            // 汤碗、果橙多里放不了菜，也夹不出菜
+            // 汤碗、橙子饮料里放不了菜，也夹不出菜
             if (!world.isClient) {
                 player.sendMessage(Text.translatable(HotPotBlockEntity.key("msg.cannot_hold_food")), true);
             }
             return ItemActionResult.SUCCESS;
         }
         if (stack.isOf(HotPotContent.CHOPSTICKS)) {
+            // 夹着菜、肚子还吃得下：不放回去，交给筷子吃。以前夹起来以后按住右键会被当成连点，
+            // 菜在碗和筷子之间来回放、夹，看着像夹不起来（用户报，2026-10-25 调整）；吃饱了才放回碗盘里
+            ItemStack inHand = Chopsticks.held(stack);
+            net.minecraft.component.type.FoodComponent food = inHand.get(net.minecraft.component.DataComponentTypes.FOOD);
+            if (food != null && player.canConsume(food.canAlwaysEat())) {
+                return ItemActionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+            }
             if (!world.isClient) {
                 ItemStack held = Chopsticks.held(stack);
                 if (held.isEmpty()) {

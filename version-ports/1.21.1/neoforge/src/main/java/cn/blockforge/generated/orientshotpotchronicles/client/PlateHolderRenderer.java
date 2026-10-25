@@ -31,21 +31,9 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
         this.blocks = MinecraftClient.getInstance().getBlockRenderManager();
     }
 
-    /** 画哪个模型：盘子按方向；汤碗按汤底、空瓶换空瓶模型（r99）。 */
+    /** 画哪个模型：见 {@link cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlock#modelState}（挖掉时的碎屑也用它）。 */
     public static BlockState modelState(PlateHolderBlockEntity.Placed p) {
-        BlockState state = p.plate.getDefaultState().with(PlateBlock.AXIS, p.axis);
-        if (p.plate instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.BowlBlock
-            && p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBowlItem bowl) {
-            state = state.with(cn.blockforge.generated.orientshotpotchronicles.hotpot.BowlBlock.SOUP,
-                cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual.fromBase(bowl.soup()));
-        }
-        if (p.plate instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock) {
-            boolean empty = p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.EmptyBottleItem;
-            cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkKind kind = p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.EmptyBottleItem e ? e.kind()
-                : p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkItem d ? d.kind() : cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkKind.GUOCHENGDUO;
-            state = state.with(cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock.EMPTY, empty).with(cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock.KIND, kind);
-        }
-        return state;
+        return cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlock.modelState(p);
     }
 
     @Override

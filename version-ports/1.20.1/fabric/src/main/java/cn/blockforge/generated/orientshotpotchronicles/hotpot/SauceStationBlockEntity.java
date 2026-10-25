@@ -1,4 +1,3 @@
-// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -25,12 +24,12 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 
 /**
- * 蘸料台的存货（r103，用户定；2026-10-23 用户改成碗不固定，）：台上 9 个小碗，每个碗对应补货界面的一个原料格。
+ * 蘸料台的存货（r103，用户定；2026-10-23 用户改成碗不固定，调整）：台上 9 个小碗，每个碗对应补货界面的一个原料格。
  * 哪个碗装什么不固定——空碗（格子里没原料、也没剩份数）放哪种原料就变成哪种调料，同一种调料也可以放好几个碗；
  * 碗里还有东西时只能补同一种。1 个原料 = 4 份，最多 16 个 = 64 份；打一次用 1 份，份数用完时自动从格子里化开 1 个原料。
  * 每个碗装的什么、有没有货同步给客户端，由 client/SauceStationRenderer 画碗里的调料面。
  * 碗的编号 = 阶梯上的位置：从最上层到最下层、每层从左到右（见 SauceStationBlock.aimed）。
- *
+ * 作者：
  */
 public class SauceStationBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
     public static final int BOWLS = 9;

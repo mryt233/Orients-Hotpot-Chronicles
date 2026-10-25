@@ -1,4 +1,4 @@
-// ；1.20.1 Forge 客户端动态物品渲染。
+// 作者：；1.20.1 Forge 客户端动态物品渲染。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
@@ -34,6 +34,14 @@ public final class ForgeItemRenderers {
                             SauceRender.surface(cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem.contents(stack).mask(), matrices, consumers, light);
                         } else if (stack.isOf(HotPotContent.CHOPSTICKS)) {
                             HeldFoodItemRenderer.renderChopsticks(stack, mode, matrices, consumers, light, overlay);
+                        } else if (stack.getItem() instanceof BlockItem potItem
+                            && potItem.getBlock() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock pot
+                            && pot.material().layout().multiSoup()) {
+                            client.getBlockRenderManager().renderBlockAsEntity(
+                                pot.getDefaultState(), matrices, consumers, light, overlay);
+                            var data = cn.blockforge.generated.orientshotpotchronicles.hotpot.ItemData.potData(stack);
+                            if (data != null) HotPotBlockEntityRenderer.renderItemSoups(
+                                pot.material(), data, matrices, consumers, light);
                         } else if (stack.getItem() instanceof PlateItem) {
                             HeldFoodItemRenderer.renderPlate(stack, mode, matrices, consumers, light, overlay);
                         } else if (stack.getItem() instanceof BlockItem item && HotPotContent.TALL_BENCH_ITEMS.contains(item)) {

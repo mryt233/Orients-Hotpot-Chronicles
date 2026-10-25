@@ -2,7 +2,8 @@
   "multipart": [
     {
       "when": {
-        "axis": "x"
+        "axis": "x",
+        "on_campfire": "false"
       },
       "apply": {
         "model": "orients_hotpot_chronicles:block/iron_hot_pot_shell"
@@ -10,7 +11,17 @@
     },
     {
       "when": {
-        "axis": "z"
+        "axis": "x",
+        "on_campfire": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/iron_hot_pot_shell_on_campfire"
+      }
+    },
+    {
+      "when": {
+        "axis": "z",
+        "on_campfire": "false"
       },
       "apply": {
         "model": "orients_hotpot_chronicles:block/iron_hot_pot_shell",
@@ -19,8 +30,19 @@
     },
     {
       "when": {
+        "axis": "z",
+        "on_campfire": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/iron_hot_pot_shell_on_campfire",
+        "y": 90
+      }
+    },
+    {
+      "when": {
         "soup": "clear",
-        "boiling": "false"
+        "boiling": "false",
+        "on_campfire": "false"
       },
       "apply": {
         "model": "orients_hotpot_chronicles:block/standalone_soup_clear"
@@ -29,7 +51,18 @@
     {
       "when": {
         "soup": "clear",
-        "boiling": "true"
+        "boiling": "false",
+        "on_campfire": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_clear_on_campfire"
+      }
+    },
+    {
+      "when": {
+        "soup": "clear",
+        "boiling": "true",
+        "on_campfire": "false"
       },
       "apply": {
         "model": "orients_hotpot_chronicles:block/standalone_soup_clear_boiling"
@@ -37,26 +70,59 @@
     },
     {
       "when": {
-        "soup": "milky",
-        "boiling": "false"
+        "soup": "clear",
+        "boiling": "true",
+        "on_campfire": "true"
       },
       "apply": {
-        "model": "orients_hotpot_chronicles:block/standalone_soup_milky"
+        "model": "orients_hotpot_chronicles:block/standalone_soup_clear_boiling_on_campfire"
       }
     },
     {
       "when": {
-        "soup": "milky",
-        "boiling": "true"
+        "soup": "rich_stock",
+        "boiling": "false",
+        "on_campfire": "false"
       },
       "apply": {
-        "model": "orients_hotpot_chronicles:block/standalone_soup_milky_boiling"
+        "model": "orients_hotpot_chronicles:block/standalone_soup_rich_stock"
+      }
+    },
+    {
+      "when": {
+        "soup": "rich_stock",
+        "boiling": "false",
+        "on_campfire": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_rich_stock_on_campfire"
+      }
+    },
+    {
+      "when": {
+        "soup": "rich_stock",
+        "boiling": "true",
+        "on_campfire": "false"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_rich_stock_boiling"
+      }
+    },
+    {
+      "when": {
+        "soup": "rich_stock",
+        "boiling": "true",
+        "on_campfire": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_rich_stock_boiling_on_campfire"
       }
     },
     {
       "when": {
         "soup": "mushroom",
-        "boiling": "false"
+        "boiling": "false",
+        "on_campfire": "false"
       },
       "apply": {
         "model": "orients_hotpot_chronicles:block/standalone_soup_mushroom"
@@ -65,7 +131,18 @@
     {
       "when": {
         "soup": "mushroom",
-        "boiling": "true"
+        "boiling": "false",
+        "on_campfire": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_mushroom_on_campfire"
+      }
+    },
+    {
+      "when": {
+        "soup": "mushroom",
+        "boiling": "true",
+        "on_campfire": "false"
       },
       "apply": {
         "model": "orients_hotpot_chronicles:block/standalone_soup_mushroom_boiling"
@@ -73,8 +150,19 @@
     },
     {
       "when": {
+        "soup": "mushroom",
+        "boiling": "true",
+        "on_campfire": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_mushroom_boiling_on_campfire"
+      }
+    },
+    {
+      "when": {
         "soup": "spicy",
-        "boiling": "false"
+        "boiling": "false",
+        "on_campfire": "false"
       },
       "apply": {
         "model": "orients_hotpot_chronicles:block/standalone_soup_spicy"
@@ -83,10 +171,31 @@
     {
       "when": {
         "soup": "spicy",
-        "boiling": "true"
+        "boiling": "false",
+        "on_campfire": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_spicy_on_campfire"
+      }
+    },
+    {
+      "when": {
+        "soup": "spicy",
+        "boiling": "true",
+        "on_campfire": "false"
       },
       "apply": {
         "model": "orients_hotpot_chronicles:block/standalone_soup_spicy_boiling"
+      }
+    },
+    {
+      "when": {
+        "soup": "spicy",
+        "boiling": "true",
+        "on_campfire": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_spicy_boiling_on_campfire"
       }
     }
   ]

@@ -32,6 +32,42 @@ public final class HotPotInteraction {
         return row * 3 + col;
     }
 
+    /** 锅模型有没有绕 y 转 90°（耳朵朝南北摆：独立锅 axis=z、灶上锅 pot_axis=z）。 */
+    public static boolean rotated(net.minecraft.block.BlockState state) {
+        if (StoveBlock.isStove(state)) {
+            return state.get(StoveBlock.POT_AXIS) == net.minecraft.util.math.Direction.Axis.Z;
+        }
+        return state.getBlock() instanceof HotPotBlock && state.get(HotPotBlock.AXIS) == net.minecraft.util.math.Direction.Axis.Z;
+    }
+
+    /** 命中点在锅腔里的模型坐标比例（0..1）。 */
+    private static double[] modelUv(net.minecraft.block.BlockState state, BlockPos pos, BlockHitResult hit,
+                                    double innerMin, double innerSize) {
+        double u = MathHelper.clamp((hit.getPos().x - pos.getX() - innerMin) / innerSize, 0, 1);
+        double v = MathHelper.clamp((hit.getPos().z - pos.getZ() - innerMin) / innerSize, 0, 1);
+        return PotLayout.toModel(u, v, rotated(state));
+    }
+
+    /** 准星对着锅里哪个大格：九宫格按 3x3，鸳鸯锅按 S / O 形的格子（{@link PotLayout#cellAt}）。新增。 */
+    public static int cellFromHit(HotPotBlockEntity be, BlockPos pos, BlockHitResult hit, double innerMin, double innerSize) {
+        PotLayout layout = be.layout();
+        if (!layout.multiSoup()) {
+            return bigCellFromHit(pos, hit, innerMin, innerSize);
+        }
+        double[] uv = modelUv(be.getCachedState(), pos, hit, innerMin, innerSize);
+        return layout.cellAt(uv[0], uv[1]);
+    }
+
+    /** 准星对着鸳鸯锅的哪一边（倒汤、舀汤用）；九宫格锅永远是 A。 */
+    public static int sideFromHit(HotPotBlockEntity be, BlockPos pos, BlockHitResult hit, double innerMin, double innerSize) {
+        PotLayout layout = be.layout();
+        if (!layout.multiSoup()) {
+            return PotLayout.SIDE_A;
+        }
+        double[] uv = modelUv(be.getCachedState(), pos, hit, innerMin, innerSize);
+        return layout.sideNear(uv[0], uv[1]);
+    }
+
     /** 筷子用于开面板，碗用于直接捞取；空手由方块的 onUse 路径处理。 */
     public static boolean isServingTool(ItemStack stack) {
         return stack.isOf(HotPotContent.CHOPSTICKS) || stack.isOf(Items.BOWL);

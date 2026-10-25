@@ -1,4 +1,3 @@
-// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.entity.Entity;
@@ -39,10 +38,6 @@ public class SeatEntity extends Entity {
         return seat;
     }
 
-    public boolean covers(BlockPos pos) {
-        return a.equals(pos) || b.equals(pos);
-    }
-
     @Override
     public void tick() {
         super.tick();
@@ -54,7 +49,7 @@ public class SeatEntity extends Entity {
     }
 
     /** 坐的人屁股正好落在凳面上（实体自身就放在凳面高度）。 */
-    // 1.20.1 移植：1.21 坐的人脚底 = 座位 + 0 − 玩家的骑乘挂点 0.6；1.20.1 是 座位 + 这里 + 玩家的 −0.35，取 −0.25 对上
+    // 1.20.1 移植（调整）：1.21 坐的人脚底 = 座位 + 0 − 玩家的骑乘挂点 0.6；1.20.1 是 座位 + 这里 + 玩家的 −0.35，取 −0.25 对上
     @Override
     public double getMountedHeightOffset() {
         return -0.25;

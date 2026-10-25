@@ -30,7 +30,7 @@ BUBBLES = 28
 # bubble body / highlight per soup
 SOUPS = {
     "clear": ((0xDA, 0xCB, 0x9E), (0xFF, 0xF8, 0xE4)),
-    "milky": ((0xF5, 0xEC, 0xDA), (0xFF, 0xFF, 0xFF)),
+    "rich_stock": ((0xF5, 0xEC, 0xDA), (0xFF, 0xFF, 0xFF)),
     "mushroom": ((0xB0, 0x84, 0x56), (0xEC, 0xCE, 0x92)),
     "spicy": ((0xE0, 0x58, 0x30), (0xFF, 0xB8, 0x78)),
 }
@@ -177,7 +177,8 @@ def main():
     for name, (body, hi) in SOUPS.items():
         src = Image.open(DIRS[0] / f"hot_pot_top_{name}.png").convert("RGB")
         base = {(x, y): src.getpixel((x, y)) for x in range(16) for y in range(16)}
-        evs = events_for(sum(map(ord, name)))
+        # 随机种子按名字算；高汤 2026-10-24 从 milky 改名 rich_stock，种子照旧用 "milky"，动画保持原样（）
+        evs = events_for(sum(map(ord, {"rich_stock": "milky"}.get(name, name))))
         sheet = Image.new("RGBA", (16, 16 * FRAMES))
         for f in range(FRAMES):
             sheet.paste(render(base, f, evs, body, hi), (0, f * 16))
@@ -190,3 +191,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # 清汤 2026-10-23 换过配色（recolor_clear_soup.py，用户发了参考图）。这里生成的是换色前的样子，
+    # 不接着换色的话重跑本脚本会把清汤变回浑黄色（2026-10-24 全面检查时发现，新增）
+    import recolor_clear_soup
+    recolor_clear_soup.main()

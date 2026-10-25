@@ -1,4 +1,3 @@
-// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.block.AbstractBlock;
@@ -24,9 +23,9 @@ import net.minecraft.world.WorldView;
  * 蘸料台的「上半截」（2026-10-23 用户：1.5 格高肯定占 2 格）：看不见，占住蘸料台头顶那一格，
  * 别的方块放不进来、不会和台子穿插。做法同高灶台的 StoveTopBlock：形状 = 下面蘸料台的形状下移一格，
  * 点它（打蘸料、开补货界面）原样转给下面的蘸料台，挖它 = 挖蘸料台；下面不是蘸料台了它自己消失。
- *
+ * 作者：
  */
-public class SauceStationTopBlock extends net.minecraft.block.Block {
+public class SauceStationTopBlock extends net.minecraft.block.Block implements PartOutline {
     public SauceStationTopBlock() {
         super(AbstractBlock.Settings.create()
             .mapColor(net.minecraft.block.MapColor.OAK_TAN)
@@ -65,6 +64,17 @@ public class SauceStationTopBlock extends net.minecraft.block.Block {
         BlockState below = world.getBlockState(pos.down());
         return below.getBlock() instanceof SauceStationBlock
             ? below.getCollisionShape(world, pos.down()).offset(0, -1, 0) : VoxelShapes.empty();
+    }
+
+    /** 选中框照下面蘸料台的规则（只框对着的碗），挪到这一格的坐标。 */
+    @Override
+    public VoxelShape aimedPart(BlockState state, BlockView world, BlockPos pos, PlayerEntity player) {
+        BlockState below = world.getBlockState(pos.down());
+        if (below.getBlock() instanceof SauceStationBlock station) {
+            VoxelShape part = station.aimedPart(below, world, pos.down(), player);
+            return part == null ? null : part.offset(0, -1, 0);
+        }
+        return null;
     }
 
     @Override
@@ -125,7 +135,7 @@ public class SauceStationTopBlock extends net.minecraft.block.Block {
     public ItemStack getPickStack(net.minecraft.world.BlockView world, BlockPos pos, BlockState state) {
         return new ItemStack(world.getBlockState(pos.down()).getBlock());
     }
-    // 沿用工程既有的 1.21 风格右键分发。
+    // 调整：沿用工程既有的 1.21 风格右键分发。
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         return ItemActionResult.dispatch(state, player, hand,

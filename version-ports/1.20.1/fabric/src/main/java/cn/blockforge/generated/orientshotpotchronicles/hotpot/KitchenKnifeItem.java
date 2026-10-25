@@ -1,4 +1,4 @@
-// ；保持主线菜刀总攻击 4、攻击速度 1.8 和耐久 250。
+// 作者：；保持主线菜刀总攻击 4、攻击速度 1.8 和耐久 250。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import com.google.common.collect.ImmutableMultimap;

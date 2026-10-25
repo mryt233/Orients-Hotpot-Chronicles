@@ -13,9 +13,9 @@ import java.util.List;
 
 /**
  * 一碗蘸料（r103，用户定）：拿碗在蘸料台上一种一种打出来，组件 sauce 记着放了哪几种、还能蘸几口（9 口）。
- * 能像盘子一样摆在桌上（筷子夹着菜点一下 = 蘸一口，效果记在菜上）；副手拿着时在锅界面里吃会自动蘸一口。
+ * 能像盘子一样摆在桌上（筷子夹着菜点一下 = 蘸一口，效果记在菜上）；主手或副手拿着时，用筷子吃会自动蘸一口。
  * 蘸完 9 口变回原版的碗。名字一律叫「蘸料」，提示里列配料（用户）。
- *
+ * 作者：
  */
 public class DippingSauceItem extends Item {
     public DippingSauceItem() {
@@ -42,6 +42,29 @@ public class DippingSauceItem extends Item {
         }
         stack.set(HotPotContent.SAUCE, left);
         return stack;
+    }
+
+    /**
+     * 往这样菜上蘸一口：配料记进菜的 dipped 组件（吃的时候生效），碗里少一口。
+     * 返回蘸完剩下的那碗（没口了是空碗）；碗里没有蘸料就原样返回、不蘸。新增（2026-10-25）。
+     */
+    public static ItemStack dipInto(ItemStack sauce, ItemStack food) {
+        if (!(sauce.getItem() instanceof DippingSauceItem) || contents(sauce).bites() <= 0) {
+            return sauce;
+        }
+        food.set(HotPotContent.DIPPED, food.getOrDefault(HotPotContent.DIPPED, 0) | contents(sauce).mask());
+        return bite(sauce);
+    }
+
+    /** 吃之前：主手或副手拿着蘸料就自动蘸一口（先看副手；用户 2026-10-25：另一只手主副都行）。 */
+    public static void dipFromHands(net.minecraft.entity.LivingEntity user, ItemStack food) {
+        for (net.minecraft.util.Hand hand : new net.minecraft.util.Hand[]{net.minecraft.util.Hand.OFF_HAND, net.minecraft.util.Hand.MAIN_HAND}) {
+            ItemStack sauce = user.getStackInHand(hand);
+            if (sauce.getItem() instanceof DippingSauceItem && contents(sauce).bites() > 0) {
+                user.setStackInHand(hand, dipInto(sauce, food));
+                return;
+            }
+        }
     }
 
     /** 「麻酱、辣油、葱花」这样的配料名单。 */

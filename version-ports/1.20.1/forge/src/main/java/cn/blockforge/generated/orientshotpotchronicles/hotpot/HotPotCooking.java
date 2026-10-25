@@ -1,4 +1,3 @@
-// 0.1.2 的 1.20.1 Forge 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.inventory.SimpleInventory;
@@ -35,7 +34,7 @@ public final class HotPotCooking {
             return false;
         }
         if (SoupBase.fromStack(stack) != null || PlateItem.placedFor(stack) != null) {
-            return false;   // 汤底原料；碗、汤碗、果橙多这些（r99）
+            return false;   // 汤底原料；碗、汤碗、橙子饮料这些（r99）
         }
         // 熟牛肉、烤土豆这类已经熟了的东西没有自己的熔炉配方，以前会掉进“无配方兜底”
         // 被当成焯菜再煮一遍（重新读条、还能重复刷经验），这里直接拒收。
@@ -44,27 +43,42 @@ public final class HotPotCooking {
         }
         // 原版与第三方食物优先读取 FOOD 组件；肉/鱼标签作为没有组件时的兜底，
         // 这样常见火锅食材不会因为模组配方注册方式不同而完全放不进去。
-        // 1.20.1 移植：1.20 没有 FOOD 组件和 #meat 标签，用 isFood() 判断
+        // 0.1.2-alpha 后用户报：对着锅右键什么都能下锅（木头煮成木炭、铁器煮成铁粒）——以前「熔炉能烧」也算。
+        // 改成照烟熏炉：只收能吃的东西，或者有烟熏炉 / 营火配方的东西（调整）。
         return stack.isFood()
+            || (stack.getItem().getFoodComponent() != null && stack.getItem().getFoodComponent().isMeat())
             || stack.isIn(ItemTags.FISHES)
-            || smeltingRecipe(world, stack).isPresent();
+            || foodRecipe(world, stack, RecipeType.SMOKING).isPresent()
+            || foodRecipe(world, stack, RecipeType.CAMPFIRE_COOKING).isPresent();
     }
 
-    /** 熔炉类配方（烧炼/烟熏/营火任一），用来取熟食产出、耗时与经验。 */
+    /**
+     * 锅里用的烹饪配方，用来取熟食产出、耗时与经验：先烟熏炉、再营火（这两种只有食物）；
+     * 熔炉配方只给食物用（熔炉还会烧木头、矿石，锅不能当熔炉，0.1.2-alpha 后 调整）。
+     */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static Optional<AbstractCookingRecipe> smeltingRecipe(World world, ItemStack stack) {
         if (world == null || stack.isEmpty()) {
             return Optional.empty();
         }
-        SimpleInventory input = new SimpleInventory(stack.copyWithCount(1));
-        RecipeType[] types = {RecipeType.SMELTING, RecipeType.SMOKING, RecipeType.CAMPFIRE_COOKING};
-        for (RecipeType type : types) {
-            Optional entry = world.getRecipeManager().getFirstMatch(type, input, world);
+        for (RecipeType type : new RecipeType[]{RecipeType.SMOKING, RecipeType.CAMPFIRE_COOKING}) {
+            Optional entry = foodRecipe(world, stack, type);
             if (entry.isPresent()) {
                 return entry;
             }
         }
+        if (stack.isFood() || (stack.getItem().getFoodComponent() != null && stack.getItem().getFoodComponent().isMeat()) || stack.isIn(ItemTags.FISHES)) {
+            return (Optional) foodRecipe(world, stack, RecipeType.SMELTING);
+        }
         return Optional.empty();
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static Optional<? extends AbstractCookingRecipe> foodRecipe(World world, ItemStack stack, RecipeType type) {
+        if (world == null || stack.isEmpty()) {
+            return Optional.empty();
+        }
+        return world.getRecipeManager().getFirstMatch(type, new SimpleInventory(stack.copyWithCount(1)), world);
     }
 
     /**

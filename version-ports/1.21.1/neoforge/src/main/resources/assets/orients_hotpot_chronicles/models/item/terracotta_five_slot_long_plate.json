@@ -1,5 +1,5 @@
 {
-  "parent": "orients_hotpot_chronicles:block/terracotta_plate_1x5",
+  "parent": "orients_hotpot_chronicles:block/terracotta_five_slot_long_plate",
   "display": {
     "gui": {
       "rotation": [

@@ -1,11 +1,14 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "LL"
+  ],
+  "key": {
+    "L": {
       "tag": "minecraft:logs"
     }
-  ],
+  },
   "result": {
     "id": "orients_hotpot_chronicles:cutting_board",
     "count": 2

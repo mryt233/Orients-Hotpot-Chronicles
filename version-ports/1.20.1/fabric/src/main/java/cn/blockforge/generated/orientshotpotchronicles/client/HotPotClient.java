@@ -1,4 +1,3 @@
-// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
@@ -49,7 +48,7 @@ public final class HotPotClient implements ClientModInitializer {
             (pos, name) -> net.minecraft.client.MinecraftClient.getInstance().setScreen(new SauceOverviewScreen(pos, name));
         BlockEntityRendererRegistry.register(HotPotContent.SAUCE_STATION_BE, SauceStationRenderer::new);
         BlockEntityRendererRegistry.register(HotPotContent.CUTTING_BOARD_BE, CuttingBoardRenderer::new);
-        // 蘸料台的葱花 / 香菜碎末贴图带透明空隙，要走镂空层，否则空隙画成实心
+        // 蘸料台的葱花 / 香菜碎末贴图带透明空隙，要走镂空层，否则空隙画成实心（）
         net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlocks(net.minecraft.client.render.RenderLayer.getCutout(),
             HotPotContent.SAUCE_STATIONS.toArray(new net.minecraft.block.Block[0]));
         ItemTooltipCallback.EVENT.register((stack, context, lines) -> {
@@ -68,12 +67,29 @@ public final class HotPotClient implements ClientModInitializer {
             HotPotContent.IRON_HOT_POT_ITEM, HotPotContent.COPPER_HOT_POT_ITEM}) {
             net.minecraft.client.item.ModelPredicateProviderRegistry.register(pot, GeneratedMod.id("soup"),
                 (stack, world, entity, seed) -> {
-                    NbtCompound nbt = cn.blockforge.generated.orientshotpotchronicles.hotpot.ItemData.potData(stack);   // 1.20.1 移植
+                    NbtCompound nbt = cn.blockforge.generated.orientshotpotchronicles.hotpot.ItemData.potData(stack);   // 1.20.1 移植（调整）
                     if (nbt == null) {
                         return 0F;
                     }
                     SoupBase soup = nbt.contains("Base") ? SoupBase.byId(nbt.getInt("Base")) : null;
                     return soup == null ? 0F : (soup.ordinal() + 1) / 10F;
+                });
+        }
+        // 鸳鸯 / 田字锅的物品：锅身方块模型 + 按物品里存的每边汤底画汤面（任意组合都对，不用为每种组合做模型；新增）
+        for (cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial material
+            : cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial.values()) {
+            if (!material.layout().multiSoup()) {
+                continue;
+            }
+            net.minecraft.item.BlockItem item = HotPotContent.itemFor(material);
+            net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.INSTANCE.register(item,
+                (stack, mode, matrices, vertexConsumers, light, overlay) -> {
+                    net.minecraft.client.MinecraftClient.getInstance().getBlockRenderManager()
+                        .renderBlockAsEntity(item.getBlock().getDefaultState(), matrices, vertexConsumers, light, overlay);
+                    NbtCompound data = cn.blockforge.generated.orientshotpotchronicles.hotpot.ItemData.potData(stack);
+                    if (data != null) {
+                        HotPotBlockEntityRenderer.renderItemSoups(material, data, matrices, vertexConsumers, light);
+                    }
                 });
         }
         // 鼠标中键选盘子：复制准星对着的那一个（连菜一起），由客户端告诉方块是谁在选
@@ -114,7 +130,7 @@ public final class HotPotClient implements ClientModInitializer {
             }
             return;
         }
-        // 盘子和装菜的碗（r99）；汤碗、果橙多这种整件的不列菜
+        // 盘子和装菜的碗（r99）；汤碗、橙子饮料这种整件的不列菜
         cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateBlock plate =
             cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem.placedFor(stack);
         if (plate == null || cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem.keepsSelf(stack)
@@ -157,9 +173,13 @@ public final class HotPotClient implements ClientModInitializer {
         if (nbt == null) {
             return;
         }
-        SoupBase soup = nbt.contains("Base") ? SoupBase.byId(nbt.getInt("Base")) : null;
-        Text soupName = Text.translatable(soup == null
-            ? HotPotBlockEntity.key("soup.none") : soup.nameKey());
+        // 鸳鸯 / 田字锅：每边的汤底用「/」列出来（同锅的状态栏，调整）
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout layout =
+            stack.getItem() instanceof net.minecraft.item.BlockItem bi
+                && bi.getBlock() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock pot
+                ? pot.material().layout() : cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout.NINE_GRID;
+        String[] keys = {"Base", "BaseB", "BaseC", "BaseD"};
+        Text soupName = HotPotBlockEntity.soupText(layout, side -> nbt.contains(keys[side]) ? nbt.getInt(keys[side]) : -1);
         lines.add(Text.translatable(HotPotBlockEntity.key("tooltip.pot.soup"), soupName)
             .formatted(Formatting.GRAY));
         int food = nbt.getList("Items", NbtElement.COMPOUND_TYPE).size();

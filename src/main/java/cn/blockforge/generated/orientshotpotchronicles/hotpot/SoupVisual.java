@@ -6,7 +6,7 @@ import net.minecraft.util.StringIdentifiable;
 public enum SoupVisual implements StringIdentifiable {
     NONE("none"),
     CLEAR("clear"),
-    MILKY("milky"),
+    RICH_STOCK("rich_stock"),
     MUSHROOM("mushroom"),
     SPICY("spicy");
 
@@ -26,6 +26,15 @@ public enum SoupVisual implements StringIdentifiable {
     }
 
     public static SoupVisual fromBase(SoupBase base) {
-        return base == null ? NONE : valueOf(base.name());
+        if (base == null) {
+            return NONE;
+        }
+        // 以后新加的汤底如果还没有九宫格锅的方块状态汤面，这里不报错，按空锅显示（鸳鸯 / 田字锅由渲染器按贴图画，不受影响）
+        for (SoupVisual v : values()) {
+            if (v.name().equals(base.name())) {
+                return v;
+            }
+        }
+        return NONE;
     }
 }

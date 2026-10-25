@@ -1,4 +1,4 @@
-// 0.1.2 的 1.20.1 Forge 接口迁移：。
+// 0.1.2 的 1.20.1 Fabric 接口迁移：调整。
 package cn.blockforge.generated.orientshotpotchronicles.mixin;
 
 import cn.blockforge.generated.orientshotpotchronicles.client.HotPotScreen;
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * 1.20.x 移植版专用：1.21 的锅界面直接重写 drawSlot 给格子加边框和熟度标记；1.20.1 的 drawSlot 是 private，
  * 改成在原版画完每个格子后调 {@link HotPotScreen#afterDrawSlot}，效果一样。
- *
+ * 作者：
  */
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin {

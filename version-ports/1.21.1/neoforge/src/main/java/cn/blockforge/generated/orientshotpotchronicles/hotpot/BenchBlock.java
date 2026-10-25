@@ -1,4 +1,3 @@
-// 1.21.1 NeoForge 移植：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.block.AbstractBlock;
@@ -52,7 +51,7 @@ public class BenchBlock extends Block implements net.minecraft.block.BlockEntity
 
     /** 板凳坐面高度（凳面顶），与模型 y 5..7 一致。 */
     public static final double SEAT_Y = 7.0 / 16.0;
-    /** 条凳（一格高）上玩家坐的高度。模型凳面顶在 16/16，但用户 r85 坐上去觉得桌子显高：
+    /** 条凳（一格高）上玩家坐的高度。模型凳面顶在 16/16，但用户 r85 坐上去觉得桌子显高（调整）：
      *  只把坐的位置抬高 4 像素，凳子外观不变。 */
     public static final double TALL_SEAT_Y = 1.0 + 4.0 / 16.0;
     /** 条凳的腿：上端在凳面下 y=14、z 6.5 / 9.5，到地面各往外岔开 2 像素（≈8°），由 BenchLegsRenderer 画。 */
@@ -190,9 +189,13 @@ public class BenchBlock extends Block implements net.minecraft.block.BlockEntity
             .with(RIGHT, sameBench(world.getBlockState(pos.offset(left.getOpposite())), facing, tall));
     }
 
-    /** 只有朝向一样、高矮一样的凳子才连成一条（不同木头也连）。 */
+    /**
+     * 顺着同一条线摆、高矮一样的凳子连成一条（不同木头也连）。朝向相反也算（调整，用户报：拆掉一头再放回去
+     * 连不上——人站到凳子另一边放，朝向就反了；凳子前后对称，反着连看不出差别）。只有横竖不一样才不连。
+     */
     public static boolean sameBench(BlockState state, Direction facing, boolean tall) {
-        return state.getBlock() instanceof BenchBlock bench && bench.tall == tall && state.get(FACING) == facing;
+        return state.getBlock() instanceof BenchBlock bench && bench.tall == tall
+            && state.get(FACING).getAxis() == facing.getAxis();
     }
 
     private VoxelShape shapeOf(BlockState state) {
@@ -274,7 +277,7 @@ public class BenchBlock extends Block implements net.minecraft.block.BlockEntity
         world.spawnEntity(entity);
         player.startRiding(entity);
     }
-    // NeoForge 可燃接口；下界木不燃烧，原数值 5 / 20。
+    // 调整：NeoForge 可燃接口；下界木不燃烧，原数值 5 / 20。
     @Override
     public boolean isFlammable(BlockState state, BlockView world, BlockPos pos, Direction face) {
         return planks != net.minecraft.block.Blocks.CRIMSON_PLANKS && planks != net.minecraft.block.Blocks.WARPED_PLANKS;

@@ -1,5 +1,5 @@
 {
-  "parent": "orients_hotpot_chronicles:block/iron_plate_1x3",
+  "parent": "orients_hotpot_chronicles:block/iron_three_slot_long_plate",
   "display": {
     "gui": {
       "rotation": [

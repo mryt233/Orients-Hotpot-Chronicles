@@ -18,8 +18,8 @@ import java.util.List;
 public enum SoupBase {
     /** 清汤锅底：水桶，均衡速度；预留饱和效果。 */
     CLEAR("soup.clear", 1.00F, Items.WATER_BUCKET, Items.BUCKET),
-    /** 浓汤锅底：牛奶桶，速度较慢；预留吸收与缓慢效果。 */
-    MILKY("soup.milky", 0.85F, Items.MILK_BUCKET, Items.BUCKET),
+    /** 高汤锅底：牛奶桶，速度较慢；预留吸收与缓慢效果。 */
+    RICH_STOCK("soup.rich_stock", 0.85F, Items.MILK_BUCKET, Items.BUCKET),
     /** 菌菇高汤：原版蘑菇煲，速度较快；预留再生效果。 */
     MUSHROOM("soup.mushroom", 1.15F, Items.MUSHROOM_STEW, Items.BOWL),
     /** 红汤锅底：岩浆桶，速度最快；预留力量与饥饿效果。 */
@@ -41,6 +41,14 @@ public enum SoupBase {
 
     public String nameKey() {
         return "text." + cn.blockforge.generated.orientshotpotchronicles.GeneratedMod.MOD_ID + "." + nameKey;
+    }
+
+    /**
+     * 汤面贴图名：textures/block/hot_pot_top_&lt;它&gt;.png，沸腾时 hot_pot_top_&lt;它&gt;_boiling.png（新增）。
+     * 鸳鸯 / 田字锅的汤面由渲染器按这个名字取贴图画，所以以后加新汤底只要加枚举值 + 这两张贴图，任何一边都能用。
+     */
+    public String textureKey() {
+        return name().toLowerCase(java.util.Locale.ROOT);
     }
 
     public float speedMul() {
@@ -66,11 +74,11 @@ public enum SoupBase {
         return cn.blockforge.generated.orientshotpotchronicles.compat.HotPotCompat.customBase(stack);
     }
 
-    /** 一碗汤的物品 ID，和显示名对得上（r102）：清汤 clear_broth_bowl、浓汤 creamy_broth_bowl …… */
+    /** 一碗汤的物品 ID，和显示名对得上（r102）：清汤 clear_broth_bowl、高汤 rich_stock_bowl …… */
     public String bowlId() {
         return switch (this) {
             case CLEAR -> "clear_broth_bowl";
-            case MILKY -> "creamy_broth_bowl";
+            case RICH_STOCK -> "rich_stock_bowl";
             case MUSHROOM -> "mushroom_broth_bowl";
             case SPICY -> "spicy_red_broth_bowl";
         };
@@ -89,7 +97,7 @@ public enum SoupBase {
                 list.add(new StatusEffectInstance(StatusEffects.STRENGTH, 180, 0, false, true));
                 list.add(new StatusEffectInstance(StatusEffects.HUNGER, 60, 0, false, true));
             }
-            case MILKY -> {
+            case RICH_STOCK -> {
                 list.add(new StatusEffectInstance(StatusEffects.ABSORPTION, 240, 0, false, true));
                 list.add(new StatusEffectInstance(StatusEffects.SLOWNESS, 60, 0, false, true));
             }

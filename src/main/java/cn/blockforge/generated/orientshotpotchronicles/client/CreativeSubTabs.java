@@ -33,7 +33,7 @@ import java.util.function.Supplier;
  * r98：一次显示 5 个，上下各一个翻页按钮，鼠标在这一列上滚轮也能翻（用户要求）。
  * r88 美化（用户要求）：用原版分类页标签的贴图横过来贴在物品栏左边，标签上画图标、鼠标停上去显示名字；
  * 位置按物品栏背景算，换界面尺寸、窗口大小都贴着物品栏。选中某一类时右边只显示这一类（过滤在 CreativeInventoryScreenMixin）。
- *
+ * 作者：
  */
 public final class CreativeSubTabs {
     public enum Sub {

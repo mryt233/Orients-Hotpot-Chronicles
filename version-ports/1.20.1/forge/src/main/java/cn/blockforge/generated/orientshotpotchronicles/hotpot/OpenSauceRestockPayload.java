@@ -1,4 +1,3 @@
-// ；任务05，按已定的Forge SimpleChannel接口迁移补货消息。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import cn.blockforge.generated.orientshotpotchronicles.GeneratedMod;

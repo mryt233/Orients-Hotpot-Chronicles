@@ -31,10 +31,17 @@ tasks.withType(JavaCompile).configureEach { options.release = 17; options.encodi
 java { toolchain.languageVersion = JavaLanguageVersion.of(17); withSourcesJar() }
 base { archivesName = project.archives_base_name }
 
-// 代码和原创资源分别授权，成品与源码 JAR 均携带两份许可声明。
+// 调整：代码和原创资源分别授权，成品与源码 JAR 均携带两份许可声明。
 tasks.withType(Jar).configureEach {
     from('LICENSE', 'ASSETS_LICENSE')
 }
 
-// 客户端隔离日志与选项，服务端沿用 run。
+// 调整：客户端隔离日志与选项，服务端沿用 run。
 loom { runs { client { runDir "run-client" } } }
+
+// 调整：任务07/08由Luna在独立目录运行开发服务端和客户端。
+if (project.hasProperty('portTestRoot')) {
+    def testRunRoot = project.relativePath(project.file(project.property('portTestRoot')))
+    loom.runs.server.runDir = testRunRoot + '/dev'
+    loom.runs.client.runDir = testRunRoot + '/client'
+}

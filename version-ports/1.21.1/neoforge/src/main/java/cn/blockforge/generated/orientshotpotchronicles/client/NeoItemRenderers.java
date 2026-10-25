@@ -1,4 +1,4 @@
-// ；1.21.1 NeoForge 物品渲染扩展桥接。
+// 作者：；1.21.1 NeoForge 物品渲染扩展桥接。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import net.minecraft.client.MinecraftClient;

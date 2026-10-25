@@ -16,6 +16,10 @@
     "orients_hotpot_chronicles:mutton_meatball",
     "orients_hotpot_chronicles:cooked_mutton_meatball",
     "orients_hotpot_chronicles:cilantro_mutton_meatball",
-    "orients_hotpot_chronicles:cooked_cilantro_mutton_meatball"
+    "orients_hotpot_chronicles:cooked_cilantro_mutton_meatball",
+    "orients_hotpot_chronicles:beef_loin",
+    "orients_hotpot_chronicles:beef_loin_slice",
+    "orients_hotpot_chronicles:cooked_beef_loin_slice",
+    "orients_hotpot_chronicles:cooked_beef_loin"
   ]
 }

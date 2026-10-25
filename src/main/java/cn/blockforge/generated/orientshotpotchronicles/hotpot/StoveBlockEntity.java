@@ -308,12 +308,12 @@ public class StoveBlockEntity extends HotPotBlockEntity {
         return burnTicks > 0 || idleFlame;
     }
 
-    /** 给界面看的燃烧刻数：空烧时没有在耗的那份燃料，火苗显示成满的。 */
     /** 正在空烧（有汤、有燃料、没生食材，不耗燃料）。 */
     public boolean idle() {
         return idleFlame && burnTicks <= 0;
     }
 
+    /** 给界面看的燃烧刻数：空烧时没有在耗的那份燃料，火苗显示成满的。 */
     public int displayBurnTicks() {
         return idleFlame && burnTicks <= 0 ? 1 : burnTicks;
     }
@@ -344,21 +344,6 @@ public class StoveBlockEntity extends HotPotBlockEntity {
             return 0;
         }
         return (int) Math.min(15, Math.ceil(15.0 * burnTicks / burnTotal));
-    }
-
-    /** 只描述下半部灶台的燃料状态，供分立交互提示使用。 */
-    public Text stoveStatusText() {
-        if (!burning()) {
-            return Text.translatable(HotPotBlockEntity.key("msg.stove_status.out"));
-        }
-        if (idle()) {
-            return Text.translatable(HotPotBlockEntity.key("msg.stove_status.idle"));
-        }
-        HotPotFuel fuel = HotPotFuel.byId(fuelType);
-        Text fuelText = Text.translatable(
-            fuel == null ? HotPotBlockEntity.key("fuel.none") : fuel.nameKey());
-        return Text.translatable(
-            HotPotBlockEntity.key("msg.stove_status.lit"), fuelText, burnTicks / 20);
     }
 
     // ------------------------------------------------------------------ NBT

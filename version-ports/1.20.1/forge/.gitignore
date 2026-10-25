@@ -5,7 +5,7 @@ logs/
 *.class
 tools/out/
 
-# ；2026-10-22 GitHub 发布范围及本地敏感文件排除。
+# 作者：；2026-10-22 调整：GitHub 发布范围及本地敏感文件排除。
 # 开发记录与发布准备材料仅留本地。
 DEV_LOG.md
 HANDOVER.md
@@ -32,7 +32,7 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-# 隔离构建及测试输出。
+# 调整：隔离构建及测试输出。
 .gradle-user-home/
 run-client/
 test-runtime-forge/

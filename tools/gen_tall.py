@@ -7,7 +7,7 @@
     下面一格（0..16）是原版砖块、上面半格是木板。open=true（正对灶膛口的那张）去掉砖身只留木桌面。
   - 高灶台 `tall_stove`：灶膛（带火口的那一段）仍在最下面 y 0..7.6，中间加一段砖 7.6..18.6，
     上面的灶口、锅、汤全部照矮灶台上移 11 像素：砖面 22（比高桌面低 2 像素）、锅沿 27（露出桌面 3 像素）。
-  - 条凳 `<木头>_tall_bench`：一格高，凳面 y 14..16、z 5..11；每头两条腿，腿间上下两根横撑（像照片里的长条凳）。
+  - 条凳 `<木头>_bench`：一格高，凳面 y 14..16、z 5..11；每头两条腿，腿间上下两根横撑（像照片里的长条凳）。
 """
 import copy
 import json
@@ -211,7 +211,7 @@ def main():
                 variants[f"{key},open=true"] = {"model": f"{MODID}:block/{name}_open{suffix(mask)}"}
             write(root / f"blockstates/{name}.json", {"variants": variants})
 
-            name = f"{wood}_tall_bench"
+            name = f"{wood}_bench"   # 模型名和 ID 一致（2026-10-24；以前条凳模型叫 <木头>_tall_bench）
             variants = {}
             sfx = {(False, False): "", (True, False): "_left", (False, True): "_right", (True, True): "_middle"}
             for left in (False, True):
@@ -222,10 +222,10 @@ def main():
                         if y:
                             v["y"] = y
                         variants[f"facing={facing},left={str(left).lower()},right={str(right).lower()}"] = v
-            write(root / f"blockstates/{name}.json", {"variants": variants})
+            write(root / f"blockstates/{wood}_bench.json", {"variants": variants})
 
         # 高灶台：方块状态照抄矮灶台，把每个模型换成上移版本
-        stove_state = json.loads((root / "blockstates/stove.json").read_text(encoding="utf-8"))
+        stove_state = json.loads((root / "blockstates/brick_stove.json").read_text(encoding="utf-8"))
         made = set()
         for part in stove_state["multipart"]:
             mid = part["apply"]["model"].split("/")[-1]
@@ -235,39 +235,39 @@ def main():
                 write(blocks / f"{tall}.json", tall_stove_base(src) if mid in ("stove", "stove_lit") else lifted(src, LIFT))
                 made.add(tall)
             part["apply"]["model"] = f"{MODID}:block/{tall}"
-        write(root / "blockstates/tall_stove.json", stove_state)
+        write(root / "blockstates/tall_brick_stove.json", stove_state)
         # 物品模型：高的东西在物品栏里缩小一点、往下挪，免得顶出格子
         tall_display = dict(BLOCK_DISPLAY, gui={"rotation": [30, 225, 0], "translation": [0, -2, 0], "scale": [0.5, 0.5, 0.5]})
-        write(root / "models/item/tall_stove.json", {"parent": f"{MODID}:block/tall_stove", "display": tall_display})
+        write(root / "models/item/tall_brick_stove.json", {"parent": f"{MODID}:block/tall_stove", "display": tall_display})
         for wood in WOODS:
             write(root / f"models/item/{wood}_tall_hotpot_table.json",
                   {"parent": f"{MODID}:block/{wood}_tall_hotpot_table_esw", "display": tall_display})
             # 条凳的斜腿不在方块模型里，物品交给 builtin/entity（客户端 BuiltinItemRenderer 画凳面 + 斜腿）
-            write(root / f"models/item/{wood}_tall_bench.json",
+            write(root / f"models/item/{wood}_bench.json",
                   {"parent": "minecraft:builtin/entity", "display": BLOCK_DISPLAY,
                    "textures": {"particle": f"minecraft:block/{wood}_planks"}})
     data = RES / "data"
     loot = lambda name: {"type": "minecraft:block", "pools": [{"rolls": 1.0, "bonus_rolls": 0.0,
                          "conditions": [{"condition": "minecraft:survives_explosion"}],
                          "entries": [{"type": "minecraft:item", "name": f"{MODID}:{name}"}]}]}
-    write(data / MODID / "recipe/tall_stove.json", {
+    write(data / MODID / "recipe/tall_brick_stove.json", {
         "type": "minecraft:crafting_shapeless",
-        "ingredients": [{"item": f"{MODID}:stove"}, {"item": "minecraft:bricks"}],
-        "result": {"id": f"{MODID}:tall_stove", "count": 1}})
-    write(data / MODID / "loot_table/blocks/tall_stove.json", loot("tall_stove"))
+        "ingredients": [{"item": f"{MODID}:brick_stove"}, {"item": "minecraft:bricks"}],
+        "result": {"id": f"{MODID}:tall_brick_stove", "count": 1}})
+    write(data / MODID / "loot_table/blocks/tall_brick_stove.json", loot("tall_brick_stove"))
     for wood in WOODS:
         write(data / MODID / f"recipe/{wood}_tall_hotpot_table.json", {
             "type": "minecraft:crafting_shaped", "group": f"{MODID}:tall_hotpot_table", "pattern": ["PPP", "BBB"],
             "key": {"P": {"item": f"minecraft:{wood}_planks"}, "B": {"item": "minecraft:bricks"}},
             "result": {"id": f"{MODID}:{wood}_tall_hotpot_table", "count": 3}})
-        write(data / MODID / f"recipe/{wood}_tall_bench.json", {
-            "type": "minecraft:crafting_shaped", "group": f"{MODID}:tall_bench", "pattern": ["PPP", "S S", "S S"],
+        write(data / MODID / f"recipe/{wood}_bench.json", {
+            "type": "minecraft:crafting_shaped", "group": f"{MODID}:bench", "pattern": ["PPP", "S S", "S S"],
             "key": {"P": {"item": f"minecraft:{wood}_planks"}, "S": {"item": "minecraft:stick"}},
-            "result": {"id": f"{MODID}:{wood}_tall_bench", "count": 3}})
+            "result": {"id": f"{MODID}:{wood}_bench", "count": 3}})
         write(data / MODID / f"loot_table/blocks/{wood}_tall_hotpot_table.json", loot(f"{wood}_tall_hotpot_table"))
-        write(data / MODID / f"loot_table/blocks/{wood}_tall_bench.json", loot(f"{wood}_tall_bench"))
-    for tag_file, ids in [("mineable/pickaxe.json", ["tall_stove"]),
-                          ("mineable/axe.json", [f"{w}_tall_hotpot_table" for w in WOODS] + [f"{w}_tall_bench" for w in WOODS])]:
+        write(data / MODID / f"loot_table/blocks/{wood}_bench.json", loot(f"{wood}_bench"))
+    for tag_file, ids in [("mineable/pickaxe.json", ["tall_brick_stove"]),
+                          ("mineable/axe.json", [f"{w}_tall_hotpot_table" for w in WOODS] + [f"{w}_bench" for w in WOODS])]:
         f = data / "minecraft/tags/block" / tag_file
         tag = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {"replace": False, "values": []}
         for i in ids:

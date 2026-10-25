@@ -1,0 +1,16 @@
+{
+  "block.orients_hotpot_chronicles.copper_split_yuanyang_hotpot": "Медный хого-юаньян с прямой перегородкой",
+  "block.orients_hotpot_chronicles.iron_split_yuanyang_hotpot": "Железный хого-юаньян с прямой перегородкой",
+  "itemGroup.orients_hotpot_chronicles.sub.seats": "Сиденья",
+  "text.orients_hotpot_chronicles.heat.open_fire": "Над костром (без расхода топлива)",
+  "item.orients_hotpot_chronicles.beef_loin_slice": "Ломтик говяжьей вырезки",
+  "item.orients_hotpot_chronicles.cooked_beef_loin_slice": "Варёный ломтик говяжьей вырезки",
+  "item.orients_hotpot_chronicles.cooked_beef_meatball": "Варёная говяжья фрикаделька",
+  "item.orients_hotpot_chronicles.cooked_cilantro_beef_meatball": "Варёная говяжья фрикаделька с кинзой",
+  "item.orients_hotpot_chronicles.cooked_pork_meatball": "Варёная свиная фрикаделька",
+  "item.orients_hotpot_chronicles.cooked_cilantro_pork_meatball": "Варёная свиная фрикаделька с кинзой",
+  "item.orients_hotpot_chronicles.cooked_mutton_meatball": "Варёная баранья фрикаделька",
+  "item.orients_hotpot_chronicles.cooked_cilantro_mutton_meatball": "Варёная баранья фрикаделька с кинзой",
+  "item.orients_hotpot_chronicles.cooked_fish_ball": "Варёный рыбный шарик",
+  "item.orients_hotpot_chronicles.cooked_cilantro_fish_ball": "Варёный рыбный шарик с кинзой"
+}

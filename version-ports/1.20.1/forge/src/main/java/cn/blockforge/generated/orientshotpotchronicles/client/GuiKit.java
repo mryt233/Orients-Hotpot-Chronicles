@@ -80,10 +80,6 @@ final class GuiKit {
         return Math.max(0, Math.min(255, (int) v));
     }
 
-    static double clamp01(double v) {
-        return Math.max(0, Math.min(1, v));
-    }
-
     static int shade(int color, double f) {
         return (color & 0xFF000000)
             | clamp255(((color >> 16) & 0xFF) * f) << 16

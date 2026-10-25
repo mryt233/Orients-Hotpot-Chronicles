@@ -1,4 +1,3 @@
-// 0.1.2 的 1.20.1 Forge 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.item.ItemStack;
@@ -9,7 +8,7 @@ public final class Chopsticks {
     }
 
     public static ItemStack held(ItemStack chopsticks) {
-        return ItemData.heldFood(chopsticks);   // 1.20.1 移植：存 NBT
+        return ItemData.heldFood(chopsticks);   // 1.20.1 移植：存 NBT（调整）
     }
 
     public static void hold(ItemStack chopsticks, ItemStack food) {

@@ -1,4 +1,3 @@
-// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.client.item.TooltipContext;
@@ -23,10 +22,10 @@ import net.minecraft.world.World;
 import java.util.List;
 
 /**
- * 一瓶饮料（r99 果橙多；r101 改成通用，加维二，种类见 {@link DrinkKind}）。
+ * 一瓶饮料（r99 橙子饮料；r101 改成通用，加维二，种类见 {@link DrinkKind}）。
  * 一瓶喝 4 口（用耐久条显示还剩多少），每口回 2 点饥饿值 + 种类自己的效果；喝完剩一个空瓶。
  * 点在方块顶面是摆上去（和盘子一样），对着空气右键是喝。配方先不做（用户）。
- *
+ * 作者：
  */
 public class DrinkItem extends Item {
     public static final int SIPS = 4;
@@ -76,7 +75,7 @@ public class DrinkItem extends Item {
             return stack;
         }
         if (user instanceof PlayerEntity player) {
-            player.getHungerManager().add(SIP.getHunger(), SIP.getSaturationModifier());   // 1.20.1 移植
+            player.getHungerManager().add(SIP.getHunger(), SIP.getSaturationModifier());   // 1.20.1 移植（调整）
             player.incrementStat(Stats.USED.getOrCreateStat(this));
         }
         kind.applySip(user);

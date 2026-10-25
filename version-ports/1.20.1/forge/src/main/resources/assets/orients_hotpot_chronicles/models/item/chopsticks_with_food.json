@@ -1,4 +1,7 @@
 {
   "parent": "minecraft:builtin/entity",
-  "gui_light": "front"
+  "gui_light": "front",
+  "textures": {
+    "particle": "orients_hotpot_chronicles:item/bamboo_chopsticks"
+  }
 }

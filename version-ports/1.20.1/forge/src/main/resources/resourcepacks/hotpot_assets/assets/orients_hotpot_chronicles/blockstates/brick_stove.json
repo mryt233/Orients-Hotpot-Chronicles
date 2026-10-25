@@ -174,20 +174,20 @@
     },
     {
       "when": {
-        "soup": "milky",
+        "soup": "rich_stock",
         "lit": "false"
       },
       "apply": {
-        "model": "orients_hotpot_chronicles:block/stove_soup_milky"
+        "model": "orients_hotpot_chronicles:block/stove_soup_rich_stock"
       }
     },
     {
       "when": {
-        "soup": "milky",
+        "soup": "rich_stock",
         "lit": "true"
       },
       "apply": {
-        "model": "orients_hotpot_chronicles:block/stove_soup_milky_boiling"
+        "model": "orients_hotpot_chronicles:block/stove_soup_rich_stock_boiling"
       }
     },
     {
@@ -224,6 +224,310 @@
       },
       "apply": {
         "model": "orients_hotpot_chronicles:block/stove_soup_spicy_boiling"
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_yuanyang_s",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_yuanyang_s_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_yuanyang_s",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_yuanyang_s_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_yuanyang_s_soup",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_yuanyang_s_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_yuanyang_s_soup",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_yuanyang_s_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_yuanyang_s",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_yuanyang_s_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_yuanyang_s",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_yuanyang_s_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_yuanyang_s_soup",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_yuanyang_s_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_yuanyang_s_soup",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_yuanyang_s_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_yuanyang_o",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_yuanyang_o_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_yuanyang_o",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_yuanyang_o_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_yuanyang_o_soup",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_yuanyang_o_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_yuanyang_o_soup",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_yuanyang_o_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_yuanyang_o",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_yuanyang_o_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_yuanyang_o",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_yuanyang_o_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_yuanyang_o_soup",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_yuanyang_o_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_yuanyang_o_soup",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_yuanyang_o_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_yuanyang_split",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_yuanyang_split_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_yuanyang_split",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_yuanyang_split_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_yuanyang_split_soup",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_yuanyang_split_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_yuanyang_split_soup",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_yuanyang_split_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_yuanyang_split",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_yuanyang_split_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_yuanyang_split",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_yuanyang_split_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_yuanyang_split_soup",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_yuanyang_split_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_yuanyang_split_soup",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_yuanyang_split_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_four_grid",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_four_grid_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_four_grid",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_four_grid_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_four_grid_soup",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_four_grid_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "copper_four_grid_soup",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_copper_four_grid_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_four_grid",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_four_grid_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_four_grid",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_four_grid_hot_pot_shell",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_four_grid_soup",
+        "pot_axis": "x"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_four_grid_hot_pot_shell"
+      }
+    },
+    {
+      "when": {
+        "pot": "iron_four_grid_soup",
+        "pot_axis": "z"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/stove_iron_four_grid_hot_pot_shell",
+        "y": 90
       }
     }
   ]

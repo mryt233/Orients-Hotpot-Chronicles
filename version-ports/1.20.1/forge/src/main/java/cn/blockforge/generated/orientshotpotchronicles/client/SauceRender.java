@@ -1,4 +1,3 @@
-// 0.1.2 的 1.20.1 Forge 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.GeneratedMod;
@@ -19,7 +18,7 @@ import net.minecraft.util.Identifier;
  * 面上按放了哪几种撒对应颜色的小点（2026-10-23 改，原来是一层平涂 + 葱香菜的绿点）。摆在桌上由 PlateHolderRenderer 调，物品由 builtin/entity 模型交给这里画。
  * 坐标：盘子格里一个摆放位置的局部坐标（0..1，碗中心在 0.5、碗底在 y=0），和 tools/gen_bowls.py 的 b 形一致：
  * 汤面在 2.5 像素高，半宽 2.5 像素。
- *
+ * 作者：
  */
 public final class SauceRender {
     private static final Identifier WHITE = GeneratedMod.id("textures/misc/white.png");
@@ -29,7 +28,7 @@ public final class SauceRender {
     private SauceRender() {
     }
 
-    // 物品渲染通过DippingSauceItem.initializeClient和ForgeItemRenderers注册。
+    // 调整：物品渲染通过DippingSauceItem.initializeClient和ForgeItemRenderers注册。
 
     /** 酱面贴图（灰度，按调料平均色染色；tools/gen_sauce_station.py 的 bowl_surface_texture）。 */
     private static final Identifier SURFACE = GeneratedMod.id("textures/misc/sauce_surface.png");

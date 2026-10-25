@@ -1,4 +1,3 @@
-// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
@@ -20,7 +19,7 @@ import net.minecraft.predicate.item.ItemPredicate;
  * 打草掉小葱、香菜（r103，用户：打草掉落，概率「多一点」= 各 25%）。和原版打草掉小麦种子一样：用剪刀剪下来的是草本身，
  * 不掉这两样；高草只算下半格，免得一株掉两次。
  * 2026-10-23 加黄豆（做豆腐用，用户：打草掉，以后再考虑做成作物）：15%，比小葱 / 香菜少一点，打草已经掉得够多了。
- *
+ * 作者：
  */
 public final class GarnishLoot {
     public static final float CHANCE = 0.25F;

@@ -2,12 +2,14 @@
 
 用法：双击 Releases/整理发布版.bat，或在 mod/ 目录运行
     python tools/make_release.py
+    python tools/make_release.py --version 0.1.1-alpha   # 用户指定版本号时（2026-10-23 起，新增）
 做的事：
   1. 找出 Releases 里还是开发编号（1.0.0-rN）的 jar，按 rN 从小到大排；
   2. 依次编成下一个 alpha 号：0.1.0-alpha.1、0.1.0-alpha.2 ……（接着已有的往后排）；
   3. 改写 jar 里 fabric.mod.json 的 version，另存为
      orients_hotpot_chronicles-1.21.1-fabric-0.1.0-alpha.N.jar，删掉放进来的原文件；
-  4. 在 Releases/版本记录.md 里记一条：发布号、对应的开发版 rN、日期、这段时间改了什么（从 DEV_LOG.md 摘）。
+  4. 在 Releases/版本记录.md 里记一条：发布号、对应的开发版 rN、日期、这段时间改了什么（从 DEV_LOG.md 摘）；
+  5. docs/移植同步清单.md 的「未发布」一段改名为这个发布版，上面再开一段空的（移植那边按段同步，新增）。
 jar 里的其他内容一个字节都不动，所以发布版和当时测的开发版完全一样。
 """
 import datetime
@@ -27,7 +29,7 @@ BASE = "0.1.0"
 STAGE = "alpha"
 NAME = "orients_hotpot_chronicles-1.21.1-fabric-{}.jar"
 DEV = re.compile(r"^\d+\.\d+\.\d+-r(\d+)$")
-HEAD = ("# 版本记录\n\n发布版编号：现阶段是 alpha（`0.1.0-alpha.N`），按放进来的先后排；"
+HEAD = ("# 版本记录\n\n发布版编号：现阶段是 alpha（`0.1.0-alpha.N`；用户指定时用指定的号，如 `0.1.1-alpha`），按放进来的先后排；"
         "括号里是对应的开发版号，详细原因见 `DEV_LOG.md`。新的在上面。\n\n")
 
 
@@ -61,7 +63,26 @@ def dev_log_since(prev_r, r):
     return sorted(items)
 
 
-def main():
+PORT_LIST = MOD / "docs" / "移植同步清单.md"
+
+
+def label_port_list(version, r, today):
+    """移植同步清单：把「未发布」那一段改名成这个发布版，上面再开一段空的「未发布」（2026-10-23 用户要求，新增）。"""
+    if not PORT_LIST.exists():
+        return
+    text = PORT_LIST.read_text(encoding="utf-8")
+    m = re.search(r"^## 未发布.*$", text, re.M)
+    if not m:
+        return
+    head = f"## {version}（开发版 r{r}，{today} 发布）"
+    body = re.sub(r"^\n\n> 这一段全部不在 .*?\n", "\n", text[m.end():], count=1)   # 「还没发布」的提示用不上了
+    fresh = f"## 未发布（{version} 之后）\n\n（还没有改动）\n\n---\n\n"
+    PORT_LIST.write_text(text[:m.start()] + fresh + head + body, encoding="utf-8")
+    print(f"移植同步清单：「未发布」已改名为 {version}")
+
+
+def main(explicit=None):
+    """explicit：用户指定的版本号（如 0.1.1-alpha，2026-10-23 用户要求），只给这一次放进来的那个 jar 用。"""
     REL.mkdir(exist_ok=True)
     state = json.loads(STATE.read_text(encoding="utf-8")) if STATE.exists() else {"releases": []}
     dropped = []
@@ -82,7 +103,10 @@ def main():
             jar.unlink()
             continue
         number = len(state["releases"]) + 1
-        version = f"{BASE}-{STAGE}.{number}"
+        version = explicit or f"{BASE}-{STAGE}.{number}"
+        if any(x["version"] == version for x in state["releases"]):
+            print(f"版本号 {version} 已经用过了，没处理 {jar.name}")
+            continue
         out = REL / NAME.format(version)
         with tempfile.TemporaryDirectory() as tmp:
             tmp_jar = Path(tmp) / out.name
@@ -99,9 +123,12 @@ def main():
         body = old[len(HEAD):] if old.startswith(HEAD) else ""
         RECORD.write_text(HEAD + "\n".join(lines) + "\n\n" + body, encoding="utf-8")
         STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        label_port_list(version, r, today)
         print(f"r{r} → {out.name}")
 
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
-    main()
+    # 用法：python tools/make_release.py [--version 0.1.1-alpha]
+    args = sys.argv[1:]
+    main(args[args.index("--version") + 1] if "--version" in args else None)

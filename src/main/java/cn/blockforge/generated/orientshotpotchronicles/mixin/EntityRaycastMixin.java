@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /**
  * 准星选方块（客户端准星、服务端判断对着哪个盘子都走这里）：高火锅桌伸进上一格的桌面也要能被选中，
  * 不然会选到后面那张桌子。具体见 {@link TallReach}。
- *
+ * 作者：
  */
 @Mixin(Entity.class)
 abstract class EntityRaycastMixin {

@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /**
  * 火锅桌上的小摆件（标签 table_decorations）贴着桌面：模型偏移（原版花草随机偏移走的同一条路，
  * 原版渲染和钠都读它）+ 选中框一起挪，见 {@link TableDecor}。
- *
+ * 作者：
  */
 @Mixin(AbstractBlock.AbstractBlockState.class)
 abstract class BlockStateTableDecorMixin {

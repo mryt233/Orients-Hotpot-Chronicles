@@ -1,5 +1,5 @@
 {
-  "parent": "orients_hotpot_chronicles:block/copper_plate_1x2",
+  "parent": "orients_hotpot_chronicles:block/copper_two_slot_plate",
   "display": {
     "gui": {
       "rotation": [

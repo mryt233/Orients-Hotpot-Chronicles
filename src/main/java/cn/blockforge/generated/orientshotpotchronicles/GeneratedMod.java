@@ -26,5 +26,14 @@ public final class GeneratedMod implements ModInitializer {
     public void onInitialize() {
         HotPotContent.register();
         ModCompat.init();
+        if (net.fabricmc.loader.api.FabricLoader.getInstance().isDevelopmentEnvironment()) {
+            // 开发环境才有的测试命令 /hpt（devtest 包不进 jar，所以用反射调；新增 2026-10-25）
+            try {
+                Class.forName("cn.blockforge.generated.orientshotpotchronicles.devtest.DevTestCommands")
+                    .getMethod("register").invoke(null);
+            } catch (ReflectiveOperationException e) {
+                LOGGER.warn("dev test commands unavailable", e);
+            }
+        }
     }
 }

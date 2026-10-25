@@ -38,10 +38,6 @@ public class SeatEntity extends Entity {
         return seat;
     }
 
-    public boolean covers(BlockPos pos) {
-        return a.equals(pos) || b.equals(pos);
-    }
-
     @Override
     public void tick() {
         super.tick();

@@ -1,32 +1,73 @@
 {
   "hidden": [
     "plates",
-    "tall_stove_top",
+    "tall_brick_stove_top",
     "iron_hot_pot_tab_icon",
     "stove_lit_icon",
     "plate_with_food",
     "chopsticks_with_food",
     "*_hot_pot_clear",
-    "*_hot_pot_milky",
+    "*_hot_pot_rich_stock",
     "*_hot_pot_mushroom",
-    "*_hot_pot_spicy"
+    "*_hot_pot_spicy",
+    "bowl",
+    "drink",
+    "pounded_meat*",
+    "sauce_station_top"
   ],
   "categories": [
     {
       "id": "cookware",
       "name": "厨具",
       "match": [
+        "brick_stove",
+        "tall_brick_stove",
+        "*_nine_grid_hotpot"
+      ],
+      "keywords": [
         "stove",
-        "tall_stove",
-        "*_hot_pot"
+        "hotpot",
+        "灶",
+        "锅",
+        "hot_pot",
+        "soup",
+        "sauce_station",
+        "pot_shell",
+        "knife",
+        "cutting_board",
+        "菜刀",
+        "砧板",
+        "rolling_pin",
+        "擀面杖"
+      ],
+      "exclude": [
+        "*table*",
+        "*bowl*"
       ]
     },
     {
       "id": "tableware",
       "name": "餐具",
       "match": [
-        "*_plate_*",
-        "chopsticks"
+        "*_small_dish",
+        "*_two_slot_plate",
+        "*_three_slot_long_plate",
+        "*_four_slot_square_plate",
+        "*_five_slot_long_plate",
+        "*_eight_slot_platter",
+        "bamboo_chopsticks"
+      ],
+      "keywords": [
+        "plate",
+        "dish",
+        "platter",
+        "bowl",
+        "chopsticks",
+        "碟",
+        "盘",
+        "碗",
+        "筷",
+        "plates"
       ]
     },
     {
@@ -34,7 +75,45 @@
       "name": "食物",
       "match": [
         "tripe",
-        "cooked_tripe"
+        "cooked_tripe",
+        "*_broth_bowl",
+        "orange_drink",
+        "empty_orange_drink_bottle",
+        "plant_protein_drink",
+        "empty_plant_protein_drink_bottle"
+      ],
+      "keywords": [
+        "drink",
+        "tripe",
+        "broth",
+        "scallion",
+        "cilantro",
+        "bottle",
+        "饮料",
+        "毛肚",
+        "汤",
+        "葱",
+        "香菜",
+        "orange_drink",
+        "plant_protein_drink",
+        "garnish",
+        "sauce_",
+        "dipping",
+        "蘸料",
+        "_roll",
+        "肉卷",
+        "potato",
+        "tofu",
+        "soybean",
+        "土豆",
+        "豆腐",
+        "黄豆",
+        "meatball",
+        "fish_ball",
+        "丸",
+        "loin",
+        "吊龙",
+        "牛脊"
       ]
     },
     {
@@ -46,6 +125,10 @@
           "name": "高",
           "match": [
             "*_tall_hotpot_table"
+          ],
+          "keywords": [
+            "tall",
+            "高"
           ]
         },
         {
@@ -58,6 +141,10 @@
             "*_tall_hotpot_table"
           ]
         }
+      ],
+      "keywords": [
+        "table",
+        "桌"
       ]
     },
     {
@@ -68,19 +155,29 @@
           "id": "stool",
           "name": "板凳",
           "match": [
-            "*_bench"
+            "*_stool"
           ],
-          "exclude": [
-            "*_tall_bench"
+          "keywords": [
+            "stool",
+            "板凳"
           ]
         },
         {
           "id": "bench",
           "name": "条凳（长凳）",
           "match": [
-            "*_tall_bench"
+            "*_bench"
+          ],
+          "keywords": [
+            "条凳"
           ]
         }
+      ],
+      "keywords": [
+        "stool",
+        "bench",
+        "凳",
+        "seat"
       ]
     }
   ]

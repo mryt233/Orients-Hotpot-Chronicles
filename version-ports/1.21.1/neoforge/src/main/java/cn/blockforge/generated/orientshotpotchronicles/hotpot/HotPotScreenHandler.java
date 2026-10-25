@@ -59,14 +59,19 @@ public class HotPotScreenHandler extends ScreenHandler {
         this.world = playerInventory.player.getWorld();
         // 客户端在服务端属性包到达前也应显示“无汤”，而不是误显示为第一种汤底。
         clientData[0] = -1;
+        for (int i = HotPotBlockEntity.PROP_EXTRA_BASES; i < HotPotBlockEntity.PROP_COUNT; i++) {
+            clientData[i] = -1;
+        }
         pot.onOpen(playerInventory.player);
 
-        // 9x9 锅面槽位：行/列每跨过 3 格让出 GAP 像素，分界线落在缝里
+        // 9x9 锅面槽位：九宫格锅行/列每跨过 3 格让出 GAP 像素，分界线落在缝里；
+        // 鸳鸯 / 田字锅 9x9 均匀排满锅面（四周留 PotLayout.GUI_INSET），压到隔板的格子不启用（调整，用户 2026-10-24 定）
+        boolean multi = pot instanceof HotPotBlockEntity potBe && potBe.layout().multiSoup();
         for (int i = 0; i < HotPotBlockEntity.SLOTS; i++) {
             int col = i % 9;
             int row = i / 9;
-            int x = GRID_X + col * 18 + (col / 3) * GAP + 1;
-            int y = GRID_Y + row * 18 + (row / 3) * GAP + 1;
+            int x = multi ? GRID_X + PotLayout.GUI_INSET + col * 18 + 1 : GRID_X + col * 18 + (col / 3) * GAP + 1;
+            int y = multi ? GRID_Y + PotLayout.GUI_INSET + row * 18 + 1 : GRID_Y + row * 18 + (row / 3) * GAP + 1;
             addSlot(new PotSlot(pot, i, x, y));
         }
         // 玩家背包
@@ -124,7 +129,36 @@ public class HotPotScreenHandler extends ScreenHandler {
     }
 
     public boolean hasSoup() {
-        return baseId() >= 0;
+        for (int side = 0; side < PotLayout.MAX_SIDES; side++) {
+            if (baseOfSide(side) >= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 某一边的汤底编号（第 0 边 = 属性 0，其余在 PROP_EXTRA_BASES 起）。 */
+    public int baseOfSide(int side) {
+        if (side <= 0) {
+            return baseId();
+        }
+        return side < PotLayout.MAX_SIDES ? properties[HotPotBlockEntity.PROP_EXTRA_BASES + side - 1].get() : -1;
+    }
+
+    /** 这口锅怎么分格（鸳鸯锅：哪些大格属于哪边，正中那格不用）。 */
+    public PotLayout layout() {
+        return potMaterial().layout();
+    }
+
+    /** 这一格在用的锅里有没有（鸳鸯锅正中那个大格没有）。 */
+    public boolean slotInUse(int slot) {
+        return layout().sideOfSlot(slot) != PotLayout.NONE;
+    }
+
+    /** 这一格泡在哪边的汤里。 */
+    public int soupOfSlot(int slot) {
+        int side = layout().sideOfSlot(slot);
+        return side == PotLayout.NONE ? -1 : baseOfSide(side);
     }
 
     public int fuelId() {
@@ -182,7 +216,7 @@ public class HotPotScreenHandler extends ScreenHandler {
             return -1F;
         }
         HotPotFuel fuel = HotPotFuel.byId(fuelId());
-        SoupBase soup = SoupBase.byId(baseId());
+        SoupBase soup = SoupBase.byId(soupOfSlot(slot));
         if (fuel == null || burnTicks() <= 0) {
             return Float.POSITIVE_INFINITY;
         }
@@ -214,10 +248,18 @@ public class HotPotScreenHandler extends ScreenHandler {
     @Override
     public boolean canInsertIntoSlot(ItemStack stack, Slot slot) {
         if (slot instanceof PotSlot) {
+            // 鸳鸯 / 田字锅：双击只收和起点格子同一种汤底里的（用户定：同汤底才一键收，不同汤底的别收）
+            if (!stack.isEmpty() && collecting && soupOfSlot(slot.getIndex()) != collectSoup) {
+                return false;
+            }
             return stack.isEmpty() || isCooked(slot.getIndex());
         }
         return super.canInsertIntoSlot(stack, slot);
     }
+
+    /** 双击收取进行中（起点在锅里的格子）：只收这种汤底里的熟食。 */
+    private boolean collecting = false;
+    private int collectSoup = -1;
 
     /** 冷锅吃东西反胃的概率和时长（时长同原版河豚的反胃 15 秒）。 */
     private static final float COLD_NAUSEA_CHANCE = 0.3F;
@@ -231,6 +273,17 @@ public class HotPotScreenHandler extends ScreenHandler {
             && isCooked(potSlot.getIndex()) && getCursorStack().isOf(HotPotContent.CHOPSTICKS)) {
             if (serverBe != null) {
                 eatWithChopsticks(player, potSlot);
+            }
+            return;
+        }
+        if (actionType == SlotActionType.PICKUP_ALL && slotId >= 0 && slotId < slots.size()
+            && slots.get(slotId) instanceof PotSlot start && layout().multiSoup()) {
+            collecting = true;
+            collectSoup = soupOfSlot(start.getIndex());
+            try {
+                super.onSlotClick(slotId, button, actionType, player);
+            } finally {
+                collecting = false;
             }
             return;
         }
@@ -257,13 +310,8 @@ public class HotPotScreenHandler extends ScreenHandler {
         if (!slot.hasStack()) {
             serverBe.onSlotEmptied(index);
         }
-        // 副手拿着蘸料：吃之前自动蘸一口（r103，用户：两种都要）
-        ItemStack offhand = player.getOffHandStack();
-        if (offhand.getItem() instanceof DippingSauceItem && DippingSauceItem.contents(offhand).bites() > 0) {
-            eaten.set(HotPotContent.DIPPED, eaten.getOrDefault(HotPotContent.DIPPED, 0)
-                | DippingSauceItem.contents(offhand).mask());
-            player.setStackInHand(net.minecraft.util.Hand.OFF_HAND, DippingSauceItem.bite(offhand));
-        }
+        // 主手或副手拿着蘸料：吃之前自动蘸一口（r103，用户：两种都要；2026-10-25 主手也算，调整）
+        DippingSauceItem.dipFromHands(player, eaten);
         player.eatFood(world, eaten.copy(), food);
         // 冷锅：没坐在烧着的灶台（或其他热源）上，吃了有概率反胃
         if (!serverBe.isHeated() && world.random.nextFloat() < COLD_NAUSEA_CHANCE) {
@@ -341,8 +389,14 @@ public class HotPotScreenHandler extends ScreenHandler {
             // 每个物理槽是一个独立的“单份格”，绝不能把新堆叠并入已有格。
             // 这条 empty-only 约束同时覆盖普通点击、拖拽和 quickMove，
             // 从根上阻断 ScreenHandler.insertItem 的自动合并路径。
-            return !hasStack() && !isCooked(getIndex())
+            return !hasStack() && !isCooked(getIndex()) && slotInUse(getIndex())
                 && HotPotCooking.acceptable(world, stack);
+        }
+
+        /** 鸳鸯锅正中那个大格不用：格子藏起来、点不到（新增）。 */
+        @Override
+        public boolean isEnabled() {
+            return slotInUse(getIndex());
         }
 
         @Override

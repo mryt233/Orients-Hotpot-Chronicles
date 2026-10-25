@@ -19,7 +19,7 @@ import net.minecraft.util.Identifier;
  * 面上按放了哪几种撒对应颜色的小点（2026-10-23 改，原来是一层平涂 + 葱香菜的绿点）。摆在桌上由 PlateHolderRenderer 调，物品由 builtin/entity 模型交给这里画。
  * 坐标：盘子格里一个摆放位置的局部坐标（0..1，碗中心在 0.5、碗底在 y=0），和 tools/gen_bowls.py 的 b 形一致：
  * 汤面在 2.5 像素高，半宽 2.5 像素。
- *
+ * 作者：
  */
 public final class SauceRender {
     private static final Identifier WHITE = GeneratedMod.id("textures/misc/white.png");

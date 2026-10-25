@@ -1,4 +1,3 @@
-// 0.1.2 的 NeoForge 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PartOutline;
@@ -14,14 +13,14 @@ import net.minecraft.util.shape.VoxelShape;
 /**
  * 只框准星对着的那一样（PartOutline，2026-10-23 用户要求，规范见 docs/交互规范手册.md）：
  * 原版画选中框之前问一下方块，给了一个部分就自己画这一部分、不让原版画整格。线的颜色 / 粗细同原版（黑色 40%）。
- *
+ * 作者：
  */
 public final class PartOutlineRenderer {
     private PartOutlineRenderer() {
     }
 
     public static void register() {
-        // 仅接管 PartOutline 的选中框。
+        // 调整：仅接管 PartOutline 的选中框。
         NeoForge.EVENT_BUS.addListener((RenderHighlightEvent.Block event) -> {
             MinecraftClient client = MinecraftClient.getInstance();
             if (client.player == null || client.world == null) {

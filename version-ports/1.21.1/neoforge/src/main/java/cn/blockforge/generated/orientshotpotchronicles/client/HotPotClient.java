@@ -1,4 +1,3 @@
-// 0.1.2 的 NeoForge 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
@@ -17,7 +16,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 
 /** 客户端入口：注册火锅屏幕，并默认启用模组内置材质包。 */
-// 1.21.1 NeoForge 移植：；该类只在物理客户端订阅。
+// 1.21.1 NeoForge 移植：调整；该类只在物理客户端订阅。
 @net.neoforged.fml.common.EventBusSubscriber(modid = GeneratedMod.MOD_ID,
     value = net.neoforged.api.distmarker.Dist.CLIENT,
     bus = net.neoforged.fml.common.EventBusSubscriber.Bus.MOD)
@@ -79,6 +78,23 @@ public final class HotPotClient {
 
     @net.neoforged.bus.api.SubscribeEvent
     public static void registerItemExtensions(net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent event) {
+        // 鸳鸯 / 田字锅的物品：锅身方块模型 + 按物品里存的每边汤底画汤面（任意组合都对，不用为每种组合做模型；新增）
+        for (cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial material
+            : cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial.values()) {
+            if (!material.layout().multiSoup()) {
+                continue;
+            }
+            net.minecraft.item.BlockItem item = HotPotContent.itemFor(material);
+            NeoItemRenderers.register(event, item,
+                (stack, mode, matrices, vertexConsumers, light, overlay) -> {
+                    net.minecraft.client.MinecraftClient.getInstance().getBlockRenderManager()
+                        .renderBlockAsEntity(item.getBlock().getDefaultState(), matrices, vertexConsumers, light, overlay);
+                    NbtComponent data = stack.get(HotPotContent.POT_CONTENTS);
+                    if (data != null) {
+                        HotPotBlockEntityRenderer.renderItemSoups(material, data.copyNbt(), matrices, vertexConsumers, light);
+                    }
+                });
+        }
         HeldFoodItemRenderer.register(event);
         SauceRender.register(event);
         for (net.minecraft.item.BlockItem item : HotPotContent.TALL_BENCH_ITEMS) {
@@ -91,7 +107,7 @@ public final class HotPotClient {
         }
     }
 
-    /** 必选、默认启用，优先级高于模组主资源。 */
+    /** 调整：必选、默认启用，优先级高于模组主资源。 */
     @net.neoforged.bus.api.SubscribeEvent
     public static void registerBuiltinPack(net.neoforged.neoforge.event.AddPackFindersEvent event) {
         event.addPackFinders(GeneratedMod.id("resourcepacks/hotpot_assets"),
@@ -111,7 +127,7 @@ public final class HotPotClient {
             }
             return;
         }
-        // 盘子和装菜的碗（r99）；汤碗、果橙多这种整件的不列菜
+        // 盘子和装菜的碗（r99）；汤碗、橙子饮料这种整件的不列菜
         cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateBlock plate =
             cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem.placedFor(stack);
         if (plate == null || cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem.keepsSelf(stack)
@@ -157,9 +173,13 @@ public final class HotPotClient {
             return;
         }
         NbtCompound nbt = data.copyNbt();
-        SoupBase soup = nbt.contains("Base") ? SoupBase.byId(nbt.getInt("Base")) : null;
-        Text soupName = Text.translatable(soup == null
-            ? HotPotBlockEntity.key("soup.none") : soup.nameKey());
+        // 鸳鸯 / 田字锅：每边的汤底用「/」列出来（同锅的状态栏，调整）
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout layout =
+            stack.getItem() instanceof net.minecraft.item.BlockItem bi
+                && bi.getBlock() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock pot
+                ? pot.material().layout() : cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout.NINE_GRID;
+        String[] keys = {"Base", "BaseB", "BaseC", "BaseD"};
+        Text soupName = HotPotBlockEntity.soupText(layout, side -> nbt.contains(keys[side]) ? nbt.getInt(keys[side]) : -1);
         lines.add(Text.translatable(HotPotBlockEntity.key("tooltip.pot.soup"), soupName)
             .formatted(Formatting.GRAY));
         int food = nbt.getList("Items", NbtElement.COMPOUND_TYPE).size();

@@ -1,6 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "orients_hotpot_chronicles:plate_1x5",
+  "group": "orients_hotpot_chronicles:five_slot_long_plate",
   "pattern": [
     "D D",
     "DDD"

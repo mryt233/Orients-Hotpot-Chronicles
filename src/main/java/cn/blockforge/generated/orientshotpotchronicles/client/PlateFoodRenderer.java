@@ -24,7 +24,7 @@ import java.util.List;
  *   <li>每样只比下面那样高 0.15 像素（物品模型厚 0.25 像素），允许稍微嵌进去一点但不会穿透，斜度也很缓（r90 用户反馈）。</li>
  * </ul>
  * 坐标是以长边沿 x 的盘子、盘子中心在 (8, 8) 像素算的；axis = Z 时整体转 90°（和 blockstate 的 y: 90 一样）。
- *
+ * 作者：
  */
 public final class PlateFoodRenderer {
     private static final float FOOD = 4F;

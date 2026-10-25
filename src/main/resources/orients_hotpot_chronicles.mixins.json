@@ -7,9 +7,7 @@
     "BlockStateTableDecorMixin",
     "BowlItemMixin",
     "EntityRaycastMixin",
-    "LivingEntityEatMixin",
-    "LegacyIdRegistryMixin",
-    "LegacyIdDefaultedRegistryMixin"
+    "LivingEntityEatMixin"
   ],
   "client": [
     "ClientPlayerInteractionManagerMixin",

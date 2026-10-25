@@ -1,5 +1,5 @@
 {
-  "parent": "orients_hotpot_chronicles:block/quartz_plate_2x2",
+  "parent": "orients_hotpot_chronicles:block/quartz_four_slot_square_plate",
   "display": {
     "gui": {
       "rotation": [

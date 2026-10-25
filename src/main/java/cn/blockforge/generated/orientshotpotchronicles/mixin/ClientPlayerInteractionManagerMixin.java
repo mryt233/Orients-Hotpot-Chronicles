@@ -23,9 +23,12 @@ abstract class ClientPlayerInteractionManagerMixin {
             return;
         }
         BlockState state = client.world.getBlockState(pos);
-        // 灶上的锅只挖锅；盘子格只挖准星对着的那个盘子：都不能先把整格预测成空气
+        // 灶上的锅只挖锅；盘子格只挖准星对着的那个盘子：都不能先把整格预测成空气（）
         if (StoveBlock.aimsAtPot(state, pos, client.player)
-            || state.isOf(cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.PLATE_HOLDER)) {
+            || state.isOf(cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.PLATE_HOLDER)
+            || (client.world.getBlockEntity(pos) instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.CuttingBoardBlockEntity board
+                && !board.item().isEmpty()
+                && cn.blockforge.generated.orientshotpotchronicles.hotpot.CuttingBoardBlock.aimsAtItem(pos, client.player))) {
             cir.setReturnValue(false);
         }
     }

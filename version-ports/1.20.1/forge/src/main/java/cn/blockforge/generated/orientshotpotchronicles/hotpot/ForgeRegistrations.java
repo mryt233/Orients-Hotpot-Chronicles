@@ -1,4 +1,4 @@
-// ；1.20.1 Forge 移植。
+// 作者：；1.20.1 Forge 移植。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import java.util.ArrayList;
@@ -22,16 +22,6 @@ final class ForgeRegistrations {
 
     static <T, V extends T> V queue(Registry<T> registry, RegistryKey<T> key, V value) {
         return queue(registry, key.getValue(), value);
-    }
-
-    static <T> void alias(Registry<T> registry, Identifier from, Identifier to) {
-        ENTRIES.add(event -> {
-            if (event.getRegistryKey().equals(registry.getKey())) {
-                if (!(event.getForgeRegistry() instanceof net.minecraftforge.registries.ForgeRegistry<?> forgeRegistry))
-                    throw new IllegalStateException("Alias requires a Forge registry: " + registry.getKey());
-                forgeRegistry.addAlias(from, to);
-            }
-        });
     }
 
     static void flush(RegisterEvent event) {

@@ -1,10 +1,10 @@
 {
   "variants": {
     "axis=x": {
-      "model": "orients_hotpot_chronicles:block/quartz_plate_1x5"
+      "model": "orients_hotpot_chronicles:block/quartz_five_slot_long_plate"
     },
     "axis=z": {
-      "model": "orients_hotpot_chronicles:block/quartz_plate_1x5",
+      "model": "orients_hotpot_chronicles:block/quartz_five_slot_long_plate",
       "y": 90
     }
   }

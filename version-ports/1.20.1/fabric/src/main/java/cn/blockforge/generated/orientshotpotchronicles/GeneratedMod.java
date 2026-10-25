@@ -1,4 +1,3 @@
-// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles;
 
 import cn.blockforge.generated.orientshotpotchronicles.compat.ModCompat;

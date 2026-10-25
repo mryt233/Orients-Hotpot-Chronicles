@@ -1,4 +1,3 @@
-// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.block.Block;
@@ -36,7 +35,7 @@ public class PlateHolderBlockEntity extends BlockEntity {
         public double z;
         public Direction.Axis axis;
         public final DefaultedList<ItemStack> items;
-        /** 整件摆上来的东西（汤碗、果橙多、空瓶；r99）：拿起来原样还回去；空 = 盘子 / 装菜的碗。 */
+        /** 整件摆上来的东西（汤碗、橙子饮料、空瓶；r99）：拿起来原样还回去；空 = 盘子 / 装菜的碗。 */
         public ItemStack self = ItemStack.EMPTY;
 
         Placed(PlateBlock plate, double x, double z, Direction.Axis axis) {
@@ -99,7 +98,7 @@ public class PlateHolderBlockEntity extends BlockEntity {
                 return self.copy();
             }
             ItemStack stack = plate instanceof BowlBlock ? new ItemStack(net.minecraft.item.Items.BOWL) : new ItemStack(plate);
-            ItemData.setContents(stack, items);   // 1.20.1 移植：存 NBT
+            ItemData.setContents(stack, items);   // 1.20.1 移植：存 NBT（调整）
             PlateItem.syncPlateModel(stack);
             return stack;
         }
@@ -126,7 +125,7 @@ public class PlateHolderBlockEntity extends BlockEntity {
         return tryAdd(plate, axis, hitX, hitZ, fromItem, false);
     }
 
-    /** keepSelf：整件摆上来（汤碗、果橙多），记着原来那件物品。 */
+    /** keepSelf：整件摆上来（汤碗、橙子饮料），记着原来那件物品。 */
     public boolean tryAdd(PlateBlock plate, Direction.Axis axis, double hitX, double hitZ, ItemStack fromItem,
                           boolean keepSelf) {
         Placed p = new Placed(plate, 8, 8, axis);

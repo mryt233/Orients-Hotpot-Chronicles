@@ -2,6 +2,14 @@
   "replace": false,
   "values": [
     "orients_hotpot_chronicles:copper_nine_grid_hotpot",
-    "orients_hotpot_chronicles:iron_nine_grid_hotpot"
+    "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "orients_hotpot_chronicles:copper_s_yuanyang_hotpot",
+    "orients_hotpot_chronicles:iron_s_yuanyang_hotpot",
+    "orients_hotpot_chronicles:copper_o_yuanyang_hotpot",
+    "orients_hotpot_chronicles:iron_o_yuanyang_hotpot",
+    "orients_hotpot_chronicles:copper_split_yuanyang_hotpot",
+    "orients_hotpot_chronicles:iron_split_yuanyang_hotpot",
+    "orients_hotpot_chronicles:copper_four_grid_hotpot",
+    "orients_hotpot_chronicles:iron_four_grid_hotpot"
   ]
 }

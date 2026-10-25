@@ -11,11 +11,17 @@
     "south": "南侧相连",
     "east": "东侧相连",
     "west": "西侧相连",
-    "on_table": "摆在火锅桌上"
+    "on_table": "摆在火锅桌上",
+    "left": "左手边相连",
+    "right": "右手边相连",
+    "open": "灶口对着这张",
+    "on_campfire": "放在篝火上",
+    "kind": "饮料",
+    "empty": "空瓶"
   },
   "values": {
     "soup=clear": "清汤",
-    "soup=milky": "浓汤",
+    "soup=rich_stock": "高汤",
     "soup=mushroom": "菌汤",
     "soup=spicy": "红汤",
     "soup=none": "无汤",
@@ -29,9 +35,358 @@
     "pot_axis=x": "东西两侧",
     "pot_axis=z": "南北两侧",
     "on_table=true": "是",
-    "on_table=false": "否"
+    "on_table=false": "否",
+    "kind=orange_drink": "橙子饮料",
+    "kind=plant_protein_drink": "植物蛋白饮料"
   },
   "blocks": {
+    "oak_stool": {
+      "props": {
+        "facing": "坐着面朝",
+        "left": "左手边相连",
+        "right": "右手边相连"
+      }
+    },
+    "spruce_stool": {
+      "props": {
+        "facing": "坐着面朝",
+        "left": "左手边相连",
+        "right": "右手边相连"
+      }
+    },
+    "birch_stool": {
+      "props": {
+        "facing": "坐着面朝",
+        "left": "左手边相连",
+        "right": "右手边相连"
+      }
+    },
+    "jungle_stool": {
+      "props": {
+        "facing": "坐着面朝",
+        "left": "左手边相连",
+        "right": "右手边相连"
+      }
+    },
+    "acacia_stool": {
+      "props": {
+        "facing": "坐着面朝",
+        "left": "左手边相连",
+        "right": "右手边相连"
+      }
+    },
+    "dark_oak_stool": {
+      "props": {
+        "facing": "坐着面朝",
+        "left": "左手边相连",
+        "right": "右手边相连"
+      }
+    },
+    "mangrove_stool": {
+      "props": {
+        "facing": "坐着面朝",
+        "left": "左手边相连",
+        "right": "右手边相连"
+      }
+    },
+    "cherry_stool": {
+      "props": {
+        "facing": "坐着面朝",
+        "left": "左手边相连",
+        "right": "右手边相连"
+      }
+    },
+    "bamboo_stool": {
+      "props": {
+        "facing": "坐着面朝",
+        "left": "左手边相连",
+        "right": "右手边相连"
+      }
+    },
+    "crimson_stool": {
+      "props": {
+        "facing": "坐着面朝",
+        "left": "左手边相连",
+        "right": "右手边相连"
+      }
+    },
+    "warped_stool": {
+      "props": {
+        "facing": "坐着面朝",
+        "left": "左手边相连",
+        "right": "右手边相连"
+      }
+    },
+    "bamboo_small_dish": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "bamboo_two_slot_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "bamboo_three_slot_long_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "bamboo_four_slot_square_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "bamboo_five_slot_long_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "bamboo_eight_slot_platter": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "terracotta_small_dish": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "terracotta_two_slot_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "terracotta_three_slot_long_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "terracotta_four_slot_square_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "terracotta_five_slot_long_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "terracotta_eight_slot_platter": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "copper_small_dish": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "copper_two_slot_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "copper_three_slot_long_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "copper_four_slot_square_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "copper_five_slot_long_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "copper_eight_slot_platter": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "iron_small_dish": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "iron_two_slot_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "iron_three_slot_long_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "iron_four_slot_square_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "iron_five_slot_long_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "iron_eight_slot_platter": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "quartz_small_dish": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "quartz_two_slot_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "quartz_three_slot_long_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "quartz_four_slot_square_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "quartz_five_slot_long_plate": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
+    "quartz_eight_slot_platter": {
+      "props": {
+        "axis": "长边方向"
+      },
+      "values": {
+        "axis=x": "东西",
+        "axis=z": "南北"
+      }
+    },
     "oak_bench": {
       "props": {
         "facing": "坐着面朝",
@@ -107,276 +462,6 @@
         "facing": "坐着面朝",
         "left": "左手边相连",
         "right": "右手边相连"
-      }
-    },
-    "bamboo_plate_1x1": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "bamboo_plate_1x2": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "bamboo_plate_1x3": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "bamboo_plate_2x2": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "bamboo_plate_1x5": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "bamboo_plate_2x4": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "terracotta_plate_1x1": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "terracotta_plate_1x2": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "terracotta_plate_1x3": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "terracotta_plate_2x2": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "terracotta_plate_1x5": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "terracotta_plate_2x4": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "copper_plate_1x1": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "copper_plate_1x2": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "copper_plate_1x3": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "copper_plate_2x2": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "copper_plate_1x5": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "copper_plate_2x4": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "iron_plate_1x1": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "iron_plate_1x2": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "iron_plate_1x3": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "iron_plate_2x2": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "iron_plate_1x5": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "iron_plate_2x4": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "quartz_plate_1x1": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "quartz_plate_1x2": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "quartz_plate_1x3": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "quartz_plate_2x2": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "quartz_plate_1x5": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
-      }
-    },
-    "quartz_plate_2x4": {
-      "props": {
-        "axis": "长边方向"
-      },
-      "values": {
-        "axis=x": "东西",
-        "axis=z": "南北"
       }
     }
   }

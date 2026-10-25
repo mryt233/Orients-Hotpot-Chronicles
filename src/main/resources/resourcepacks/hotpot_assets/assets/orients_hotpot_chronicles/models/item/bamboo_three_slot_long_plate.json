@@ -1,5 +1,5 @@
 {
-  "parent": "orients_hotpot_chronicles:block/bamboo_plate_1x3",
+  "parent": "orients_hotpot_chronicles:block/bamboo_three_slot_long_plate",
   "display": {
     "gui": {
       "rotation": [

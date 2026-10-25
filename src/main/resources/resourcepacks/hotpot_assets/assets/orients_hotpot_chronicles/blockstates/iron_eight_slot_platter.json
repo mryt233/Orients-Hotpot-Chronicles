@@ -1,10 +1,10 @@
 {
   "variants": {
     "axis=x": {
-      "model": "orients_hotpot_chronicles:block/iron_plate_2x4"
+      "model": "orients_hotpot_chronicles:block/iron_eight_slot_platter"
     },
     "axis=z": {
-      "model": "orients_hotpot_chronicles:block/iron_plate_2x4",
+      "model": "orients_hotpot_chronicles:block/iron_eight_slot_platter",
       "y": 90
     }
   }

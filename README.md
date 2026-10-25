@@ -15,10 +15,10 @@ Minecraft 1.20.1 / 1.20.4 / 1.21.1 · Fabric / Forge / NeoForge · 作者 / Auth
 </div>
 
 > [!WARNING]
-> **测试版（alpha）**：现在是 `0.1.2-alpha`，可能有 bug。请先在新存档里试玩，并备份你的存档。
+> **测试版（alpha）**：现在是 `0.1.3-alpha-hotfix1`，可能有 bug。请先在新存档里试玩，并备份你的存档。
 > **旧存档**：1.21.1 Fabric 恢复了部分早期 ID 的识别；其他移植版不转换 0.1.0-alpha.1 存档。请先备份并用新存档试玩，不能据此保证旧存档完整兼容。
 >
-> **Alpha version**: this is `0.1.2-alpha` and may contain bugs. Please try it in a new world first and back up your saves.
+> **Alpha version**: this is `0.1.3-alpha-hotfix1` and may contain bugs. Please try it in a new world first and back up your saves.
 > **Older worlds**: 1.21.1 Fabric restores recognition of some early IDs; the ports do not convert 0.1.0-alpha.1 worlds. Back up your saves and test in a new world first; complete old-world compatibility is not guaranteed.
 
 <a id="downloads"></a>
@@ -29,8 +29,8 @@ Minecraft 1.20.1 / 1.20.4 / 1.21.1 · Fabric / Forge / NeoForge · 作者 / Auth
 
 | Minecraft | 加载器 / Loaders | Java | 模组版本 / Mod version | 下载 / Download |
 | --- | --- | --- | --- | --- |
-| 1.20.1 | Fabric + Forge | 17+ | 0.1.2-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha) |
-| 1.21.1 | Fabric + NeoForge | 21+ | 0.1.2-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.2-alpha) |
+| 1.20.1 | Fabric + Forge | 17+ | 0.1.3-alpha-hotfix1 | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) |
+| 1.21.1 | Fabric + NeoForge | 21+ | 0.1.3-alpha-hotfix1 | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) |
 | 1.20.4 | Fabric | 17+ | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) |
 
 同一 MC 版本的各加载器共用一个发布页，请下载文件名中加载器与游戏配置一致的 JAR。1.20.4 尚未同步 0.1.2 的蘸料与切菜内容。
@@ -155,7 +155,7 @@ The Forge / NeoForge builds do not require Fabric API. The same 1.20.1 Forge JAR
 2. 从上方发布页选择匹配加载器与 MC 版本的 JAR，放入客户端和服务端的 `mods` 文件夹。**这两版不需要 Fabric API。**
 
 1. Use [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) for Minecraft **1.20.1** (recorded test: **47.4.28**), or [NeoForge](https://neoforged.net/) **21.1.264+** for Minecraft **1.21.1**.
-2. Once the corresponding pre-release is published, select its matching JAR and put it in the `mods` folder on both client and server. **These builds do not require Fabric API.**
+2. Select the matching JAR from the [0.1.3-alpha-hotfix1 release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) and put it in the `mods` folder on both client and server. **These builds do not require Fabric API.**
 
 Minecraft **1.20.1 / 1.20.4 使用 Java 17+**，**1.21.1 使用 Java 21+**。
 

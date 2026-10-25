@@ -1,4 +1,3 @@
-// 0.1.2 的 1.20.1 Forge 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.block.Block;
@@ -11,7 +10,7 @@ import net.minecraft.state.property.EnumProperty;
 /**
  * 摆在桌上的原版碗（r99，用户要求）：和盘子一样不单独占方块，摆在盘子格里；这个方块只用来带模型（空碗 / 盛着哪种汤）。
  * 没有自己的物品：拿起来是原版的碗（装菜时带 container 组件）或本模组的汤碗。
- *
+ * 作者：
  */
 public class BowlBlock extends PlateBlock {
     public static final EnumProperty<SoupVisual> SOUP = EnumProperty.of("soup", SoupVisual.class);

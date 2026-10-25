@@ -1,10 +1,10 @@
 {
   "variants": {
     "axis=x": {
-      "model": "orients_hotpot_chronicles:block/copper_plate_1x3"
+      "model": "orients_hotpot_chronicles:block/copper_three_slot_long_plate"
     },
     "axis=z": {
-      "model": "orients_hotpot_chronicles:block/copper_plate_1x3",
+      "model": "orients_hotpot_chronicles:block/copper_three_slot_long_plate",
       "y": 90
     }
   }

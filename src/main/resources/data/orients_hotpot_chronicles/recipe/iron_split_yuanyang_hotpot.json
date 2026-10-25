@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "I",
+    "P"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "P": {
+      "item": "orients_hotpot_chronicles:iron_nine_grid_hotpot"
+    }
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:iron_split_yuanyang_hotpot",
+    "count": 1
+  }
+}

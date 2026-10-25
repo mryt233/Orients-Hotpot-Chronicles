@@ -42,6 +42,24 @@ public class HotPotBlock extends Block implements BlockEntityProvider {
     public static final BooleanProperty BOILING = BooleanProperty.of("boiling");
     /** 两只锅耳朵所在的轴：放下时耳朵在玩家左右两侧，不对着玩家。 */
     public static final EnumProperty<Direction.Axis> AXIS = Properties.HORIZONTAL_AXIS;
+    /**
+     * 下面是篝火 / 灵魂篝火：整口锅往下沉 {@link #CAMPFIRE_DROP} 像素，锅底坐在篝火顶上（篝火 7 像素高；
+     * 0.1.2-alpha 后用户报锅浮在篝火上方，新增）。模型用 tools/gen_pot_on_campfire.py 生成的下沉副本，
+     * 汤面 / 菜 / 热气按 StoveBlock.liftOf 一起下沉。
+     */
+    public static final BooleanProperty ON_CAMPFIRE = BooleanProperty.of("on_campfire");
+    // 第一版下沉 9 像素，但原版篝火火苗 17 像素高，会从锅底穿进锅里、锅也不好挖（用户报）；
+    // 改成不下沉，模型里加四根铁支架踩到篝火上（tools/gen_pot_on_campfire.py）。保留常量和 liftOf 的分支，要调高度改这里。
+    public static final double CAMPFIRE_DROP = 0.0;
+    private static final VoxelShape POT_SHAPE_LOW = POT_SHAPE.offset(0, -CAMPFIRE_DROP / 16.0, 0);
+
+    public static boolean campfireBelow(net.minecraft.world.BlockView world, BlockPos pos) {
+        return world.getBlockState(pos.down()).isIn(net.minecraft.registry.tag.BlockTags.CAMPFIRES);
+    }
+
+    private static VoxelShape shapeOf(BlockState state) {
+        return state.get(ON_CAMPFIRE) ? POT_SHAPE_LOW : POT_SHAPE;
+    }
 
     private final HotPotMaterial material;
 
@@ -52,7 +70,8 @@ public class HotPotBlock extends Block implements BlockEntityProvider {
             .with(HAS_SOUP, false)
             .with(SOUP, SoupVisual.NONE)
             .with(BOILING, false)
-            .with(AXIS, Direction.Axis.X));
+            .with(AXIS, Direction.Axis.X)
+            .with(ON_CAMPFIRE, false));
     }
 
     /** 玩家朝向转 90° 就是耳朵的方向：面朝南北时耳朵在东西两侧，面朝东西时在南北两侧。 */
@@ -62,7 +81,8 @@ public class HotPotBlock extends Block implements BlockEntityProvider {
 
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return getDefaultState().with(AXIS, handleAxisFor(ctx.getHorizontalPlayerFacing()));
+        return getDefaultState().with(AXIS, handleAxisFor(ctx.getHorizontalPlayerFacing()))
+            .with(ON_CAMPFIRE, campfireBelow(ctx.getWorld(), ctx.getBlockPos()));
     }
 
     public HotPotMaterial material() {
@@ -105,18 +125,28 @@ public class HotPotBlock extends Block implements BlockEntityProvider {
     @Override
     protected VoxelShape getOutlineShape(BlockState state, net.minecraft.world.BlockView world,
                                          BlockPos pos, ShapeContext context) {
-        return POT_SHAPE;
+        return shapeOf(state);
     }
 
     @Override
     protected VoxelShape getCollisionShape(BlockState state, net.minecraft.world.BlockView world,
                                            BlockPos pos, ShapeContext context) {
-        return POT_SHAPE;
+        return shapeOf(state);
+    }
+
+    /** 下面的方块变了（篝火放上 / 拆掉）：跟着沉下去或抬回来。 */
+    @Override
+    protected BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState,
+                                                   net.minecraft.world.WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        if (direction == Direction.DOWN) {
+            return state.with(ON_CAMPFIRE, neighborState.isIn(net.minecraft.registry.tag.BlockTags.CAMPFIRES));
+        }
+        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(HAS_SOUP, SOUP, BOILING, AXIS);
+        builder.add(HAS_SOUP, SOUP, BOILING, AXIS, ON_CAMPFIRE);
     }
 
     @Override
@@ -125,7 +155,20 @@ public class HotPotBlock extends Block implements BlockEntityProvider {
         if (!(world.getBlockEntity(pos) instanceof HotPotBlockEntity be)) {
             return ActionResult.PASS;
         }
-        int bigCell = HotPotInteraction.bigCellFromHit(pos, hit);
+        // 空手潜行右键 = 把锅连汤带食材拿进背包，和灶台上拆锅一样（用户报：篝火上的锅 Shift+右键拿不下来；新增）
+        if (player.isSneaking()) {
+            if (!world.isClient) {
+                ItemStack pot = be.toPotItem(material);
+                world.setBlockState(pos, net.minecraft.block.Blocks.AIR.getDefaultState());
+                if (!player.getInventory().insertStack(pot)) {
+                    player.dropItem(pot, false);
+                }
+                world.playSound(null, pos, net.minecraft.sound.SoundEvents.BLOCK_ANVIL_LAND,
+                    net.minecraft.sound.SoundCategory.BLOCKS, 0.25F, 0.75F);
+            }
+            return ActionResult.SUCCESS;
+        }
+        int bigCell = HotPotInteraction.cellFromHit(be, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE);
         int slot = be.firstCookedSlotInCell(bigCell);
         if (!world.isClient && !be.collectCookedSlot(player, slot)) {
             player.sendMessage(be.statusText(), true);
@@ -139,7 +182,7 @@ public class HotPotBlock extends Block implements BlockEntityProvider {
         if (!(world.getBlockEntity(pos) instanceof HotPotBlockEntity be)) {
             return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
-        int bigCell = HotPotInteraction.bigCellFromHit(pos, hit);
+        int bigCell = HotPotInteraction.cellFromHit(be, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE);
         int cookedSlot = be.firstCookedSlotInCell(bigCell);
 
         if (isPlate(stack)) {
@@ -150,7 +193,7 @@ public class HotPotBlock extends Block implements BlockEntityProvider {
         }
         if (be.canScoopWith(stack)) {
             if (!world.isClient) {
-                be.scoopSoup(player, hand);
+                be.scoopSoup(player, hand, HotPotInteraction.sideFromHit(be, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE));
             }
             return ItemActionResult.SUCCESS;
         }
@@ -162,12 +205,19 @@ public class HotPotBlock extends Block implements BlockEntityProvider {
         }
         if (HotPotInteraction.isServingTool(stack)) {
             if (stack.isOf(HotPotContent.CHOPSTICKS)) {
-                // 筷子上夹着盘子里的菜：放进准星对着的那一格；空筷子开面板（捞取交给碗）
+                // 夹着的是熟菜（下不了锅）：不管锅，交给筷子吃（按住右键吃）。以前会提示「煮不了」，
+                // 刚从锅里夹起来、右键还按着时就吃不上（用户报：筷子夹起来的菜吃不了。调整）
+                ItemStack held = Chopsticks.held(stack);
+                if (!held.isEmpty() && !HotPotCooking.acceptable(world, held)) {
+                    return ItemActionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+                }
+                // 筷子上夹着菜：放进准星对着的那一格；空筷子：夹起这一格的一样熟食
+                // （2026-10-25 用户定的新交互；开锅界面改成拿筷子 Shift+右键，见 ChopsticksItem.useOnBlock。调整）
                 if (!world.isClient) {
                     if (!Chopsticks.held(stack).isEmpty()) {
                         be.insertHeld(player, stack, be.firstEmptySlotInCell(bigCell));
-                    } else {
-                        be.useWithChopsticks(player);
+                    } else if (!be.pickWithChopsticks(player, stack, cookedSlot)) {
+                        player.sendMessage(net.minecraft.text.Text.translatable(HotPotBlockEntity.key("msg.no_cooked_here")), true);
                     }
                 }
                 return ItemActionResult.SUCCESS;
@@ -179,7 +229,7 @@ public class HotPotBlock extends Block implements BlockEntityProvider {
             return ItemActionResult.SUCCESS;
         }
         if (SoupBase.fromStack(stack) != null) {
-            if (!world.isClient && !be.pourSoup(player, hand)) {
+            if (!world.isClient && !be.pourSoup(player, hand, HotPotInteraction.sideFromHit(be, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE))) {
                 return ItemActionResult.FAIL;
             }
             return ItemActionResult.SUCCESS;

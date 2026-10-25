@@ -6,8 +6,8 @@
     "axis=x,soup=clear": {
       "model": "orients_hotpot_chronicles:block/bowl_b_soup_clear"
     },
-    "axis=x,soup=milky": {
-      "model": "orients_hotpot_chronicles:block/bowl_b_soup_milky"
+    "axis=x,soup=rich_stock": {
+      "model": "orients_hotpot_chronicles:block/bowl_b_soup_rich_stock"
     },
     "axis=x,soup=mushroom": {
       "model": "orients_hotpot_chronicles:block/bowl_b_soup_mushroom"
@@ -23,8 +23,8 @@
       "model": "orients_hotpot_chronicles:block/bowl_b_soup_clear",
       "y": 90
     },
-    "axis=z,soup=milky": {
-      "model": "orients_hotpot_chronicles:block/bowl_b_soup_milky",
+    "axis=z,soup=rich_stock": {
+      "model": "orients_hotpot_chronicles:block/bowl_b_soup_rich_stock",
       "y": 90
     },
     "axis=z,soup=mushroom": {

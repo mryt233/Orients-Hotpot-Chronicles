@@ -2,6 +2,9 @@
   "replace": false,
   "values": [
     "minecraft:beef",
-    "minecraft:mutton"
+    "minecraft:mutton",
+    "orients_hotpot_chronicles:beef_loin",
+    "minecraft:potato",
+    "orients_hotpot_chronicles:tofu"
   ]
 }

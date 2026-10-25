@@ -67,7 +67,7 @@ public class StoveBlock extends Block implements PartOutline, BlockEntityProvide
         POT_BODY, POT_RIM_NORTH, POT_RIM_SOUTH, POT_RIM_WEST, POT_RIM_EAST,
         POT_HANDLE_NORTH, POT_HANDLE_SOUTH).simplify();
     /** 高灶台比矮灶台抬高的像素：灶口、锅、汤整体上移（配高火锅桌，桌面 23/16，灶台砖面比桌面低 2 像素）。
-     *  r83 是 11，r84 用户说桌子和灶台再低一点，一起降 1。 */
+     *  r83 是 11，r84 用户说桌子和灶台再低一点，一起降 1（调整）。 */
     public static final double TALL_LIFT = 10.0;
 
     /** 这一种灶台整体抬高多少像素（矮灶台 0，高灶台 {@link #TALL_LIFT}）。 */
@@ -128,6 +128,9 @@ public class StoveBlock extends Block implements PartOutline, BlockEntityProvide
 
     /** 灶台抬高的方块单位（不是灶台返回 0）。 */
     public static float liftOf(BlockState state) {
+        if (state.getBlock() instanceof HotPotBlock && state.get(HotPotBlock.ON_CAMPFIRE)) {
+            return (float) (-HotPotBlock.CAMPFIRE_DROP / 16.0);   // 坐在篝火上的锅整体下沉（新增）
+        }
         return state.getBlock() instanceof StoveBlock stove ? (float) (stove.lift / 16.0) : 0F;
     }
 
@@ -228,7 +231,7 @@ public class StoveBlock extends Block implements PartOutline, BlockEntityProvide
                     stove.openFuelScreen(player);
                 } else {
                     // 空手点锅体：先按准星格收取熟食，没有可取的才提示状态。
-                    int bigCell = HotPotInteraction.bigCellFromHit(pos, hit,
+                    int bigCell = HotPotInteraction.cellFromHit(stove, pos, hit,
                         HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE);
                     if (!stove.collectCookedSlot(player, stove.firstCookedSlotInCell(bigCell))) {
                         player.sendMessage(stove.statusText(), true);
@@ -302,7 +305,7 @@ public class StoveBlock extends Block implements PartOutline, BlockEntityProvide
             return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
-        int bigCell = HotPotInteraction.bigCellFromHit(pos, hit,
+        int bigCell = HotPotInteraction.cellFromHit(stove, pos, hit,
                     HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE);
         int cookedSlot = stove.firstCookedSlotInCell(bigCell);
         if (plate) {
@@ -313,7 +316,7 @@ public class StoveBlock extends Block implements PartOutline, BlockEntityProvide
         }
         if (scoop) {
             if (!world.isClient) {
-                stove.scoopSoup(player, hand);
+                stove.scoopSoup(player, hand, HotPotInteraction.sideFromHit(stove, pos, hit, HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE));
             }
             return ItemActionResult.SUCCESS;
         }
@@ -325,12 +328,19 @@ public class StoveBlock extends Block implements PartOutline, BlockEntityProvide
         }
         if (servingTool) {
             if (stack.isOf(HotPotContent.CHOPSTICKS)) {
-                // 筷子上夹着盘子里的菜：放进准星对着的那一格；空筷子开面板（捞取交给碗）
+                // 夹着的是熟菜（下不了锅）：不管锅，交给筷子吃（按住右键吃）。以前会提示「煮不了」，
+                // 刚从锅里夹起来、右键还按着时就吃不上（用户报：筷子夹起来的菜吃不了。调整）
+                ItemStack held = Chopsticks.held(stack);
+                if (!held.isEmpty() && !HotPotCooking.acceptable(world, held)) {
+                    return ItemActionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+                }
+                // 筷子上夹着菜：放进准星对着的那一格；空筷子：夹起这一格的一样熟食
+                // （2026-10-25 用户定的新交互；开锅界面改成拿筷子 Shift+右键，见 ChopsticksItem.useOnBlock。调整）
                 if (!world.isClient) {
                     if (!Chopsticks.held(stack).isEmpty()) {
                         stove.insertHeld(player, stack, stove.firstEmptySlotInCell(bigCell));
-                    } else {
-                        stove.useWithChopsticks(player);
+                    } else if (!stove.pickWithChopsticks(player, stack, cookedSlot)) {
+                        player.sendMessage(Text.translatable(HotPotBlockEntity.key("msg.no_cooked_here")), true);
                     }
                 }
                 return ItemActionResult.SUCCESS;
@@ -341,7 +351,7 @@ public class StoveBlock extends Block implements PartOutline, BlockEntityProvide
             return ItemActionResult.SUCCESS;
         }
         if (soupSource) {
-            if (!world.isClient && !stove.pourSoup(player, hand)) {
+            if (!world.isClient && !stove.pourSoup(player, hand, HotPotInteraction.sideFromHit(stove, pos, hit, HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE))) {
                 return ItemActionResult.FAIL;
             }
             return ItemActionResult.SUCCESS;

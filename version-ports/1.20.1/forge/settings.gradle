@@ -1,4 +1,4 @@
-// ；1.21.1 NeoForge 移植。
+// 作者：；1.21.1 NeoForge 移植。
 pluginManagement {
     repositories {
         maven { url = 'https://maven.architectury.dev/' }

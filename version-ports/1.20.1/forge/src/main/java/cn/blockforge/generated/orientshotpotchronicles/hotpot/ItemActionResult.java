@@ -1,4 +1,4 @@
-// 0.1.2 的 1.20.1 Forge 接口迁移：。
+// 0.1.2 的 1.20.1 Fabric 接口迁移：调整。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.block.BlockState;
@@ -10,7 +10,7 @@ import net.minecraft.util.Hand;
  * 1.20.x 移植版专用：照 1.21 原版 {@code net.minecraft.util.ItemActionResult} 写的一份。1.21 把方块右键拆成
  * 「拿着东西点」（onUseWithItem）和「空手点」（onUse）两步，1.20 只有一个 onUse；方块类里保留 1.21 的两个方法
  * （改名 useWithItem / useWithoutItem），由 {@link #dispatch} 按 1.21 的顺序调用，行为和 1.21 版一致。
- *
+ * 作者：
  */
 public enum ItemActionResult {
     SUCCESS,

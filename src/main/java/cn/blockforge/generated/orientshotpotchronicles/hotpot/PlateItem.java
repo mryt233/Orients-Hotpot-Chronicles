@@ -47,14 +47,14 @@ public class PlateItem extends BlockItem {
             net.minecraft.component.type.ContainerComponent.DEFAULT).streamNonEmpty().findAny().isPresent());
     }
 
-    /** 能不能装进盘子：能下锅的生食材，或者本身能吃的东西（熟食也能装）；汤碗、果橙多这种整件摆的不算。 */
+    /** 能不能装进盘子：能下锅的生食材，或者本身能吃的东西（熟食也能装）；汤碗、橙子饮料这种整件摆的不算。 */
     public static boolean holdsFood(World world, ItemStack stack) {
         return !stack.isEmpty() && placedFor(stack) == null && (stack.contains(DataComponentTypes.FOOD) || HotPotCooking.acceptable(world, stack));
     }
 
     /**
      * 手里这件东西摆到桌上是什么（r99 起不只盘子）：盘子 → 盘子；原版的碗 → 碗（装的菜跟着）；
-     * 汤碗 → 碗（整件记着）；果橙多 / 空瓶 → 瓶子（整件记着）。不能摆返回 null。
+     * 汤碗 → 碗（整件记着）；橙子饮料 / 空瓶 → 瓶子（整件记着）。不能摆返回 null。
      */
     @org.jetbrains.annotations.Nullable
     public static PlateBlock placedFor(ItemStack stack) {
@@ -85,7 +85,7 @@ public class PlateItem extends BlockItem {
 
     /**
      * 点在方块顶面：在上面那一格的「盘子格」里摆一个（盘子、碗、瓶子共用）。点的不是顶面返回 PASS，交给原版
-     * （碗、汤碗、果橙多接着就是原版的用法）；锅和灶台上不摆。
+     * （碗、汤碗、橙子饮料接着就是原版的用法）；锅和灶台上不摆。
      */
     public static ActionResult placeOn(ItemUsageContext context, PlateBlock plate, boolean keepSelf) {
         World world = context.getWorld();

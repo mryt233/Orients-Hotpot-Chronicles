@@ -1,4 +1,3 @@
-// ；按 已定的 1.20.1 网络接口迁移。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import cn.blockforge.generated.orientshotpotchronicles.GeneratedMod;

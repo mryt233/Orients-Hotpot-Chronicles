@@ -33,6 +33,9 @@ SIZES = {
     "1x5": (5, 1, 15, 6, ["D D", "DDD"]),
     "2x4": (4, 2, 15, 8, ["DDD", "D D", "DDD"]),
 }
+# 物品 / 方块 ID 里材质后面那段（r102 起和显示名对得上；2026-10-24 起方块模型文件名也用它，以前是 <材质>_plate_<大小>）
+PLATE_IDS = {"1x1": "small_dish", "1x2": "two_slot_plate", "1x3": "three_slot_long_plate",
+             "2x2": "four_slot_square_plate", "1x5": "five_slot_long_plate", "2x4": "eight_slot_platter"}
 FLOOR, RIM_H, RIM_T = 1.0, 0.75, 0.5
 PLATE_DISPLAY = {
     "gui": {"rotation": [30, 225, 0], "translation": [0, 2, 0], "scale": [0.75, 0.75, 0.75]},
@@ -89,7 +92,7 @@ def main():
         write(root / "models/block/plates.json", {"textures": {"particle": "minecraft:block/quartz_block_side"}})
         for mat, (floor_tex, rim_tex, _) in MATERIALS.items():
             for size in SIZES:
-                name = f"{mat}_plate_{size}"
+                name = f"{mat}_{PLATE_IDS[size]}"
                 write(root / f"models/block/{name}.json", model(size, floor_tex, rim_tex, 0))
                 variants = {}
                 for axis, y in (("x", 0), ("z", 90)):
@@ -97,10 +100,11 @@ def main():
                     if y:
                         v["y"] = y
                     variants[f"axis={axis}"] = v
-                write(root / f"blockstates/{name}.json", {"variants": variants})
+                ident = f"{mat}_{PLATE_IDS[size]}"
+                write(root / f"blockstates/{ident}.json", {"variants": variants})
                 # 手持往上翘一点能看到盘面（原来平着拿几乎只看到一条边，r91）；装了菜时切到 builtin 模型，
-                # 由 HeldFoodItemRenderer 先画盘子再把菜摆上去
-                write(root / f"models/item/{name}.json", {
+                # 由 HeldFoodItemRenderer 先画盘子再把菜摆上去（）
+                write(root / f"models/item/{ident}.json", {
                     "parent": f"{MODID}:block/{name}", "display": PLATE_DISPLAY,
                     "overrides": [{"predicate": {"custom_model_data": 1}, "model": f"{MODID}:item/plate_with_food"}]})
 
@@ -109,14 +113,15 @@ def main():
         if old.exists():
             old.unlink()
     for mat, (_, _, material) in MATERIALS.items():
-        dish = f"{MODID}:{mat}_plate_1x1"
+        dish = f"{MODID}:{mat}_small_dish"
         for size, (_, _, _, _, pattern) in SIZES.items():
-            name = f"{mat}_plate_{size}"
+            name = f"{mat}_{PLATE_IDS[size]}"
             if pattern is None:
-                recipe = {"type": "minecraft:crafting_shaped", "group": f"{MODID}:plate_1x1", "pattern": ["MM"],
-                          "key": {"M": {"item": material}}, "result": {"id": dish, "count": 2}}
+                # 材料 碗 材料（调整 r117：原来两个横排，铁的和原版重质测重压力板冲突）
+                recipe = {"type": "minecraft:crafting_shaped", "group": f"{MODID}:small_dish", "pattern": ["MBM"],
+                          "key": {"M": {"item": material}, "B": {"item": "minecraft:bowl"}}, "result": {"id": dish, "count": 2}}
             else:
-                recipe = {"type": "minecraft:crafting_shaped", "group": f"{MODID}:plate_{size}", "pattern": pattern,
+                recipe = {"type": "minecraft:crafting_shaped", "group": f"{MODID}:{PLATE_IDS[size]}", "pattern": pattern,
                           "key": {"D": {"item": dish}}, "result": {"id": f"{MODID}:{name}", "count": 1}}
             write(DATA / f"recipe/{name}.json", recipe)
     print(f"已生成 {len(MATERIALS)} 种材质 × {len(SIZES)} 种大小的盘子")

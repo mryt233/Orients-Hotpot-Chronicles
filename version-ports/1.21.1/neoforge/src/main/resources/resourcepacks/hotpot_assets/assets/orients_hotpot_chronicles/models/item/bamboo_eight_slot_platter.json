@@ -1,5 +1,5 @@
 {
-  "parent": "orients_hotpot_chronicles:block/bamboo_plate_2x4",
+  "parent": "orients_hotpot_chronicles:block/bamboo_eight_slot_platter",
   "display": {
     "gui": {
       "rotation": [

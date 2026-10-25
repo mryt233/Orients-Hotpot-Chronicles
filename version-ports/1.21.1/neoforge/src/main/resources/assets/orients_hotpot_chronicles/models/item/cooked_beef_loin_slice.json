@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "orients_hotpot_chronicles:item/cooked_beef_loin_slice"
+  }
+}

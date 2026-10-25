@@ -68,7 +68,7 @@ def write(path, obj):
 def main():
     for root in ASSET_ROOTS:
         for wood in WOODS:
-            name = f"{wood}_bench"
+            name = f"{wood}_stool"   # 模型名和 ID 一致（2026-10-24 用户：alpha 名字对不上的都改；以前板凳模型叫 <木头>_bench）
             planks = f"minecraft:block/{wood}_planks"
             variants = {}
             for left in (False, True):
@@ -79,14 +79,15 @@ def main():
                         if y:
                             v["y"] = y
                         variants[f"facing={facing},left={str(left).lower()},right={str(right).lower()}"] = v
-            write(root / f"blockstates/{name}.json", {"variants": variants})
-            write(root / f"models/item/{name}.json", model(False, False, planks, all_faces=True))
+            ident = f"{wood}_stool"
+            write(root / f"blockstates/{ident}.json", {"variants": variants})
+            write(root / f"models/item/{ident}.json", model(False, False, planks, all_faces=True))
 
     for wood in WOODS:
-        name = f"{wood}_bench"
+        name = f"{wood}_stool"
         write(DATA / MODID / f"recipe/{name}.json", {
             "type": "minecraft:crafting_shaped",
-            "group": f"{MODID}:bench",
+            "group": f"{MODID}:stool",
             "pattern": ["PPP", "S S"],
             "key": {"P": {"item": f"minecraft:{wood}_planks"}, "S": {"item": "minecraft:stick"}},
             "result": {"id": f"{MODID}:{name}", "count": 3},
@@ -100,7 +101,7 @@ def main():
     axe = DATA / "minecraft/tags/block/mineable/axe.json"
     tag = json.loads(axe.read_text(encoding="utf-8")) if axe.exists() else {"replace": False, "values": []}
     for wood in WOODS:
-        ident = f"{MODID}:{wood}_bench"
+        ident = f"{MODID}:{wood}_stool"
         if ident not in tag["values"]:
             tag["values"].append(ident)
     write(axe, tag)

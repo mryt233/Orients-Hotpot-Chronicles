@@ -1,4 +1,3 @@
-// 1.21.1 NeoForge 移植：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.block.AbstractBlock;
@@ -127,7 +126,7 @@ public class HotPotTableBlock extends Block {
                                            ShapeContext context) {
         return shapeOf(state);
     }
-    // NeoForge 可燃接口；下界木不燃烧，原数值 5 / 20。
+    // 调整：NeoForge 可燃接口；下界木不燃烧，原数值 5 / 20。
     @Override
     public boolean isFlammable(BlockState state, BlockView world, BlockPos pos, Direction face) {
         return planks != net.minecraft.block.Blocks.CRIMSON_PLANKS && planks != net.minecraft.block.Blocks.WARPED_PLANKS;
