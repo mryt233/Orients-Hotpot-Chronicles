@@ -8,7 +8,9 @@ public enum SoupVisual implements StringIdentifiable {
     CLEAR("clear"),
     RICH_STOCK("rich_stock"),
     MUSHROOM("mushroom"),
-    SPICY("spicy");
+    SPICY("spicy"),
+    TOMATO("tomato"),
+    THREE_FRESH("three_fresh");
 
     private final String name;
 

@@ -22,7 +22,7 @@ import net.minecraft.util.math.Direction;
  * </ul>
  * 有菜的物品带自定义模型数据 1（PlateItem.syncFoodModel），模型是 builtin/entity、不带显示变换，交给这里画；
  * 这里去掉自定义模型数据再画一遍就是原来的模型（不会递归），菜用原来模型的显示变换对齐。
- * 作者：
+ *
  */
 public final class HeldFoodItemRenderer {
     /** 筷子尖在物品模型里的位置（0..1，贴图左下角那两根筷子的尖）和夹着的菜的大小。 */
@@ -33,12 +33,12 @@ public final class HeldFoodItemRenderer {
     private HeldFoodItemRenderer() {
     }
 
-    // 调整：注册改由物品 initializeClient / 原版碗 Mixin 接入 ForgeItemRenderers。
+    // ：注册改由物品 initializeClient / 原版碗 Mixin 接入 ForgeItemRenderers。
 
     /** 去掉自定义模型数据的复制品 = 原来的模型。 */
     private static ItemStack plain(ItemStack stack) {
         ItemStack copy = stack.copy();
-        cn.blockforge.generated.orientshotpotchronicles.hotpot.ItemData.clearModel(copy);   // 1.20.1 移植（调整）
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.ItemData.clearModel(copy);   // 1.20.1 移植（）
         return copy;
     }
 
@@ -100,7 +100,7 @@ public final class HeldFoodItemRenderer {
     /** 装着菜的碗：画立体的碗（和摆在桌上的同一个模型），再把菜叠在碗里；显示变换在 item/bowl_with_food.json。 */
     public static void renderBowl(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices,
                                    VertexConsumerProvider consumers, int light, int overlay) {
-        // 调整：空碗回到原版模型，移除模型覆盖以避免递归。
+        // ：空碗回到原版模型，移除模型覆盖以避免递归。
         if (!cn.blockforge.generated.orientshotpotchronicles.hotpot.ItemData.hasContents(stack)) {
             withBase(stack, mode, matrices, consumers, light, overlay, () -> {});
             return;

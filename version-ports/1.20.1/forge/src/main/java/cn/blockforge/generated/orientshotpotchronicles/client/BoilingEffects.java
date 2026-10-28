@@ -30,9 +30,11 @@ final class BoilingEffects {
 
     private static Palette palette(SoupVisual soup) {
         return switch (soup) {
-            case CLEAR -> new Palette(0xC6CCCA, 0xF4F4EC);   // 2026-10-23 清汤换成清亮的银灰（用户参考图），调整
+            case CLEAR -> new Palette(0xC6CCCA, 0xF4F4EC);   // 2026-10-23 清汤换成清亮的银灰（用户参考图），
             case RICH_STOCK -> new Palette(0xF2E7D2, 0xFFFFFF);
             case MUSHROOM -> new Palette(0x9A7048, 0xE8C88A);
+            case TOMATO -> new Palette(0xE2563A, 0xFF9A6A);       // 2026-10-25 番茄锅底（）
+            case THREE_FRESH -> new Palette(0xE6D8B0, 0xFFF6DC);  // 2026-10-25 三鲜锅底
             default -> new Palette(0xBE3325, 0xD8553A); // 红汤：比汤底 #B82F23 稍亮，顶面带红油光泽
         };
     }
@@ -53,7 +55,7 @@ final class BoilingEffects {
     }
 
     /**
-     * @param keepAt 鸳鸯锅：只在这一边冒泡（参数是方块坐标 x、z），落在别处的气泡这一轮不画；null = 整锅。新增。
+     * @param keepAt 鸳鸯锅：只在这一边冒泡（参数是方块坐标 x、z），落在别处的气泡这一轮不画；null = 整锅。。
      */
     static void render(SoupVisual soup, float surfaceY, float innerMin, float innerSize, float heat,
                        double seconds, int salt, MatrixStack matrices, VertexConsumerProvider consumers, int light,
@@ -173,6 +175,6 @@ final class BoilingEffects {
             .texture(u, v)
             .overlay(OverlayTexture.DEFAULT_UV)
             .light(light)
-            .normal(e.getNormalMatrix(), nx, ny, nz).next();   // 1.20.1 移植（调整）
+            .normal(e.getNormalMatrix(), nx, ny, nz).next();   // 1.20.1 移植（）
     }
 }

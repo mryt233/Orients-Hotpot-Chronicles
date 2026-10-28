@@ -9,7 +9,7 @@
       ],
       "translation": [
         0,
-        1.5,
+        2.4,
         0
       ],
       "scale": [
@@ -103,6 +103,18 @@
         "orients_hotpot_chronicles:soup": 0.4
       },
       "model": "orients_hotpot_chronicles:item/copper_hot_pot_spicy"
+    },
+    {
+      "predicate": {
+        "orients_hotpot_chronicles:soup": 0.5
+      },
+      "model": "orients_hotpot_chronicles:item/copper_hot_pot_tomato"
+    },
+    {
+      "predicate": {
+        "orients_hotpot_chronicles:soup": 0.6
+      },
+      "model": "orients_hotpot_chronicles:item/copper_hot_pot_three_fresh"
     }
   ]
 }

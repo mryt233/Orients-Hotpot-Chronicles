@@ -15,18 +15,18 @@ import net.minecraft.util.math.BlockPos;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cn.blockforge.generated.orientshotpotchronicles.client.GuiKit.*;
+
 /**
  * 蘸料台总览（2026-10-23 用户要求）：右键蘸料台先打开这里，3×3 九张小卡片和台上的九个碗一一对应
  * （从最上层到最下层、每层从左到右），看每个碗装的什么、还剩多少；下面「补充蘸料台」按钮进补货界面（SauceStationScreen）。
- * 只读界面，数据直接看客户端的方块实体（存货变了服务端会同步过来）。原版灰色样式，同补货界面。
+ * 只读界面，数据直接看客户端的方块实体（存货变了服务端会同步过来）。2026-10-26 起和补货界面一起改成灶台那样的木框、浅色字（用户：灰底深字糊）。
  * 网页预览 viewer/screens.js 的 sauceOverview 与本类一一对应。
- * 作者：
+ *
  */
 public class SauceOverviewScreen extends Screen {
     public static final int W = 176, H = 176;
     public static final int CARD_X = 8, CARD_Y = 30, CARD_W = 52, CARD_H = 36, STEP_X = 54, STEP_Y = 38;
-    private static final int BG = 0xFFC6C6C6, LIGHT = 0xFFFFFFFF, DARK = 0xFF555555, EDGE = 0xFF000000;
-    private static final int SLOT = 0xFF8B8B8B, SLOT_DARK = 0xFF373737, TEXT = 0xFF404040, HINT = 0xFF707070;
     private static final int MAX = SauceStationBlockEntity.MAX_RAW * SauceStationBlockEntity.PORTIONS_PER_RAW;
     private final BlockPos pos;
     private int x, y;
@@ -66,7 +66,7 @@ public class SauceOverviewScreen extends Screen {
 
     @Override
     public void render(DrawContext g, int mouseX, int mouseY, float delta) {
-        renderBackground(g); // 调整：1.20.1 Screen.render 不自动绘制背景。
+        renderBackground(g); // ：1.20.1 Screen.render 不自动绘制背景。
         super.render(g, mouseX, mouseY, delta);
         SauceStationBlockEntity be = station();
         if (be == null) {
@@ -78,21 +78,22 @@ public class SauceOverviewScreen extends Screen {
             int cx = x + CARD_X + (i % 3) * STEP_X, cy = y + CARD_Y + (i / 3) * STEP_Y;
             Seasoning s = be.kind(i);
             int left = Math.min(MAX, be.available(i));
-            g.fill(cx, cy, cx + CARD_W, cy + CARD_H, SLOT_DARK);
-            g.fill(cx + 1, cy + 1, cx + CARD_W, cy + CARD_H, LIGHT);
-            g.fill(cx + 1, cy + 1, cx + CARD_W - 1, cy + CARD_H - 1, SLOT);
+            // 卡片 = 放大的凹槽：左上压暗、右下透亮
+            g.fill(cx, cy, cx + CARD_W, cy + CARD_H, SLOT_LIGHT);
+            g.fill(cx, cy, cx + CARD_W - 1, cy + CARD_H - 1, SLOT_SHADOW);
+            g.fill(cx + 1, cy + 1, cx + CARD_W - 1, cy + CARD_H - 1, SLOT_BG);
             if (s != null && left > 0) {
                 g.drawItem(new ItemStack(s.rawShown(Util.getMeasuringTimeMs())), cx + 3, cy + 3);
                 Text name = Text.translatable(s.nameKey());
-                g.drawText(textRenderer, textRenderer.trimToWidth(name, CARD_W - 24).getString(), cx + 21, cy + 4, 0xFFFFFFFF, true);
-                g.drawText(textRenderer, String.valueOf(left), cx + 21, cy + 14, 0xFFE0E0E0, true);
+                g.drawText(textRenderer, textRenderer.trimToWidth(name, CARD_W - 24).getString(), cx + 21, cy + 4, TITLE, true);
+                g.drawText(textRenderer, String.valueOf(left), cx + 21, cy + 14, LABEL, true);
                 // 剩余条
                 int bw = CARD_W - 8, fw = Math.round(bw * left / (float) MAX);
-                g.fill(cx + 4, cy + CARD_H - 8, cx + 4 + bw, cy + CARD_H - 4, SLOT_DARK);
+                g.fill(cx + 4, cy + CARD_H - 8, cx + 4 + bw, cy + CARD_H - 4, SLOT_SHADOW);
                 g.fill(cx + 4, cy + CARD_H - 8, cx + 4 + fw, cy + CARD_H - 4, s.color());
             } else {
                 g.drawCenteredTextWithShadow(textRenderer, Text.translatable(HotPotBlockEntity.key("screen.sauce.empty_bowl")),
-                    cx + CARD_W / 2, cy + CARD_H / 2 - 4, 0xFFC0C0C0);
+                    cx + CARD_W / 2, cy + CARD_H / 2 - 4, SauceStationScreen.HINT);
             }
             if (mouseX >= cx && mouseX < cx + CARD_W && mouseY >= cy && mouseY < cy + CARD_H) {
                 hoverLines = new ArrayList<>();
@@ -113,16 +114,10 @@ public class SauceOverviewScreen extends Screen {
     @Override
     public void renderBackground(DrawContext g) {
         super.renderBackground(g);
-        g.fill(x + 1, y, x + W - 1, y + 1, EDGE);
-        g.fill(x + 1, y + H - 1, x + W - 1, y + H, EDGE);
-        g.fill(x, y + 1, x + 1, y + H - 1, EDGE);
-        g.fill(x + W - 1, y + 1, x + W, y + H - 1, EDGE);
-        g.fill(x + 1, y + 1, x + W - 1, y + H - 1, BG);
-        g.fill(x + 1, y + 1, x + W - 2, y + 3, LIGHT);
-        g.fill(x + 1, y + 1, x + 3, y + H - 2, LIGHT);
-        g.fill(x + 3, y + H - 3, x + W - 1, y + H - 1, DARK);
-        g.fill(x + W - 3, y + 3, x + W - 1, y + H - 1, DARK);
-        g.drawText(textRenderer, title, x + 8, y + 6, TEXT, false);
-        g.drawText(textRenderer, Text.translatable(HotPotBlockEntity.key("screen.sauce.overview_hint")), x + 8, y + 17, HINT, false);
+        SauceStationScreen.panel(g, x, y, W, H);
+        // 标题 + 一道黄铜线（同灶台），下面一行提示
+        g.drawText(textRenderer, title, x + 12, y + 7, TITLE, true);
+        g.fill(x + 12, y + 17, x + W - 12, y + 18, BRASS_DARK);
+        g.drawText(textRenderer, Text.translatable(HotPotBlockEntity.key("screen.sauce.overview_hint")), x + 12, y + 20, SauceStationScreen.HINT, true);
     }
 }

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "G G",
+    "GGG"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:glass"
+    }
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:glass_cup",
+    "count": 4
+  }
+}

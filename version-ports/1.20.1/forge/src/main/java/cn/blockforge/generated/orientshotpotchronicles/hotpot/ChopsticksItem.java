@@ -20,7 +20,7 @@ import net.minecraft.world.World;
  * 竹筷（r103 起有自己的类）：夹着能吃的菜时，对着空气按住右键就把菜吃掉（用户同意的吃法），
  * 吃法、饱食度、声音全走原版 eatFood；菜蘸过蘸料的话效果在 LivingEntityEatMixin 里生效。
  * Shift+右键锅开锅界面在这里（useOnBlock）；夹菜 / 放菜 / 蘸桌上的蘸料在各个方块里处理。
- * 作者：
+ *
  */
 public class ChopsticksItem extends Item {
     public ChopsticksItem() {
@@ -34,7 +34,7 @@ public class ChopsticksItem extends Item {
 
     /**
      * 拿筷子 Shift+右键锅 = 开锅界面（2026-10-25 用户定，代替原来的直接右键开锅；直接右键改成夹菜，见 HotPotBlock / StoveBlock）。
-     * 潜行又拿着东西时原版不调方块的右键，只调物品的 useOnBlock，所以放在这里。新增。
+     * 潜行又拿着东西时原版不调方块的右键，只调物品的 useOnBlock，所以放在这里。。
      */
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
@@ -51,6 +51,21 @@ public class ChopsticksItem extends Item {
             hit = new BlockHitResult(hit.getPos(), hit.getSide(), pos, hit.isInsideBlock());
         }
         BlockState state = world.getBlockState(pos);
+        // Shift+右键桌上的碗 / 盘子：筷子（连夹着的菜）架在碗沿上（2026-10-27 用户：只架碗和盘子，不架锅）
+        if (state.isOf(HotPotContent.PLATE_HOLDER) && world.getBlockEntity(pos) instanceof PlateHolderBlockEntity holder) {
+            PlateHolderBlockEntity.Placed plate = PlateHolderBlock.aimed(player, pos, holder);
+            if (plate == null || !plate.restsChopsticks() || !plate.chopsticks.isEmpty()) {
+                return ActionResult.PASS;
+            }
+            if (!world.isClient) {
+                plate.chopsticks = context.getStack().copy();
+                player.setStackInHand(context.getHand(), ItemStack.EMPTY);
+                holder.changed();
+                world.playSound(null, pos, net.minecraft.sound.SoundEvents.BLOCK_BAMBOO_PLACE,
+                    net.minecraft.sound.SoundCategory.BLOCKS, 0.6F, 1.4F);
+            }
+            return ActionResult.success(world.isClient);
+        }
         boolean pot = state.getBlock() instanceof HotPotBlock
             || (StoveBlock.isStove(state) && StoveBlock.isPotHit(state, pos, hit));
         if (!pot || !(world.getBlockEntity(pos) instanceof HotPotBlockEntity be) || !be.hasPot()) {
@@ -92,7 +107,7 @@ public class ChopsticksItem extends Item {
             return stack;
         }
         ItemStack eaten = held.copy();
-        // 另一只手（主手或副手）拿着蘸料：吃之前自动蘸一口（2026-10-25 用户：主手副手都行；调整）
+        // 另一只手（主手或副手）拿着蘸料：吃之前自动蘸一口（2026-10-25 用户：主手副手都行；）
         if (!world.isClient) {
             DippingSauceItem.dipFromHands(user, eaten);
         }
@@ -100,7 +115,7 @@ public class ChopsticksItem extends Item {
         if (!world.isClient) {
             Chopsticks.hold(stack, ItemStack.EMPTY);
             if (user instanceof PlayerEntity player && !player.isCreative()) {
-                // 调整：沿用 1.20.1 的碗装食物及合成剩余物判断。
+                // ：沿用 1.20.1 的碗装食物及合成剩余物判断。
                 ItemStack rest = eaten.getItem() instanceof net.minecraft.item.StewItem
                     || eaten.getItem() instanceof net.minecraft.item.SuspiciousStewItem
                     ? new ItemStack(net.minecraft.item.Items.BOWL) : eaten.getCraftingRemainingItem();
@@ -109,7 +124,8 @@ public class ChopsticksItem extends Item {
         }
         return stack;
     }
-    // 调整：沿用本工程Forge物品客户端扩展。
+
+    // ：沿用本工程 Forge 物品客户端扩展。
     @Override
     public void initializeClient(java.util.function.Consumer<net.minecraftforge.client.extensions.common.IClientItemExtensions> consumer) {
         consumer.accept(cn.blockforge.generated.orientshotpotchronicles.client.ForgeItemRenderers.extension());

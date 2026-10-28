@@ -19,8 +19,8 @@ import net.minecraft.predicate.entity.EntityPredicate;
 /**
  * 牛（和哞菇）被打死时多掉毛肚：数量规则和原版牛肉完全一样（用户要求）——每次 1～3 个，抢夺每级最多多 1 个，
  * 被火烧死直接掉熟毛肚。原版的幼年牛不掉东西，这里同样不掉。
- * 另外 25% 掉一块牛脊肉（切吊龙用；新增）：抢夺每级多 1 次机会掉，被火烧死直接掉熟牛脊肉。
- * 作者：
+ * 另外 25% 掉一块牛脊肉（切吊龙用；）：抢夺每级多 1 次机会掉，被火烧死直接掉熟牛脊肉。
+ *
  */
 public final class TripeLoot {
     private TripeLoot() {
@@ -30,7 +30,7 @@ public final class TripeLoot {
         NeoForge.EVENT_BUS.addListener(TripeLoot::onLootTableLoad);
     }
 
-    // 调整：包括数据包覆盖的牛掉落表，沿用已定 NeoForge 行为。
+    // ：包括数据包覆盖的牛掉落表，沿用已定 NeoForge 行为。
     private static void onLootTableLoad(LootTableLoadEvent event) {
             var key = event.getKey();
             var registries = event.getRegistries();

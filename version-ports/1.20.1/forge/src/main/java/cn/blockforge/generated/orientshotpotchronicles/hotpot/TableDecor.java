@@ -15,7 +15,7 @@ import net.minecraft.block.Block;
  * 里的方块直接放在火锅桌上时，外观和选中框整体挪到桌面上；挂着的灯笼不动。
  * 碰撞不挪（挪了会伸出本格，原版缓存的形状对不上会让站上去的人抽搐，同盘子那次）。
  * 别的模组 / 数据包可以往这个标签里加方块。
- * 作者：
+ *
  */
 public final class TableDecor {
     public static final TagKey<Block> TABLE_DECORATIONS =

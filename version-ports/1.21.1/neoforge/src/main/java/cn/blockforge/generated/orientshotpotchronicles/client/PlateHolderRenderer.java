@@ -54,7 +54,31 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
             }
             PlateFoodRenderer.render(p.plate.size(), p.axis, p.items, matrices, vertexConsumers, light,
                 be.getWorld(), seed, itemRenderer);
+            if (!p.chopsticks.isEmpty()) {
+                renderChopsticks(p, matrices, vertexConsumers, light);
+            }
             matrices.pop();
         }
+    }
+
+    /** 筷子架在碗沿上占多大：物品贴图 16 像素 × 这个比例，斜着的两根筷子约 12 像素长，比碗宽一截（2026-10-27）。 */
+    private static final float CHOPSTICKS_SCALE = 0.6F;
+
+    /**
+     * 架在碗沿 / 盘沿上的筷子（2026-10-27 用户，）：平躺在碗口上方一点，筷子尖在碗正中上方、另一头搭出碗沿；
+     * 夹着菜时 HeldFoodItemRenderer 把菜画在筷子尖上，跟着一起躺平。
+     */
+    private void renderChopsticks(PlateHolderBlockEntity.Placed p, MatrixStack matrices,
+                                  VertexConsumerProvider vertexConsumers, int light) {
+        matrices.push();
+        matrices.translate(0.5, (PlateHolderBlockEntity.heightOf(p) + 0.3) / 16.0, 0.5);
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((p.axis == Direction.Axis.X ? 0 : 90) + 45));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
+        matrices.scale(CHOPSTICKS_SCALE, CHOPSTICKS_SCALE, CHOPSTICKS_SCALE);
+        // 筷子尖（夹着的菜在这儿）挪到碗正中上方，另一头搭在碗沿外（物品显示 fixed 转了 180°，尖在 +x、-y）
+        matrices.translate(-0.26F, 0.3F, 0F);
+        itemRenderer.renderItem(p.chopsticks, ModelTransformationMode.FIXED, light, OverlayTexture.DEFAULT_UV,
+            matrices, vertexConsumers, null, 0);
+        matrices.pop();
     }
 }

@@ -15,7 +15,7 @@ import net.minecraft.world.World;
  * 一碗汤（r99，用户要求）：拿碗点有汤的锅盛出来（锅里的汤不会少），能喝、能像盘子一样摆在桌上。
  * 四种都回 4 点饥饿值；清汤解反胃，高汤饱和度高一些，菌汤 6 秒生命恢复 I，红汤 9 秒力量 I + 3 秒饥饿（用户定的）。
  * 喝完还一只空碗（同原版蘑菇煲）。
- * 作者：
+ *
  */
 public class SoupBowlItem extends Item {
     private final SoupBase soup;
@@ -28,7 +28,8 @@ public class SoupBowlItem extends Item {
     private static FoodComponent foodOf(SoupBase soup) {
         return new FoodComponent.Builder()
             .hunger(4)
-            .saturationModifier(soup == SoupBase.RICH_STOCK ? 0.9F : 0.6F)
+            .saturationModifier(soup == SoupBase.RICH_STOCK || soup == SoupBase.THREE_FRESH ? 0.9F : 0.6F)
+
             .build();
     }
 
@@ -46,17 +47,17 @@ public class SoupBowlItem extends Item {
     public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
         ItemStack result = super.finishUsing(stack, world, user);
         if (!world.isClient) {
-            if (soup == SoupBase.CLEAR) {
+            if (soup == SoupBase.CLEAR || soup == SoupBase.TOMATO) {
                 user.removeStatusEffect(StatusEffects.NAUSEA);
             }
             // 菌汤 / 红汤的效果和 SoupBase.dishBonusEffects 里的一样；清汤、高汤按用户定的（不用那里的饱和 / 伤害吸收）
-            if (soup == SoupBase.MUSHROOM || soup == SoupBase.SPICY) {
+            if (soup == SoupBase.MUSHROOM || soup == SoupBase.SPICY || soup == SoupBase.TOMATO || soup == SoupBase.THREE_FRESH) {
                 for (net.minecraft.entity.effect.StatusEffectInstance effect : soup.dishBonusEffects()) {
                     user.addStatusEffect(effect);
                 }
             }
         }
-        // 1.20.1 移植（调整）：1.20 的食物没有 usingConvertsTo，喝完还碗照原版蘑菇煲写
+        // 1.20.1 移植（）：1.20 的食物没有 usingConvertsTo，喝完还碗照原版蘑菇煲写
         if (user instanceof PlayerEntity player && player.getAbilities().creativeMode) {
             return result;
         }

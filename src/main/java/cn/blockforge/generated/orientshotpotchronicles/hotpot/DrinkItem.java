@@ -25,7 +25,7 @@ import java.util.List;
  * 一瓶饮料（r99 橙子饮料；r101 改成通用，加维二，种类见 {@link DrinkKind}）。
  * 一瓶喝 4 口（用耐久条显示还剩多少），每口回 2 点饥饿值 + 种类自己的效果；喝完剩一个空瓶。
  * 点在方块顶面是摆上去（和盘子一样），对着空气右键是喝。配方先不做（用户）。
- * 作者：
+ *
  */
 public class DrinkItem extends Item {
     public static final int SIPS = 4;
@@ -87,6 +87,18 @@ public class DrinkItem extends Item {
         }
         stack.setDamage(stack.getDamage() + 1);
         return stack;
+    }
+
+    /** 倒出一口（倒进杯子，2026-10-25）：返回倒完剩下的瓶子，最后一口倒完是空瓶。创造模式也照样少一口。 */
+    public static ItemStack pourOne(ItemStack bottle) {
+        if (!(bottle.getItem() instanceof DrinkItem drink)) {
+            return bottle;
+        }
+        if (bottle.getDamage() + 1 >= SIPS) {
+            return new ItemStack(HotPotContent.emptyBottle(drink.kind()));
+        }
+        bottle.setDamage(bottle.getDamage() + 1);
+        return bottle;
     }
 
     @Override

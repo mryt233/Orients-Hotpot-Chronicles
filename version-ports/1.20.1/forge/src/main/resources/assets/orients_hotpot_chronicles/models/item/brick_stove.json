@@ -84,7 +84,7 @@
       "predicate": {
         "custom_model_data": 1
       },
-      "model": "orients_hotpot_chronicles:item/stove_lit_icon"
+      "model": "orients_hotpot_chronicles:item/brick_stove_lit"
     }
   ]
 }

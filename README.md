@@ -17,11 +17,11 @@ Minecraft 1.20.1 / 1.20.4 / 1.21.1 · Fabric / Forge / NeoForge · 作者 / Auth
 ![一桌火锅 · A full hotpot table](docs/images/full-table.jpg)
 
 > [!WARNING]
-> **测试版（alpha）**：现在是 `0.1.3-alpha-hotfix1`，可能有 bug，请备份存档。
-> **请开新存档**：这一版整理了物品的内部名字，**0.1.2-alpha 及更早的存档里，改过名的东西（比如摆着的饮料、高汤锅）可能会消失**。
+> **测试版（alpha）**：现在是 `0.1.4-alpha`，可能有 bug，请备份存档。
+> **请开新存档**：本版鸳鸯锅改名并更新内部 ID，**旧存档中放置的 S 形、O 形铜锅与铁锅会消失**。
 >
-> **Alpha version**: this is `0.1.3-alpha-hotfix1` and may contain bugs. Please back up your saves.
-> **Please start a new world**: internal item names were cleaned up in this version. **In worlds from 0.1.2-alpha or earlier, renamed things (such as placed drinks or pots of Rich Stock) may disappear.**
+> **Alpha version**: this is `0.1.4-alpha` and may contain bugs. Please back up your saves.
+> **Please start a new world**: Yuanyang pot IDs were renamed. **Placed S-shaped and O-shaped copper and iron pots will disappear in existing worlds.**
 
 <a id="downloads"></a>
 
@@ -31,21 +31,27 @@ Minecraft 1.20.1 / 1.20.4 / 1.21.1 · Fabric / Forge / NeoForge · 作者 / Auth
 
 | Minecraft | 加载器 / Loader | 要求 / Requirements | 模组版本 / Mod version | 下载 / Download |
 | --- | --- | --- | --- | --- |
-| 1.21.1 | Fabric | Fabric Loader 0.15.11+、[Fabric API](https://modrinth.com/mod/fabric-api)、Java 21 | 0.1.3-alpha-hotfix1 | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) |
-| 1.21.1 | NeoForge | NeoForge 21.1.264+、Java 21 | 0.1.3-alpha-hotfix1 | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) |
-| 1.20.1 | Fabric | Fabric Loader **0.19.3+**、[Fabric API](https://modrinth.com/mod/fabric-api) **0.92.12+**、Java 17 | 0.1.3-alpha-hotfix1 | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) |
-| 1.20.1 | Forge | Forge 47.1+、Java 17（同一文件也能装在 NeoForge 1.20.1 上 / also loads on NeoForge 1.20.1） | 0.1.3-alpha-hotfix1 | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) |
+| 1.21.1 | Fabric | Fabric Loader 0.15.11+、[Fabric API](https://modrinth.com/mod/fabric-api)、Java 21 | 0.1.4-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) |
+| 1.21.1 | NeoForge | NeoForge 21.1.264+、Java 21 | 0.1.4-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) |
+| 1.20.1 | Fabric | Fabric Loader **0.19.3+**、[Fabric API](https://modrinth.com/mod/fabric-api) **0.92.12+**、Java 17 | 0.1.4-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) |
+| 1.20.1 | Forge | Forge 47.1+、Java 17（同一文件也能装在 NeoForge 1.20.1 上 / also loads on NeoForge 1.20.1） | 0.1.4-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) |
 | 1.20.4 | Fabric | Fabric Loader 0.15.11+、Fabric API、Java 17 | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) |
 
-四个 0.1.3-alpha-hotfix1 文件都在同一个发布页里，请下载文件名里的 MC 版本和加载器都对得上的那个。Forge / NeoForge 版不需要 Fabric API。1.20.4 还停在 0.1.1-alpha，没有 0.1.2 之后的内容。
+四个 0.1.4-alpha 文件都在同一个发布页里，请下载文件名里的 MC 版本和加载器都对得上的那个。Forge / NeoForge 版不需要 Fabric API。1.20.4 还停在 0.1.1-alpha，没有 0.1.2 之后的内容。
 
-All four 0.1.3-alpha-hotfix1 files are on the same release page; pick the one whose file name matches your Minecraft version and loader. The Forge / NeoForge builds do not need Fabric API. Minecraft 1.20.4 is still on 0.1.1-alpha and has none of the content from 0.1.2 onward.
+All four 0.1.4-alpha files are on the same release page; pick the one whose file name matches your Minecraft version and loader. The Forge / NeoForge builds do not need Fabric API. Minecraft 1.20.4 is still on 0.1.1-alpha and has none of the content from 0.1.2 onward.
 
 > 1.21.1 Fabric 是主版本，作者进游戏实测过；其他移植版做过服务端自动检查和客户端启动检查，右键交互、界面和画面还没有大量实测。与其他模组的兼容性也还没测过。欢迎反馈问题。
 >
 > 1.21.1 Fabric is the main build and was tested in game by the author. The ports passed automated server checks and client start-up checks, but right-click interactions, screens and visuals have not been widely tested. Compatibility with other mods has not been tested either. Bug reports are welcome.
 
 [各版本源码与说明 · Port sources and notes](version-ports/README.md)
+
+## 0.1.4-alpha 更新 · What's new
+
+从 0.1.3-alpha-hotfix1 升级：虾、之晗可乐、玻璃杯、番茄 / 三鲜汤底、更多锅型、石料桌与交互修复。文件、依赖、测试范围及完整改动见[发布说明](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha)。
+
+Changes since 0.1.3-alpha-hotfix1: shrimp, Orient Cola, glass cups, Tomato and Three Delicacies broths, more pot layouts, stone tables and interaction fixes. See the [release notes](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) for files, requirements, testing and the full changelog.
 
 ## 0.1.3-alpha-hotfix1 更新 · What's new
 

@@ -15,7 +15,7 @@ import java.util.List;
  * 一碗蘸料（r103，用户定）：拿碗在蘸料台上一种一种打出来，组件 sauce 记着放了哪几种、还能蘸几口（9 口）。
  * 能像盘子一样摆在桌上（筷子夹着菜点一下 = 蘸一口，效果记在菜上）；主手或副手拿着时，用筷子吃会自动蘸一口。
  * 蘸完 9 口变回原版的碗。名字一律叫「蘸料」，提示里列配料（用户）。
- * 作者：
+ *
  */
 public class DippingSauceItem extends Item {
     public DippingSauceItem() {
@@ -46,13 +46,13 @@ public class DippingSauceItem extends Item {
 
     /**
      * 往这样菜上蘸一口：配料记进菜的 dipped 组件（吃的时候生效），碗里少一口。
-     * 返回蘸完剩下的那碗（没口了是空碗）；碗里没有蘸料就原样返回、不蘸。新增（2026-10-25）。
+     * 返回蘸完剩下的那碗（没口了是空碗）；碗里没有蘸料就原样返回、不蘸。（2026-10-25）。
      */
     public static ItemStack dipInto(ItemStack sauce, ItemStack food) {
         if (!(sauce.getItem() instanceof DippingSauceItem) || contents(sauce).bites() <= 0) {
             return sauce;
         }
-        // 调整：1.20.1 用既有物品 NBT 保存蘸料。
+        // ：1.20.1 用既有物品 NBT 保存蘸料。
         ItemData.setDipped(food, ItemData.dipped(food) | contents(sauce).mask());
         return bite(sauce);
     }
@@ -92,14 +92,12 @@ public class DippingSauceItem extends Item {
     @Override
     public void appendTooltip(ItemStack stack, net.minecraft.world.World world, List<Text> tooltip, TooltipContext context) {
         SauceContents c = contents(stack);
-        for (Seasoning s : Seasoning.ALL) {
-            if (c.has(s)) {
-                tooltip.add(Text.literal(" ").append(Text.translatable(s.nameKey())).formatted(Formatting.GRAY));
-            }
-        }
+        // 每种配料一行，带效果（用户 2026-10-25：蘸料的属性要显示对应调料和 buff）
+        Seasoning.appendEffects(c.mask(), tooltip);
         tooltip.add(Text.translatable(HotPotBlockEntity.key("tooltip.sauce.bites"), c.bites()).formatted(Formatting.GRAY));
     }
-    // 调整：沿用本工程Forge物品客户端扩展。
+
+    // ：沿用本工程 Forge 物品客户端扩展。
     @Override
     public void initializeClient(java.util.function.Consumer<net.minecraftforge.client.extensions.common.IClientItemExtensions> consumer) {
         consumer.accept(cn.blockforge.generated.orientshotpotchronicles.client.ForgeItemRenderers.extension());

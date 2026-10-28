@@ -31,11 +31,11 @@ tasks.withType(JavaCompile).configureEach { options.release = 21; options.encodi
 java { toolchain.languageVersion = JavaLanguageVersion.of(21); withSourcesJar() }
 base { archivesName = project.archives_base_name }
 
-// 调整：代码和原创资源分别授权，成品与源码 JAR 均携带两份许可声明。
+// ：代码和原创资源分别授权，成品与源码 JAR 均携带两份许可声明。
 tasks.withType(Jar).configureEach {
     from('LICENSE', 'ASSETS_LICENSE')
 }
 
-// 新增（2026-10-25）：devtest 包是开发环境专用的测试命令（/hpt，见 DevTestCommands），不进成品和源码 jar
+// （2026-10-25）：devtest 包是开发环境专用的测试命令（/hpt，见 DevTestCommands），不进成品和源码 jar
 tasks.named('jar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }
 tasks.named('sourcesJar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }

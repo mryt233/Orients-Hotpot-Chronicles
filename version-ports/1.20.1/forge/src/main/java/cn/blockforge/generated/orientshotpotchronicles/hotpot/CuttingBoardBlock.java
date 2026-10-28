@@ -23,7 +23,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
@@ -34,7 +33,7 @@ import net.minecraft.world.World;
  * {@code cuttable}（能放上砧板的东西）。台面上放着的东西由 client/CuttingBoardRenderer 平躺着画出来。
  * 交互：拿能切的东西右键 = 放一个上去；拿菜刀右键 = 切（掉出切好的东西，菜刀掉 1 点耐久）；空手右键 = 拿回来。
  * 标签 {@code cut_piece_by_piece} 里的（土豆）一刀只掉 1 份，切满配方的份数才切完（用户：一个土豆切三下）；其他一刀切完。
- * 作者：
+ *
  */
 public class CuttingBoardBlock extends Block implements BlockEntityProvider, PartOutline {
     public static final TagKey<net.minecraft.item.Item> CUTTABLE =
@@ -198,7 +197,7 @@ public class CuttingBoardBlock extends Block implements BlockEntityProvider, Par
             if (hits >= Pounding.HITS) {
                 board.setItem(ItemStack.EMPTY);
                 ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + TOP + 0.1, pos.getZ() + 0.5,
-                    new ItemStack(ball, Pounding.RESULT_COUNT));
+                    new ItemStack(ball, Pounding.resultCount(meat)));
             } else {
                 board.setCuts(hits);
             }
@@ -253,27 +252,27 @@ public class CuttingBoardBlock extends Block implements BlockEntityProvider, Par
         }
         super.onStateReplaced(state, world, pos, newState, moved);
     }
-    // 调整：沿用工程既有的 1.21 风格右键分发。
+    // ：沿用工程既有的 1.21 风格右键分发。
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         return ItemActionResult.dispatch(state, player, hand,
             () -> useWithItem(player.getStackInHand(hand), state, world, pos, player, hand, hit),
             () -> useWithoutItem(state, world, pos, player, hit));
     }
-    // 调整：Forge可燃接口；下界木不燃烧，原数值 5 / 20。
+
+    // ：Forge 可燃接口；下界木不燃烧，原数值 5 / 20。
     @Override
-    public boolean isFlammable(BlockState state, BlockView world, BlockPos pos, Direction face) {
+    public boolean isFlammable(BlockState state, net.minecraft.world.BlockView world, BlockPos pos, net.minecraft.util.math.Direction face) {
         return true;
     }
 
     @Override
-    public int getFlammability(BlockState state, BlockView world, BlockPos pos, Direction face) {
+    public int getFlammability(BlockState state, net.minecraft.world.BlockView world, BlockPos pos, net.minecraft.util.math.Direction face) {
         return isFlammable(state, world, pos, face) ? 5 : 0;
     }
 
     @Override
-    public int getFireSpreadSpeed(BlockState state, BlockView world, BlockPos pos, Direction face) {
+    public int getFireSpreadSpeed(BlockState state, net.minecraft.world.BlockView world, BlockPos pos, net.minecraft.util.math.Direction face) {
         return isFlammable(state, world, pos, face) ? 20 : 0;
     }
-
 }

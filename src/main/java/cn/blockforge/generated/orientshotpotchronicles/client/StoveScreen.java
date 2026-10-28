@@ -29,6 +29,10 @@ import static cn.blockforge.generated.orientshotpotchronicles.client.GuiKit.*;
 public class StoveScreen extends HandledScreen<StoveScreenHandler> {
     // 灶膛砖面直接用原版砖块贴图，和灶台方块一致
     private static final Identifier STOVE_SIDE = Identifier.ofVanilla("textures/block/bricks.png");
+    /** 灶台正面贴图（和方块用的同一张）：没烧 / 烧着（竖排 16 帧动画）；方块正面看得见的是最下面 11 行。 */
+    private static final Identifier FRONT = GeneratedMod.id("textures/block/stove_front.png");
+    private static final Identifier FRONT_LIT = GeneratedMod.id("textures/block/stove_front_lit.png");
+    private static final int FRONT_FRAMES = 16, FRONT_ROWS = 11;
 
     private static final int W = 176;
     private static final int H = 166;
@@ -61,8 +65,6 @@ public class StoveScreen extends HandledScreen<StoveScreenHandler> {
     };
 
     /** 三层火舌：高度倍率、最大半宽、颜色（外焰 → 焰心）。 */
-    private static final double[][] FLAME_LAYERS = {{1, 3.2}, {0.7, 2.1}, {0.42, 1.1}};
-    private static final int[] FLAME_COLORS = {0xFFD8401F, 0xFFF08A2C, 0xFFFBE08A};
 
     public StoveScreen(StoveScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, Text.translatable(HotPotBlockEntity.key("screen.stove")));
@@ -98,109 +100,23 @@ public class StoveScreen extends HandledScreen<StoveScreenHandler> {
         context.getMatrices().pop();
     }
 
+    /**
+     * 灶膛窗口：直接画灶台方块正面的贴图（2026-10-26 用户：界面里的灶台用灶台本身的贴图；以前手画的大拱门和方块对不上，
+     * 照方块拱门手画的版本用户也说怪。）。方块正面看得见的是贴图第 5～16 行（炉口在下面），放大 3 倍、
+     * 居中，窗口只框这一块；烧着用 stove_front_lit（16 帧，每帧 2 刻，和方块一样跳），没烧用 stove_front。
+     */
     private void drawHearth(DrawContext c, double t) {
-        // 砖面铺灶台侧面贴图（16x16 整张），和方块本身对得上
-        for (int ty = 0; ty < HH; ty += 16) {
-            for (int tx = 0; tx < HW; tx += 16) {
-                c.drawTexture(STOVE_SIDE, HX + tx, HY + ty, 0, 0, Math.min(16, HW - tx), Math.min(16, HH - ty), 16, 16);
-            }
-        }
-        c.fill(HX - 1, HY - 1, HX + HW + 1, HY, RIM_LINE);
-        c.fill(HX - 1, HY + HH, HX + HW + 1, HY + HH + 1, RIM_LINE);
-        c.fill(HX - 1, HY, HX, HY + HH, RIM_LINE);
-        c.fill(HX + HW, HY, HX + HW + 1, HY + HH, RIM_LINE);
-
-        int ax = HX + 8;
-        int ay = HY + 9;
-        int aw = HW - 16;
-        int ah = HH - 12;
-        int bottom = ay + ah;
-        int mouth = 0xFF0A0503;
-        c.fill(ax + 6, ay, ax + aw - 6, bottom, mouth);
-        c.fill(ax + 3, ay + 3, ax + aw - 3, bottom, mouth);
-        c.fill(ax, ay + 8, ax + aw, bottom, mouth);
-
+        // 窗口就是灶台正面那一块（16×11 放大 3 倍），不再另外铺砖——砖纹和贴图里的砖对不上，拼在一起很怪（用户截图）
         boolean burning = handler.burnTicks() > 0;
-        if (!burning) {
-            // 冷灶：灰白炉灰；有燃料等点火时一点余烬缓缓明灭
-            c.fill(ax + 3, bottom - 3, ax + aw - 3, bottom, 0xFF2E2A26);
-            for (int k = 0; k < 6; k++) {
-                c.fill(ax + 5 + k * 5, bottom - 3 + k % 2, ax + 7 + k * 5, bottom - 2 + k % 2, 0xFF4A443D);
-            }
-            if (handler.hasFuelInSlot()) {
-                double u = frac(t / 2.4);
-                double a = 0.25 + 0.35 * easeInOutSine(u < 0.5 ? u * 2 : 2 - u * 2);
-                c.fill(ax + 14, bottom - 3, ax + 22, bottom - 1, alpha(0xFFB8361C, a));
-            }
-            return;
-        }
-        float ratio = handler.burnRatio();
-        double heat = 0.3 + 0.7 * easeOutQuad(ratio);
-        // 火光映在砖面上
-        c.fill(HX, HY, HX + HW, HY + HH, alpha(0xFFFF8A2A, 0.07 + 0.05 * Math.sin(t * 2.3)));
-        c.fill(ax, ay + 8, ax + aw, bottom, alpha(0xFF5A1606, 0.9));
-        c.fill(ax + 3, ay + 3, ax + aw - 3, bottom, alpha(0xFF5A1606, 0.5));
-        // 炭床
-        int base = bottom - 3;
-        for (int k = 0; k < 10; k++) {
-            int x = ax + 2 + k * (aw - 4) / 10;
-            double glow = 0.5 + 0.5 * Math.sin(t * 2.1 + k * 1.3);
-            c.fill(x, base, x + 3, bottom, mix(0xFFB8361C, 0xFFF0A23C, glow));
-            if (k % 3 == 1) {
-                c.fill(x + 1, base + 1, x + 2, base + 2, mix(0xFFF0A23C, 0xFFFBE08A, glow));
-            }
-        }
-        // 火舌：每簇三层嵌套的水滴形，逐行收窄，越往上摆得越厉害
-        double maxH = (base - ay - 2) * heat;
-        for (int layer = 0; layer < FLAME_LAYERS.length; layer++) {
-            double hMul = FLAME_LAYERS[layer][0];
-            double wMax = FLAME_LAYERS[layer][1];
-            int color = FLAME_COLORS[layer];
-            for (int j = 0; j < 5; j++) {
-                int cx = ax + 6 + j * 6;
-                double n = 0.5 + 0.5 * (0.55 * Math.sin(t * 6.3 + j * 1.9)
-                    + 0.3 * Math.sin(t * 11.7 + j * 0.7) + 0.15 * Math.sin(t * 23.1 + j * 2.3));
-                double edge = j == 0 || j == 4 ? 0.62 : j == 2 ? 1 : 0.85;
-                int hj = (int) Math.round(maxH * (0.55 + 0.45 * n) * edge * hMul);
-                double sway = Math.sin(t * 4.7 + j * 2.1);
-                for (int yy = 0; yy < hj; yy++) {
-                    double f = yy / (double) hj;
-                    double half = wMax * (1 - Math.pow(f, 1.7));
-                    double xc = cx + sway * 1.6 * f * f;
-                    int y = base - yy - 1;
-                    int x0 = (int) Math.round(xc - half);
-                    int x1 = (int) Math.round(xc + half) + 1;
-                    if (y <= archTop(x0, ax, ay, aw) || x1 <= x0) {
-                        continue;
-                    }
-                    c.fill(Math.max(ax, x0), y, Math.min(ax + aw, x1), y + 1, color);
-                }
-            }
-        }
-        // 火星：缓出上飘、渐隐
-        for (int i = 0; i < 6; i++) {
-            double life = (0.9 + hash(i, 7) * 0.7) / (0.6 + 0.6 * ratio);
-            int cyc = (int) Math.floor(t / life + hash(i, 3));
-            double u = frac(t / life + hash(i, 3));
-            int x0 = ax + 6 + (int) Math.floor(hash(i, cyc) * (aw - 12));
-            int y = (int) Math.round(base - 2 - (base - ay - 4) * easeOutCubic(u));
-            int x = x0 + (int) Math.round(Math.sin(u * 5 + i) * 2);
-            if (y < archTop(x, ax, ay, aw) + 1) {
-                continue;
-            }
-            c.fill(x, y, x + 1, y + 1, alpha(0xFFFBE08A, Math.pow(1 - u, 1.5)));
-        }
-    }
-
-    /** 拱形炉口在横坐标 x 处的顶边。 */
-    private static int archTop(int x, int ax, int ay, int aw) {
-        if (x >= ax + 6 && x < ax + aw - 6) {
-            return ay;
-        }
-        if (x >= ax + 3 && x < ax + aw - 3) {
-            return ay + 3;
-        }
-        return ay + 8;
+        int s = 3, w = 16 * s, h = FRONT_ROWS * s;
+        int x = HX + (HW - w) / 2, y = HY + (HH - h) / 2;
+        int frame = burning ? (int) ((Util.getMeasuringTimeMs() / 100) % FRONT_FRAMES) : 0;
+        c.drawTexture(burning ? FRONT_LIT : FRONT, x, y, w, h, 0, frame * 16 + (16 - FRONT_ROWS), 16, FRONT_ROWS,
+            16, burning ? 16 * FRONT_FRAMES : 16);
+        c.fill(x - 1, y - 1, x + w + 1, y, RIM_LINE);
+        c.fill(x - 1, y + h, x + w + 1, y + h + 1, RIM_LINE);
+        c.fill(x - 1, y, x, y + h, RIM_LINE);
+        c.fill(x + w, y, x + w + 1, y + h, RIM_LINE);
     }
 
     /** 原版熔炉式火焰：燃料越少，从上往下熄掉越多。 */

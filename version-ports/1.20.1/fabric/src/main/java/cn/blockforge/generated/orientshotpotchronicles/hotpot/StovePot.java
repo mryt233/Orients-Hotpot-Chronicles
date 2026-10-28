@@ -9,7 +9,7 @@ public enum StovePot implements StringIdentifiable {
     COPPER_SOUP("copper_soup", HotPotMaterial.COPPER, true),
     IRON("iron", HotPotMaterial.IRON, false),
     IRON_SOUP("iron_soup", HotPotMaterial.IRON, true),
-    // 鸳鸯锅坐灶（新增）：名字 = 模型名里的锅名（HotPotMaterial.modelKey）
+    // 鸳鸯锅坐灶（）：名字 = 模型名里的锅名（HotPotMaterial.modelKey）
     COPPER_YUANYANG_S("copper_yuanyang_s", HotPotMaterial.COPPER_S, false),
     COPPER_YUANYANG_S_SOUP("copper_yuanyang_s_soup", HotPotMaterial.COPPER_S, true),
     COPPER_YUANYANG_O("copper_yuanyang_o", HotPotMaterial.COPPER_O, false),
@@ -25,7 +25,11 @@ public enum StovePot implements StringIdentifiable {
     COPPER_FOUR_GRID("copper_four_grid", HotPotMaterial.COPPER_FOUR, false),
     COPPER_FOUR_GRID_SOUP("copper_four_grid_soup", HotPotMaterial.COPPER_FOUR, true),
     IRON_FOUR_GRID("iron_four_grid", HotPotMaterial.IRON_FOUR, false),
-    IRON_FOUR_GRID_SOUP("iron_four_grid_soup", HotPotMaterial.IRON_FOUR, true);
+    IRON_FOUR_GRID_SOUP("iron_four_grid_soup", HotPotMaterial.IRON_FOUR, true),
+    COPPER_YUANYANG_SQUARE("copper_yuanyang_square", HotPotMaterial.COPPER_SQUARE, false),
+    COPPER_YUANYANG_SQUARE_SOUP("copper_yuanyang_square_soup", HotPotMaterial.COPPER_SQUARE, true),
+    IRON_YUANYANG_SQUARE("iron_yuanyang_square", HotPotMaterial.IRON_SQUARE, false),
+    IRON_YUANYANG_SQUARE_SOUP("iron_yuanyang_square_soup", HotPotMaterial.IRON_SQUARE, true);
 
     private final String name;
     private final HotPotMaterial material;

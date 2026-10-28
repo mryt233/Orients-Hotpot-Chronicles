@@ -67,7 +67,7 @@ public class HotPotBlockEntity extends BlockEntity
     private float pendingXp = 0F;
     /**
      * 每边一种汤底（-1 = 没汤）：九宫格锅只用第 0 边；鸳鸯锅 0、1；田字锅 0..3（PotLayout）。
-     * 汤底不和格局绑定，任何汤底（包括以后新加的）都能倒进任何一边。调整（原来是单个 base）。
+     * 汤底不和格局绑定，任何汤底（包括以后新加的）都能倒进任何一边。（原来是单个 base）。
      */
     private final int[] bases = {-1, -1, -1, -1};
     /** 客户端缓动热度，用于让食材起伏和蒸汽自然启停。 */
@@ -431,10 +431,22 @@ public class HotPotBlockEntity extends BlockEntity
                 order.add(cell);
             }
         }
+        // 先盛你看到浮在准星那格上的那一样（用户 2026-10-26：和筷子一样；它还生着就跳过），再照原来的顺序盛
+        int shown = shownIn(player, bigCell);
+        if (shown >= 0 && cooked[shown]) {
+            ItemStack food = ingredients.getStack(shown).copy();
+            xp += xpValue[shown] * food.getCount();
+            ingredients.setStack(shown, ItemStack.EMPTY);
+            resetSlot(shown, ItemStack.EMPTY);
+            scooped.add(food.copyWithCount(1));
+            if (food.getCount() > 1) {
+                ingredients.setStack(shown, food.copyWithCount(food.getCount() - 1));
+            }
+        }
         outer:
         for (int cell : order) {
             int slot;
-            while ((slot = firstCookedSlotInCell(cell)) >= 0) {
+            while (scooped.size() < 3 && (slot = firstCookedSlotInCell(cell)) >= 0) {
                 ItemStack food = ingredients.getStack(slot).copy();
                 xp += xpValue[slot] * food.getCount();
                 ingredients.setStack(slot, ItemStack.EMPTY);
@@ -451,6 +463,7 @@ public class HotPotBlockEntity extends BlockEntity
         }
         ItemStack result;
         if (!scooped.isEmpty()) {
+            HotPotCriterion.fire(player, "pot_cooked");
             result = new ItemStack(net.minecraft.item.Items.BOWL);
             result.set(net.minecraft.component.DataComponentTypes.CONTAINER,
                 net.minecraft.component.type.ContainerComponent.fromStacks(scooped));
@@ -488,6 +501,24 @@ public class HotPotBlockEntity extends BlockEntity
         SoupBase soup = SoupBase.fromStack(stack);
         if (soup == null) {
             return false;
+        }
+        if (soup.isAdditive(stack)) {
+            // 锅底料（番茄 / 三鲜）：只能加进清汤里，把这边的清汤变成这种汤；没汤先倒清汤，别的汤（含已经加过的）不能再加（用户 2026-10-26）
+            int current = baseOfSide(side);
+            if (current < 0) {
+                player.sendMessage(Text.translatable(key("msg.base_needs_clear")), true);
+                return false;
+            }
+            if (current != SoupBase.CLEAR.ordinal()) {
+                player.sendMessage(Text.translatable(key("msg.base_only_clear")), true);
+                return false;
+            }
+            setBaseOfSide(side, soup.ordinal());
+            consumeHand(player, hand, net.minecraft.item.Items.AIR);
+            updateSoupVisual();
+            world.playSound(null, pos, SoundEvents.ENTITY_GENERIC_SPLASH, SoundCategory.BLOCKS, 0.5F, 1.3F);
+            markDirtyAndSync();
+            return true;
         }
         if (baseOfSide(side) >= 0) {
             player.sendMessage(Text.translatable(key("msg.already_soup")), true);
@@ -619,13 +650,14 @@ public class HotPotBlockEntity extends BlockEntity
     public boolean collectCookedSlot(PlayerEntity player, int slot) {
         int delivered = transferCookedSlot(player, slot);
         if (delivered > 0) {
+            HotPotCriterion.fire(player, "pot_cooked");
             finishCollection();
         }
         return delivered > 0;
     }
 
     /**
-     * 空筷子直接点锅（2026-10-25 用户定，开发计划「筷子新交互」；新增）：从这一格夹一样熟食到筷子上，
+     * 空筷子直接点锅（2026-10-25 用户定，开发计划「筷子新交互」；）：从这一格夹一样熟食到筷子上，
      * 照常结算出锅经验。夹着的菜之后按住右键吃、或放进碗盘 / 另一格，见 ChopsticksItem。
      */
     public boolean pickWithChopsticks(PlayerEntity player, ItemStack chopsticks, int slot) {
@@ -648,8 +680,48 @@ public class HotPotBlockEntity extends BlockEntity
             resetSlot(slot, ItemStack.EMPTY);
         }
         grantTakeXp(slotXp, 1);
+        HotPotCriterion.fire(player, "pot_cooked");
         finishCollection();
         return true;
+    }
+
+    /**
+     * 空筷子直接右键锅：夹客户端报来的「这一刻浮在这格上的那样」（ChopsticksAimPayload）；它还生着就提示、不夹。
+     * 没报（或报的不在这格）就夹这格第一样熟的。返回 false = 这格没有能夹的熟食。（2026-10-25）。
+     */
+    public boolean pickShown(PlayerEntity player, ItemStack chopsticks, int bigCell) {
+        int shown = shownIn(player, bigCell);
+        if (shown >= 0) {
+            if (!cooked[shown]) {
+                player.sendMessage(Text.translatable(key("msg.not_cooked_yet")), true);
+                return true;
+            }
+            return pickWithChopsticks(player, chopsticks, shown);
+        }
+        return pickWithChopsticks(player, chopsticks, firstCookedSlotInCell(bigCell));
+    }
+
+    /** 客户端报来的「这一刻浮在这格上的那一小格」（ChopsticksAimPayload）：在这格里、有东西才算，否则 -1。用一次就清掉。 */
+    private int shownIn(PlayerEntity player, int bigCell) {
+        int shown = ChopsticksAimPayload.take(player, pos);
+        return shown >= 0 && shown < SLOTS && firstSlotInCell(bigCell, slot -> slot == shown) == shown
+            && !ingredients.getStack(shown).isEmpty() ? shown : -1;
+    }
+
+    /**
+     * 空手右键锅捞熟食：捞的是这一刻浮在这格上、你看到的那一样（用户 2026-10-26：和筷子一样）；它还生着就提示、不捞。
+     * 没报就捞这格第一样熟的。返回 false = 这格没有能捞的熟食。
+     */
+    public boolean collectShown(PlayerEntity player, int bigCell) {
+        int shown = shownIn(player, bigCell);
+        if (shown >= 0) {
+            if (!cooked[shown]) {
+                player.sendMessage(Text.translatable(key("msg.not_cooked_yet")), true);
+                return true;
+            }
+            return collectCookedSlot(player, shown);
+        }
+        return collectCookedSlot(player, firstCookedSlotInCell(bigCell));
     }
 
     private int transferCookedSlot(PlayerEntity player, int slot) {
@@ -710,6 +782,7 @@ public class HotPotBlockEntity extends BlockEntity
             return;
         }
         grantTakeXp(xpValue[slot], count);
+        HotPotCriterion.fire(player, "pot_cooked");
         tracked[slot] = ingredients.getStack(slot).copy();
         markDirty();
     }

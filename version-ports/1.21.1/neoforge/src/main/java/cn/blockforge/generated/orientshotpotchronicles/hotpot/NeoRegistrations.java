@@ -1,4 +1,4 @@
-// 作者：；1.21.1 NeoForge 移植。
+// 1.21.1 NeoForge 移植。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import java.util.ArrayList;

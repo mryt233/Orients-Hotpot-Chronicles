@@ -197,6 +197,7 @@ public class StoveBlockEntity extends HotPotBlockEntity {
             return;
         }
         ItemStack pot = toPotItem(material);
+        HotPotCriterion.fire(player, "carry_pot");
         removePot();
         if (!player.getInventory().insertStack(pot)) {
             player.dropItem(pot, false);

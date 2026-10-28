@@ -64,7 +64,7 @@ public class HotPotScreenHandler extends ScreenHandler {
         pot.onOpen(playerInventory.player);
 
         // 9x9 锅面槽位：九宫格锅行/列每跨过 3 格让出 GAP 像素，分界线落在缝里；
-        // 鸳鸯 / 田字锅 9x9 均匀排满锅面（四周留 PotLayout.GUI_INSET），压到隔板的格子不启用（调整，用户 2026-10-24 定）
+        // 鸳鸯 / 田字锅 9x9 均匀排满锅面（四周留 PotLayout.GUI_INSET），压到隔板的格子不启用（用户 2026-10-24 定）
         boolean multi = pot instanceof HotPotBlockEntity potBe && potBe.layout().multiSoup();
         for (int i = 0; i < HotPotBlockEntity.SLOTS; i++) {
             int col = i % 9;
@@ -295,7 +295,7 @@ public class HotPotScreenHandler extends ScreenHandler {
      */
     private void eatWithChopsticks(PlayerEntity player, Slot slot) {
         ItemStack stack = slot.getStack();
-        FoodComponent food = stack.getItem().getFoodComponent();   // 1.20.1 移植（调整）
+        FoodComponent food = stack.getItem().getFoodComponent();   // 1.20.1 移植（）
         if (food == null) {
             return;
         }
@@ -309,7 +309,7 @@ public class HotPotScreenHandler extends ScreenHandler {
         if (!slot.hasStack()) {
             serverBe.onSlotEmptied(index);
         }
-        // 主手或副手拿着蘸料：吃之前自动蘸一口（r103，用户：两种都要；2026-10-25 主手也算，调整）
+        // 主手或副手拿着蘸料：吃之前自动蘸一口（r103，用户：两种都要；2026-10-25 主手也算，）
         DippingSauceItem.dipFromHands(player, eaten);
         player.eatFood(world, eaten.copy());
         // 冷锅：没坐在烧着的灶台（或其他热源）上，吃了有概率反胃
@@ -317,7 +317,7 @@ public class HotPotScreenHandler extends ScreenHandler {
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, COLD_NAUSEA_TICKS, 0));
             player.sendMessage(Text.translatable(HotPotBlockEntity.key("msg.cold_pot")), true);
         }
-        // 1.20.1 移植（调整）：1.20 的食物没有 usingConvertsTo，碗装的食物（蘑菇煲之类）照原版还碗
+        // 1.20.1 移植（）：1.20 的食物没有 usingConvertsTo，碗装的食物（蘑菇煲之类）照原版还碗
         if (!player.getAbilities().creativeMode) {
             ItemStack rest = eaten.getItem() instanceof net.minecraft.item.StewItem
                 || eaten.getItem() instanceof net.minecraft.item.SuspiciousStewItem
@@ -398,7 +398,7 @@ public class HotPotScreenHandler extends ScreenHandler {
                 && HotPotCooking.acceptable(world, stack);
         }
 
-        /** 鸳鸯锅正中那个大格不用：格子藏起来、点不到（新增）。 */
+        /** 鸳鸯锅正中那个大格不用：格子藏起来、点不到（）。 */
         @Override
         public boolean isEnabled() {
             return slotInUse(getIndex());

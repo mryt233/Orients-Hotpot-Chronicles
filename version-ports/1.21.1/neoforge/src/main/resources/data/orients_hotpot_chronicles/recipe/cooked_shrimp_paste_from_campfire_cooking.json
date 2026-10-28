@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "ingredient": {
+    "item": "orients_hotpot_chronicles:shrimp_paste"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_shrimp_paste"
+  },
+  "experience": 0.35,
+  "cookingtime": 300
+}

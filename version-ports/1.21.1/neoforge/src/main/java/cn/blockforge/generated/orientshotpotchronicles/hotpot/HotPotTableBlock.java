@@ -126,10 +126,14 @@ public class HotPotTableBlock extends Block {
                                            ShapeContext context) {
         return shapeOf(state);
     }
-    // 调整：NeoForge 可燃接口；下界木不燃烧，原数值 5 / 20。
+    // ：NeoForge 可燃接口；下界木不燃烧，原数值 5 / 20。
     @Override
     public boolean isFlammable(BlockState state, BlockView world, BlockPos pos, Direction face) {
-        return planks != net.minecraft.block.Blocks.CRIMSON_PLANKS && planks != net.minecraft.block.Blocks.WARPED_PLANKS;
+        // ：只认主线登记的木桌材质，石料/金属桌不可燃。
+        return HotPotContent.TABLE_WOODS.stream()
+            .filter(wood -> !wood.equals("crimson") && !wood.equals("warped"))
+            .anyMatch(wood -> net.minecraft.registry.Registries.BLOCK.get(
+                net.minecraft.util.Identifier.ofVanilla(wood + "_planks")) == planks);
     }
 
     @Override

@@ -19,8 +19,8 @@ import java.util.function.Supplier;
  * 蘸料台上的 9 种调料（r103，用户定）。顺序 = 蘸料台小碗的顺序（阶梯式：从最上层到最下层、每层从左到右）= 补货界面的格子顺序。
  * 每种由一种原料补货（1 个原料 = 4 份）；蘸过的菜吃下去时，碗里有几种就叠几种效果（用户：全部叠加）。
  * 葱花、香菜碎末只提味，没有效果（用户）。
- * 2026-10-23 用户改（调整）：麻酱换成味精（原料小麦，提鲜：多回 2 点饥饿值）；醋的原料改成苹果或甜菜根（一种调料可以有几种原料）。
- * 作者：
+ * 2026-10-23 用户改（）：麻酱换成味精（原料小麦，提鲜：多回 2 点饥饿值）；醋的原料改成苹果或甜菜根（一种调料可以有几种原料）。
+ *
  */
 public enum Seasoning {
     MSG("msg", 0xFFECECF0, () -> Items.WHEAT),
@@ -31,7 +31,8 @@ public enum Seasoning {
     VINEGAR("vinegar", 0xFF462418, () -> Items.APPLE, () -> Items.BEETROOT),
     SUGAR("sugar", 0xFFF0EEE8, () -> Items.SUGAR),
     CHOPPED_SCALLION("chopped_scallion", 0xFF6CB03A, () -> HotPotContent.SCALLION),
-    MINCED_CILANTRO("minced_cilantro", 0xFF4E9A2C, () -> HotPotContent.CILANTRO);
+    MINCED_CILANTRO("minced_cilantro", 0xFF4E9A2C, () -> HotPotContent.CILANTRO),
+    GARLIC_PASTE("garlic_paste", 0xFFE8D696, () -> HotPotContent.GARLIC_PASTE);   // 蒜泥（2026-10-25 用户加，第 10 种）
 
     public static final Seasoning[] ALL = values();
 
@@ -90,6 +91,22 @@ public enum Seasoning {
         return HotPotBlockEntity.key("seasoning." + id);
     }
 
+    /** 效果说明（物品提示里用，和 apply 对应； 2026-10-25）。 */
+    public String effectKey() {
+        return HotPotBlockEntity.key("seasoning." + id + ".effect");
+    }
+
+    /** 「 辣油：抗火 10 秒」这样一行灰字：蘸料碗、蘸过的菜的提示共用。 */
+    public static void appendEffects(int mask, java.util.List<Text> lines) {
+        for (Seasoning s : ALL) {
+            if ((mask & s.bit()) != 0) {
+                lines.add(Text.literal(" ").append(Text.translatable(HotPotBlockEntity.key("tooltip.sauce.line"),
+                    Text.translatable(s.nameKey()), Text.translatable(s.effectKey())))
+                    .formatted(net.minecraft.util.Formatting.GRAY));
+            }
+        }
+    }
+
     /** 这件东西是哪种调料的原料；不是返回 null。 */
     public static Seasoning ofRaw(ItemStack stack) {
         for (Seasoning s : ALL) {
@@ -121,6 +138,8 @@ public enum Seasoning {
                 user.removeStatusEffect(StatusEffects.HUNGER);
             }
             case SUGAR -> user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 200, 0));
+            // 蒜泥：抗性提升 I 8 秒（「蒜能辟邪」，计划里的建议；）
+            case GARLIC_PASTE -> user.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 160, 0));
             case CHOPPED_SCALLION, MINCED_CILANTRO -> {
             }
         }

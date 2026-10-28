@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 锅里怎么分格（2026-10-23 鸳鸯锅 / 田字锅，用户定；作者：）。
+ * 锅里怎么分格（2026-10-23 鸳鸯锅 / 田字锅，用户定；）。
  *
  * <p>后台仍是 81 格（9 个大格 × 每格 3x3 小格），格局只决定：锅分几边、每边一种汤（{@link #sides}）、
  * 每个大格属于哪边（{@link #sideOfCell}），在锅里画在哪（{@link #cellCenter}），准星点在哪一格 / 哪一边
@@ -12,6 +12,7 @@ import java.util.List;
  * <ul>
  *   <li>九宫格锅：1 边，9 格。</li>
  *   <li>S 形鸳鸯锅（太极）：2 边，每边 4 格；O 形（中间一圈）：圈外 6 格、圈里 2 格；正中那格不用。</li>
+ *   <li>方心鸳鸯锅：和 O 形一样，中间那圈是正方形（2026-10-25）。</li>
  *   <li>直隔板鸳鸯锅：中间一道直隔板，左右各 3 格（中间一列不用）。</li>
  *   <li>田字锅：十字隔板分四块，每块一种汤、2 格（正中那格不用）。</li>
  * </ul>
@@ -28,6 +29,11 @@ public enum PotLayout {
         {2.4, 6.6}, {6.5, 6.5}, {10.6, 6.4},
         {1.9, 10.6}, {5.2, 10.0}, {10.4, 10.6}}),
     YUANYANG_O(2, new int[]{0, 0, 0, 1, -1, 1, 0, 0, 0}, new double[][]{
+        {2.2, 2.2}, {6.5, 1.6}, {10.8, 2.2},
+        {5.0, 6.5}, {6.5, 6.5}, {8.0, 6.5},
+        {2.2, 10.8}, {6.5, 11.4}, {10.8, 10.8}}),
+    /** 方心鸳鸯锅（2026-10-25 用户：和 O 形锅一样，中间那圈换成正方形）：圈外 6 格、方格里 2 格，正中那格不用。 */
+    YUANYANG_SQUARE(2, new int[]{0, 0, 0, 1, -1, 1, 0, 0, 0}, new double[][]{
         {2.2, 2.2}, {6.5, 1.6}, {10.8, 2.2},
         {5.0, 6.5}, {6.5, 6.5}, {8.0, 6.5},
         {2.2, 10.8}, {6.5, 11.4}, {10.8, 10.8}}),
@@ -51,6 +57,8 @@ public enum PotLayout {
     private static final double INNER_PX = 13.0;
     private static final double HALF_WALL = 0.5;
     private static final double RING = 3.4;
+    /** 方心锅中间方格的半边长（像素）：6×6 的方格，面积和 O 形锅的圆差不多。 */
+    private static final double SQUARE = 3.0;
 
     private final int sides;
     private final int[] cellSides;
@@ -184,6 +192,13 @@ public enum PotLayout {
                     return NONE;
                 }
                 return z < c ? (x < c ? 0 : 1) : (x < c ? 3 : 2);
+            case YUANYANG_SQUARE: {
+                double d = Math.max(Math.abs(x - c), Math.abs(z - c));
+                if (Math.abs(d - SQUARE) < HALF_WALL) {
+                    return NONE;
+                }
+                return d < SQUARE ? SIDE_B : SIDE_A;
+            }
             case YUANYANG_O: {
                 double d = Math.hypot(x - c, z - c);
                 if (Math.abs(d - RING) < HALF_WALL) {

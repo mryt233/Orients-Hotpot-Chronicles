@@ -13,16 +13,19 @@ public enum HotPotMaterial {
     COPPER("copper_nine_grid_hotpot", MapColor.ORANGE, BlockSoundGroup.COPPER, 3.0F, NoteBlockInstrument.HARP),
     /** 扎实耐用的铁锅：硬度同原版铁块。 */
     IRON("iron_nine_grid_hotpot", MapColor.IRON_GRAY, BlockSoundGroup.METAL, 5.0F, NoteBlockInstrument.IRON_XYLOPHONE),
-    // 鸳鸯锅（2026-10-23 用户要，新增）：锅身同九宫格锅，隔板换成 S 形 / O 形，两边各一种汤（PotLayout）
-    COPPER_S("copper_s_yuanyang_hotpot", MapColor.ORANGE, BlockSoundGroup.COPPER, 3.0F, NoteBlockInstrument.HARP),
-    COPPER_O("copper_o_yuanyang_hotpot", MapColor.ORANGE, BlockSoundGroup.COPPER, 3.0F, NoteBlockInstrument.HARP),
-    IRON_S("iron_s_yuanyang_hotpot", MapColor.IRON_GRAY, BlockSoundGroup.METAL, 5.0F, NoteBlockInstrument.IRON_XYLOPHONE),
-    IRON_O("iron_o_yuanyang_hotpot", MapColor.IRON_GRAY, BlockSoundGroup.METAL, 5.0F, NoteBlockInstrument.IRON_XYLOPHONE),
-    // 中间一道直隔板的鸳鸯锅、田字四宫格锅（用户发照片要的，新增）
+    // 鸳鸯锅（2026-10-23 用户要，）：锅身同九宫格锅，隔板换成 S 形 / O 形，两边各一种汤（PotLayout）
+    COPPER_S("copper_taiji_yuanyang_hotpot", MapColor.ORANGE, BlockSoundGroup.COPPER, 3.0F, NoteBlockInstrument.HARP),
+    COPPER_O("copper_round_yuanyang_hotpot", MapColor.ORANGE, BlockSoundGroup.COPPER, 3.0F, NoteBlockInstrument.HARP),
+    IRON_S("iron_taiji_yuanyang_hotpot", MapColor.IRON_GRAY, BlockSoundGroup.METAL, 5.0F, NoteBlockInstrument.IRON_XYLOPHONE),
+    IRON_O("iron_round_yuanyang_hotpot", MapColor.IRON_GRAY, BlockSoundGroup.METAL, 5.0F, NoteBlockInstrument.IRON_XYLOPHONE),
+    // 中间一道直隔板的鸳鸯锅、田字四宫格锅（用户发照片要的，）
     COPPER_SPLIT("copper_split_yuanyang_hotpot", MapColor.ORANGE, BlockSoundGroup.COPPER, 3.0F, NoteBlockInstrument.HARP),
     IRON_SPLIT("iron_split_yuanyang_hotpot", MapColor.IRON_GRAY, BlockSoundGroup.METAL, 5.0F, NoteBlockInstrument.IRON_XYLOPHONE),
     COPPER_FOUR("copper_four_grid_hotpot", MapColor.ORANGE, BlockSoundGroup.COPPER, 3.0F, NoteBlockInstrument.HARP),
-    IRON_FOUR("iron_four_grid_hotpot", MapColor.IRON_GRAY, BlockSoundGroup.METAL, 5.0F, NoteBlockInstrument.IRON_XYLOPHONE);
+    IRON_FOUR("iron_four_grid_hotpot", MapColor.IRON_GRAY, BlockSoundGroup.METAL, 5.0F, NoteBlockInstrument.IRON_XYLOPHONE),
+    // 方心鸳鸯锅（2026-10-25 用户：照 O 形锅，中间换成正方形；）
+    COPPER_SQUARE("copper_square_yuanyang_hotpot", MapColor.ORANGE, BlockSoundGroup.COPPER, 3.0F, NoteBlockInstrument.HARP),
+    IRON_SQUARE("iron_square_yuanyang_hotpot", MapColor.IRON_GRAY, BlockSoundGroup.METAL, 5.0F, NoteBlockInstrument.IRON_XYLOPHONE);
 
     private final String idPath;
     private final MapColor mapColor;
@@ -51,8 +54,8 @@ public enum HotPotMaterial {
     /** 锅的金属：COPPER 或 IRON（鸳鸯锅归到同金属的九宫格锅）。 */
     public HotPotMaterial metal() {
         return switch (this) {
-            case COPPER, COPPER_S, COPPER_O, COPPER_SPLIT, COPPER_FOUR -> COPPER;
-            case IRON, IRON_S, IRON_O, IRON_SPLIT, IRON_FOUR -> IRON;
+            case COPPER, COPPER_S, COPPER_O, COPPER_SPLIT, COPPER_FOUR, COPPER_SQUARE -> COPPER;
+            case IRON, IRON_S, IRON_O, IRON_SPLIT, IRON_FOUR, IRON_SQUARE -> IRON;
         };
     }
 
@@ -64,6 +67,7 @@ public enum HotPotMaterial {
             case COPPER_O, IRON_O -> PotLayout.YUANYANG_O;
             case COPPER_SPLIT, IRON_SPLIT -> PotLayout.SPLIT;
             case COPPER_FOUR, IRON_FOUR -> PotLayout.FOUR_GRID;
+            case COPPER_SQUARE, IRON_SQUARE -> PotLayout.YUANYANG_SQUARE;
         };
     }
 
@@ -75,6 +79,7 @@ public enum HotPotMaterial {
             case YUANYANG_O -> textureKey() + "_yuanyang_o";
             case SPLIT -> textureKey() + "_yuanyang_split";
             case FOUR_GRID -> textureKey() + "_four_grid";
+            case YUANYANG_SQUARE -> textureKey() + "_yuanyang_square";
         };
     }
 

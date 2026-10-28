@@ -29,7 +29,7 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
     implements BlockEntityRenderer<T> {
     private static final float OMEGA = 0.22F;
     private static final float AMPLITUDE = 0.022F;
-    // 冷锅（调整，用户报：没开锅时食材在汤面上闪、一沉一浮）：以前冷锅食材压在汤面下 0.007，
+    // 冷锅（用户报：没开锅时食材在汤面上闪、一沉一浮）：以前冷锅食材压在汤面下 0.007，
     // 和汤面几乎同高在打架；轮换食材还照沸腾的快节奏。现在冷锅时浮在汤面上方一点，很慢地上下漂（约 6 秒一个来回），
     // 随火力在冷 / 沸两套之间平滑过渡。
     private static final float COLD_OMEGA = 0.05F;
@@ -69,7 +69,7 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
         float floorY = lift + (onStove ? STOVE_FLOOR : STANDALONE_FLOOR);
         float surfaceY = be.hasSoup() ? soupY : floorY;
         float heat = be.clientHeat();
-        // 用 double（调整）：世界时间从存档创建起一直累加，存成 float 时老存档里（几百万刻以上）
+        // 用 double（）：世界时间从存档创建起一直累加，存成 float 时老存档里（几百万刻以上）
         // 一刻内的 tickDelta 会被精度吃掉，食材浮动 / 气泡只能每刻跳一下，看起来像锁在 20 帧
         double ticks = be.getWorld().getTime() + (double) tickDelta;
         PotLayout layout = be.layout();
@@ -105,7 +105,7 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
             float cold = cellSoup ? 1F - heat : 0F;
 
             // 一格里有几样食材就轮流显示：每个浮动周期在最低点（sin = -1）换下一样；冷锅按慢节奏换
-            double cycle = ((cold > 0.5F ? coldAngle : angle) - 1.5 * Math.PI) / (2 * Math.PI);
+            double cycle = displayCycle(bigCell, cold, ticks);
             int slot = slots[Math.floorMod((int) Math.floor(cycle), n)];
             ItemStack stack = be.getStack(slot);
             // 换的前后一小段：当前这样沉下去、变小，下一样再冒上来
@@ -144,7 +144,7 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
     }
 
     /**
-     * 鸳鸯 / 田字锅的汤面（新增）：方块模型里只有锅身和隔板，各边的汤面在这里按 {@link PotLayout#regions}
+     * 鸳鸯 / 田字锅的汤面（）：方块模型里只有锅身和隔板，各边的汤面在这里按 {@link PotLayout#regions}
      * 一块块画，贴图按汤底名取（hot_pot_top_&lt;汤底&gt;，沸腾时叠 _boiling），所以任何汤底、以后新加的汤底都能放任何一边。
      * 沸腾的立体气泡也只冒在各自那边。
      */
@@ -178,7 +178,7 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
 
     /**
      * 鸳鸯 / 田字锅的物品图标（收起来的锅、掉在地上的锅）：锅身由方块模型画，这里按物品里存的每边汤底画汤面，
-     * 和摆在地上时同一套画法，所以任意汤底组合、以后新加的汤底都对（新增，用户 2026-10-24 报：收起来的新锅图标没汤）。
+     * 和摆在地上时同一套画法，所以任意汤底组合、以后新加的汤底都对（用户 2026-10-24 报：收起来的新锅图标没汤）。
      * 坐标是方块坐标 0..1（独立锅：汤面 5.6 像素高、锅腔 1.5..14.5）。
      */
     public static void renderItemSoups(cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial material,
@@ -217,6 +217,33 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
                     sprite.getMinU() + du * c[0], sprite.getMinV() + dv * c[1], alpha, light);
             }
         }
+    }
+
+    /** 轮换显示的进度：整数部分 = 轮到第几样，每个浮动周期在最低点换下一样。 */
+    private static double displayCycle(int bigCell, float cold, double ticks) {
+        float phase = bigCell * 1.37F;
+        double angle = (cold > 0.5F ? COLD_OMEGA : OMEGA) * ticks + phase;
+        return (angle - 1.5 * Math.PI) / (2 * Math.PI);
+    }
+
+    /**
+     * 这一刻这个大格浮在汤面上显示的是哪一小格（和 render 用同一套算法）；空格返回 -1。
+     * 筷子直接右键锅时，客户端用它告诉服务端「我看到的是这一样」（ChopsticksAimPayload；用户 2026-10-25：
+     * 看到的是牛肉，夹起来却是同一格别的东西。）。
+     */
+    public static int shownSlot(HotPotBlockEntity be, int bigCell, double ticks) {
+        PotLayout layout = be.layout();
+        if (bigCell < 0 || bigCell > 8 || !layout.usesCell(bigCell)) {
+            return -1;
+        }
+        int[] slots = new int[HotPotBlockEntity.SLOTS];
+        int n = visibleSlots(be, bigCell, slots);
+        int side = layout.sideOfCell(bigCell);
+        if (n == 0 || side == PotLayout.NONE) {
+            return -1;
+        }
+        float cold = be.baseOfSide(side) >= 0 ? 1F - be.clientHeat() : 0F;
+        return slots[Math.floorMod((int) Math.floor(displayCycle(bigCell, cold, ticks)), n)];
     }
 
     /** 大格里有东西的小格，按行优先写进 out，返回个数。 */

@@ -27,6 +27,20 @@
     "axis=z,empty=true,kind=plant_protein_drink": {
       "model": "orients_hotpot_chronicles:block/plant_protein_drink_empty",
       "y": 90
+    },
+    "axis=x,empty=false,kind=orient_cola": {
+      "model": "orients_hotpot_chronicles:block/orient_cola"
+    },
+    "axis=x,empty=true,kind=orient_cola": {
+      "model": "orients_hotpot_chronicles:block/orient_cola_empty"
+    },
+    "axis=z,empty=false,kind=orient_cola": {
+      "model": "orients_hotpot_chronicles:block/orient_cola",
+      "y": 90
+    },
+    "axis=z,empty=true,kind=orient_cola": {
+      "model": "orients_hotpot_chronicles:block/orient_cola_empty",
+      "y": 90
     }
   }
 }

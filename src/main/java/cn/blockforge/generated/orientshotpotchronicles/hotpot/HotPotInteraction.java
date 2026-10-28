@@ -48,7 +48,7 @@ public final class HotPotInteraction {
         return PotLayout.toModel(u, v, rotated(state));
     }
 
-    /** 准星对着锅里哪个大格：九宫格按 3x3，鸳鸯锅按 S / O 形的格子（{@link PotLayout#cellAt}）。新增。 */
+    /** 准星对着锅里哪个大格：九宫格按 3x3，鸳鸯锅按 S / O 形的格子（{@link PotLayout#cellAt}）。。 */
     public static int cellFromHit(HotPotBlockEntity be, BlockPos pos, BlockHitResult hit, double innerMin, double innerSize) {
         PotLayout layout = be.layout();
         if (!layout.multiSoup()) {
@@ -67,6 +67,12 @@ public final class HotPotInteraction {
         double[] uv = modelUv(be.getCachedState(), pos, hit, innerMin, innerSize);
         return layout.sideNear(uv[0], uv[1]);
     }
+
+    /**
+     * 客户端钩子：空筷子 / 空手 / 碗右键锅时，报告这一刻浮在准星那一格上的是哪一小格（HotPotClient 里设成发
+     * ChopsticksAimPayload）。服务端什么都不做。（2026-10-25）。
+     */
+    public static java.util.function.BiConsumer<HotPotBlockEntity, Integer> clientChopsticksAim = (be, cell) -> { };
 
     /** 筷子用于开面板，碗用于直接捞取；空手由方块的 onUse 路径处理。 */
     public static boolean isServingTool(ItemStack stack) {

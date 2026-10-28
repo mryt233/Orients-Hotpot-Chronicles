@@ -65,7 +65,7 @@ public class HotPotScreenHandler extends ScreenHandler {
         pot.onOpen(playerInventory.player);
 
         // 9x9 锅面槽位：九宫格锅行/列每跨过 3 格让出 GAP 像素，分界线落在缝里；
-        // 鸳鸯 / 田字锅 9x9 均匀排满锅面（四周留 PotLayout.GUI_INSET），压到隔板的格子不启用（调整，用户 2026-10-24 定）
+        // 鸳鸯 / 田字锅 9x9 均匀排满锅面（四周留 PotLayout.GUI_INSET），压到隔板的格子不启用（用户 2026-10-24 定）
         boolean multi = pot instanceof HotPotBlockEntity potBe && potBe.layout().multiSoup();
         for (int i = 0; i < HotPotBlockEntity.SLOTS; i++) {
             int col = i % 9;
@@ -310,7 +310,7 @@ public class HotPotScreenHandler extends ScreenHandler {
         if (!slot.hasStack()) {
             serverBe.onSlotEmptied(index);
         }
-        // 主手或副手拿着蘸料：吃之前自动蘸一口（r103，用户：两种都要；2026-10-25 主手也算，调整）
+        // 主手或副手拿着蘸料：吃之前自动蘸一口（r103，用户：两种都要；2026-10-25 主手也算，）
         DippingSauceItem.dipFromHands(player, eaten);
         player.eatFood(world, eaten.copy(), food);
         // 冷锅：没坐在烧着的灶台（或其他热源）上，吃了有概率反胃
@@ -393,7 +393,7 @@ public class HotPotScreenHandler extends ScreenHandler {
                 && HotPotCooking.acceptable(world, stack);
         }
 
-        /** 鸳鸯锅正中那个大格不用：格子藏起来、点不到（新增）。 */
+        /** 鸳鸯锅正中那个大格不用：格子藏起来、点不到（）。 */
         @Override
         public boolean isEnabled() {
             return slotInUse(getIndex());

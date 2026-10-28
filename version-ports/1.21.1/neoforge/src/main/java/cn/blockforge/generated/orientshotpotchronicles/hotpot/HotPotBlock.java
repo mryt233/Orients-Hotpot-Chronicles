@@ -44,13 +44,13 @@ public class HotPotBlock extends Block implements BlockEntityProvider {
     public static final EnumProperty<Direction.Axis> AXIS = Properties.HORIZONTAL_AXIS;
     /**
      * 下面是篝火 / 灵魂篝火：整口锅往下沉 {@link #CAMPFIRE_DROP} 像素，锅底坐在篝火顶上（篝火 7 像素高；
-     * 0.1.2-alpha 后用户报锅浮在篝火上方，新增）。模型用 tools/gen_pot_on_campfire.py 生成的下沉副本，
+     * 0.1.2-alpha 后用户报锅浮在篝火上方，）。模型用 tools/gen_pot_on_campfire.py 生成的下沉副本，
      * 汤面 / 菜 / 热气按 StoveBlock.liftOf 一起下沉。
      */
     public static final BooleanProperty ON_CAMPFIRE = BooleanProperty.of("on_campfire");
     // 第一版下沉 9 像素，但原版篝火火苗 17 像素高，会从锅底穿进锅里、锅也不好挖（用户报）；
     // 改成不下沉，模型里加四根铁支架踩到篝火上（tools/gen_pot_on_campfire.py）。保留常量和 liftOf 的分支，要调高度改这里。
-    public static final double CAMPFIRE_DROP = 0.0;
+    public static final double CAMPFIRE_DROP = 4.0;   // 2026-10-26 用户：篝火上的锅调矮（火苗尖在汤面下面；tools/gen_pot_on_campfire.py 的 DROP 一致）
     private static final VoxelShape POT_SHAPE_LOW = POT_SHAPE.offset(0, -CAMPFIRE_DROP / 16.0, 0);
 
     public static boolean campfireBelow(net.minecraft.world.BlockView world, BlockPos pos) {
@@ -155,10 +155,11 @@ public class HotPotBlock extends Block implements BlockEntityProvider {
         if (!(world.getBlockEntity(pos) instanceof HotPotBlockEntity be)) {
             return ActionResult.PASS;
         }
-        // 空手潜行右键 = 把锅连汤带食材拿进背包，和灶台上拆锅一样（用户报：篝火上的锅 Shift+右键拿不下来；新增）
+        // 空手潜行右键 = 把锅连汤带食材拿进背包，和灶台上拆锅一样（用户报：篝火上的锅 Shift+右键拿不下来；）
         if (player.isSneaking()) {
             if (!world.isClient) {
                 ItemStack pot = be.toPotItem(material);
+                HotPotCriterion.fire(player, "carry_pot");
                 world.setBlockState(pos, net.minecraft.block.Blocks.AIR.getDefaultState());
                 if (!player.getInventory().insertStack(pot)) {
                     player.dropItem(pot, false);
@@ -169,8 +170,10 @@ public class HotPotBlock extends Block implements BlockEntityProvider {
             return ActionResult.SUCCESS;
         }
         int bigCell = HotPotInteraction.cellFromHit(be, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE);
-        int slot = be.firstCookedSlotInCell(bigCell);
-        if (!world.isClient && !be.collectCookedSlot(player, slot)) {
+        if (world.isClient) {
+            HotPotInteraction.clientChopsticksAim.accept(be, bigCell);   // 空手也捞看到的那样（2026-10-26）
+        }
+        if (!world.isClient && !be.collectShown(player, bigCell)) {
             player.sendMessage(be.statusText(), true);
         }
         return ActionResult.SUCCESS;
@@ -198,6 +201,9 @@ public class HotPotBlock extends Block implements BlockEntityProvider {
             return ItemActionResult.SUCCESS;
         }
         if (stack.isOf(net.minecraft.item.Items.BOWL)) {
+            if (world.isClient) {
+                HotPotInteraction.clientChopsticksAim.accept(be, bigCell);   // 碗先盛看到的那样（2026-10-26）
+            }
             if (!world.isClient) {
                 be.serveWithBowl(player, hand, bigCell);
             }
@@ -206,17 +212,21 @@ public class HotPotBlock extends Block implements BlockEntityProvider {
         if (HotPotInteraction.isServingTool(stack)) {
             if (stack.isOf(HotPotContent.CHOPSTICKS)) {
                 // 夹着的是熟菜（下不了锅）：不管锅，交给筷子吃（按住右键吃）。以前会提示「煮不了」，
-                // 刚从锅里夹起来、右键还按着时就吃不上（用户报：筷子夹起来的菜吃不了。调整）
+                // 刚从锅里夹起来、右键还按着时就吃不上（用户报：筷子夹起来的菜吃不了。）
                 ItemStack held = Chopsticks.held(stack);
                 if (!held.isEmpty() && !HotPotCooking.acceptable(world, held)) {
                     return ItemActionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
                 }
                 // 筷子上夹着菜：放进准星对着的那一格；空筷子：夹起这一格的一样熟食
-                // （2026-10-25 用户定的新交互；开锅界面改成拿筷子 Shift+右键，见 ChopsticksItem.useOnBlock。调整）
+                // （2026-10-25 用户定的新交互；开锅界面改成拿筷子 Shift+右键，见 ChopsticksItem.useOnBlock。）
+                if (world.isClient && Chopsticks.held(stack).isEmpty()) {
+                    // 告诉服务端这一刻浮在这格上的是哪样，夹的就是看到的那样（用户 2026-10-25）
+                    HotPotInteraction.clientChopsticksAim.accept(be, bigCell);
+                }
                 if (!world.isClient) {
                     if (!Chopsticks.held(stack).isEmpty()) {
                         be.insertHeld(player, stack, be.firstEmptySlotInCell(bigCell));
-                    } else if (!be.pickWithChopsticks(player, stack, cookedSlot)) {
+                    } else if (!be.pickShown(player, stack, bigCell)) {
                         player.sendMessage(net.minecraft.text.Text.translatable(HotPotBlockEntity.key("msg.no_cooked_here")), true);
                     }
                 }
@@ -253,18 +263,21 @@ public class HotPotBlock extends Block implements BlockEntityProvider {
         return stack.getItem() instanceof net.minecraft.item.BlockItem item && item.getBlock() instanceof PlateBlock;
     }
 
-    /** 支撑消失时，整锅（连汤带食材）打包成一个锅物品掉落。 */
+    /**
+     * 鼠标中键：创造模式复制整锅（汤底 + 食材，和 Shift+右键端下来的一样；用户 2026-10-26 报：端下来的锅放地上，中键只复制空锅）。
+     * 生存模式照原版在物品栏里找同样的锅（给带内容的锅就对不上普通的空锅）。
+     */
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock,
-                                  BlockPos sourcePos, boolean notify) {
-        if (world.isClient || !world.isAir(pos.down())) {
-            return;
+    public ItemStack getPickStack(net.minecraft.world.WorldView world, BlockPos pos, BlockState state) {
+        PlayerEntity player = PlateHolderBlock.pickPlayer.get();
+        if (player != null && player.isCreative() && world.getBlockEntity(pos) instanceof HotPotBlockEntity be) {
+            return be.toPotItem(material);
         }
-        ItemStack drop = world.getBlockEntity(pos) instanceof HotPotBlockEntity be
-            ? be.toPotItem(material) : new ItemStack(this);
-        world.setBlockState(pos, net.minecraft.block.Blocks.AIR.getDefaultState());
-        Block.dropStack(world, pos, drop);
+        return super.getPickStack(world, pos, state);
     }
+
+    // 以前下面是空气就整锅掉成物品（像脚手架），悬空摆的锅一碰邻居更新就没了；
+    // 2026-10-26 用户报 bug，去掉：锅和普通方块一样能悬空放。
 
     /**
      * 正常挖下来时，汤底和食材由战利品表（copy_components）打包进锅物品，不再散落一地。

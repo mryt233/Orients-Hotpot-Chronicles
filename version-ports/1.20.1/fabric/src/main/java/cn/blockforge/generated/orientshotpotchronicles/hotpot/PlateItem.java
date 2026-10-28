@@ -30,7 +30,7 @@ public class PlateItem extends BlockItem {
 
     /**
      * 物品上有菜（盘子装了菜 / 筷子夹着菜）时用自定义模型数据 1，切到 builtin/entity 模型，
-     * 由客户端的 HeldFoodItemRenderer 先画原来的样子再把菜画上去；没菜就去掉，用原来的模型（，r91）。
+     * 由客户端的 HeldFoodItemRenderer 先画原来的样子再把菜画上去；没菜就去掉，用原来的模型（r91）。
      */
     public static void syncFoodModel(ItemStack stack, boolean hasFood) {
         if (hasFood) {
@@ -66,6 +66,9 @@ public class PlateItem extends BlockItem {
         if (stack.getItem() instanceof DrinkItem || stack.getItem() instanceof EmptyBottleItem) {
             return HotPotContent.DRINK_BLOCK;
         }
+        if (stack.getItem() instanceof CupItem) {
+            return HotPotContent.CUP_BLOCK;
+        }
         return null;
     }
 
@@ -73,7 +76,8 @@ public class PlateItem extends BlockItem {
     public static boolean keepsSelf(ItemStack stack) {
         return stack.getItem() instanceof SoupBowlItem || stack.getItem() instanceof DippingSauceItem
             || stack.getItem() instanceof DrinkItem
-            || stack.getItem() instanceof EmptyBottleItem;
+            || stack.getItem() instanceof EmptyBottleItem
+            || stack.getItem() instanceof CupItem;
     }
 
     @Override

@@ -1,22 +1,22 @@
 {
   "parent": "orients_hotpot_chronicles:block/cutting_board",
-  "gui_light": "front",
+  "gui_light": "side",
   "display": {
     "gui": {
       "rotation": [
-        90,
-        0,
+        40,
+        20,
         0
       ],
       "translation": [
         0,
-        0,
+        4.75,
         0
       ],
       "scale": [
-        1.0,
-        1.0,
-        1.0
+        0.95,
+        0.95,
+        0.95
       ]
     },
     "fixed": {

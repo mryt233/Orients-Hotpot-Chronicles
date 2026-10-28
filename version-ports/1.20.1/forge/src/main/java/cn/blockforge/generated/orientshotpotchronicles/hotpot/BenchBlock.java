@@ -50,7 +50,7 @@ public class BenchBlock extends Block implements net.minecraft.block.BlockEntity
 
     /** 板凳坐面高度（凳面顶），与模型 y 5..7 一致。 */
     public static final double SEAT_Y = 7.0 / 16.0;
-    /** 条凳（一格高）上玩家坐的高度。模型凳面顶在 16/16，但用户 r85 坐上去觉得桌子显高（调整）：
+    /** 条凳（一格高）上玩家坐的高度。模型凳面顶在 16/16，但用户 r85 坐上去觉得桌子显高（）：
      *  只把坐的位置抬高 4 像素，凳子外观不变。 */
     public static final double TALL_SEAT_Y = 1.0 + 4.0 / 16.0;
     /** 条凳的腿：上端在凳面下 y=14、z 6.5 / 9.5，到地面各往外岔开 2 像素（≈8°），由 BenchLegsRenderer 画。 */
@@ -168,28 +168,73 @@ public class BenchBlock extends Block implements net.minecraft.block.BlockEntity
         return facing.rotateYCounterclockwise();
     }
 
+    /** 连成一条最长几格（2026-10-26 用户：条凳最长 3 格，超过就不再吸附）。 */
+    public static final int MAX_LENGTH = 3;
+
+    /**
+     * 放下时决定连哪边：数一数左右两边已经连着的有几张，连上后整条不超过 {@link #MAX_LENGTH} 才连；
+     * 两边都能连但加起来超了，就连能凑满的那一边（一样长连左边）。已经连好的凳子不会因为后来放的而改变。
+     */
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         BlockState state = getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing());
-        return refresh(state, ctx.getWorld(), ctx.getBlockPos());
+        BlockView world = ctx.getWorld();
+        BlockPos pos = ctx.getBlockPos();
+        Direction left = leftOf(state.get(FACING));
+        int l = runLength(world, pos.offset(left), left, state.get(FACING));
+        int r = runLength(world, pos.offset(left.getOpposite()), left.getOpposite(), state.get(FACING));
+        boolean joinL = l > 0, joinR = r > 0;
+        if (1 + l + r > MAX_LENGTH) {
+            boolean fitL = l > 0 && 1 + l <= MAX_LENGTH, fitR = r > 0 && 1 + r <= MAX_LENGTH;
+            joinL = fitL && (!fitR || l >= r);
+            joinR = fitR && !joinL;
+        }
+        return state.with(LEFT, joinL).with(RIGHT, joinR);
     }
 
+    /** 邻居变了：一边还连着，要那一边的凳子也说连着我才算（谁连谁在放下时就定了）；那边没凳子了就断开。 */
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState,
                                                    WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        return refresh(state, world, pos);
-    }
-
-    private BlockState refresh(BlockState state, BlockView world, BlockPos pos) {
         Direction facing = state.get(FACING);
         Direction left = leftOf(facing);
         return state
-            .with(LEFT, sameBench(world.getBlockState(pos.offset(left)), facing, tall))
-            .with(RIGHT, sameBench(world.getBlockState(pos.offset(left.getOpposite())), facing, tall));
+            .with(LEFT, joinedTo(world.getBlockState(pos.offset(left)), left.getOpposite(), facing))
+            .with(RIGHT, joinedTo(world.getBlockState(pos.offset(left.getOpposite())), left, facing));
+    }
+
+    /** 这张凳子在 dir 方向上连着别的凳子吗（按它自己的朝向换算成 LEFT / RIGHT）。 */
+    private static boolean connected(BlockState state, Direction dir) {
+        if (!(state.getBlock() instanceof BenchBlock)) {
+            return false;
+        }
+        Direction left = leftOf(state.get(FACING));
+        return dir == left ? state.get(LEFT) : dir == left.getOpposite() && state.get(RIGHT);
+    }
+
+    /** 那边的凳子能和我连、而且它在朝我的方向（towardMe）上说连着。 */
+    private boolean joinedTo(BlockState neighbor, Direction towardMe, Direction facing) {
+        return sameBench(neighbor, facing, tall) && connected(neighbor, towardMe);
+    }
+
+    /** 从 start 往 away 方向数：能和我连的、已经一张接一张连着的凳子有几张（start 不是凳子就是 0）。 */
+    private int runLength(BlockView world, BlockPos start, Direction away, Direction facing) {
+        int n = 0;
+        BlockPos p = start;
+        BlockState s = world.getBlockState(p);
+        while (sameBench(s, facing, tall) && n <= MAX_LENGTH) {
+            n++;
+            if (!connected(s, away)) {
+                break;
+            }
+            p = p.offset(away);
+            s = world.getBlockState(p);
+        }
+        return n;
     }
 
     /**
-     * 顺着同一条线摆、高矮一样的凳子连成一条（不同木头也连）。朝向相反也算（调整，用户报：拆掉一头再放回去
+     * 顺着同一条线摆、高矮一样的凳子连成一条（不同木头也连）。朝向相反也算（用户报：拆掉一头再放回去
      * 连不上——人站到凳子另一边放，朝向就反了；凳子前后对称，反着连看不出差别）。只有横竖不一样才不连。
      */
     public static boolean sameBench(BlockState state, Direction facing, boolean tall) {
@@ -222,7 +267,7 @@ public class BenchBlock extends Block implements net.minecraft.block.BlockEntity
             : ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
-    /** 1.20.1 移植（调整）：1.20 只有这一个右键入口，照 1.21 的顺序分给 useWithItem / useWithoutItem。 */
+    /** 1.20.1 移植（）：1.20 只有这一个右键入口，照 1.21 的顺序分给 useWithItem / useWithoutItem。 */
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
                               BlockHitResult hit) {
@@ -283,20 +328,20 @@ public class BenchBlock extends Block implements net.minecraft.block.BlockEntity
         world.spawnEntity(entity);
         player.startRiding(entity);
     }
-    // 调整：NeoForge 可燃接口；下界木不燃烧，原数值 5 / 20。
+
+    // ：Forge 可燃接口；下界木不燃烧，原数值 5 / 20。
     @Override
-    public boolean isFlammable(BlockState state, BlockView world, BlockPos pos, Direction face) {
+    public boolean isFlammable(BlockState state, net.minecraft.world.BlockView world, BlockPos pos, net.minecraft.util.math.Direction face) {
         return planks != net.minecraft.block.Blocks.CRIMSON_PLANKS && planks != net.minecraft.block.Blocks.WARPED_PLANKS;
     }
 
     @Override
-    public int getFlammability(BlockState state, BlockView world, BlockPos pos, Direction face) {
+    public int getFlammability(BlockState state, net.minecraft.world.BlockView world, BlockPos pos, net.minecraft.util.math.Direction face) {
         return isFlammable(state, world, pos, face) ? 5 : 0;
     }
 
     @Override
-    public int getFireSpreadSpeed(BlockState state, BlockView world, BlockPos pos, Direction face) {
+    public int getFireSpreadSpeed(BlockState state, net.minecraft.world.BlockView world, BlockPos pos, net.minecraft.util.math.Direction face) {
         return isFlammable(state, world, pos, face) ? 20 : 0;
     }
-
 }

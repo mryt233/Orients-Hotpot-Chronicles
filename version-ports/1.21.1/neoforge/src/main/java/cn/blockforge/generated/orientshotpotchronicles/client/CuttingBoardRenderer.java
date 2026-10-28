@@ -16,7 +16,7 @@ import net.minecraft.util.math.RotationAxis;
  * 砧板上放着的东西（2026-10-23）：平躺在板面中间，半格大小，像原版物品展示框里的样子；
  * 捣丸子捣到一半时换成捶碎 / 肉浆的样子（用户：每一下都要有变化，而且要和原版食材放上去一样是立体的）。
  * 网页预览 viewer/animations.js 的 cutting_board 场景与本类对应。
- * 作者：
+ *
  */
 public class CuttingBoardRenderer implements BlockEntityRenderer<CuttingBoardBlockEntity> {
     public CuttingBoardRenderer(BlockEntityRendererFactory.Context ctx) {

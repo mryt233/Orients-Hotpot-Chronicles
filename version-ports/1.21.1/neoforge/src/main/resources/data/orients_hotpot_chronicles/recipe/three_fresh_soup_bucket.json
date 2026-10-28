@@ -1,0 +1,16 @@
+{
+  "type": "orients_hotpot_chronicles:soup_bucket",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:water_bucket"
+    },
+    {
+      "item": "orients_hotpot_chronicles:three_fresh_hotpot_base"
+    }
+  ],
+  "result": {
+    "id": "orients_hotpot_chronicles:three_fresh_soup_bucket",
+    "count": 1
+  }
+}

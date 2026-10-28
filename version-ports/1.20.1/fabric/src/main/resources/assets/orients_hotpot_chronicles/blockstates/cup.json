@@ -1,0 +1,74 @@
+{
+  "variants": {
+    "axis=x,empty=false,kind=orange_drink": {
+      "model": "orients_hotpot_chronicles:block/cup_orange_drink"
+    },
+    "axis=x,empty=true,kind=orange_drink": {
+      "model": "orients_hotpot_chronicles:block/cup"
+    },
+    "axis=x,empty=false,kind=plant_protein_drink": {
+      "model": "orients_hotpot_chronicles:block/cup_plant_protein_drink"
+    },
+    "axis=x,empty=true,kind=plant_protein_drink": {
+      "model": "orients_hotpot_chronicles:block/cup"
+    },
+    "axis=x,empty=false,kind=orient_cola": {
+      "model": "orients_hotpot_chronicles:block/cup_orient_cola"
+    },
+    "axis=x,empty=true,kind=orient_cola": {
+      "model": "orients_hotpot_chronicles:block/cup"
+    },
+    "axis=x,empty=false,kind=water": {
+      "model": "orients_hotpot_chronicles:block/cup_water"
+    },
+    "axis=x,empty=true,kind=water": {
+      "model": "orients_hotpot_chronicles:block/cup"
+    },
+    "axis=x,empty=false,kind=milk": {
+      "model": "orients_hotpot_chronicles:block/cup_milk"
+    },
+    "axis=x,empty=true,kind=milk": {
+      "model": "orients_hotpot_chronicles:block/cup"
+    },
+    "axis=z,empty=false,kind=orange_drink": {
+      "model": "orients_hotpot_chronicles:block/cup_orange_drink",
+      "y": 90
+    },
+    "axis=z,empty=true,kind=orange_drink": {
+      "model": "orients_hotpot_chronicles:block/cup",
+      "y": 90
+    },
+    "axis=z,empty=false,kind=plant_protein_drink": {
+      "model": "orients_hotpot_chronicles:block/cup_plant_protein_drink",
+      "y": 90
+    },
+    "axis=z,empty=true,kind=plant_protein_drink": {
+      "model": "orients_hotpot_chronicles:block/cup",
+      "y": 90
+    },
+    "axis=z,empty=false,kind=orient_cola": {
+      "model": "orients_hotpot_chronicles:block/cup_orient_cola",
+      "y": 90
+    },
+    "axis=z,empty=true,kind=orient_cola": {
+      "model": "orients_hotpot_chronicles:block/cup",
+      "y": 90
+    },
+    "axis=z,empty=false,kind=water": {
+      "model": "orients_hotpot_chronicles:block/cup_water",
+      "y": 90
+    },
+    "axis=z,empty=true,kind=water": {
+      "model": "orients_hotpot_chronicles:block/cup",
+      "y": 90
+    },
+    "axis=z,empty=false,kind=milk": {
+      "model": "orients_hotpot_chronicles:block/cup_milk",
+      "y": 90
+    },
+    "axis=z,empty=true,kind=milk": {
+      "model": "orients_hotpot_chronicles:block/cup",
+      "y": 90
+    }
+  }
+}

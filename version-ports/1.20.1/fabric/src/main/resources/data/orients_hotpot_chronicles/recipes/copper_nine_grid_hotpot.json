@@ -1,14 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "N N",
-    "ICI",
-    "   "
+    "ICI"
   ],
   "key": {
-    "N": {
-      "item": "minecraft:copper_ingot"
-    },
     "I": {
       "item": "minecraft:copper_ingot"
     },

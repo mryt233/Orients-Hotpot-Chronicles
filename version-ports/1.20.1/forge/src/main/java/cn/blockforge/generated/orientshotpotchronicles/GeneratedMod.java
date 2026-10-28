@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * 倒汤底后用筷子打开 9x9 的九宫格面板下菜，像熔炉一样等它煮熟，
  * 直接取走带经验收益的熟食；汤底效果接口为后续扩展预留——全程只有气泡与蒸汽在变。
  */
-// 1.20.1 Forge 移植：调整。
+// 1.20.1 Forge 移植：。
 @Mod(GeneratedMod.MOD_ID)
 public final class GeneratedMod {
     public static final String MOD_ID = "orients_hotpot_chronicles";

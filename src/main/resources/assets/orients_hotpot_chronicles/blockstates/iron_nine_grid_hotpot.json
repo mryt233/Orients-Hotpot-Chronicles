@@ -197,6 +197,86 @@
       "apply": {
         "model": "orients_hotpot_chronicles:block/standalone_soup_spicy_boiling_on_campfire"
       }
+    },
+    {
+      "when": {
+        "soup": "tomato",
+        "boiling": "false",
+        "on_campfire": "false"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_tomato"
+      }
+    },
+    {
+      "when": {
+        "soup": "tomato",
+        "boiling": "false",
+        "on_campfire": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_tomato_on_campfire"
+      }
+    },
+    {
+      "when": {
+        "soup": "three_fresh",
+        "boiling": "false",
+        "on_campfire": "false"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_three_fresh"
+      }
+    },
+    {
+      "when": {
+        "soup": "three_fresh",
+        "boiling": "false",
+        "on_campfire": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_three_fresh_on_campfire"
+      }
+    },
+    {
+      "when": {
+        "soup": "tomato",
+        "boiling": "true",
+        "on_campfire": "false"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_tomato_boiling"
+      }
+    },
+    {
+      "when": {
+        "soup": "tomato",
+        "boiling": "true",
+        "on_campfire": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_tomato_boiling_on_campfire"
+      }
+    },
+    {
+      "when": {
+        "soup": "three_fresh",
+        "boiling": "true",
+        "on_campfire": "false"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_three_fresh_boiling"
+      }
+    },
+    {
+      "when": {
+        "soup": "three_fresh",
+        "boiling": "true",
+        "on_campfire": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_three_fresh_boiling_on_campfire"
+      }
     }
   ]
 }

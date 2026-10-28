@@ -15,6 +15,12 @@
     "axis=x,soup=spicy": {
       "model": "orients_hotpot_chronicles:block/bowl_b_soup_spicy"
     },
+    "axis=x,soup=tomato": {
+      "model": "orients_hotpot_chronicles:block/bowl_b_soup_tomato"
+    },
+    "axis=x,soup=three_fresh": {
+      "model": "orients_hotpot_chronicles:block/bowl_b_soup_three_fresh"
+    },
     "axis=z,soup=none": {
       "model": "orients_hotpot_chronicles:block/bowl_b",
       "y": 90
@@ -33,6 +39,14 @@
     },
     "axis=z,soup=spicy": {
       "model": "orients_hotpot_chronicles:block/bowl_b_soup_spicy",
+      "y": 90
+    },
+    "axis=z,soup=tomato": {
+      "model": "orients_hotpot_chronicles:block/bowl_b_soup_tomato",
+      "y": 90
+    },
+    "axis=z,soup=three_fresh": {
+      "model": "orients_hotpot_chronicles:block/bowl_b_soup_three_fresh",
       "y": 90
     }
   }

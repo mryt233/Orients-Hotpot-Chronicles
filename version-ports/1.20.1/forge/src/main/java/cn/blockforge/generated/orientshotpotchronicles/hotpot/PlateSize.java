@@ -15,7 +15,9 @@ public enum PlateSize {
     /** 原版的碗摆在桌上（r99）：敞口碗上圈 7×7，一格一样、叠 3 层，像小碟一样正叠。不注册成盘子。 */
     BOWL("bowl", "bowl", 1, 1, 7, 7),
     /** 橙子饮料瓶子（r99）：瓶身 6×5，放在桌上像盘子一样占位置；不装菜。 */
-    DRINK("drink", "drink", 1, 1, 6, 5);
+    DRINK("drink", "drink", 1, 1, 6, 5),
+    /** 玻璃杯（2026-10-25）：4×4、6 像素高，借盘子格摆；不装菜。 */
+    CUP("cup", "cup", 1, 1, 4, 4);
 
     /** 盘底厚度、盘沿厚度（像素）；摆在火锅桌上整体下移的距离（桌面 11/16）。 */
     public static final double FLOOR = 1.0;
@@ -26,6 +28,8 @@ public enum PlateSize {
     public static final double BOWL_H = 3.0;
     /** 橙子饮料瓶高 15 像素（tools/gen_drink.py）。 */
     public static final double DRINK_H = 15.0;
+    /** 玻璃杯高 6 像素（tools/gen_cup.py）。 */
+    public static final double CUP_H = 6.0;
 
     private final String id;
     /** 物品 ID 里材质后面那段，和显示名对得上（r102 用户要求）：小碟 small_dish、双格盘 two_slot_plate …… */
@@ -52,7 +56,7 @@ public enum PlateSize {
         return itemId;
     }
 
-    /** 每格最多放几样：都是 3（r89 其他盘子 ×3；r90 小碟也 ×3，小碟正叠、其他压半面，见 PlateFoodRenderer；调整）。 */
+    /** 每格最多放几样：都是 3（r89 其他盘子 ×3；r90 小碟也 ×3，小碟正叠、其他压半面，见 PlateFoodRenderer；）。 */
     public int layers() {
         return 3;
     }
@@ -84,7 +88,7 @@ public enum PlateSize {
 
     /** 摆在桌上时多高（像素），选中框和碰撞用。 */
     public double height() {
-        return this == BOWL ? BOWL_H : this == DRINK ? DRINK_H : FLOOR + RIM_H;
+        return this == BOWL ? BOWL_H : this == DRINK ? DRINK_H : this == CUP ? CUP_H : FLOOR + RIM_H;
     }
 
     /** 一格只放一样、正叠（小碟和碗）；其他盘子压半面。 */

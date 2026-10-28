@@ -8,7 +8,7 @@ public final class Chopsticks {
     }
 
     public static ItemStack held(ItemStack chopsticks) {
-        return ItemData.heldFood(chopsticks);   // 1.20.1 移植：存 NBT（调整）
+        return ItemData.heldFood(chopsticks);   // 1.20.1 移植：存 NBT（）
     }
 
     public static void hold(ItemStack chopsticks, ItemStack food) {

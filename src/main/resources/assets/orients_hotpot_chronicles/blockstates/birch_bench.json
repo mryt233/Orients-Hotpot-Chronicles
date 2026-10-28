@@ -5,60 +5,72 @@
     },
     "facing=east,left=false,right=false": {
       "model": "orients_hotpot_chronicles:block/birch_bench",
-      "y": 90
+      "y": 90,
+      "uvlock": true
     },
     "facing=south,left=false,right=false": {
       "model": "orients_hotpot_chronicles:block/birch_bench",
-      "y": 180
+      "y": 180,
+      "uvlock": true
     },
     "facing=west,left=false,right=false": {
       "model": "orients_hotpot_chronicles:block/birch_bench",
-      "y": 270
+      "y": 270,
+      "uvlock": true
     },
     "facing=north,left=false,right=true": {
       "model": "orients_hotpot_chronicles:block/birch_bench_right"
     },
     "facing=east,left=false,right=true": {
       "model": "orients_hotpot_chronicles:block/birch_bench_right",
-      "y": 90
+      "y": 90,
+      "uvlock": true
     },
     "facing=south,left=false,right=true": {
       "model": "orients_hotpot_chronicles:block/birch_bench_right",
-      "y": 180
+      "y": 180,
+      "uvlock": true
     },
     "facing=west,left=false,right=true": {
       "model": "orients_hotpot_chronicles:block/birch_bench_right",
-      "y": 270
+      "y": 270,
+      "uvlock": true
     },
     "facing=north,left=true,right=false": {
       "model": "orients_hotpot_chronicles:block/birch_bench_left"
     },
     "facing=east,left=true,right=false": {
       "model": "orients_hotpot_chronicles:block/birch_bench_left",
-      "y": 90
+      "y": 90,
+      "uvlock": true
     },
     "facing=south,left=true,right=false": {
       "model": "orients_hotpot_chronicles:block/birch_bench_left",
-      "y": 180
+      "y": 180,
+      "uvlock": true
     },
     "facing=west,left=true,right=false": {
       "model": "orients_hotpot_chronicles:block/birch_bench_left",
-      "y": 270
+      "y": 270,
+      "uvlock": true
     },
     "facing=north,left=true,right=true": {
       "model": "orients_hotpot_chronicles:block/birch_bench_middle"
     },
     "facing=east,left=true,right=true": {
       "model": "orients_hotpot_chronicles:block/birch_bench_middle",
-      "y": 90
+      "y": 90,
+      "uvlock": true
     },
     "facing=south,left=true,right=true": {
       "model": "orients_hotpot_chronicles:block/birch_bench_middle",
-      "y": 180
+      "y": 180,
+      "uvlock": true
     },
     "facing=west,left=true,right=true": {
       "model": "orients_hotpot_chronicles:block/birch_bench_middle",
-      "y": 270
+      "y": 270,
+      "uvlock": true
     }
   }
 }

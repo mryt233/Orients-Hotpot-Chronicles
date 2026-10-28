@@ -41,7 +41,7 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
     private static final int BAR_DONE = 0xFF63D14C;
 
     public HotPotScreen(HotPotScreenHandler handler, PlayerInventory inventory, Text title) {
-        // 鸳鸯 / 田字锅标题用锅自己的名字，九宫格锅照旧「九宫格火锅」（调整）
+        // 鸳鸯 / 田字锅标题用锅自己的名字，九宫格锅照旧「九宫格火锅」（）
         super(handler, inventory, handler.layout().multiSoup()
             ? cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.blockFor(handler.potMaterial()).getName()
             : Text.translatable(HotPotBlockEntity.key("screen.title")));
@@ -62,11 +62,14 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
             return NO_SOUP;
         }
         return switch (soup) {
-            case CLEAR -> new Soup(0xFFB4BCBC, 0xFFF4F4EC, 0xFFC6CCCA,   // 清汤配色同锅里的新贴图（2026-10-23，调整）
+            case CLEAR -> new Soup(0xFFB4BCBC, 0xFFF4F4EC, 0xFFC6CCCA,   // 清汤配色同锅里的新贴图（2026-10-23，）
                 new int[]{0xFF6FAF3A, 0xFF8FCF52, 0xFFD04A2A});
             case RICH_STOCK -> new Soup(0xFFE3D7BF, 0xFFFFFFFF, 0xFFF2E7D2, new int[]{0xFFFFF8EA, 0xFF6FAF3A, 0xFFD9C9A8});
             case MUSHROOM -> new Soup(0xFF7C5836, 0xFFE8C88A, 0xFF9A7048, new int[]{0xFF4A3220, 0xFFC9A16A, 0xFF5E4026});
             case SPICY -> new Soup(0xFFB32A1E, 0xFFFFB070, 0xFFD94A2E, new int[]{0xFFE8862A, 0xFF7A1408, 0xFF3A1208});
+            // 2026-10-25 新汤底（）：番茄 = 橙红汤面 + 蛋花黄 / 番茄块 / 葱绿；三鲜 = 淡金汤面 + 蘑菇 / 胡萝卜 / 海带
+            case TOMATO -> new Soup(0xFFD8482A, 0xFFFF9A6A, 0xFFE86040, new int[]{0xFFF2C14A, 0xFFB82818, 0xFF6FAF3A});
+            case THREE_FRESH -> new Soup(0xFFD8C79A, 0xFFFFF6DC, 0xFFE6D8B0, new int[]{0xFF8A5A34, 0xFFF08A30, 0xFF3E7A3A});
         };
     }
 
@@ -413,7 +416,7 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
         int x = PANEL_X + 6;
         int right = W - 12;
 
-        // 汤底：鸳鸯 / 田字锅每边一个色块，名字用「/」隔开，放不下就缩小（调整）
+        // 汤底：鸳鸯 / 田字锅每边一个色块，名字用「/」隔开，放不下就缩小（）
         PotLayout layout = handler.layout();
         int swatchX = x;
         for (int side = 0; side < layout.sides(); side++) {
@@ -518,7 +521,7 @@ public class HotPotScreen extends HandledScreen<HotPotScreenHandler> {
 
     // ------------------------------------------------------------- 槽位
 
-    /** 1.20.1 移植（调整）：1.20.1 的 drawSlot 是 private，由 HandledScreenMixin 在原版画完每个格子后调这里。 */
+    /** 1.20.1 移植（）：1.20.1 的 drawSlot 是 private，由 HandledScreenMixin 在原版画完每个格子后调这里。 */
     public void afterDrawSlot(DrawContext context, Slot slot) {
         if (!handler.isPotSlot(slot)) {
             return;

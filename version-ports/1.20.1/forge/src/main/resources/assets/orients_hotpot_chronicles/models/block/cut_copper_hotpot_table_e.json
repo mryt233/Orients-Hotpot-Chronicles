@@ -1,0 +1,67 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "planks": "minecraft:block/cut_copper",
+    "particle": "minecraft:block/cut_copper",
+    "top": "minecraft:block/cut_copper",
+    "bricks": "minecraft:block/bricks"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        7,
+        0
+      ],
+      "to": [
+        16,
+        11,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#planks"
+        },
+        "south": {
+          "texture": "#planks"
+        },
+        "west": {
+          "texture": "#planks"
+        },
+        "up": {
+          "texture": "#top"
+        },
+        "down": {
+          "texture": "#planks"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        0,
+        4
+      ],
+      "to": [
+        16,
+        7,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bricks"
+        },
+        "south": {
+          "texture": "#bricks"
+        },
+        "west": {
+          "texture": "#bricks"
+        },
+        "down": {
+          "texture": "#bricks",
+          "cullface": "down"
+        }
+      }
+    }
+  ]
+}

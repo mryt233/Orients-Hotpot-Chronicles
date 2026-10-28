@@ -13,10 +13,10 @@ import net.minecraft.util.math.BlockPos;
 
 /**
  * 蘸料台的补货界面（r103，用户：保留一个补货界面，只用来放原料、看还剩多少）。
- * 上面 9 个原料格 = 台上 9 个小碗（2026-10-23 起碗不固定：空碗放什么原料都行，有东西的只收同一种；调整），
+ * 上面 9 个原料格 = 台上 9 个小碗（2026-10-23 起碗不固定：空碗放什么原料都行，有东西的只收同一种；），
  * 下面玩家背包。同步给客户端的数：前 9 个是每个碗已化开的份数，后 9 个是每个碗装的调料（序号 + 1，0 = 空碗）。
  * 网页预览 viewer/screens.js 的 sauceStation 与 client/SauceStationScreen 一一对应。
- * 作者：
+ *
  */
 public class SauceStationScreenHandler extends ScreenHandler {
     /** 9 个原料格排成 3×3，和台上的碗一一对应（第一行 = 最上层，从左到右；2026-10-23 用户要求）。 */

@@ -1,0 +1,120 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "planks": "minecraft:block/polished_diorite",
+    "particle": "minecraft:block/polished_diorite",
+    "top": "minecraft:block/polished_diorite",
+    "bricks": "minecraft:block/bricks"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        19.0,
+        0
+      ],
+      "to": [
+        16,
+        23.0,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "east": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "south": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "west": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "up": {
+          "texture": "#top"
+        },
+        "down": {
+          "texture": "#planks"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        16,
+        4
+      ],
+      "to": [
+        16,
+        19.0,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            13.0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            13.0,
+            12,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            13.0,
+            16,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#planks",
+          "uv": [
+            4,
+            13.0,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#planks"
+        }
+      }
+    }
+  ]
+}

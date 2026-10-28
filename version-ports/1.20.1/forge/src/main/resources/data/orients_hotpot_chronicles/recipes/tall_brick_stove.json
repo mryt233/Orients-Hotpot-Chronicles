@@ -1,13 +1,18 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    {
-      "item": "orients_hotpot_chronicles:brick_stove"
-    },
-    {
-      "item": "minecraft:bricks"
-    }
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "B",
+    "S"
   ],
+  "key": {
+    "B": {
+      "item": "minecraft:bricks"
+    },
+    "S": {
+      "item": "orients_hotpot_chronicles:brick_stove"
+    }
+  },
   "result": {
     "count": 1,
     "item": "orients_hotpot_chronicles:tall_brick_stove"

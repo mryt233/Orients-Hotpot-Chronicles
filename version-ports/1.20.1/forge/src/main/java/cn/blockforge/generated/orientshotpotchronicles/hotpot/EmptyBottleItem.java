@@ -6,7 +6,7 @@ import net.minecraft.util.ActionResult;
 
 /**
  * 喝完的空瓶（r99 橙子饮料，r101 起每种饮料一个）：也能像盘子一样摆在桌上。
- * 作者：
+ *
  */
 public class EmptyBottleItem extends Item {
     private final DrinkKind kind;

@@ -7,7 +7,9 @@
     "BlockStateTableDecorMixin",
     "BowlItemMixin",
     "EntityRaycastMixin",
-    "LivingEntityEatMixin"
+    "LivingEntityEatMixin",
+    "LootPoolAccessor",
+    "LootTableAccessor"
   ],
   "client": [
     "ClientPlayerInteractionManagerMixin",

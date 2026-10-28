@@ -17,7 +17,7 @@ import net.minecraft.world.BlockView;
  * 2026-10-23 加反方向（）：矮火锅桌上的盘子 / 饮料底面比自己这一格低 5 像素，沉进了下面桌子那一格；
  * 原版查到桌子那一格只认桌子，准星对着盘子下半截选中的是桌子（用户报：桌上的饮料、菜中键复制不了）。
  * 所以每一格也看一眼上面那格方块垂下来的部分。
- * 作者：
+ *
  */
 public final class TallReach {
     private TallReach() {

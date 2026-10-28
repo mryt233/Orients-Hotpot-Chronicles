@@ -1,0 +1,112 @@
+{
+  "variants": {
+    "kind=orange_drink,sips=1": {
+      "model": "orients_hotpot_chronicles:block/orange_drink_cauldron_level1"
+    },
+    "kind=orange_drink,sips=2": {
+      "model": "orients_hotpot_chronicles:block/orange_drink_cauldron_level1"
+    },
+    "kind=orange_drink,sips=3": {
+      "model": "orients_hotpot_chronicles:block/orange_drink_cauldron_level1"
+    },
+    "kind=orange_drink,sips=4": {
+      "model": "orients_hotpot_chronicles:block/orange_drink_cauldron_level1"
+    },
+    "kind=orange_drink,sips=5": {
+      "model": "orients_hotpot_chronicles:block/orange_drink_cauldron_level2"
+    },
+    "kind=orange_drink,sips=6": {
+      "model": "orients_hotpot_chronicles:block/orange_drink_cauldron_level2"
+    },
+    "kind=orange_drink,sips=7": {
+      "model": "orients_hotpot_chronicles:block/orange_drink_cauldron_level2"
+    },
+    "kind=orange_drink,sips=8": {
+      "model": "orients_hotpot_chronicles:block/orange_drink_cauldron_level2"
+    },
+    "kind=orange_drink,sips=9": {
+      "model": "orients_hotpot_chronicles:block/orange_drink_cauldron_full"
+    },
+    "kind=orange_drink,sips=10": {
+      "model": "orients_hotpot_chronicles:block/orange_drink_cauldron_full"
+    },
+    "kind=orange_drink,sips=11": {
+      "model": "orients_hotpot_chronicles:block/orange_drink_cauldron_full"
+    },
+    "kind=orange_drink,sips=12": {
+      "model": "orients_hotpot_chronicles:block/orange_drink_cauldron_full"
+    },
+    "kind=plant_protein_drink,sips=1": {
+      "model": "orients_hotpot_chronicles:block/plant_protein_drink_cauldron_level1"
+    },
+    "kind=plant_protein_drink,sips=2": {
+      "model": "orients_hotpot_chronicles:block/plant_protein_drink_cauldron_level1"
+    },
+    "kind=plant_protein_drink,sips=3": {
+      "model": "orients_hotpot_chronicles:block/plant_protein_drink_cauldron_level1"
+    },
+    "kind=plant_protein_drink,sips=4": {
+      "model": "orients_hotpot_chronicles:block/plant_protein_drink_cauldron_level1"
+    },
+    "kind=plant_protein_drink,sips=5": {
+      "model": "orients_hotpot_chronicles:block/plant_protein_drink_cauldron_level2"
+    },
+    "kind=plant_protein_drink,sips=6": {
+      "model": "orients_hotpot_chronicles:block/plant_protein_drink_cauldron_level2"
+    },
+    "kind=plant_protein_drink,sips=7": {
+      "model": "orients_hotpot_chronicles:block/plant_protein_drink_cauldron_level2"
+    },
+    "kind=plant_protein_drink,sips=8": {
+      "model": "orients_hotpot_chronicles:block/plant_protein_drink_cauldron_level2"
+    },
+    "kind=plant_protein_drink,sips=9": {
+      "model": "orients_hotpot_chronicles:block/plant_protein_drink_cauldron_full"
+    },
+    "kind=plant_protein_drink,sips=10": {
+      "model": "orients_hotpot_chronicles:block/plant_protein_drink_cauldron_full"
+    },
+    "kind=plant_protein_drink,sips=11": {
+      "model": "orients_hotpot_chronicles:block/plant_protein_drink_cauldron_full"
+    },
+    "kind=plant_protein_drink,sips=12": {
+      "model": "orients_hotpot_chronicles:block/plant_protein_drink_cauldron_full"
+    },
+    "kind=orient_cola,sips=1": {
+      "model": "orients_hotpot_chronicles:block/orient_cola_cauldron_level1"
+    },
+    "kind=orient_cola,sips=2": {
+      "model": "orients_hotpot_chronicles:block/orient_cola_cauldron_level1"
+    },
+    "kind=orient_cola,sips=3": {
+      "model": "orients_hotpot_chronicles:block/orient_cola_cauldron_level1"
+    },
+    "kind=orient_cola,sips=4": {
+      "model": "orients_hotpot_chronicles:block/orient_cola_cauldron_level1"
+    },
+    "kind=orient_cola,sips=5": {
+      "model": "orients_hotpot_chronicles:block/orient_cola_cauldron_level2"
+    },
+    "kind=orient_cola,sips=6": {
+      "model": "orients_hotpot_chronicles:block/orient_cola_cauldron_level2"
+    },
+    "kind=orient_cola,sips=7": {
+      "model": "orients_hotpot_chronicles:block/orient_cola_cauldron_level2"
+    },
+    "kind=orient_cola,sips=8": {
+      "model": "orients_hotpot_chronicles:block/orient_cola_cauldron_level2"
+    },
+    "kind=orient_cola,sips=9": {
+      "model": "orients_hotpot_chronicles:block/orient_cola_cauldron_full"
+    },
+    "kind=orient_cola,sips=10": {
+      "model": "orients_hotpot_chronicles:block/orient_cola_cauldron_full"
+    },
+    "kind=orient_cola,sips=11": {
+      "model": "orients_hotpot_chronicles:block/orient_cola_cauldron_full"
+    },
+    "kind=orient_cola,sips=12": {
+      "model": "orients_hotpot_chronicles:block/orient_cola_cauldron_full"
+    }
+  }
+}

@@ -10,7 +10,7 @@ import java.util.Map;
  * 用擀面杖（原叫木棒，2026-10-23 用户改）在砧板上捣丸子（2026-10-23 用户定，方案 A）：生牛肉 / 生猪排 / 生羊肉 / 生鳕鱼 / 生鲑鱼放砧板上，擀面杖捣三下：
  * 第 1 下捶碎、第 2 下成肉浆（砧板上的样子跟着变，用户要求），第 3 下掉出 3 个生丸子。
  * 进度记在 CuttingBoardBlockEntity 的 cuts 里（捣过的不能再用菜刀切）。阶段贴图 textures/block/pounding/&lt;meat&gt;_&lt;minced|paste&gt;。
- * 作者：
+ *
  */
 public final class Pounding {
     public static final int HITS = 3;
@@ -27,8 +27,23 @@ public final class Pounding {
         return MEAT.get(stack.getItem());
     }
 
+    /** 大蒜也能敲：敲三下出 2 份蒜泥（用户 2026-10-25：大蒜 + 蒜泥，用擀面杖敲；）。 */
+    public static boolean isGarlic(ItemStack stack) {
+        return stack.isOf(HotPotContent.GARLIC);
+    }
+
+    /** 虾仁拍三下成一颗虾滑（用户 2026-10-26：虾滑用擀面杖拍出来；）。 */
+    public static boolean isPeeledShrimp(ItemStack stack) {
+        return stack.isOf(HotPotContent.PEELED_SHRIMP);
+    }
+
     public static boolean poundable(ItemStack stack) {
-        return meatOf(stack) != null;
+        return meatOf(stack) != null || isGarlic(stack) || isPeeledShrimp(stack);
+    }
+
+    /** 敲完掉几个：丸子 3 个，蒜泥 2 份，虾滑 1 颗。 */
+    public static int resultCount(ItemStack stack) {
+        return isGarlic(stack) ? 2 : isPeeledShrimp(stack) ? 1 : RESULT_COUNT;
     }
 
     private static final java.util.List<String> MEAT_ORDER = java.util.List.of("beef", "pork", "mutton", "fish");
@@ -38,6 +53,14 @@ public final class Pounding {
      * 同 tools/gen_meatballs.py），按普通物品画就有厚度（2026-10-23 用户：要和原版食材放上去一样是立体的）。
      */
     public static ItemStack display(ItemStack meat, int hits) {
+        if (isGarlic(meat)) {
+            // 大蒜：敲一下还是蒜头，第二下起已经是一摊蒜泥
+            return hits >= 2 ? new ItemStack(HotPotContent.GARLIC_PASTE) : meat;
+        }
+        if (isPeeledShrimp(meat)) {
+            // 虾仁：拍一下还是虾仁，第二下起已经是一团虾滑
+            return hits >= 2 ? new ItemStack(HotPotContent.SHRIMP_PASTE) : meat;
+        }
         String m = meatOf(meat);
         if (m == null || hits <= 0) {
             return meat;
@@ -50,6 +73,12 @@ public final class Pounding {
 
     /** 这块肉捣出来的生丸子。 */
     public static Item result(ItemStack stack) {
+        if (isGarlic(stack)) {
+            return HotPotContent.GARLIC_PASTE;
+        }
+        if (isPeeledShrimp(stack)) {
+            return HotPotContent.SHRIMP_PASTE;
+        }
         String meat = meatOf(stack);
         if (meat == null) {
             return null;

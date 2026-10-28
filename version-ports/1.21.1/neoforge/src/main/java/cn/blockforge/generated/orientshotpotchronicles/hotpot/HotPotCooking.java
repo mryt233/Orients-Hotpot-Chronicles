@@ -46,7 +46,7 @@ public final class HotPotCooking {
         // 原版与第三方食物优先读取 FOOD 组件；肉/鱼标签作为没有组件时的兜底，
         // 这样常见火锅食材不会因为模组配方注册方式不同而完全放不进去。
         // 0.1.2-alpha 后用户报：对着锅右键什么都能下锅（木头煮成木炭、铁器煮成铁粒）——以前「熔炉能烧」也算。
-        // 改成照烟熏炉：只收能吃的东西，或者有烟熏炉 / 营火配方的东西（调整）。
+        // 改成照烟熏炉：只收能吃的东西，或者有烟熏炉 / 营火配方的东西（）。
         return stack.contains(DataComponentTypes.FOOD)
             || stack.isIn(ItemTags.MEAT)
             || stack.isIn(ItemTags.FISHES)
@@ -56,7 +56,7 @@ public final class HotPotCooking {
 
     /**
      * 锅里用的烹饪配方，用来取熟食产出、耗时与经验：先烟熏炉、再营火（这两种只有食物）；
-     * 熔炉配方只给食物用（熔炉还会烧木头、矿石，锅不能当熔炉，0.1.2-alpha 后 调整）。
+     * 熔炉配方只给食物用（熔炉还会烧木头、矿石，锅不能当熔炉，0.1.2-alpha 后 ）。
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static Optional<RecipeEntry<? extends AbstractCookingRecipe>> smeltingRecipe(World world, ItemStack stack) {
@@ -88,6 +88,9 @@ public final class HotPotCooking {
      * 每次现查配方表（只在放入食材时调用，量很小），数据包重载后也不会过期。
      */
     public static boolean isCookedFood(World world, ItemStack stack) {
+        if (POT_RESULTS.containsValue(stack.getItem())) {
+            return true;   // 锅专用产物（熟海带）也是熟的，不能再下锅
+        }
         if (world == null || stack.isEmpty() || smeltingRecipe(world, stack).isPresent()) {
             return false;
         }
@@ -106,6 +109,16 @@ public final class HotPotCooking {
             }
         }
         return false;
+    }
+
+    /**
+     * 只在锅里才有的产物（2026-10-25 用户：海带在火锅里煮成「熟海带」，原版熔炉 / 烟熏炉照旧出干海带）：
+     * 耗时和经验还照原版配方，只换产物。以后锅（或模组别的厨具）专用的煮法都加在这里。
+     */
+    private static final java.util.Map<Item, Item> POT_RESULTS = new java.util.HashMap<>();
+
+    public static void potResult(Item raw, Item cooked) {
+        POT_RESULTS.put(raw, cooked);
     }
 
     /** 标准煮熟耗时（tick），无配方食材用兜底值。 */
@@ -127,6 +140,10 @@ public final class HotPotCooking {
      */
     public static ItemStack finish(World world, ItemStack raw, SoupBase soup) {
         int portions = Math.max(1, raw.getCount());
+        Item potOnly = POT_RESULTS.get(raw.getItem());
+        if (potOnly != null) {
+            return new ItemStack(potOnly, portions);
+        }
         // 原版 AbstractCookingRecipe#getResult() 返回的是配方自身缓存的 result 实例本身，
         // 不是拷贝（SimpleInventory#setStack 也只存引用）。若把它直接塞进锅格或在上面
         // setCount，所有同配方的熟食就会共用同一个 ItemStack 对象：之后任意一格被

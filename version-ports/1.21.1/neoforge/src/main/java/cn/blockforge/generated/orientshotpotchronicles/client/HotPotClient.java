@@ -15,8 +15,8 @@ import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 
-/** 客户端入口：注册火锅屏幕，并默认启用模组内置材质包。 */
-// 1.21.1 NeoForge 移植：调整；该类只在物理客户端订阅。
+/** 客户端入口：注册火锅屏幕，绑定指南、渲染器和提示。 */
+// 1.21.1 NeoForge 移植：该类只在物理客户端订阅。
 @net.neoforged.fml.common.EventBusSubscriber(modid = GeneratedMod.MOD_ID,
     value = net.neoforged.api.distmarker.Dist.CLIENT,
     bus = net.neoforged.fml.common.EventBusSubscriber.Bus.MOD)
@@ -27,6 +27,18 @@ public final class HotPotClient {
     }
 
     private static void setupClient() {
+        // ：客户端钩子保持主线时序，网络发送走NeoForge。
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.GuideBookItem.clientOpen =
+            () -> net.minecraft.client.MinecraftClient.getInstance().setScreen(new GuideBookScreen());
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotInteraction.clientChopsticksAim = (be, cell) -> {
+            double ticks = be.getWorld().getTime() + (double) net.minecraft.client.MinecraftClient.getInstance()
+                .getRenderTickCounter().getTickDelta(true);
+            int slot = HotPotBlockEntityRenderer.shownSlot(be, cell, ticks);
+            if (slot >= 0) {
+                net.neoforged.neoforge.network.PacketDistributor.sendToServer(
+                    new cn.blockforge.generated.orientshotpotchronicles.hotpot.ChopsticksAimPayload(be.getPos(), slot));
+            }
+        };
         CreativeSubTabs.register();
         PartOutlineRenderer.register();
         cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlock.openOverview =
@@ -36,8 +48,16 @@ public final class HotPotClient {
                 appendPotTooltip(event.getItemStack(), event.getToolTip());
                 appendPlateTooltip(event.getItemStack(), event.getToolTip());
                 Integer dipped = event.getItemStack().get(HotPotContent.DIPPED);
-                if (dipped != null && dipped != 0) event.getToolTip().add(Text.translatable(
-                    HotPotBlockEntity.key("tooltip.dipped"), cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem.names(dipped)).formatted(Formatting.GOLD));
+                if (dipped != null && dipped != 0) {
+                    event.getToolTip().add(Text.translatable(HotPotBlockEntity.key("tooltip.dipped"),
+                        cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem.names(dipped)).formatted(Formatting.GOLD));
+                    cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning.appendEffects(dipped, event.getToolTip());
+                }
+                var id = net.minecraft.registry.Registries.ITEM.getId(event.getItemStack().getItem());
+                String key = "tooltip." + GeneratedMod.MOD_ID + ".flavor." + id.getPath();
+                if (GeneratedMod.MOD_ID.equals(id.getNamespace()) && net.minecraft.client.resource.language.I18n.hasTranslation(key)) {
+                    event.getToolTip().add(Text.translatable(key).formatted(Formatting.GRAY, Formatting.ITALIC));
+                }
             });
         // 装着汤的锅物品（掉在地上、物品栏里）显示对应汤面：谓词 = (汤底编号 + 1) / 10，没汤为 0（r94，）
         for (net.minecraft.item.Item pot : new net.minecraft.item.Item[]{
@@ -78,7 +98,7 @@ public final class HotPotClient {
 
     @net.neoforged.bus.api.SubscribeEvent
     public static void registerItemExtensions(net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent event) {
-        // 鸳鸯 / 田字锅的物品：锅身方块模型 + 按物品里存的每边汤底画汤面（任意组合都对，不用为每种组合做模型；新增）
+        // 鸳鸯 / 田字锅的物品：锅身方块模型 + 按物品里存的每边汤底画汤面（任意组合都对，不用为每种组合做模型；）
         for (cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial material
             : cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial.values()) {
             if (!material.layout().multiSoup()) {
@@ -105,16 +125,6 @@ public final class HotPotClient {
                 BenchLegsRenderer.renderLegs(state, matrices, consumers, light);
             });
         }
-    }
-
-    /** 调整：必选、默认启用，优先级高于模组主资源。 */
-    @net.neoforged.bus.api.SubscribeEvent
-    public static void registerBuiltinPack(net.neoforged.neoforge.event.AddPackFindersEvent event) {
-        event.addPackFinders(GeneratedMod.id("resourcepacks/hotpot_assets"),
-            net.minecraft.resource.ResourceType.CLIENT_RESOURCES,
-            Text.translatable("resourcePack." + GeneratedMod.MOD_ID + ".hotpot_assets"),
-            net.minecraft.resource.ResourcePackSource.BUILTIN, true,
-            net.minecraft.resource.ResourcePackProfile.InsertionPosition.TOP);
     }
 
     /** 盘子：装了几样 / 能装几样，下面列出每一样；筷子：夹着什么。 */
@@ -173,7 +183,7 @@ public final class HotPotClient {
             return;
         }
         NbtCompound nbt = data.copyNbt();
-        // 鸳鸯 / 田字锅：每边的汤底用「/」列出来（同锅的状态栏，调整）
+        // 鸳鸯 / 田字锅：每边的汤底用「/」列出来（同锅的状态栏，）
         cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout layout =
             stack.getItem() instanceof net.minecraft.item.BlockItem bi
                 && bi.getBlock() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock pot

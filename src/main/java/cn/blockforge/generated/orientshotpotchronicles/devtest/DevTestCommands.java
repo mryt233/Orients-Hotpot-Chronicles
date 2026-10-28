@@ -24,11 +24,12 @@ import net.minecraft.util.math.Vec3d;
  * 用 RCON 就能测交互（服务端没有真人）。打 jar 时整个 devtest 包被排除（build.gradle）。
  * <pre>
  * /hpt hold &lt;主手物品&gt; [副手物品]      物品写法同 /give，例如 orients_hotpot_chronicles:chopsticks
+ * /hpt aim &lt;方块&gt; &lt;小格&gt;             模拟客户端报「这格浮着的是第几小格」（筷子夹菜用）
  * /hpt use &lt;方块&gt; &lt;点击坐标&gt; &lt;潜行&gt;   假玩家主手右键（走原版 interactBlock，和真人一样先方块后物品）
  * /hpt eat                              假玩家把主手的东西「吃完」（筷子夹着菜时 = 按住右键吃完）
  * /hpt show                             打印两只手的物品和组件、饥饿值、状态效果
  * </pre>
- * 作者：（2026-10-25）
+ * （2026-10-25）
  */
 public final class DevTestCommands {
     private DevTestCommands() {
@@ -47,6 +48,10 @@ public final class DevTestCommands {
                         .then(CommandManager.argument("hit", Vec3ArgumentType.vec3(false))
                             .then(CommandManager.argument("sneak", BoolArgumentType.bool())
                                 .executes(DevTestCommands::use)))))
+                .then(CommandManager.literal("aim")
+                    .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
+                        .then(CommandManager.argument("slot", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 80))
+                            .executes(DevTestCommands::aim))))
                 .then(CommandManager.literal("eat").executes(DevTestCommands::eat))
                 .then(CommandManager.literal("show").executes(DevTestCommands::show))));
     }
@@ -82,6 +87,13 @@ public final class DevTestCommands {
         }
         p.setSneaking(false);
         return report(ctx, text);
+    }
+
+    /** 模拟客户端的 ChopsticksAimPayload：「我看到这口锅那格浮着的是第 slot 小格」，紧接着的 use 用它。 */
+    private static int aim(CommandContext<ServerCommandSource> ctx) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.ChopsticksAimPayload.remember(player(ctx),
+            BlockPosArgumentType.getBlockPos(ctx, "pos"), com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "slot"));
+        return report(ctx, "aim ok");
     }
 
     private static int eat(CommandContext<ServerCommandSource> ctx) {

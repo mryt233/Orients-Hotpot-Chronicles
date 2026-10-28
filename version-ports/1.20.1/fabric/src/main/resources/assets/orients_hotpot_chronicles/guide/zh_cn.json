@@ -1,0 +1,689 @@
+{
+ "categories": [
+  {
+   "id": "start",
+   "icon": "orients_hotpot_chronicles:hotpot_guide",
+   "title": "入门",
+   "entries": [
+    {
+     "icon": "orients_hotpot_chronicles:hotpot_guide",
+     "title": "五步吃上火锅",
+     "text": "从零开始，到吃上第一口涮肉。",
+     "tip": "每一步的细节在左边书签对应的分类里。",
+     "steps": [
+      "做一个灶台，放进燃料",
+      "拿着锅右键灶台，把锅架上去",
+      "拿着水桶右键锅，倒进汤底",
+      "拿着生菜右键锅，下到准星对着的那一格",
+      "菜浮起来变色就熟了，空手或拿筷子右键锅捞出来吃"
+     ]
+    },
+    {
+     "icon": "minecraft:golden_apple",
+     "title": "围着锅吃",
+     "rows": [
+      [
+       "minecraft:glistering_melon_slice",
+       "点着火的锅，6 格内的人一直有生命恢复"
+      ],
+      [
+       "minecraft:rotten_flesh",
+       "冷锅（没在烧）里的菜吃了，30% 反胃 15 秒"
+      ],
+      [
+       "orients_hotpot_chronicles:plant_protein_drink",
+       "反胃了：喝植物蛋白饮料或清汤能解"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hotpot",
+   "icon": "orients_hotpot_chronicles:iron_nine_grid_hotpot#tomato",
+   "title": "火锅",
+   "entries": [
+    {
+     "icon": "orients_hotpot_chronicles:brick_stove#lit",
+     "title": "灶台",
+     "text": "烧火煮锅。矮灶台配矮桌，高灶台配高桌（头顶要空一格）。",
+     "recipes": [
+      "orients_hotpot_chronicles:brick_stove",
+      "orients_hotpot_chronicles:tall_brick_stove"
+     ],
+     "steps": [
+      "空手右键灶台的砖身，打开灶膛",
+      "放进燃料（熔炉能烧的都行）"
+     ]
+    },
+    {
+     "icon": "minecraft:coal",
+     "title": "燃料和火力",
+     "text": "只有锅里有生菜要煮时才耗燃料，空烧不耗。",
+     "rows": [
+      [
+       "minecraft:oak_planks",
+       "木头类：火力 ×0.65"
+      ],
+      [
+       "minecraft:coal",
+       "煤炭、木炭：火力 ×1.0"
+      ],
+      [
+       "minecraft:lava_bucket",
+       "岩浆桶：火力 ×1.6"
+      ],
+      [
+       "minecraft:campfire",
+       "点着的篝火：火力 ×1.0，不耗燃料"
+      ]
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+     "text": "9 个大格，每格 9 份，一锅最多 81 份菜。铜锅、铁锅只是样子不同。",
+     "recipes": [
+      "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+      "orients_hotpot_chronicles:copper_nine_grid_hotpot"
+     ],
+     "steps": [
+      "拿着锅右键灶台或篝火，或直接放地上",
+      "空手潜行右键锅：连汤带菜收进背包"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+     "title": "分格锅",
+     "text": "九宫格锅加铜锭 / 铁锭改出来，每边一种汤底。",
+     "tip": "倒汤、舀汤时，准星对着哪一边就是哪一边。",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+       "锭放锅左边：太极鸳鸯锅"
+      ],
+      [
+       "orients_hotpot_chronicles:copper_round_yuanyang_hotpot",
+       "锭放锅下面：圆心鸳鸯锅"
+      ],
+      [
+       "orients_hotpot_chronicles:copper_split_yuanyang_hotpot",
+       "锭放锅上面：直隔鸳鸯锅"
+      ],
+      [
+       "orients_hotpot_chronicles:copper_square_yuanyang_hotpot",
+       "上下各一块：方心鸳鸯锅"
+      ],
+      [
+       "orients_hotpot_chronicles:copper_four_grid_hotpot",
+       "左右各一块：田字锅（4 种汤）"
+      ]
+     ],
+     "recipes": [
+      "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+      "orients_hotpot_chronicles:copper_round_yuanyang_hotpot",
+      "orients_hotpot_chronicles:copper_split_yuanyang_hotpot",
+      "orients_hotpot_chronicles:copper_square_yuanyang_hotpot",
+      "orients_hotpot_chronicles:copper_four_grid_hotpot"
+     ]
+    },
+    {
+     "icon": "minecraft:water_bucket",
+     "title": "汤底",
+     "text": "拿着桶右键锅倒汤，空桶右键锅舀回来。汤底决定涮多快。",
+     "tip": "没有汤的锅不点火。",
+     "rows": [
+      [
+       "minecraft:water_bucket",
+       "清汤 ×1.0"
+      ],
+      [
+       "minecraft:milk_bucket",
+       "高汤 ×0.85，最慢"
+      ],
+      [
+       "minecraft:mushroom_stew",
+       "菌汤 ×1.15（碗会还你）"
+      ],
+      [
+       "minecraft:lava_bucket",
+       "红汤 ×1.3，最快"
+      ],
+      [
+       "orients_hotpot_chronicles:tomato_soup_bucket",
+       "番茄汤 ×1.1"
+      ],
+      [
+       "orients_hotpot_chronicles:three_fresh_soup_bucket",
+       "三鲜汤 ×1.0"
+      ]
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:tomato_hotpot_base",
+     "title": "锅底料",
+     "get": "番茄打草掉落",
+     "text": "清汤里加锅底料，变成番茄锅 / 三鲜锅（只能加进清汤）。",
+     "recipes": [
+      "orients_hotpot_chronicles:tomato_hotpot_base",
+      "orients_hotpot_chronicles:three_fresh_hotpot_base",
+      "orients_hotpot_chronicles:tomato_soup_bucket",
+      "orients_hotpot_chronicles:three_fresh_soup_bucket"
+     ],
+     "steps": [
+      "空桶右键番茄 / 三鲜锅：舀出汤底桶",
+      "汤底桶倒回锅里就是那种汤，不能倒在地上"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:beef_loin_slice",
+     "title": "下菜和捞菜",
+     "text": "能在烟熏炉里烤熟的，都能涮熟。熟食不能再下锅。",
+     "tip": "一格里几样菜轮流浮起，捞到的就是你看到的那一样。",
+     "rows": [
+      [
+       "minecraft:beef",
+       "拿生菜右键锅：下到准星对着的那一格"
+      ],
+      [
+       "orients_hotpot_chronicles:quartz_two_slot_plate",
+       "拿一盘菜右键锅：生的全倒进去"
+      ],
+      [
+       "minecraft:bowl",
+       "空手或碗右键锅：捞出那格正浮着的熟菜"
+      ],
+      [
+       "orients_hotpot_chronicles:bamboo_chopsticks",
+       "筷子右键锅：夹起正浮着的熟菜"
+      ]
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
+     "title": "火锅界面",
+     "text": "拿着筷子潜行右键锅打开，锅里每份菜都看得见。",
+     "steps": [
+      "光标拿着筷子左键熟菜：吃一口",
+      "双击：收起同样的熟菜",
+      "手里拿着蘸料，吃的时候自动蘸一口"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ingredients",
+   "icon": "orients_hotpot_chronicles:iron_kitchen_knife",
+   "title": "食材",
+   "entries": [
+    {
+     "icon": "orients_hotpot_chronicles:cutting_board",
+     "text": "切菜、捣丸子都在砧板上。拿着要加工的东西右键放上去，空手右键拿回。",
+     "recipes": [
+      "orients_hotpot_chronicles:cutting_board"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:iron_kitchen_knife",
+     "text": "拿菜刀右键砧板切一刀。也能当武器。切石机也能一次切好。",
+     "rows": [
+      [
+       "minecraft:beef",
+       "生牛肉 → 3 个肥牛卷"
+      ],
+      [
+       "minecraft:mutton",
+       "生羊肉 → 3 个羊肉卷"
+      ],
+      [
+       "orients_hotpot_chronicles:beef_loin",
+       "牛脊肉 → 3 片吊龙"
+      ],
+      [
+       "minecraft:potato",
+       "土豆（3 刀）→ 3 份土豆片"
+      ],
+      [
+       "orients_hotpot_chronicles:tofu",
+       "豆腐 → 3 份豆腐块"
+      ],
+      [
+       "orients_hotpot_chronicles:shrimp",
+       "虾 → 1 个虾仁（剥壳去头）"
+      ]
+     ],
+     "recipes": [
+      "orients_hotpot_chronicles:iron_kitchen_knife"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:rolling_pin",
+     "text": "拿擀面杖右键砧板，敲三下。",
+     "rows": [
+      [
+       "minecraft:beef",
+       "生牛 / 猪 / 羊肉 → 3 个丸子"
+      ],
+      [
+       "minecraft:cod",
+       "生鳕鱼 / 鲑鱼 → 3 个鱼丸"
+      ],
+      [
+       "orients_hotpot_chronicles:garlic",
+       "大蒜 → 2 份蒜泥"
+      ],
+      [
+       "orients_hotpot_chronicles:peeled_shrimp",
+       "虾仁 → 1 颗虾滑"
+      ]
+     ],
+     "recipes": [
+      "orients_hotpot_chronicles:rolling_pin"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:beef_meatball",
+     "title": "丸子",
+     "text": "熟丸子回 3 饥饿。2 个丸子 + 1 颗香菜合成香菜丸子，熟的回 4。",
+     "recipes": [
+      "orients_hotpot_chronicles:cilantro_beef_meatball"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:tripe",
+     "title": "牛身上的",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:tripe",
+       "毛肚：杀牛掉落，熟的回 5，涮得快"
+      ],
+      [
+       "orients_hotpot_chronicles:beef_loin",
+       "牛脊肉：杀牛 25% 多掉一块，熟的回 8"
+      ],
+      [
+       "orients_hotpot_chronicles:beef_loin_slice",
+       "吊龙：牛脊肉切的，涮得最快"
+      ]
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:shrimp",
+     "title": "虾",
+     "get": "钓鱼钓到",
+     "text": "带壳的虾、虾仁、虾滑都能下锅涮。",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:shrimp",
+       "菜刀切一刀：剥成虾仁"
+      ],
+      [
+       "orients_hotpot_chronicles:peeled_shrimp",
+       "擀面杖拍三下：成一颗虾滑"
+      ],
+      [
+       "orients_hotpot_chronicles:cooked_shrimp_paste",
+       "熟的回：虾 3、虾仁 3、虾滑 4"
+      ]
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:tofu",
+     "text": "3 黄豆 + 水桶合成，水桶还你。切成豆腐块再涮。",
+     "recipes": [
+      "orients_hotpot_chronicles:tofu"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:scallion",
+     "title": "打草和树叶",
+     "text": "不用剪刀，打短草、高草就掉。",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:scallion",
+       "小葱：25%"
+      ],
+      [
+       "orients_hotpot_chronicles:cilantro",
+       "香菜：25%"
+      ],
+      [
+       "orients_hotpot_chronicles:soybean",
+       "黄豆：15%"
+      ],
+      [
+       "orients_hotpot_chronicles:garlic",
+       "大蒜"
+      ],
+      [
+       "orients_hotpot_chronicles:tomato",
+       "番茄"
+      ],
+      [
+       "orients_hotpot_chronicles:orange",
+       "橙子：橡木、深色橡木树叶掉（同苹果）"
+      ]
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:cooked_kelp",
+     "text": "海带下锅煮成熟海带（熔炉里还是干海带）。"
+    }
+   ]
+  },
+  {
+   "id": "sauce",
+   "icon": "orients_hotpot_chronicles:oak_sauce_station",
+   "title": "蘸料",
+   "entries": [
+    {
+     "icon": "orients_hotpot_chronicles:oak_sauce_station",
+     "text": "台上 9 个小碗。11 种木头加铁的，占两格高。",
+     "recipes": [
+      "orients_hotpot_chronicles:oak_sauce_station",
+      "orients_hotpot_chronicles:iron_sauce_station"
+     ],
+     "steps": [
+      "空手右键蘸料台：打开补货界面",
+      "每格放一种原料，1 个原料 = 4 份调料",
+      "右上角的「?」是原料对照表"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:garlic_paste",
+     "title": "十种小料",
+     "text": "一碗里加几种，吃下去就有几种效果。",
+     "rows": [
+      [
+       "minecraft:wheat",
+       "味精：多回 2 饥饿"
+      ],
+      [
+       "minecraft:blaze_powder",
+       "辣油：抗火 10 秒"
+      ],
+      [
+       "minecraft:sweet_berries",
+       "酸甜酱：速度 10 秒"
+      ],
+      [
+       "minecraft:honey_bottle",
+       "蜂蜜：解辣、解毒"
+      ],
+      [
+       "minecraft:sunflower",
+       "香油：生命恢复 5 秒"
+      ],
+      [
+       "minecraft:apple",
+       "醋：解反胃、解辣"
+      ],
+      [
+       "minecraft:sugar",
+       "白糖：急迫 10 秒"
+      ],
+      [
+       "orients_hotpot_chronicles:scallion",
+       "葱花：只提味"
+      ],
+      [
+       "orients_hotpot_chronicles:cilantro",
+       "香菜碎末：只提味"
+      ],
+      [
+       "orients_hotpot_chronicles:garlic_paste",
+       "蒜泥：抗性提升 8 秒"
+      ]
+     ]
+    },
+    {
+     "icon": "minecraft:bowl",
+     "title": "打蘸料",
+     "steps": [
+      "拿碗右键台上有货的小碗：盛进一份",
+      "拿着这碗蘸料再点别的小碗：继续加",
+      "同一种一碗只加一次，一碗蘸 9 口"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
+     "title": "怎么蘸",
+     "tip": "蘸过的菜不管怎么吃，效果都算。",
+     "rows": [
+      [
+       "minecraft:bowl",
+       "蘸料摆桌上，筷子夹着菜右键它"
+      ],
+      [
+       "orients_hotpot_chronicles:bamboo_chopsticks",
+       "主手或副手拿蘸料，吃的时候自动蘸"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tableware",
+   "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
+   "title": "餐具",
+   "entries": [
+    {
+     "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+       "右键锅：夹正浮着的熟菜；潜行右键：开界面"
+      ],
+      [
+       "orients_hotpot_chronicles:quartz_small_dish",
+       "右键碗、盘：夹最后放的那样"
+      ],
+      [
+       "minecraft:beef",
+       "夹着生菜右键锅：下锅"
+      ],
+      [
+       "orients_hotpot_chronicles:cooked_beef_meatball",
+       "夹着熟菜按住右键：吃掉"
+      ]
+     ],
+     "recipes": [
+      "orients_hotpot_chronicles:bamboo_chopsticks"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:quartz_small_dish",
+     "title": "盘子",
+     "text": "5 种材质 × 6 种大小。每格装 3 样菜，摆在桌上或地上。",
+     "recipes": [
+      "orients_hotpot_chronicles:quartz_small_dish",
+      "orients_hotpot_chronicles:quartz_two_slot_plate",
+      "orients_hotpot_chronicles:quartz_four_slot_square_plate",
+      "orients_hotpot_chronicles:quartz_eight_slot_platter"
+     ],
+     "steps": [
+      "拿食物右键盘子：放进去",
+      "空手右键：连盘带菜拿起来",
+      "空手潜行右键：取出一样"
+     ]
+    },
+    {
+     "icon": "minecraft:bowl",
+     "title": "碗",
+     "text": "原版碗能摆桌上装 3 样菜；右键锅先盛熟菜，没熟菜就盛汤。",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:clear_broth_bowl",
+       "清汤：解反胃"
+      ],
+      [
+       "orients_hotpot_chronicles:rich_stock_bowl",
+       "高汤：更抗饿"
+      ],
+      [
+       "orients_hotpot_chronicles:mushroom_broth_bowl",
+       "菌汤：生命恢复"
+      ],
+      [
+       "orients_hotpot_chronicles:spicy_red_broth_bowl",
+       "红汤：力量，但有点辣"
+      ],
+      [
+       "orients_hotpot_chronicles:tomato_soup_bowl",
+       "番茄汤：解反胃"
+      ],
+      [
+       "orients_hotpot_chronicles:three_fresh_soup_bowl",
+       "三鲜汤：更抗饿"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "drinks",
+   "icon": "orients_hotpot_chronicles:orient_cola",
+   "title": "饮料",
+   "entries": [
+    {
+     "icon": "orients_hotpot_chronicles:orange_drink",
+     "text": "一瓶 4 口，速度 15 秒，解辣。",
+     "recipes": [
+      "orients_hotpot_chronicles:orange_drink"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:plant_protein_drink",
+     "text": "一瓶 4 口，解辣、解反胃。作者推荐。",
+     "recipes": [
+      "orients_hotpot_chronicles:plant_protein_drink"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:orient_cola",
+     "text": "一瓶 4 口，速度、急迫各 15 秒。",
+     "recipes": [
+      "orients_hotpot_chronicles:orient_cola"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:glass_cup",
+     "text": "拿着饮料右键空杯（背包里或桌上）倒一杯，一杯一口，喝完还是空杯。",
+     "recipes": [
+      "orients_hotpot_chronicles:glass_cup"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:water_cup",
+     "title": "水和牛奶",
+     "rows": [
+      [
+       "minecraft:water_bucket",
+       "水桶倒空杯：一杯水，桶不会空"
+      ],
+      [
+       "minecraft:milk_bucket",
+       "奶桶倒空杯：一杯牛奶，清掉所有效果"
+      ],
+      [
+       "orients_hotpot_chronicles:glass_cup",
+       "空杯对着水源右键也能舀水"
+      ]
+     ]
+    },
+    {
+     "icon": "minecraft:cauldron",
+     "title": "倒进炼药锅",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:orange_drink",
+       "饮料瓶、满杯右键炼药锅倒进去"
+      ],
+      [
+       "minecraft:cauldron",
+       "一锅一种饮料，最多 12 口"
+      ],
+      [
+       "orients_hotpot_chronicles:glass_cup",
+       "空杯舀一口，玻璃瓶舀一瓶"
+      ]
+     ]
+    },
+    {
+     "icon": "minecraft:glass_bottle",
+     "title": "喝和摆",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:orange_drink",
+       "吃饱了也能喝"
+      ],
+      [
+       "orients_hotpot_chronicles:oak_hotpot_table",
+       "饮料、杯子都能摆桌上，右键喝"
+      ],
+      [
+       "orients_hotpot_chronicles:empty_orange_drink_bottle",
+       "喝完留下空瓶"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "furniture",
+   "icon": "orients_hotpot_chronicles:oak_hotpot_table",
+   "title": "桌凳",
+   "entries": [
+    {
+     "icon": "orients_hotpot_chronicles:oak_hotpot_table",
+     "text": "桌面和矮灶台齐平，挨着的桌子、灶台会连成一张长桌。",
+     "recipes": [
+      "orients_hotpot_chronicles:oak_hotpot_table"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:oak_tall_hotpot_table",
+     "text": "1.5 格高，配高灶台。灶口对着桌子时那边露出火。",
+     "recipes": [
+      "orients_hotpot_chronicles:oak_tall_hotpot_table"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:smooth_stone_hotpot_table",
+     "title": "石料桌",
+     "text": "9 种桌面：平滑石头、磨制石头、石英、切制铜、铁，下面是红砖。",
+     "recipes": [
+      "orients_hotpot_chronicles:smooth_stone_hotpot_table",
+      "orients_hotpot_chronicles:smooth_stone_tall_hotpot_table"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:oak_stool",
+     "title": "凳子",
+     "text": "板凳配矮桌，条凳配高桌。同一条线挨着的会连成长凳，最长 3 格。",
+     "recipes": [
+      "orients_hotpot_chronicles:oak_stool",
+      "orients_hotpot_chronicles:oak_bench"
+     ],
+     "steps": [
+      "空手右键凳子：坐下",
+      "潜行：起身"
+     ]
+    },
+    {
+     "icon": "minecraft:lantern",
+     "title": "桌上摆什么",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:quartz_small_dish",
+       "盘子、碗、饮料、蘸料"
+      ],
+      [
+       "minecraft:lantern",
+       "灯笼、花盆、蜡烛：贴住桌面"
+      ]
+     ]
+    }
+   ]
+  }
+ ]
+}

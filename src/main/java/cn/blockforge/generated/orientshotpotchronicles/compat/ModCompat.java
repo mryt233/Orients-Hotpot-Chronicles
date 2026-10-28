@@ -28,7 +28,7 @@ public final class ModCompat {
         int n = 0;
         Item tomato = HotPotCompat.itemOf("farmersdelight", "tomato");
         if (tomato != null) {
-            HotPotCompat.registerBaseSource(tomato, SoupBase.SPICY);
+            HotPotCompat.registerBaseSource(tomato, SoupBase.TOMATO);   // 2026-10-25 有了番茄锅底，农夫乐事的番茄改成倒出番茄锅底（原来是红汤；）
             n++;
         }
         Item richSoup = HotPotCompat.itemOf("farmersdelight", "rich_soup");

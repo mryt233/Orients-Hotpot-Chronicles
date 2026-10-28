@@ -33,7 +33,7 @@ import net.minecraft.world.World;
  * {@code cuttable}（能放上砧板的东西）。台面上放着的东西由 client/CuttingBoardRenderer 平躺着画出来。
  * 交互：拿能切的东西右键 = 放一个上去；拿菜刀右键 = 切（掉出切好的东西，菜刀掉 1 点耐久）；空手右键 = 拿回来。
  * 标签 {@code cut_piece_by_piece} 里的（土豆）一刀只掉 1 份，切满配方的份数才切完（用户：一个土豆切三下）；其他一刀切完。
- * 作者：
+ *
  */
 public class CuttingBoardBlock extends Block implements BlockEntityProvider, PartOutline {
     public static final TagKey<net.minecraft.item.Item> CUTTABLE =
@@ -198,7 +198,7 @@ public class CuttingBoardBlock extends Block implements BlockEntityProvider, Par
             if (hits >= Pounding.HITS) {
                 board.setItem(ItemStack.EMPTY);
                 ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + TOP + 0.1, pos.getZ() + 0.5,
-                    new ItemStack(ball, Pounding.RESULT_COUNT));
+                    new ItemStack(ball, Pounding.resultCount(meat)));
             } else {
                 board.setCuts(hits);
             }

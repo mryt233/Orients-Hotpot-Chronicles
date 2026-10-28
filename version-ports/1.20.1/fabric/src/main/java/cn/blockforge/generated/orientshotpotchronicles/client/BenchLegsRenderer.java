@@ -108,6 +108,6 @@ public final class BenchLegsRenderer implements BlockEntityRenderer<BenchBlockEn
     private static void vertex(VertexConsumer vc, MatrixStack.Entry e, float x, float y, float z, float u, float v,
                                int light, float nx, float ny, float nz) {
         vc.vertex(e.getPositionMatrix(), x, y, z).color(255, 255, 255, 255).texture(u, v)
-            .overlay(OverlayTexture.DEFAULT_UV).light(light).normal(e.getNormalMatrix(), nx, ny, nz).next();   // 1.20.1 移植（调整）
+            .overlay(OverlayTexture.DEFAULT_UV).light(light).normal(e.getNormalMatrix(), nx, ny, nz).next();   // 1.20.1 移植（）
     }
 }

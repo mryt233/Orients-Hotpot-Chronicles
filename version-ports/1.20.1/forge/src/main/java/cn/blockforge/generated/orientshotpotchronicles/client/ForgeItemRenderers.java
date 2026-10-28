@@ -1,4 +1,4 @@
-// 作者：；1.20.1 Forge 客户端动态物品渲染。
+// 1.20.1 Forge 客户端动态物品渲染。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;

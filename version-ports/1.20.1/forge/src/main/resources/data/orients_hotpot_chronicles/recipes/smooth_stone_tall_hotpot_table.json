@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "orients_hotpot_chronicles:tall_hotpot_table",
+  "pattern": [
+    "PPP",
+    "BBB"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:smooth_stone"
+    },
+    "B": {
+      "item": "minecraft:bricks"
+    }
+  },
+  "result": {
+    "count": 3,
+    "item": "orients_hotpot_chronicles:smooth_stone_tall_hotpot_table"
+  }
+}

@@ -1,4 +1,4 @@
-// 作者：；仅客户端接入 Forge 的原版碗渲染扩展。
+// 仅客户端接入 Forge 的原版碗渲染扩展。
 package cn.blockforge.generated.orientshotpotchronicles.mixin;
 
 import cn.blockforge.generated.orientshotpotchronicles.client.ForgeItemRenderers;

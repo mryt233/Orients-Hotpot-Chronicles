@@ -19,7 +19,7 @@ import net.minecraft.util.Identifier;
  * 面上按放了哪几种撒对应颜色的小点（2026-10-23 改，原来是一层平涂 + 葱香菜的绿点）。摆在桌上由 PlateHolderRenderer 调，物品由 builtin/entity 模型交给这里画。
  * 坐标：盘子格里一个摆放位置的局部坐标（0..1，碗中心在 0.5、碗底在 y=0），和 tools/gen_bowls.py 的 b 形一致：
  * 汤面在 2.5 像素高，半宽 2.5 像素。
- * 作者：
+ *
  */
 public final class SauceRender {
     private static final Identifier WHITE = GeneratedMod.id("textures/misc/white.png");
@@ -44,7 +44,8 @@ public final class SauceRender {
     private static final float[][][] DOTS = {
         {{6.2F, 6.6F}, {9.4F, 9.0F}}, {{7.4F, 6.0F}, {8.8F, 7.6F}}, {{6.0F, 8.6F}, {9.6F, 6.4F}},
         {{7.8F, 9.4F}, {6.6F, 7.6F}}, {{8.4F, 6.8F}, {7.0F, 9.6F}}, {{9.2F, 8.2F}, {6.4F, 9.0F}},
-        {{7.6F, 7.0F}, {8.6F, 9.6F}}, {{6.8F, 6.2F}, {9.0F, 7.0F}, {7.4F, 8.8F}}, {{8.2F, 8.4F}, {6.0F, 7.2F}, {9.6F, 9.4F}}};
+        {{7.6F, 7.0F}, {8.6F, 9.6F}}, {{6.8F, 6.2F}, {9.0F, 7.0F}, {7.4F, 8.8F}}, {{8.2F, 8.4F}, {6.0F, 7.2F}, {9.6F, 9.4F}},
+        {{7.0F, 8.0F}, {9.0F, 6.0F}}};   // 蒜泥（2026-10-25）
 
     /**
      * 碗里的调料面（mask 为空就不画）。2026-10-23 用户说不像蘸料（原来是一层平涂的色），改成：

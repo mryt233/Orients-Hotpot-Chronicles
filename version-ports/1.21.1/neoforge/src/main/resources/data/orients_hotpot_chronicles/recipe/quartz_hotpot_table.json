@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "orients_hotpot_chronicles:hotpot_table",
+  "pattern": [
+    "PPP",
+    "PBP",
+    "PPP"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:quartz_block"
+    },
+    "B": {
+      "item": "minecraft:brick"
+    }
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:quartz_hotpot_table",
+    "count": 4
+  }
+}

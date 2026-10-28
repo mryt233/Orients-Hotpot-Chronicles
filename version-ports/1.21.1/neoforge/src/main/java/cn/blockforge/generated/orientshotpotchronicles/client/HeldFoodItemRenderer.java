@@ -25,7 +25,7 @@ import net.minecraft.util.math.Direction;
  * </ul>
  * 有菜的物品带自定义模型数据 1（PlateItem.syncFoodModel），模型是 builtin/entity、不带显示变换，交给这里画；
  * 这里去掉自定义模型数据再画一遍就是原来的模型（不会递归），菜用原来模型的显示变换对齐。
- * 作者：
+ *
  */
 public final class HeldFoodItemRenderer {
     /** 筷子尖在物品模型里的位置（0..1，贴图左下角那两根筷子的尖）和夹着的菜的大小。 */
@@ -110,7 +110,7 @@ public final class HeldFoodItemRenderer {
     /** 装着菜的碗：画立体的碗（和摆在桌上的同一个模型），再把菜叠在碗里；显示变换在 item/bowl_with_food.json。 */
     private static void renderBowl(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices,
                                    VertexConsumerProvider consumers, int light, int overlay) {
-        // 调整：无装菜组件时回到原版碗；清除模型覆盖以防递归。
+        // ：无装菜组件时回到原版碗；清除模型覆盖以防递归。
         if (!stack.contains(DataComponentTypes.CONTAINER)
             || stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).streamNonEmpty().findAny().isEmpty()) {
             withBase(stack, mode, matrices, consumers, light, overlay, () -> {});

@@ -67,7 +67,7 @@ public class StoveBlock extends Block implements PartOutline, BlockEntityProvide
         POT_BODY, POT_RIM_NORTH, POT_RIM_SOUTH, POT_RIM_WEST, POT_RIM_EAST,
         POT_HANDLE_NORTH, POT_HANDLE_SOUTH).simplify();
     /** 高灶台比矮灶台抬高的像素：灶口、锅、汤整体上移（配高火锅桌，桌面 23/16，灶台砖面比桌面低 2 像素）。
-     *  r83 是 11，r84 用户说桌子和灶台再低一点，一起降 1（调整）。 */
+     *  r83 是 11，r84 用户说桌子和灶台再低一点，一起降 1（）。 */
     public static final double TALL_LIFT = 10.0;
 
     /** 这一种灶台整体抬高多少像素（矮灶台 0，高灶台 {@link #TALL_LIFT}）。 */
@@ -129,7 +129,7 @@ public class StoveBlock extends Block implements PartOutline, BlockEntityProvide
     /** 灶台抬高的方块单位（不是灶台返回 0）。 */
     public static float liftOf(BlockState state) {
         if (state.getBlock() instanceof HotPotBlock && state.get(HotPotBlock.ON_CAMPFIRE)) {
-            return (float) (-HotPotBlock.CAMPFIRE_DROP / 16.0);   // 坐在篝火上的锅整体下沉（新增）
+            return (float) (-HotPotBlock.CAMPFIRE_DROP / 16.0);   // 坐在篝火上的锅整体下沉（）
         }
         return state.getBlock() instanceof StoveBlock stove ? (float) (stove.lift / 16.0) : 0F;
     }
@@ -222,6 +222,11 @@ public class StoveBlock extends Block implements PartOutline, BlockEntityProvide
             return ActionResult.SUCCESS;
         }
 
+        if (world.isClient && potHit && hasPot && player.getMainHandStack().isEmpty()) {
+            // 空手捞看到的那样（2026-10-26）：先把这一刻浮在准星那格上的是哪样报给服务端
+            HotPotInteraction.clientChopsticksAim.accept(stove, HotPotInteraction.cellFromHit(stove, pos, hit,
+                HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE));
+        }
         if (!world.isClient) {
             if (potHit && hasPot) {
                 if (!player.getMainHandStack().isEmpty()) {
@@ -233,7 +238,7 @@ public class StoveBlock extends Block implements PartOutline, BlockEntityProvide
                     // 空手点锅体：先按准星格收取熟食，没有可取的才提示状态。
                     int bigCell = HotPotInteraction.cellFromHit(stove, pos, hit,
                         HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE);
-                    if (!stove.collectCookedSlot(player, stove.firstCookedSlotInCell(bigCell))) {
+                    if (!stove.collectShown(player, bigCell)) {
                         player.sendMessage(stove.statusText(), true);
                     }
                 }
@@ -321,6 +326,9 @@ public class StoveBlock extends Block implements PartOutline, BlockEntityProvide
             return ItemActionResult.SUCCESS;
         }
         if (stack.isOf(net.minecraft.item.Items.BOWL)) {
+            if (world.isClient) {
+                HotPotInteraction.clientChopsticksAim.accept(stove, bigCell);   // 碗先盛看到的那样（2026-10-26）
+            }
             if (!world.isClient) {
                 stove.serveWithBowl(player, hand, bigCell);
             }
@@ -329,17 +337,21 @@ public class StoveBlock extends Block implements PartOutline, BlockEntityProvide
         if (servingTool) {
             if (stack.isOf(HotPotContent.CHOPSTICKS)) {
                 // 夹着的是熟菜（下不了锅）：不管锅，交给筷子吃（按住右键吃）。以前会提示「煮不了」，
-                // 刚从锅里夹起来、右键还按着时就吃不上（用户报：筷子夹起来的菜吃不了。调整）
+                // 刚从锅里夹起来、右键还按着时就吃不上（用户报：筷子夹起来的菜吃不了。）
                 ItemStack held = Chopsticks.held(stack);
                 if (!held.isEmpty() && !HotPotCooking.acceptable(world, held)) {
                     return ItemActionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
                 }
                 // 筷子上夹着菜：放进准星对着的那一格；空筷子：夹起这一格的一样熟食
-                // （2026-10-25 用户定的新交互；开锅界面改成拿筷子 Shift+右键，见 ChopsticksItem.useOnBlock。调整）
+                // （2026-10-25 用户定的新交互；开锅界面改成拿筷子 Shift+右键，见 ChopsticksItem.useOnBlock。）
+                if (world.isClient && Chopsticks.held(stack).isEmpty()) {
+                    // 告诉服务端这一刻浮在这格上的是哪样，夹的就是看到的那样（用户 2026-10-25）
+                    HotPotInteraction.clientChopsticksAim.accept(stove, bigCell);
+                }
                 if (!world.isClient) {
                     if (!Chopsticks.held(stack).isEmpty()) {
                         stove.insertHeld(player, stack, stove.firstEmptySlotInCell(bigCell));
-                    } else if (!stove.pickWithChopsticks(player, stack, cookedSlot)) {
+                    } else if (!stove.pickShown(player, stack, bigCell)) {
                         player.sendMessage(Text.translatable(HotPotBlockEntity.key("msg.no_cooked_here")), true);
                     }
                 }
@@ -411,6 +423,11 @@ public class StoveBlock extends Block implements PartOutline, BlockEntityProvide
         PlayerEntity player = PlateHolderBlock.pickPlayer.get();
         HotPotMaterial material = state.get(POT).material();
         if (player != null && material != null && aimsAtPot(state, pos, player)) {
+            // 创造模式复制整锅（汤底 + 食材，同 Shift+右键端下来的；用户 2026-10-26 报：中键只复制空锅）；
+            // 生存模式照原版在物品栏里找同样的锅，给带内容的锅就对不上普通空锅了
+            if (player.isCreative() && world.getBlockEntity(pos) instanceof StoveBlockEntity stove) {
+                return stove.toPotItem(material);
+            }
             return new ItemStack(HotPotContent.blockFor(material));
         }
         return super.getPickStack(world, pos, state);

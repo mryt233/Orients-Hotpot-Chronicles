@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "orients_hotpot_chronicles:tall_hotpot_table",
+  "pattern": [
+    "PPP",
+    "BBB"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:iron_ingot"
+    },
+    "B": {
+      "item": "minecraft:bricks"
+    }
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:iron_tall_hotpot_table",
+    "count": 3
+  }
+}

@@ -197,6 +197,7 @@ public class StoveBlockEntity extends HotPotBlockEntity {
             return;
         }
         ItemStack pot = toPotItem(material);
+        HotPotCriterion.fire(player, "carry_pot");
         removePot();
         if (!player.getInventory().insertStack(pot)) {
             player.dropItem(pot, false);
@@ -278,7 +279,7 @@ public class StoveBlockEntity extends HotPotBlockEntity {
 
             @Override
             public void writeScreenOpeningData(ServerPlayerEntity sp, net.minecraft.network.PacketByteBuf buf) {
-                buf.writeBlockPos(pos);   // 1.20.1 移植（调整）
+                buf.writeBlockPos(pos);   // 1.20.1 移植（）
             }
 
             @Override

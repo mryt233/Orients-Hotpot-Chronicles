@@ -1,0 +1,689 @@
+{
+ "categories": [
+  {
+   "id": "start",
+   "icon": "orients_hotpot_chronicles:hotpot_guide",
+   "title": "Getting started",
+   "entries": [
+    {
+     "icon": "orients_hotpot_chronicles:hotpot_guide",
+     "title": "Hot pot in five steps",
+     "text": "From nothing to your first bite.",
+     "tip": "Each step is covered in detail under the tabs on the left.",
+     "steps": [
+      "Build a stove and put fuel in it",
+      "Use a pot on the stove to set it on top",
+      "Use a water bucket on the pot to add broth",
+      "Use raw food on the pot; it goes where you aim",
+      "When it floats up cooked, use an empty hand or chopsticks to take it"
+     ]
+    },
+    {
+     "icon": "minecraft:golden_apple",
+     "title": "Eating together",
+     "rows": [
+      [
+       "minecraft:glistering_melon_slice",
+       "A lit pot gives Regeneration within 6 blocks"
+      ],
+      [
+       "minecraft:rotten_flesh",
+       "Food from a cold pot: 30% Nausea for 15 s"
+      ],
+      [
+       "orients_hotpot_chronicles:plant_protein_drink",
+       "Plant protein drink or clear broth cures Nausea"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hotpot",
+   "icon": "orients_hotpot_chronicles:iron_nine_grid_hotpot#tomato",
+   "title": "Hot pot",
+   "entries": [
+    {
+     "icon": "orients_hotpot_chronicles:brick_stove#lit",
+     "title": "Stoves",
+     "text": "Low stove for low tables, tall stove for tall tables (needs a free block above).",
+     "recipes": [
+      "orients_hotpot_chronicles:brick_stove",
+      "orients_hotpot_chronicles:tall_brick_stove"
+     ],
+     "steps": [
+      "Use the brick body with an empty hand to open the firebox",
+      "Add any furnace fuel"
+     ]
+    },
+    {
+     "icon": "minecraft:coal",
+     "title": "Fuel and heat",
+     "text": "Fuel burns only while raw food is cooking.",
+     "rows": [
+      [
+       "minecraft:oak_planks",
+       "Wood: heat ×0.65"
+      ],
+      [
+       "minecraft:coal",
+       "Coal, charcoal: heat ×1.0"
+      ],
+      [
+       "minecraft:lava_bucket",
+       "Lava bucket: heat ×1.6"
+      ],
+      [
+       "minecraft:campfire",
+       "Lit campfire: heat ×1.0, no fuel"
+      ]
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+     "text": "9 sections of 9 slots, up to 81 pieces. Copper and iron only differ in looks.",
+     "recipes": [
+      "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+      "orients_hotpot_chronicles:copper_nine_grid_hotpot"
+     ],
+     "steps": [
+      "Place it on a stove, a campfire or the ground",
+      "Sneak-use with an empty hand to pick it up with everything inside"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+     "title": "Divided pots",
+     "text": "A nine-grid pot plus copper or iron ingots. One broth per side.",
+     "tip": "Pouring and scooping use the side you aim at.",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+       "Ingot left of the pot: S yuanyang"
+      ],
+      [
+       "orients_hotpot_chronicles:copper_round_yuanyang_hotpot",
+       "Ingot below: O yuanyang"
+      ],
+      [
+       "orients_hotpot_chronicles:copper_split_yuanyang_hotpot",
+       "Ingot above: split yuanyang"
+      ],
+      [
+       "orients_hotpot_chronicles:copper_square_yuanyang_hotpot",
+       "Above and below: square yuanyang"
+      ],
+      [
+       "orients_hotpot_chronicles:copper_four_grid_hotpot",
+       "Left and right: four-grid (4 broths)"
+      ]
+     ],
+     "recipes": [
+      "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+      "orients_hotpot_chronicles:copper_round_yuanyang_hotpot",
+      "orients_hotpot_chronicles:copper_split_yuanyang_hotpot",
+      "orients_hotpot_chronicles:copper_square_yuanyang_hotpot",
+      "orients_hotpot_chronicles:copper_four_grid_hotpot"
+     ]
+    },
+    {
+     "icon": "minecraft:water_bucket",
+     "title": "Broths",
+     "text": "Use a bucket on the pot to pour; an empty bucket scoops it back. The broth sets the cooking speed.",
+     "tip": "A pot without broth won't light.",
+     "rows": [
+      [
+       "minecraft:water_bucket",
+       "Clear broth ×1.0"
+      ],
+      [
+       "minecraft:milk_bucket",
+       "Rich stock ×0.85, slowest"
+      ],
+      [
+       "minecraft:mushroom_stew",
+       "Mushroom broth ×1.15 (bowl returned)"
+      ],
+      [
+       "minecraft:lava_bucket",
+       "Spicy red broth ×1.3, fastest"
+      ],
+      [
+       "orients_hotpot_chronicles:tomato_soup_bucket",
+       "Tomato broth ×1.1"
+      ],
+      [
+       "orients_hotpot_chronicles:three_fresh_soup_bucket",
+       "Three-fresh broth ×1.0"
+      ]
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:tomato_hotpot_base",
+     "title": "Hot pot bases",
+     "get": "Tomatoes drop from grass",
+     "text": "Add a base to clear broth to make a tomato or three-fresh pot (clear broth only).",
+     "recipes": [
+      "orients_hotpot_chronicles:tomato_hotpot_base",
+      "orients_hotpot_chronicles:three_fresh_hotpot_base",
+      "orients_hotpot_chronicles:tomato_soup_bucket",
+      "orients_hotpot_chronicles:three_fresh_soup_bucket"
+     ],
+     "steps": [
+      "An empty bucket scoops a broth bucket out of that pot",
+      "Pour it back into a pot; it can't be poured on the ground"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:beef_loin_slice",
+     "title": "Adding and taking food",
+     "text": "Anything a smoker can cook, the pot can cook. Cooked food can't go back in.",
+     "tip": "Pieces in one section take turns floating up; you get the one you see.",
+     "rows": [
+      [
+       "minecraft:beef",
+       "Raw food on the pot: goes where you aim"
+      ],
+      [
+       "orients_hotpot_chronicles:quartz_two_slot_plate",
+       "A full plate on the pot: pours in the raw food"
+      ],
+      [
+       "minecraft:bowl",
+       "Empty hand or bowl: takes the cooked piece floating up"
+      ],
+      [
+       "orients_hotpot_chronicles:bamboo_chopsticks",
+       "Chopsticks: pick up the cooked piece floating up"
+      ]
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
+     "title": "Pot screen",
+     "text": "Sneak-use chopsticks on the pot to see every piece inside.",
+     "steps": [
+      "Left-click cooked food with the chopsticks cursor: eat it",
+      "Double-click: gather the same food",
+      "Holding a dipping sauce dips each bite"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ingredients",
+   "icon": "orients_hotpot_chronicles:iron_kitchen_knife",
+   "title": "Ingredients",
+   "entries": [
+    {
+     "icon": "orients_hotpot_chronicles:cutting_board",
+     "text": "Cutting and pounding happen here. Use an item on it to put it down; empty hand takes it back.",
+     "recipes": [
+      "orients_hotpot_chronicles:cutting_board"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:iron_kitchen_knife",
+     "text": "Use it on the board to cut once. Also a weapon. A stonecutter works too.",
+     "rows": [
+      [
+       "minecraft:beef",
+       "Raw beef → 3 fatty beef rolls"
+      ],
+      [
+       "minecraft:mutton",
+       "Raw mutton → 3 mutton rolls"
+      ],
+      [
+       "orients_hotpot_chronicles:beef_loin",
+       "Beef loin → 3 loin slices"
+      ],
+      [
+       "minecraft:potato",
+       "Potato (3 cuts) → 3 potato slices"
+      ],
+      [
+       "orients_hotpot_chronicles:tofu",
+       "Tofu → 3 tofu cubes"
+      ],
+      [
+       "orients_hotpot_chronicles:shrimp",
+       "Shrimp → 1 peeled shrimp"
+      ]
+     ],
+     "recipes": [
+      "orients_hotpot_chronicles:iron_kitchen_knife"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:rolling_pin",
+     "text": "Use it on the board three times.",
+     "rows": [
+      [
+       "minecraft:beef",
+       "Raw beef / pork / mutton → 3 meatballs"
+      ],
+      [
+       "minecraft:cod",
+       "Raw cod / salmon → 3 fish balls"
+      ],
+      [
+       "orients_hotpot_chronicles:garlic",
+       "Garlic → 2 garlic paste"
+      ],
+      [
+       "orients_hotpot_chronicles:peeled_shrimp",
+       "Peeled shrimp → 1 shrimp paste"
+      ]
+     ],
+     "recipes": [
+      "orients_hotpot_chronicles:rolling_pin"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:beef_meatball",
+     "title": "Meatballs",
+     "text": "Cooked: 3 hunger. 2 meatballs + 1 cilantro make cilantro meatballs, cooked: 4.",
+     "recipes": [
+      "orients_hotpot_chronicles:cilantro_beef_meatball"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:tripe",
+     "title": "From cows",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:tripe",
+       "Tripe: cow drop, cooked 5, cooks fast"
+      ],
+      [
+       "orients_hotpot_chronicles:beef_loin",
+       "Beef loin: 25% extra cow drop, cooked 8"
+      ],
+      [
+       "orients_hotpot_chronicles:beef_loin_slice",
+       "Loin slice: cut from loin, fastest to cook"
+      ]
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:shrimp",
+     "title": "Shrimp",
+     "get": "Caught by fishing",
+     "text": "Shrimp, peeled shrimp and shrimp paste all cook in the pot.",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:shrimp",
+       "Cut once with the knife: peeled shrimp"
+      ],
+      [
+       "orients_hotpot_chronicles:peeled_shrimp",
+       "Three hits with the rolling pin: shrimp paste"
+      ],
+      [
+       "orients_hotpot_chronicles:cooked_shrimp_paste",
+       "Cooked: shrimp 3, peeled 3, paste 4"
+      ]
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:tofu",
+     "text": "3 soybeans + water bucket (bucket returned). Cut into cubes before cooking.",
+     "recipes": [
+      "orients_hotpot_chronicles:tofu"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:scallion",
+     "title": "From grass and leaves",
+     "text": "Break short or tall grass, no shears needed.",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:scallion",
+       "Scallion: 25%"
+      ],
+      [
+       "orients_hotpot_chronicles:cilantro",
+       "Cilantro: 25%"
+      ],
+      [
+       "orients_hotpot_chronicles:soybean",
+       "Soybean: 15%"
+      ],
+      [
+       "orients_hotpot_chronicles:garlic",
+       "Garlic"
+      ],
+      [
+       "orients_hotpot_chronicles:tomato",
+       "Tomato"
+      ],
+      [
+       "orients_hotpot_chronicles:orange",
+       "Orange: oak and dark oak leaves (like apples)"
+      ]
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:cooked_kelp",
+     "text": "Kelp cooked in the pot becomes cooked kelp (a furnace still makes dried kelp)."
+    }
+   ]
+  },
+  {
+   "id": "sauce",
+   "icon": "orients_hotpot_chronicles:oak_sauce_station",
+   "title": "Dipping sauce",
+   "entries": [
+    {
+     "icon": "orients_hotpot_chronicles:oak_sauce_station",
+     "text": "Nine little bowls on top. 11 woods plus iron; two blocks tall.",
+     "recipes": [
+      "orients_hotpot_chronicles:oak_sauce_station",
+      "orients_hotpot_chronicles:iron_sauce_station"
+     ],
+     "steps": [
+      "Use it with an empty hand to open restocking",
+      "One ingredient per slot; 1 ingredient = 4 servings",
+      "The \"?\" at the top right lists the ingredients"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:garlic_paste",
+     "title": "Ten seasonings",
+     "text": "Every seasoning in the bowl adds its effect.",
+     "rows": [
+      [
+       "minecraft:wheat",
+       "MSG: +2 hunger"
+      ],
+      [
+       "minecraft:blaze_powder",
+       "Chili oil: Fire Resistance 10 s"
+      ],
+      [
+       "minecraft:sweet_berries",
+       "Sweet and sour: Speed 10 s"
+      ],
+      [
+       "minecraft:honey_bottle",
+       "Honey: cures spice and Poison"
+      ],
+      [
+       "minecraft:sunflower",
+       "Sesame oil: Regeneration 5 s"
+      ],
+      [
+       "minecraft:apple",
+       "Vinegar: cures Nausea and spice"
+      ],
+      [
+       "minecraft:sugar",
+       "Sugar: Haste 10 s"
+      ],
+      [
+       "orients_hotpot_chronicles:scallion",
+       "Scallion: flavor only"
+      ],
+      [
+       "orients_hotpot_chronicles:cilantro",
+       "Cilantro: flavor only"
+      ],
+      [
+       "orients_hotpot_chronicles:garlic_paste",
+       "Garlic paste: Resistance 8 s"
+      ]
+     ]
+    },
+    {
+     "icon": "minecraft:bowl",
+     "title": "Mixing a sauce",
+     "steps": [
+      "Use a bowl on a stocked little bowl: one serving",
+      "Use the sauce on other bowls to add more",
+      "Each seasoning once per bowl; 9 dips per bowl"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
+     "title": "Dipping",
+     "tip": "Dipped food keeps its effects however you eat it.",
+     "rows": [
+      [
+       "minecraft:bowl",
+       "Put the sauce on a table, use chopsticks with food on it"
+      ],
+      [
+       "orients_hotpot_chronicles:bamboo_chopsticks",
+       "Hold the sauce in either hand to dip as you eat"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tableware",
+   "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
+   "title": "Tableware",
+   "entries": [
+    {
+     "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+       "On a pot: pick the floating piece; sneak: open screen"
+      ],
+      [
+       "orients_hotpot_chronicles:quartz_small_dish",
+       "On a bowl or plate: take the last piece"
+      ],
+      [
+       "minecraft:beef",
+       "Holding raw food, on a pot: put it in"
+      ],
+      [
+       "orients_hotpot_chronicles:cooked_beef_meatball",
+       "Holding cooked food, hold use: eat"
+      ]
+     ],
+     "recipes": [
+      "orients_hotpot_chronicles:bamboo_chopsticks"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:quartz_small_dish",
+     "title": "Plates",
+     "text": "5 materials × 6 sizes. 3 pieces per cell; place on tables or the ground.",
+     "recipes": [
+      "orients_hotpot_chronicles:quartz_small_dish",
+      "orients_hotpot_chronicles:quartz_two_slot_plate",
+      "orients_hotpot_chronicles:quartz_four_slot_square_plate",
+      "orients_hotpot_chronicles:quartz_eight_slot_platter"
+     ],
+     "steps": [
+      "Use food on a plate: put it in",
+      "Empty hand: pick up plate and food",
+      "Sneak with empty hand: take one piece out"
+     ]
+    },
+    {
+     "icon": "minecraft:bowl",
+     "title": "Bowls",
+     "text": "A vanilla bowl holds 3 pieces on a table. On a pot it takes cooked food first, else broth.",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:clear_broth_bowl",
+       "Clear broth: cures Nausea"
+      ],
+      [
+       "orients_hotpot_chronicles:rich_stock_bowl",
+       "Rich stock: more filling"
+      ],
+      [
+       "orients_hotpot_chronicles:mushroom_broth_bowl",
+       "Mushroom broth: Regeneration"
+      ],
+      [
+       "orients_hotpot_chronicles:spicy_red_broth_bowl",
+       "Spicy red broth: Strength, a bit spicy"
+      ],
+      [
+       "orients_hotpot_chronicles:tomato_soup_bowl",
+       "Tomato soup: cures Nausea"
+      ],
+      [
+       "orients_hotpot_chronicles:three_fresh_soup_bowl",
+       "Three-fresh soup: more filling"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "drinks",
+   "icon": "orients_hotpot_chronicles:orient_cola",
+   "title": "Drinks",
+   "entries": [
+    {
+     "icon": "orients_hotpot_chronicles:orange_drink",
+     "text": "4 sips. Speed 15 s, cures spice.",
+     "recipes": [
+      "orients_hotpot_chronicles:orange_drink"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:plant_protein_drink",
+     "text": "4 sips. Cures spice and Nausea. The author's favourite.",
+     "recipes": [
+      "orients_hotpot_chronicles:plant_protein_drink"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:orient_cola",
+     "text": "4 sips. Speed and Haste 15 s each.",
+     "recipes": [
+      "orients_hotpot_chronicles:orient_cola"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:glass_cup",
+     "text": "Use a drink on an empty cup (in your inventory or on a table) to pour a cup. One sip each.",
+     "recipes": [
+      "orients_hotpot_chronicles:glass_cup"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:water_cup",
+     "title": "Water and milk",
+     "rows": [
+      [
+       "minecraft:water_bucket",
+       "Water bucket on an empty cup: a cup of water, bucket stays full"
+      ],
+      [
+       "minecraft:milk_bucket",
+       "Milk bucket on an empty cup: a cup of milk, clears all effects"
+      ],
+      [
+       "orients_hotpot_chronicles:glass_cup",
+       "Use an empty cup on water to scoop some"
+      ]
+     ]
+    },
+    {
+     "icon": "minecraft:cauldron",
+     "title": "Into a cauldron",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:orange_drink",
+       "Use a drink or full cup on a cauldron to pour it in"
+      ],
+      [
+       "minecraft:cauldron",
+       "One drink per cauldron, up to 12 sips"
+      ],
+      [
+       "orients_hotpot_chronicles:glass_cup",
+       "Empty cup takes a sip, glass bottle a bottle"
+      ]
+     ]
+    },
+    {
+     "icon": "minecraft:glass_bottle",
+     "title": "Drinking and placing",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:orange_drink",
+       "Drinkable even when full"
+      ],
+      [
+       "orients_hotpot_chronicles:oak_hotpot_table",
+       "Drinks and cups can sit on tables; use to drink"
+      ],
+      [
+       "orients_hotpot_chronicles:empty_orange_drink_bottle",
+       "Leaves an empty bottle"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "furniture",
+   "icon": "orients_hotpot_chronicles:oak_hotpot_table",
+   "title": "Tables and seats",
+   "entries": [
+    {
+     "icon": "orients_hotpot_chronicles:oak_hotpot_table",
+     "text": "Level with the low stove. Neighbouring tables and stoves join into one long table.",
+     "recipes": [
+      "orients_hotpot_chronicles:oak_hotpot_table"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:oak_tall_hotpot_table",
+     "text": "1.5 blocks tall, for the tall stove. The side facing a stove's fire opens up.",
+     "recipes": [
+      "orients_hotpot_chronicles:oak_tall_hotpot_table"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:smooth_stone_hotpot_table",
+     "title": "Stone tables",
+     "text": "9 tops: smooth stone, polished stones, quartz, cut copper and iron, on bricks.",
+     "recipes": [
+      "orients_hotpot_chronicles:smooth_stone_hotpot_table",
+      "orients_hotpot_chronicles:smooth_stone_tall_hotpot_table"
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:oak_stool",
+     "title": "Seats",
+     "text": "Stools for low tables, benches for tall ones. Seats in a row join, up to 3 long.",
+     "recipes": [
+      "orients_hotpot_chronicles:oak_stool",
+      "orients_hotpot_chronicles:oak_bench"
+     ],
+     "steps": [
+      "Use with an empty hand: sit",
+      "Sneak: stand up"
+     ]
+    },
+    {
+     "icon": "minecraft:lantern",
+     "title": "On the table",
+     "rows": [
+      [
+       "orients_hotpot_chronicles:quartz_small_dish",
+       "Plates, bowls, drinks, sauces"
+      ],
+      [
+       "minecraft:lantern",
+       "Lanterns, flower pots, candles sit flush"
+      ]
+     ]
+    }
+   ]
+  }
+ ]
+}

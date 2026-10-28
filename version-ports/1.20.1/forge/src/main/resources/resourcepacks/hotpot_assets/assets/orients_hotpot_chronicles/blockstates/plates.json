@@ -1,9 +1,0 @@
-{
-  "multipart": [
-    {
-      "apply": {
-        "model": "orients_hotpot_chronicles:block/plates"
-      }
-    }
-  ]
-}

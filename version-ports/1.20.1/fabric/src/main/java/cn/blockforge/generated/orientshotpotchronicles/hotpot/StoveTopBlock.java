@@ -27,7 +27,7 @@ import net.minecraft.world.WorldView;
  * 这一格放上这个方块后，它的形状就是灶台伸上来的那部分，点它的所有操作都原样转给下面的灶台（准星位置不变），
  * 挖它就是挖灶台（对着锅挖则只挖锅，见 HotPotContent 的破坏事件）。下面不是高灶台了它自己消失。</p>
  *
- * 作者：
+ *
  */
 public class StoveTopBlock extends Block implements PartOutline {
     public StoveTopBlock() {
@@ -97,7 +97,7 @@ public class StoveTopBlock extends Block implements PartOutline {
         return new BlockHitResult(hit.getPos(), hit.getSide(), pos.down(), hit.isInsideBlock());
     }
 
-    /** 1.20.1 移植（调整）：1.20 只有一个右键入口，整个转给下面的灶台。 */
+    /** 1.20.1 移植（）：1.20 只有一个右键入口，整个转给下面的灶台。 */
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
                               BlockHitResult hit) {

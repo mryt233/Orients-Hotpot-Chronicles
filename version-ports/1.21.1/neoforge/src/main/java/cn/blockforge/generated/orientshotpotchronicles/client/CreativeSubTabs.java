@@ -30,11 +30,12 @@ import java.util.function.Supplier;
  * r98：一次显示 5 个，上下各一个翻页按钮，鼠标在这一列上滚轮也能翻（用户要求）。
  * r88 美化（用户要求）：用原版分类页标签的贴图横过来贴在物品栏左边，标签上画图标、鼠标停上去显示名字；
  * 位置按物品栏背景算，换界面尺寸、窗口大小都贴着物品栏。选中某一类时右边只显示这一类（过滤在 CreativeInventoryScreenMixin）。
- * 作者：
+ *
  */
 public final class CreativeSubTabs {
     public enum Sub {
-        ALL("all"), COOKWARE("cookware"), TABLEWARE("tableware"), TABLES("tables"), SEATS("seats"), FOOD("food");
+        // 桌子和凳子合成一类「桌凳」（2026-10-26 用户要求，）
+        ALL("all"), COOKWARE("cookware"), TABLEWARE("tableware"), FURNITURE("furniture"), FOOD("food");
 
         final String key;
 
@@ -71,12 +72,17 @@ public final class CreativeSubTabs {
     }
 
     public static Sub categoryOf(ItemStack stack) {
-        if (stack.isOf(HotPotContent.CHOPSTICKS) || stack.getItem() instanceof PlateItem) {
-            return Sub.TABLEWARE;
+        if (stack.isOf(HotPotContent.CHOPSTICKS) || stack.getItem() instanceof PlateItem
+            || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.CupItem) {
+            return Sub.TABLEWARE;   // 玻璃杯（空的、装满的）算餐具（2026-10-26 用户报有的没分类，）
         }
         if (stack.isOf(HotPotContent.KITCHEN_KNIFE) || stack.isOf(HotPotContent.CUTTING_BOARD_ITEM)
-            || stack.isOf(HotPotContent.ROLLING_PIN)) {
-            return Sub.COOKWARE;   // 菜刀、砧板算厨具（2026-10-23）
+            || stack.isOf(HotPotContent.ROLLING_PIN) || stack.isOf(HotPotContent.HOTPOT_GUIDE)) {
+            return Sub.COOKWARE;   // 菜刀、砧板算厨具（2026-10-23）；火锅指南（菜刀合成）也放这里（2026-10-26）
+        }
+        if (stack.isOf(HotPotContent.TOMATO_HOTPOT_BASE) || stack.isOf(HotPotContent.THREE_FRESH_HOTPOT_BASE)
+            || stack.isOf(HotPotContent.TOMATO_SOUP_BUCKET) || stack.isOf(HotPotContent.THREE_FRESH_SOUP_BUCKET)) {
+            return Sub.FOOD;   // 锅底料、汤底桶不能直接吃，下面按「能吃」认不出来（2026-10-26）
         }
         if (stack.isOf(HotPotContent.RAW_TRIPE) || stack.isOf(HotPotContent.COOKED_TRIPE)
             || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkItem
@@ -91,10 +97,10 @@ public final class CreativeSubTabs {
                 return Sub.COOKWARE;
             }
             if (item.getBlock() instanceof HotPotTableBlock) {
-                return Sub.TABLES;
+                return Sub.FURNITURE;
             }
             if (item.getBlock() instanceof BenchBlock) {
-                return Sub.SEATS;
+                return Sub.FURNITURE;
             }
         }
         return Sub.ALL;
@@ -111,14 +117,13 @@ public final class CreativeSubTabs {
         return CreativeInventoryScreenAccessor.getSelectedTab() == HotPotContent.ITEM_GROUP;
     }
 
-    /** 每个子类标签上的图标。全部 = 分类页图标（煮着红汤的铁锅），厨具 = 点着火、灶膛口朝外的灶台（物品自定义模型 1）。 */
+    /** 每个子类标签上的图标。全部 = 分类页图标（煮着红汤的铁锅），厨具 = 菜刀。 */
     private static ItemStack iconOf(Sub sub) {
         return switch (sub) {
             case ALL -> HotPotContent.ITEM_GROUP.getIcon();
-            case COOKWARE -> new ItemStack(HotPotContent.IRON_HOT_POT_ITEM);   // 空的铁锅（r91 用户：灶台看着怪）
+            case COOKWARE -> new ItemStack(HotPotContent.KITCHEN_KNIFE);   // 菜刀（2026-10-25 用户要求；r91 起是空铁锅，再之前是灶台）
             case TABLEWARE -> new ItemStack(HotPotContent.CHOPSTICKS);
-            case TABLES -> new ItemStack(HotPotContent.TALL_TABLE_ITEMS.get(0));   // 高的橡木火锅桌（r90 用户要求）
-            case SEATS -> new ItemStack(HotPotContent.TALL_BENCH_ITEMS.get(0));
+            case FURNITURE -> new ItemStack(HotPotContent.TALL_TABLE_ITEMS.get(0));   // 高的橡木火锅桌（r90 用户要求，桌子那一类的图标）
             case FOOD -> new ItemStack(HotPotContent.RAW_TRIPE);   // 生毛肚（r98 用户要求）
         };
     }
@@ -163,7 +168,7 @@ public final class CreativeSubTabs {
         }
     }
 
-    // 调整：按屏幕保存控件；全局事件仅注册一次，避免反复开界面累积监听器。
+    // ：按屏幕保存控件；全局事件仅注册一次，避免反复开界面累积监听器。
     private record Widgets(List<SubTab> tabs, ButtonWidget up, ButtonWidget down,
                            int left, int top, int maxOffset) {}
     private static final java.util.Map<net.minecraft.client.gui.screen.Screen, Widgets> WIDGETS = new java.util.WeakHashMap<>();

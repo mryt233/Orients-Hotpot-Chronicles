@@ -1,4 +1,4 @@
-// 0.1.2 的 1.20.1 Fabric 接口迁移：调整。
+// 0.1.2 的 1.20.1 Fabric 接口迁移：。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import net.minecraft.nbt.NbtList;
 /**
  * 1.20.x 移植版专用：1.21 用的物品组件（container、held_food、pot_contents、custom_model_data）
  * 在 1.20 还不存在，全部改存物品 NBT，字段名照组件取。其他代码只通过这里读写。
- * 作者：
+ *
  */
 public final class ItemData {
     private static final String CONTAINER = "container";
@@ -110,7 +110,7 @@ public final class ItemData {
     public static void clearModel(ItemStack stack) {
         stack.removeSubNbt(MODEL);
     }
-    // 调整：1.20.1 中用 NBT 保存蘸料组件，随物品一起同步和持久化。
+    // ：1.20.1 中用 NBT 保存蘸料组件，随物品一起同步和持久化。
     public static SauceContents sauce(ItemStack stack) {
         NbtCompound nbt = stack.getSubNbt("orients_hotpot_chronicles:sauce");
         return nbt == null ? null : new SauceContents(nbt.getInt("mask"), nbt.getInt("bites"));

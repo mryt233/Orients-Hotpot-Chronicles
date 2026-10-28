@@ -2,9 +2,9 @@
 
 <!-- 本文件由 version-ports/tools/gen_port_readme.py 生成（）；要改请改脚本里的数据再生成。 -->
 
-**Minecraft 1.20.1 · Forge · 0.1.3-alpha-hotfix1**
+**Minecraft 1.20.1 · Forge · 0.1.4-alpha**
 
-[Download / 下载](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) · [Full gameplay guide / 完整玩法](https://github.com/mryt233/Orients-Hotpot-Chronicles#readme) · [Report an issue / 反馈问题](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
+[Download / 下载](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) · [Full gameplay guide / 完整玩法](https://github.com/mryt233/Orients-Hotpot-Chronicles#readme) · [Report an issue / 反馈问题](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
 
 > **Alpha / 测试版**
 > Only preliminary testing has been performed. Compatibility with other mods and potential bugs have not been thoroughly verified. Back up your saves, try it in a new world first, and report any issues.
@@ -28,11 +28,11 @@
 ## Installation · 安装
 
 1. Install [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) for Minecraft **1.20.1** (tested with 47.4.28).
-2. Put `orients_hotpot_chronicles-1.20.1-forge-0.1.3-alpha-hotfix1.jar` into the `mods` folder on both client and server.
+2. Put `orients_hotpot_chronicles-1.20.1-forge-0.1.4-alpha.jar` into the `mods` folder on both client and server.
 3. Launch the Minecraft **1.20.1 Forge** profile with **Java 17+**.
 
 1. 安装 Minecraft **1.20.1** 对应的 [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html)（测试用 47.4.28）。
-2. 把 `orients_hotpot_chronicles-1.20.1-forge-0.1.3-alpha-hotfix1.jar` 放进客户端和服务端的 `mods` 文件夹。
+2. 把 `orients_hotpot_chronicles-1.20.1-forge-0.1.4-alpha.jar` 放进客户端和服务端的 `mods` 文件夹。
 3. 选择 Minecraft **1.20.1 Forge** 启动配置，用 **Java 17+** 启动。
 
 The same JAR also passed preliminary server checks on **NeoForge 1.20.1 (47.1.106)**; client, multiplayer and modpack compatibility on that loader still need testing.
@@ -41,9 +41,9 @@ The same JAR also passed preliminary server checks on **NeoForge 1.20.1 (47.1.10
 
 ## About this port · 移植说明
 
-This is the **Minecraft 1.20.1 Forge** port of the published **0.1.3-alpha-hotfix1** (originally made for Minecraft 1.21.1 Fabric). It includes: brick stoves; iron and copper nine-grid, S-shaped / O-shaped / split yuanyang and four-grid hotpots (one broth per side); four broths, bamboo chopsticks, hotpot tables, stools, benches, plates, tripe, bowls and drinks; dipping-sauce stations with nine seasonings and bowls of dipping sauce; a cutting board, iron kitchen knife and rolling pin with fatty beef rolls, mutton rolls, beef loin slices, potato slices, soybeans, tofu and meatballs; scallions and cilantro from grass.
+This is the **Minecraft 1.20.1 Forge** port of the published **0.1.4-alpha** (originally made for Minecraft 1.21.1 Fabric). It includes: brick stoves; iron and copper nine-grid, S-shaped / O-shaped / split yuanyang and four-grid hotpots (one broth per side); four broths, bamboo chopsticks, hotpot tables, stools, benches, plates, tripe, bowls and drinks; dipping-sauce stations with nine seasonings and bowls of dipping sauce; a cutting board, iron kitchen knife and rolling pin with fatty beef rolls, mutton rolls, beef loin slices, potato slices, soybeans, tofu and meatballs; scallions and cilantro from grass.
 
-本版是已发布的 **0.1.3-alpha-hotfix1**（原版本为 Minecraft 1.21.1 Fabric）的 **Minecraft 1.20.1 Forge 移植版**，包含：灶台；铁 / 铜的九宫格锅、S 形 / O 形 / 直隔鸳鸯锅和田字锅（每边一种汤底）；四种汤底、竹筷、火锅桌、桌凳、盘子、毛肚、碗与饮料；蘸料台、九种小料和蘸料；砧板、铁菜刀、擀面杖，以及肥牛卷、羊肉卷、吊龙、土豆片、黄豆、豆腐和丸子；草里掉的小葱、香菜。
+本版是已发布的 **0.1.4-alpha**（原版本为 Minecraft 1.21.1 Fabric）的 **Minecraft 1.20.1 Forge 移植版**，包含：灶台；铁 / 铜的九宫格锅、S 形 / O 形 / 直隔鸳鸯锅和田字锅（每边一种汤底）；四种汤底、竹筷、火锅桌、桌凳、盘子、毛肚、碗与饮料；蘸料台、九种小料和蘸料；砧板、铁菜刀、擀面杖，以及肥牛卷、羊肉卷、吊龙、土豆片、黄豆、豆腐和丸子；草里掉的小葱、香菜。
 
 Differences from the main 1.21.1 Fabric build / 和 1.21.1 Fabric 主版本的差异：
 
@@ -70,11 +70,11 @@ Choose the JAR matching your Minecraft version and loader. Download the matching
 
 | Minecraft | Loader / 加载器 | File / 文件 | Java |
 | --- | --- | --- | --- |
-| 1.21.1 | Fabric（main / 主版本） | [`orients_hotpot_chronicles-1.21.1-fabric-0.1.3-alpha-hotfix1.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) | 21+ |
-| 1.21.1 | NeoForge | [`orients_hotpot_chronicles-1.21.1-neoforge-0.1.3-alpha-hotfix1.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) | 21+ |
+| 1.21.1 | Fabric（main / 主版本） | [`orients_hotpot_chronicles-1.21.1-fabric-0.1.4-alpha.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) | 21+ |
+| 1.21.1 | NeoForge | [`orients_hotpot_chronicles-1.21.1-neoforge-0.1.4-alpha.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) | 21+ |
 | 1.20.4 | Fabric | [`orients_hotpot_chronicles-1.20.4-fabric-0.1.1-alpha.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) | 17+ |
-| 1.20.1 | Fabric | [`orients_hotpot_chronicles-1.20.1-fabric-0.1.3-alpha-hotfix1.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) | 17+ |
-| 1.20.1 | Forge | [`orients_hotpot_chronicles-1.20.1-forge-0.1.3-alpha-hotfix1.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.3-alpha-hotfix1) | 17+ |
+| 1.20.1 | Fabric | [`orients_hotpot_chronicles-1.20.1-fabric-0.1.4-alpha.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) | 17+ |
+| 1.20.1 | Forge | [`orients_hotpot_chronicles-1.20.1-forge-0.1.4-alpha.jar`](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) | 17+ |
 
 Fabric builds need [Fabric API](https://modrinth.com/mod/fabric-api) for the same Minecraft version; Forge and NeoForge builds do not.
 
@@ -82,7 +82,7 @@ Fabric 版需要同 Minecraft 版本的 Fabric API；Forge 和 NeoForge 版不�
 
 ## Release file · 发行文件
 
-`orients_hotpot_chronicles-1.20.1-forge-0.1.3-alpha-hotfix1.jar`
+`orients_hotpot_chronicles-1.20.1-forge-0.1.4-alpha.jar`
 
 SHA-256: `dcdaef04d0a68f919e50d4ac2acf1c2b31f4008b17d9873300ae4e4030d90b71`
 

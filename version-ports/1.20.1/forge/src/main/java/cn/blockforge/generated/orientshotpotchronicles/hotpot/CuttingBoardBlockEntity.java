@@ -12,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
 
 /**
  * 砧板上放着的那一件东西（2026-10-23）。变了就存档并同步给客户端，CuttingBoardRenderer 画在板面上。
- * 作者：
+ *
  */
 public class CuttingBoardBlockEntity extends BlockEntity {
     private ItemStack item = ItemStack.EMPTY;

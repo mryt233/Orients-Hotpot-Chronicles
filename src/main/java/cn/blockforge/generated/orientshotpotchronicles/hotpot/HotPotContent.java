@@ -38,11 +38,13 @@ public final class HotPotContent {
 
     public static final HotPotBlock IRON_HOT_POT = Registry.register(Registries.BLOCK,
         GeneratedMod.id(HotPotMaterial.IRON.idPath()), new HotPotBlock(HotPotMaterial.IRON));
-    /** 鸳鸯锅（2026-10-23，新增）：S 形 / O 形隔板，两边各一种汤；铜、铁各两种。 */
+    /** 鸳鸯锅（2026-10-23，）：S 形 / O 形隔板，两边各一种汤；铜、铁各两种。 */
     public static final HotPotBlock COPPER_S_POT = potBlock(HotPotMaterial.COPPER_S);
     public static final HotPotBlock COPPER_O_POT = potBlock(HotPotMaterial.COPPER_O);
     public static final HotPotBlock IRON_S_POT = potBlock(HotPotMaterial.IRON_S);
     public static final HotPotBlock IRON_O_POT = potBlock(HotPotMaterial.IRON_O);
+    public static final HotPotBlock COPPER_SQUARE_POT = potBlock(HotPotMaterial.COPPER_SQUARE);
+    public static final HotPotBlock IRON_SQUARE_POT = potBlock(HotPotMaterial.IRON_SQUARE);
     public static final HotPotBlock COPPER_SPLIT_POT = potBlock(HotPotMaterial.COPPER_SPLIT);
     public static final HotPotBlock IRON_SPLIT_POT = potBlock(HotPotMaterial.IRON_SPLIT);
     /** 田字四宫格锅：四块各一种汤。 */
@@ -52,6 +54,12 @@ public final class HotPotContent {
     /** 每种原版木板一种火锅桌（顺序同原版木板），围着灶台拼成 3x3 的大桌，顶面和灶台台面齐平。 */
     public static final java.util.List<String> TABLE_WOODS = java.util.List.of(
         "oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped");
+    /** 石料 / 金属桌面的桌子：{材质（ID 用）, 取声音和颜色的原版方块}，和 tools/gen_stone_tables.py 的 MATERIALS 同序（2026-10-26）。 */
+    static final String[][] STONE_TABLES = {
+        {"smooth_stone", "smooth_stone"}, {"polished_andesite", "polished_andesite"}, {"polished_diorite", "polished_diorite"},
+        {"polished_granite", "polished_granite"}, {"polished_deepslate", "polished_deepslate"},
+        {"polished_blackstone", "polished_blackstone"}, {"quartz", "quartz_block"}, {"cut_copper", "cut_copper"},
+        {"iron", "iron_block"}};
     public static final java.util.List<HotPotTableBlock> HOTPOT_TABLES = new java.util.ArrayList<>();
     public static final java.util.List<BlockItem> HOTPOT_TABLE_ITEMS = new java.util.ArrayList<>();
     /** 板凳（矮）：同样每种原版木板一种，能坐。 */
@@ -92,7 +100,7 @@ public final class HotPotContent {
                 default -> net.minecraft.sound.BlockSoundGroup.METAL;
             };
             for (PlateSize size : PlateSize.values()) {
-                if (size == PlateSize.BOWL || size == PlateSize.DRINK) {
+                if (size == PlateSize.BOWL || size == PlateSize.DRINK || size == PlateSize.CUP) {
                     continue;   // 碗、橙子饮料不是盘子（只借用盘子格摆放）
                 }
                 String id = material + "_" + size.itemId();   // ID 和显示名对得上（r102）：quartz_small_dish 等
@@ -111,6 +119,13 @@ public final class HotPotContent {
     /** 摆在桌上的橙子饮料（只带模型，r99）。 */
     public static final DrinkBlock DRINK_BLOCK = Registry.register(Registries.BLOCK,
         GeneratedMod.id("drink"), new DrinkBlock());
+    /** 摆在桌上的玻璃杯（只带模型，2026-10-25）。 */
+    public static final CupBlock CUP_BLOCK = Registry.register(Registries.BLOCK,
+        GeneratedMod.id("cup"), new CupBlock());
+
+    /** 装着饮料的炼药锅（2026-10-27，见 DrinkCauldronBlock；没有物品，拆了掉原版炼药锅）。 */
+    public static final DrinkCauldronBlock DRINK_CAULDRON = Registry.register(Registries.BLOCK,
+        GeneratedMod.id("drink_cauldron"), new DrinkCauldronBlock());
 
     /** 摆盘子的那一格：一格里能摆好几个盘子。 */
     public static final PlateHolderBlock PLATE_HOLDER = Registry.register(Registries.BLOCK,
@@ -159,6 +174,22 @@ public final class HotPotContent {
             TALL_BENCH_ITEMS.add(Registry.register(Registries.ITEM,
                 GeneratedMod.id(wood + "_bench"), new BlockItem(bench, new Item.Settings())));
         }
+        // 石料 / 金属桌面的火锅桌（2026-10-26 用户：平滑石头、磨制安山岩……铁块；桌面是这种材质，下面红砖）：
+        // 矮桌、高桌各一张，模型等由 tools/gen_stone_tables.py 生成，ID = <材质>_hotpot_table / <材质>_tall_hotpot_table。
+        // 声音、地图颜色取那种原版方块；不会着火。
+        for (String[] m : STONE_TABLES) {
+            net.minecraft.block.Block material = Registries.BLOCK.get(Identifier.ofVanilla(m[1]));
+            HotPotTableBlock table = Registry.register(Registries.BLOCK,
+                GeneratedMod.id(m[0] + "_hotpot_table"), new HotPotTableBlock(material));
+            HOTPOT_TABLES.add(table);
+            HOTPOT_TABLE_ITEMS.add(Registry.register(Registries.ITEM,
+                GeneratedMod.id(m[0] + "_hotpot_table"), new BlockItem(table, new Item.Settings())));
+            TallHotPotTableBlock tall = Registry.register(Registries.BLOCK,
+                GeneratedMod.id(m[0] + "_tall_hotpot_table"), new TallHotPotTableBlock(material));
+            TALL_TABLES.add(tall);
+            TALL_TABLE_ITEMS.add(Registry.register(Registries.ITEM,
+                GeneratedMod.id(m[0] + "_tall_hotpot_table"), new BlockItem(tall, new Item.Settings())));
+        }
         // 旧版只有一种火锅桌（hotpot_table），老存档里的桌子和物品变成橡木火锅桌
         Registries.BLOCK.addAlias(GeneratedMod.id("hotpot_table"), GeneratedMod.id("oak_hotpot_table"));
         Registries.ITEM.addAlias(GeneratedMod.id("hotpot_table"), GeneratedMod.id("oak_hotpot_table"));
@@ -181,6 +212,8 @@ public final class HotPotContent {
     public static final BlockItem COPPER_O_POT_ITEM = potItem(COPPER_O_POT);
     public static final BlockItem IRON_S_POT_ITEM = potItem(IRON_S_POT);
     public static final BlockItem IRON_O_POT_ITEM = potItem(IRON_O_POT);
+    public static final BlockItem COPPER_SQUARE_POT_ITEM = potItem(COPPER_SQUARE_POT);
+    public static final BlockItem IRON_SQUARE_POT_ITEM = potItem(IRON_SQUARE_POT);
     public static final BlockItem COPPER_SPLIT_POT_ITEM = potItem(COPPER_SPLIT_POT);
     public static final BlockItem IRON_SPLIT_POT_ITEM = potItem(IRON_SPLIT_POT);
     public static final BlockItem COPPER_FOUR_POT_ITEM = potItem(COPPER_FOUR_POT);
@@ -195,7 +228,7 @@ public final class HotPotContent {
             .nutrition(5).saturationModifier(0.6F).build())));
 
     /**
-     * 切菜（2026-10-23 用户定，新增）：生牛肉 / 生羊肉在砧板上用铁菜刀点一下（或切石机）切成 3 卷；
+     * 切菜（2026-10-23 用户定，）：生牛肉 / 生羊肉在砧板上用铁菜刀点一下（或切石机）切成 3 卷；
      * 每卷熟的回 3 饥饿（3 卷 = 9，比整块牛排多一点，算切开涮的奖励），生的回 1；锅里涮得比整块肉快一半（熔炉配方 100 tick）。
      */
     public static final Item FATTY_BEEF_ROLL = foodItem("fatty_beef_roll", 1, 0.3F);
@@ -203,7 +236,7 @@ public final class HotPotContent {
     public static final Item MUTTON_ROLL = foodItem("mutton_roll", 1, 0.3F);
     public static final Item COOKED_MUTTON_ROLL = foodItem("cooked_mutton_roll", 3, 0.6F);
     /**
-     * 吊龙（用户定，新增）：牛 / 哞菇 25% 掉一块牛脊肉（生吃同生牛肉 3 饥饿；整块烤 = 熟牛脊肉，数值同熟牛排），
+     * 吊龙（用户定，）：牛 / 哞菇 25% 掉一块牛脊肉（生吃同生牛肉 3 饥饿；整块烤 = 熟牛脊肉，数值同熟牛排），
      * 砧板上一刀（或切石机）切成 3 片吊龙；每片熟的回 3、生的回 1；锅里涮得最快（熔炉 50 tick，肥牛卷的一半）。
      */
     public static final Item BEEF_LOIN = foodItem("beef_loin", 3, 0.3F);
@@ -233,6 +266,43 @@ public final class HotPotContent {
     public static final Item SOYBEAN = foodItem("soybean", 1, 0.1F);
     public static final Item TOFU = foodItem("tofu", 2, 0.4F);
     public static final Item TOFU_CUBE = foodItem("tofu_cube", 1, 0.3F);
+    /**
+     * 橙子（2026-10-25 用户：橙子饮料要有原料）：橡木 / 深色橡木树叶像掉苹果一样掉（OrangeLoot），能吃，数值同苹果。
+     * 大蒜：打草掉（GarnishLoot，同小葱 / 香菜 / 黄豆；用户：作物先保留）；在砧板上用擀面杖敲三下出 2 份蒜泥（Pounding），
+     * 蒜泥是蘸料台第 10 种调料（Seasoning.GARLIC_PASTE）。
+     */
+    public static final Item ORANGE = foodItem("orange", 4, 0.3F);
+    public static final Item GARLIC = foodItem("garlic", 1, 0.1F);
+    public static final Item GARLIC_PASTE = foodItem("garlic_paste", 1, 0.1F);
+    /**
+     * 虾（2026-10-26 用户：加虾和虾滑）：钓鱼钓到带壳的虾（ShrimpLoot）；砧板上菜刀切一刀剥成虾仁（去壳去头，也能用切石机）；
+     * 虾仁放砧板上擀面杖拍三下成一颗虾滑（Pounding）。三样都能下锅涮 / 烤熟，熟的回 3 / 3 / 4。
+     */
+    public static final Item SHRIMP = foodItem("shrimp", 1, 0.2F);
+    public static final Item COOKED_SHRIMP = foodItem("cooked_shrimp", 3, 0.5F);
+    public static final Item PEELED_SHRIMP = foodItem("peeled_shrimp", 1, 0.2F);
+    public static final Item COOKED_PEELED_SHRIMP = foodItem("cooked_peeled_shrimp", 3, 0.6F);
+    public static final Item SHRIMP_PASTE = foodItem("shrimp_paste", 1, 0.2F);
+    public static final Item COOKED_SHRIMP_PASTE = foodItem("cooked_shrimp_paste", 4, 0.6F);
+    /** 番茄（2026-10-25）：打草掉（GarnishLoot，同大蒜 15%），能吃；做番茄锅底料。 */
+    public static final Item TOMATO = foodItem("tomato", 2, 0.3F);
+    /** 游戏内教程书「火锅指南」（2026-10-25 用户）：菜刀 + 书无序合成，右键打开（GuideBookItem / client.GuideBookScreen）。 */
+    public static final Item HOTPOT_GUIDE = Registry.register(Registries.ITEM, GeneratedMod.id("hotpot_guide"), new GuideBookItem());
+    /** 锅底料（2026-10-25）：拿着右键锅 = 倒进新汤底（SoupBase.TOMATO / THREE_FRESH），一块一锅。 */
+    public static final Item TOMATO_HOTPOT_BASE = Registry.register(Registries.ITEM, GeneratedMod.id("tomato_hotpot_base"),
+        new Item(new Item.Settings()));
+    public static final Item THREE_FRESH_HOTPOT_BASE = Registry.register(Registries.ITEM, GeneratedMod.id("three_fresh_hotpot_base"),
+        new Item(new Item.Settings()));
+    /**
+     * 汤底桶（2026-10-26 用户）：只能用空桶从番茄锅 / 三鲜锅里舀出来（没有配方），倒回锅里就是那种汤（SoupBase 的 source）；
+     * 不是液体，不能倒在地上。图标照原版水桶 / 岩浆桶的样子（tools/gen_garden.py）。
+     */
+    public static final Item TOMATO_SOUP_BUCKET = Registry.register(Registries.ITEM, GeneratedMod.id("tomato_soup_bucket"),
+        new Item(new Item.Settings().maxCount(1)));
+    public static final Item THREE_FRESH_SOUP_BUCKET = Registry.register(Registries.ITEM, GeneratedMod.id("three_fresh_soup_bucket"),
+        new Item(new Item.Settings().maxCount(1)));
+    /** 熟海带（2026-10-25 用户）：原版海带在锅里煮出来（HotPotCooking.potResult），熔炉 / 烟熏炉照旧是干海带；回 2。 */
+    public static final Item COOKED_KELP = foodItem("cooked_kelp", 2, 0.3F);
     public static final Item COOKED_TOFU_CUBE = foodItem("cooked_tofu_cube", 2, 0.6F);
 
     /**
@@ -283,9 +353,51 @@ public final class HotPotContent {
         GeneratedMod.id("plant_protein_drink"), new DrinkItem(DrinkKind.PLANT_PROTEIN_DRINK));
     public static final EmptyBottleItem EMPTY_PLANT_PROTEIN_DRINK_BOTTLE = Registry.register(Registries.ITEM,
         GeneratedMod.id("empty_plant_protein_drink_bottle"), new EmptyBottleItem(DrinkKind.PLANT_PROTEIN_DRINK));
+    /** 之晗可乐（原名 之晗可乐，2026-10-26 用户改名）（2026-10-25 用户定名）：一瓶 4 口，喝完剩空瓶，满瓶空瓶都能摆桌上（和另外两种饮料一样）。 */
+    public static final DrinkItem ORIENT_COLA = Registry.register(Registries.ITEM,
+        GeneratedMod.id("orient_cola"), new DrinkItem(DrinkKind.ORIENT_COLA));
+    public static final EmptyBottleItem EMPTY_ORIENT_COLA_BOTTLE = Registry.register(Registries.ITEM,
+        GeneratedMod.id("empty_orient_cola_bottle"), new EmptyBottleItem(DrinkKind.ORIENT_COLA));
+    /** 玻璃杯（2026-10-25 用户）：空杯 + 三种饮料各一种装满的杯子（一口），见 CupItem。 */
+    public static final CupItem GLASS_CUP = Registry.register(Registries.ITEM, GeneratedMod.id("glass_cup"), new CupItem(null));
+    public static final CupItem ORANGE_DRINK_CUP = Registry.register(Registries.ITEM, GeneratedMod.id("orange_drink_cup"),
+        new CupItem(DrinkKind.ORANGE_DRINK));
+    public static final CupItem PLANT_PROTEIN_DRINK_CUP = Registry.register(Registries.ITEM,
+        GeneratedMod.id("plant_protein_drink_cup"), new CupItem(DrinkKind.PLANT_PROTEIN_DRINK));
+    public static final CupItem ORIENT_COLA_CUP = Registry.register(Registries.ITEM, GeneratedMod.id("orient_cola_cup"),
+        new CupItem(DrinkKind.ORIENT_COLA));
+    /** 一杯水、一杯牛奶（2026-10-27 用户）：拿水桶 / 奶桶往空杯里倒，桶不会空；空杯对着水源右键也能舀一杯水。 */
+    public static final CupItem WATER_CUP = Registry.register(Registries.ITEM, GeneratedMod.id("water_cup"),
+        new CupItem(DrinkKind.WATER));
+    public static final CupItem MILK_CUP = Registry.register(Registries.ITEM, GeneratedMod.id("milk_cup"),
+        new CupItem(DrinkKind.MILK));
+
+    public static CupItem cupFor(DrinkKind kind) {
+        return switch (kind) {
+            case ORANGE_DRINK -> ORANGE_DRINK_CUP;
+            case PLANT_PROTEIN_DRINK -> PLANT_PROTEIN_DRINK_CUP;
+            case ORIENT_COLA -> ORIENT_COLA_CUP;
+            case WATER -> WATER_CUP;
+            case MILK -> MILK_CUP;
+        };
+    }
+
+    public static DrinkItem drinkFor(DrinkKind kind) {
+        return switch (kind) {
+            case ORANGE_DRINK -> ORANGE_DRINK;
+            case PLANT_PROTEIN_DRINK -> PLANT_PROTEIN_DRINK;
+            case ORIENT_COLA -> ORIENT_COLA;
+            case WATER, MILK -> throw new IllegalArgumentException("水、牛奶没有瓶装");
+        };
+    }
 
     public static Item emptyBottle(DrinkKind kind) {
-        return kind == DrinkKind.PLANT_PROTEIN_DRINK ? EMPTY_PLANT_PROTEIN_DRINK_BOTTLE : EMPTY_ORANGE_DRINK_BOTTLE;
+        return switch (kind) {
+            case ORANGE_DRINK -> EMPTY_ORANGE_DRINK_BOTTLE;
+            case PLANT_PROTEIN_DRINK -> EMPTY_PLANT_PROTEIN_DRINK_BOTTLE;
+            case ORIENT_COLA -> EMPTY_ORIENT_COLA_BOTTLE;
+            case WATER, MILK -> net.minecraft.item.Items.GLASS_BOTTLE;   // 用不到：水、牛奶没有瓶装
+        };
     }
 
     public static final Item CHOPSTICKS = Registry.register(Registries.ITEM,
@@ -353,7 +465,7 @@ public final class HotPotContent {
     public static final BlockEntityType<HotPotBlockEntity> HOT_POT_BE = Registry.register(
         Registries.BLOCK_ENTITY_TYPE, GeneratedMod.id("hot_pot"),
         FabricBlockEntityTypeBuilder.create(HotPotBlockEntity::new,
-            COPPER_HOT_POT, IRON_HOT_POT, COPPER_S_POT, COPPER_O_POT, IRON_S_POT, IRON_O_POT,
+            COPPER_HOT_POT, IRON_HOT_POT, COPPER_S_POT, COPPER_O_POT, IRON_S_POT, IRON_O_POT, COPPER_SQUARE_POT, IRON_SQUARE_POT,
             COPPER_SPLIT_POT, IRON_SPLIT_POT, COPPER_FOUR_POT, IRON_FOUR_POT).build());
 
     /** 组合灶台方块实体：燃料、锅库存和烹饪数据全部在同一个位置。 */
@@ -394,11 +506,13 @@ public final class HotPotContent {
                 entries.add(IRON_HOT_POT_ITEM);
                 entries.add(IRON_S_POT_ITEM);
                 entries.add(IRON_O_POT_ITEM);
+                entries.add(IRON_SQUARE_POT_ITEM);
                 entries.add(IRON_SPLIT_POT_ITEM);
                 entries.add(IRON_FOUR_POT_ITEM);
                 entries.add(COPPER_HOT_POT_ITEM);
                 entries.add(COPPER_S_POT_ITEM);
                 entries.add(COPPER_O_POT_ITEM);
+                entries.add(COPPER_SQUARE_POT_ITEM);
                 entries.add(COPPER_SPLIT_POT_ITEM);
                 entries.add(COPPER_FOUR_POT_ITEM);
                 entries.add(CHOPSTICKS);
@@ -421,6 +535,10 @@ public final class HotPotContent {
                 for (Item ball : new Item[]{BEEF_MEATBALL, COOKED_BEEF_MEATBALL, CILANTRO_BEEF_MEATBALL, COOKED_CILANTRO_BEEF_MEATBALL, PORK_MEATBALL, COOKED_PORK_MEATBALL, CILANTRO_PORK_MEATBALL, COOKED_CILANTRO_PORK_MEATBALL, MUTTON_MEATBALL, COOKED_MUTTON_MEATBALL, CILANTRO_MUTTON_MEATBALL, COOKED_CILANTRO_MUTTON_MEATBALL, FISH_BALL, COOKED_FISH_BALL, CILANTRO_FISH_BALL, COOKED_CILANTRO_FISH_BALL}) {
                     entries.add(ball);
                 }
+                for (Item shrimp : new Item[]{SHRIMP, COOKED_SHRIMP, PEELED_SHRIMP, COOKED_PEELED_SHRIMP, SHRIMP_PASTE, COOKED_SHRIMP_PASTE}) {
+                    entries.add(shrimp);
+                }
+                entries.add(HOTPOT_GUIDE);
                 entries.add(KITCHEN_KNIFE);
                 entries.add(ROLLING_PIN);
                 entries.add(CUTTING_BOARD_ITEM);
@@ -429,8 +547,25 @@ public final class HotPotContent {
                 entries.add(EMPTY_ORANGE_DRINK_BOTTLE);
                 entries.add(PLANT_PROTEIN_DRINK);
                 entries.add(EMPTY_PLANT_PROTEIN_DRINK_BOTTLE);
+                entries.add(ORIENT_COLA);
+                entries.add(EMPTY_ORIENT_COLA_BOTTLE);
+                entries.add(GLASS_CUP);
+                entries.add(ORANGE_DRINK_CUP);
+                entries.add(PLANT_PROTEIN_DRINK_CUP);
+                entries.add(ORIENT_COLA_CUP);
+                entries.add(WATER_CUP);
+                entries.add(MILK_CUP);
                 entries.add(SCALLION);
                 entries.add(CILANTRO);
+                entries.add(ORANGE);
+                entries.add(GARLIC);
+                entries.add(GARLIC_PASTE);
+                entries.add(COOKED_KELP);
+                entries.add(TOMATO);
+                entries.add(TOMATO_HOTPOT_BASE);
+                entries.add(THREE_FRESH_HOTPOT_BASE);
+                entries.add(TOMATO_SOUP_BUCKET);
+                entries.add(THREE_FRESH_SOUP_BUCKET);
                 entries.add(DIPPING_SAUCE);
                 HOTPOT_TABLE_ITEMS.forEach(entries::add);
                 BENCH_ITEMS.forEach(entries::add);
@@ -450,7 +585,14 @@ public final class HotPotContent {
         ITEM_GROUP.getDisplayName();
         TripeLoot.register();
         GarnishLoot.register();
+        OrangeLoot.register();
+        ShrimpLoot.register();
+        DrinkCauldronBlock.registerEmptyCauldron();
+        HotPotCooking.potResult(net.minecraft.item.Items.KELP, COOKED_KELP);
         OpenSauceRestockPayload.register();
+        ChopsticksAimPayload.register();
+        HotPotCriterion.register();
+        SoupBucketRecipe.register();
         // 下界木（绯红、诡异）不可燃，其余和原版木板一样会着火
         for (int i = 0; i < TABLE_WOODS.size(); i++) {
             String wood = TABLE_WOODS.get(i);
@@ -461,21 +603,21 @@ public final class HotPotContent {
                     .add(BENCHES.get(i), 5, 20);
                 net.fabricmc.fabric.api.registry.FlammableBlockRegistry.getDefaultInstance()
                     .add(TALL_BENCHES.get(i), 5, 20);
-                // 高火锅桌以前漏了，不会着火（调整，2026-10-23，用户要求修；Forge 系移植版已经会着火）
+                // 高火锅桌以前漏了，不会着火（2026-10-23，用户要求修；Forge 系移植版已经会着火）
                 net.fabricmc.fabric.api.registry.FlammableBlockRegistry.getDefaultInstance()
                     .add(TALL_TABLES.get(i), 5, 20);
-                // 木头蘸料台（和 TABLE_WOODS 同序，铁的在最后不登记）也会着火（调整，2026-10-23，用户要求）
+                // 木头蘸料台（和 TABLE_WOODS 同序，铁的在最后不登记）也会着火（2026-10-23，用户要求）
                 net.fabricmc.fabric.api.registry.FlammableBlockRegistry.getDefaultInstance()
                     .add(SAUCE_STATIONS.get(i), 5, 20);
             }
         }
-        // 砧板（橡木）也会着火，数值同桌子（调整，2026-10-23，用户要求）
+        // 砧板（橡木）也会着火，数值同桌子（2026-10-23，用户要求）
         net.fabricmc.fabric.api.registry.FlammableBlockRegistry.getDefaultInstance()
             .add(CUTTING_BOARD, 5, 20);
         // 灶上有锅时，对着锅挖只挖下锅（连汤带菜打包掉落），灶台留着；对着灶身挖才挖整个灶台
         net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.BEFORE.register(
             (world, player, pos, state, blockEntity) -> {
-                // 砧板：对着板上的东西挖只挖东西，砧板留着（，0.1.2-alpha 后用户报）
+                // 砧板：对着板上的东西挖只挖东西，砧板留着（0.1.2-alpha 后用户报）
                 if (blockEntity instanceof CuttingBoardBlockEntity board && !board.item().isEmpty()
                     && CuttingBoardBlock.aimsAtItem(pos, player)) {
                     CuttingBoardBlock.breakItem(world, pos, board, player);
@@ -520,6 +662,8 @@ public final class HotPotContent {
             case COPPER_O -> COPPER_O_POT;
             case IRON_S -> IRON_S_POT;
             case IRON_O -> IRON_O_POT;
+            case COPPER_SQUARE -> COPPER_SQUARE_POT;
+            case IRON_SQUARE -> IRON_SQUARE_POT;
             case COPPER_SPLIT -> COPPER_SPLIT_POT;
             case IRON_SPLIT -> IRON_SPLIT_POT;
             case COPPER_FOUR -> COPPER_FOUR_POT;
@@ -535,6 +679,8 @@ public final class HotPotContent {
             case COPPER_O -> COPPER_O_POT_ITEM;
             case IRON_S -> IRON_S_POT_ITEM;
             case IRON_O -> IRON_O_POT_ITEM;
+            case COPPER_SQUARE -> COPPER_SQUARE_POT_ITEM;
+            case IRON_SQUARE -> IRON_SQUARE_POT_ITEM;
             case COPPER_SPLIT -> COPPER_SPLIT_POT_ITEM;
             case IRON_SPLIT -> IRON_SPLIT_POT_ITEM;
             case COPPER_FOUR -> COPPER_FOUR_POT_ITEM;

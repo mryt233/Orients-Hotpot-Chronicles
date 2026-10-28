@@ -55,7 +55,7 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider, Part
             .nonOpaque()
             .dropsNothing()
             // 形状随方块实体（摆了哪些盘子）变、矮桌上还伸出本格：不让原版提前缓存形状（同潜影盒），
-            // 否则缓存的是空世界里的默认小方块，和真实碰撞对不上，站上去会抽搐（调整）
+            // 否则缓存的是空世界里的默认小方块，和真实碰撞对不上，站上去会抽搐（）
             .dynamicBounds()
             .pistonBehavior(net.minecraft.block.piston.PistonBehavior.DESTROY));
         setDefaultState(getDefaultState().with(ON_TABLE, false).with(ON_TALL_TABLE, false));
@@ -138,6 +138,9 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider, Part
             && world.getBlockEntity(pos) instanceof PlateHolderBlockEntity be) {
             for (PlateHolderBlockEntity.Placed p : be.plates()) {
                 Block.dropStack(world, pos, p.toItem());
+                if (!p.chopsticks.isEmpty()) {
+                    Block.dropStack(world, pos, p.chopsticks);
+                }
             }
             be.plates().clear();
         }
@@ -175,7 +178,7 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider, Part
 
     /**
      * 这个盘子长什么样：盘子按方向；汤碗按汤底、空瓶换空瓶模型（r99）、饮料按种类。渲染和挖掉时的碎屑共用
-     * （调整：以前碎屑用默认状态，植物蛋白饮料挖掉飞出的是橙子饮料的碎屑，用户报）。
+     * （：以前碎屑用默认状态，植物蛋白饮料挖掉飞出的是橙子饮料的碎屑，用户报）。
      */
     public static BlockState modelState(PlateHolderBlockEntity.Placed p) {
         BlockState state = p.plate.getDefaultState().with(cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateBlock.AXIS, p.axis);
@@ -189,6 +192,10 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider, Part
             cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkKind kind = p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.EmptyBottleItem e ? e.kind()
                 : p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkItem d ? d.kind() : cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkKind.ORANGE_DRINK;
             state = state.with(cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock.EMPTY, empty).with(cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock.KIND, kind);
+        }
+        if (p.plate instanceof CupBlock) {
+            DrinkKind kind = p.self.getItem() instanceof CupItem cup ? cup.kind() : null;
+            state = state.with(DrinkBlock.EMPTY, kind == null).with(CupBlock.KIND, kind == null ? DrinkKind.ORANGE_DRINK : kind);
         }
         return state;
     }
@@ -218,6 +225,9 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider, Part
         if (!player.isCreative()) {
             Block.dropStack(world, pos, plate.toItem());
         }
+        if (!plate.chopsticks.isEmpty()) {
+            Block.dropStack(world, pos, plate.chopsticks);   // 架着的筷子创造模式也掉，免得没了
+        }
         be.remove(plate);
         if (be.plates().isEmpty()) {
             world.removeBlock(pos, false);
@@ -239,6 +249,27 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider, Part
             return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         double[] at = local(pos, hit);
+        // 拿饮料瓶右键桌上的空杯 = 倒一杯（2026-10-25，）；要在「再摆一个」之前判断，不然瓶子会被摆上去
+        PlateHolderBlockEntity.Placed target = be.at(at[0], at[1]);
+        if (target != null && stack.getItem() instanceof DrinkItem drink && CupItem.isEmptyCup(target.self)) {
+            if (!world.isClient) {
+                target.self = new ItemStack(HotPotContent.cupFor(drink.kind()));
+                player.setStackInHand(hand, DrinkItem.pourOne(stack));
+                be.changed();
+                world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.BLOCKS, 0.8F, 1.1F);
+            }
+            return ItemActionResult.SUCCESS;
+        }
+        // 拿水桶 / 奶桶右键桌上的空杯 = 倒一杯，桶不会空（2026-10-27 用户：原版的桶就无限倒）
+        DrinkKind fromBucket = CupItem.bucketKind(stack);
+        if (target != null && fromBucket != null && CupItem.isEmptyCup(target.self)) {
+            if (!world.isClient) {
+                target.self = new ItemStack(HotPotContent.cupFor(fromBucket));
+                be.changed();
+                world.playSound(null, pos, SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 0.6F, 1.2F);
+            }
+            return ItemActionResult.SUCCESS;
+        }
         PlateBlock placing = PlateItem.placedFor(stack);
         if (placing != null) {
             // 盘子、碗、汤碗、橙子饮料：在这一格再摆一个（r99 起碗和瓶子也走这里）
@@ -259,7 +290,7 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider, Part
             return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         // 筷子夹着菜点桌上的蘸料碗 = 蘸一口，配料记在菜上，吃的时候生效
-        // （r103 有过，2026-10-23 去掉；2026-10-25 用户在开发计划「筷子新交互」里要回来。调整）
+        // （r103 有过，2026-10-23 去掉；2026-10-25 用户在开发计划「筷子新交互」里要回来。）
         if (stack.isOf(HotPotContent.CHOPSTICKS) && plate.self.getItem() instanceof DippingSauceItem) {
             if (!world.isClient) {
                 ItemStack held = Chopsticks.held(stack);
@@ -286,7 +317,7 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider, Part
         }
         if (stack.isOf(HotPotContent.CHOPSTICKS)) {
             // 夹着菜、肚子还吃得下：不放回去，交给筷子吃。以前夹起来以后按住右键会被当成连点，
-            // 菜在碗和筷子之间来回放、夹，看着像夹不起来（用户报，2026-10-25 调整）；吃饱了才放回碗盘里
+            // 菜在碗和筷子之间来回放、夹，看着像夹不起来（用户报，2026-10-25 ）；吃饱了才放回碗盘里
             ItemStack inHand = Chopsticks.held(stack);
             net.minecraft.component.type.FoodComponent food = inHand.get(net.minecraft.component.DataComponentTypes.FOOD);
             if (food != null && player.canConsume(food.canAlwaysEat())) {
@@ -338,6 +369,16 @@ public class PlateHolderBlock extends Block implements BlockEntityProvider, Part
         PlateHolderBlockEntity.Placed plate = be.at(at[0], at[1]);
         if (plate == null) {
             return ActionResult.PASS;
+        }
+        // 空手右键架着筷子的碗 / 盘子：先把筷子（连夹着的菜）拿回来（2026-10-27）
+        if (!plate.chopsticks.isEmpty() && !player.isSneaking()) {
+            if (!world.isClient) {
+                player.setStackInHand(Hand.MAIN_HAND, plate.chopsticks);
+                plate.chopsticks = ItemStack.EMPTY;
+                be.changed();
+                world.playSound(null, pos, SoundEvents.BLOCK_BAMBOO_HIT, SoundCategory.BLOCKS, 0.6F, 1.4F);
+            }
+            return ActionResult.SUCCESS;
         }
         // 潜行 + 空手右键：按「最后放进去的先出来」取一样菜进背包，按一下取一个（r96，）
         if (player.isSneaking()) {
