@@ -1,4 +1,4 @@
-# 作者：。内置浏览器桥接不可用，使用隔离 Edge 无头配置验证静态教程，不接入用户浏览器会话。
+# 作者：mryt233内置浏览器桥接不可用，使用隔离 Edge 无头配置验证静态教程，不接入用户浏览器会话。
 from pathlib import Path
 from html.parser import HTMLParser
 import hashlib
@@ -26,7 +26,7 @@ window.addEventListener('load',function(){setTimeout(function(){
  var link=document.querySelector('a[href="#page-sauce"]');link.click();var navigates=location.hash==='#page-sauce';
  history.replaceState(null,'',location.pathname);document.documentElement.style.scrollBehavior='auto';window.scrollTo({top:0,behavior:'instant'});
  var result={title:document.title,width:innerWidth,imageCount:images.length,brokenImages:broken,anchorCount:anchors.length,missingAnchors:missing,menuToggles:toggled,sauceNavigationWorks:navigates,errors:window.__qaErrors,horizontalOverflow:document.documentElement.scrollWidth>innerWidth,language:document.documentElement.lang,hasReleasedVersion:document.body.innerText.includes('0.1.2-alpha'),hasUpcomingLabels:(document.body.innerText.includes('Coming in 0.1.3')||document.body.innerText.includes('0.1.3 更新預告'))};
- var out=document.createElement('pre');out.id='qa-result';out.hidden=true;out.textContent=JSON.stringify(result);document.body.appendChild(out);navigator.sendBeacon('/qa-result',JSON.stringify(result));
+ var out=document.createElement('pre');out.id='tutorial-qa-result';out.hidden=true;out.textContent=JSON.stringify(result);document.body.appendChild(out);navigator.sendBeacon('/qa-result',JSON.stringify(result));
 },1000)});
 </script>'''
 text=source.read_text(encoding='utf-8');text=text.replace('<script>',prelude+'<script>',1).replace('</body>',checks+'</body>')
@@ -57,7 +57,7 @@ assert run.returncode==0,'Headless Edge failed'
 class ResultParser(HTMLParser):
     def __init__(self):super().__init__();self.active=False;self.data=[]
     def handle_starttag(self,tag,attrs):
-        if tag=='pre' and dict(attrs).get('id')=='qa-result':self.active=True
+        if tag=='pre' and dict(attrs).get('id')=='tutorial-qa-result':self.active=True
     def handle_endtag(self,tag):
         if tag=='pre':self.active=False
     def handle_data(self,data):

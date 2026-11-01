@@ -15,8 +15,8 @@ from pathlib import Path
 
 MOD = Path(__file__).resolve().parent.parent
 MODID = "orients_hotpot_chronicles"
-RES = MOD / "src/main/resources"
-ASSET_ROOTS = [RES / "assets" / MODID, RES / "resourcepacks/hotpot_assets/assets" / MODID]
+RES = MOD / "common/src/main/resources"
+ASSET_ROOTS = [RES / "assets" / MODID]
 WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped"]
 # 高火锅桌桌面板 y TOP0..TOP1：r82 定 20..24（1.5 格），r84 用户说桌子和灶台都再低一点 → 19..23
 TOP0, TOP1 = 19.0, 23.0
@@ -221,6 +221,8 @@ def main():
                         v = {"model": f"{MODID}:block/{name}{sfx[(left, right)]}"}
                         if y:
                             v["y"] = y
+                            # 贴图锁定：正着、反着放的条凳拼在一起木纹接得上（用户 2026-10-26，调整）
+                            v["uvlock"] = True
                         variants[f"facing={facing},left={str(left).lower()},right={str(right).lower()}"] = v
             write(root / f"blockstates/{wood}_bench.json", {"variants": variants})
 
@@ -238,7 +240,9 @@ def main():
         write(root / "blockstates/tall_brick_stove.json", stove_state)
         # 物品模型：高的东西在物品栏里缩小一点、往下挪，免得顶出格子
         tall_display = dict(BLOCK_DISPLAY, gui={"rotation": [30, 225, 0], "translation": [0, -2, 0], "scale": [0.5, 0.5, 0.5]})
-        write(root / "models/item/tall_brick_stove.json", {"parent": f"{MODID}:block/tall_stove", "display": tall_display})
+        # 高灶台图标往下只挪 1.1（原来 2，偏下约 0.9）：在格子正中（2026-10-26 用户；调整）；高桌还用 tall_display
+        stove_display = dict(BLOCK_DISPLAY, gui={"rotation": [30, 225, 0], "translation": [0, -1.1, 0], "scale": [0.5, 0.5, 0.5]})
+        write(root / "models/item/tall_brick_stove.json", {"parent": f"{MODID}:block/tall_stove", "display": stove_display})
         for wood in WOODS:
             write(root / f"models/item/{wood}_tall_hotpot_table.json",
                   {"parent": f"{MODID}:block/{wood}_tall_hotpot_table_esw", "display": tall_display})
@@ -250,9 +254,10 @@ def main():
     loot = lambda name: {"type": "minecraft:block", "pools": [{"rolls": 1.0, "bonus_rolls": 0.0,
                          "conditions": [{"condition": "minecraft:survives_explosion"}],
                          "entries": [{"type": "minecraft:item", "name": f"{MODID}:{name}"}]}]}
+    # 高灶台：砖块摞在灶台上面（有形状，2026-10-27 用户改；原来是无序合成。调整）
     write(data / MODID / "recipe/tall_brick_stove.json", {
-        "type": "minecraft:crafting_shapeless",
-        "ingredients": [{"item": f"{MODID}:brick_stove"}, {"item": "minecraft:bricks"}],
+        "type": "minecraft:crafting_shaped", "category": "misc", "pattern": ["B", "S"],
+        "key": {"B": {"item": "minecraft:bricks"}, "S": {"item": f"{MODID}:brick_stove"}},
         "result": {"id": f"{MODID}:tall_brick_stove", "count": 1}})
     write(data / MODID / "loot_table/blocks/tall_brick_stove.json", loot("tall_brick_stove"))
     for wood in WOODS:

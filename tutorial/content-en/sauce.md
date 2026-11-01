@@ -1,4 +1,5 @@
-<!-- 作者：；英文翻译。 -->
+<!-- 作者：mryt233；英文翻译，原文：mryt233。发布前由 mryt233 同步并审核。 -->
+<!-- mryt233 改，2026-10-30：同步正式版 #30–#71 和未发布 #72–#82；保留原译者署名。 -->
 # Dipping Sauces
 
 A good dipping sauce completes a hotpot meal. The mod uses a **self-service sauce station**: nine small bowls let you **mix your own sauce**. Each seasoning has its own effect, and **all effects stack**.
@@ -22,13 +23,13 @@ Each recipe makes one station. Replace planks with iron ingots for iron, or use 
 
 **Right-click the station with an empty hand** to open its restocking screen:
 
-- **Nine slots** correspond to the nine bowls on the station.
+- **Nine slots** correspond to the nine bowls on the station (there are 10 seasonings, with room for up to 9 kinds at once).
 - **Each slot accepts one ingredient type.** The ingredient placed in an empty slot determines its seasoning. Multiple slots can hold the same ingredient.
 - **One ingredient = four servings** of seasoning. A slot holds up to 16 ingredients, or 64 servings.
 - The **?** in the top-right opens an **ingredient reference**, showing which ingredient makes which seasoning.
 - Stocked bowls visibly show their seasoning on the station.
 
-## Nine seasonings {#seasoning}
+## 10 seasonings {#seasoning}
 
 | Seasoning | Ingredient | Effect when eaten |
 | --- | --- | --- |
@@ -41,6 +42,9 @@ Each recipe makes one station. Replace planks with iron ingots for iron, or use 
 | Sugar | {{i:minecraft:sugar}} | Haste for 10 seconds |
 | Chopped scallions | {{i:scallion}} | Flavor only; no effect |
 | Chopped cilantro | {{i:cilantro}} | Flavor only; no effect |
+| Garlic paste | {{i:garlic_paste}} | Resistance for 8 seconds |
+
+Since 0.1.4-alpha, garlic drops from grass. Pound it on a cutting board with a rolling pin 3 times to make 2 portions of garlic paste.
 
 “Cooling the spice” means clearing the Hunger effect from Spicy Red Broth. **Every seasoning in your bowl contributes its effect when you eat dipped food.**
 
@@ -66,15 +70,15 @@ There are three ways:
 ### ① Dip at the table
 
 1. **Place your sauce bowl on a table** by right-clicking the tabletop, just like placing a plate.
-2. **Hold food with chopsticks** and right-click the sauce bowl to dip it.
-3. The food now carries the sauce's effects. Its tooltip lists **“Dipped: …”**.
+2. **Hold food with bamboo chopsticks** and right-click the sauce bowl on the table to take a dip (clicking the sauce bowl with empty chopsticks will prompt you to pick up food first).
+3. The food now carries the sauce's effects; hover over it to see **“Dipped: …”**. After taking the last dip, the sauce bowl turns back into an empty bowl.
 
 ### ② Automatic dipping at the pot
 
-**Hold sauce in your off hand** and eat with chopsticks in the hotpot screen. Each bite is **automatically dipped**, without taking it out first.
+Hold dipping sauce in your **main hand or off hand** (either hand works); eating with chopsticks in the hotpot screen will **automatically dip each bite**, without taking it out first. Eating food held by chopsticks while aiming into the air (see “③” below) also automatically dips if you are holding sauce in hand.
 
 ### ③ Eat directly with chopsticks
 
-Hold dipped food with chopsticks and **hold right-click while aiming into the air** to eat. Its effects still apply. **However you eat it**—in the screen, with chopsticks, or from the table—dipped food keeps its effects.
+Hold dipped food with chopsticks and **hold right-click while aiming into the air** to eat; the sauce's effects still apply. **However you eat it**—in the screen, with chopsticks, or from the table—dipped food keeps its effects.
 
-Each dip uses one serving. After nine dips, the sauce bowl becomes an **empty bowl**.
+Each dip uses one serving from the sauce bowl; after nine dips, the dipping sauce becomes an **empty bowl**.

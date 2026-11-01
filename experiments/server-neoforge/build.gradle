@@ -1,0 +1,7 @@
+// EXP-PKG 空服务端（NeoForge）。作者：mryt233。
+plugins { id 'net.neoforged.moddev' version '2.0.148' }
+
+neoForge {
+    version = project.neoforge_version
+    runs { server { server(); programArgument '--nogui'; gameDirectory = project.file('run') } }
+}

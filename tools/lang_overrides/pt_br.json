@@ -5,5 +5,15 @@
   "item.orients_hotpot_chronicles.beef_loin_slice": "Fatia de lombo bovino",
   "item.orients_hotpot_chronicles.cooked_beef_loin_slice": "Fatia de lombo bovino cozida",
   "item.orients_hotpot_chronicles.cooked_fish_ball": "Bolinho de peixe cozido",
-  "item.orients_hotpot_chronicles.cooked_cilantro_fish_ball": "Bolinho de peixe com coentro cozido"
+  "item.orients_hotpot_chronicles.cooked_cilantro_fish_ball": "Bolinho de peixe com coentro cozido",
+  "block.orients_hotpot_chronicles.copper_round_yuanyang_hotpot": "Hotpot yuanyang com centro redondo de cobre",
+  "block.orients_hotpot_chronicles.iron_round_yuanyang_hotpot": "Hotpot yuanyang com centro redondo de ferro",
+  "item.orients_hotpot_chronicles.cooked_beef_loin": "Lombo bovino cozido",
+  "text.orients_hotpot_chronicles.seasoning.garlic_paste.effect": "Resistência 8 s",
+  "item.orients_hotpot_chronicles.tomato_hotpot_base": "Base de hotpot de tomate",
+  "item.orients_hotpot_chronicles.three_fresh_hotpot_base": "Base de hotpot três delícias",
+  "block.orients_hotpot_chronicles.copper_square_yuanyang_hotpot": "Hotpot yuanyang com centro quadrado de cobre",
+  "block.orients_hotpot_chronicles.iron_square_yuanyang_hotpot": "Hotpot yuanyang com centro quadrado de ferro",
+  "item.orients_hotpot_chronicles.hotpot_guide": "Guia do hotpot",
+  "item.orients_hotpot_chronicles.cooked_ham_sausage_slice": "Fatia de salsicha de presunto cozida"
 }

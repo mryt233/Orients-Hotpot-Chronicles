@@ -1,0 +1,345 @@
+/* 作者：mryt233（2026-10-27）指南样式教程：照游戏内「火锅指南」GuideBookScreen 的书。
+   贴图 guide_book.png 按 2 倍显示（一个贴图像素 = 2 个网页像素）：左书签 (280,0/24) 28×24、顶书签 (312,0/24) 24×24、
+   物品格 (340,0) 18×18、箭头 (340,18) 12×8、翻页三角 (360/370, 0/9) 9×9。书皮、纸页颜色取自 tools/gen_guide_gui.py。
+   正文字号、标题和段落间距、表格、引用块、提示框底色：mryt233 于 2026-10-27 微调。 */
+:root{
+  --outline:#340c0a;--leather:#8a221a;--leather-hi:#aa3426;--leather-lo:#6a1812;
+  --paper:#f1ead8;--paper-edge:#c4bca8;--paper-line:#dcd3bc;
+  --text:#2a1a0e;--heading:#5a2a10;--muted:#7a6040;--tip:#2e5e1e;--number:#1e6e78;--rule:rgba(96,56,32,.25);--warn:#8a221a;--gold:#9a6a10;
+  --bg:#1c1714;
+  --pw:400px;          /* 一页正文宽 */
+  --ph:560px;          /* 一页正文高 */
+  --pad:34px;          /* 纸页内边距（左右） */
+  --spine:6px;
+  --gap:calc(var(--pad) * 2 + var(--spine));
+  --spring:cubic-bezier(.34,1.56,.64,1);     /* 回弹：冲过头一点再回来 */
+  --out:cubic-bezier(.22,1,.36,1);           /* 快出慢停 */
+  --turn:cubic-bezier(.45,.05,.25,1);        /* 翻页：慢起、加速、慢落 */
+}
+@media (max-width:1080px){:root{--pw:calc((100vw - 200px) / 2 - 70px);--pad:28px}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(ellipse at 50% 40%,#2e2520 0,var(--bg) 70%) fixed;color:var(--text);
+  font:15px/1.7 -apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh}
+.bar{display:flex;align-items:center;gap:12px;justify-content:center;padding:14px 16px 0;color:#efe2c8;font-weight:700;letter-spacing:.04em}
+.snd{width:28px;height:28px;border:0;padding:0;cursor:pointer;background:none;position:relative;opacity:.85}
+.snd:hover{opacity:1}
+/* 像素喇叭：机身 + 声波（关掉时换成叉） */
+.snd::before{content:"";position:absolute;left:5px;top:10px;width:5px;height:8px;background:#efe2c8;box-shadow:5px -3px 0 0 #efe2c8,5px 3px 0 0 #efe2c8,5px 0 0 0 #efe2c8}
+.snd::after{content:"";position:absolute;left:17px;top:8px;width:3px;height:12px;border-right:2px solid #efe2c8;border-radius:0 8px 8px 0}
+.snd.off::after{content:"×";border:0;left:17px;top:3px;width:auto;height:auto;color:#e0b84a;font:700 16px/1 sans-serif}
+.bar .draft{font-size:12px;font-weight:600;color:var(--outline);background:#e0b84a;padding:2px 8px}
+.stage{display:flex;justify-content:center;padding:94px 16px 60px 122px}
+
+/* ---------- 书 ---------- */
+.book{position:relative}
+.cover{position:relative;z-index:2;padding:18px 24px 27px;background:var(--leather) url("__LEATHER__") repeat;image-rendering:pixelated;
+  box-shadow:inset 3px 3px 0 var(--leather-hi),inset -3px -3px 0 var(--leather-lo),0 0 0 3px var(--outline),12px 12px 0 rgba(0,0,0,.4)}
+.paper{position:relative;width:calc(var(--pw) * 2 + var(--gap) + var(--pad) * 2);padding:26px var(--pad) 48px;image-rendering:auto;
+  background:linear-gradient(to right,var(--paper) 0,var(--paper) calc(50% - 36px),#e3d9c2 calc(50% - 3px),var(--outline) calc(50% - 3px),
+    var(--outline) calc(50% + 3px),#e3d9c2 calc(50% + 3px),var(--paper) calc(50% + 36px),var(--paper) 100%);
+  /* 一层层的书页边（书的厚度）：往外、往下错开 */
+  box-shadow:-3px 3px 0 var(--paper-line),3px 3px 0 var(--paper-line),-6px 6px 0 var(--paper-edge),6px 6px 0 var(--paper-edge),-9px 9px 0 var(--paper-line),9px 9px 0 var(--paper-edge)}
+.view{width:calc(var(--pw) * 2 + var(--gap));height:var(--ph);overflow:hidden}
+.flow{width:calc(var(--pw) * 2 + var(--gap));height:var(--ph);column-width:var(--pw);column-gap:var(--gap);column-fill:auto;
+  transition:transform .55s var(--out)}
+.flow.noanim{transition:none}
+.paper{touch-action:pan-y}   /* 横着滑交给翻页，竖着滑照常滚动 */
+.paper img{-webkit-user-drag:none;user-drag:none}
+/* 触摸屏上书页里的字不让长按选中（选字会把滑动手势吃掉）；鼠标照常能选字 */
+@media (pointer:coarse){.paper,.paper *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}}
+.flow{transition:transform .55s var(--out),translate .3s var(--out)}
+
+/* ---------- 书签 ---------- */
+/* 书签按贴图 2.5 倍显示（用户 2026-10-27：太小了，放大）；悬停 / 选中用回弹缓动伸出来 */
+.cats{position:absolute;z-index:1;left:-64px;top:22px;display:flex;flex-direction:column;gap:0}
+.cats button,.tabs button{position:relative;border:0;padding:0;cursor:pointer;background:url("__SPRITE__") no-repeat;background-size:1280px 640px;image-rendering:pixelated;
+  transition:transform .32s var(--spring)}
+.cats button{width:70px;height:60px;background-position:-700px 0}
+.cats button.on{background-position:-700px -60px;transform:translateX(-10px)}
+.cats button:hover{transform:translateX(-10px)}
+.cats button img{position:absolute;left:12px;top:10px;width:40px;height:40px;transition:transform .32s var(--spring)}
+.cats button:hover img{transform:scale(1.12)}
+.tabs{position:absolute;z-index:1;left:30px;top:-57px;display:flex;gap:5px}
+.tabs button{width:60px;height:60px;background-position:-780px 0}
+.tabs button.on{background-position:-780px -60px;transform:translateY(-8px)}
+.tabs button:hover{transform:translateY(-8px)}
+.tabs button img{position:absolute;left:10px;top:10px;width:40px;height:40px;transition:transform .32s var(--spring)}
+.tabs button:hover img{transform:scale(1.12)}
+
+/* 打开页面：书从下面浮上来，带一点回弹 */
+.book{animation:bookIn .7s var(--spring) backwards}   /* 只用 backwards：填充到结束会让 .book 一直算有 transform，手机滑出菜单（position:fixed）被关进书里、被遮罩盖住点不了 */
+@keyframes bookIn{from{opacity:0;transform:translateY(26px) scale(.97)}to{opacity:1;transform:none}}
+/* 换条目：正文从翻页方向滑进来、渐显 */
+.flow.enter{animation:enterR .45s var(--out) both}
+.flow.enter.back{animation-name:enterL}
+@keyframes enterR{from{opacity:0;translate:26px 0}to{opacity:1;translate:0 0}}
+@keyframes enterL{from{opacity:0;translate:-26px 0}to{opacity:1;translate:0 0}}
+/* 翻页：一张带内容的纸绕书脊翻过去（正面旧页、背面新页），翻到竖直时最暗，下面的页被它投上影子 */
+.pg-under,.sheet3d,.pg-shade{position:absolute;z-index:5;pointer-events:none;overflow:hidden}
+.pg-under{background:var(--paper)}
+.sheet3d{overflow:visible;transform-style:preserve-3d;animation-duration:.62s;animation-timing-function:cubic-bezier(.42,.0,.2,1);animation-fill-mode:forwards}
+.sheet3d.fwd{transform-origin:left center;animation-name:turnF}
+.sheet3d.bwd{transform-origin:right center;animation-name:turnB}
+@keyframes turnF{0%{transform:perspective(2200px) rotateY(0)}100%{transform:perspective(2200px) rotateY(-180deg)}}
+@keyframes turnB{0%{transform:perspective(2200px) rotateY(0)}100%{transform:perspective(2200px) rotateY(180deg)}}
+.face{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;background:var(--paper)}
+.face.back{transform:rotateY(180deg)}
+/* 书脊那一边的弯曲暗影 + 翻动时整面变暗再变亮 */
+.face::after{content:"";position:absolute;inset:0;pointer-events:none;animation:.62s cubic-bezier(.42,0,.2,1) forwards}
+.fwd .face.front::after{background:linear-gradient(to right,rgba(80,50,20,.28),rgba(80,50,20,0) 14%);animation-name:dimOut}
+.fwd .face.back::after{background:linear-gradient(to left,rgba(80,50,20,.28),rgba(80,50,20,0) 14%);animation-name:dimIn}
+.bwd .face.front::after{background:linear-gradient(to left,rgba(80,50,20,.28),rgba(80,50,20,0) 14%);animation-name:dimOut}
+.bwd .face.back::after{background:linear-gradient(to right,rgba(80,50,20,.28),rgba(80,50,20,0) 14%);animation-name:dimIn}
+@keyframes dimOut{0%{box-shadow:inset 0 0 0 9999px rgba(40,20,5,0)}100%{box-shadow:inset 0 0 0 9999px rgba(40,20,5,.32)}}
+@keyframes dimIn{0%{box-shadow:inset 0 0 0 9999px rgba(40,20,5,.32)}100%{box-shadow:inset 0 0 0 9999px rgba(40,20,5,0)}}
+/* 纸边缘的高光和厚度 */
+.sheet3d.fwd .face.front{box-shadow:inset -2px 0 0 rgba(255,255,255,.6)}
+.sheet3d.bwd .face.front{box-shadow:inset 2px 0 0 rgba(255,255,255,.6)}
+/* 下面那一页上的投影：纸立起来时最深 */
+.pg-shade{z-index:4;animation:.62s cubic-bezier(.42,0,.2,1) forwards}
+.pg-shade.fwd{background:linear-gradient(to right,rgba(40,20,5,.35),rgba(40,20,5,0) 60%);animation-name:castF}
+.pg-shade.bwd{background:linear-gradient(to left,rgba(40,20,5,.35),rgba(40,20,5,0) 60%);animation-name:castF}
+@keyframes castF{0%{opacity:0}45%{opacity:1}100%{opacity:0}}
+/* 书脊那道黑线单独画在最上面：翻页的纸、暂留的旧页都不会盖住它（用户 2026-10-27：翻页时黑线闪、宽度在变） */
+.spine{position:absolute;z-index:6;top:0;bottom:0;left:calc(50% - 3px);width:6px;background:var(--outline);pointer-events:none}
+
+/* 竖屏单页翻页：书脊在左，纸绕左边翻；翻走时越翻越暗、最后淡出，翻回来反过来 */
+.sheet1,.pg-shade1{position:absolute;z-index:5;pointer-events:none}
+.sheet1{transform-origin:left center;animation:.6s cubic-bezier(.42,0,.2,1) forwards}
+.sheet1.out{animation-name:turn1Out}.sheet1.in{animation-name:turn1In}
+@keyframes turn1Out{0%{transform:perspective(1400px) rotateY(0);opacity:1}75%{opacity:1}100%{transform:perspective(1400px) rotateY(-105deg);opacity:0}}
+@keyframes turn1In{0%{transform:perspective(1400px) rotateY(-105deg);opacity:0}25%{opacity:1}100%{transform:perspective(1400px) rotateY(0);opacity:1}}
+.face1{position:absolute;inset:0;overflow:hidden;background:var(--paper);box-shadow:4px 0 14px rgba(40,20,5,.25)}
+.face1::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,rgba(80,50,20,.25),rgba(80,50,20,0) 16%,rgba(255,255,255,0) 80%,rgba(255,255,255,.18));
+  animation:.6s cubic-bezier(.42,0,.2,1) forwards}
+.sheet1.out .face1::after{animation-name:dimOut}.sheet1.in .face1::after{animation-name:dimIn}
+.pg-shade1{z-index:4;background:linear-gradient(to right,rgba(40,20,5,.3),rgba(40,20,5,0) 70%);animation:castF .6s cubic-bezier(.42,0,.2,1) forwards}
+
+/* 翻页三角：悬停时往外弹一下 */
+.turn{transition:transform .3s var(--spring)}
+.turn.prev:hover{transform:translateX(-4px) scale(1.15)}.turn.next:hover{transform:translateX(4px) scale(1.15)}
+/* 配方卡换材料：成品图标轻轻弹一下 */
+.rg-pv img,.rg-b .slot img{animation:pop .38s var(--spring)}
+@keyframes pop{from{transform:scale(.75);opacity:.4}to{transform:none;opacity:1}}
+.rg-chips button{transition:transform .25s var(--spring),box-shadow .2s}
+.rg-chips button:hover{transform:translateY(-2px) scale(1.1)}
+/* 鼠标提示：从小变大弹出 */
+.mctip:not([hidden]){animation:tipIn .18s var(--out)}
+@keyframes tipIn{from{opacity:0;transform:scale(.92) translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* ---------- 搜索：右上角放大镜书签（同顶书签贴图），点开在书页上方弹出纸色搜索框 ---------- */
+.find-tab{position:absolute;z-index:1;right:30px;top:-57px;width:60px;height:60px;border:0;padding:0;cursor:pointer;
+  background:url("__SPRITE__") -780px 0/1280px 640px no-repeat;image-rendering:pixelated;transition:transform .32s var(--spring)}
+.find-tab:hover,.find-tab.on{transform:translateY(-8px)}
+.find-tab.on{background-position:-780px -60px}
+.find-tab .cmp{position:absolute;left:10px;top:10px;width:40px;height:40px;image-rendering:pixelated;transition:transform .32s var(--spring)}
+.find-tab:hover .cmp{transform:scale(1.12)}
+.mfind{display:none}
+.findbox{position:fixed;z-index:40;left:50%;top:96px;width:min(560px,calc(100vw - 24px));transform:translateX(-50%);
+  background:var(--paper);box-shadow:0 0 0 3px var(--outline),inset 0 0 0 2px var(--paper-edge),10px 10px 0 rgba(0,0,0,.35);
+  animation:findIn .28s var(--spring)}
+.findbox[hidden]{display:none}
+@keyframes findIn{from{opacity:0;transform:translate(-50%,-14px) scale(.96)}to{opacity:1;transform:translate(-50%,0)}}
+.fb-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:2px solid var(--rule)}
+.fb-head .cmp{width:28px;height:28px;flex:none;image-rendering:pixelated}
+#fq{flex:1;min-width:0;border:0;outline:0;background:rgba(96,56,32,.07);padding:8px 10px;font:inherit;font-size:16px;color:var(--text);box-shadow:inset 0 0 0 2px var(--rule)}
+#fq:focus{box-shadow:inset 0 0 0 2px var(--number)}
+#fclose{border:0;background:none;font:700 22px/1 sans-serif;color:var(--muted);cursor:pointer;padding:0 4px}
+#fclose:hover{color:var(--warn)}
+.fb-list{max-height:min(60vh,460px);overflow-y:auto;padding:6px 6px 8px}
+.fb-hint{color:var(--muted);margin:10px 8px;font-size:14px}
+.fb-item{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;border:0;background:none;padding:7px 8px;cursor:pointer;font:inherit;color:var(--text);
+  border-bottom:1px solid var(--rule);transition:background .15s,transform .2s var(--spring)}
+.fb-item:hover,.fb-item:focus{background:rgba(30,110,120,.1);transform:translateX(3px);outline:0}
+.fb-ic img{width:28px;height:28px;display:block;image-rendering:pixelated}
+.fb-t{min-width:0;line-height:1.4}.fb-t b{display:block;color:var(--heading);font-size:14px}
+.fb-t small{display:block;color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis}
+.fb-t mark,mark.hit{background:#ffd54a;color:#2a1a0e;padding:0 1px}
+mark.hit{animation:hitPulse 1.6s var(--out)}
+@keyframes hitPulse{0%{box-shadow:0 0 0 6px rgba(255,213,74,.9)}100%{box-shadow:0 0 0 0 rgba(255,213,74,0)}}
+
+/* 翻页三角、页码 */
+.turn{position:absolute;bottom:16px;width:18px;height:18px;border:0;padding:0;cursor:pointer;background:url("__SPRITE__") no-repeat;background-size:1024px 512px;image-rendering:pixelated}
+.turn.prev{left:var(--pad);background-position:-720px 0}.turn.prev:hover{background-position:-740px 0}
+.turn.next{right:var(--pad);background-position:-720px -18px}.turn.next:hover{background-position:-740px -18px}
+.turn[hidden]{display:none}
+.pno{position:absolute;bottom:14px;right:calc(var(--pad) + var(--pw) / 2);transform:translateX(50%);color:var(--muted);font-size:13px}
+
+/* 原版样式的鼠标提示（深紫底、紫边） */
+.mctip{position:fixed;z-index:50;pointer-events:none;padding:5px 8px;background:rgba(16,0,16,.94);color:#fff;font-size:14px;line-height:1.4;white-space:nowrap;
+  border:2px solid;border-image:linear-gradient(#5000ff,#28007f) 1;box-shadow:0 0 0 2px rgba(16,0,16,.94)}
+.mctip small{display:block;color:#a8a8a8;font-size:12px}
+
+/* ---------- 正文 ---------- */
+.flow img.ic{image-rendering:pixelated}
+.flow>*{break-inside:avoid-column}
+.flow p,.flow ul,.flow ol{break-inside:auto}
+.flow li{break-inside:avoid}
+.ehead{display:flex;align-items:center;gap:10px;padding-bottom:8px;margin-bottom:14px;border-bottom:2px solid var(--rule);break-after:avoid}
+.ehead .eic{width:32px;height:32px;flex:none}
+.ehead h1,.ehead h2{margin:0;color:var(--heading);font-size:22px;line-height:1.35}
+.ehead h1{font-size:24px}
+.flow h2{color:var(--heading);font-size:18.5px;margin:.95em 0 .35em;break-after:avoid}
+.flow h3{color:var(--heading);font-size:16px;margin:.9em 0 .25em;break-after:avoid}
+.flow h3:before{content:"◆ ";color:var(--warn);font-size:11px;vertical-align:2px}
+.flow p{margin:.4em 0}
+.flow ul,.flow ol{margin:.35em 0;padding-left:1.35em}
+.flow ol>li::marker{color:var(--number);font-weight:700}
+.flow b,.flow strong{color:#3a1c08}
+.flow a{color:var(--number)}
+.flow a[data-todo]{color:var(--muted);text-decoration:underline dotted}
+.flow code{background:rgba(96,56,32,.1);padding:1px 5px;font:13.5px Consolas,monospace}
+.flow pre{white-space:pre-wrap;font-size:13px;background:rgba(96,56,32,.08);padding:8px 10px}
+.flow blockquote{margin:.6em 0;padding:6px 12px;background:rgba(96,56,32,.06);border-left:3px solid var(--number);color:var(--text)}
+.flow blockquote p{margin:.2em 0}
+.flow table{border-collapse:collapse;margin:.65em 0;font-size:13.5px;line-height:1.45;width:100%;word-break:break-word}
+.flow th,.flow td{border-bottom:1px solid var(--rule);padding:4px 6px;text-align:left;vertical-align:middle}
+.flow th{color:var(--heading);border-bottom:2px solid var(--rule);background:rgba(96,56,32,.04);font-weight:700}
+.flow hr{border:0;border-top:2px dashed var(--rule)}
+.muted{color:var(--muted)}
+figure{margin:.8em 0}figure img{width:100%;border:3px solid var(--outline);display:block}figcaption{color:var(--muted);font-size:13px}
+.callout{margin:.7em 0;padding:5px 10px 5px 12px;border-left:3px solid var(--tip);background:rgba(46,94,30,.05);color:var(--tip)}
+.callout .ct{font-weight:700}.callout p{margin:.25em 0}.callout b,.callout strong{color:inherit}
+.callout.warn{border-color:var(--warn);background:rgba(138,34,26,.05);color:#6a1812}
+.callout.dev{border-color:var(--gold);background:rgba(154,106,16,.06);color:#6a4a08}
+.tag{display:inline-block;font-size:11.5px;line-height:1;padding:3px 6px;margin-left:6px;vertical-align:3px;font-weight:600;border:2px solid}
+.tag.since{color:var(--tip);border-color:var(--tip)}.tag.dev{color:#fff;background:var(--gold);border-color:var(--gold)}
+.it{display:inline-flex;align-items:center;gap:3px;vertical-align:middle;margin:0 1px;white-space:nowrap;color:var(--heading)}
+.it .ic{width:22px;height:22px}
+.chips{display:flex;flex-wrap:wrap;gap:6px 10px;margin:.6em 0}
+.ic.missing{display:inline-grid;place-items:center;width:32px;height:32px;background:#a33;color:#fff}
+
+/* 配方：直接画在纸上，物品格和箭头用指南贴图 */
+.recipes{margin:.8em 0 1em;break-inside:avoid}
+.rtitle{display:flex;align-items:center;gap:6px;color:var(--number);font-weight:700;margin-bottom:2px}
+.rtitle .ic{width:22px;height:22px}
+.rcp{margin:4px 0 8px}
+.rlabel{font-size:12px;color:var(--muted)}
+.rbody{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(var(--cols),36px)}
+.slot{position:relative;width:36px;height:36px;display:grid;place-items:center;background:url("__SPRITE__") -680px 0/1024px 512px no-repeat;image-rendering:pixelated}
+.slot .ic{width:32px;height:32px}
+.slot .cnt{position:absolute;right:1px;bottom:-2px;font:700 14px/1 Consolas,monospace;color:#fff;text-shadow:2px 2px 0 #3f3f3f}
+.arr{display:block;width:24px;height:16px;background:url("__SPRITE__") -680px -36px/1024px 512px no-repeat;image-rendering:pixelated}
+.cks{display:flex;flex-direction:column;font-size:12.5px;color:var(--muted);line-height:1.5}
+
+.drawer{display:contents}
+.mtop,.backdrop{display:none}
+.cats .lbl,.tabs .lbl{display:none}
+
+/* 合成表大全的轮换卡片：标题、配方（固定 3×3 格不跳动）、右边大图预览、下面一排可点的材料 */
+.rg{margin:.4em 0 1.1em;padding-bottom:.8em;border-bottom:2px dashed var(--rule);break-inside:avoid}
+.rg-t{color:var(--number);font-weight:700;margin-bottom:4px}
+.rg-b{min-height:108px}
+.grid.g3{grid-template-columns:repeat(3,36px)}
+.grid.one{grid-template-columns:36px}
+.rg-pv{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:88px;text-align:center;font-size:13px;color:var(--heading);line-height:1.35}
+.rg-pv img{width:56px;height:56px;image-rendering:pixelated}
+.rg-pv small{color:var(--muted);font-size:11.5px}
+.rg-pv .tag{margin:2px 0 0}
+.rg-chips{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}
+.rg-chips button{position:relative;width:28px;height:28px;padding:2px;border:0;cursor:pointer;background:rgba(96,56,32,.08);box-shadow:inset 0 0 0 1px var(--rule)}
+.rg-chips button img{width:24px;height:24px;display:block;image-rendering:pixelated}
+.rg-chips button.on{background:rgba(30,110,120,.18);box-shadow:inset 0 0 0 2px var(--number)}
+.rg-chips button.pin{box-shadow:inset 0 0 0 2px var(--warn);background:rgba(138,34,26,.14)}
+.rg-chips button.dev::after{content:"";position:absolute;right:1px;top:1px;width:5px;height:5px;background:var(--gold)}
+
+/* 锅形展示：大图（斜看）+ 小图（俯看），下面一排选铜 / 铁，一排选锅形 */
+.potviewer{margin:.8em 0 1em;padding:10px;background:rgba(96,56,32,.06);box-shadow:inset 0 0 0 2px var(--rule);break-inside:avoid}
+.pv-static{display:inline-block;margin:4px;text-align:center}.pv-static img{width:96px;height:96px;border:0}.pv-static figcaption{font-size:12px}
+.pv-stage{position:relative;height:190px;display:flex;align-items:center;justify-content:center}
+.pv-stage img{image-rendering:pixelated;cursor:pointer;animation:pop .4s var(--spring)}
+.pv-main{width:180px;height:180px}
+.pv-alt{position:absolute;right:0;bottom:0;width:84px;height:84px;background:var(--paper);box-shadow:0 0 0 2px var(--rule)}
+.pv-info{text-align:center;margin:2px 0 6px}.pv-info b{color:var(--heading);font-size:16px}
+.pv-info p{margin:.15em 0;font-size:14px}.pv-info .pv-r{color:var(--muted);font-size:13px}
+.pv-row{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:6px}
+.pv-row button{display:flex;align-items:center;gap:4px;border:0;cursor:pointer;padding:3px 8px 3px 3px;font:inherit;font-size:13.5px;color:var(--text);
+  background:rgba(96,56,32,.08);box-shadow:inset 0 0 0 2px var(--rule);transition:transform .25s var(--spring),box-shadow .2s}
+.pv-row button img{width:30px;height:30px;image-rendering:pixelated}
+.pv-shapes button{padding:3px;position:relative}.pv-shapes button img{width:40px;height:40px}
+.pv-row button:hover{transform:translateY(-2px) scale(1.06)}
+.pv-row button.on{background:rgba(30,110,120,.16);box-shadow:inset 0 0 0 2px var(--number)}
+.pv-shapes button.dev::after{content:"";position:absolute;right:2px;top:2px;width:6px;height:6px;background:var(--gold)}
+
+/* 每章第一页的「本章目录」：一条一行，图标 + 标题 + 一句开头，悬停往右弹一下 */
+.toc{margin-top:1em;break-inside:auto}
+.toc-h{margin-top:.6em}
+.toc-tip{color:var(--muted);font-size:13.5px;margin:.2em 0 .6em}
+.flow .toc-item{display:flex;align-items:center;gap:10px;padding:6px 6px;border-bottom:1px solid var(--rule);text-decoration:none;color:var(--text);
+  break-inside:avoid;transition:background .15s,transform .25s var(--spring)}
+.flow .toc-item:hover{background:rgba(30,110,120,.08);transform:translateX(4px)}
+.toc-item img{width:32px;height:32px;flex:none;image-rendering:pixelated}
+.toc-item span{min-width:0;line-height:1.35}
+.toc-item b{display:block;color:var(--heading);font-size:15px}
+.toc-item small{display:block;color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* 物品图鉴：一行两个，图标 + 名字 + ID */
+.flow h2 small{font-size:13px;color:var(--muted);font-weight:400}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:4px 10px;margin:.4em 0 1em}
+.card{display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid var(--rule);break-inside:avoid}
+.card .ic{width:32px;height:32px;flex:none}
+.card>div{min-width:0;line-height:1.3}
+.card b{font-size:13.5px;color:var(--heading)}
+.card .tag{font-size:10px;padding:2px 4px;margin-left:4px;vertical-align:1px}
+.card code{display:block;background:none;padding:0;font-size:10.5px;color:var(--muted);word-break:break-all}
+
+/* ---------- 手机：单页；书签和电脑版一样，收在左边，点「目录」书签才滑出来 ---------- */
+@media (max-width:820px){
+  :root{--pw:calc(100vw - 16px - 24px - 2 * var(--pad));--ph:calc(100vh - 150px);--pad:18px}
+  .stage{padding:70px 8px 40px}
+  .cover{padding:12px 12px 18px}
+  .paper{width:calc(var(--pw) + var(--pad) * 2);background:var(--paper)}
+  .view,.flow{width:var(--pw)}
+  .pno{right:50%}
+  .spine{display:none}
+  .find-tab{display:none}
+  .mfind{display:block;position:relative;flex:none;width:44px;height:44px;border:0;padding:0;cursor:pointer;
+    background:url("__SPRITE__") -572px 0/939px 469px no-repeat;image-rendering:pixelated}
+  .mfind{transition:transform .3s var(--spring)}
+  .mfind.on{background-position:-572px -44px;transform:translateY(-8px)}
+  .mfind .cmp{position:absolute;left:7px;top:7px;width:30px;height:30px;image-rendering:pixelated}
+  .findbox{top:12px}
+  .bar{font-size:14px}
+  /* 书顶一排：最左「三横线」书签固定不动（点了滑出菜单），右边是这个分类的条目小书签，左右滑动 */
+  .mtop{display:flex;align-items:flex-end;gap:4px;position:absolute;z-index:1;left:12px;right:12px;top:-46px;height:48px}
+  .menu-btn{flex:none;display:flex;align-items:center;gap:6px;height:42px;margin-bottom:-2px;padding:0 10px 0 9px;border:0;cursor:pointer;
+    background:var(--leather) url("__LEATHER__");color:#f1ead8;font:700 14px/1 inherit;
+    box-shadow:inset 2px 2px 0 var(--leather-hi),inset -2px 0 0 var(--leather-lo),0 0 0 2px var(--outline)}
+  .menu-btn:active{transform:translateY(-3px)}
+  .menu-btn .mb-ic img{display:block;width:28px;height:28px;image-rendering:pixelated}
+  .burger{display:block;width:20px;height:4px;margin:8px 2px;background:#f1ead8;box-shadow:0 -7px 0 #f1ead8,0 7px 0 #f1ead8,1px 1px 0 var(--outline),1px -6px 0 var(--outline),1px 8px 0 var(--outline)}
+  .mtabs{flex:1;min-width:0;display:flex;align-items:flex-end;gap:4px;overflow-x:auto;overflow-y:hidden;height:60px;padding-top:14px;margin-top:-12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .mtabs::-webkit-scrollbar{display:none}
+  .mtabs button{position:relative;flex:none;width:44px;height:44px;border:0;padding:0;cursor:pointer;background:url("__SPRITE__") -572px 0/939px 469px no-repeat;image-rendering:pixelated;transform:none}
+  .mtabs button{transition:transform .3s var(--spring)}
+  .mtabs button.on{background-position:-572px -44px;transform:translateY(-8px)}
+  /* 选中的书签下面接一截同色的「脖子」连到书页上，抬起来也不悬空（用户 2026-10-27：抬起后空隙太大） */
+  .mtabs button.on::after,.mfind.on::after{content:"";position:absolute;left:2px;right:2px;top:calc(100% - 3px);height:11px;background:var(--paper);box-shadow:inset 2px 0 0 var(--outline),inset -2px 0 0 var(--outline)}
+  .mtabs button img{position:absolute;left:7px;top:7px;width:30px;height:30px}
+  /* 滑出的菜单：左边一列分类书签、右边是这个分类的条目书签（贴图、悬出、选中样式都和电脑版一样），手机上没有鼠标悬停，所以名字直接写在旁边 */
+  .drawer{display:flex;position:fixed;z-index:30;left:0;top:0;bottom:0;width:min(86vw,330px);padding:16px 0 16px 12px;gap:10px;overflow-y:auto;
+    background:var(--paper);border-right:12px solid var(--leather);box-shadow:3px 0 0 var(--outline),inset -3px 0 0 var(--paper-edge),12px 0 24px rgba(0,0,0,.5);
+    transform:translateX(-110%);transition:transform .38s var(--out);will-change:transform;contain:paint}
+  .drawer.open{transform:none}
+  .backdrop{display:block;position:fixed;inset:0;z-index:29;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .22s}
+  .backdrop.open{opacity:1;pointer-events:auto}
+  .drawer .cats{position:static;flex:none;flex-direction:column;padding-top:4px}
+  /* 菜单里的书签不做悬停弹出、不带过渡：菜单滑出时书签会一个个从鼠标底下经过，原来每个都弹一下，看着像拖影（用户 2026-10-27） */
+  .drawer .cats button{width:56px;height:48px;background-size:1024px 512px;background-position:-560px 0}
+  .drawer .cats button.on{background-position:-560px -48px}
+  .drawer .cats button img{left:10px;top:8px;width:32px;height:32px}
+  .drawer .cats button,.drawer .cats button:hover{transform:translateX(0);transition:none}
+  .drawer .cats button.on{transform:translateX(8px)}
+  .drawer button img,.drawer button:hover img{transform:none;transition:none}
+  .drawer .tabs{position:static;flex:1;flex-direction:column;gap:6px;padding:4px 10px 0 0;margin:0}
+  .drawer .tabs button{display:flex;align-items:center;width:auto;height:48px;background:none;transform:none;text-align:left}
+  .drawer .tabs button::before{content:"";flex:none;width:48px;height:48px;background:url("__SPRITE__") -624px 0/1024px 512px no-repeat;image-rendering:pixelated}
+  .drawer .tabs button.on::before{background-position:-624px -48px}
+  .drawer .tabs button img{left:8px;top:8px;width:32px;height:32px}
+  .drawer .tabs .lbl{display:block;margin-left:8px;color:var(--text);font-size:14px;line-height:1.3}
+  .drawer .tabs button.on .lbl{color:var(--heading);font-weight:700}
+  .drawer .tabs .ctitle{color:var(--heading);font-weight:700;font-size:16px;padding:12px 0 6px;border-bottom:2px solid var(--rule);margin-bottom:4px}
+}

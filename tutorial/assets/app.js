@@ -1,4 +1,4 @@
-// 作者： 教程站脚本：当前页高亮、手机菜单、全文搜索
+// 作者：mryt233 教程站脚本：当前页高亮、手机菜单、全文搜索
 (function () {
   var slug = location.pathname.split("/").pop().replace(".html", "") || "index";
   document.querySelectorAll("#nav a").forEach(function (a) { if (a.dataset.slug === slug) a.classList.add("on"); });

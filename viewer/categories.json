@@ -13,7 +13,10 @@
     "bowl",
     "drink",
     "pounded_meat*",
-    "sauce_station_top"
+    "sauce_station_top",
+    "*_hot_pot_tomato",
+    "*_hot_pot_three_fresh",
+    "cup"
   ],
   "categories": [
     {
@@ -42,7 +45,9 @@
       ],
       "exclude": [
         "*table*",
-        "*bowl*"
+        "*bowl*",
+        "*_hotpot_base",
+        "hotpot_guide"
       ]
     },
     {
@@ -67,7 +72,9 @@
         "盘",
         "碗",
         "筷",
-        "plates"
+        "plates",
+        "cup",
+        "杯"
       ]
     },
     {
@@ -80,7 +87,10 @@
         "orange_drink",
         "empty_orange_drink_bottle",
         "plant_protein_drink",
-        "empty_plant_protein_drink_bottle"
+        "empty_plant_protein_drink_bottle",
+        "*_soup_bowl",
+        "rich_stock_bowl",
+        "*_soup_bucket"
       ],
       "keywords": [
         "drink",
@@ -113,7 +123,26 @@
         "丸",
         "loin",
         "吊龙",
-        "牛脊"
+        "牛脊",
+        "cola",
+        "可乐",
+        "orange",
+        "橙子",
+        "garlic",
+        "大蒜",
+        "蒜泥",
+        "tomato",
+        "番茄",
+        "kelp",
+        "海带",
+        "shrimp",
+        "sausage",
+        "minced_pork",
+        "火腿肠",
+        "猪肉末",
+        "虾",
+        "hotpot_base",
+        "锅底料"
       ]
     },
     {

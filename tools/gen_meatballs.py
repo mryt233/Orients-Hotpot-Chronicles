@@ -7,7 +7,7 @@
   砧板上的阶段贴图 block/pounding/<beef|pork|mutton|fish>_<minced|paste>.png（由砧板渲染器画在板面上）
 
     python tools/gen_meatballs.py
-作者：
+作者：mryt233
 """
 import json
 import math
@@ -18,8 +18,8 @@ from PIL import Image
 
 MOD = Path(__file__).resolve().parent.parent
 MODID = "orients_hotpot_chronicles"
-RES = MOD / "src/main/resources"
-ROOTS = [RES / "assets" / MODID, RES / "resourcepacks/hotpot_assets/assets" / MODID]
+RES = MOD / "common/src/main/resources"
+ROOTS = [RES / "assets" / MODID]
 
 
 def clamp(c):

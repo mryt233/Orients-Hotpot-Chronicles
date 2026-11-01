@@ -1,2 +1,21 @@
-pluginManagement { repositories { maven { url = 'https://maven.fabricmc.net/' }; gradlePluginPortal(); mavenCentral() } }
-rootProject.name = 'blockforge-generated'
+pluginManagement {
+    repositories {
+        maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.architectury.dev/' }
+        maven { url = 'https://maven.neoforged.net/releases/' }
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'orients-hotpot-multiloader'
+
+include 'common'
+include 'fabric'
+include 'neoforge'
+include 'framework:pure'
+include 'framework:loader'
+include 'framework:game'
+include 'framework:client'
+include 'experiments:server-fabric'
+include 'experiments:server-neoforge'

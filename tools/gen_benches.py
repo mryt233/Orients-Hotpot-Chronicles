@@ -12,8 +12,8 @@ from pathlib import Path
 
 MOD = Path(__file__).resolve().parent.parent
 MODID = "orients_hotpot_chronicles"
-RES = MOD / "src/main/resources"
-ASSET_ROOTS = [RES / "assets" / MODID, RES / "resourcepacks/hotpot_assets/assets" / MODID]
+RES = MOD / "common/src/main/resources"
+ASSET_ROOTS = [RES / "assets" / MODID]
 DATA = RES / "data"
 WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped"]
 
@@ -78,6 +78,8 @@ def main():
                         v = {"model": f"{MODID}:block/{name}{suffix(left, right)}"}
                         if y:
                             v["y"] = y
+                            # 贴图锁定：转了方向木纹也按世界方向贴，正着、反着放的凳子拼在一起木纹接得上（用户 2026-10-26，调整）
+                            v["uvlock"] = True
                         variants[f"facing={facing},left={str(left).lower()},right={str(right).lower()}"] = v
             ident = f"{wood}_stool"
             write(root / f"blockstates/{ident}.json", {"variants": variants})

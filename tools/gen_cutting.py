@@ -7,7 +7,7 @@
   砧板 cutting_board（方块：圆木墩，直径 12、高 3 像素；顶面年轮，侧面带一圈树皮）
 
     python tools/gen_cutting.py
-作者：
+作者：mryt233
 """
 import json
 import math
@@ -18,8 +18,8 @@ from PIL import Image
 
 MOD = Path(__file__).resolve().parent.parent
 MODID = "orients_hotpot_chronicles"
-RES = MOD / "src/main/resources"
-ROOTS = [RES / "assets" / MODID, RES / "resourcepacks/hotpot_assets/assets" / MODID]
+RES = MOD / "common/src/main/resources"
+ROOTS = [RES / "assets" / MODID]
 
 
 def clamp(c):
@@ -224,7 +224,19 @@ def knife_texture():
     hx = int(KNIFE_ORIGIN[0] + (hu + hv) * s2)
     hy = int(KNIFE_ORIGIN[1] + (hv - hu) * s2)
     px[hx, hy] = (70, 72, 78, 255)
-    return centered(im)
+    return knife_user_edit(centered(im))
+
+
+def knife_user_edit(im):
+    """2026-10-26 用户逐像素调的刀把（看预览定的，调整）：刀把加粗一排（亮 / 原色 / 暗三排，暗的那排在新加的一侧），
+    末端收平。用户看的预览是物品栏里的样子：物品模型的 gui 显示本来就沿对角线翻一面（见下面 iron_kitchen_knife.json），
+    所以贴图本身不再翻（r120 开发中翻过一次，物品栏 / 指南里就反了，用户报，已改回）。"""
+    HI, LO = (74, 50, 28, 255), (34, 22, 11, 255)
+    for p in [(6, 10), (6, 11), (5, 12), (4, 13), (3, 14)]:
+        im.putpixel(p, HI)
+    for p in [(5, 10), (4, 11), (3, 12), (2, 13)]:
+        im.putpixel(p, LO)
+    return im
 
 
 def centered(im):
@@ -291,7 +303,7 @@ def board_model():
 
 def write(p, obj):
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(obj, indent=2) + "\n", encoding="utf-8")
+    p.write_bytes((json.dumps(obj, indent=2) + "\n").encode("utf-8"))  # 调整：保持 LF
 
 
 def main():
@@ -317,10 +329,11 @@ def main():
         board_side().save(tex / "block/cutting_board_side.png")
         write(root / "models/block/cutting_board.json", board_model())
         # 物品栏图标：俯视（用户：斜着看太小）；拿在手里照原版方块。
-        # gui_light = front（调整，用户报：物品栏里的砧板比放下的暗、颜色不一样）：方块模型默认按「斜着看的方块」打光，
-        # 正对屏幕的板面只吃到一半的光，看着发褐；front 是原版平面物品的打光，板面按贴图原色显示
-        write(root / "models/item/cutting_board.json", {"parent": f"{MODID}:block/cutting_board", "gui_light": "front", "display": {
-            "gui": {"rotation": [90, 0, 0], "translation": [0, 0, 0], "scale": [1.0, 1.0, 1.0]},
+        # 打光：以前正上方平看时用 front（板面正对屏幕用方块打光会发暗）；2026-10-26 改成斜看，板面朝上，用方块的 side 打光正常亮
+        # 物品栏：斜上方往下看、稍侧一点（2026-10-26 用户发查看器截图要这个角度；原来是正上方平看）——调整
+        write(root / "models/item/cutting_board.json", {"parent": f"{MODID}:block/cutting_board", "gui_light": "side", "display": {
+            # 往上 4.75（原来 1.5，图标偏下约 3 像素）：按游戏的物品栏变换算，砧板在格子正中（2026-10-26 用户；调整）
+            "gui": {"rotation": [40, 20, 0], "translation": [0, 4.75, 0], "scale": [0.95, 0.95, 0.95]},
             "fixed": {"rotation": [90, 0, 0], "translation": [0, 0, 0], "scale": [0.8, 0.8, 0.8]},
             # 0.1.2-alpha 后用户：第一人称看不见，要和放下后一样大 → 1 倍，抬高、微微向自己倾斜露出板面
             "firstperson_righthand": {"rotation": [15, 45, 0], "translation": [0, 5, 0], "scale": [1.0, 1.0, 1.0]},
@@ -368,7 +381,7 @@ def data_files():
     write(rec / "iron_kitchen_knife.json", {"type": "minecraft:crafting_shaped", "category": "equipment", "pattern": ["II", "S "],
                                              "key": {"I": {"item": "minecraft:iron_ingot"}, "S": {"item": "minecraft:stick"}},
                                              "result": {"id": f"{MODID}:iron_kitchen_knife", "count": 1}})
-    # 两个原木横排（调整 r117：原来单个原木无序合成，和原版「原木 → 木板」冲突）
+    # 两个原木横排（r117：原来单个原木无序合成，和原版「原木 → 木板」冲突）
     write(rec / "cutting_board.json", {"type": "minecraft:crafting_shaped", "category": "misc", "pattern": ["LL"],
                                         "key": {"L": {"tag": "minecraft:logs"}},
                                         "result": {"id": f"{MODID}:cutting_board", "count": 2}})
@@ -377,7 +390,7 @@ def data_files():
     tag = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {"replace": False, "values": []}
     # 合并写、不覆盖：土豆 / 豆腐由 gen_ingredients.py 加。r106～r110 这里整份覆盖，跑完把土豆、豆腐挤掉了，
     # 砧板切不了土豆片、豆腐块（用户报，调整）；这里也列上，两个脚本谁后跑都齐全
-    for v in ["minecraft:beef", "minecraft:mutton", "minecraft:potato", f"{MODID}:tofu", f"{MODID}:beef_loin"]:
+    for v in ["minecraft:beef", "minecraft:mutton", "minecraft:porkchop", "minecraft:potato", f"{MODID}:tofu", f"{MODID}:beef_loin", f"{MODID}:shrimp"]:   # 虾、猪排由各自加工方案共用此标签
         if v not in tag["values"]:
             tag["values"].append(v)
     write(f, tag)

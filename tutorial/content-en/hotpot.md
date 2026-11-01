@@ -1,4 +1,5 @@
-<!-- 作者：；英文翻译。 -->
+<!-- 作者：mryt233；英文翻译，原文：mryt233。发布前由 mryt233 同步并审核。 -->
+<!-- mryt233 改，2026-10-30：同步正式版 #30–#71 和未发布 #72–#82；保留原译者署名。 -->
 # Stoves & Hotpots
 
 Hotpot has three essentials: a **stove** for heat, a **pot** for broth and ingredients, and a **broth base** that affects cooking speed. Here is how they all work.
@@ -42,7 +43,11 @@ The firebox screen has no temperature bar or remaining-time counter. The size of
 | Pot | Description |
 | --- | --- |
 | {{i:iron_nine_grid_hotpot}} / {{i:copper_nine_grid_hotpot}} | Nine-grid pot: one broth across nine large cells. Copper and iron differ only in appearance. |
-| Yuanyang and four-grid pots | Coming in 0.1.3; see [Yuanyang and four-grid pots](#yuanyang) below. |
+| Yuanyang and four-grid pots | Available since 0.1.3-alpha-hotfix1; see [Yuanyang and four-grid pots](#yuanyang) below. |
+
+Choose copper or iron, then select a pot shape below:
+
+{{potviewer}}
 
 {{recipe:iron_nine_grid_hotpot,copper_nine_grid_hotpot}}
 
@@ -60,6 +65,10 @@ A nine-grid pot has nine large cells, each containing a 3×3 set of smaller slot
 | {{i:minecraft:milk_bucket}} | Rich Stock | ×0.85 | Milky white; slowest |
 | {{i:minecraft:mushroom_stew}} | Mushroom Broth | ×1.15 | Pour in the stew; the bowl is returned |
 | {{i:minecraft:lava_bucket}} | Spicy Red Broth | ×1.30 | Bright red; fastest |
+| {{i:tomato_soup_bucket}} | Tomato Broth | ×1.10 | Craft a broth bucket from hotpot base + water bucket, or add base to Clear Broth |
+| {{i:three_fresh_soup_bucket}} | Three Delicacies Broth | ×1.00 | Same method with Three Delicacies Hotpot Base |
+
+**Hotpot bases:** {{i:tomato_hotpot_base}} uses tomatoes; {{i:three_fresh_hotpot_base}} uses fish, mushroom, carrot, and kelp (see the [Recipe Collection](recipes.html)). Add base to Clear Broth in the pot, or pour in a prepared broth bucket. Added in 0.1.4-alpha.
 
 - Add broth: **hold the bucket or mushroom stew and right-click the pot**. A regular pot holds only one broth at a time; divided pots are different.
 - **Remove broth:** **right-click with an empty bucket** to recover its original contents (water returns as a water bucket). Mushroom broth requires a **bowl** and **no food remaining in the pot**; take all food out first.
@@ -76,7 +85,7 @@ For example, raw beef takes five seconds in a smoker. Coal + Clear Broth also ta
 See the cooking section of the [Recipe Collection](recipes.html) for each ingredient's cooking times.
 
 :::warn
-**Only put food in the pot.** In 0.1.2-alpha, wood, ores, and iron items can also be added and “cooked” into charcoal or iron nuggets using furnace recipes. Avoid doing this. **From 0.1.3 onward, pots only accept food:** edible items or items with smoker / campfire recipes. Cooked food cannot be added again.
+**Only put food in the pot.** In 0.1.2-alpha, wood, ores, and iron items could also be added and “cooked” into charcoal or iron nuggets using furnace recipes. Avoid doing this. **From 0.1.3-alpha-hotfix1 onward, pots only accept food:** edible items or items with smoker / campfire recipes. Cooked food cannot be added again.
 :::
 
 ### Ways to add and remove things
@@ -85,68 +94,80 @@ See the cooking section of the [Recipe Collection](recipes.html) for each ingred
 | --- | --- |
 | Raw ingredient | Adds it to the large cell under your crosshair |
 | A [plate](tableware.html) of food | Tips **raw** ingredients into randomly chosen large cells with space; cooked food stays on the plate |
-| Chopsticks holding food | Places that food in the targeted large cell |
-| Empty chopsticks | Opens the hotpot screen |
-| Bucket | Adds broth to an empty pot, or removes broth with an empty bucket |
+| Bamboo chopsticks holding **raw** ingredient | Places that food in the targeted large cell (into the pot) |
+| Bamboo chopsticks holding **cooked** food | Eats it (if you are still hungry; if full, right-clicking a bowl or plate puts it back) |
+| Bamboo chopsticks (empty) | **Picks up a cooked portion** from the targeted cell (notifies you if there is none); hold right-click to eat once picked up |
+| Bamboo chopsticks + sneak (Shift) | **Opens the hotpot screen** |
+| Bucket | Adds broth to an empty pot, or scoops broth with an empty bucket |
 | Bowl | Collects cooked food or serves soup |
 | Empty hand | Collects cooked food from the targeted cell |
-| Empty hand + sneak (Shift) | Packs a stove-mounted pot, including broth and food, into your inventory (also works for standalone / campfire pots from 0.1.3) |
+| Empty hand + sneak (Shift) | Packs a stove-mounted pot, including broth and food, into your inventory (also works for standalone / campfire pots from 0.1.3-alpha-hotfix1) |
+
+:::tip
+**Chopsticks and empty hands take the food currently visible at the surface**; if it is still raw, you are told it is not cooked yet. A bowl first takes the visible cooked portion, then other cooked food, up to 3 portions.
+:::
+
+:::dev
+The development build lets you keep eating with chopsticks even when full; the hunger bar stays full but saturation is still added. Returning food to a bowl or plate uses sneak + right-click — **food is returned first, and only empty chopsticks rest on the rim** — so the two actions do not conflict. Follow the table above for 0.1.4-alpha. See the [Development Preview](preview.html#chopsticks).
+:::
 
 ## The hotpot screen {#screen}
 
 {{recipe:bamboo_chopsticks}}
 
-**Hold chopsticks and right-click the pot** to open it:
+**Hold bamboo chopsticks and Shift + right-click the pot** to open it (right-clicking directly picks up a cooked portion without opening the screen). Inside the screen:
 
 - Every portion is visible, with different appearances for raw and cooked food.
-- With chopsticks on your cursor, **left-click cooked food** to eat it, restoring hunger and saturation just like vanilla food.
+- With chopsticks on your cursor, **left-click cooked food** to eat it in one bite, restoring hunger and saturation just like vanilla food.
 - Double-click to collect matching cooked food onto your cursor, like double-clicking in the vanilla inventory.
 - **Hover over food** to see its name. Dipped food also lists “Dipped: …”.
-- Hold [dipping sauce](sauce.html) in your off hand to **automatically dip each bite** eaten in this screen.
+- Holding [dipping sauce](sauce.html) in your **main hand or off hand** will **automatically dip each bite** eaten in this screen.
 
 ### Cold pots
 
-A pot is **cold** when it is **not on a burning stove or lit campfire**. The broth is still and ingredients float in it. Eating from a cold pot with chopsticks has a 30% chance of causing **Nausea for 15 seconds**. A [Plant Protein Drink](tableware.html#drink) clears Nausea.
+A pot is **cold** when it is **not on a burning stove or lit campfire**. The broth is still and ingredients float in it. Eating from a cold pot with chopsticks has a 30% chance of causing **Nausea for 15 seconds**—avoid cold food to keep from upsetting your stomach. A [Plant Protein Drink](tableware.html#drink) clears Nausea.
 
 ## Cooking on a campfire {#campfire}{{since:0.1.1-alpha}}
 
 You can cook without a stove by placing the pot **on a lit campfire or soul campfire**:
 
-- In 0.1.2-alpha, the pot sits directly on the campfire. From 0.1.3, four slender iron supports rest on the campfire logs, so the pot no longer appears to float and flames no longer pass through it.
+- In 0.1.2-alpha, the pot sits directly on the campfire. From 0.1.3-alpha-hotfix1, four slender iron supports rest on the campfire logs, so the pot no longer appears to float and flames no longer pass through it.
 - Heat equals coal, **no fuel is consumed**, and nearby players are healed too.
 - Extinguishing or breaking the campfire makes the pot cold.
-- In 0.1.2-alpha, you must **mine** this pot to pick it up. From 0.1.3, **Shift + right-click with an empty hand** packs it with broth and food, just like a stove-mounted pot.
+- In 0.1.2-alpha, you had to **mine** this pot to pick it up. From 0.1.3-alpha-hotfix1, **Shift + right-click with an empty hand** packs it with broth and food, just like a stove-mounted pot.
 
 ## Benefits of eating together {#heal}
 
 A **heated pot** refreshes **Regeneration I** for **10 seconds** every **four seconds** on players **within six blocks**, like a beacon's area effect. Staying beside a pot keeps restoring health, and sharing a table makes it even livelier.
 
-## Yuanyang and four-grid pots {#yuanyang}{{dev}}
+## Yuanyang and four-grid pots {#yuanyang}{{since:0.1.3-alpha-hotfix1}}
 
-:::dev
-These pots are **coming in 0.1.3** and are not in 0.1.2-alpha. Gameplay and details, especially the screen, may still change before release.
-:::
-
-Craft a divided pot from a **nine-grid pot** and matching copper / iron ingots: **ingot to the left = S-shaped Yuanyang; below = O-shaped; above = straight divider; one on each side = four-grid pot**. Each compartment holds **its own broth**. Aim at a compartment to add or remove its broth. Each food slot cooks with **that compartment's broth**; a compartment without broth will not cook. Like nine-grid pots, these work on the ground, campfires, short stoves, and tall stoves.
+Craft a divided pot from a **nine-grid pot** and matching copper / iron ingots: **ingot to the left = Taiji Yuanyang; below = Round-Center; above = straight divider; one on each side = four-grid pot; one above and one below = Square-Center Yuanyang**. Each compartment holds **its own broth**. Aim at a compartment to add or remove its broth. Each food slot cooks with **that compartment's broth**; a compartment without broth will not cook. Like nine-grid pots, these work on the ground, campfires, short stoves, and tall stoves.
 
 | Pot | Divider | Broths | Capacity per compartment |
 | --- | --- | --- | --- |
-| S-shaped Yuanyang | S-shaped, like a yin-yang symbol | 2 | 28 on each side |
-| O-shaped Yuanyang | A ring in the middle | 2 | 44 outside, 9 inside |
+| Taiji Yuanyang | S-shaped, like a yin-yang symbol | 2 | 28 on each side |
+| Round-Center Yuanyang | A ring in the middle | 2 | 44 outside, 9 inside |
 | Straight-divider Yuanyang | One straight central divider | 2 | 36 on each side |
 | Four-grid hotpot | A cross dividing four compartments | 4 | 16 per compartment |
+| Square-Center Yuanyang | A square ring in the middle | 2 | 44 outside, 9 inside |
 
-Open the screen with chopsticks. Small slots fill the pot from the edges inward, as with a nine-grid pot. **Spaces too close to a divider to fit a full slot are left empty**, showing only broth and the pot bottom. Food floats at several positions in each compartment (S: four per side; O: six outside and two inside; straight: three per side; four-grid: two per compartment). Items sharing a position take turns appearing.
+:::warn
+In 0.1.4-alpha, S-shaped and O-shaped pots were renamed **Taiji Yuanyang** and **Round-Center Yuanyang**, including their item IDs. **The four renamed pots already placed in worlds from 0.1.3 or earlier will disappear** (two each in copper and iron).
+:::
+
+Open the screen with bamboo chopsticks (Shift + right-click the pot). As with a nine-grid pot, small slots fill the pot from the edges inward. **Spaces too close to a divider to fit a full slot are left empty**, showing only broth and the pot bottom. Food floats at several positions in each compartment (S: four per side; O: six outside and two inside; straight: three per side; four-grid: two per compartment). Items sharing a position take turns bobbing to the surface.
 
 In the screen, **double-clicking matching cooked food or collecting it with a bowl only combines food from the same broth**. Compartments with matching broths can be collected together; otherwise, only the selected side is collected.
 
-{{recipe:copper_s_yuanyang_hotpot,copper_o_yuanyang_hotpot,copper_split_yuanyang_hotpot,copper_four_grid_hotpot}}
+{{recipe:copper_taiji_yuanyang_hotpot,copper_round_yuanyang_hotpot,copper_split_yuanyang_hotpot,copper_four_grid_hotpot,copper_square_yuanyang_hotpot}}
 
 Iron recipes are the same: replace copper ingots and the copper pot with iron equivalents.
 
 ## Mining and removal
 
-- **Mine the pot:** only the pot is removed. Broth and food are packed into its item and restored when placed again.
+- **Mine the pot:** only the pot is removed. Broth and food are packed into its item and restored when placed again. In Creative mode, **middle-click** also copies the complete pot with broth and food.
+- Standalone pots **stay in place even with air underneath**.
 - **Mine the stove's brick body:** the whole stove is removed, and the packed pot drops too.
 - The pot item's tooltip lists its **broth**, **food portions**, and how many are cooked.
 - To remove a pot without mining the stove, **Shift + right-click the pot with an empty hand**.

@@ -130,7 +130,7 @@ const stove = {
   blocks: ["brick_stove"],
   open: "右键灶台：没装锅时点哪里都行；装了锅时点砖砌的灶身（或手里拿着跟锅无关的东西点锅）",
   size: [ST.W, ST.H],
-  textures: ["minecraft:block/bricks"],
+  textures: ["minecraft:block/bricks", `${NS}:block/stove_front`, `${NS}:block/stove_front_lit`],
   params: [
     { key: "fuel", label: "燃料槽", options: [["minecraft:coal", "煤炭"], ["minecraft:oak_log", "原木"], ["minecraft:lava_bucket", "岩浆桶"], ["", "空"]], default: "minecraft:coal" },
     { key: "burning", label: "灶火", options: [["on", "正在烧"], ["off", "没点火"]], default: "on" },
@@ -153,7 +153,7 @@ const stove = {
     const d = this.derive(s);
     const t = time / 1000;
     frame(g, w, h, 3, false);
-    this.hearth(g, d, t);
+    this.hearth(g, d);
     // fuel slot: brass ring around a recessed slot
     const fx = ST.FUEL_X, fy = ST.FUEL_Y;
     g.fill(fx - 4, fy - 4, fx + 20, fy + 20, RIM_LINE);
@@ -171,80 +171,19 @@ const stove = {
     inventoryFrames(g, ST.INV_X, ST.INV_Y, ST.HOTBAR_Y);
   },
 
-  // brick hearth with an arched mouth; flames flicker with layered sines, sparks rise and slow down
-  hearth(g, d, t) {
+  // hearth window = the stove block's own front texture (2026-10-26, = StoveScreen.drawHearth): rows 5..16 of
+  // stove_front(_lit), ×3, centred; the window frames just that (no extra bricks around it). The game animates the lit texture
+  // (16 frames); screen textures in the viewer are single frames, so here it shows frame 0.
+  hearth(g, d) {
     const { HX, HY, HW, HH } = ST;
-    for (let ty = 0; ty < HH; ty += 16) for (let tx = 0; tx < HW; tx += 16) {
-      g.texture("minecraft:block/bricks", HX + tx, HY + ty, 0, 0, Math.min(16, HW - tx), Math.min(16, HH - ty), 16, 16);
-    }
-    g.fill(HX - 1, HY - 1, HX + HW + 1, HY, RIM_LINE);
-    g.fill(HX - 1, HY + HH, HX + HW + 1, HY + HH + 1, RIM_LINE);
-    g.fill(HX - 1, HY, HX, HY + HH, RIM_LINE);
-    g.fill(HX + HW, HY, HX + HW + 1, HY + HH, RIM_LINE);
-    const ax = HX + 8, ay = HY + 9, aw = HW - 16, ah = HH - 12;
-    const bottom = ay + ah;
-    const archTop = (x) => (x >= ax + 6 && x < ax + aw - 6 ? ay : x >= ax + 3 && x < ax + aw - 3 ? ay + 3 : ay + 8);
-    const MOUTH = 0xff0a0503;
-    g.fill(ax + 6, ay, ax + aw - 6, bottom, MOUTH);
-    g.fill(ax + 3, ay + 3, ax + aw - 3, bottom, MOUTH);
-    g.fill(ax, ay + 8, ax + aw, bottom, MOUTH);
-
-    const burning = d.burnTicks > 0;
-    if (!burning) {
-      // cold: grey ash bed; a faint ember breathes when fuel is waiting
-      g.fill(ax + 3, bottom - 3, ax + aw - 3, bottom, 0xff2e2a26);
-      for (let k = 0; k < 6; k++) g.fill(ax + 5 + k * 5, bottom - 3 + (k % 2), ax + 7 + k * 5, bottom - 2 + (k % 2), 0xff4a443d);
-      if (d.hasFuelInSlot) {
-        const a = 0.25 + 0.35 * easeInOutSine(frac(t / 2.4) < 0.5 ? frac(t / 2.4) * 2 : 2 - frac(t / 2.4) * 2);
-        g.fill(ax + 14, bottom - 3, ax + 22, bottom - 1, alpha(0xffb8361c, a));
-      }
-      return;
-    }
-    const heat = 0.3 + 0.7 * easeOutQuad(d.burnRatio);
-    // warm light spilling onto the bricks
-    g.fill(HX, HY, HX + HW, HY + HH, alpha(0xffff8a2a, 0.07 + 0.05 * Math.sin(t * 2.3)));
-    g.fill(ax, ay + 8, ax + aw, bottom, alpha(0xff5a1606, 0.9));
-    g.fill(ax + 3, ay + 3, ax + aw - 3, bottom, alpha(0xff5a1606, 0.5));
-    // ember bed
-    const base = bottom - 3;
-    for (let k = 0; k < 10; k++) {
-      const x = ax + 2 + Math.floor((k * (aw - 4)) / 10);
-      const glow = 0.5 + 0.5 * Math.sin(t * 2.1 + k * 1.3);
-      g.fill(x, base, x + 3, bottom, mix(0xffb8361c, 0xfff0a23c, glow));
-      if (k % 3 === 1) g.fill(x + 1, base + 1, x + 2, base + 2, mix(0xfff0a23c, 0xfffbe08a, glow));
-    }
-    // flame tongues: three nested teardrops per tongue, each row narrower toward a swaying tip
-    const maxH = (base - ay - 2) * heat;
-    const layers = [[1, 3.2, 0xffd8401f], [0.7, 2.1, 0xfff08a2c], [0.42, 1.1, 0xfffbe08a]];
-    for (const [hMul, wMax, color] of layers) {
-      for (let j = 0; j < 5; j++) {
-        const cx = ax + 6 + j * 6;
-        const n = 0.5 + 0.5 * (0.55 * Math.sin(t * 6.3 + j * 1.9) + 0.3 * Math.sin(t * 11.7 + j * 0.7) + 0.15 * Math.sin(t * 23.1 + j * 2.3));
-        const edge = j === 0 || j === 4 ? 0.62 : j === 2 ? 1 : 0.85;
-        const hj = Math.round(maxH * (0.55 + 0.45 * n) * edge * hMul);
-        const sway = Math.sin(t * 4.7 + j * 2.1);
-        for (let yy = 0; yy < hj; yy++) {
-          const f = yy / hj;
-          const half = wMax * (1 - Math.pow(f, 1.7));
-          const xc = cx + sway * 1.6 * f * f;
-          const y = base - yy - 1;
-          const x0 = Math.round(xc - half), x1 = Math.round(xc + half) + 1;
-          if (y <= archTop(x0) || x1 <= x0) continue;
-          g.fill(Math.max(ax, x0), y, Math.min(ax + aw, x1), y + 1, color);
-        }
-      }
-    }
-    // sparks: ease-out rise, fading
-    for (let i = 0; i < 6; i++) {
-      const life = (0.9 + hash(i, 7) * 0.7) / (0.6 + 0.6 * d.burnRatio);
-      const cyc = Math.floor(t / life + hash(i, 3));
-      const u = frac(t / life + hash(i, 3));
-      const x0 = ax + 6 + Math.floor(hash(i, cyc) * (aw - 12));
-      const y = Math.round(base - 2 - (base - ay - 4) * easeOutCubic(u));
-      const x = x0 + Math.round(Math.sin(u * 5 + i) * 2);
-      if (y < archTop(x) + 1) continue;
-      g.fill(x, y, x + 1, y + 1, alpha(0xfffbe08a, Math.pow(1 - u, 1.5)));
-    }
+    const rows = 11, k = 3, w = 16 * k, h = rows * k;
+    const x = HX + (HW - w) / 2, y = HY + (HH - h) / 2;
+    const img = g.textures.get(d.burnTicks > 0 ? `${NS}:block/stove_front_lit` : `${NS}:block/stove_front`);
+    if (img) g.g.drawImage(img, 0, 16 - rows, 16, rows, (g.ox + x) * g.s, (g.oy + y) * g.s, w * g.s, h * g.s);
+    g.fill(x - 1, y - 1, x + w + 1, y, RIM_LINE);
+    g.fill(x - 1, y + h, x + w + 1, y + h + 1, RIM_LINE);
+    g.fill(x - 1, y, x, y + h, RIM_LINE);
+    g.fill(x + w, y, x + w + 1, y + h, RIM_LINE);
   },
 
   // vanilla-furnace style flame that empties from the top as fuel burns down
@@ -289,12 +228,15 @@ const SOUPS = {
   rich_stock: { base: 0xffe3d7bf, hi: 0xffffffff, lo: 0xfff2e7d2, bits: [0xfffff8ea, 0xff6faf3a, 0xffd9c9a8] },
   mushroom: { base: 0xff7c5836, hi: 0xffe8c88a, lo: 0xff9a7048, bits: [0xff4a3220, 0xffc9a16a, 0xff5e4026] },
   spicy: { base: 0xffb32a1e, hi: 0xffffb070, lo: 0xffd94a2e, bits: [0xffe8862a, 0xff7a1408, 0xff3a1208] },
+  tomato: { base: 0xffd8482a, hi: 0xffff9a6a, lo: 0xffe86040, bits: [0xfff2c14a, 0xffb82818, 0xff6faf3a] },
+  three_fresh: { base: 0xffd8c79a, hi: 0xfffff6dc, lo: 0xffe6d8b0, bits: [0xff8a5a34, 0xfff08a30, 0xff3e7a3a] },
 };
-// = PotLayout：每个大格属于哪边汤（-1 = 不用），几边（鸳鸯锅 / 田字锅，2026-10-23 新增）
+// = PotLayout：每个大格属于哪边汤（-1 = 不用），几边（鸳鸯锅 / 田字锅，2026-10-23 mryt233 加）
 const LAYOUTS = {
   nine: { sides: 1, cells: [0, 0, 0, 0, 0, 0, 0, 0, 0] },
   s: { sides: 2, cells: [0, 0, 1, 0, -1, 1, 0, 1, 1] },
   o: { sides: 2, cells: [0, 0, 0, 1, -1, 1, 0, 0, 0] },
+  square: { sides: 2, cells: [0, 0, 0, 1, -1, 1, 0, 0, 0] },   // 方心鸳鸯锅 2026-10-25
   split: { sides: 2, cells: [0, -1, 1, 0, -1, 1, 0, -1, 1] },
   four: { sides: 4, cells: [0, 0, 1, 3, -1, 1, 3, 2, 2] },
 };
@@ -308,6 +250,7 @@ function yySideAt(shape, u, v) {   // = PotLayout.sideAt；-1 = 隔板
     return z < c ? (x < c ? 0 : 1) : (x < c ? 3 : 2);
   }
   if (shape === "o") { const d = Math.hypot(x - c, z - c); return Math.abs(d - 3.4) < 0.5 ? -1 : d < 3.4 ? 1 : 0; }
+  if (shape === "square") { const d = Math.max(Math.abs(x - c), Math.abs(z - c)); return Math.abs(d - 3.0) < 0.5 ? -1 : d < 3.0 ? 1 : 0; }
   const r = c / 2;
   const dUp = x >= c ? Math.abs(Math.hypot(x - c, z - r) - r) : Math.hypot(x - c, Math.min(Math.abs(z), Math.abs(z - c)));
   const dDn = x <= c ? Math.abs(Math.hypot(x - c, z - c - r) - r) : Math.hypot(x - c, Math.min(Math.abs(z - c), Math.abs(z - 2 * c)));
@@ -353,16 +296,16 @@ const hotpot = {
   id: "hotpot",
   name: "火锅界面",
   blocks: ["copper_nine_grid_hotpot", "iron_nine_grid_hotpot", "brick_stove",
-    ...["copper", "iron"].flatMap((m) => ["s_yuanyang_hotpot", "o_yuanyang_hotpot", "split_yuanyang_hotpot", "four_grid_hotpot"].map((k) => `${m}_${k}`))],
+    ...["copper", "iron"].flatMap((m) => ["taiji_yuanyang_hotpot", "round_yuanyang_hotpot", "split_yuanyang_hotpot", "four_grid_hotpot"].map((k) => `${m}_${k}`))],
   open: "手拿筷子右键锅（放在地上的锅、或坐在灶台上的锅都可以）",
   size: [HP.W, HP.H],
   params: [
     { key: "pot", label: "锅", options: [["copper", "铜锅"], ["iron", "铁锅"]], default: "copper" },
-    { key: "layout", label: "分格", options: [["nine", "九宫格"], ["s", "S 形鸳鸯"], ["o", "O 形鸳鸯"], ["split", "直隔鸳鸯"], ["four", "田字"]], default: "nine" },
-    { key: "soup", label: "汤底（第 1 边）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["", "空锅"]], default: "spicy" },
-    { key: "soup2", label: "第 2 边", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["", "没汤"]], default: "clear" },
-    { key: "soup3", label: "第 3 边（田字）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["", "没汤"]], default: "mushroom" },
-    { key: "soup4", label: "第 4 边（田字）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["", "没汤"]], default: "" },
+    { key: "layout", label: "分格", options: [["nine", "九宫格"], ["s", "太极鸳鸯"], ["o", "圆心鸳鸯"], ["square", "方心鸳鸯"], ["split", "直隔鸳鸯"], ["four", "田字"]], default: "nine" },
+    { key: "soup", label: "汤底（第 1 边）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["", "空锅"]], default: "spicy" },
+    { key: "soup2", label: "第 2 边", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["", "没汤"]], default: "clear" },
+    { key: "soup3", label: "第 3 边（田字）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["", "没汤"]], default: "mushroom" },
+    { key: "soup4", label: "第 4 边（田字）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["", "没汤"]], default: "" },
     { key: "fire", label: "灶火", options: [["on", "在烧"], ["off", "熄了"], ["none", "没灶台"]], default: "on" },
     { key: "ratio", label: "剩余燃烧", range: [0.05, 1, 0.05], default: 0.6 },
     { key: "food", label: "锅里", options: [["cooking", "正在煮"], ["raw", "刚下锅"], ["cooked", "全熟了"], ["empty", "空的"]], default: "cooking" },
@@ -676,7 +619,7 @@ const hotpot = {
     g.fill(ix, iy + 2, ix + 1, iy + 5, m.dark);
     g.fill(ix + 13, iy + 2, ix + 14, iy + 5, m.dark);
     // 鸳鸯 / 田字锅标题用锅自己的名字（= HotPotScreen 构造器）
-    const potId = { s: "s_yuanyang_hotpot", o: "o_yuanyang_hotpot", split: "split_yuanyang_hotpot", four: "four_grid_hotpot" }[s.layout];
+    const potId = { s: "taiji_yuanyang_hotpot", o: "round_yuanyang_hotpot", square: "square_yuanyang_hotpot", split: "split_yuanyang_hotpot", four: "four_grid_hotpot" }[s.layout];
     g.text(potId ? g.tr(`block.orients_hotpot_chronicles.${s.pot}_${potId}`) : g.tr(key("screen.title")), 28, 6, TITLE, true);
 
     const x = HP.PANEL_X + 6, right = w - 12;
@@ -761,7 +704,7 @@ const hotpot = {
 };
 
 
-// ===================================================================== sauce station (r103, )
+// ===================================================================== sauce station (r103, mryt233)
 // Web port of client/SauceStationScreen + hotpot/SauceStationScreenHandler. User's design (2026-10-23): the station is a self-service sauce bar — you
 // take a bowl and right-click the small bowls on it to add seasonings (any mix, each kind once per bowl,
 // 9 dips per bowl). This screen is ONLY for restocking: empty-hand right-click opens it. Each slot = one of the 9 small
@@ -780,6 +723,7 @@ const SAUCE_SEASONINGS = [
   ["sugar", ["minecraft:sugar"], 0xfff0eee8, "糖"],
   ["chopped_scallion", [`${NS}:scallion`], 0xff6cb03a, "小葱"],
   ["minced_cilantro", [`${NS}:cilantro`], 0xff4e9a2c, "香菜"],
+  ["garlic_paste", [`${NS}:garlic_paste`], 0xffe8d696, "蒜泥"],
 ];
 const SAUCE_KEY = (k) => `text.${NS}.${k}`;
 // 2026-10-23: the 9 raw slots form a 3×3 grid matching the bowls on the station (row 0 = top step, left → right),
@@ -788,34 +732,20 @@ const SS = { W: 176, H: 178, GRID_X: 44, GRID_Y: 18, STEP_X: 30, STEP_Y: 22, INV
 const ssX = (i) => SS.GRID_X + (i % 3) * SS.STEP_X;
 const ssY = (i) => SS.GRID_Y + Math.floor(i / 3) * SS.STEP_Y;
 // ingredients table (Java: GAP, GUIDE_ROW_Y, GUIDE_ROW_H, ICONS_W); the canvas reserves GUIDE_MAX, the panel is drawn at its real width
-const SG = { GAP: 2, ROW_Y: 18, ROW_H: 16, ICONS_W: 34, MAX_W: 200 };
+const SG = { GAP: 2, ROW_Y: 17, ROW_H: 16, ICONS_W: 34, MAX_W: 200 };   // ROW_Y 17 since garlic paste made it 10 rows
 // what is in each of the 9 bowls for the preview (seasoning index, -1 = empty bowl)
 const SAUCE_LAYOUTS = {
   each: [0, 1, 2, 3, 4, 5, 6, 7, 8],
   mixed: [1, 1, 5, -1, 3, 1, 0, 7, -1],
 };
-// vanilla container colours
-const V_BG = 0xffc6c6c6, V_LIGHT = 0xffffffff, V_DARK = 0xff555555, V_EDGE = 0xff000000;
-const V_SLOT = 0xff8b8b8b, V_SLOT_DARK = 0xff373737, V_TEXT = 0xff404040, V_HINT = 0xff707070;
-
-function vanillaPanel(g, w, h, x = 0, y = 0) {
-  g.fill(x + 1, y, x + w - 1, y + 1, V_EDGE);
-  g.fill(x + 1, y + h - 1, x + w - 1, y + h, V_EDGE);
-  g.fill(x, y + 1, x + 1, y + h - 1, V_EDGE);
-  g.fill(x + w - 1, y + 1, x + w, y + h - 1, V_EDGE);
-  g.fill(x + 1, y + 1, x + w - 1, y + h - 1, V_BG);
-  g.fill(x + 1, y + 1, x + w - 2, y + 3, V_LIGHT);
-  g.fill(x + 1, y + 1, x + 3, y + h - 2, V_LIGHT);
-  g.fill(x + 3, y + h - 3, x + w - 1, y + h - 1, V_DARK);
-  g.fill(x + w - 3, y + 3, x + w - 1, y + h - 1, V_DARK);
+// 2026-10-26: both sauce screens now use the wood frame of the stove / hot pot screens (GuiKit) with light shadowed text;
+// woodPanel = SauceStationScreen.panel, S_HINT = SauceStationScreen.HINT (mryt233)
+const S_HINT = 0xffa88c5c;
+function woodPanel(g, w, h, x = 0, y = 0) {
+  g.translate(x, y);
+  frame(g, w, h, 0, false);   // no wood seams: they would cross the tier labels and the table rows
+  g.translate(-x, -y);
 }
-
-function vanillaSlot(g, x, y) {
-  g.fill(x - 1, y - 1, x + 17, y + 17, V_LIGHT);
-  g.fill(x - 1, y - 1, x + 16, y + 16, V_SLOT_DARK);
-  g.fill(x, y, x + 16, y + 16, V_SLOT);
-}
-
 // vanilla ButtonWidget look (12×12 "?")
 function vanillaButton(g, x, y, w, h, label) {
   g.fill(x, y, x + w, y + h, 0xff000000);
@@ -868,23 +798,22 @@ const sauceStation = {
 
   background(g, s, w, h) {
     const d = this.derive(s);
-    vanillaPanel(g, SS.W, SS.H);
-    g.text("橡木蘸料台", 8, 6, V_TEXT);
-    vanillaButton(g, SS.W - 17, 4, 12, 12, "?");
-    ["tier_top", "tier_mid", "tier_low"].forEach((k, row) => g.text(g.tr(SAUCE_KEY(`screen.sauce.${k}`)), 8, SS.GRID_Y + row * SS.STEP_Y + 4, V_HINT));
+    woodPanel(g, SS.W, SS.H);
+    g.text("橡木蘸料台", 12, 7, TITLE, true);
+    vanillaButton(g, SS.W - 26, 4, 12, 12, "?");
+    ["tier_top", "tier_mid", "tier_low"].forEach((k, row) => g.text(g.tr(SAUCE_KEY(`screen.sauce.${k}`)), 8, SS.GRID_Y + row * SS.STEP_Y + 4, S_HINT, true));
     d.kinds.forEach((k, i) => {
       const x = ssX(i), y = ssY(i);
-      vanillaSlot(g, x, y);
+      slotFrame(g, x, y);
       const p = Math.min(SS.MAX, d.portions[i] + d.raws[i] * 4);
       const bx = x + 18;
-      g.fill(bx, y - 1, bx + 5, y + 17, V_SLOT_DARK);
-      g.fill(bx + 1, y, bx + 4, y + 16, V_SLOT);
+      g.fill(bx, y - 1, bx + 5, y + 17, SLOT_SHADOW);
+      g.fill(bx + 1, y, bx + 4, y + 16, SLOT_BG);
       const fh = Math.round((16 * p) / SS.MAX);
       if (fh && k >= 0) g.fill(bx + 1, y + 16 - fh, bx + 4, y + 16, SAUCE_SEASONINGS[k][2]);
     });
-    for (let row = 0; row < 3; row++) for (let col = 0; col < 9; col++) vanillaSlot(g, SS.INV_X + col * 18, SS.INV_Y + row * 18);
-    for (let col = 0; col < 9; col++) vanillaSlot(g, SS.INV_X + col * 18, SS.HOTBAR_Y);
-    g.text("物品栏", 8, SS.INV_Y - 10, V_TEXT);
+    inventoryFrames(g, SS.INV_X, SS.INV_Y, SS.HOTBAR_Y);
+    g.text("物品栏", 8, SS.INV_Y - 11, LABEL, true);
     if (s.guide === "open") this.guide(g, SS.W + SG.GAP, 0);
   },
 
@@ -893,20 +822,20 @@ const sauceStation = {
     const title = g.tr(SAUCE_KEY("screen.sauce.guide"));
     const rows = SAUCE_SEASONINGS.map(([id, raws]) => ({ raws, name: g.tr(SAUCE_KEY(`seasoning.${id}`)), effect: g.tr(SAUCE_KEY(`seasoning.${id}.effect`)) }));
     const textW = Math.max(g.width(title), ...rows.map((r) => SG.ICONS_W + 4 + g.width(r.name) + 4 + g.width(r.effect)));
-    const gw = 7 + Math.ceil(textW) + 7;
-    vanillaPanel(g, gw, SS.H, px, py);
-    g.text(title, px + 7, py + 6, V_TEXT);
+    const gw = Math.max(7 + Math.ceil(textW) + 7, 12 + Math.ceil(g.width(title)) + 14);
+    woodPanel(g, gw, SS.H, px, py);
+    g.text(title, px + 12, py + 7, TITLE, true);
     rows.forEach((r, i) => {
       const ry = py + SG.ROW_Y + i * SG.ROW_H;
       r.raws.slice(0, 2).forEach((id, k) => g.item(id, px + 7 + k * 17, ry));
       const tx = px + 7 + SG.ICONS_W + 4;
-      g.text(r.name, tx, ry + 4, V_TEXT);
-      g.text(r.effect, tx + g.width(r.name) + 4, ry + 4, V_HINT);
+      g.text(r.name, tx, ry + 4, LABEL, true);
+      g.text(r.effect, tx + g.width(r.name) + 4, ry + 4, S_HINT, true);
     });
   },
 
   slotOverlay(g, slot) {
-    if (slot.ghost) g.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, 0xb08b8b8b);   // raw used up: faded icon of what's in the bowl
+    if (slot.ghost) g.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, 0xb32a190c);   // raw used up: faded icon of what's in the bowl
   },
 
   tooltip(g, slot, s) {
@@ -924,7 +853,7 @@ const sauceStation = {
   },
 };
 
-// ===================================================================== sauce station overview (2026-10-23, )
+// ===================================================================== sauce station overview (2026-10-23, mryt233)
 // Web port of client/SauceOverviewScreen: right-clicking the station opens this read-only overview first — 3×3 cards matching
 // the bowls (row 0 = top step), each with the raw item, name, portions left and a bar; "Restock" opens the restock screen above.
 const SO = { W: 176, H: 176, CARD_X: 8, CARD_Y: 30, CARD_W: 52, CARD_H: 36, STEP_X: 54, STEP_Y: 38 };
@@ -944,30 +873,254 @@ const sauceOverview = {
   },
   background(g, s) {
     const d = sauceStation.derive({ ...s, raw: "yes" });
-    vanillaPanel(g, SO.W, SO.H);
-    g.text("橡木蘸料台", 8, 6, V_TEXT);
-    g.text(g.tr(SAUCE_KEY("screen.sauce.overview_hint")), 8, 17, V_HINT);
+    woodPanel(g, SO.W, SO.H);
+    g.text("橡木蘸料台", 12, 7, TITLE, true);
+    g.fill(12, 17, SO.W - 12, 18, BRASS_DARK);
+    g.text(g.tr(SAUCE_KEY("screen.sauce.overview_hint")), 12, 20, S_HINT, true);
     d.kinds.forEach((k, i) => {
       const cx = SO.CARD_X + (i % 3) * SO.STEP_X, cy = SO.CARD_Y + Math.floor(i / 3) * SO.STEP_Y;
       const left = Math.min(SS.MAX, d.portions[i] + d.raws[i] * 4);
-      g.fill(cx, cy, cx + SO.CARD_W, cy + SO.CARD_H, V_SLOT_DARK);
-      g.fill(cx + 1, cy + 1, cx + SO.CARD_W, cy + SO.CARD_H, V_LIGHT);
-      g.fill(cx + 1, cy + 1, cx + SO.CARD_W - 1, cy + SO.CARD_H - 1, V_SLOT);
+      g.fill(cx, cy, cx + SO.CARD_W, cy + SO.CARD_H, SLOT_LIGHT);
+      g.fill(cx, cy, cx + SO.CARD_W - 1, cy + SO.CARD_H - 1, SLOT_SHADOW);
+      g.fill(cx + 1, cy + 1, cx + SO.CARD_W - 1, cy + SO.CARD_H - 1, SLOT_BG);
       if (k >= 0 && left > 0) {
         const [id, raws, color] = SAUCE_SEASONINGS[k];
         g.item(raws[0], cx + 3, cy + 3);
-        g.text(g.tr(SAUCE_KEY(`seasoning.${id}`)), cx + 21, cy + 4, 0xffffffff, true);
-        g.text(String(left), cx + 21, cy + 14, 0xffe0e0e0, true);
+        g.text(g.tr(SAUCE_KEY(`seasoning.${id}`)), cx + 21, cy + 4, TITLE, true);
+        g.text(String(left), cx + 21, cy + 14, LABEL, true);
         const bw = SO.CARD_W - 8, fw = Math.round((bw * left) / SS.MAX);
-        g.fill(cx + 4, cy + SO.CARD_H - 8, cx + 4 + bw, cy + SO.CARD_H - 4, V_SLOT_DARK);
+        g.fill(cx + 4, cy + SO.CARD_H - 8, cx + 4 + bw, cy + SO.CARD_H - 4, SLOT_SHADOW);
         g.fill(cx + 4, cy + SO.CARD_H - 8, cx + 4 + fw, cy + SO.CARD_H - 4, color);
       } else {
         const t = g.tr(SAUCE_KEY("screen.sauce.empty_bowl"));
-        g.text(t, cx + SO.CARD_W / 2 - g.width(t) / 2, cy + SO.CARD_H / 2 - 4, 0xffc0c0c0, true);
+        g.text(t, cx + SO.CARD_W / 2 - g.width(t) / 2, cy + SO.CARD_H / 2 - 4, S_HINT, true);
       }
     });
     vanillaButton(g, SO.W / 2 - 50, SO.H - 26, 100, 20, g.tr(SAUCE_KEY("screen.sauce.restock")));
   },
 };
 
-export default [hotpot, stove, sauceOverview, sauceStation];
+// ===================================================================== hot pot guide book (2026-10-25, mryt233; redone 2026-10-26)
+// Web port of client/GuideBookScreen: an open red book (textures/gui/guide_book.png from tools/gen_guide_gui.py), category
+// bookmarks down the left, entry bookmarks along the top (hover = stick out + name), one spread per entry.
+// Content = assets/<ns>/guide/zh_cn.json (tools/gen_guide_book.py from tools/guide_content.py). Same layout numbers as the
+// Java (book 272×180, columns x 16 / 144, width 112, from y 12, height 144; rows 14, recipe block 66). The bookmarks and
+// page arrows are clickable here too. Differences: no bold, recipes show the first item of a tag, no item tooltips.
+const GB = { W: 272, H: 180, LEFT_X: 16, RIGHT_X: 144, COL_W: 112, COL_Y: 12, COL_H: 144, RECIPE_H: 66, BX: 28, BY: 24 };
+const GB_COL = { text: 0xff2a1a0e, heading: 0xff5a2a10, muted: 0xff7a6040, tip: 0xff2e5e1e, number: 0xff1e6e78, rule: 0x40603820 };
+const GB_TEX = `${NS}:gui/guide_book`;
+const GB_PROJECT = (new URLSearchParams(location.hash.slice(1)).get("p")) || "mod";
+const GUIDE = await fetch(`/api/file?p=${encodeURIComponent(GB_PROJECT)}&f=src/main/resources/assets/${NS}/guide/zh_cn.json`)
+  .then((r) => (r.ok ? r.json() : { categories: [] })).catch(() => ({ categories: [] }));
+const GB_CATS = GUIDE.categories || [];
+const GB_INDEX = await fetch(`/api/index?p=${encodeURIComponent(GB_PROJECT)}`).then((r) => r.json()).catch(() => ({ recipes: [], itemTags: {} }));
+
+function gbItemName(g, id) {
+  const [ns, path] = id.includes(":") ? id.split(":") : ["minecraft", id];
+  for (const k of [`item.${ns}.${path}`, `block.${ns}.${path}`]) if (g.lang[k]) return g.lang[k];
+  return path;
+}
+// result item → 9 cells of item ids (first matching item of a tag), like GuideBookScreen.drawRecipe
+function gbRecipe(id) {
+  const r = GB_INDEX.recipes.find((x) => /crafting_(shaped|shapeless)|soup_bucket/.test(x.json.type) && ((x.json.result || {}).id || (x.json.result || {}).item) === id);
+  const pick = (ing) => {
+    if (!ing) return null;
+    if (Array.isArray(ing)) return pick(ing[0]);
+    if (ing.item) return ing.item;
+    if (ing.tag) return ((GB_INDEX.itemTags || {})[ing.tag] || [])[0] || null;
+    return null;
+  };
+  const cells = Array(9).fill(null);
+  if (!r) return { cells, count: 1 };
+  const j = r.json;
+  if (j.pattern) j.pattern.forEach((row, y) => [...row].forEach((ch, x) => { if (ch !== " ") cells[y * 3 + x] = pick(j.key[ch]); }));
+  else (j.ingredients || []).forEach((ing, i) => { if (i < 9) cells[i] = pick(ing); });
+  return { cells, count: (j.result && j.result.count) || 1 };
+}
+// "<pot>#<soup>" (a pot holding that broth) → the pot item model with that soup surface, e.g. iron_hot_pot_tomato;
+// "<id>#lit" → the "<id>_lit" item model (the lit stove) (= GuideBookScreen.stack)
+function gbIcon(id) {
+  if (id.endsWith("#lit")) return id.slice(0, -4) + "_lit";
+  const m = /^(.*):(iron|copper)_nine_grid_hotpot#(\w+)$/.exec(id);
+  return m ? `${m[1]}:${m[2]}_hot_pot_${m[3]}` : id;
+}
+function gbTitle(g, e) {
+  return e.title || gbItemName(g, e.icon);
+}
+// = GuideBookScreen.layout + pour: columns of { kind, h, lines, ... }
+function gbLayout(g, e) {
+  const left = [], right = [];
+  const rowsLeft = !!(e.recipes || e.steps);
+  const title = g.wrap(gbTitle(g, e), GB.COL_W - 20);
+  left.push({ kind: "header", h: Math.max(18, title.length * 9 + 6) + 6, lines: title, icon: e.icon });
+  const text = (s, color, out) => g.wrap(s, GB.COL_W).forEach((t) => out.push({ kind: "text", h: 9, lines: [t], color }));
+  if (e.get) { text(e.get, GB_COL.muted, left); left.push({ kind: "gap", h: 3 }); }
+  if (e.text) { text(e.text, GB_COL.text, left); left.push({ kind: "gap", h: 5 }); }
+  const rows = [];
+  if (e.rows) {
+    for (const [icon, s] of e.rows) {
+      const lines = g.wrap(s, GB.COL_W - 15);
+      rows.push({ kind: "row", h: lines.length === 1 ? 14 : lines.length * 9 + 5, lines, icon });
+    }
+    rows.push({ kind: "gap", h: 3 });
+  }
+  (rowsLeft ? left : right).push(...rows);
+  if (e.recipes) right.push({ kind: "recipe", h: GB.RECIPE_H, recipes: e.recipes });
+  if (e.steps) {
+    e.steps.forEach((s, i) => { const lines = g.wrap(s, GB.COL_W - 11); right.push({ kind: "step", h: lines.length * 9 + 3, lines, n: String(i + 1) }); });
+    right.push({ kind: "gap", h: 3 });
+  }
+  if (e.tip) { const lines = g.wrap(e.tip, GB.COL_W - 6); right.push({ kind: "tip", h: lines.length * 9 + 2, lines }); }
+  const cols = [];
+  const pour = (elems, newCol) => {
+    if (!elems.length) return;
+    let cur;
+    if (newCol || !cols.length) { cur = []; cols.push(cur); } else cur = cols[cols.length - 1];
+    let used = cur.reduce((a, x) => a + x.h, 0);
+    for (const el of elems) {
+      if (used + el.h > GB.COL_H && cur.length) {
+        cur = []; cols.push(cur); used = 0;
+        if (el.kind === "gap") continue;
+      }
+      cur.push(el); used += el.h;
+    }
+  };
+  pour(left, true);
+  pour(right, cols.length % 2 === 1);
+  return cols;
+}
+function gbState(s) {
+  const cat = Math.max(0, Math.min(parseInt(s.cat, 10) || 0, GB_CATS.length - 1));
+  const entries = GB_CATS[cat] ? GB_CATS[cat].entries : [];
+  const entry = Math.max(0, Math.min(parseInt(s.entry, 10) || 0, entries.length - 1));
+  return { cat, entry, entries, e: entries[entry] };
+}
+function gbIn(m, x, y, w, h) {
+  return m && m[0] >= x && m[0] < x + w && m[1] >= y && m[1] < y + h;
+}
+const guideBook = {
+  id: "hotpot_guide",
+  name: "火锅指南（教程书）",
+  blocks: [],
+  open: "拿着「火锅指南」右键打开。左边书签切分类、顶上书签切条目（鼠标放上去伸出来并显示名字），左下 / 右下三角、← → 键、滚轮翻页。这里也能直接点书签和三角",
+  size: [GB.BX + GB.W + 3, GB.BY + GB.H + 3],
+  textures: [GB_TEX],
+  params: [
+    { key: "cat", label: "分类", options: GB_CATS.map((c, i) => [String(i), c.title]), default: "0" },
+    { key: "entry", label: "条目", options: [...Array(9)].map((_, i) => [String(i), String(i + 1)]), default: "0" },
+    { key: "spread", label: "跨页", options: [["0", "1"], ["1", "2"], ["2", "3"]], default: "0" },
+  ],
+  icons() {
+    const ids = new Set();
+    for (const c of GB_CATS) {
+      ids.add(gbIcon(c.icon));
+      for (const e of c.entries) {
+        ids.add(gbIcon(e.icon));
+        (e.rows || []).forEach((r) => ids.add(r[0]));
+        (e.recipes || []).forEach((r) => { ids.add(r); gbRecipe(r).cells.forEach((x) => x && ids.add(x)); });
+      }
+    }
+    return [...ids];
+  },
+  slots() { return []; },
+  background() {},
+  foreground(g, s, w, slots, time, mouse) {
+    const { BX: bx, BY: by } = GB;
+    const { cat, entry, entries, e } = gbState(s);
+    if (!e) return;
+    const cols = gbLayout(g, e);
+    const spreads = Math.max(1, Math.ceil(cols.length / 2));
+    const spread = Math.min(parseInt(s.spread, 10) || 0, spreads - 1);
+    s._spreads = spreads;
+    let hoverCat = -1, hoverEntry = -1;
+    GB_CATS.forEach((c, i) => {
+      const ty = by + 10 + i * 24;
+      const hover = gbIn(mouse, bx - 28, ty, 28, 24);
+      if (hover) hoverCat = i;
+      g.texture(GB_TEX, bx - 24 - (i === cat || hover ? 4 : 0), ty, 280, i === cat ? 24 : 0, 28, 24, 512, 256);
+    });
+    entries.forEach((x, i) => {
+      const tx = bx + 14 + i * 26;
+      const hover = gbIn(mouse, tx, by - 24, 24, 24);
+      if (hover) hoverEntry = i;
+      g.texture(GB_TEX, tx, by - 20 - (i === entry || hover ? 3 : 0), 312, i === entry ? 24 : 0, 24, 24, 512, 256);
+    });
+    g.texture(GB_TEX, bx, by, 0, 0, GB.W + 3, GB.H + 3, 512, 256);
+    GB_CATS.forEach((c, i) => g.item(gbIcon(c.icon), bx - 19 - (i === cat || i === hoverCat ? 4 : 0), by + 10 + i * 24 + 4));
+    entries.forEach((x, i) => g.item(gbIcon(x.icon), bx + 14 + i * 26 + 4, by - 16 - (i === entry || i === hoverEntry ? 3 : 0)));
+    for (let k = 0; k < 2 && spread * 2 + k < cols.length; k++) {
+      const x = bx + (k === 0 ? GB.LEFT_X : GB.RIGHT_X);
+      let y = by + GB.COL_Y;
+      for (const el of cols[spread * 2 + k]) {
+        if (el.kind === "header") {
+          g.item(gbIcon(el.icon), x, y);
+          let ty = y + (el.lines.length === 1 ? 4 : 1);
+          for (const t of el.lines) { g.text(t, x + 20, ty, GB_COL.heading); ty += 9; }
+          g.fill(x, y + el.h - 4, x + GB.COL_W, y + el.h - 3, GB_COL.rule);
+        } else if (el.kind === "text") g.text(el.lines[0], x, y, el.color);
+        else if (el.kind === "row") {
+          const img = g.icons.get(el.icon);
+          if (img) g.g.drawImage(img, (g.ox + x) * g.s, (g.oy + y + 1) * g.s, 12 * g.s, 12 * g.s);
+          let ty = y + (el.lines.length === 1 ? 3 : 2);
+          for (const t of el.lines) { g.text(t, x + 15, ty, GB_COL.text); ty += 9; }
+        } else if (el.kind === "step") {
+          g.text(el.n, x + 1, y, GB_COL.number);
+          let ty = y;
+          for (const t of el.lines) { g.text(t, x + 11, ty, GB_COL.text); ty += 9; }
+        } else if (el.kind === "tip") {
+          g.fill(x, y, x + 2, y + el.h - 2, GB_COL.tip);
+          let ty = y;
+          for (const t of el.lines) { g.text(t, x + 6, ty, GB_COL.tip); ty += 9; }
+        } else if (el.kind === "recipe") {
+          const idx = Math.floor(time / 2000) % el.recipes.length;
+          const id = el.recipes[idx];
+          const { cells, count } = gbRecipe(id);
+          const gx = x + 10, gy = y + 1;
+          for (let i = 0; i < 9; i++) {
+            g.texture(GB_TEX, gx + (i % 3) * 18, gy + Math.floor(i / 3) * 18, 340, 0, 18, 18, 512, 256);
+            if (cells[i]) g.item(cells[i], gx + (i % 3) * 18 + 1, gy + Math.floor(i / 3) * 18 + 1);
+          }
+          g.texture(GB_TEX, gx + 58, gy + 23, 340, 18, 12, 8, 512, 256);
+          g.texture(GB_TEX, gx + 74, gy + 18, 340, 0, 18, 18, 512, 256);
+          g.item(id, gx + 75, gy + 19, count);
+          const name = gbItemName(g, id), cnt = el.recipes.length > 1 ? `  ${idx + 1}/${el.recipes.length}` : "";
+          const lx = x + (GB.COL_W - g.width(name) - g.width(cnt)) / 2;
+          g.text(name, lx, y + 57, GB_COL.number);
+          if (cnt) g.text(cnt, lx + g.width(name), y + 57, GB_COL.muted);
+        }
+        y += el.h;
+      }
+    }
+    const atStart = cat === 0 && entry === 0 && spread === 0;
+    const atEnd = cat === GB_CATS.length - 1 && entry === entries.length - 1 && spread === spreads - 1;
+    if (!atStart) g.texture(GB_TEX, bx + GB.LEFT_X, by + 159, gbIn(mouse, bx + GB.LEFT_X - 2, by + 158, 13, 11) ? 370 : 360, 0, 9, 9, 512, 256);
+    if (!atEnd) g.texture(GB_TEX, bx + GB.W - GB.LEFT_X - 9, by + 159, gbIn(mouse, bx + GB.W - GB.LEFT_X - 11, by + 158, 13, 11) ? 370 : 360, 9, 9, 9, 512, 256);
+    if (spreads > 1) { const p = `${spread + 1} / ${spreads}`; g.text(p, bx + GB.RIGHT_X + GB.COL_W / 2 - g.width(p) / 2, by + 160, GB_COL.muted); }
+    if (hoverCat >= 0) g.tooltip([GB_CATS[hoverCat].title], mouse[0], mouse[1], w, GB.BY + GB.H);
+    else if (hoverEntry >= 0) g.tooltip([gbTitle(g, entries[hoverEntry])], mouse[0], mouse[1], w, GB.BY + GB.H);
+  },
+  // clicks: bookmarks and page arrows change the preview state (= GuideBookScreen.mouseClicked); true = redraw
+  click(s, mx, my) {
+    const { BX: bx, BY: by } = GB;
+    const m = [mx, my];
+    for (let i = 0; i < GB_CATS.length; i++) if (gbIn(m, bx - 28, by + 10 + i * 24, 28, 24)) { s.cat = String(i); s.entry = "0"; s.spread = "0"; return true; }
+    const { cat, entry, entries } = gbState(s);
+    for (let i = 0; i < entries.length; i++) if (gbIn(m, bx + 14 + i * 26, by - 24, 24, 24)) { s.entry = String(i); s.spread = "0"; return true; }
+    const spreads = s._spreads || 1;
+    const spread = Math.min(parseInt(s.spread, 10) || 0, spreads - 1);
+    const go = (c, en, sp) => { s.cat = String(c); s.entry = String(en); s.spread = String(sp); return true; };
+    if (gbIn(m, bx + GB.LEFT_X - 2, by + 158, 13, 11)) {
+      if (spread > 0) return go(cat, entry, spread - 1);
+      if (entry > 0) return go(cat, entry - 1, 9);
+      if (cat > 0) return go(cat - 1, GB_CATS[cat - 1].entries.length - 1, 9);
+    }
+    if (gbIn(m, bx + GB.W - GB.LEFT_X - 11, by + 158, 13, 11)) {
+      if (spread < spreads - 1) return go(cat, entry, spread + 1);
+      if (entry < entries.length - 1) return go(cat, entry + 1, 0);
+      if (cat < GB_CATS.length - 1) return go(cat + 1, 0, 0);
+    }
+    return false;
+  },
+};
+
+export default [hotpot, stove, sauceOverview, sauceStation, guideBook];

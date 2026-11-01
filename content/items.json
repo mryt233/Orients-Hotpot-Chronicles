@@ -1,0 +1,837 @@
+{
+  "_说明": "内容清单（mryt233 建，gen_content_manifest.py 生成）：81 个物品。每条记录描述一个物品，check_content.py 用它核对贴图 / 模型 / 配方 / 语言 / 指南是否齐全，并核对 hunger / saturation 与代码是否一致。改数值可以直接改这里的 hunger / saturation，再跑 gen_food_numbers.py --apply 写回代码。",
+  "_字段": {
+    "id": "物品 ID（不含命名空间）",
+    "block": "是不是方块物品（有 block 模型）",
+    "food": "是不是食物（foodItem 注册）",
+    "hunger": "食物饥饿点数（2 点 = 一个完整图标）",
+    "saturation": "饱和度系数（注意不是饱和点数；实际饱和点数 = 2 × 饥饿 × 系数）",
+    "cook_ticks": "烧炼 / 烟熏 / 营火的 cookingtime（20 tick = 1 秒）",
+    "recipes": "这条链用到的配方文件名（data/<ns>/recipe/<名字>.json，不含 .json）",
+    "guide": "游戏内指南里有没有讲到（guide_content.py 里出现这个 ID）"
+  },
+  "items": [
+    {
+      "id": "bamboo_chopsticks",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "bamboo_chopsticks"
+      ],
+      "guide": true
+    },
+    {
+      "id": "beef_loin",
+      "block": false,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.3,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "beef_loin_slice",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [
+        "beef_loin_slice_from_stonecutting"
+      ],
+      "guide": true
+    },
+    {
+      "id": "beef_meatball",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "brick_stove",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "brick_stove"
+      ],
+      "guide": true
+    },
+    {
+      "id": "cilantro",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "cilantro_beef_meatball",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [
+        "cilantro_beef_meatball"
+      ],
+      "guide": true
+    },
+    {
+      "id": "cilantro_fish_ball",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [
+        "cilantro_fish_ball"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cilantro_mutton_meatball",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [
+        "cilantro_mutton_meatball"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cilantro_pork_meatball",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [
+        "cilantro_pork_meatball"
+      ],
+      "guide": false
+    },
+    {
+      "id": "clear_broth_bowl",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "cooked_beef_loin",
+      "block": false,
+      "food": true,
+      "hunger": 8,
+      "saturation": 0.8,
+      "cook_ticks": 600,
+      "recipes": [
+        "cooked_beef_loin",
+        "cooked_beef_loin_from_campfire_cooking",
+        "cooked_beef_loin_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_beef_loin_slice",
+      "block": false,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.6,
+      "cook_ticks": 150,
+      "recipes": [
+        "cooked_beef_loin_slice",
+        "cooked_beef_loin_slice_from_campfire_cooking",
+        "cooked_beef_loin_slice_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_beef_meatball",
+      "block": false,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_beef_meatball",
+        "cooked_beef_meatball_from_campfire_cooking",
+        "cooked_beef_meatball_from_smoking"
+      ],
+      "guide": true
+    },
+    {
+      "id": "cooked_cilantro_beef_meatball",
+      "block": false,
+      "food": true,
+      "hunger": 4,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_cilantro_beef_meatball",
+        "cooked_cilantro_beef_meatball_from_campfire_cooking",
+        "cooked_cilantro_beef_meatball_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_cilantro_fish_ball",
+      "block": false,
+      "food": true,
+      "hunger": 4,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_cilantro_fish_ball",
+        "cooked_cilantro_fish_ball_from_campfire_cooking",
+        "cooked_cilantro_fish_ball_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_cilantro_mutton_meatball",
+      "block": false,
+      "food": true,
+      "hunger": 4,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_cilantro_mutton_meatball",
+        "cooked_cilantro_mutton_meatball_from_campfire_cooking",
+        "cooked_cilantro_mutton_meatball_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_cilantro_pork_meatball",
+      "block": false,
+      "food": true,
+      "hunger": 4,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_cilantro_pork_meatball",
+        "cooked_cilantro_pork_meatball_from_campfire_cooking",
+        "cooked_cilantro_pork_meatball_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_fatty_beef_roll",
+      "block": false,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_fatty_beef_roll",
+        "cooked_fatty_beef_roll_from_campfire_cooking",
+        "cooked_fatty_beef_roll_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_fish_ball",
+      "block": false,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_fish_ball",
+        "cooked_fish_ball_from_campfire_cooking",
+        "cooked_fish_ball_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_ham_sausage_slice",
+      "block": false,
+      "food": true,
+      "hunger": 2,
+      "saturation": 0.5,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_ham_sausage_slice",
+        "cooked_ham_sausage_slice_from_campfire_cooking",
+        "cooked_ham_sausage_slice_from_smoking"
+      ],
+      "guide": true
+    },
+    {
+      "id": "cooked_kelp",
+      "block": false,
+      "food": true,
+      "hunger": 2,
+      "saturation": 0.3,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "cooked_mutton_meatball",
+      "block": false,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_mutton_meatball",
+        "cooked_mutton_meatball_from_campfire_cooking",
+        "cooked_mutton_meatball_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_mutton_roll",
+      "block": false,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_mutton_roll",
+        "cooked_mutton_roll_from_campfire_cooking",
+        "cooked_mutton_roll_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_peeled_shrimp",
+      "block": false,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_peeled_shrimp",
+        "cooked_peeled_shrimp_from_campfire_cooking",
+        "cooked_peeled_shrimp_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_pork_meatball",
+      "block": false,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_pork_meatball",
+        "cooked_pork_meatball_from_campfire_cooking",
+        "cooked_pork_meatball_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_potato_slice",
+      "block": false,
+      "food": true,
+      "hunger": 2,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_potato_slice",
+        "cooked_potato_slice_from_campfire_cooking",
+        "cooked_potato_slice_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_shrimp",
+      "block": false,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.5,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_shrimp",
+        "cooked_shrimp_from_campfire_cooking",
+        "cooked_shrimp_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_shrimp_paste",
+      "block": false,
+      "food": true,
+      "hunger": 4,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_shrimp_paste",
+        "cooked_shrimp_paste_from_campfire_cooking",
+        "cooked_shrimp_paste_from_smoking"
+      ],
+      "guide": true
+    },
+    {
+      "id": "cooked_tofu_cube",
+      "block": false,
+      "food": true,
+      "hunger": 2,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_tofu_cube",
+        "cooked_tofu_cube_from_campfire_cooking",
+        "cooked_tofu_cube_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_tripe",
+      "block": false,
+      "food": false,
+      "cook_ticks": 300,
+      "recipes": [
+        "cooked_tripe",
+        "cooked_tripe_from_campfire_cooking",
+        "cooked_tripe_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cutting_board",
+      "block": true,
+      "food": false,
+      "recipes": [
+        "cutting_board"
+      ],
+      "guide": true
+    },
+    {
+      "id": "dipping_sauce",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "empty_orange_drink_bottle",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "empty_orient_cola_bottle",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "empty_plant_protein_drink_bottle",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "fatty_beef_roll",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [
+        "fatty_beef_roll_from_stonecutting"
+      ],
+      "guide": false
+    },
+    {
+      "id": "fish_ball",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "garlic",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.1,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "garlic_paste",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.1,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "glass_cup",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "glass_cup"
+      ],
+      "guide": true
+    },
+    {
+      "id": "ham_sausage",
+      "block": false,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "ham_sausage",
+        "ham_sausage_from_campfire_cooking",
+        "ham_sausage_from_smoking",
+        "ham_sausage_slice_from_stonecutting"
+      ],
+      "guide": true
+    },
+    {
+      "id": "ham_sausage_slice",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [
+        "cooked_ham_sausage_slice",
+        "cooked_ham_sausage_slice_from_campfire_cooking",
+        "cooked_ham_sausage_slice_from_smoking",
+        "ham_sausage_slice_from_stonecutting"
+      ],
+      "guide": true
+    },
+    {
+      "id": "hotpot_guide",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "hotpot_guide"
+      ],
+      "guide": true
+    },
+    {
+      "id": "iron_kitchen_knife",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "iron_kitchen_knife"
+      ],
+      "guide": true
+    },
+    {
+      "id": "milk_cup",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "minced_pork",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "minced_pork_from_stonecutting"
+      ],
+      "guide": true
+    },
+    {
+      "id": "mushroom_broth_bowl",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "mutton_meatball",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "mutton_roll",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [
+        "mutton_roll_from_stonecutting"
+      ],
+      "guide": false
+    },
+    {
+      "id": "orange",
+      "block": false,
+      "food": true,
+      "hunger": 4,
+      "saturation": 0.3,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "orange_drink",
+      "block": true,
+      "food": false,
+      "recipes": [
+        "orange_drink"
+      ],
+      "guide": true
+    },
+    {
+      "id": "orange_drink_cup",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "orient_cola",
+      "block": true,
+      "food": false,
+      "recipes": [
+        "orient_cola"
+      ],
+      "guide": true
+    },
+    {
+      "id": "orient_cola_cup",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "peeled_shrimp",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.2,
+      "recipes": [
+        "peeled_shrimp"
+      ],
+      "guide": true
+    },
+    {
+      "id": "plant_protein_drink",
+      "block": true,
+      "food": false,
+      "recipes": [
+        "plant_protein_drink"
+      ],
+      "guide": true
+    },
+    {
+      "id": "plant_protein_drink_cup",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "pork_meatball",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "potato_slice",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [
+        "potato_slice_from_stonecutting"
+      ],
+      "guide": false
+    },
+    {
+      "id": "pounded_meat",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "raw_ham_sausage",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [
+        "ham_sausage",
+        "ham_sausage_from_campfire_cooking",
+        "ham_sausage_from_smoking",
+        "raw_ham_sausage"
+      ],
+      "guide": true
+    },
+    {
+      "id": "rich_stock_bowl",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "rolling_pin",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "rolling_pin"
+      ],
+      "guide": true
+    },
+    {
+      "id": "scallion",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "shrimp",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.2,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "shrimp_paste",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.2,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "soybean",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.1,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "spicy_red_broth_bowl",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "tall_brick_stove",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "tall_brick_stove"
+      ],
+      "guide": true
+    },
+    {
+      "id": "three_fresh_hotpot_base",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "three_fresh_hotpot_base"
+      ],
+      "guide": true
+    },
+    {
+      "id": "three_fresh_soup_bowl",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "three_fresh_soup_bucket",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "three_fresh_soup_bucket"
+      ],
+      "guide": true
+    },
+    {
+      "id": "tofu",
+      "block": false,
+      "food": true,
+      "hunger": 2,
+      "saturation": 0.4,
+      "recipes": [
+        "tofu"
+      ],
+      "guide": true
+    },
+    {
+      "id": "tofu_cube",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [
+        "tofu_cube_from_stonecutting"
+      ],
+      "guide": false
+    },
+    {
+      "id": "tomato",
+      "block": false,
+      "food": true,
+      "hunger": 2,
+      "saturation": 0.3,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "tomato_hotpot_base",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "tomato_hotpot_base"
+      ],
+      "guide": true
+    },
+    {
+      "id": "tomato_soup_bowl",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "tomato_soup_bucket",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "tomato_soup_bucket"
+      ],
+      "guide": true
+    },
+    {
+      "id": "tripe",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "water_cup",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": true
+    }
+  ]
+}

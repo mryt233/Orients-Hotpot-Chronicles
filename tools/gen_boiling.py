@@ -9,20 +9,19 @@ over a seamless 24-frame loop (1 tick per frame = 1.2 s):
   * froth   - pixels crowded by bubbles turn into light foam
 Frames are crisp (no interpolate) so everything reads as pixel art.
 
-    python tools/gen_boiling.py            # writes both resource copies
+    python tools/gen_boiling.py
+作者：mryt233（2026-11-01 mryt233 改：改用 tools/pixkit 公共库；.mcmeta 统一写 LF，贴图逐字节不变）
 """
-import json
 import math
 import random
-from pathlib import Path
 
 from PIL import Image
 
-ROOT = Path(__file__).resolve().parent.parent / "src/main/resources"
-DIRS = [
-    ROOT / "assets/orients_hotpot_chronicles/textures/block",
-    ROOT / "resourcepacks/hotpot_assets/assets/orients_hotpot_chronicles/textures/block",
-]
+from pixkit import anim
+from pixkit.color import ease_out_cubic, lerp as mix, shade
+from pixkit.paths import ASSETS
+
+DIRS = [ASSETS / "textures/block"]
 FRAMES = 24
 FRAMETIME = 1
 BUBBLES = 28
@@ -33,20 +32,9 @@ SOUPS = {
     "rich_stock": ((0xF5, 0xEC, 0xDA), (0xFF, 0xFF, 0xFF)),
     "mushroom": ((0xB0, 0x84, 0x56), (0xEC, 0xCE, 0x92)),
     "spicy": ((0xE0, 0x58, 0x30), (0xFF, 0xB8, 0x78)),
+    "tomato": ((0xE8, 0x60, 0x38), (0xFF, 0xC0, 0x90)),        # 2026-10-25 新汤底
+    "three_fresh": ((0xE0, 0xCC, 0x98), (0xFF, 0xF6, 0xDC)),
 }
-
-
-def mix(a, b, t):
-    t = max(0.0, min(1.0, t))
-    return tuple(round(a[i] * (1 - t) + b[i] * t) for i in range(3))
-
-
-def shade(c, f):
-    return tuple(max(0, min(255, round(v * f))) for v in c)
-
-
-def ease_out_cubic(x):
-    return 1 - (1 - x) ** 3
 
 
 class Frame:
@@ -177,15 +165,11 @@ def main():
     for name, (body, hi) in SOUPS.items():
         src = Image.open(DIRS[0] / f"hot_pot_top_{name}.png").convert("RGB")
         base = {(x, y): src.getpixel((x, y)) for x in range(16) for y in range(16)}
-        # 随机种子按名字算；高汤 2026-10-24 从 milky 改名 rich_stock，种子照旧用 "milky"，动画保持原样（）
+        # 随机种子按名字算；高汤 2026-10-24 从 milky 改名 rich_stock，种子照旧用 "milky"，动画保持原样
         evs = events_for(sum(map(ord, {"rich_stock": "milky"}.get(name, name))))
-        sheet = Image.new("RGBA", (16, 16 * FRAMES))
-        for f in range(FRAMES):
-            sheet.paste(render(base, f, evs, body, hi), (0, f * 16))
-        meta = {"animation": {"frametime": FRAMETIME, "interpolate": False}}
+        sheet = anim.strip([render(base, f, evs, body, hi) for f in range(FRAMES)])
         for d in DIRS:
-            sheet.save(d / f"hot_pot_top_{name}_boiling.png")
-            (d / f"hot_pot_top_{name}_boiling.png.mcmeta").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+            anim.save(sheet, anim.mcmeta(FRAMETIME, interpolate=False), d / f"hot_pot_top_{name}_boiling.png")
         print("wrote", name)
 
 

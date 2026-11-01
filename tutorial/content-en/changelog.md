@@ -1,43 +1,170 @@
-<!-- 作者：；英文翻译。 -->
+<!-- 作者：mryt233；英文翻译，原文：mryt233。发布前由 mryt233 同步并审核。 -->
+<!-- mryt233 改，2026-10-30：补齐 #30–#71 正式版记录；r130 单列开发版。 -->
 # Changelog
 
-This page is updated with each release, **newest first**. The “0.1.3 Preview” section lists completed work that has not been released. **Gameplay in this guide is based on the released 0.1.2-alpha.**
+This page is updated with each release, **newest first**. The Development Preview describes completed work that is not yet released. **Gameplay in this guide follows released 0.1.4-alpha.**
 
 :::tip
-**Maintenance note (players can skip this):** each game change gets a numbered entry under “Unreleased” in `docs/移植同步清单.md`. The `<!--清单#N-->` markers here refer to those entries, and `python tools/build_tutorial.py` checks for omissions. At release time, rename the whole preview section to the release version and start a new preview section.
+**Maintenance note (players can skip this):** every game change gets a numbered entry in the unreleased section of `docs/移植同步清单.md`. The `<!--清单#N-->` markers in `preview.md` link to those entries. `python tools/build_tutorial.py` checks for omissions. At release time, move the preview into the release history and start a new preview.
 :::
 
-## 0.1.3 Preview {{dev}} {#unreleased}
+## Development Preview {{dev}} {#unreleased}
 
-Completed work following 0.1.2-alpha, **coming in 0.1.3**. It is not released yet, and details may still change.
+**Development build r132 (preview build 0.2.0-alpha) is not released:** Minced Pork and the sausage preparation chain, eating while full (chopsticks and all of this mod's foods), reloadable numeric configuration (including drink nutrition), loader wiring, hoppers feeding pots, plus resilience, compatibility, long-distance teleport crash and server freeze fixes. See the [Development Preview](preview.html) for illustrated instructions and entries #72–#101.
+
+## 0.1.4-alpha{{since:0.1.4-alpha}} {#v014}
+
+Released on 2026-10-29. **0.1.4-alpha currently covers 1.21.1 Fabric only**; 1.21.1 NeoForge and 1.20.1 Fabric / Forge remain on 0.1.3-alpha-hotfix1.
+
+:::warn
+**Renamed Yuanyang pots:** S-shaped is now **Taiji Yuanyang**, and O-shaped is now **Round-Center Yuanyang**, including their item IDs. **The four renamed pots already placed in old worlds will disappear** (two each in copper and iron). Back up your world before upgrading.
+:::
+
+## Shrimp, peeled shrimp, and shrimp paste {#shrimp}
+
+{{icons:shrimp,peeled_shrimp,shrimp_paste}}
+
+- **Fishing** can yield shrimp.
+- Use a knife on the cutting board, or a stonecutter, to peel shrimp.
+- Pound peeled shrimp 3 times with a rolling pin to make shrimp paste.
+- All three cook in a hotpot or by roasting. Cooked portions restore **3 / 3 / 4** hunger points respectively.<!--清单#56-->
+
+{{recipe:peeled_shrimp,cooked_shrimp_paste}}
+
+## Orient Cola and cups {#cola}
+
+{{icons:orient_cola,empty_orient_cola_bottle,glass_cup,orient_cola_cup}}
+
+- **Orient Cola:** 4 sips per bottle, with Speed and Haste for 15 seconds per sip. The square bottle bubbles.<!--清单#35--><!--清单#59--><!--清单#62-->
+- **Glass cups:** right-click an empty cup with a drink to pour one sip. Drinking leaves an empty cup; cups can sit on tables.<!--清单#37-->
+
+{{recipe:orient_cola,glass_cup}}
+
+### Water and milk cups
+
+{{icons:water_cup,milk_cup}}
+
+- Fill an empty cup from a water / milk bucket; **the bucket remains full**. An empty cup can also scoop water from a source.
+- Water has no effect; milk clears all effects. Neither restores hunger.<!--清单#68-->
+
+### Drinks in cauldrons
+
+{{icons:minecraft:cauldron,orange_drink,orient_cola,plant_protein_drink}}
+
+- Pour bottles or filled cups into a vanilla **cauldron**, holding one drink type and up to 12 sips.
+- An empty cup scoops one sip; a glass bottle or that drink's empty bottle scoops a bottle.<!--清单#67-->
+
+## Drinks and fruit {#drinks}
+
+{{icons:orange,orange_drink,plant_protein_drink}}
+
+- **Oranges** drop from oak and dark oak leaves.
+- Both older drinks have recipes: 3 oranges (or 3 soybeans) + sugar + glass bottle.<!--清单#34-->
+
+{{recipe:orange_drink,plant_protein_drink}}
+
+## New seasonings and broths {#base}
+
+{{icons:garlic,garlic_paste,cooked_kelp,tomato,tomato_hotpot_base,three_fresh_hotpot_base}}
+
+- **Garlic** drops from grass. Pound it 3 times on a board to make 2 **Garlic Paste**, the tenth seasoning (Resistance for 8 seconds).<!--清单#33-->
+- **Cooked Kelp:** cook vanilla kelp in the hotpot; restores 2 hunger points.<!--清单#36-->
+- **Tomatoes** drop from grass. Add hotpot base to Clear Broth for Tomato / Three Delicacies Broth. Scoop it into an empty bucket, then pour it back to restore that broth.<!--清单#38-->
+
+{{recipe:tomato_hotpot_base,three_fresh_hotpot_base,tomato_soup_bucket}}
+
+## New Yuanyang pots {#yuanyang}
+
+{{icons:copper_taiji_yuanyang_hotpot,copper_round_yuanyang_hotpot,copper_square_yuanyang_hotpot}}
+
+- Added **Square-Center Yuanyang pots**.<!--清单#39-->
+- Renamed S-shaped and O-shaped pots to **Taiji Yuanyang** and **Round-Center Yuanyang**, including item IDs; these pots will disappear from old worlds.<!--清单#66-->
+
+{{recipe:copper_square_yuanyang_hotpot}}
+
+## Stone and metal tables {#stone}
+
+{{icons:smooth_stone_hotpot_table,polished_granite_hotpot_table,polished_deepslate_hotpot_table,quartz_hotpot_table,cut_copper_hotpot_table,iron_hotpot_table}}
+
+9 tabletop materials: smooth stone, four polished stone types, polished blackstone, quartz, cut copper, and iron. Low and tall variants make 18 tables.<!--清单#51-->
+
+{{recipe:smooth_stone_hotpot_table}}
+
+## The in-game Hotpot Guide {#guide}
+
+{{icons:hotpot_guide}}
+
+- Right-click to open a red book with category bookmarks on the left and entry bookmarks above. Opening and closing play book sounds. This website's book style is based on it.<!--清单#41--><!--清单#52--><!--清单#60-->
+- An advancement framework is ready, but there are no advancements yet.<!--清单#40-->
+
+{{recipe:hotpot_guide}}
+
+## Gameplay changes {#changes}
+
+- **Pots can float:** standalone pots stay in place with air underneath.<!--清单#65-->
+- **Take what you see:** chopsticks, empty hands, and bowls select the food currently visible at the surface; raw food triggers a message.<!--清单#30--><!--清单#43-->
+- **Rest chopsticks on bowls and plates:** Shift + right-click to rest them; right-click with an empty hand to retrieve.<!--清单#69-->
+- **Seating connects up to 3 blocks**, with continuous wood grain even when placed from opposite sides.<!--清单#49--><!--清单#50-->
+- **Campfire pots sit 4 pixels lower**, and square-center pots now have supports too.<!--清单#48-->
+- **Copper nine-grid pots** now use the same arrangement as iron: copper ingot, cauldron, copper ingot in a row.<!--清单#57-->
+- Creative **middle-click copies the whole pot**, including broth and food.<!--清单#44-->
+- Tooltips list sauce effects and add small flavor lines to some food items.<!--清单#32-->
+- Creative subcategories are All / Kitchenware / Tableware / Furniture / Food. Kitchenware uses a knife icon, and new items are categorized.<!--清单#31--><!--清单#45--><!--清单#46-->
+
+## Appearance and fixes {#looks}
+
+- Sauce station screens now use wooden frames and light text, matching the stove.<!--清单#53-->
+- The firebox screen shows the stove's actual block appearance.<!--清单#64-->
+- A thicker knife handle; refreshed garlic, garlic paste, shrimp paste, cups, cooked kelp, hotpot base, and tofu.<!--清单#54--><!--清单#55--><!--清单#58-->
+- An angled cutting-board icon and better-centered inventory icons.<!--清单#42--><!--清单#63-->
+- Removed an extra bowl floating beside sauce stations.<!--清单#47-->
+- Removed a duplicate built-in resource pack, almost halving jar size without changing gameplay.<!--清单#61-->
+
+{{icons:iron_kitchen_knife,garlic_paste,shrimp_paste,cooked_kelp,tofu}}
+
+### Other changes
+
+- **Tall stove recipe:** place a brick block directly above a stove, rather than in any arrangement.<!--清单#70-->
+- **Translations in 9 languages** were proofread; gameplay and values are unchanged.<!--清单#71-->
+
+## 0.1.3-alpha-hotfix1{{since:0.1.3-alpha-hotfix1}} {#v013}
+
+Released on 2026-10-25. **0.1.3-alpha was not released separately; its contents have all been merged into this build**, so below is the full list of changes from 0.1.2-alpha to this version.
+
+**Compatibility with older world saves has been removed. Renamed items in worlds from 0.1.2-alpha or earlier (such as placed drinks and Rich Stock pots) may disappear. Please play in a new world.**
 
 ### New content
 
-- **Beef Loin and Beef Loin Slices:** cows and mooshrooms have a 25% chance to drop loin. Cooked loin restores eight hunger points. Slice it into three on a board or in a stonecutter; these are the fastest-cooking hotpot slices. ([Ingredients & Food Preparation](ingredients.html#loin))<!--清单#13-->
-- **Yuanyang and four-grid pots:** S-shaped, O-shaped, and straight-divider Yuanyang pots, plus a four-compartment pot, in copper and iron. Craft using an ingot and a nine-grid pot. Each compartment has its own broth; aim at a compartment to add or remove broth, and its food cooks in that broth. ([Stoves & Hotpots](hotpot.html#yuanyang))<!--清单#20--><!--清单#21-->
+- **Beef Loin and Beef Loin Slices:** cows and mooshrooms have a 25% chance to drop loin. Cooked loin restores 8 hunger points. Slice it into 3 slices on a cutting board or in a stonecutter; these are the fastest-cooking hotpot slices. ([Ingredients & Food Preparation](ingredients.html#loin))<!--清单#13-->
+- **Yuanyang and four-grid pots:** S-shaped, O-shaped, and straight-divider Yuanyang pots, plus a four-grid pot, each with one broth per compartment, in copper and iron. Crafted with one ingot + a nine-grid pot. Each compartment has its own broth; aim at a compartment to add or scoop broth, and each slot cooks in its own broth. ([Stoves & Hotpots](hotpot.html#yuanyang))<!--清单#20--><!--清单#21-->
 
 ### Changes
 
-- **Milky broth renamed to Rich Stock**, including translated names. This is the broth made with a milk bucket.<!--清单#23-->
+- **New chopsticks gameplay:** hold bamboo chopsticks and **Shift + right-click the pot** to open the hotpot screen; **right-clicking the pot directly** picks up a cooked portion from the targeted cell, which can then be eaten by holding right-click. Right-clicking a pot, bowl, or plate while holding cooked food eats it, returning it only if too full to eat; right-clicking a pot while holding raw food adds it to the pot as before.<!--清单#29-->
+- **Dipping sauces are easier to use:** holding dipping sauce in your **main hand or off hand** automatically dips each bite when eating (previously only the off hand was checked); bamboo chopsticks holding food can also **right-click a sauce bowl placed on a table** to take a dip, turning the sauce bowl back into an empty bowl after the last dip.<!--清单#29-->
+- **New crafting recipes for cutting boards and small dishes**, no longer conflicting with vanilla recipes: cutting boards are now crafted from **two logs of any type placed side by side horizontally**, producing 2 boards; all 5 small dish types (bamboo, copper, iron, quartz, terracotta) are now crafted from **“material bowl material” placed horizontally**, still producing 2 dishes.<!--清单#28-->
+- **Proofread names and tooltips in 9 languages** (English, Traditional Chinese, Japanese, Korean, Russian, German, French, Spanish, Portuguese): several names are more accurate, and Traditional Chinese wood names now use official Taiwan translations; gameplay and stats remain unchanged.<!--清单#27-->
+- **Creamy Broth renamed to Rich Stock** (the broth made with a milk bucket), with translated names updated accordingly.<!--清单#23-->
 - **Packed Yuanyang / four-grid pots:** item icons show each compartment's broth, and tooltips list broths by compartment.<!--清单#22-->
-- **Pots accept only food.** Wood and iron items previously cooked into charcoal and iron nuggets; now only food can be added.<!--清单#7-->
+- **Pots accept only food:** wood and iron items previously cooked into charcoal and iron nuggets; now only food can be added.<!--清单#7-->
 - **Sauce stations lowered by one trapdoor's height**, making all three tiers easier to reach.<!--清单#1-->
 - **Cutting boards have a facing direction**, with food facing the player placing it.<!--清单#5-->
-- **Mining food on a board removes only the food.** The board remains; food and board directions are stored separately.<!--清单#11-->
+- **Mining food on a board removes only the food:** the board remains; food and board directions are stored separately.<!--清单#11-->
 - **Cutting boards are visible in hand**, and inventory icons are no longer dark.<!--清单#9--><!--清单#19-->
 - **Rolling Pins** have a new design with handles.<!--清单#10-->
-- **Campfire pots** have iron supports at their four corners, so they no longer appear to float and flames no longer pass through them.<!--清单#2-->
-- **Food in cold pots** no longer flickers; it slowly bobs up and down on a roughly six-second cycle.<!--清单#16-->
-- **Benches connect even when facing opposite ways**, as long as they are along the same line.<!--清单#17-->
+- **Campfire pots:** iron supports at the four bottom corners rest on the campfire logs, so the pot no longer appears to float and flames no longer pass through it.<!--清单#2-->
+- **Food in cold pots** no longer flickers; it slowly bobs up and down on a roughly 6-second cycle.<!--清单#16-->
+- **Benches connect even when placed from the opposite side:** benches along the same line connect regardless of which side you stand on when placing them.<!--清单#17-->
 - **Sauce station selection outlines** surround only the bowl under the crosshair.<!--清单#8-->
-- **Standalone / campfire pots** can be picked up whole with an empty hand and Shift + right-click.<!--清单#15-->
+- **Standalone / campfire pots:** can be packed into your inventory whole with an empty hand and Shift + right-click.<!--清单#15-->
 
 ### Fixes
 
+- **Food no longer jitters back and forth when eaten by holding right-click with chopsticks from bowls or plates**, eliminating the issue where food seemed unable to be picked up.<!--清单#29-->
 - Organized recipe-book groups for stools, benches, and plates to match current item names; removed unused old files.<!--清单#24-->
-- Aligned internal drink names with item names. No visible change, but **drinks placed in old test worlds may disappear**.<!--清单#25-->
-- Aligned internal names for Rich Stock, seating, plate models, and other assets; removed compatibility for old world IDs. **Renamed items in old test worlds may disappear.**<!--清单#26-->
-- The cutting board can process **potatoes and tofu** again; they could not be placed in 0.1.2-alpha.<!--清单#18-->
+- Aligned internal drink names with item names (no visible change, but **drinks placed in old test worlds may disappear**).<!--清单#25-->
+- Aligned internal names for Rich Stock, seating, plate models, and other assets; removed compatibility for old world saves (**renamed items in old test worlds may disappear**).<!--清单#26-->
+- The cutting board can process **potatoes and tofu** again (they could not be placed on the cutting board in 0.1.2-alpha).<!--清单#18-->
 - Food no longer leaves a ghost image after a cutting board is emptied.<!--清单#6-->
 - Eating with chopsticks creates food-colored crumbs instead of purple-and-black missing-texture particles.<!--清单#4-->
 - Breaking a Plant Protein Drink creates particles in its own colors rather than those of Orange Drink.<!--清单#14-->

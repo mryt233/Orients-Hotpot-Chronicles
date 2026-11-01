@@ -4,7 +4,7 @@
 绿色的葱花点原样保留。原来的贴图备份在 archive/clear_soup_old/（重跑时从备份读，结果不会越跑越偏）。
 
     python tools/recolor_clear_soup.py
-作者：
+作者：mryt233
 """
 import shutil
 from pathlib import Path
@@ -12,9 +12,8 @@ from pathlib import Path
 from PIL import Image
 
 MOD = Path(__file__).resolve().parent.parent
-RES = MOD / "src/main/resources"
-DIRS = [RES / "assets/orients_hotpot_chronicles/textures/block",
-        RES / "resourcepacks/hotpot_assets/assets/orients_hotpot_chronicles/textures/block"]
+RES = MOD / "common/src/main/resources"
+DIRS = [RES / "assets/orients_hotpot_chronicles/textures/block"]
 BACKUP = MOD / "archive/clear_soup_old"
 FILES = ["hot_pot_top_clear.png", "hot_pot_top_clear_boiling.png"]
 # 色带：暗处 = 透过清汤看到的锅底（偏冷的银灰），亮处 = 水面反光（白里带一点暖）

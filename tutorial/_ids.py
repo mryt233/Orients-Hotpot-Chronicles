@@ -1,7 +1,7 @@
-# 作者：  收集教程要画图标的物品 ID
+# 作者：mryt233  收集教程要画图标的物品 ID
 import json,glob,re,os
 M='orients_hotpot_chronicles'
-base='src/main/resources'
+base='common/src/main/resources'
 lang=json.load(open(f'{base}/assets/{M}/lang/zh_cn.json',encoding='utf-8'))
 ids=set()
 for k in lang:

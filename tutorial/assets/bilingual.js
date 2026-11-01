@@ -1,4 +1,4 @@
-// 作者：。简中、zh_tw、英文三语选择；图片共享，支持离线与章节定位。
+// 作者：mryt233。简中、zh_tw、英文三语选择；图片共享，支持离线与章节定位。
 (function () {
   'use strict';
   var pages = JSON.parse(document.getElementById('translations').textContent);
@@ -79,6 +79,9 @@
       url.hash = anchor ? '#' + anchor : '';
       history.replaceState(null, '', url.href);
     } catch (_) { /* 离线嵌入场景可能不允许改地址。 */ }
+    // mryt233 改，2026-10-30：先定位，避免后台预览/动图 decode 未结束时切语种留在旧滚动位置。
+    // 图片解码完成后再校准一次，仍保留原来的防过期检查。
+    jump(anchor || 'page-index');
     await Promise.all(pending);
     if (turn !== generation) return;
     jump(anchor || 'page-index');

@@ -2,12 +2,21 @@
   "block.orients_hotpot_chronicles.copper_split_yuanyang_hotpot": "銅の直線仕切り鴛鴦鍋",
   "block.orients_hotpot_chronicles.iron_split_yuanyang_hotpot": "鉄の直線仕切り鴛鴦鍋",
   "itemGroup.orients_hotpot_chronicles.sub.all": "すべて",
-  "itemGroup.orients_hotpot_chronicles.sub.tables": "テーブル",
   "item.orients_hotpot_chronicles.cooked_tripe": "煮たセンマイ",
   "item.orients_hotpot_chronicles.clear_broth_bowl": "清湯スープ",
   "item.orients_hotpot_chronicles.spicy_red_broth_bowl": "麻辣スープ",
   "item.orients_hotpot_chronicles.cooked_fatty_beef_roll": "煮た牛バラ巻き",
   "item.orients_hotpot_chronicles.cooked_mutton_roll": "煮たラム巻き",
   "item.orients_hotpot_chronicles.cooked_beef_loin": "煮た牛ロース",
-  "item.orients_hotpot_chronicles.cooked_beef_loin_slice": "煮た牛ロース薄切り"
+  "item.orients_hotpot_chronicles.cooked_beef_loin_slice": "煮た牛ロース薄切り",
+  "text.orients_hotpot_chronicles.msg.not_cooked_yet": "それはまだ煮えていません",
+  "text.orients_hotpot_chronicles.seasoning.garlic_paste.effect": "耐性 8秒",
+  "item.orients_hotpot_chronicles.cooked_kelp": "煮た昆布",
+  "text.orients_hotpot_chronicles.soup.tomato": "トマトスープ",
+  "text.orients_hotpot_chronicles.msg.base_needs_clear": "先に清湯（水バケツ）を入れてから素を加えてください",
+  "text.orients_hotpot_chronicles.msg.base_only_clear": "素は清湯にしか入れられません",
+  "item.orients_hotpot_chronicles.cooked_shrimp": "煮たエビ",
+  "item.orients_hotpot_chronicles.cooked_peeled_shrimp": "煮たむきエビ",
+  "item.orients_hotpot_chronicles.cooked_shrimp_paste": "煮たエビのすり身",
+  "item.orients_hotpot_chronicles.cooked_ham_sausage_slice": "煮たハムソーセージのスライス"
 }

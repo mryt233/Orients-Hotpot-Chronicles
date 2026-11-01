@@ -1,0 +1,96 @@
+// fabric：Fabric 入口 + platform / client / compat / mixin / devtest。
+plugins {
+    id 'dev.architectury.loom' version '1.10.455'
+}
+
+// 把 common 的源码集注册成额外的 mod 源（mryt233 2026-10-29）：
+// 只靠 files() 依赖能编过、Java 类也能加载，但 Fabric 不会把它的 assets/ 和 data/
+// 当成模组资源扫描，结果游戏里一条配方都读不到（实测 1290 vs 1495）。
+// 资源（assets / data）统一放在 common，这里把它的资源目录并入 fabric 的资源集：
+// 合成一个模组打包，Fabric 才会去扫描这些配方和贴图（mryt233 2026-10-29）。
+sourceSets.main.resources.srcDirs += project(':common').file('src/main/resources')
+// mryt233 改：同一份原版客户端绘制在两个加载器各自编译，不混入 common 核心。
+sourceSets.main.java.srcDir project(':common').file('src/client/java')
+sourceSets.main.java.srcDir project(':common').file('src/mixin/java')
+sourceSets.main.java.srcDir project(':common').file('src/devtest/java')
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+    // 核心工程：同映射同版本，直接当普通依赖用（mryt233 2026-10-29）。
+    // 用 implementation 而不是 modImplementation：后者会让 loom 去读 common 的 jar 元数据并重映射，
+    // 而 common 不是独立 mod，不需要 remap。发布时再用 include 把 core 打进 jar。
+    // 直接吃 common 的编译产物（classes + resources），不经 loom 的 jar 重映射：
+    // 成品 jar 是 intermediary 名，和 Yarn 名源码对不上（2026-10-29 实测 NoSuchMethodError）。
+    implementation files(project(':common').sourceSets.main.output)
+    // mryt233 加（P1 第一批）：框架契约与纯逻辑
+    implementation files(project(':framework:pure').sourceSets.main.output,
+                         project(':framework:loader').sourceSets.main.output,
+                         project(':framework:game').sourceSets.main.output,
+                         project(':framework:client').sourceSets.main.output)
+    // 注意：**不能**在这里写 include project(':common')。loom 的 include 会把 common 的
+    // 已重映射（intermediary 名）jar 嵌进来，开发期运行时会优先用那份，和 Yarn 名的源码对不上，
+    // 直接 NoSuchMethodError（mryt233 2026-10-29 实测）。打包成品的做法等打包时再定。
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filteringCharset = 'UTF-8'
+    filesMatching('fabric.mod.json') {
+        filter { line -> line.replace('${version}', project.version.toString()) }
+    }
+}
+
+// devtest 是开发环境专用测试命令（/hpt），不进成品和源码 jar
+tasks.named('jar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }
+tasks.named('sourcesJar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }
+
+// 先编 common 再编 fabric（用 files() 依赖不会自动建任务依赖）
+tasks.named('compileJava') { dependsOn ':common:classes', ':framework:pure:classes', ':framework:loader:classes', ':framework:game:classes', ':framework:client:classes' }
+tasks.named('processResources') { dependsOn ':common:processResources' }
+tasks.matching { it.name in ['runServer', 'runClient'] }.configureEach { dependsOn ':common:classes', ':framework:loader:classes' }
+
+// 核心类不在本工程的 sourceSet 产出里，打包时必须显式并进来，
+// 否则成品 jar 只有平台代码、没有 hotpot 核心（mryt233 2026-10-30）。
+tasks.named('jar') {
+    from(project(':common').sourceSets.main.output.classesDirs)
+    // mryt233 加（P1 第一批）：框架类随 Jar 分发
+    from(project(':framework:pure').sourceSets.main.output.classesDirs)
+    from(project(':framework:loader').sourceSets.main.output.classesDirs)
+    from(project(':framework:game').sourceSets.main.output.classesDirs)
+    from(project(':framework:client').sourceSets.main.output.classesDirs)
+}
+tasks.named('sourcesJar') {
+    from(project(':common').sourceSets.main.allSource)
+}
+// common 的资源目录已经并进本工程的 resources，再 from(allSource) 会出现重复条目
+tasks.withType(Jar).configureEach { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
+
+// mryt233 改：只有显式 -PhotpotTestServer=地址 才自动连开发服，常规启动进主菜单。
+// -PhotpotClientProbe 启用开发客户端取证，不进入分发包。
+loom {
+    runs {
+        client {
+            // 客户端和服务端各用各的运行目录，否则两边的 latest.log 会互相锁文件（实测踩过）
+            runDir 'run-client'
+            if (project.hasProperty('hotpotTestServer')) {
+                programArgs '--quickPlayMultiplayer', project.property('hotpotTestServer'), '--quickPlayPath', 'quickplay.log'
+            }
+            if (project.hasProperty('hotpotClientProbe')) {
+                vmArg '-Dhotpot.clientProbe=true'
+            }
+            if (project.hasProperty('hotpotExpreg')) {
+                vmArg '-Dhotpot.expreg=true'
+            }
+        }
+        server {
+            runDir 'run-server'
+            if (project.hasProperty('hotpotExpreg')) {
+                vmArg '-Dhotpot.expreg=true'
+            }
+        }
+    }
+}

@@ -25,9 +25,18 @@ body:
     attributes:
       label: 模组版本（Mod version）
       description: 在游戏的模组列表里能看到，或者看 jar 文件名。(Shown in the mod list, or in the jar file name.)
-      placeholder: "0.1.2-alpha"
+      placeholder: "0.2.0-alpha"
     validations:
       required: true
+
+  - type: input
+    id: framework_version
+    attributes:
+      label: 前置 orient_framework 版本（Framework version，单 jar 用户不用填）
+      description: 单 jar 已内嵌前置，无需填写；仅手动拆分安装时填写。(The single JAR bundles the framework; fill this only for a manual split installation.)
+      placeholder: "0.1.2"
+    validations:
+      required: false
 
   - type: dropdown
     id: loader
@@ -44,7 +53,7 @@ body:
     id: loader_version
     attributes:
       label: 加载器版本（Loader version）
-      placeholder: "0.19.3 / 47.4.28 / 21.1.264"
+      placeholder: "0.19.3 / 47.4.28 / 21.1.265"
     validations:
       required: true
 

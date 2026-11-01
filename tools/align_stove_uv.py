@@ -5,13 +5,13 @@
 贴图 5..16 行 = 整个火口拱门，火口不会被切掉。重跑安全。
 
     python tools/align_stove_uv.py
-作者：
+作者：mryt233
 """
 import json
 from pathlib import Path
 
-RES = Path(__file__).resolve().parent.parent / "src/main/resources"
-ROOTS = [RES / "assets/orients_hotpot_chronicles", RES / "resourcepacks/hotpot_assets/assets/orients_hotpot_chronicles"]
+RES = Path(__file__).resolve().parent.parent / "common/src/main/resources"
+ROOTS = [RES / "assets/orients_hotpot_chronicles"]
 
 
 def aligned_uv(face, frm, to):

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "ingredient": {
+    "item": "orients_hotpot_chronicles:beef_loin_slice"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_beef_loin_slice"
+  },
+  "experience": 0.35,
+  "cookingtime": 150
+}

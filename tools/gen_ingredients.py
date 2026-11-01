@@ -6,35 +6,17 @@
   豆腐块 tofu_cube / 熟豆腐块 cooked_tofu_cube           一整块豆腐在砧板上切 3 块
 
     python tools/gen_ingredients.py
-作者：
+作者：mryt233（2026-11-01 mryt233 改：改用 tools/pixkit 公共库；JSON 统一写 LF，贴图逐字节不变）
 """
 import json
 import random
-from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "src/main/resources"
-ROOTS = [RES / "assets" / MODID, RES / "resourcepacks/hotpot_assets/assets" / MODID]
-
-
-def clamp(c):
-    return tuple(max(0, min(255, int(v))) for v in c)
-
-
-def shade(c, k):
-    return clamp(tuple(v * k for v in c))
-
-
-def outline(im, color):
-    """不透明区域最外一圈描深色（同原版物品）。"""
-    px = im.load()
-    solid = {(x, y) for y in range(16) for x in range(16) if px[x, y][3]}
-    for (x, y) in solid:
-        if any((x + dx, y + dy) not in solid for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
-            px[x, y] = color + (255,)
+from pixkit import canvas, io, model as pm
+from pixkit.canvas import iso_cube as cube, outline_inner as outline
+from pixkit.color import shade_floor as shade
+from pixkit.paths import MODID, RES, ROOTS
 
 
 # ---------------------------------------------------------------- 土豆片
@@ -91,12 +73,12 @@ def soybean_texture():
     return im
 
 
-# ---------------------------------------------------------------- 豆腐（等角小方块）
-def cube(draw, cx, ty, w, h, top, left, right):
-    q = w / 4
-    draw.polygon([(cx, ty), (cx + w / 2, ty + q), (cx, ty + 2 * q), (cx - w / 2, ty + q)], fill=top)
-    draw.polygon([(cx - w / 2, ty + q), (cx, ty + 2 * q), (cx, ty + 2 * q + h), (cx - w / 2, ty + q + h)], fill=left)
-    draw.polygon([(cx + w / 2, ty + q), (cx, ty + 2 * q), (cx, ty + 2 * q + h), (cx + w / 2, ty + q + h)], fill=right)
+# ---------------------------------------------------------------- 豆腐（等角小方块，canvas.iso_cube）
+# 整块豆腐顶上的一圈轮廓（2026-10-26 用户：顶角那块看着塌陷；尺寸、细节都不变，只修这里；调整）：
+# 多边形填出来的顶棱台阶是 3 / 2 / 1 格，越往上越窄，看着往里凹；改成两边都是 2 格一台阶、顶上平平 3 格。
+# 每行：(行, 描边的列, 顶面的列)
+TOFU_TOP = [(2, (6, 7, 8), ()), (3, (4, 5, 9, 10), (6, 7, 8)), (4, (2, 3, 11, 12), tuple(range(4, 11))),
+            (5, (0, 1, 13, 14), tuple(range(2, 13)))]
 
 
 TOFU = {
@@ -115,23 +97,29 @@ def tofu_texture(name):
     for cx, ty, w, h in cubes:
         layer = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
         cube(ImageDraw.Draw(layer), cx, ty, w, h, top + (255,), left + (255,), right + (255,))
-        px = layer.load()
-        for y in range(16):                                                            # 细细的气孔
-            for x in range(16):
-                if px[x, y][3] and rnd.random() < 0.05:
-                    px[x, y] = shade(px[x, y][:3], 0.92) + (255,)
+        canvas.speckle(layer, rnd, 0.05, 0.92, fn=shade)                               # 细细的气孔
         outline(layer, shade(right, 0.62))
+        if name == "tofu":
+            px = layer.load()
+            for y in range(0, 2):
+                for x in range(16):
+                    px[x, y] = (0, 0, 0, 0)
+            for y, edge, face in TOFU_TOP:
+                for x in range(16):
+                    px[x, y] = (0, 0, 0, 0) if y == 2 else px[x, y]
+                for x in edge:
+                    px[x, y] = shade(right, 0.62) + (255,)
+                for x in face:
+                    px[x, y] = top + (255,)
         im.alpha_composite(layer)
     return im
 
 
-def write(p, obj):
-    p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(obj, indent=2) + "\n", encoding="utf-8")
+write = io.write_json
 
 
 def item_model(root, name):
-    write(root / f"models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{MODID}:item/{name}"}})
+    write(root / f"models/item/{name}.json", pm.item_generated(name))
 
 
 def main():

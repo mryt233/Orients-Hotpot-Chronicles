@@ -1,9 +1,21 @@
 {
-  "block.orients_hotpot_chronicles.copper_s_yuanyang_hotpot": "Kupferner S-förmiger Yuanyang-Hotpot",
-  "block.orients_hotpot_chronicles.copper_o_yuanyang_hotpot": "Kupferner O-förmiger Yuanyang-Hotpot",
+  "block.orients_hotpot_chronicles.copper_taiji_yuanyang_hotpot": "Kupferner Taiji-Yuanyang-Hotpot",
+  "block.orients_hotpot_chronicles.copper_round_yuanyang_hotpot": "Kupferner Yuanyang-Hotpot mit runder Mitte",
   "block.orients_hotpot_chronicles.copper_split_yuanyang_hotpot": "Kupferner gerade geteilter Yuanyang-Hotpot",
-  "block.orients_hotpot_chronicles.iron_s_yuanyang_hotpot": "Eiserner S-förmiger Yuanyang-Hotpot",
-  "block.orients_hotpot_chronicles.iron_o_yuanyang_hotpot": "Eiserner O-förmiger Yuanyang-Hotpot",
+  "block.orients_hotpot_chronicles.iron_taiji_yuanyang_hotpot": "Eiserner Taiji-Yuanyang-Hotpot",
+  "block.orients_hotpot_chronicles.iron_round_yuanyang_hotpot": "Eiserner Yuanyang-Hotpot mit runder Mitte",
   "block.orients_hotpot_chronicles.iron_split_yuanyang_hotpot": "Eiserner gerade geteilter Yuanyang-Hotpot",
-  "text.orients_hotpot_chronicles.heat.open_fire": "Über einem Lagerfeuer (kein Brennstoffverbrauch)"
+  "text.orients_hotpot_chronicles.heat.open_fire": "Über einem Lagerfeuer (kein Brennstoffverbrauch)",
+  "item.orients_hotpot_chronicles.cooked_beef_loin": "Gegarter Rinderrücken",
+  "text.orients_hotpot_chronicles.seasoning.garlic_paste.effect": "Resistenz 8 s",
+  "item.orients_hotpot_chronicles.cooked_kelp": "Gegarter Seetang",
+  "block.orients_hotpot_chronicles.copper_square_yuanyang_hotpot": "Kupferner Yuanyang-Hotpot mit quadratischer Mitte",
+  "block.orients_hotpot_chronicles.iron_square_yuanyang_hotpot": "Eiserner Yuanyang-Hotpot mit quadratischer Mitte",
+  "item.orients_hotpot_chronicles.cooked_shrimp": "Gegarte Garnele",
+  "item.orients_hotpot_chronicles.cooked_peeled_shrimp": "Gegarte geschälte Garnele",
+  "item.orients_hotpot_chronicles.cooked_shrimp_paste": "Gegarte Garnelenpaste",
+  "item.orients_hotpot_chronicles.raw_ham_sausage": "Rohe Schinkenwurst",
+  "item.orients_hotpot_chronicles.ham_sausage": "Schinkenwurst",
+  "item.orients_hotpot_chronicles.ham_sausage_slice": "Schinkenwurstscheibe",
+  "item.orients_hotpot_chronicles.cooked_ham_sausage_slice": "Gegarte Schinkenwurstscheibe"
 }

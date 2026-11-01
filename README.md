@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="src/main/resources/assets/orients_hotpot_chronicles/icon.png" width="128" alt="icon">
+<img src="common/src/main/resources/assets/orients_hotpot_chronicles/icon.png" width="128" alt="icon">
 
 # 之晗的火锅物语 · Orient's Hotpot Chronicles
 
@@ -8,7 +8,7 @@
 
 Have a hotpot dinner in Minecraft: build a stove, seat a pot on it, pour in a broth, light the fire, prep your ingredients, cook them and eat them with chopsticks and dipping sauce.
 
-Minecraft 1.20.1 / 1.20.4 / 1.21.1 · Fabric / Forge / NeoForge · 作者 / Author：蘧白川 / Orient（GitHub：[@mryt233](https://github.com/mryt233)）
+0.2.0-alpha：Minecraft 1.21.1 · Fabric / NeoForge · 作者 / Author：蘧白川 / Orient（GitHub：[@mryt233](https://github.com/mryt233)）
 
 [中文图文教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/) / [繁中圖文教學](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-tw/) / [English Guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/) · [下载测试版 · Download Alpha](#downloads) · [更新日志 · Changelog](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) · [反馈问题 · Report an Issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
 
@@ -17,11 +17,9 @@ Minecraft 1.20.1 / 1.20.4 / 1.21.1 · Fabric / Forge / NeoForge · 作者 / Auth
 ![一桌火锅 · A full hotpot table](docs/images/full-table.jpg)
 
 > [!WARNING]
-> **测试版（alpha）**：现在是 `0.1.4-alpha`，可能有 bug，请备份存档。
-> **请开新存档**：本版鸳鸯锅改名并更新内部 ID，**旧存档中放置的 S 形、O 形铜锅与铁锅会消失**。
+> **测试版（alpha）**：现在是 `0.2.0-alpha`。与 0.1.4-alpha 相比没有删除或更改任何已有物品、方块 ID，但内部重构较大，升级前请备份存档。
 >
-> **Alpha version**: this is `0.1.4-alpha` and may contain bugs. Please back up your saves.
-> **Please start a new world**: Yuanyang pot IDs were renamed. **Placed S-shaped and O-shaped copper and iron pots will disappear in existing worlds.**
+> **Alpha version**: this is `0.2.0-alpha`. No existing item or block IDs were removed or changed since 0.1.4-alpha, but the internal refactor is substantial. Back up your saves before upgrading.
 
 <a id="downloads"></a>
 
@@ -31,21 +29,71 @@ Minecraft 1.20.1 / 1.20.4 / 1.21.1 · Fabric / Forge / NeoForge · 作者 / Auth
 
 | Minecraft | 加载器 / Loader | 要求 / Requirements | 模组版本 / Mod version | 下载 / Download |
 | --- | --- | --- | --- | --- |
-| 1.21.1 | Fabric | Fabric Loader 0.15.11+、[Fabric API](https://modrinth.com/mod/fabric-api)、Java 21 | 0.1.4-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) |
-| 1.21.1 | NeoForge | NeoForge 21.1.264+、Java 21 | 0.1.4-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) |
-| 1.20.1 | Fabric | Fabric Loader **0.19.3+**、[Fabric API](https://modrinth.com/mod/fabric-api) **0.92.12+**、Java 17 | 0.1.4-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) |
-| 1.20.1 | Forge | Forge 47.1+、Java 17（同一文件也能装在 NeoForge 1.20.1 上 / also loads on NeoForge 1.20.1） | 0.1.4-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) |
-| 1.20.4 | Fabric | Fabric Loader 0.15.11+、Fabric API、Java 17 | 0.1.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) |
+| 1.21.1 | Fabric | Fabric Loader 0.15.11+、[Fabric API](https://modrinth.com/mod/fabric-api)、Java 21 | 0.2.0-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.0-alpha) |
+| 1.21.1 | NeoForge | NeoForge 21.1.265+、Java 21 | 0.2.0-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.0-alpha) |
+| 1.20.1 | Fabric | Fabric Loader **0.19.3+**、[Fabric API](https://modrinth.com/mod/fabric-api) **0.92.12+**、Java 17 | 0.1.4-alpha（旧移植版，已停止维护 / legacy, discontinued） | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) |
+| 1.20.1 | Forge | Forge 47.1+、Java 17（同一文件也能装在 NeoForge 1.20.1 上 / also loads on NeoForge 1.20.1） | 0.1.4-alpha（旧移植版，已停止维护 / legacy, discontinued） | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) |
+| 1.20.4 | Fabric | Fabric Loader 0.15.11+、Fabric API、Java 17 | 0.1.1-alpha（旧移植版，已停止维护 / legacy, discontinued） | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) |
 
-四个 0.1.4-alpha 文件都在同一个发布页里，请下载文件名里的 MC 版本和加载器都对得上的那个。Forge / NeoForge 版不需要 Fabric API。1.20.4 还停在 0.1.1-alpha，没有 0.1.2 之后的内容。
+0.2.0-alpha 只提供 **Minecraft 1.21.1 Fabric / NeoForge**。每个加载器下载对应的**单个 JAR**，已内嵌 **orient_framework 0.1.2**，直接放入客户端和服务端的 `mods` 文件夹，无需另装前置；Fabric 仍需安装 Fabric API。两个文件集中在[同一个发布页](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.0-alpha)。
 
-All four 0.1.4-alpha files are on the same release page; pick the one whose file name matches your Minecraft version and loader. The Forge / NeoForge builds do not need Fabric API. Minecraft 1.20.4 is still on 0.1.1-alpha and has none of the content from 0.1.2 onward.
+0.2.0-alpha is available only for **Minecraft 1.21.1 Fabric / NeoForge**. Download the **single JAR** for your loader; **orient_framework 0.1.2 is bundled**. Put it directly in `mods` on both client and server; no separate framework download is needed. Fabric still requires Fabric API. Both files share [one release page](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.0-alpha).
+
+**旧移植版已停止维护**：1.20.1 Fabric / Forge 最后版本为 0.1.4-alpha；1.20.4 Fabric 为 0.1.1-alpha。下载链接保留，不再提供更新或修复。
+
+**Legacy ports are discontinued**: the final versions are 0.1.4-alpha for 1.20.1 Fabric / Forge and 0.1.1-alpha for 1.20.4 Fabric. Their download links remain available, but these ports receive no further updates or fixes.
 
 > 1.21.1 Fabric 是主版本，作者进游戏实测过；其他移植版做过服务端自动检查和客户端启动检查，右键交互、界面和画面还没有大量实测。与其他模组的兼容性也还没测过。欢迎反馈问题。
 >
 > 1.21.1 Fabric is the main build and was tested in game by the author. The ports passed automated server checks and client start-up checks, but right-click interactions, screens and visuals have not been widely tested. Compatibility with other mods has not been tested either. Bug reports are welcome.
 
-[各版本源码与说明 · Port sources and notes](version-ports/README.md)
+[旧移植源码与说明（已停止维护）· Legacy port sources and notes (discontinued)](version-ports/README.md)
+
+## 0.2.0-alpha 更新 · What's new
+
+以下是相对 0.1.4-alpha 的变化。内部重构为多加载器 + 前置框架，玩法不变。
+
+Changes since 0.1.4-alpha. Internally refactored into multiple loader modules and a prerequisite framework; existing gameplay is preserved.
+
+### 新内容
+
+- **火腿肠加工**：原版猪排在砧板上用菜刀加工成 1 份**猪肉末**；猪肉末 + 小麦合成 3 根**生火腿肠**。煮成**火腿肠**后切成 3 片**火腿肠片**，肠片还能再加热成**熟火腿肠片**；切石机也能切片，擀面杖制作猪肉丸的玩法保留。
+- **可热重载的数值配置**：`config/orients_hotpot_chronicles.json` 可调整食物、饮料每口营养、汤底速度、燃料、蘸料及烹饪兜底数值。执行 `/orientshotpot reload` 即时生效；多人服由服务端同步，写错的项单独回退并提示原因。
+
+### 调整
+
+- **饱了也能吃**：本模组食物直接吃、用筷子吃、在锅界面吃都不再要求先饿肚子；满饥饿时饥饿值不再增加，饱和度仍按原版规则增长、最多到 20。可与 Always Eat 一起使用。
+- **筷子放菜和架筷分开**：夹着食物潜行右键碗盘，优先放回食物；只有空筷子潜行右键才架到碗盘沿，普通右键仍用于吃菜。
+- **漏斗按生熟分工**：上方漏斗只投放能煮的生食材，一格一份；锅或灶台下方的漏斗只取熟食，生食留在锅中。
+- **画面更连贯**：多样食材轮换保持大小，只靠上下浮动换样；点火、熄火不再突然换成另一种菜，升温时气泡速度连续，高刷新率下运动更顺滑。
+- **语言与提示**：补全配方查看器的自定义标签译名，校对多语言物品名称和繁中教程用词；配置警告、重载回执与断线提示跟随玩家语言。Fabric 网络版本不匹配时会明确提示安装与服务器相同的模组版本。
+
+### 修复
+
+- 修复远距离传送或死亡重生后的 `hasFire()` / `LIT` 客户端崩溃，以及高灶台、蘸料台在加载区块或进服时导致的服务器卡死。
+- 修复灶膛燃料重启后消失、锅内未熟食材在重启后使用错误烹饪时间的问题；灶台和蘸料台界面在走远或方块被挖掉时会自动关闭。
+- 修复篝火上的锅在界面显示「没有火」、挖高灶台上的锅时误拆整台灶或闪烁，以及 NeoForge 筷子夹菜崩溃。
+- 砧板在切石机配方被整合包删除或覆盖后仍能加工基础食材；修复已接入的第三方汤底、燃料注册未被核心烹饪逻辑使用的问题。第三方组合的完整兼容性仍待验证。
+
+### New
+
+- **Ham sausage preparation**: cut a vanilla porkchop on a Cutting Board with the kitchen knife to get one **Minced Pork**. Craft it with wheat into three **Raw Ham Sausages**. Cook them into **Ham Sausage**, cut each into three **Ham Sausage Slices**, then heat the slices again for **Cooked Ham Sausage Slices**. The stonecutter also slices; pounding pork meatballs with the Rolling Pin is unchanged.
+- **Reloadable numerical configuration**: configure food and per-sip drink nutrition, broth speeds, fuel, seasoning effects and fallback cooking values in `config/orients_hotpot_chronicles.json`. Run `/orientshotpot reload` to apply changes immediately. Servers sync the values to clients; invalid fields fall back individually with an explanation.
+
+### Changes
+
+- **Eat while full**: the mod's foods can be eaten directly, with chopsticks or in the pot screen even at full hunger. Hunger stops increasing when full; saturation still follows vanilla rules, up to 20. Works alongside Always Eat.
+- **Returning food and resting chopsticks**: sneak-right-click a bowl or plate with food in the chopsticks to return the food. Only empty chopsticks rest on the rim; normal right-click still eats.
+- **Hopper input and output**: hoppers above a pot insert only cookable raw food, one item per cell. Hoppers beneath the pot or stove extract only cooked food.
+- **Smoother visuals**: cycling foods keep the same size and move below and above the broth. Lighting or extinguishing the fire no longer jumps to a different food; bubbles change speed smoothly and move smoothly at high refresh rates.
+- **Languages and feedback**: translated custom recipe-viewer tags and reviewed multilingual item names and Traditional Chinese tutorial wording. Configuration warnings, reload responses and disconnect messages follow the player's language. Fabric reports incompatible network versions when joining a server.
+
+### Fixes
+
+- Fixed the `hasFire()` / `LIT` client crash after long-distance teleportation or respawning, and server freezes when loading chunks containing Tall Brick Stoves or Sauce Stations.
+- Fixed lost stove fuel after restarting and incorrect cooking times for unfinished food after reloading. Stove and Sauce Station screens close when players move away or the block is removed.
+- Fixed the pot screen showing no fire on a lit campfire, mining a pot on a tall stove breaking or flickering the stove, and NeoForge crashes when picking up food with chopsticks.
+- Cutting Boards retain basic processing when a modpack removes or overrides stonecutting recipes. Registered third-party broth sources and fuels now reach the core cooking logic; full compatibility across third-party combinations remains unverified.
 
 ## 0.1.4-alpha 更新 · What's new
 
@@ -151,10 +199,10 @@ Changes since 0.1.3-alpha-hotfix1: shrimp, Orient Cola, glass cups, Tomato and T
 ## 特色 · Features
 
 - **灶台和锅**：灶台用原版熔炉燃料烧火，铁锅、铜锅坐在灶台上煮。还有 1.5 格高的高灶台，配高火锅桌用。
-- **四种汤底**：清汤（水桶）、高汤（牛奶桶）、菌汤（蘑菇煲）、红汤（岩浆桶）。汤底不同，煮的快慢也不同：红汤最快，高汤最慢。
+- **六种汤底**：清汤（水桶）、高汤（牛奶桶）、菌汤（蘑菇煲）、红汤（岩浆桶），以及番茄、三鲜汤底。汤底不同，煮的快慢也不同：红汤最快，高汤最慢。
 - **九宫格锅和分隔锅**：九宫格锅 9×9 = 81 格；鸳鸯锅、田字锅每一边一种汤底，铜、铁各一套。生食材按熔炉配方的时间煮熟，熟了拿出来能得到和熔炉一样的经验。
 - **竹筷**：Shift + 右键锅打开锅界面，在界面里用筷子左键点熟食直接吃；直接右键锅从准星那格夹起熟食，按住右键吃；也能从盘子、碗里夹菜、把生菜放进锅里。
-- **蘸料台和九种小料**：自己配一碗蘸料，主手或副手拿着，用筷子吃东西时自动蘸一口，不同小料有不同效果。
+- **蘸料台和十种小料**：自己配一碗蘸料，主手或副手拿着，用筷子吃东西时自动蘸一口，不同小料有不同效果。
 - **备菜**：砧板 + 铁菜刀切肥牛卷、羊肉卷、土豆片、豆腐块、吊龙；擀面杖捣丸子；切石机也能切。
 - **新食材**：牛和哞菇掉毛肚、牛脊肉；打草掉小葱、香菜、黄豆，黄豆能做豆腐。
 - **趁热吃**：锅不在烧着的灶台、点燃的篝火或灵魂篝火上时就是冷锅，吃冷锅里的东西有概率反胃。
@@ -165,7 +213,7 @@ Changes since 0.1.3-alpha-hotfix1: shrimp, Orient Cola, glass cups, Tomato and T
 - **板凳和条凳**：11 种木头，条凳在同一条线上挨着放会连成长凳，能坐。
 - **盘子**：石英、竹编、红陶、铜、铁 5 种材质 × 6 种大小，摆在桌上放菜，一格能叠 3 样。
 - **碗**：原版的碗能摆在桌上装菜，能从锅里盛熟菜，锅里没有熟菜时还能盛一碗汤喝：清汤解反胃，高汤更顶饱，菌汤给生命恢复，红汤给力量（但会有点饿）。
-- **饮料**：橙子饮料、植物蛋白饮料，一瓶喝 4 口，都能解红汤的饥饿；橙子饮料加速，植物蛋白饮料解反胃。能摆在桌上。暂时只能在创造模式拿到。
+- **饮料**：橙子饮料、植物蛋白饮料，一瓶喝 4 口，都能解红汤的饥饿；橙子饮料加速，植物蛋白饮料解反胃。能合成并摆在桌上，另有之晗可乐和玻璃杯。
 - **篝火煮锅**：锅放在点着的篝火、灵魂篝火上也能煮，速度和灶台一样，不耗燃料，也给周围的人回血。
 - **桌面摆件**：灯笼、花盆、蜡烛、蛋糕等小摆件放在火锅桌上会贴住桌面。
 - **10 种语言**：简体中文、繁体中文、英语、日语、韩语、俄语、德语、法语、西班牙语、葡萄牙语（巴西）。
@@ -173,10 +221,10 @@ Changes since 0.1.3-alpha-hotfix1: shrimp, Orient Cola, glass cups, Tomato and T
 ---
 
 - **Stove and pots**: the stove burns vanilla furnace fuel; seat an iron or copper pot on it to cook. A 1.5-block Tall Brick Stove matches the tall hotpot tables.
-- **Four broths**: Clear (water bucket), Rich Stock (milk bucket), Mushroom (mushroom stew), Red Oil (lava bucket). Each cooks at a different speed: Red Oil is the fastest, Rich Stock the slowest.
+- **Six broths**: Clear (water bucket), Rich Stock (milk bucket), Mushroom (mushroom stew), Red Oil (lava bucket), Tomato and Three Delicacies. Each cooks at a different speed: Red Oil is the fastest, Rich Stock the slowest.
 - **Nine-grid and divided pots**: the nine-grid pot has 9×9 = 81 slots; yuanyang and four-grid pots hold one broth per section, in copper and iron. Raw food cooks in the time its furnace recipe takes and gives the same XP as a furnace.
 - **Bamboo Chopsticks**: Shift + right-click a pot to open the pot screen, where left-clicking cooked food with the chopsticks eats it; right-click a pot to pick up cooked food from the aimed cell and hold right-click to eat. They also pick food up from plates and bowls and put raw food into the pot.
-- **Sauce station and nine seasonings**: mix your own dipping sauce; hold it in either hand and it is dipped automatically when you eat with chopsticks. Each seasoning has its own effect.
+- **Sauce station and ten seasonings**: mix your own dipping sauce; hold it in either hand and it is dipped automatically when you eat with chopsticks. Each seasoning has its own effect.
 - **Food prep**: Cutting Board + Iron Kitchen Knife for fatty beef rolls, mutton rolls, potato slices, tofu cubes and beef loin slices; pound meatballs with the Rolling Pin; the stonecutter slices too.
 - **New ingredients**: cows and mooshrooms drop tripe and beef loin; grass drops scallions, cilantro and soybeans, and soybeans make tofu.
 - **Eat it hot**: a pot that is not on a lit stove, campfire or soul campfire is a cold pot. Eating from a cold pot may give you Nausea.
@@ -187,7 +235,7 @@ Changes since 0.1.3-alpha-hotfix1: shrimp, Orient Cola, glass cups, Tomato and T
 - **Stools and benches**: 11 wood types. Benches placed in a line join into a long bench you can sit on.
 - **Plates**: 5 materials (quartz, bamboo, terracotta, copper, iron) × 6 sizes. Put them on the table and stack up to 3 foods in each slot.
 - **Bowls**: vanilla bowls can be placed on tables to hold food, scoop cooked food out of the pot, or, when the pot has no cooked food, scoop a bowl of broth to drink: Clear cures Nausea, Rich Stock is more filling, Mushroom gives Regeneration, Red Oil gives Strength (and a little Hunger).
-- **Drinks**: Orange Drink and Plant Protein Drink, 4 sips per bottle. Both cure the Hunger from Red Oil broth; Orange Drink gives Speed, Plant Protein Drink cures Nausea. They can be placed on tables. Creative-only for now.
+- **Drinks**: Orange Drink and Plant Protein Drink, 4 sips per bottle. Both cure the Hunger from Red Oil broth; Orange Drink gives Speed, Plant Protein Drink cures Nausea. They can be crafted and placed on tables; Orient Cola and Glass Cups are also available.
 - **Campfire cooking**: a pot on a lit campfire or soul campfire cooks at stove speed, uses no fuel, and also heals nearby players.
 - **Table decorations**: lanterns, flower pots, candles, cakes and other small decorations sit flush on hotpot tables.
 - **10 languages**: English, Simplified Chinese, Traditional Chinese, Japanese, Korean, Russian, German, French, Spanish, Portuguese (Brazil).
@@ -200,7 +248,7 @@ Changes since 0.1.3-alpha-hotfix1: shrimp, Orient Cola, glass cups, Tomato and T
 | Fabric Loader（仅 Fabric） | 1.21.1 / 1.20.4：**0.15.11+**；1.20.1：**0.19.3+** | 0.19.3 |
 | Fabric API（仅 Fabric） | 对应 Minecraft 版本；1.20.1 需 **0.92.12+** · match your Minecraft version; 1.20.1 needs **0.92.12+** | 0.92.12+1.20.1 / 0.97.3+1.20.4 / 0.116.14+1.21.1 |
 | Forge（仅 1.20.1 Forge） | **47.1+** | **47.4.28** |
-| NeoForge（仅 1.21.1 NeoForge） | **21.1.264+** | **21.1.264** |
+| NeoForge（仅 1.21.1 NeoForge） | **21.1.265+** | **21.1.265** |
 | Java | Minecraft 1.20.1 / 1.20.4：**17+**；1.21.1：**21+** | 17 / 21 |
 | 安装位置 · Side | **客户端和服务端都要装 · both client and server** | — |
 
@@ -208,9 +256,9 @@ Forge / NeoForge 两版不需要 Fabric API。1.20.1 Forge 的同一个 JAR 也�
 
 The Forge / NeoForge builds do not require Fabric API. The same 1.20.1 Forge JAR also loads on NeoForge 1.20.1.
 
-**各版本的小差异**：玩法、数值、配方各版本都一样。1.20.1（Fabric、Forge）锅里的热气用白色云粒子（1.20.1 没有白烟粒子），生毛肚、熟毛肚算肉、狼可以吃；NeoForge 1.21.1 和 Forge 1.20.1 在数据包整个替换了牛、哞菇或草的掉落时，仍会多掉毛肚、牛脊肉、小葱、香菜、黄豆。
+**各版本的小差异**：0.2.0-alpha 的 1.21.1 Fabric / NeoForge 玩法、数值、配方一致；旧移植版停留在历史版本，不包含本次新内容。1.20.1（Fabric、Forge）锅里的热气用白色云粒子（1.20.1 没有白烟粒子），生毛肚、熟毛肚算肉、狼可以吃；NeoForge 1.21.1 和 Forge 1.20.1 在数据包整个替换了牛、哞菇或草的掉落时，仍会多掉毛肚、牛脊肉、小葱、香菜、黄豆。
 
-**Differences between builds**: gameplay, values and recipes are the same everywhere. On 1.20.1 (Fabric, Forge) pot steam uses white cloud particles (1.20.1 has no white smoke particle), and raw and cooked tripe count as meat, so wolves can eat them. On NeoForge 1.21.1 and Forge 1.20.1, tripe, beef loin, scallions, cilantro and soybeans are still added even if a data pack replaces the cow, mooshroom or grass loot tables.
+**Differences between builds**: the 0.2.0-alpha Fabric / NeoForge builds for 1.21.1 share gameplay, values and recipes. Legacy ports remain on older versions and do not include these additions. On 1.20.1 (Fabric, Forge) pot steam uses white cloud particles (1.20.1 has no white smoke particle), and raw and cooked tripe count as meat, so wolves can eat them. On NeoForge 1.21.1 and Forge 1.20.1, tripe, beef loin, scallions, cilantro and soybeans are still added even if a data pack replaces the cow, mooshroom or grass loot tables.
 
 ### 和其他模组的兼容性 · Compatibility with other mods
 
@@ -230,10 +278,10 @@ The Forge / NeoForge builds do not require Fabric API. The same 1.20.1 Forge JAR
 
 ### Forge / NeoForge
 
-1. Minecraft **1.20.1** 使用 [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.1+**（现有测试版本 **47.4.28**）；Minecraft **1.21.1** 使用 [NeoForge](https://neoforged.net/) **21.1.264+**。
+1. Minecraft **1.20.1** 使用 [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.1+**（现有测试版本 **47.4.28**）；Minecraft **1.21.1** 使用 [NeoForge](https://neoforged.net/) **21.1.265+**。
 2. 从[下载表](#downloads)选择匹配加载器与 MC 版本的 JAR，放入客户端和服务端的 `mods` 文件夹。**这两版不需要 Fabric API。**
 
-1. Use [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.1+** for Minecraft **1.20.1** (recorded test: **47.4.28**), or [NeoForge](https://neoforged.net/) **21.1.264+** for Minecraft **1.21.1**.
+1. Use [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.1+** for Minecraft **1.20.1** (recorded test: **47.4.28**), or [NeoForge](https://neoforged.net/) **21.1.265+** for Minecraft **1.21.1**.
 2. Select the matching JAR from the [download table](#downloads) and put it in the `mods` folder on both client and server. **These builds do not require Fabric API.**
 
 Minecraft **1.20.1 / 1.20.4 使用 Java 17+**，**1.21.1 使用 Java 21+**。
@@ -255,7 +303,7 @@ Use **Java 17+ for Minecraft 1.20.1 / 1.20.4**, or **Java 21+ for Minecraft 1.21
    - 筷子夹着生食材右键锅，菜会放进准星对着的那个格子；
    - 拿着装了菜的盘子右键锅，生食材会整盘倒进去，熟的留在盘子里。
 
-   只有能吃的生食材能下锅，熟了的不能再下锅。分隔锅里每格的菜用自己那边的汤煮，没汤的那边不煮。
+   只有可食用、能继续烹饪的食材能下锅；通常熟食不能再下锅，但火腿肠片可以再次加热成熟火腿肠片。分隔锅里每格的菜用自己那边的汤煮，没汤的那边不煮。
 5. **吃**：
    - 拿竹筷**直接右键**锅，从准星对着的那一格夹起一样熟食，再**按住右键**吃掉；
    - 或者在锅界面里把筷子拿到鼠标上，左键点熟食就能吃掉；
@@ -268,7 +316,7 @@ Use **Java 17+ for Minecraft 1.20.1 / 1.20.4**, or **Java 21+ for Minecraft 1.21
 11. **盘子**：
     - 拿盘子右键桌面或地面摆上去，一格能摆好几个（比如 5 个小碟、2 个长盘，或者混着摆）；
     - 拿食物右键盘子放菜，每一格能叠 3 样；
-    - 筷子右键盘子夹走最后放上去的那样；夹着熟菜再右键盘子，还吃得下就是吃，吃饱了才放回去；
+    - 筷子右键盘子夹走最后放上去的那样；夹着食物普通右键会吃掉，饱了也能吃；潜行右键放回食物，空筷子潜行右键才架到碗盘沿；
     - 空手右键拿起整个盘子，菜跟着走；潜行 + 空手右键一次取出一样菜；
     - 挖只挖准星对着的那个盘子；鼠标中键能连菜一起复制盘子；
     - 装了菜的盘子，物品提示里会像收纳袋一样列出里面的菜。
@@ -278,7 +326,7 @@ Use **Java 17+ for Minecraft 1.20.1 / 1.20.4**, or **Java 21+ for Minecraft 1.21
 15. **饮料**：对着空气右键喝一口，一瓶 4 口，喝完剩空瓶。拿饮料右键桌面能摆上去。
 16. **篝火煮锅**：把锅直接放在点着的篝火或灵魂篝火上，倒汤下菜就能煮，不用燃料。
 
-创造模式里有单独的分类页「之晗的火锅物语」，左边能切换子类：全部、厨具、餐具、桌子、凳子、食物。
+创造模式里有单独的分类页「之晗的火锅物语」，左边能切换子类：全部、厨具、餐具、桌凳、食物。
 
 </details>
 
@@ -293,7 +341,7 @@ Use **Java 17+ for Minecraft 1.20.1 / 1.20.4**, or **Java 21+ for Minecraft 1.21
    - right-click the pot with chopsticks holding raw food to put it into the cell you are aiming at;
    - right-click the pot with a plate of food to pour all the raw food in. Cooked food stays on the plate.
 
-   Only raw, edible items can go in, and cooked food can't go back in. In divided pots every cell cooks in its own section's broth; a section without broth doesn't cook.
+   Only edible food that can still be cooked can go in. Cooked food normally cannot go back in; Ham Sausage Slices are an exception and can be heated again into Cooked Ham Sausage Slices. In divided pots every cell cooks in its own section's broth; a section without broth doesn't cook.
 5. **Eating**:
    - **right-click** the pot with Bamboo Chopsticks to pick up a cooked food from the cell you are aiming at, then **hold right-click** to eat it;
    - or, in the pot screen, hold the chopsticks on your cursor and left-click cooked food to eat it;
@@ -306,7 +354,7 @@ Use **Java 17+ for Minecraft 1.20.1 / 1.20.4**, or **Java 21+ for Minecraft 1.21
 11. **Plates**:
     - right-click a table top or the ground with a plate to place it. One block can hold several plates (for example 5 small dishes, 2 long plates, or a mix);
     - right-click a plate with food to put it on. Each slot stacks up to 3 foods;
-    - right-click a plate with chopsticks to pick up the last food placed; right-click a plate again while holding cooked food to eat it if you're hungry, or put it back if you're full;
+    - right-click a plate with chopsticks to pick up the last food placed; right-click with food in the chopsticks to eat, even when full; sneak-right-click to put the food back;
     - right-click with an empty hand to pick up the whole plate with its food; sneak + right-click with an empty hand to take out one food at a time;
     - mining only breaks the plate you are aiming at; middle-click copies a plate together with its food;
     - a plate with food lists its contents in the tooltip, like a bundle.
@@ -316,7 +364,7 @@ Use **Java 17+ for Minecraft 1.20.1 / 1.20.4**, or **Java 21+ for Minecraft 1.21
 15. **Drinks**: right-click the air to take a sip; 4 sips per bottle, leaving an empty bottle. Right-click a table top to place a drink.
 16. **Campfire cooking**: place the pot directly on a lit campfire or soul campfire, add broth and food, and it cooks without fuel.
 
-In Creative mode, the mod has its own tab, "Orient's Hotpot Chronicles", with sub-categories on the left: All, Cook, Dish, Table, Seat, Food.
+In Creative mode, the mod has its own tab, "Orient's Hotpot Chronicles", with sub-categories on the left: All, Cook, Dish, Furniture, Food.
 
 </details>
 
@@ -332,8 +380,8 @@ The table lists basic crafting-table recipes. Cook food with heat; slicing also 
 | 高灶台 · Tall Brick Stove | 灶台 + 红砖块（无序）<br>Stove + bricks (shapeless) | 1 |
 | 铁制九宫格火锅 · Iron Nine-Grid Hotpot | 一排：铁锭、炼药锅、铁锭<br>One row: iron ingot, cauldron, iron ingot | 1 |
 | 铜制九宫格火锅 · Copper Nine-Grid Hotpot | 上排：铜锭、空、铜锭；下排：铜锭、炼药锅、铜锭<br>Top: copper ingot, empty, copper ingot; bottom: copper ingot, cauldron, copper ingot | 1 |
-| S 形鸳鸯锅 · S-Shaped Yuanyang Hotpot | 一排：锭、九宫格火锅（锭在左；铜锅配铜锭，铁锅配铁锭）<br>One row: ingot, nine-grid hotpot (ingot on the left; same metal) | 1 |
-| O 形鸳鸯锅 · O-Shaped Yuanyang Hotpot | 竖排：九宫格火锅在上、锭在下<br>Column: nine-grid hotpot above, ingot below | 1 |
+| 太极鸳鸯锅 · Taiji Yuanyang Hotpot | 一排：锭、九宫格火锅（锭在左；铜锅配铜锭，铁锅配铁锭）<br>One row: ingot, nine-grid hotpot (ingot on the left; same metal) | 1 |
+| 圆心鸳鸯锅 · Round-Center Yuanyang Hotpot | 竖排：九宫格火锅在上、锭在下<br>Column: nine-grid hotpot above, ingot below | 1 |
 | 直隔鸳鸯锅 · Straight-Divider Yuanyang Hotpot | 竖排：锭在上、九宫格火锅在下<br>Column: ingot above, nine-grid hotpot below | 1 |
 | 田字火锅 · Four-Grid Hotpot | 一排：锭、九宫格火锅、锭<br>One row: ingot, nine-grid hotpot, ingot | 1 |
 | 竹筷 · Bamboo Chopsticks | 2×2 竹子<br>2×2 bamboo | 1 |
@@ -355,6 +403,20 @@ The table lists basic crafting-table recipes. Cook food with heat; slicing also 
 | 八格大盘 · Eight-Slot Platter | 同材质小碟 ×8 围一圈，中间空<br>8 small dishes in a ring, center empty | 1 |
 | 熟毛肚 · Cooked Tripe | 熔炉、烟熏炉或营火烤生毛肚<br>Smelt Raw Tripe in a furnace, smoker or campfire | 1 |
 | 熟牛脊肉 · Cooked Beef Loin | 熔炉、烟熏炉或营火烤牛脊肉<br>Smelt Beef Loin in a furnace, smoker or campfire | 1 |
+
+## 从源码构建 · Building
+
+使用 **JDK 21**，在仓库根目录执行：
+
+Use **JDK 21** and run from the repository root:
+
+```sh
+./gradlew :fabric:build :neoforge:build
+```
+
+多模块结构：`framework/` 为前置框架，`common/` 为共享火锅内容，`fabric/` 与 `neoforge/` 为对应加载器入口。
+
+The multi-module project contains the prerequisite framework in `framework/`, shared hotpot content in `common/`, and loader entry points in `fabric/` and `neoforge/`.
 
 ## 许可证 · License
 

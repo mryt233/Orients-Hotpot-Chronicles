@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "minecraft:beef"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:fatty_beef_roll",
+    "count": 3
+  }
+}

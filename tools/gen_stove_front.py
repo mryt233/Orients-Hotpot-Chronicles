@@ -9,7 +9,7 @@
 要换上：把这两张 png 拷进两份资源的 textures/block，gen_stove_fire.py 的 MASK 换成 fire_mask.txt，HotPotBlockEntity 炉口火苗 side 范围 0.36 → 0.3。
 
     python tools/gen_stove_front.py
-作者：
+作者：mryt233
 """
 import random
 from pathlib import Path
@@ -19,8 +19,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent.parent
 BRICKS = ROOT.parent / "viewer/cache/1.21.1/assets/minecraft/textures/block/bricks.png"   # 原版砖块（查看器缓存里的原版资源）
 ARCHIVE = ROOT / "archive/stove_mouth_small"
-GAME = [ROOT / "src/main/resources/assets/orients_hotpot_chronicles/textures/block",
-        ROOT / "src/main/resources/resourcepacks/hotpot_assets/assets/orients_hotpot_chronicles/textures/block"]
+GAME = [ROOT / "common/src/main/resources/assets/orients_hotpot_chronicles/textures/block"]
 
 # F 拱门边框（深砖色）  T 拱顶里面（暗红褐）  B 炉膛（近黑）  G 炉膛底（灰褐炉灰）  S 炉口下沿
 SHAPES = {

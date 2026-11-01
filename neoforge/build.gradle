@@ -1,0 +1,112 @@
+// neoforge：NeoForge 入口 + 等价平台实现（mryt233 2026-10-29 起）
+//
+// 用 NeoForge 官方的 ModDevGradle（比 NeoGradle 轻，run 配置由插件生成）。
+// 映射：NeoForge 用官方 Mojang 映射，common 也是官方 Mojang 映射（fabric-loom 的
+// officialMojangMappings），两边类名本来就一致，直接把 common 的产出当普通依赖用。
+plugins {
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+neoForge {
+    version = project.neoforge_version
+
+    // 把自己的源码集声明成「一个模组」（mryt233 2026-10-30，实测必需）：
+    // 不写这段，ModDevGradle 只把 build/resources/main 当模组根（靠 META-INF/neoforge.mods.toml
+    // 从 classpath 找），@Mod 类在另一个目录 build/classes/java/main 里，NeoForge 扫不到，
+    // 结果模组在列表里但从不实例化、物品方块一个都不注册。声明后它会把 classes + resources
+    // 两个目录一起交给 FML（fml.modFolders），@Mod 才能被认出来。
+    mods {
+        orients_hotpot_chronicles {
+            sourceSet sourceSets.main
+            // 核心工程的源码集也算这个模组的「一半」（mryt233 2026-10-30）：
+            // 只把它当普通依赖加进 runtimeClasspath 时，NeoForge 的模组 classloader
+            // 看不到它（实测 NoClassDefFoundError: ...hotpot/HotPot）。
+            // 加进 mods 之后 common/build/classes 会和本工程一起交给 FML 的模组 classloader。
+            sourceSet project(':common').sourceSets.main
+            // mryt233 加（P1 第一批）：框架源码集也交给 FML 模组类加载器
+            sourceSet project(':framework:pure').sourceSets.main
+            sourceSet project(':framework:loader').sourceSets.main
+            sourceSet project(':framework:game').sourceSets.main
+            sourceSet project(':framework:client').sourceSets.main
+        }
+    }
+
+    // ModDevGradle 2.x 不会自动生成 run：这里显式声明两个 run 配置，
+    // 生成的任务名是 runClient / runServer（工作目录默认本工程的 run/）（mryt233 2026-10-30）
+    runs {
+        client {
+            client()
+            gameDirectory = project.file('run-client')
+            if (project.hasProperty('hotpotTestServer')) {
+                programArguments.addAll '--quickPlayMultiplayer', project.property('hotpotTestServer'), '--quickPlayPath', 'quickplay.log'
+            }
+            if (project.hasProperty('hotpotClientProbe')) {
+                systemProperty 'hotpot.clientProbe', 'true'
+            }
+            if (project.hasProperty('hotpotExpreg')) {
+                systemProperty 'hotpot.expreg', 'true'
+            }
+        }
+        server {
+            server()
+            gameDirectory = project.file('run-server')
+            programArgument '--nogui'
+            if (project.hasProperty('hotpotExpreg')) {
+                systemProperty 'hotpot.expreg', 'true'
+            }
+        }
+    }
+}
+
+// 接入 common 核心，照抄 fabric/build.gradle 里已验证过的两条做法（mryt233 2026-10-30）：
+// 1) common 的编译产物（classes + resources 目录）直接当普通依赖，不经任何重映射——
+//    两份都是 Mojang 名，重映射反而会把类名改成另一套，运行时 NoSuchMethodError。
+// 2) 把 common 的资源目录并进本工程的资源集：assets/ 和 data/（贴图、模型、配方、
+//    战利品表、语言文件）只有在同一个 jar 里，NeoForge 才会当成这个模组的资源扫。
+sourceSets.main.resources.srcDirs += project(':common').file('src/main/resources')
+// mryt233 改：共享原版客户端源码只在平台模块编译，专用服不初始化客户端入口。
+sourceSets.main.java.srcDir project(':common').file('src/client/java')
+sourceSets.main.java.srcDir project(':common').file('src/mixin/java')
+sourceSets.main.java.srcDir project(':common').file('src/devtest/java')
+// mryt233 加：和 Fabric 一样，开发命令只用于 run，不分发给玩家。
+tasks.named('jar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }
+tasks.named('sourcesJar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }
+
+dependencies {
+    implementation files(project(':common').sourceSets.main.output)
+    // mryt233 加（P1 第一批）：框架契约与纯逻辑
+    implementation files(project(':framework:pure').sourceSets.main.output,
+                         project(':framework:loader').sourceSets.main.output,
+                         project(':framework:game').sourceSets.main.output,
+                         project(':framework:client').sourceSets.main.output)
+}
+
+// NeoForge 的元数据模板，版本占位在这里替换
+tasks.named('processResources', ProcessResources) {
+    inputs.property 'version', project.version
+    filteringCharset = 'UTF-8'
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand version: project.version, minecraft_version: project.minecraft_version,
+               neoforge_version: project.neoforge_version
+    }
+}
+
+// files() 依赖不会自动建任务依赖：先编 common，再编 neoforge（mryt233 2026-10-30）
+tasks.named('compileJava') { dependsOn ':common:classes', ':framework:pure:classes', ':framework:loader:classes', ':framework:game:classes', ':framework:client:classes' }
+tasks.named('processResources') { dependsOn ':common:processResources' }
+tasks.matching { it.name in ['runServer', 'runClient', 'runData'] }.configureEach { dependsOn ':common:classes', ':framework:loader:classes' }
+
+// 打包：common 的**类**不在本工程的 sourceSet 产出里（资源已经并进来了），
+// 只靠 implementation files(...) 的话成品 jar 会缺核心类，装进 mods 直接崩。
+// 这里把 common 的编译产物一起打进 jar（mryt233 2026-10-30）
+tasks.named('jar') { from(project(':common').sourceSets.main.output.classesDirs) }
+tasks.named('jar') {
+    // mryt233 加（P1 第一批）：框架类随 Jar 分发
+    from(project(':framework:pure').sourceSets.main.output.classesDirs)
+    from(project(':framework:loader').sourceSets.main.output.classesDirs)
+    from(project(':framework:game').sourceSets.main.output.classesDirs)
+    from(project(':framework:client').sourceSets.main.output.classesDirs)
+}
+tasks.named('sourcesJar') { from(project(':common').sourceSets.main.allJava) }
+
+// mryt233 改：客户端/服务端独立目录，由运行配置创建，不再共用 run/。

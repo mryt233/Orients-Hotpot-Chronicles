@@ -3,7 +3,7 @@
     python tools/gen_drink.py
 a 是第一版（按用户最早给的 33×30×18 厘米，后来用户更正为 12×10×30）；
 b 是按照片里瓶子的比例（细高）做的：第一版 3×2、6 像素高，用户说太小、像洗洁精，改成 4×3 瓶身、近 10 像素高，有瓶肩、瓶颈、提手环、橙子标签。都放在盘子格里由渲染器挪到桌面。
-作者：
+作者：mryt233
 """
 import json
 from pathlib import Path
@@ -11,8 +11,8 @@ from PIL import Image
 
 MOD = Path(__file__).resolve().parent.parent
 MODID = "orients_hotpot_chronicles"
-RES = MOD / "src/main/resources"
-ASSET_ROOTS = [RES / "assets" / MODID, RES / "resourcepacks/hotpot_assets/assets" / MODID]
+RES = MOD / "common/src/main/resources"
+ASSET_ROOTS = [RES / "assets" / MODID]
 
 O, OL, OD = (247, 160, 20, 255), (255, 200, 70, 255), (212, 118, 12, 255)
 R, W, G = (205, 32, 30, 255), (250, 246, 236, 255), (96, 160, 44, 255)
@@ -224,7 +224,7 @@ DRINK_DISPLAY = {
 def game_files():
     """摆在桌上的瓶子（方块状态 drink：种类 × 满 / 空 × 方向）和每种饮料的满瓶 / 空瓶物品模型。
     r101 加了维二（模型和贴图在 tools/gen_plant_protein_drink.py，物品显示参数共用这里的 DRINK_DISPLAY）。"""
-    kinds = ("orange_drink", "plant_protein_drink")
+    kinds = ("orange_drink", "plant_protein_drink", "orient_cola")   # 之晗可乐（原名 之晗可乐，2026-10-26 用户改名） 2026-10-25 加（模型贴图在 tools/gen_orient_cola.py）
     for root in ASSET_ROOTS:
         variants = {}
         for kind in kinds:
@@ -237,10 +237,16 @@ def game_files():
         (root / "blockstates/drink.json").write_text(json.dumps({"variants": variants}, indent=2) + "\n", encoding="utf-8")
         for kind in kinds:
             full, empty = {"orange_drink": ("orange_drink", "empty_orange_drink_bottle"),
-                           "plant_protein_drink": ("plant_protein_drink", "empty_plant_protein_drink_bottle")}[kind]   # 物品 ID（r102）
+                           "plant_protein_drink": ("plant_protein_drink", "empty_plant_protein_drink_bottle"),
+                           "orient_cola": ("orient_cola", "empty_orient_cola_bottle")}[kind]   # 物品 ID（r102）
             for item, model in ((full, kind), (empty, f"{kind}_empty")):
-                (root / f"models/item/{item}.json").write_text(json.dumps(
-                    {"parent": f"{MODID}:block/{model}", "display": DRINK_DISPLAY}, indent=2) + "\n", encoding="utf-8")
+                display = DRINK_DISPLAY
+                if kind == "orient_cola":
+                    # 可乐瓶比另外两种矮，共用的 gui 平移让它偏下 1.5～1.8 像素；单独往上挪到格子正中（2026-10-26 用户；调整）
+                    lift = 1.95 if item == full else 2.3
+                    display = dict(DRINK_DISPLAY, gui=dict(DRINK_DISPLAY["gui"], translation=[0, lift, 0]))
+                (root / f"models/item/{item}.json").write_bytes((json.dumps(
+                    {"parent": f"{MODID}:block/{model}", "display": display}, indent=2) + "\n").encode("utf-8"))
 
 
 game_files()

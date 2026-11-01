@@ -1,11 +1,18 @@
 build/
 .gradle/
+.gradle-arch/
+.gradle-swap/
 run/
+run-server/
+run-client/
 logs/
+quickplay.log
+hotpot-probe-*.json
+screenshots/
 *.class
 tools/out/
 
-# 作者：；2026-10-22 调整：GitHub 发布范围及本地敏感文件排除。
+# 作者：mryt233；2026-10-22 mryt233 改：GitHub 发布范围及本地敏感文件排除。
 # 开发记录与发布准备材料仅留本地。
 DEV_LOG.md
 HANDOVER.md
@@ -31,3 +38,17 @@ __pycache__/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# EXP-PKG 本地实验运行目录
+experiments/server-*/run/
+build/exp-pkg/
+
+# 生产/验证环境与测试助爪的本地产物（只保留源码与构建脚本）
+experiments/prod-*/
+experiments/harness-*/.gradle/
+experiments/harness-*/build/
+experiments/server-*/build/
+experiments/server-*/.gradle/
+experiments/*installer*.jar
+
+installer.log

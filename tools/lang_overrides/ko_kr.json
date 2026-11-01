@@ -3,5 +3,12 @@
   "block.orients_hotpot_chronicles.iron_split_yuanyang_hotpot": "철 직선 칸막이 원앙 훠궈",
   "text.orients_hotpot_chronicles.heat.open_fire": "모닥불 위 (연료 소모 없음)",
   "item.orients_hotpot_chronicles.beef_loin_slice": "소 등심 슬라이스",
-  "item.orients_hotpot_chronicles.cooked_beef_loin_slice": "익힌 소 등심 슬라이스"
+  "item.orients_hotpot_chronicles.cooked_beef_loin_slice": "익힌 소 등심 슬라이스",
+  "text.orients_hotpot_chronicles.msg.not_cooked_yet": "그건 아직 익지 않았습니다",
+  "text.orients_hotpot_chronicles.seasoning.garlic_paste.effect": "저항 8초",
+  "item.orients_hotpot_chronicles.cooked_kelp": "익힌 다시마",
+  "item.orients_hotpot_chronicles.tomato_soup_bowl": "토마토 육수 한 그릇",
+  "item.orients_hotpot_chronicles.three_fresh_soup_bowl": "삼선 육수 한 그릇",
+  "block.orients_hotpot_chronicles.copper_square_yuanyang_hotpot": "구리 사각 중심 원앙 훠궈",
+  "block.orients_hotpot_chronicles.iron_square_yuanyang_hotpot": "철 사각 중심 원앙 훠궈"
 }

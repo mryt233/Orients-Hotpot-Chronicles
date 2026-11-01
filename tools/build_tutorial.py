@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 把 mod/tutorial/content/*.md 编成一个静态教程网站（mod/tutorial/site/），双击 index.html 就能看。
-作者：（2026-10-24）
+作者：mryt233
 
 做了三件事：
 1. Markdown -> HTML，加了几个写文章用的小指令（见下），配方图直接读游戏里的配方 JSON 画，所以配方永远和游戏一致。
@@ -32,7 +32,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 TUT = os.path.join(ROOT, "tutorial")
 CONTENT = os.path.join(TUT, "content")
 SITE = os.path.join(TUT, "site")
-RES = os.path.join(ROOT, "src", "main", "resources")
+RES = os.path.join(ROOT, "common", "src", "main", "resources")
 MOD = "orients_hotpot_chronicles"
 RECIPES = os.path.join(RES, "data", MOD, "recipe")
 ICONS = os.path.join(TUT, "img", "icons")
@@ -54,6 +54,7 @@ PAGES = [  # (文件名, 导航标题, 分组)
     ("faq", "常见问题", "玩法"),
     ("recipes", "配方大全", "查阅"),
     ("items", "物品图鉴", "查阅"),
+    ("preview", "开发版预览", "查阅"),
     ("changelog", "更新日志", "查阅"),
 ]
 VERSION = "见更新日志"
@@ -186,8 +187,8 @@ def slot(ref, count=None):
 
 # 已发布版里还没有、要等下一版才发布的物品（教程基于已发布的 0.1.3-alpha，这些在配方 / 图鉴里加「0.1.4 将更新」角标）。
 # 发版时把已发布的从这里删掉。
-UPCOMING = set()   # 0.1.3-alpha（2026-10-25）发布时清空：牛脊肉 / 吊龙、鸳鸯锅 / 田字锅都已发布（）
-BADGE = '<span class="tag dev">0.1.4 将更新</span>'
+UPCOMING = set()   # 0.1.3-alpha（2026-10-25）发布时清空：牛脊肉 / 吊龙、鸳鸯锅 / 田字锅都已发布
+BADGE = '<span class="tag dev">开发版预览</span>'
 
 
 def badge(i):
@@ -261,13 +262,45 @@ def cooking_map():
 
 COOK = cooking_map()
 
+# 教程以已发布版为准（2026-10-27）：配方先用已发布版冻结源码里的，开发版新加的照样带上；
+# 开发版才有的物品不要求正文讲（它们集中写在更新日志「开发版预览」，靠清单编号检查）
+RELEASE_RES = os.path.join(ROOT, "..", "version-ports", "base", "0.1.4-alpha", "src", "main", "resources")
+
+
+def use_release_recipes():
+    base_dir = os.path.join(RELEASE_RES, "data", MOD, "recipe")
+    base = {os.path.basename(f)[:-5]: json.load(open(f, encoding="utf-8")) for f in sorted(glob.glob(os.path.join(base_dir, "*.json")))}
+    if not base:
+        warnings.append("找不到已发布版的配方（%s），按开发版的配方画" % base_dir)
+        return
+    merged = dict(base)
+    for k, r in RECIPE_DB.items():
+        merged.setdefault(k, r)
+    RECIPE_DB.clear()
+    RECIPE_DB.update(merged)
+    COOK.clear()
+    COOK.update(cooking_map())
+
+
+def release_item_ids():
+    p = os.path.join(RELEASE_RES, "assets", MOD, "lang", "zh_cn.json")
+    if not os.path.exists(p):
+        return None
+    out = set()
+    for k in json.load(open(p, encoding="utf-8")):
+        m = re.match(r"(item|block)\.%s\.(.+)" % MOD, k)
+        if m:
+            out.add(m.group(2))
+    return out
+
 
 def recipes_for(item_id):
     item_id = full_id(item_id)
     out = []
     for rid, r in RECIPE_DB.items():
         t = r["type"].replace("minecraft:", "")
-        if t in ("crafting_shaped", "crafting_shapeless", "stonecutting") and result_id(r) == item_id:
+        # 模组自己的合成类型（如汤底桶 soup_bucket）有 pattern / ingredients 的，也按工作台格子画（2026-10-27）
+        if (t in ("crafting_shaped", "crafting_shapeless", "stonecutting") or "pattern" in r or "ingredients" in r) and result_id(r) == item_id:
             out.append(r)
     return out
 
@@ -289,6 +322,62 @@ def recipe_html(item_id):
 
 
 # ---------------- 指令展开 ----------------
+# 锅形展示（2026-10-27，用户：讲锅那里加多种锅的展示，自己选看任意锅形）。
+# 图是查看器按游戏模型渲染的 256 像素大图：tutorial/img/pot_<材质>_<锅形>_iso.png（斜看）/ _top.png（俯看）。
+# S 形 / O 形用开发版里改名后的太极 / 圆心模型渲染（形状一样），名字照已发布版写。
+POTS = [
+    {
+        "k": "nine_grid_hotpot",
+        "n": "九宫格火锅",
+        "d": "一整锅一种汤，9 个大格。",
+        "r": "铜锭 / 铁锭 + 炼药锅（配方见下面）",
+        "dev": False
+    },
+    {
+        "k": "taiji_yuanyang_hotpot",
+        "n": "太极鸳鸯锅",
+        "d": "太极图那样的 S 形隔板，两边各一种汤。",
+        "r": "九宫格锅 + 1 块锭，锭放在锅的左边",
+        "dev": False
+    },
+    {
+        "k": "round_yuanyang_hotpot",
+        "n": "圆心鸳鸯锅",
+        "d": "中间一圈：圈外、圈里各一种汤。",
+        "r": "九宫格锅 + 1 块锭，锭放在锅的下面",
+        "dev": False
+    },
+    {
+        "k": "split_yuanyang_hotpot",
+        "n": "直隔鸳鸯锅",
+        "d": "中间一道直隔板，左右各一种汤。",
+        "r": "九宫格锅 + 1 块锭，锭放在锅的上面",
+        "dev": False
+    },
+    {
+        "k": "four_grid_hotpot",
+        "n": "田字火锅",
+        "d": "十字隔板分成四块，每块一种汤。",
+        "r": "九宫格锅 + 2 块锭，锅的左右各一块",
+        "dev": False
+    },
+    {
+        "k": "square_yuanyang_hotpot",
+        "n": "方心鸳鸯锅",
+        "d": "圆心鸳鸯锅中间换成正方形。",
+        "r": "九宫格锅 + 2 块锭，锅的上下各一块",
+        "dev": False
+    }
+]
+
+
+def potviewer_html():
+    data = json.dumps(POTS, ensure_ascii=False)
+    imgs = "".join('<figure class="pv-static"><img src="img/pot_copper_%s_iso.png" alt="%s" width="128" height="128"><figcaption>%s</figcaption></figure>'
+                   % (p["k"], html.escape(p["n"]), html.escape(p["n"] + ("（开发版预览）" if p["dev"] else ""))) for p in POTS)
+    return '\n\n<div class="potviewer" data-p="%s">%s</div>\n\n' % (html.escape(data, quote=True), imgs)
+
+
 def expand_inline(text):
     def i_(m):
         return chip(m.group(1).strip())
@@ -312,7 +401,8 @@ def expand_inline(text):
     text = re.sub(r"\{\{recipe:([^}]+)\}\}", recipe_, text)
     text = re.sub(r"\{\{img:([^}]+)\}\}", img_, text)
     text = re.sub(r"\{\{since:([^}]+)\}\}", lambda m: '<span class="tag since">自 %s</span>' % m.group(1), text)
-    text = text.replace("{{dev}}", '<span class="tag dev">0.1.4 将更新</span>')
+    text = text.replace("{{potviewer}}", potviewer_html())
+    text = text.replace("{{dev}}", '<span class="tag dev">开发版预览</span>')
     return text
 
 
@@ -322,7 +412,7 @@ MD = markdown.Markdown(extensions=["tables", "attr_list", "sane_lists"])
 def render_md(text):
     def callout(m):
         kind, body = m.group(1), m.group(2)
-        title = {"tip": "小提示", "warn": "注意", "dev": "0.1.4 将更新的内容（本教程基于 0.1.3-alpha，这部分还没有发布）"}[kind]
+        title = {"tip": "小提示", "warn": "注意", "dev": "开发版预览（还没正式发布，名字和数值以后可能会变）"}[kind]
         inner = render_md_plain(body)
         return '\n\n<div class="callout %s"><div class="ct">%s</div>%s</div>\n\n' % (kind, title, inner)
 
@@ -437,11 +527,12 @@ def shell(slug, title, body, nav_html, search_index_json):
 <input id="q" type="search" placeholder="搜索教程…" autocomplete="off"></header>
 <div class="wrap"><nav id="nav">{nav_html}</nav>
 <main><div id="results" hidden></div><article id="doc">{body}</article>
-<footer>反馈：<a href="https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose">GitHub Issues</a> · QQ 群 248314791 · <a href="https://www.curseforge.com/minecraft/mc-mods/orients-hotpot-chronicles">CurseForge</a> · <a href="https://modrinth.com/mod/orients-hotpot-chronicles">Modrinth</a><br>本教程随模组版本更新 · 配方与图鉴由游戏数据自动生成 · 作者：</footer></main></div>
+<footer>反馈：<a href="https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose">GitHub Issues</a> · QQ 群 248314791 · <a href="https://www.curseforge.com/minecraft/mc-mods/orients-hotpot-chronicles">CurseForge</a> · <a href="https://modrinth.com/mod/orients-hotpot-chronicles">Modrinth</a> · <a href="https://www.mcmod.cn/class/32185.html">MC 百科</a><br>本教程随模组版本更新 · 配方与图鉴由游戏数据自动生成 · 作者：mryt233</footer></main></div>
 <script>window.SEARCH={search_index_json};</script><script src="app.js"></script></body></html>"""
 
 
 def main():
+    use_release_recipes()
     # 把教程提到的原版物品名先准备好
     vanilla = set()
     for r in RECIPE_DB.values():
@@ -528,9 +619,10 @@ def check_coverage(bodies):
     """教程有没有跟上游戏。"""
     text_all = "".join(open(f, encoding="utf-8").read() for f in glob.glob(os.path.join(CONTENT, "*.md")))
     hide = {"plates", "sauce_station_top", "tall_brick_stove_top", "bowl", "drink"}
+    released = release_item_ids()
     for full, zh in NAMES.items():
         i = full.split(":")[1]
-        if i in hide:
+        if i in hide or (released is not None and i not in released):
             continue
         # 木头 / 材质变种由「一类」代表，只要求代表出现
         base = i
@@ -548,6 +640,10 @@ def check_coverage(bodies):
             continue
         if i.startswith("cooked_") and (NAMES.get(MOD + ":" + i[7:], "") in text_all or i[7:] in text_all):
             continue
+        if re.match(r"^(?:smooth_stone|polished_\w+|quartz|cut_copper|iron)_(?:tall_)?hotpot_table$", i) and i != "smooth_stone_hotpot_table":
+            continue   # 18 张石料 / 金属桌由「平滑石头火锅桌」代表（正文写了「9 种桌面」）
+        if i in ("empty_orange_drink_bottle", "empty_plant_protein_drink_bottle") or i.endswith(("_drink_cup", "_cola_cup")):
+            continue   # 饮料的空瓶、一杯装，归在「饮料」一节里讲
         if i.startswith("iron_") and ("yuanyang" in i or "four_grid" in i):
             continue
         if "cilantro_" in i and ("meatball" in i or "fish_ball" in i) and "香菜丸子" in text_all:
@@ -563,15 +659,18 @@ def check_coverage(bodies):
         if m:
             nums = [int(x) for x in re.findall(r"^#### (\d+)\.", m.group(1), flags=re.M)]
             lg = open(log, encoding="utf-8").read()
+            pv = os.path.join(CONTENT, "preview.md")   # 开发版预览单独一章（2026-10-27）
+            if os.path.exists(pv):
+                lg += open(pv, encoding="utf-8").read()
             done = {int(x) for x in re.findall(r"清单#(\d+)", lg)}
             for n in nums:
                 if n not in done:
-                    warnings.append("移植同步清单「未发布」#%d 还没写进更新日志（在对应条目后面加 <!--清单#%d--> 标记）" % (n, n))
+                    warnings.append("移植同步清单「未发布」#%d 还没写进更新日志（在 preview.md 对应条目后面加 <!--清单#%d--> 标记）" % (n, n))
 
 
 
 
-# ---------------- 单文件长页面版（新增，2026-10-24） ----------------
+# ---------------- 单文件长页面版（2026-10-24） ----------------
 def build_single(bodies, filename=None, transform=None):
     """所有页面合成一个 HTML：左侧目录（章 + 小节），右侧一直往下翻；图片全部内嵌，一个文件就能看。"""
     import base64
@@ -655,7 +754,7 @@ q.placeholder='搜索（回车跳到下一处）';
 <a class="brand" href="#page-index">我的世界[之晗的火锅物语]模组 <small>游玩教程</small></a>
 <input id="q" type="search" autocomplete="off"></header>
 <div class="wrap"><nav id="nav">{toc}</nav>
-<main>{page}<footer>反馈：<a href="https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose">GitHub Issues</a> · QQ 群 248314791 · <a href="https://www.curseforge.com/minecraft/mc-mods/orients-hotpot-chronicles">CurseForge</a> · <a href="https://modrinth.com/mod/orients-hotpot-chronicles">Modrinth</a><br>本教程随模组版本更新 · 配方与图鉴由游戏数据自动生成 · 作者：</footer></main></div>
+<main>{page}<footer>反馈：<a href="https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose">GitHub Issues</a> · QQ 群 248314791 · <a href="https://www.curseforge.com/minecraft/mc-mods/orients-hotpot-chronicles">CurseForge</a> · <a href="https://modrinth.com/mod/orients-hotpot-chronicles">Modrinth</a> · <a href="https://www.mcmod.cn/class/32185.html">MC 百科</a><br>本教程随模组版本更新 · 配方与图鉴由游戏数据自动生成 · 作者：mryt233</footer></main></div>
 <button id="top">↑ 回到顶部</button>
 <script>{js}</script></body></html>"""
     # 调整：允许英文构建复用布局、内嵌图片和交互，不覆盖中文成品。

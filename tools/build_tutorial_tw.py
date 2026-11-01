@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""作者：。生成經用語校訂的 zh_tw 單檔指南。
+"""作者：mryt233生成經用語校訂的 zh_tw 單檔指南。
 
 在 mod/ 下執行：python tools/build_tutorial_tw.py
 正文獨立維護；原版名稱取本機 Minecraft 1.21.1 繁中語言檔的裁剪副本。
@@ -21,13 +21,14 @@ PAGES = [
     ("tableware", "盤子、碗與飲料", "玩法教學"), ("ingredients", "食材與切菜", "玩法教學"),
     ("sauce", "沾醬", "玩法教學"), ("faq", "常見問題", "玩法教學"),
     ("recipes", "合成配方總覽", "資料查詢"), ("items", "物品圖鑑", "資料查詢"),
+    ("preview", "開發版預覽", "資料查詢"),  # 调整：与简体/英文一致，登记预览章节。
     ("changelog", "更新紀錄", "資料查詢"),
 ]
 UI = {
     "我的世界[之晗的火锅物语]模组-游玩教程": "Minecraft［之晗的火鍋物語］模組－遊玩指南 · zh_tw",
     "我的世界[之晗的火锅物语]模组": "之晗的火鍋物語",
-    "本教程随模组版本更新 · 配方与图鉴由游戏数据自动生成 · 作者：":
-        "隨模組版本更新 · 配方與圖鑑依遊戲資料自動產生 · 中文原文及 zh_tw 在地化",
+    "本教程随模组版本更新 · 配方与图鉴由游戏数据自动生成 · 作者：mryt233":
+        "隨模組版本更新 · 配方與圖鑑依遊戲資料自動產生 · 原文：mryt233",
     "这一页由脚本<b>直接读游戏里的配方文件</b>画出来，和游戏永远一致。鼠标放到格子上能看到物品名。":
         "本頁<b>直接依遊戲內的配方檔案產生</b>，方便對照製作。將滑鼠游標移到格子上，就能查看物品名稱。",
     "11 种木头的火锅桌、高火锅桌、板凳、条凳、蘸料台配方都一样，只是把木板换成对应的木板，这里只画<b>橡木</b>的。盘子五种材质（石英、竹、红陶、铜、铁）的<b>小碟</b>各自单列，大盘子只画石英的，其他材质把小碟换成对应材质的小碟。":
@@ -88,7 +89,8 @@ def main():
             text = (TUTORIAL / "content-zh-tw" / (slug + ".md")).read_text(encoding="utf-8")
             check_translation(slug, text)
             original = (TUTORIAL / "content" / (slug + ".md")).read_text(encoding="utf-8")
-            numbers = lambda value: Counter(re.findall(r"\d+(?:\.\d+)*", value))
+            # mryt233 改：去掉 HTML 注释再比数字，署名 / 清单编号注释不算正文数字。
+            numbers = lambda value: Counter(re.findall(r"\d+(?:\.\d+)*", re.sub(r"<!--.*?-->", "", value, flags=re.S)))
             if numbers(original) != numbers(text):
                 raise ValueError(f"Numbers differ from source in {slug}")
             bodies[slug] = localize(guide.render_md(text))

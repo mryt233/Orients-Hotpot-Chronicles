@@ -3,5 +3,17 @@
   "block.orients_hotpot_chronicles.iron_split_yuanyang_hotpot": "Hotpot yuanyang con división recta de hierro",
   "text.orients_hotpot_chronicles.heat.open_fire": "Sobre una fogata (sin gastar combustible)",
   "item.orients_hotpot_chronicles.beef_loin_slice": "Loncha de lomo de ternera",
-  "item.orients_hotpot_chronicles.cooked_beef_loin_slice": "Loncha de lomo de ternera cocida"
+  "item.orients_hotpot_chronicles.cooked_beef_loin_slice": "Loncha de lomo de ternera cocida",
+  "block.orients_hotpot_chronicles.copper_round_yuanyang_hotpot": "Hotpot yuanyang con centro redondo de cobre",
+  "block.orients_hotpot_chronicles.iron_round_yuanyang_hotpot": "Hotpot yuanyang con centro redondo de hierro",
+  "item.orients_hotpot_chronicles.cooked_beef_loin": "Lomo de ternera cocido",
+  "text.orients_hotpot_chronicles.seasoning.garlic_paste.effect": "Resistencia 8 s",
+  "item.orients_hotpot_chronicles.cooked_kelp": "Alga cocida",
+  "item.orients_hotpot_chronicles.tomato_hotpot_base": "Base de hotpot de tomate",
+  "item.orients_hotpot_chronicles.three_fresh_hotpot_base": "Base de hotpot de tres delicias",
+  "block.orients_hotpot_chronicles.copper_square_yuanyang_hotpot": "Hotpot yuanyang con centro cuadrado de cobre",
+  "block.orients_hotpot_chronicles.iron_square_yuanyang_hotpot": "Hotpot yuanyang con centro cuadrado de hierro",
+  "item.orients_hotpot_chronicles.hotpot_guide": "Guía del hotpot",
+  "item.orients_hotpot_chronicles.ham_sausage_slice": "Rodaja de salchicha de jamón",
+  "item.orients_hotpot_chronicles.cooked_ham_sausage_slice": "Rodaja de salchicha de jamón cocida"
 }

@@ -1,0 +1,21 @@
+// 生产客户端验证用的小测试模组：进服后发一次真实的瞄准包，然后退出客户端。作者：mryt233。
+// 独立 Gradle 工程，不进主工程构建；产物用 remapJar 转成生产命名。
+plugins { id 'dev.architectury.loom' version '1.10.455' }
+
+version = '1.0.0'
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+dependencies {
+    minecraft "com.mojang:minecraft:1.21.1"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:0.19.3"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.116.14+1.21.1"
+    // 只借用火锅内容模块里的 payload 类做编译；运行时由候选内容 jar 提供
+    implementation files('../../common/build/classes/java/main')
+    implementation files('../../fabric/build/classes/java/main')
+}
+
+processResources {
+    inputs.property 'version', '1.0.0'
+    filesMatching('fabric.mod.json') { expand version: project.version }
+}

@@ -5,16 +5,16 @@
 和盘子一样由盘子格的渲染器平移、贴着桌面画。贴图 bowl_wood / bowl_wood_inner 是按原版碗物品的颜色给橡木木板重新上色的。
   a：直壁碗——4×4 碗底脚，6×6 碗身，壁厚 1，高 3
   b：敞口碗——4×4 碗脚，下圈 6×6、上圈 7×7 往外张半像素，高 3（8×8 的话一格并排两只会连成一条槽）
-作者：
+作者：mryt233
 """
 import json
 from pathlib import Path
 
 MOD = Path(__file__).resolve().parent.parent
 MODID = "orients_hotpot_chronicles"
-RES = MOD / "src/main/resources"
-ASSET_ROOTS = [RES / "assets" / MODID, RES / "resourcepacks/hotpot_assets/assets" / MODID]
-SOUPS = ["clear", "rich_stock", "mushroom", "spicy"]
+RES = MOD / "common/src/main/resources"
+ASSET_ROOTS = [RES / "assets" / MODID]
+SOUPS = ["clear", "rich_stock", "mushroom", "spicy", "tomato", "three_fresh"]
 FACES = ["north", "east", "south", "west", "up", "down"]
 
 
@@ -103,7 +103,8 @@ def game_files():
         write(root / "blockstates/bowl.json", {"variants": variants})
         for soup in SOUPS:
             bowl_id = {"clear": "clear_broth_bowl", "rich_stock": "rich_stock_bowl", "mushroom": "mushroom_broth_bowl",
-                       "spicy": "spicy_red_broth_bowl"}[soup]   # 物品 ID（r102 起和显示名对得上）
+                       "spicy": "spicy_red_broth_bowl",
+                       "tomato": "tomato_soup_bowl", "three_fresh": "three_fresh_soup_bowl"}[soup]   # 物品 ID（r102 起和显示名对得上）
             write(root / f"models/item/{bowl_id}.json",
                   {"parent": f"{MODID}:block/bowl_{GAME_SHAPE}_soup_{soup}", "display": BOWL_DISPLAY})
         write(root / "models/item/bowl_with_food.json", {"parent": "minecraft:builtin/entity", "display": BOWL_DISPLAY})

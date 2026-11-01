@@ -16,16 +16,15 @@ from pathlib import Path
 
 from PIL import Image
 
-ROOT = Path(__file__).resolve().parent.parent / "src/main/resources"
+ROOT = Path(__file__).resolve().parent.parent / "common/src/main/resources"
 DIRS = [
     ROOT / "assets/orients_hotpot_chronicles/textures/block",
-    ROOT / "resourcepacks/hotpot_assets/assets/orients_hotpot_chronicles/textures/block",
 ]
 FRAMES = 16
 FRAMETIME = 2
 
 # fire area of the mouth (the pixels the old static lit texture painted)
-MASK = [   # 2026-10-23 炉口改成中号（同 tools/gen_stove_front.py medium 的 T / B / G 格；原大炉口的范围见 DEV_LOG）（调整）
+MASK = [   # 2026-10-23 炉口改成中号（同 tools/gen_stove_front.py medium 的 T / B / G 格；原大炉口的范围见 DEV_LOG）
     "................",
     "................",
     "................",

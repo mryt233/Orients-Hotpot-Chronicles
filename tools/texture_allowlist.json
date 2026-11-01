@@ -1,0 +1,93 @@
+{
+  "_说明": "贴图自检白名单：{路径: {检查代号: 原因}}。原因为空的条目不算数，要补上。",
+  "item/bamboo_chopsticks": {
+    "outline": "用户确认的造型；细长竹筷和原版木棍 stick 一样不加深色描边"
+  },
+  "item/beef_meatball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/cilantro_beef_meatball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/cilantro_fish_ball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/cilantro_mutton_meatball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/cilantro_pork_meatball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/cooked_beef_meatball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/cooked_cilantro_beef_meatball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/cooked_cilantro_fish_ball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/cooked_cilantro_mutton_meatball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/cooked_cilantro_pork_meatball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/cooked_fatty_beef_roll": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/cooked_fish_ball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/cooked_mutton_meatball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/cooked_mutton_roll": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/cooked_pork_meatball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/fatty_beef_roll": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/fish_ball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/garlic_paste": {
+    "center": "待用户决定是否调整（2026-11-01 自检首次发现，未改动游戏内容）"
+  },
+  "item/mutton_meatball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/mutton_roll": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/pork_meatball": {
+    "colors": "用户确认过的造型（丸子球面 / 肉卷渐变上色），颜色数比原版多；以后重画可用 pixkit + vanilla_ref ramp 收敛色板"
+  },
+  "item/soybean": {
+    "center": "待用户决定是否调整（2026-11-01 自检首次发现，未改动游戏内容）"
+  },
+  "models/item/clear_broth_bowl": {
+    "gui_center": "待用户决定是否调整（2026-11-01 自检首次发现，未改动游戏内容）"
+  },
+  "models/item/mushroom_broth_bowl": {
+    "gui_center": "待用户决定是否调整（2026-11-01 自检首次发现，未改动游戏内容）"
+  },
+  "models/item/rich_stock_bowl": {
+    "gui_center": "待用户决定是否调整（2026-11-01 自检首次发现，未改动游戏内容）"
+  },
+  "models/item/spicy_red_broth_bowl": {
+    "gui_center": "待用户决定是否调整（2026-11-01 自检首次发现，未改动游戏内容）"
+  },
+  "models/item/stove_lit_icon": {
+    "gui_center": "待用户决定是否调整（2026-11-01 自检首次发现，未改动游戏内容）"
+  },
+  "models/item/three_fresh_soup_bowl": {
+    "gui_center": "待用户决定是否调整（2026-11-01 自检首次发现，未改动游戏内容）"
+  },
+  "models/item/tomato_soup_bowl": {
+    "gui_center": "待用户决定是否调整（2026-11-01 自检首次发现，未改动游戏内容）"
+  }
+}

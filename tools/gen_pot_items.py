@@ -3,16 +3,15 @@
 生成 models/item/<铁|铜>_hot_pot_<汤底>.json，并在 <铁|铜>_hot_pot.json 里写好 overrides：
 谓词 orients_hotpot_chronicles:soup = (汤底编号 + 1) / 10（客户端 HotPotClient 注册），
 自定义模型数据 1（分类页图标）放在最后、优先级最高。两份资源（assets 和内置资源包）一起写。
-作者：
+作者：mryt233
 """
 import json
 import os
 
 ROOT = os.path.join(os.path.dirname(__file__), '..', 'src', 'main', 'resources')
-COPIES = [os.path.join(ROOT, 'assets', 'orients_hotpot_chronicles'),
-          os.path.join(ROOT, 'resourcepacks', 'hotpot_assets', 'assets', 'orients_hotpot_chronicles')]
+COPIES = [os.path.join(ROOT, 'assets', 'orients_hotpot_chronicles')]
 NS = 'orients_hotpot_chronicles'
-SOUPS = ['clear', 'rich_stock', 'mushroom', 'spicy']   # 顺序 = SoupBase 编号
+SOUPS = ['clear', 'rich_stock', 'mushroom', 'spicy', 'tomato', 'three_fresh']   # 顺序 = SoupBase 编号
 METALS = ['iron', 'copper']
 
 

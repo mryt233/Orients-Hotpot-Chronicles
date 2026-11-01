@@ -5,7 +5,7 @@
 削掉四个角的「圆」（从上往下看是八边形）。从下往上：圆角瓶底、白色下半截（靠近瓶底一条红线）、
 腰（收进去一圈）、紫色标签（白色「V」、一点黄）、白色上半截、圆圆的瓶肩、瓶颈、宽的淡紫色瓶盖。
 贴图一条「环绕」的侧面图（四面都一样），一行 = 模型里 1 像素高。
-作者：
+作者：mryt233
 """
 import json
 from pathlib import Path
@@ -13,8 +13,8 @@ from PIL import Image
 
 MOD = Path(__file__).resolve().parent.parent
 MODID = "orients_hotpot_chronicles"
-RES = MOD / "src/main/resources"
-ASSET_ROOTS = [RES / "assets" / MODID, RES / "resourcepacks/hotpot_assets/assets" / MODID]
+RES = MOD / "common/src/main/resources"
+ASSET_ROOTS = [RES / "assets" / MODID]
 
 WH, WH_HI, WH_LO = (238, 234, 226, 255), (250, 248, 242, 255), (214, 208, 200, 255)   # 瓶身奶白
 PU, PU_HI, PU_LO = (118, 66, 160, 255), (146, 96, 188, 255), (88, 46, 124, 255)       # 标签紫
@@ -58,9 +58,11 @@ def texture():
     return im
 
 
-def tier(y0, y1, d, kind="body", rows=None):
+def tier(y0, y1, d, kind="body", rows=None, round_corners=False, square=False, square_side=None):
     """一层「圆」：直径 d（像素），两个交叉的长方块，四个角各削 1 像素（d ≥ 4）。
-    rows=(下, 上)：这一层侧面用贴图里哪几行（按 y 算的行号，含下不含上）；不给就按自己的高度取。"""
+    rows=(下, 上)：这一层侧面用贴图里哪几行（按 y 算的行号，含下不含上）；不给就按自己的高度取。
+    round_corners：再加一块四边各收 0.5 的方块，把削掉的角补回一半，从上往下看是 0.5 一台阶、更圆
+    （2026-10-26 用户：可乐从上面看不够圆，四个角加 0.5 像素；新增，只有之晗可乐用）。"""
     a, b = 8 - d / 2, 8 + d / 2
     c = 1 if d >= 4 else 0.5
     if kind == "cap":
@@ -73,9 +75,18 @@ def tier(y0, y1, d, kind="body", rows=None):
     faces = {k: {"uv": side, "texture": "#d"} for k in ["north", "south", "east", "west"]}
     faces["up"] = {"uv": top, "texture": "#d"}
     faces["down"] = {"uv": top, "texture": "#d"}
+    if square:
+        # 方的一块：横截面积和两块交叉拼的「圆」一样（边长 √(d² − 4c²)，取到 0.25）
+        # （2026-10-26 用户：可乐补角的版本看着怪，改成「同体积但是方的」；新增，只有之晗可乐用）
+        # square_side 给了就直接用这个边长（用户逐个调的，如之晗可乐瓶盖）
+        e = square_side if square_side is not None else round(((d * d - 4 * c * c) ** 0.5) * 4) / 4
+        return [{"from": [8 - e / 2, y0, 8 - e / 2], "to": [8 + e / 2, y1, 8 + e / 2], "faces": faces}]
     return [{"from": [a, y0, a + c], "to": [b, y1, b - c], "faces": faces},
             # 第二块上下各收 0.01：两块顶面原来在同一高度重叠，进游戏会闪（0.1.2-alpha 后用户报瓶盖闪烁，调整）
-            {"from": [a + c, y0 + 0.01, a], "to": [b - c, y1 - 0.01, b], "faces": json.loads(json.dumps(faces))}]
+            {"from": [a + c, y0 + 0.01, a], "to": [b - c, y1 - 0.01, b], "faces": json.loads(json.dumps(faces))}] + (
+        # 补角那块上下再收 0.01，免得和前两块的顶面重叠闪烁
+        [{"from": [a + 0.5, y0 + 0.02, a + 0.5], "to": [b - 0.5, y1 - 0.02, b - 0.5], "faces": json.loads(json.dumps(faces))}]
+        if round_corners and c == 1 else [])
 
 
 def model():

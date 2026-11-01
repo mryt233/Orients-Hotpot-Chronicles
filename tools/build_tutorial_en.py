@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""作者：。复用中文教程的配方、图片和页面布局，生成独立英文单文件。
+"""作者：mryt233复用中文教程的配方、图片和页面布局，生成独立英文单文件。
 
 在 mod/ 下运行：python tools/build_tutorial_en.py
 """
@@ -27,6 +27,7 @@ PAGES = [
     ("faq", "Frequently Asked Questions", "Gameplay"),
     ("recipes", "Recipe Collection", "Reference"),
     ("items", "Item Catalog", "Reference"),
+    ("preview", "Development Preview", "Reference"),  # 调整：登记独立开发版预览，保留锚点。
     ("changelog", "Changelog", "Reference"),
 ]
 
@@ -34,8 +35,8 @@ PAGES = [
 UI = {
     "我的世界[之晗的火锅物语]模组-游玩教程": "Minecraft [Orient's Hotpot Chronicles] Mod — Player Guide",
     "我的世界[之晗的火锅物语]模组": "Orient's Hotpot Chronicles",
-    "本教程随模组版本更新 · 配方与图鉴由游戏数据自动生成 · 作者：":
-        "Updated with the mod · Recipes and catalog generated from game data · Guide and English translation",
+    "本教程随模组版本更新 · 配方与图鉴由游戏数据自动生成 · 作者：mryt233":
+        "Updated with the mod · Recipes and catalog generated from game data · Original guide: mryt233",
     "这一页由脚本<b>直接读游戏里的配方文件</b>画出来，和游戏永远一致。鼠标放到格子上能看到物品名。":
         "These diagrams are generated <b>directly from the game's recipe files</b> to match the game. Hover over a slot to see its item name.",
     "11 种木头的火锅桌、高火锅桌、板凳、条凳、蘸料台配方都一样，只是把木板换成对应的木板，这里只画<b>橡木</b>的。盘子五种材质（石英、竹、红陶、铜、铁）的<b>小碟</b>各自单列，大盘子只画石英的，其他材质把小碟换成对应材质的小碟。":
@@ -137,7 +138,7 @@ def main():
     if missing:
         raise ValueError(f"Missing anchors: {missing}")
     # 记录翻译所依据的中文版本，以便后续更新时核对。
-    (ENGLISH / "source-hashes.json").write_text(json.dumps({"author": "", "sha256": source_hashes}, indent=2) + "\n", encoding="utf-8")
+    (ENGLISH / "source-hashes.json").write_text(json.dumps({"author": "mryt233", "sha256": source_hashes}, indent=2) + "\n", encoding="utf-8")
     print(f"Validated {len(bodies)} chapters, {len(ids)} HTML IDs; no missing assets or anchors.")
 
 

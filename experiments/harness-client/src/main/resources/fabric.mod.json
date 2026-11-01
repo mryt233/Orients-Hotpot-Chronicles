@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "id": "hotpot_harness",
+  "version": "${version}",
+  "name": "Hotpot Production Harness",
+  "environment": "client",
+  "entrypoints": {"client": ["exp.harness.HarnessClient"]},
+  "depends": {"fabricloader": ">=0.19", "minecraft": "1.21.1", "fabric-api": "*", "orients_hotpot_chronicles": "*"}
+}

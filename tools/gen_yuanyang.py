@@ -15,7 +15,7 @@
   blockstates/brick_stove.json / tall_brick_stove.json 里这几种锅的条目（先删旧的再加，重跑安全）
   data：战利品表（连汤带食材掉锅物品）、配方、镐子 / 石镐标签
     python tools/gen_yuanyang.py      （会接着跑 gen_pot_on_campfire 加篝火支架）
-作者：
+作者：mryt233
 """
 import json
 import math
@@ -23,16 +23,18 @@ from pathlib import Path
 
 MOD = Path(__file__).resolve().parent.parent
 MODID = "orients_hotpot_chronicles"
-RES = MOD / "src/main/resources"
-ROOTS = [RES / "assets" / MODID, RES / "resourcepacks/hotpot_assets/assets" / MODID]
+RES = MOD / "common/src/main/resources"
+ROOTS = [RES / "assets" / MODID]
 DATA = RES / "data"
 METALS = ["copper", "iron"]
 # 形状代号, 锅名后缀（模型名）, 方块 ID 模板, 配方摆法（I = 同金属锭，P = 同金属九宫格锅）
 SHAPES = [
-    ("s", "yuanyang_s", "{m}_s_yuanyang_hotpot", ["IP"]),
-    ("o", "yuanyang_o", "{m}_o_yuanyang_hotpot", ["P", "I"]),
+    ("s", "yuanyang_s", "{m}_taiji_yuanyang_hotpot", ["IP"]),
+    ("o", "yuanyang_o", "{m}_round_yuanyang_hotpot", ["P", "I"]),
     ("split", "yuanyang_split", "{m}_split_yuanyang_hotpot", ["I", "P"]),
     ("four", "four_grid", "{m}_four_grid_hotpot", ["IPI"]),
+    # 方心鸳鸯锅（2026-10-25 用户：和 O 形一样，中间换成正方形）：锭上下各一（锭在右会被当成 S 的镜像）
+    ("square", "yuanyang_square", "{m}_square_yuanyang_hotpot", ["I", "P", "I"]),
 ]
 
 STEP = 0.5          # 半像素格子
@@ -55,6 +57,11 @@ def classify(shape, x, z):
         if abs(x - c) < HALF_W or abs(z - c) < HALF_W:
             return None
         return (0 if x < c else 1) if z < c else (3 if x < c else 2)
+    if shape == "square":
+        d = max(abs(x - c), abs(z - c))
+        if abs(d - 3.0) < HALF_W:
+            return None
+        return 1 if d < 3.0 else 0
     if shape == "o":
         d = math.hypot(x - c, z - c)
         if abs(d - 3.4) < HALF_W:
@@ -174,7 +181,7 @@ def data():
 def main():
     assets()
     data()
-    # 篝火支架（on_campfire 的锅身模型和方块状态条目）接着加上，单独跑本脚本结果就是完整的（2026-10-24，）
+    # 篝火支架（on_campfire 的锅身模型和方块状态条目）接着加上，单独跑本脚本结果就是完整的（2026-10-24）
     import gen_pot_on_campfire
     gen_pot_on_campfire.main()
     for shape, *_ in SHAPES:     # 终端里画一张草图核对

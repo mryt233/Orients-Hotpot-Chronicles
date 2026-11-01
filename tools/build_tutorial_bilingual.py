@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""作者：。把简中、zh_tw 及英文教程合成带语言选择的离线 HTML。
+"""作者：mryt233把简中、zh_tw 及英文教程合成带语言选择的离线 HTML。
 
 用法（mod/ 下）：python tools/build_tutorial_bilingual.py
 先更新三种语言教程；本脚本只读取成品，共享内嵌图片，不需要联网。
@@ -41,7 +41,7 @@ def main():
     image_json = json.dumps(images).replace("</", "<\\/")
     js = (TUTORIAL / "assets" / "bilingual.js").read_text(encoding="utf-8")
     page = f'''<!doctype html>
-
+<!-- 作者：mryt233；作者：mryt233。 -->
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{zh['title']}</title><style>{css}
 #language{{flex:none;background:#1d1a17;color:#fff;border:2px solid #7a6f60;padding:6px 10px;cursor:pointer;font:inherit;font-size:14px}}

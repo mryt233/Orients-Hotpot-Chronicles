@@ -12,8 +12,8 @@ from pathlib import Path
 
 MOD = Path(__file__).resolve().parent.parent
 MODID = "orients_hotpot_chronicles"
-RES = MOD / "src/main/resources"
-ASSET_ROOTS = [RES / "assets" / MODID, RES / "resourcepacks/hotpot_assets/assets" / MODID]
+RES = MOD / "common/src/main/resources"
+ASSET_ROOTS = [RES / "assets" / MODID]
 DATA = RES / "data" / MODID
 
 # id: (盘面贴图, 盘沿贴图, 合成材料)
@@ -38,7 +38,8 @@ PLATE_IDS = {"1x1": "small_dish", "1x2": "two_slot_plate", "1x3": "three_slot_lo
              "2x2": "four_slot_square_plate", "1x5": "five_slot_long_plate", "2x4": "eight_slot_platter"}
 FLOOR, RIM_H, RIM_T = 1.0, 0.75, 0.5
 PLATE_DISPLAY = {
-    "gui": {"rotation": [30, 225, 0], "translation": [0, 2, 0], "scale": [0.75, 0.75, 0.75]},
+    # 往上 4.6（原来 2，图标偏下约 2.6 像素）：按游戏物品栏变换算，盘子在格子正中（2026-10-26 用户；调整）
+    "gui": {"rotation": [30, 225, 0], "translation": [0, 4.6, 0], "scale": [0.75, 0.75, 0.75]},
     "ground": {"rotation": [0, 0, 0], "translation": [0, 3, 0], "scale": [0.5, 0.5, 0.5]},
     "fixed": {"rotation": [0, 0, 0], "translation": [0, 0, 0], "scale": [0.75, 0.75, 0.75]},
     "thirdperson_righthand": {"rotation": [75, 45, 0], "translation": [0, 2.5, 2], "scale": [0.5, 0.5, 0.5]},
@@ -103,7 +104,7 @@ def main():
                 ident = f"{mat}_{PLATE_IDS[size]}"
                 write(root / f"blockstates/{ident}.json", {"variants": variants})
                 # 手持往上翘一点能看到盘面（原来平着拿几乎只看到一条边，r91）；装了菜时切到 builtin 模型，
-                # 由 HeldFoodItemRenderer 先画盘子再把菜摆上去（）
+                # 由 HeldFoodItemRenderer 先画盘子再把菜摆上去
                 write(root / f"models/item/{ident}.json", {
                     "parent": f"{MODID}:block/{name}", "display": PLATE_DISPLAY,
                     "overrides": [{"predicate": {"custom_model_data": 1}, "model": f"{MODID}:item/plate_with_food"}]})
@@ -117,7 +118,7 @@ def main():
         for size, (_, _, _, _, pattern) in SIZES.items():
             name = f"{mat}_{PLATE_IDS[size]}"
             if pattern is None:
-                # 材料 碗 材料（调整 r117：原来两个横排，铁的和原版重质测重压力板冲突）
+                # 材料 碗 材料（r117：原来两个横排，铁的和原版重质测重压力板冲突）
                 recipe = {"type": "minecraft:crafting_shaped", "group": f"{MODID}:small_dish", "pattern": ["MBM"],
                           "key": {"M": {"item": material}, "B": {"item": "minecraft:bowl"}}, "result": {"id": dish, "count": 2}}
             else:

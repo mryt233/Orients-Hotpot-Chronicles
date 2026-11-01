@@ -1,0 +1,12 @@
+// NeoForge 生产客户端验证用的小测试模组。作者：mryt233。独立工程，不进主工程构建。
+plugins { id 'net.neoforged.moddev' version '2.0.148' }
+
+version = '1.0.0'
+neoForge {
+    version = '21.1.265'
+    mods { hotpot_harness_neo { sourceSet sourceSets.main } }
+}
+
+dependencies {
+    implementation files('../../common/build/classes/java/main', '../../neoforge/build/classes/java/main')
+}

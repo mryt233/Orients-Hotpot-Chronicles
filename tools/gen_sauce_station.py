@@ -4,7 +4,7 @@
 用户选了「每种木头都做一个 + 铁台」：11 种木头（台身木板 + 白色石英台面）+ 铁（原版铁块）；每种有「九碗都装满」和「空碗」两个模型。
 调料面贴图 sauce_<调料>.png 是纯色加一点深浅；葱花、香菜碎末用 tools/gen_garnish.py 画的方块贴图，直接放在白瓷碗里。
 九碗顺序（从北往南、从西往东）：麻酱 辣油 酸甜酱 / 蜂蜜 香油 醋 / 白糖 葱花 香菜碎末。
-作者：
+作者：mryt233
 """
 import json
 import random
@@ -13,8 +13,8 @@ from PIL import Image
 
 MOD = Path(__file__).resolve().parent.parent
 MODID = "orients_hotpot_chronicles"
-RES = MOD / "src/main/resources"
-ROOTS = [RES / "assets" / MODID, RES / "resourcepacks/hotpot_assets/assets" / MODID]
+RES = MOD / "common/src/main/resources"
+ROOTS = [RES / "assets" / MODID]
 
 # 调料 ID（英文名）→ 颜色（基色）；葱花 / 香菜碎末用画好的贴图
 SAUCES = [
@@ -27,6 +27,7 @@ SAUCES = [
     ("sugar", (240, 238, 232)),           # 白糖（糖）
     ("chopped_scallion", None),           # 葱花（小葱）
     ("minced_cilantro", None),            # 香菜碎末（香菜）
+    ("garlic_paste", (232, 214, 150)),    # 蒜泥（2026-10-25 用户加；大蒜用擀面杖敲。2026-10-26 照新贴图改成米黄，调整）
 ]
 # 用户 2026-10-23 定：每种原版木头一个（台身该木头的木板、台面白色石英）+ 一个铁的（原版铁块）。ID = <木头>_sauce_station / iron_sauce_station
 WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped"]
@@ -196,7 +197,8 @@ def model(body, filled):
         z0, z1 = TIER_D * tier, TIER_D * (tier + 1)
         els += boxes([0, 0, z0], [16, top - CAP, z1], "#side")          # 台身
         els += boxes([0, top - CAP, z0], [16, top, z1], "#top")         # 白色台面
-    for i, (name, rgb) in enumerate(SAUCES):
+    # 台上固定 9 个小碗（3 层 × 3）；不能按调料种数画——2026-10-25 加了第 10 种蒜泥后多画了一个碗飘在台子外（用户报，调整）
+    for i, (name, rgb) in enumerate(SAUCES[:9]):
         cx, cz, y0 = bowl_center(i)
         a0, a1 = cx - BOWL / 2, cx + BOWL / 2
         b0, b1 = cz - BOWL / 2, cz + BOWL / 2
@@ -217,7 +219,7 @@ def model(body, filled):
                 tex[key] = f"{MODID}:block/sauce_{name}"
             if rgb is None:
                 # 葱花 / 香菜碎末堆得满一点（用户 2026-10-23：看着只有薄薄一层）：三层错开的碎末叠起来，
-                # 层层错开显得厚（）
+                # 层层错开显得厚
                 # 用户：侧面看最上一层冒出碗口悬空了 → 四层都收在碗口以内
                 layers = [(y1 - 1.3, 0, [2, 2, 14, 14], 0), (y1 - 0.95, 0, [0, 4, 12, 16], 90),
                           (y1 - 0.6, 0, [4, 0, 16, 12], 180), (y1 - 0.25, 0, [3, 3, 13, 13], 270)]
@@ -261,7 +263,8 @@ if __name__ == "__main__":
 # ---------------------------------------------------------------- r103 进游戏：方块状态 / 物品 / 掉落 / 挖掘工具
 ROT = {"north": 0, "east": 90, "south": 180, "west": 270}   # 正面朝向 → 模型绕 y 转（顺时针）
 BLOCK_DISPLAY = {
-    "gui": {"rotation": [30, 225, 0], "translation": [0, -2, 0], "scale": [0.5, 0.5, 0.5]},
+    # 往下 1.15（原来 2）：按游戏的物品栏变换算，整台在格子里上下正中（2026-10-26 用户：图标要在物品栏正中；调整）
+    "gui": {"rotation": [30, 225, 0], "translation": [0, -1.15, 0], "scale": [0.5, 0.5, 0.5]},
     "ground": {"rotation": [0, 0, 0], "translation": [0, 3, 0], "scale": [0.25, 0.25, 0.25]},
     "fixed": {"rotation": [0, 0, 0], "translation": [0, 0, 0], "scale": [0.5, 0.5, 0.5]},
     # 拿在手里：正面（最矮那层）朝着自己（2026-10-23 用户要求；原版方块是 45 / 225，这里各转半圈）
@@ -275,7 +278,7 @@ BLOCK_DISPLAY = {
 def game_files():
     data = RES / "data"
     for root in ROOTS:
-        # 2026-10-23 碗不固定后，调料面改由 client/SauceStationRenderer 画，删掉按位置叠加的 sauce_fill_* 模型（）
+        # 2026-10-23 碗不固定后，调料面改由 client/SauceStationRenderer 画，删掉按位置叠加的 sauce_fill_* 模型
         for old in (root / "models/block").glob("sauce_fill_*.json"):
             old.unlink()
         for body in BODIES:
@@ -306,7 +309,7 @@ def game_files():
 game_files()
 
 
-# ---------------------------------------------------------------- 配方（2026-10-23 用户定：台阶样式，3 碗斜线 + 3 木板；铁的用铁锭）（）
+# ---------------------------------------------------------------- 配方（2026-10-23 用户定：台阶样式，3 碗斜线 + 3 木板；铁的用铁锭）
 
 
 def recipes():
@@ -323,7 +326,7 @@ def recipes():
 recipes()
 
 
-# ---------------------------------------------------------------- 一碗蘸料的表面（2026-10-23 用户：碗里的东西不像蘸料）（）
+# ---------------------------------------------------------------- 一碗蘸料的表面（2026-10-23 用户：碗里的东西不像蘸料）
 # 灰度的「酱面」：中间亮四周暗、一道斜反光、一圈淡波纹；游戏里按碗里几种调料的平均色染色（client/SauceRender），
 # 再按放了哪几种撒对应颜色的小点（辣油红点、葱花绿点……），一眼看得出放了什么。
 def bowl_surface_texture():

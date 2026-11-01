@@ -12,7 +12,7 @@
 重跑安全（从不带 on_campfire 的原始条目重建）。
 
     python tools/gen_pot_on_campfire.py
-作者：
+作者：mryt233
 """
 import copy
 import json
@@ -20,13 +20,15 @@ from pathlib import Path
 
 MOD = Path(__file__).resolve().parent.parent
 MODID = "orients_hotpot_chronicles"
-RES = MOD / "src/main/resources"
-ROOTS = [RES / "assets" / MODID, RES / "resourcepacks/hotpot_assets/assets" / MODID]
+RES = MOD / "common/src/main/resources"
+ROOTS = [RES / "assets" / MODID]
 POTS = ["copper_nine_grid_hotpot", "iron_nine_grid_hotpot"] + [   # 鸳鸯锅 / 田字锅（gen_yuanyang.py，新增）
     f"{m}_{k}" for m in ("copper", "iron")
-    for k in ("s_yuanyang_hotpot", "o_yuanyang_hotpot", "split_yuanyang_hotpot", "four_grid_hotpot")]
-DROP = 0.0   # 不下沉了：原版篝火火苗高 17 像素，锅压下去火会穿进锅里（用户报）；锅底正好压住火苗尖
-LEG_TOP, LEG_BOTTOM = 0.0, -9.0   # 支架：从锅底一直到篝火木头顶（篝火 7 像素高）
+    for k in ("taiji_yuanyang_hotpot", "round_yuanyang_hotpot", "square_yuanyang_hotpot", "split_yuanyang_hotpot", "four_grid_hotpot")]   # 方心锅 2026-10-26 补上
+# 下沉 4 像素（2026-10-26 用户：篝火上的锅调矮）：火苗尖（篝火 17 像素高）落在锅里 y≈5，比汤面 5.6 低，有汤时看不到火；
+# 以前下沉 9 火会穿出汤面（用户报过），后来改 0 又显得高。和 HotPotBlock.CAMPFIRE_DROP 一致
+DROP = 4.0
+LEG_TOP, LEG_BOTTOM = -DROP, -9.0   # 支架：从（下沉后的）锅底一直到篝火木头顶（篝火 7 像素高）
 SUFFIX = "_on_campfire"
 
 

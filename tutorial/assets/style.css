@@ -1,4 +1,4 @@
-/* 作者： 教程站样式：原版 MC 界面风（石头灰面板、凹槽格子、深色顶栏） */
+/* 作者：mryt233 教程站样式：原版 MC 界面风（石头灰面板、凹槽格子、深色顶栏） */
 :root{--bg:#2a2622;--panel:#f4efe4;--ink:#2b2824;--sub:#6a6358;--line:#c9c0ae;--accent:#b5472c;--slotbg:#8b8b8b;--ui:#c6c6c6;--code:#e8e1d0;--green:#3f7a2e;--gold:#b07a12}
 @media (prefers-color-scheme:dark){:root{--bg:#171513;--panel:#24211e;--ink:#e9e3d6;--sub:#a29a8b;--line:#3d3832;--code:#33302b;--accent:#e0764f}}
 *{box-sizing:border-box}
@@ -57,4 +57,5 @@ figure{margin:1.2em 0}figure img{max-width:100%;border:3px solid #1d1a17;image-r
 .card{display:flex;align-items:center;gap:10px;padding:6px 10px;background:var(--code)}
 .card .ic{width:40px;height:40px;flex:none}.card b{display:block;font-size:15px}.card code{font-size:11.5px;background:none;padding:0;color:var(--sub);word-break:break-all}
 footer{margin:16px 0 40px;color:#a99f90;font-size:13px;text-align:center}
-@media(max-width:820px){#menu{display:block}.wrap{display:block;margin:10px auto}nav{display:none;position:fixed;inset:54px 0 0 0;z-index:15;max-height:none;border-width:0 0 3px}nav.open{display:block}article,#results{padding:18px 16px}h1{font-size:25px}}
+/* mryt233 改，2026-10-30：三语教程窄屏标题、搜索框和配置路径不挤出页面。 */
+@media(max-width:820px){.top{flex-wrap:wrap;gap:8px}.brand{flex:1;min-width:0;white-space:normal;line-height:1.4;flex-wrap:wrap;font-size:14px}#q{width:100%;max-width:none;order:4}code{overflow-wrap:anywhere}#menu{display:block}.wrap{display:block;margin:10px auto}nav{display:none;position:fixed;inset:106px 0 0 0;z-index:15;max-height:none;border-width:0 0 3px}nav.open{display:block}article,#results{padding:18px 16px}h1{font-size:25px}}

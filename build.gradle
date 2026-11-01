@@ -1,41 +1,43 @@
-plugins {
-    id 'fabric-loom' version "${loom_version}"
-}
+// 之晗的火锅物语 · 多加载器根构建（mryt233 2026-10-29）
+//
+// 目录：
+//   common  —— hotpot 核心，只依赖 Minecraft 本体，0 个加载器 import（check_layering.py 守）
+//   fabric  —— Fabric 入口 + platform / client / compat / mixin / devtest
+//   neoforge—— NeoForge 入口 + 等价平台实现（待接）
+//
+// 说明：这里没有用 architectury-plugin。实测它与 architectury-loom 1.10.455 组合会在
+// common() / fabric() 里往 compileClasspath、runtimeClasspath 上声明依赖而直接报错，
+// 且那套机制的用途是「跨映射重映射」；本工程 common 与 fabric 同映射同版本，不需要。
+// 每个子工程各用 fabric-loom，靠普通 Gradle 工程依赖连接——更少抽象、更容易排查。
 
-version = project.mod_version
-group = project.maven_group
+allprojects {
+    apply plugin: 'java'
 
-repositories { mavenCentral() }
+    base { archivesName = rootProject.archives_base_name }
+    version = rootProject.mod_version
+    group = rootProject.maven_group
 
-dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-}
+    repositories {
+        maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.architectury.dev/' }
+        maven { url = 'https://maven.neoforged.net/releases/' }
+        mavenCentral()
+    }
 
-processResources {
-    inputs.property "version", project.version
-    // filter 同样按 filteringCharset 读写，不显式设成 UTF-8 时取平台默认
-    // （容器里常是 ASCII），会把 description 里的中文破坏成非法 UTF-8：
-    // Gradle 仍报 BUILD SUCCESSFUL，但最终 JAR 里的 JSON 已经坏了。
-    filteringCharset = 'UTF-8'
-    // 只替换版本占位符。Gradle expand 会把 JSON 字符串里的 \n 解释成真实换行，
-    // 造成源文件合法、最终 JAR 中 fabric.mod.json 却损坏。
-    filesMatching("fabric.mod.json") {
-        filter { line -> line.replace('${version}', project.version.toString()) }
+    tasks.withType(JavaCompile).configureEach {
+        options.release = 21
+        options.encoding = 'UTF-8'
+        // javac 默认只报前 100 个错误，迁移期看不到全貌，放宽上限（mryt233 2026-10-29）
+        options.compilerArgs += ['-Xmaxerrs', '5000']
+    }
+
+    java {
+        toolchain.languageVersion = JavaLanguageVersion.of(21)
+        withSourcesJar()
+    }
+
+    // 代码和原创资源分别授权，成品与源码 JAR 均携带两份许可声明（沿用主工程约定）
+    tasks.withType(Jar).configureEach {
+        from(rootProject.file('LICENSE'), rootProject.file('ASSETS_LICENSE'))
     }
 }
-
-tasks.withType(JavaCompile).configureEach { options.release = 21; options.encoding = 'UTF-8' }
-java { toolchain.languageVersion = JavaLanguageVersion.of(21); withSourcesJar() }
-base { archivesName = project.archives_base_name }
-
-// ：代码和原创资源分别授权，成品与源码 JAR 均携带两份许可声明。
-tasks.withType(Jar).configureEach {
-    from('LICENSE', 'ASSETS_LICENSE')
-}
-
-// （2026-10-25）：devtest 包是开发环境专用的测试命令（/hpt，见 DevTestCommands），不进成品和源码 jar
-tasks.named('jar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }
-tasks.named('sourcesJar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }

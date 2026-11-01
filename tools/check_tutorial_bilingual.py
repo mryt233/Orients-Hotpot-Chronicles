@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""作者：。隔离 Edge 验证三语切换、台湾用语、刷新记忆、导航和图片。"""
+"""作者：mryt233隔离 Edge 验证三语切换、台湾用语、刷新记忆、导航和图片。"""
 from pathlib import Path
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import hashlib

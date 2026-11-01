@@ -1,4 +1,5 @@
-<!-- 作者：；英文翻译。 -->
+<!-- 作者：mryt233；英文翻译，原文：mryt233。发布前由 mryt233 同步并审核。 -->
+<!-- mryt233 改，2026-10-30：同步正式版 #30–#71 和未发布 #72–#82；保留原译者署名。 -->
 # Tables & Seating
 
 Hotpot is best shared around a table. There are **two matching sets**: a low set close to the ground, like a home hotpot table, and a tall set with 1.5-block-high tables, like a restaurant. Both come in **11 wood types**:
@@ -38,6 +39,14 @@ Oak, spruce, birch, jungle, acacia, dark oak, mangrove, cherry, bamboo, crimson,
 - **Small decorations** such as lanterns, flower pots, candles, and cakes **sit flush with the tabletop** instead of floating.
 - Other regular blocks follow vanilla placement: they float five pixels above low tables or sink seven pixels into tall tables. You can still use them as decorations.
 
+## Stone and metal hotpot tables {#stone}{{since:0.1.4-alpha}}
+
+{{icons:smooth_stone_hotpot_table,polished_granite_hotpot_table,polished_deepslate_hotpot_table,quartz_hotpot_table,cut_copper_hotpot_table,iron_hotpot_table}}
+
+There are **9 additional tabletop materials**: smooth stone; polished andesite, diorite, granite, deepslate, and blackstone; quartz; cut copper; and iron. Each has a low and tall table, for **18 tables**. Their bases remain red brick, with the tabletop made from the chosen material.
+
+{{recipe:smooth_stone_hotpot_table}}
+
 ## Stools and benches
 
 | Seating | Height | Recipe yield |
@@ -52,7 +61,7 @@ Both come in 11 wood types. Use the corresponding planks in the recipes.
 ### Placement
 
 - **Facing:** seating and seated players face the direction you were looking when placing it.
-- **Connecting:** adjacent seats in a straight line connect automatically when they are the same height, even with different woods. Middle legs disappear and end legs move inward. Perpendicular seats do not connect. In 0.1.2-alpha, seats must **face the same direction**; placing from the opposite side leaves them offset. From 0.1.3, they connect along the same line regardless of which side you stand on.
+- **Connecting:** adjacent seats in a straight line connect automatically when they are the same height, even with different woods. Middle legs disappear and end legs move inward. Perpendicular seats do not connect. **Each connected run is limited to 3 blocks**; a further seat starts a separate run. In 0.1.2-alpha, seats must **face the same direction**; placing from the opposite side leaves them offset. From 0.1.3-alpha-hotfix1, they connect along the same line regardless of which side you stand on.
 - Tall benches have angled A-frame legs, drawn by code because vanilla models cannot rotate at such small angles.
 
 ### Sitting down {#sit}

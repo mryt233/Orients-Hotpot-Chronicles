@@ -17,8 +17,7 @@ from PIL import Image
 MOD = Path(__file__).resolve().parent.parent
 MODID = "orients_hotpot_chronicles"
 ROOTS = [
-    MOD / "src/main/resources/resourcepacks/hotpot_assets/assets",
-    MOD / "src/main/resources/assets",
+    MOD / "common/src/main/resources/assets",
     MOD.parent / "viewer/cache/1.21.1/assets",
 ]
 

@@ -1,0 +1,23 @@
+// common：hotpot 核心。只依赖 Minecraft 本体，0 个加载器 import。
+//
+// 用 fabric-loom 只是为了让这个工程能拿到「已映射的 Minecraft」来编译；
+// fabric-loader 只是带来 mixin 注解依赖，核心不 import 它的任何类。
+// 产出会被 fabric 工程以普通工程依赖吃进去（同映射同版本，不需要重映射）。
+plugins {
+    id 'dev.architectury.loom' version '1.10.455'
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    // mryt233 加（P1 第一批）：框架契约与纯逻辑；用 files 避免 loom 重映射子工程产物。
+    implementation files(project(':framework:pure').sourceSets.main.output,
+                         project(':framework:loader').sourceSets.main.output,
+                         project(':framework:game').sourceSets.main.output,
+                         project(':framework:client').sourceSets.main.output)
+}
+
+tasks.named('compileJava') {
+    dependsOn ':framework:pure:classes', ':framework:loader:classes', ':framework:game:classes', ':framework:client:classes'
+}

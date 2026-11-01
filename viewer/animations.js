@@ -16,13 +16,13 @@ const PX = 1 / 16;
 const STOVE = { innerMin: 1.837 / 16, innerSize: 12.326 / 16, surface: 14.32 / 16 };
 const STANDALONE = { innerMin: 1.5 / 16, innerSize: 13 / 16, surface: 5.6 / 16 };
 // tall stove (StoveBlock.TALL_LIFT = 10 px): pot, soup, food, steam and the collar sparks are all lifted;
-// the firebox mouth flame stays at the bottom (HotPotBlockEntity.clientTick, liftOf). 新增，2026-10-25
+// the firebox mouth flame stays at the bottom (HotPotBlockEntity.clientTick, liftOf). mryt233 加，2026-10-25
 const TALL_LIFT = 10 / 16;
 const TALL_STOVE = { ...STOVE, surface: STOVE.surface + TALL_LIFT };
 const OMEGA = 0.22, AMPLITUDE = 0.022, FOOD_SCALE = 0.24;
 // cold pot: float just above the soup, slow bob (~6 s) — HotPotBlockEntityRenderer COLD_*
 const COLD_OMEGA = 0.05, COLD_AMPLITUDE = 0.004, COLD_FLOAT = 0.009;
-// the mod's own hotpot ingredients (pot only takes food since r108) — 调整 2026-10-23
+// the mod's own hotpot ingredients (pot only takes food since r108) — mryt233 改 2026-10-23
 const FOODS = ["orients_hotpot_chronicles:fatty_beef_roll", "orients_hotpot_chronicles:potato_slice", "orients_hotpot_chronicles:cooked_beef_meatball",
   "orients_hotpot_chronicles:tofu_cube", "orients_hotpot_chronicles:mutton_roll", "orients_hotpot_chronicles:beef_loin_slice",
   "orients_hotpot_chronicles:fish_ball", "orients_hotpot_chronicles:tripe", "orients_hotpot_chronicles:cooked_cilantro_pork_meatball"];
@@ -32,6 +32,8 @@ const PALETTES = {
   rich_stock: { body: 0xf2e7d2, hi: 0xffffff, shadow: 0xc4b699 },
   mushroom: { body: 0x9a7048, hi: 0xe8c88a, shadow: 0x5a3e24 },
   spicy: { body: 0xbe3325, hi: 0xd8553a, shadow: 0x7e1c16 },
+  tomato: { body: 0xe2563a, hi: 0xff9a6a, shadow: 0x962a18 },
+  three_fresh: { body: 0xe6d8b0, hi: 0xfff6dc, shadow: 0xb2a072 },
 };
 
 // ---------------------------------------------------------------- BoilingEffects port
@@ -39,7 +41,7 @@ const PALETTES = {
 // Square bubbles: a cube swells out of the soup, floats up, splits from the middle into four
 // smaller cubes that fly apart, then they drop back and sink, leaving a faint ripple.
 // All pure functions of time (same hash / easing as the Java side).
-function boilingEffects(batch, soup, pot, heat, t, salt) {
+function boilingEffects(batch, soup, pot, heat, t, salt, keepAt = null) {
   if (heat < 0.05) return;
   const pal = PALETTES[soup];
   const { innerMin, innerSize } = pot;
@@ -49,9 +51,12 @@ function boilingEffects(batch, soup, pot, heat, t, salt) {
 
   // Timing follows real boiling, slowed to be readable: a site sends up a bubble every fraction
   // of a second, the cap ruptures almost instantly, and the bits drop back fast.
-  const n = Math.round(3 + 5 * heat);
-  for (let i = 0; i < n; i++) {
-    const period = (0.7 + hash(i, 21) * 0.45) / (0.7 + 0.5 * heat); // ~0.6-1.0 s at full heat
+  // = BoilingEffects（2026-11-01 同步）：t 是锅自己累计的气泡时间（热度已经积进去），周期不再除热度；
+  // 第 i 个气泡随火候从小长出来（grow），不再取整后突然冒出半个
+  for (let i = 0; i < 8; i++) {
+    const grow = Math.max(0, Math.min(1, 3 + 5 * heat - i));
+    if (grow <= 0) continue;
+    const period = 0.7 + hash(i, 21) * 0.45;
     const off = hash(i, 22 + salt);
     const cyc = Math.floor(t / period + off);
     const u = frac(t / period + off);
@@ -61,11 +66,12 @@ function boilingEffects(batch, soup, pot, heat, t, salt) {
     // smaller bubbles toward the pot wall: full size 3 px in from the edge, ~1/3 at the edge
     const edge = Math.min(x0 - innerMin, innerMin + innerSize - x0, z0 - innerMin, innerMin + innerSize - z0) / PX;
     const near = Math.max(0.35, Math.min(1, 0.35 + (0.65 * edge) / 3));
-    const sMax = PX * (0.7 + 0.6 * hash(i, cyc * 5 + salt)) * (0.85 + 0.15 * heat) * near; // ~0.25..1.3 px
+    const sMax = PX * (0.7 + 0.6 * hash(i, cyc * 5 + salt)) * (0.85 + 0.15 * heat) * near * grow; // ~0.25..1.3 px
     // keep the bubble and its split pieces clear of the wall
     const keep = sMax * 1.3 + 0.3 * PX;
     const x = Math.min(innerMin + innerSize - keep, Math.max(innerMin + keep, x0));
     const z = Math.min(innerMin + innerSize - keep, Math.max(innerMin + keep, z0));
+    if (keepAt && !keepAt(x, z)) continue;   // 鸳鸯 / 田字锅：每边只冒自己那边的泡（= BoilingEffects keepAt）
     const rise = PX * (0.3 + 0.4 * hash(i, cyc * 5 + 1)); // just clears the surface
     const pop = PX * 0.25;
 
@@ -115,16 +121,43 @@ async function buildScene(ctx, s, kind) {
   let state;
   const stoveLike = kind === "stove" || kind === "tallStove";
   const lift = kind === "tallStove" ? TALL_LIFT : 0;
-  if (stoveLike) state = { lit: String(lit), facing: "north", pot: `${s.pot}_soup`, soup: s.soup, pot_axis: "x" };
+  // 鸳鸯 / 田字锅（2026-10-26）：锅身模型换成那种锅的，汤面不走方块状态（soup=none），照 HotPotBlockEntityRenderer.renderSideSoups 按边画
+  const shape = s.shape && s.shape !== "nine" ? YY_SHAPES.find((x) => x[0] === s.shape) : null;
+  if (stoveLike) state = { lit: String(lit), facing: "north", pot: shape ? `${s.pot}_${shape[1]}_soup` : `${s.pot}_soup`, soup: shape ? "none" : s.soup, pot_axis: "x" };
   // an empty stove in game is pot=none, soup=none (StoveBlock default state), so no soup is drawn
   else if (kind === "stoveOnly") state = { lit: String(lit), facing: "north", pot: "none", soup: "none", pot_axis: "x" };
   else state = { soup: s.soup, boiling: String(lit), axis: "x" };
-  const blockId = kind === "pot" ? `${s.pot}_nine_grid_hotpot` : kind === "tallStove" ? "tall_brick_stove" : "brick_stove";
+  const potId = shape ? { s: "taiji_yuanyang_hotpot", o: "round_yuanyang_hotpot", square: "square_yuanyang_hotpot", split: "split_yuanyang_hotpot", four: "four_grid_hotpot" }[shape[0]] : "nine_grid_hotpot";
+  if (kind === "pot" && shape) state = { axis: "x" };
+  const blockId = kind === "pot" ? `${s.pot}_${potId}` : kind === "tallStove" ? "tall_brick_stove" : "brick_stove";
   if (kind === "pot" && lit) state.on_campfire = "true";   // legs down to the campfire (gen_pot_on_campfire.py)
   root.add(await ctx.buildBlock(blockId, state));
 
-  const pot = kind === "tallStove" ? TALL_STOVE : kind === "stove" ? STOVE : STANDALONE;
+  // 坐在篝火上的锅整体下沉 4 像素（= HotPotBlock.CAMPFIRE_DROP，2026-10-26 用户：调矮）
+  const pot = kind === "tallStove" ? TALL_STOVE : kind === "stove" ? STOVE
+    : kind === "pot" && lit ? { ...STANDALONE, surface: STANDALONE.surface - 4 / 16 } : STANDALONE;
   const hasSoup = kind !== "stoveOnly";
+  // 每边的汤（第 1 边 = 汤底，第 2 边 = 第 2 边汤底，田字锅 3 / 4 边轮流用这两种）
+  const sideSoups = shape ? [...Array(shape[2])].map((_, i) => (i % 2 === 0 ? s.soup : s.soup2 || "clear")) : null;
+  if (shape && hasSoup) {
+    for (let side = 0; side < shape[2]; side++) {
+      const tex = await ctx.texture(`${ctx.modid}:block/hot_pot_top_${sideSoups[side]}${lit ? "_boiling" : ""}`);
+      const pos = [], uv = [];
+      for (const [u0, v0, u1, v1] of yyRegions(shape[0], side)) {
+        const X = (u) => pot.innerMin + pot.innerSize * u - 0.5, Z = (v) => pot.innerMin + pot.innerSize * v - 0.5;
+        const quad = [[u0, v1], [u1, v1], [u1, v0], [u0, v0]];
+        for (const t of [0, 1, 2, 0, 2, 3]) {
+          const [u, v] = quad[t];
+          pos.push(X(u), pot.surface + 0.001 - 0.5, Z(v));
+          uv.push(u, 1 - v);
+        }
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+      geo.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+      root.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex.texture || tex, side: THREE.DoubleSide })));
+    }
+  }
   const batch = new BoxBatch();
   const particles = new Particles();
   root.add(batch, particles);
@@ -133,6 +166,7 @@ async function buildScene(ctx, s, kind) {
   const cells = [];
   if (hasSoup && s.food === "on") {
     for (let cell = 0; cell < 9; cell++) {
+      if (shape && YY_LAYOUT[shape[0]].cells[cell] < 0) continue;   // 这种锅不用的格（正中 / 隔板上）
       const count = 1 + ((cell * 2) % 3); // 1, 3, 2, 1, 3, 2 ...
       const items = [];
       for (let j = 0; j < count; j++) {
@@ -155,6 +189,10 @@ async function buildScene(ctx, s, kind) {
 
   // clientHeat survives rebuilds (toggling the fire swaps the block model), so the ramp is visible
   let heat = s._heat ?? (lit && hasSoup ? 1 : 0);
+  // = HotPotBlockEntity.bubbleSeconds / cycleAngle：每刻按当前热度累加，换档不跳（2026-11-01 同步 B4/B5）
+  let bubbleT = s._bubbleT ?? 0;
+  let cycleAngle = s._cycleAngle ?? 0;
+  const cycleRate = () => (hasSoup && heat < 0.5 ? COLD_OMEGA : OMEGA);
   const target = () => (s.fire === "on" && hasSoup ? 1 : 0);
   const salt = 0x1d3; // a fixed "block position" seed
 
@@ -164,6 +202,10 @@ async function buildScene(ctx, s, kind) {
     tick() {
       heat += (target() - heat) * 0.08;
       s._heat = heat;
+      bubbleT += (0.7 + 0.5 * heat) / 20;
+      cycleAngle += cycleRate();
+      s._bubbleT = bubbleT;
+      s._cycleAngle = cycleAngle;
       if (kind !== "pot" && s.fire === "on" && rand() < 0.5) {
         // HotPotBlockEntity: SMALL_FLAME at the stove mouth (facing north)
         const side = (rand() - 0.5) * 0.36;
@@ -200,7 +242,14 @@ async function buildScene(ctx, s, kind) {
     // every render frame; ticks = game time in ticks (fractional), partial = progress into the current tick
     frame(ticks, partial) {
       batch.begin();
-      if (hasSoup) boilingEffects(batch, s.soup, pot, heat, ticks / 20, salt);
+      const bt = bubbleT + (partial * (0.7 + 0.5 * heat)) / 20;   // 带这一刻内的插值（B5）
+      if (hasSoup && !shape) boilingEffects(batch, s.soup, pot, heat, bt, salt);
+      if (hasSoup && shape) {
+        for (let side = 0; side < shape[2]; side++) {
+          boilingEffects(batch, sideSoups[side], pot, heat, bt, salt + side * 97,   // = HotPotBlockEntityRenderer（2026-11-01 对齐，原来是 101）
+            (x, z) => yySide(shape[0], (x - pot.innerMin) / pot.innerSize, (z - pot.innerMin) / pot.innerSize) === side);
+        }
+      }
       batch.end();
       for (const { cell, items } of cells) {
         const n = items.length;
@@ -209,8 +258,9 @@ async function buildScene(ctx, s, kind) {
         const angle = OMEGA * ticks + phase;
         const coldAngle = COLD_OMEGA * ticks + phase;
         const cold = hasSoup ? 1 - heat : 0;
-        // a new food each bob, swapped at the low point (sin = -1); slow rhythm in a cold pot
-        const cycle = ((cold > 0.5 ? coldAngle : angle) - 1.5 * Math.PI) / (2 * Math.PI);
+        // a new food each bob, swapped at the low point (sin = -1); slow rhythm in a cold pot.
+        // 轮换相位用累计的 cycleAngle（= HotPotBlockEntity.cycleAngle），点火 / 熄火不跳（B4）
+        const cycle = (cycleAngle + partial * cycleRate() + phase - 1.5 * Math.PI) / (2 * Math.PI);
         const idx = ((Math.floor(cycle) % n) + n) % n;
         let dip = 0;
         if (n > 1) {
@@ -221,14 +271,15 @@ async function buildScene(ctx, s, kind) {
         const yOffset = AMPLITUDE * heat * Math.sin(angle) + COLD_AMPLITUDE * cold * Math.sin(coldAngle);
         const drift = 0.006 * heat * Math.cos(OMEGA * 0.7 * ticks + phase);
         const tilt = 3.5 * heat * Math.sin(OMEGA * 0.55 * ticks + phase) + 1.0 * cold * Math.sin(COLD_OMEGA * 0.6 * ticks + phase);
-        const x = pot.innerMin + (pot.innerSize * (col + 0.5)) / 3 + drift;
-        const z = pot.innerMin + (pot.innerSize * (row + 0.5)) / 3 - drift;
+        const c = shape ? YY_LAYOUT[shape[0]].centers[cell] : [(col + 0.5) / 3 * 13, (row + 0.5) / 3 * 13];   // = PotLayout.cellCenter（像素 / 13）
+        const x = pot.innerMin + (pot.innerSize * c[0]) / 13 + drift;
+        const z = pot.innerMin + (pot.innerSize * c[1]) / 13 - drift;
         items.forEach((it, j) => {
           it.holder.visible = j === idx;
           if (j !== idx) return;
           it.holder.position.set(mc(x), mc(pot.surface - (0.007 * (1 - cold) - COLD_FLOAT * cold) - 0.03 * dip + yOffset), mc(z));
           it.holder.rotation.set(((90 + tilt) * Math.PI) / 180, (((it.slot * 47) % 360) * Math.PI) / 180, ((tilt * 0.55) * Math.PI) / 180);
-          it.holder.scale.setScalar(FOOD_SCALE * (1 - 0.65 * dip));
+          it.holder.scale.setScalar(FOOD_SCALE);   // = HotPotBlockEntityRenderer：大小不变，换样只靠下沉（2026-11-01 用户）
         });
       }
       particles.draw(partial);
@@ -237,7 +288,10 @@ async function buildScene(ctx, s, kind) {
 }
 
 const POT = { key: "pot", label: "锅", options: [["copper", "铜锅"], ["iron", "铁锅"]], default: "copper" };
-const SOUP = { key: "soup", label: "汤底", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"]], default: "spicy" };
+// 锅形（2026-10-26 用户：灶台上煮火锅里把各个锅形加上）：nine = 九宫格，其余同 YY_SHAPES
+const SHAPE = { key: "shape", label: "锅形", options: [["nine", "九宫格"], ["s", "太极鸳鸯"], ["o", "圆心鸳鸯"], ["square", "方心鸳鸯"], ["split", "直隔鸳鸯"], ["four", "田字"]], default: "nine" };
+const SOUP2 = { key: "soup2", label: "第 2 边汤底（鸳鸯 / 田字锅）", options: [["clear", "清汤"], ["spicy", "红汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"]], default: "clear" };
+const SOUP = { key: "soup", label: "汤底", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"]], default: "spicy" };
 const FIRE = { key: "fire", label: "灶火", options: [["on", "点着"], ["off", "熄灭"]], default: "on", live: true };
 const FOOD = { key: "food", label: "食材", options: [["on", "放几样"], ["off", "不放"]], default: "on" };
 
@@ -316,7 +370,7 @@ async function benchLegs(ctx, wood, state) {
 
 // 1.5-block table, tall stove (firebox still at the bottom, pot / soup lifted 10 px) and the one-block-high bench.
 // In the game since r83; the stove part is the same dynamic scene as stove_pot (BER food, boiling, steam, sparks),
-// lifted like the game does (调整，2026-10-25: was static models only).
+// lifted like the game does (mryt233 改，2026-10-25: was static models only).
 async function buildTallRing(ctx, s) {
   const scene = await buildScene(ctx, s, "tallStove");
   const root = scene.object;
@@ -443,7 +497,7 @@ async function buildPlates(ctx, s) {
   return { object: root, tick() {}, frame() {} };
 }
 
-// Bowls (r99 preview, ): the vanilla bowl placed like a plate (same plate-holder layer, same drop / lift onto
+// Bowls (r99 preview, mryt233): the vanilla bowl placed like a plate (same plate-holder layer, same drop / lift onto
 // the table top), holding up to 3 foods piled like the 1x1 dish (each turned 15° clockwise), or a bowl of soup.
 // Two shapes to pick from: a = straight walls 6×6, b = flared 6×6 → 8×8. Models from tools/gen_bowls.py.
 const BOWL_FOODS = ["minecraft:beef", "minecraft:carrot", "minecraft:cod"];
@@ -471,6 +525,7 @@ async function buildBowls(ctx, s) {
       const bowl = await ctx.buildModel(`${ns}:block/bowl_${s.shape}${soup ? "_soup_" + what : ""}`);
       bowl.position.set(bx + ox / 16, lift / 16, bz);
       root.add(bowl);
+      if (s.chop !== "none") await addRestingChopsticks(ctx, root, bx + ox / 16, lift + 3, bz, s.chop === "food");
       if (soup) continue;
       for (let layer = 0; layer < what; layer++) {
         const item = await ctx.buildItem(BOWL_FOODS[layer]);
@@ -491,7 +546,36 @@ async function buildBowls(ctx, s) {
   return { object: root, tick() {}, frame() {} };
 }
 
-// 果橙多 (r99 preview, ): the drink bottle on a table next to a 1x1 dish of food and a bowl for scale.
+// Chopsticks resting on a bowl / plate rim (2026-10-27, PlateHolderRenderer.renderChopsticks): the chopsticks item
+// laid flat 0.3 px above the rim (rimY px), turned 45° so the diagonal sprite runs straight, 0.6 of the item size,
+// tip (and the food on it) over the bowl's centre, the other end across the rim; with food the cooked beef sits on the tip (HeldFoodItemRenderer TIP_X/Y, size 0.42).
+async function addRestingChopsticks(ctx, root, x, rimY, z, withFood) {
+  const S = 0.6;
+  const lay = new THREE.Group();
+  lay.rotation.order = "YXZ";
+  lay.rotation.y = Math.PI / 4;
+  lay.rotation.x = Math.PI / 2;
+  lay.scale.setScalar(S);
+  lay.position.set(x, mc((rimY + 0.3) / 16), z);
+  // move the chopstick tip (where the food is) over the bowl's centre; the other end rests on the rim
+  const shift = new THREE.Group();
+  shift.position.set(-0.26, 0.3, 0);
+  lay.add(shift);
+  const fixed = new THREE.Group();
+  fixed.rotation.y = Math.PI; // item/generated "fixed" display
+  fixed.add(await ctx.buildItem(`${ctx.modid}:bamboo_chopsticks`));
+  shift.add(fixed);
+  if (withFood) {
+    const food = new THREE.Group();
+    food.add(await ctx.buildItem("minecraft:cooked_beef"));
+    food.scale.setScalar(0.42);
+    food.position.set(-(0.24 - 0.5), 0.2 - 0.5, -0.04); // tip of the sprite, mirrored by the fixed 180° turn
+    shift.add(food);
+  }
+  root.add(lay);
+}
+
+// 果橙多 (r99 preview, mryt233): the drink bottle on a table next to a 1x1 dish of food and a bowl for scale.
 // a = the user's real size 33×30×18 cm → about 5×3 px, 5.3 px tall; b = the photo's slim bottle, 3×2, 6 px tall.
 async function buildDrink(ctx, s) {
   const root = new THREE.Group();
@@ -534,12 +618,12 @@ async function buildDrink(ctx, s) {
   return { object: root, tick() {}, frame() {} };
 }
 
-// Sauce station (r103, ; tiered 1.5-block version 2026-10-23): three steps, 3 small wooden bowls per step.
+// Sauce station (r103, mryt233; tiered 1.5-block version 2026-10-23): three steps, 3 small wooden bowls per step.
 // Bowls are not fixed (user, 2026-10-23): what each bowl holds lives in the block entity, so the block model is the
 // stand + empty bowls and the sauce surfaces are drawn by client/SauceStationRenderer — ported here 1:1:
 // liquids = one face 0.5 px under the rim, chopped scallion / minced cilantro = four offset layers.
 // One per vanilla wood (planks + quartz top) plus iron, 4 × 3. Models from tools/gen_sauce_station.py.
-const SAUCE_IDS = ["msg", "chili_oil", "sweet_sour_sauce", "honey", "sesame_oil", "vinegar", "sugar", "chopped_scallion", "minced_cilantro"];
+const SAUCE_IDS = ["msg", "chili_oil", "sweet_sour_sauce", "honey", "sesame_oil", "vinegar", "sugar", "chopped_scallion", "minced_cilantro", "garlic_paste"];
 const SAUCE_TIER_TOPS = [11, 15, 19], SAUCE_BOWL = 5, SAUCE_BOWL_H = 2.5, SAUCE_WALL = 0.75;
 // garnish layers: depth under the rim, texture rect (0..16), quarter turns — same as SauceStationRenderer.GARNISH_LAYERS
 const SAUCE_GARNISH = [[1.3, 2, 2, 14, 14, 0], [0.95, 0, 4, 12, 16, 1], [0.6, 4, 0, 16, 12, 2], [0.25, 3, 3, 13, 13, 3]];
@@ -600,7 +684,7 @@ async function buildSauceStation(ctx, s) {
   return { object: root, tick() {}, frame() {} };
 }
 
-// Cutting board (2026-10-23, ): port of client/CuttingBoardRenderer — the item on the board lies flat in the middle,
+// Cutting board (2026-10-23, mryt233): port of client/CuttingBoardRenderer — the item on the board lies flat in the middle,
 // half a block big, on top of the 3 px board (FIXED transform = turned 180° about y like an item frame).
 async function buildCuttingBoard(ctx, s) {
   const root = new THREE.Group();
@@ -631,7 +715,7 @@ async function buildCuttingBoard(ctx, s) {
 
 // Parts the game draws in code rather than in the block model; the viewer adds them when a block is shown on its
 // own (方块+物品 page, list icons). Bench legs: BenchLegsRenderer in game (splayed ~8°, models can't rotate that).
-// 鸳鸯锅 / 田字锅（2026-10-23，）：锅身是 tools/gen_yuanyang.py 生成的模型；各边汤面照
+// 鸳鸯锅 / 田字锅（2026-10-23，mryt233）：锅身是 tools/gen_yuanyang.py 生成的模型；各边汤面照
 // client/HotPotBlockEntityRenderer.renderSideSoups 一比一画：按 PotLayout.sideAt 的半像素格子分块、一行行合并，贴图按汤底名取
 const YY_INNER = 13, YY_HALF = 0.5;
 function yySide(shape, u, v) {   // = PotLayout.sideAt（模型坐标比例 0..1）；-1 = 隔板
@@ -644,6 +728,10 @@ function yySide(shape, u, v) {   // = PotLayout.sideAt（模型坐标比例 0..1
   if (shape === "o") {
     const d = Math.hypot(x - c, z - c);
     return Math.abs(d - 3.4) < YY_HALF ? -1 : d < 3.4 ? 1 : 0;
+  }
+  if (shape === "square") {   // 方心鸳鸯锅 2026-10-25（= PotLayout.YUANYANG_SQUARE）
+    const d = Math.max(Math.abs(x - c), Math.abs(z - c));
+    return Math.abs(d - 3.0) < YY_HALF ? -1 : d < 3.0 ? 1 : 0;
   }
   const r = c / 2;
   const dUp = x >= c ? Math.abs(Math.hypot(x - c, z - r) - r) : Math.hypot(x - c, Math.min(Math.abs(z), Math.abs(z - c)));
@@ -666,7 +754,15 @@ function yyRegions(shape, side) {   // = PotLayout.regions
   }
   return out;
 }
-const YY_SHAPES = [["s", "yuanyang_s", 2], ["o", "yuanyang_o", 2], ["split", "yuanyang_split", 2], ["four", "four_grid", 4]];
+// = PotLayout 每个大格属于哪边（-1 不用）、在锅里画在哪（像素，锅腔 13）
+const YY_LAYOUT = {
+  s: { cells: [0, 0, 1, 0, -1, 1, 0, 1, 1], centers: [[2.6, 2.4], [7.8, 3.0], [11.1, 2.4], [2.4, 6.6], [6.5, 6.5], [10.6, 6.4], [1.9, 10.6], [5.2, 10.0], [10.4, 10.6]] },
+  o: { cells: [0, 0, 0, 1, -1, 1, 0, 0, 0], centers: [[2.2, 2.2], [6.5, 1.6], [10.8, 2.2], [5.0, 6.5], [6.5, 6.5], [8.0, 6.5], [2.2, 10.8], [6.5, 11.4], [10.8, 10.8]] },
+  square: { cells: [0, 0, 0, 1, -1, 1, 0, 0, 0], centers: [[2.2, 2.2], [6.5, 1.6], [10.8, 2.2], [5.0, 6.5], [6.5, 6.5], [8.0, 6.5], [2.2, 10.8], [6.5, 11.4], [10.8, 10.8]] },
+  split: { cells: [0, -1, 1, 0, -1, 1, 0, -1, 1], centers: [[3.25, 2.2], [6.5, 2.2], [9.75, 2.2], [3.25, 6.5], [6.5, 6.5], [9.75, 6.5], [3.25, 10.8], [6.5, 10.8], [9.75, 10.8]] },
+  four: { cells: [0, 0, 1, 3, -1, 1, 3, 2, 2], centers: [[1.9, 3.25], [4.6, 3.25], [9.75, 1.9], [3.25, 8.4], [6.5, 6.5], [9.75, 4.6], [3.25, 11.1], [8.4, 9.75], [11.1, 9.75]] },
+};
+const YY_SHAPES = [["s", "yuanyang_s", 2], ["o", "yuanyang_o", 2], ["square", "yuanyang_square", 2], ["split", "yuanyang_split", 2], ["four", "four_grid", 4]];
 async function buildYuanyang(ctx, s) {
   const ns = ctx.modid;
   const root = new THREE.Group();
@@ -712,14 +808,14 @@ export default [
     id: "stove_pot",
     name: "灶台上煮火锅",
     desc: "锅坐在灶台上、灶膛点火：汤面大滚（沸腾贴图 + 立体气泡和滚包）、食材在汤面上下翻滚、热气上升、炉口冒火苗。「灶火」切到熄灭：冷锅里的食材浮在汤面上很慢地上下漂（约 6 秒一个来回），随火力平滑过渡",
-    params: [POT, SOUP, FIRE, FOOD],
+    params: [POT, SHAPE, SOUP, SOUP2, FIRE, FOOD],
     build: (ctx, s) => buildScene(ctx, s, "stove"),
   },
   {
     id: "pot",
     name: "单独的锅",
     desc: "单独摆放的锅；下方有点着的灶台，或者点着的篝火 / 灵魂篝火（r102）时同样会沸腾、能煮。「灶火」开着时下面放一个点着的篝火，锅底四角有铁支架踩在篝火上（0.1.2-alpha 后修：以前看着浮在半空）。空手 Shift+右键整锅连汤带食材拿进背包",
-    params: [POT, SOUP, FIRE, FOOD],
+    params: [POT, SHAPE, SOUP, SOUP2, FIRE, FOOD],
     // fire on = the pot sits on a lit campfire: HotPotBlock on_campfire → the *_on_campfire models add four iron legs down to
     // the campfire logs; the pot stays at its normal height so its bottom covers the 17 px campfire flames (2026-10-23)
     build: async (ctx, s) => {
@@ -766,6 +862,7 @@ export default [
     params: [
       { key: "shape", label: "碗形", options: [["b", "b 敞口碗（游戏里用的）"], ["a", "a 直壁碗（留档）"]], default: "b" },
       { key: "place", label: "摆在", options: [["table", "矮火锅桌上"], ["tall", "高火锅桌上"], ["ground", "地上"]], default: "table" },
+      { key: "chop", label: "筷子", options: [["none", "不架"], ["empty", "架空筷子"], ["food", "架夹着菜的筷子"]], default: "none" },
       WOOD,
     ],
     build: buildBowls,
@@ -797,13 +894,13 @@ export default [
   {
     id: "yuanyang",
     name: "鸳鸯锅 / 田字锅",
-    desc: "2026-10-23：锅身同九宫格锅（同大小、同贴图），隔板换成 S 形（太极）、O 形（中间一圈）、中间一道直隔板、田字十字。每边一种汤，任意汤底都能放任意一边（汤面由渲染器按贴图画）。S 形左右各 4 格、O 形圈外 6 圈里 2、直隔板左右各 3、田字每块 2 格。合成：同金属九宫格锅 + 同金属锭（锭在左 = S、锭在下 = O、锭在上 = 直隔板、锭在左右 = 田字）",
-    params: [{ key: "shape", label: "形状", options: [["all", "四种并排"], ["s", "S 形"], ["o", "O 形"], ["split", "直隔板"], ["four", "田字"]], default: "all" },
+    desc: "2026-10-23：锅身同九宫格锅（同大小、同贴图），隔板换成太极（S 形）、圆心（中间一圈）、中间一道直隔板、田字十字。每边一种汤，任意汤底都能放任意一边（汤面由渲染器按贴图画）。S 形左右各 4 格、O 形圈外 6 圈里 2、直隔板左右各 3、田字每块 2 格。合成：同金属九宫格锅 + 同金属锭（锭在左 = S、锭在下 = O、锭在上 = 直隔板、锭在左右 = 田字）",
+    params: [{ key: "shape", label: "形状", options: [["all", "五种并排"], ["s", "太极"], ["o", "圆心"], ["square", "方心"], ["split", "直隔板"], ["four", "田字"]], default: "all" },
       POT,
-      { key: "soupA", label: "第 1 边（S 左 / O 圈外 / 直隔左 / 田字左上）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["none", "没汤"]], default: "spicy" },
-      { key: "soupB", label: "第 2 边（S 右 / O 圈里 / 直隔右 / 田字右上）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["none", "没汤"]], default: "clear" },
-      { key: "soupC", label: "第 3 边（田字右下）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["none", "没汤"]], default: "mushroom" },
-      { key: "soupD", label: "第 4 边（田字左下）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["none", "没汤"]], default: "rich_stock" },
+      { key: "soupA", label: "第 1 边（S 左 / O 圈外 / 直隔左 / 田字左上）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["none", "没汤"]], default: "spicy" },
+      { key: "soupB", label: "第 2 边（S 右 / O 圈里 / 直隔右 / 田字右上）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["none", "没汤"]], default: "clear" },
+      { key: "soupC", label: "第 3 边（田字右下）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["none", "没汤"]], default: "mushroom" },
+      { key: "soupD", label: "第 4 边（田字左下）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["none", "没汤"]], default: "rich_stock" },
       { key: "fire", label: "火", options: [["off", "冷锅"], ["on", "沸腾贴图"]], default: "off" }],
     build: buildYuanyang,
   },

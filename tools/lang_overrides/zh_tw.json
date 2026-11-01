@@ -54,5 +54,7 @@
   "text.orients_hotpot_chronicles.msg.bowl_empty": "這個小碗是空的：空手右鍵沾醬台放原料",
   "block.orients_hotpot_chronicles.sauce_station_top": "沾醬台",
   "text.orients_hotpot_chronicles.screen.sauce.restock": "補充沾醬台",
-  "text.orients_hotpot_chronicles.screen.sauce.overview_hint": "九個碗和檯上一一對應"
+  "text.orients_hotpot_chronicles.screen.sauce.overview_hint": "九個碗和檯上一一對應",
+  "item.orients_hotpot_chronicles.orange": "柳橙",
+  "item.orients_hotpot_chronicles.orange_drink_cup": "一杯柳橙飲料"
 }

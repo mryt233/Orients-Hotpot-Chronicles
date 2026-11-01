@@ -3,7 +3,7 @@
     python tools/gen_garnish.py            # 出对比图 tools/out/garnish/sheet.png（每样两版 + 原版参照）
     python tools/gen_garnish.py install    # 写进两份资源：物品 小葱 / 香菜，蘸料台里的 葱花 / 香菜碎末
 手画像素：深色描边、3~4 档绿色，照原版物品（甜浆果、小麦种子）的画法。
-作者：
+作者：mryt233
 """
 import json
 import sys
@@ -14,7 +14,7 @@ MOD = Path(__file__).resolve().parent.parent
 MODID = "orients_hotpot_chronicles"
 OUT = MOD / "tools/out/garnish"
 VANILLA = MOD.parent / "viewer/cache/1.21.1/assets/minecraft/textures/item"
-ROOTS = [MOD / "src/main/resources/assets" / MODID, MOD / "src/main/resources/resourcepacks/hotpot_assets/assets" / MODID]
+ROOTS = [MOD / "common/src/main/resources/assets" / MODID]
 
 OUT_DK = (34, 70, 20, 255)
 G1, G2, G3, G4 = (60, 120, 34, 255), (92, 156, 44, 255), (134, 194, 66, 255), (182, 224, 110, 255)

@@ -1,0 +1,12 @@
+// EXP-PKG 空服务端（无模组源码，只验证 run/mods 的真实 jar 解析）。作者：mryt233。
+plugins { id 'dev.architectury.loom' version '1.10.455' }
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    // 候选 Runtime 与火锅内容都声明依赖 fabric-api，实验服必须提供（mryt233 2026-10-30）
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+}
+
+loom { runs { server { runDir 'run' } } }

@@ -2,7 +2,7 @@
 
 用法：双击 Releases/整理发布版.bat，或在 mod/ 目录运行
     python tools/make_release.py
-    python tools/make_release.py --version 0.1.1-alpha   # 用户指定版本号时（2026-10-23 起，新增）
+    python tools/make_release.py --version 0.1.1-alpha # 用户指定版本号时（2026-10-23 起，新增）
 做的事：
   1. 找出 Releases 里还是开发编号（1.0.0-rN）的 jar，按 rN 从小到大排；
   2. 依次编成下一个 alpha 号：0.1.0-alpha.1、0.1.0-alpha.2 ……（接着已有的往后排）；
