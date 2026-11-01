@@ -2778,7 +2778,7 @@ def main():
         items_file = MOD / "tools" / "lang_items.json"
         if items_file.exists():
             by_full.update(json.loads(items_file.read_text(encoding="utf-8")).get(code, {}))
-        # 发布版译文覆盖：读取 lang_overrides/<语言>.json，覆盖上面的默认文本
+        # 审核过的发布版译文（2026-10-25）：translate_sync.py import 写进 lang_overrides/<语言>.json，盖在上面的表上
         override = MOD / "tools" / "lang_overrides" / f"{code}.json"
         if override.exists():
             by_full.update(json.loads(override.read_text(encoding="utf-8")))

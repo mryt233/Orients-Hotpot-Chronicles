@@ -25,7 +25,7 @@ body:
     attributes:
       label: 模组版本（Mod version）
       description: 在游戏的模组列表里能看到，或者看 jar 文件名。(Shown in the mod list, or in the jar file name.)
-      placeholder: "0.2.0-alpha"
+      placeholder: "0.2.1-alpha"
     validations:
       required: true
 
@@ -53,7 +53,7 @@ body:
     id: loader_version
     attributes:
       label: 加载器版本（Loader version）
-      placeholder: "0.19.3 / 47.4.28 / 21.1.265"
+      placeholder: "0.19.3 / 47.4.28 / 21.1.186"
     validations:
       required: true
 

@@ -8,7 +8,7 @@
 
 Have a hotpot dinner in Minecraft: build a stove, seat a pot on it, pour in a broth, light the fire, prep your ingredients, cook them and eat them with chopsticks and dipping sauce.
 
-0.2.0-alpha：Minecraft 1.21.1 · Fabric / NeoForge · 作者 / Author：蘧白川 / Orient（GitHub：[@mryt233](https://github.com/mryt233)）
+0.2.1-alpha：Minecraft 1.21.1 · Fabric / NeoForge · 作者 / Author：蘧白川 / Orient（GitHub：[@mryt233](https://github.com/mryt233)）
 
 [中文图文教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/) / [繁中圖文教學](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-tw/) / [English Guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/) · [下载测试版 · Download Alpha](#downloads) · [更新日志 · Changelog](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) · [反馈问题 · Report an Issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
 
@@ -17,9 +17,9 @@ Have a hotpot dinner in Minecraft: build a stove, seat a pot on it, pour in a br
 ![一桌火锅 · A full hotpot table](docs/images/full-table.jpg)
 
 > [!WARNING]
-> **测试版（alpha）**：现在是 `0.2.0-alpha`。与 0.1.4-alpha 相比没有删除或更改任何已有物品、方块 ID，但内部重构较大，升级前请备份存档。
+> **测试版（alpha）**：现在是 `0.2.1-alpha`。与 0.1.4-alpha 相比没有删除或更改任何已有物品、方块 ID，但内部重构较大，升级前请备份存档。
 >
-> **Alpha version**: this is `0.2.0-alpha`. No existing item or block IDs were removed or changed since 0.1.4-alpha, but the internal refactor is substantial. Back up your saves before upgrading.
+> **Alpha version**: this is `0.2.1-alpha`. No existing item or block IDs were removed or changed since 0.1.4-alpha, but the internal refactor is substantial. Back up your saves before upgrading.
 
 <a id="downloads"></a>
 
@@ -29,15 +29,15 @@ Have a hotpot dinner in Minecraft: build a stove, seat a pot on it, pour in a br
 
 | Minecraft | 加载器 / Loader | 要求 / Requirements | 模组版本 / Mod version | 下载 / Download |
 | --- | --- | --- | --- | --- |
-| 1.21.1 | Fabric | Fabric Loader 0.15.11+、[Fabric API](https://modrinth.com/mod/fabric-api)、Java 21 | 0.2.0-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.0-alpha) |
-| 1.21.1 | NeoForge | NeoForge 21.1.265+、Java 21 | 0.2.0-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.0-alpha) |
+| 1.21.1 | Fabric | Fabric Loader 0.15.11+、[Fabric API](https://modrinth.com/mod/fabric-api)、Java 21 | 0.2.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.1-alpha) |
+| 1.21.1 | NeoForge | NeoForge 21.1.186+、Java 21 | 0.2.1-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.1-alpha) |
 | 1.20.1 | Fabric | Fabric Loader **0.19.3+**、[Fabric API](https://modrinth.com/mod/fabric-api) **0.92.12+**、Java 17 | 0.1.4-alpha（旧移植版，已停止维护 / legacy, discontinued） | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) |
 | 1.20.1 | Forge | Forge 47.1+、Java 17（同一文件也能装在 NeoForge 1.20.1 上 / also loads on NeoForge 1.20.1） | 0.1.4-alpha（旧移植版，已停止维护 / legacy, discontinued） | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.4-alpha) |
 | 1.20.4 | Fabric | Fabric Loader 0.15.11+、Fabric API、Java 17 | 0.1.1-alpha（旧移植版，已停止维护 / legacy, discontinued） | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) |
 
-0.2.0-alpha 只提供 **Minecraft 1.21.1 Fabric / NeoForge**。每个加载器下载对应的**单个 JAR**，已内嵌 **orient_framework 0.1.2**，直接放入客户端和服务端的 `mods` 文件夹，无需另装前置；Fabric 仍需安装 Fabric API。两个文件集中在[同一个发布页](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.0-alpha)。
+0.2.1-alpha 只提供 **Minecraft 1.21.1 Fabric / NeoForge**。每个加载器下载对应的**单个 JAR**，已内嵌 **orient_framework 0.1.2**，直接放入客户端和服务端的 `mods` 文件夹，无需另装前置；Fabric 仍需安装 Fabric API。两个文件集中在[同一个发布页](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.1-alpha)。
 
-0.2.0-alpha is available only for **Minecraft 1.21.1 Fabric / NeoForge**. Download the **single JAR** for your loader; **orient_framework 0.1.2 is bundled**. Put it directly in `mods` on both client and server; no separate framework download is needed. Fabric still requires Fabric API. Both files share [one release page](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.0-alpha).
+0.2.1-alpha is available only for **Minecraft 1.21.1 Fabric / NeoForge**. Download the **single JAR** for your loader; **orient_framework 0.1.2 is bundled**. Put it directly in `mods` on both client and server; no separate framework download is needed. Fabric still requires Fabric API. Both files share [one release page](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.1-alpha).
 
 **旧移植版已停止维护**：1.20.1 Fabric / Forge 最后版本为 0.1.4-alpha；1.20.4 Fabric 为 0.1.1-alpha。下载链接保留，不再提供更新或修复。
 
@@ -49,7 +49,17 @@ Have a hotpot dinner in Minecraft: build a stove, seat a pot on it, pour in a br
 
 [旧移植源码与说明（已停止维护）· Legacy port sources and notes (discontinued)](version-ports/README.md)
 
-## 0.2.0-alpha 更新 · What's new
+## 0.2.1-alpha 更新（含 0.2.0-alpha 全部内容）· What's new
+
+- **NeoForge 版对加载器的要求降低了**：现在 **NeoForge 21.1.186 及以上**就能装（0.2.0-alpha 要求 21.1.265+）。之前很多玩家反馈加载器版本要求太高、装不上。
+- Fabric 版要求不变：Fabric Loader 0.15.11+、Fabric API。
+- 玩法、物品、配方和内嵌前置与 0.2.0-alpha 完全相同。已经在玩 0.2.0-alpha 的，如果 NeoForge 不低于 21.1.265，可以不更新。
+
+- **Lower loader requirement for NeoForge**: the NeoForge build now runs on **NeoForge 21.1.186 or newer** (0.2.0-alpha required 21.1.265+). Many players could not use the mod because the requirement was too high.
+- The Fabric build is unchanged: Fabric Loader 0.15.11+ and Fabric API.
+- Gameplay, items, recipes and the built-in framework are exactly the same as 0.2.0-alpha. If you already play 0.2.0-alpha, you only need to update if your NeoForge is older than 21.1.265.
+
+### 0.2.0-alpha 的全部更新（相对 0.1.4-alpha）· Everything new since 0.1.4-alpha
 
 以下是相对 0.1.4-alpha 的变化。内部重构为多加载器 + 前置框架，玩法不变。
 
@@ -248,7 +258,7 @@ Changes since 0.1.3-alpha-hotfix1: shrimp, Orient Cola, glass cups, Tomato and T
 | Fabric Loader（仅 Fabric） | 1.21.1 / 1.20.4：**0.15.11+**；1.20.1：**0.19.3+** | 0.19.3 |
 | Fabric API（仅 Fabric） | 对应 Minecraft 版本；1.20.1 需 **0.92.12+** · match your Minecraft version; 1.20.1 needs **0.92.12+** | 0.92.12+1.20.1 / 0.97.3+1.20.4 / 0.116.14+1.21.1 |
 | Forge（仅 1.20.1 Forge） | **47.1+** | **47.4.28** |
-| NeoForge（仅 1.21.1 NeoForge） | **21.1.265+** | **21.1.265** |
+| NeoForge（仅 1.21.1 NeoForge） | **21.1.186+** | **21.1.265** |
 | Java | Minecraft 1.20.1 / 1.20.4：**17+**；1.21.1：**21+** | 17 / 21 |
 | 安装位置 · Side | **客户端和服务端都要装 · both client and server** | — |
 
@@ -278,10 +288,10 @@ The Forge / NeoForge builds do not require Fabric API. The same 1.20.1 Forge JAR
 
 ### Forge / NeoForge
 
-1. Minecraft **1.20.1** 使用 [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.1+**（现有测试版本 **47.4.28**）；Minecraft **1.21.1** 使用 [NeoForge](https://neoforged.net/) **21.1.265+**。
+1. Minecraft **1.20.1** 使用 [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.1+**（现有测试版本 **47.4.28**）；Minecraft **1.21.1** 使用 [NeoForge](https://neoforged.net/) **21.1.186+**。
 2. 从[下载表](#downloads)选择匹配加载器与 MC 版本的 JAR，放入客户端和服务端的 `mods` 文件夹。**这两版不需要 Fabric API。**
 
-1. Use [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.1+** for Minecraft **1.20.1** (recorded test: **47.4.28**), or [NeoForge](https://neoforged.net/) **21.1.265+** for Minecraft **1.21.1**.
+1. Use [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.1+** for Minecraft **1.20.1** (recorded test: **47.4.28**), or [NeoForge](https://neoforged.net/) **21.1.186+** for Minecraft **1.21.1**.
 2. Select the matching JAR from the [download table](#downloads) and put it in the `mods` folder on both client and server. **These builds do not require Fabric API.**
 
 Minecraft **1.20.1 / 1.20.4 使用 Java 17+**，**1.21.1 使用 Java 21+**。

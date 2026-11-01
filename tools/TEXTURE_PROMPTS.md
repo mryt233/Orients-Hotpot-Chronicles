@@ -63,7 +63,7 @@ Minecraft texture, authentic vanilla Minecraft art style, designed on an exact {
 | `IMAGE_API_KEY` | `sk-...` | 中转站密钥 |
 | `IMAGE_MODEL` | `gpt-image-2.5-flare` | 不填默认 `gpt-image-1` |
 
-在 Windows「编辑账户的环境变量」里添加，改完需要重启 Claude / 终端。
+在 Windows「编辑账户的环境变量」里添加，改完需要重启终端。
 
 ## 3. 脚本参数
 

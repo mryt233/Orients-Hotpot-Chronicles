@@ -25,7 +25,8 @@ config="orients_hotpot_chronicles.mixins.json"
 [[dependencies.orients_hotpot_chronicles]]
 modId="neoforge"
 type="required"
-versionRange="[${neoforge_version},)"
+# mryt233 改：最低运行版本独立于编译依赖，21.1.186 已通过两端基础加载测试。
+versionRange="[21.1.186,)"
 ordering="NONE"
 side="BOTH"
 
