@@ -10,6 +10,13 @@ Have a hotpot dinner in Minecraft: build a stove, seat a pot on it, pour in a br
 
 0.2.1-alpha：Minecraft 1.21.1 · Fabric / NeoForge · 作者 / Author：蘧白川 / Orient（GitHub：[@mryt233](https://github.com/mryt233)）
 
+<p>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/Code-MIT-2ea44f?style=flat-square" alt="Source code license: MIT"></a>
+  <a href="ASSETS_LICENSE"><img src="https://img.shields.io/badge/Assets-CC%20BY--NC--SA%204.0-7957d5?style=flat-square" alt="Original assets license: CC BY-NC-SA 4.0"></a>
+</p>
+
+<p><sub>源代码 / Source code：<a href="LICENSE">MIT</a> · 原创贴图、模型、音效等 / Original creative assets：<a href="ASSETS_LICENSE">CC BY-NC-SA 4.0</a></sub></p>
+
 [简中书本教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/?lang=zh_cn&v=0.2.1-alpha-book-20261102) / [繁中書本教學](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-tw/?lang=zh_tw&v=0.2.1-alpha-book-20261102) / [English Book Guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/?lang=en&v=0.2.1-alpha-book-20261102) · [下载测试版 · Download Alpha](#downloads) · [更新日志 · Changelog](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) · [反馈问题 · Report an Issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
 
 </div>
