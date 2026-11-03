@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:beef",
+    "minecraft:mutton",
+    "orients_hotpot_chronicles:beef_loin",
+    "minecraft:potato",
+    "orients_hotpot_chronicles:tofu",
+    "orients_hotpot_chronicles:shrimp",
+    "minecraft:porkchop",
+    "orients_hotpot_chronicles:ham_sausage"
+  ]
+}

@@ -1,0 +1,228 @@
+package cn.blockforge.generated.orientshotpotchronicles.client;
+
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.BenchBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTableBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlock;
+import cn.blockforge.generated.orientshotpotchronicles.mixin.CreativeInventoryScreenAccessor;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.AbstractWidget;
+import cn.blockforge.orient.framework.compat.DataComponents;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Axis;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * 创造模式「之晗的火锅物语」分类页左边的一列子类标签：全部 / 厨具 / 餐具 / 桌子 / 凳子（r86 用户要求，不再细分）/ 食物（r98）。
+ * r98：一次显示 5 个，上下各一个翻页按钮，鼠标在这一列上滚轮也能翻（用户要求）。
+ * r88 美化（用户要求）：用原版分类页标签的贴图横过来贴在物品栏左边，标签上画图标、鼠标停上去显示名字；
+ * 位置按物品栏背景算，换界面尺寸、窗口大小都贴着物品栏。选中某一类时右边只显示这一类（过滤在 CreativeInventoryScreenMixin）。
+ * 作者：mryt233 */
+public final class CreativeSubTabs {
+    public enum Sub {
+        // 桌子和凳子合成一类「桌凳」（2026-10-26 用户要求，调整）
+        ALL("all"), COOKWARE("cookware"), TABLEWARE("tableware"), FURNITURE("furniture"), FOOD("food");
+
+        final String key;
+
+        Sub(String key) {
+            this.key = key;
+        }
+    }
+
+    /** 当前选中的子类（关掉物品栏也记着，下次打开还是这一类）。 */
+    public static Sub current = Sub.ALL;
+
+    /** 这一列往下翻了几个（同样关掉物品栏也记着）。 */
+    public static int offset = 0;
+    /** 一次显示几个标签：5 个正好是物品栏背景的高度。 */
+    private static final int VISIBLE = 5;
+    /** 翻页按钮大小。 */
+    private static final int ARROW_W = 28;
+    private static final int ARROW_H = 14;
+
+    /** 原版顶上分类标签的贴图（26 × 32，开口朝下），转 90° 后变成 32 × 26、开口朝右贴在物品栏左边。 */
+    private static final ResourceLocation TAB_UNSELECTED = new ResourceLocation("container/creative_inventory/tab_top_unselected_2");
+    private static final ResourceLocation TAB_SELECTED = new ResourceLocation("container/creative_inventory/tab_top_selected_2");
+    private static final int TAB_W = 32;
+    private static final int TAB_H = 26;
+    /** 原版标签之间的间距（顶上那排是 27）。 */
+    private static final int STEP = 27;
+    /** 选中的标签往物品栏里压几像素，盖住物品栏左边框，看起来和物品栏连成一体（同原版选中标签）。 */
+    private static final int SELECTED_OVERLAP = 3;
+    /** 原版创造物品栏背景的大小（195 × 136）。 */
+    private static final int BG_W = 195;
+    private static final int BG_H = 136;
+
+    private CreativeSubTabs() {
+    }
+
+    public static Sub categoryOf(ItemStack stack) {
+        if (stack.is(HotPotContent.CHOPSTICKS) || stack.getItem() instanceof PlateItem
+            || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.CupItem) {
+            return Sub.TABLEWARE;   // 玻璃杯（空的、装满的）算餐具（2026-10-26 用户报有的没分类，新增）
+        }
+        if (stack.is(HotPotContent.KITCHEN_KNIFE) || stack.is(HotPotContent.CUTTING_BOARD_ITEM)
+            || stack.is(HotPotContent.ROLLING_PIN) || stack.is(HotPotContent.HOTPOT_GUIDE)) {
+            return Sub.COOKWARE;   // 菜刀、砧板算厨具（2026-10-23）；火锅指南（菜刀合成）也放这里（2026-10-26）
+        }
+        if (stack.is(HotPotContent.TOMATO_HOTPOT_BASE) || stack.is(HotPotContent.THREE_FRESH_HOTPOT_BASE)
+            || stack.is(HotPotContent.TOMATO_SOUP_BUCKET) || stack.is(HotPotContent.THREE_FRESH_SOUP_BUCKET)) {
+            return Sub.FOOD;   // 锅底料、汤底桶不能直接吃，下面按「能吃」认不出来（2026-10-26）
+        }
+        if (stack.is(HotPotContent.RAW_TRIPE) || stack.is(HotPotContent.COOKED_TRIPE)
+            || stack.is(HotPotContent.MINCED_PORK)
+            || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkItem
+            || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.EmptyBottleItem
+            || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem
+            || (!(stack.getItem() instanceof BlockItem) && stack.isEdible())) {
+            return Sub.FOOD;
+        }
+        if (stack.getItem() instanceof BlockItem item) {
+            if (item.getBlock() instanceof StoveBlock || item.getBlock() instanceof HotPotBlock
+                || item.getBlock() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlock) {   // 蘸料台算厨具（r103）
+                return Sub.COOKWARE;
+            }
+            if (item.getBlock() instanceof HotPotTableBlock) {
+                return Sub.FURNITURE;
+            }
+            if (item.getBlock() instanceof BenchBlock) {
+                return Sub.FURNITURE;
+            }
+        }
+        return Sub.ALL;
+    }
+
+    /** 按当前子类筛一遍物品列表（只在本模组分类页时调用）。 */
+    public static void filter(List<ItemStack> items) {
+        if (current != Sub.ALL) {
+            items.removeIf(stack -> categoryOf(stack) != current);
+        }
+    }
+
+    public static boolean ourTabSelected() {
+        return CreativeInventoryScreenAccessor.getSelectedTab() == HotPotContent.ITEM_GROUP;
+    }
+
+    /** 每个子类标签上的图标。全部 = 分类页图标（煮着红汤的铁锅），厨具 = 菜刀。 */
+    private static ItemStack iconOf(Sub sub) {
+        return switch (sub) {
+            case ALL -> HotPotContent.ITEM_GROUP.getIconItem();
+            case COOKWARE -> new ItemStack(HotPotContent.KITCHEN_KNIFE);   // 菜刀（2026-10-25 用户要求；r91 起是空铁锅，再之前是灶台）
+            case TABLEWARE -> new ItemStack(HotPotContent.CHOPSTICKS);
+            case FURNITURE -> new ItemStack(HotPotContent.TALL_TABLE_ITEMS.get(0));   // 高的橡木火锅桌（r90 用户要求，桌子那一类的图标）
+            case FOOD -> new ItemStack(HotPotContent.RAW_TRIPE);   // 生毛肚（r98 用户要求）
+        };
+    }
+
+    /** 一个横过来的分类标签。 */
+    private static final class SubTab extends AbstractWidget {
+        private final Sub sub;
+        private final int baseX;
+        private final ItemStack icon;
+        private final Runnable onSelect;
+
+        SubTab(Sub sub, int x, int y, Runnable onSelect) {
+            super(x, y, TAB_W, TAB_H, Component.translatable("itemGroup.orients_hotpot_chronicles.sub." + sub.key));
+            this.sub = sub;
+            this.baseX = x;
+            this.icon = iconOf(sub);
+            this.onSelect = onSelect;
+            setTooltip(Tooltip.create(getMessage()));
+        }
+
+        @Override
+        protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+            boolean selected = current == sub;
+            setX(selected ? baseX + SELECTED_OVERLAP : baseX);
+            // 贴图 26 × 32 绕左上角转 -90°：贴图的底边（开口）转到右边，正好对着物品栏
+            context.pose().pushPose();
+            context.pose().translate(getX(), getY() + TAB_H, 0);
+            context.pose().mulPose(Axis.ZP.rotationDegrees(-90F));
+            context.blit(new ResourceLocation("textures/gui/container/creative_inventory/tabs.png"), 0, 0, TAB_H, selected ? TAB_W : 0, TAB_H, TAB_W);
+            context.pose().popPose();
+            context.renderItem(icon, getX() + 9, getY() + 5);
+        }
+
+        @Override
+        public void onClick(double mouseX, double mouseY) {
+            onSelect.run();
+        }
+
+        @Override
+        protected void updateWidgetNarration(NarrationElementOutput builder) {
+            defaultButtonNarrationText(builder);
+        }
+    }
+
+    @FunctionalInterface
+    public interface ScrollHandler {
+        boolean allow(double mouseX, double mouseY, double vertical);
+    }
+
+    /** 两平台将自己的屏幕事件接入同一份状态。作者：mryt233 */
+    public record Hooks(Runnable beforeRender, ScrollHandler scroll) {}
+
+    public static Hooks init(CreativeModeInventoryScreen creative, int width, int height,
+                             java.util.function.Consumer<AbstractWidget> addWidget) {
+            // 物品栏背景左上角（原版 HandledScreen 也是这样居中算的），标签开口贴着它的左边
+            int left = (width - BG_W) / 2;
+            int top = (height - BG_H) / 2;
+            List<SubTab> tabs = new ArrayList<>();
+            for (Sub sub : Sub.values()) {
+                SubTab tab = new SubTab(sub, left - TAB_W, top, () -> {
+                    current = sub;
+                    // 重新选一次本分类页，让物品列表按新的子类刷新
+                    ((CreativeInventoryScreenAccessor) creative).invokeSetSelectedTab(HotPotContent.ITEM_GROUP);
+                });
+                tabs.add(tab);
+                addWidget.accept(tab);
+            }
+            int maxOffset = Math.max(0, tabs.size() - VISIBLE);
+            offset = Math.min(Math.max(offset, 0), maxOffset);
+            // 翻页按钮：原版按钮样式，上面那个贴着第一个标签的上沿，下面那个贴着最后一个可见标签的下沿
+            Button up = Button.builder(Component.literal("▲"), b -> offset = Math.max(0, offset - 1))
+                .bounds(left - TAB_W + 2, top - ARROW_H - 1, ARROW_W, ARROW_H)
+                .tooltip(Tooltip.create(Component.translatable("itemGroup.orients_hotpot_chronicles.sub.up"))).build();
+            Button down = Button.builder(Component.literal("▼"), b -> offset = Math.min(maxOffset, offset + 1))
+                .bounds(left - TAB_W + 2, top + VISIBLE * STEP + 1, ARROW_W, ARROW_H)
+                .tooltip(Tooltip.create(Component.translatable("itemGroup.orients_hotpot_chronicles.sub.down"))).build();
+            addWidget.accept(up);
+            addWidget.accept(down);
+            // 鼠标在这一列（含两个按钮）上滚轮：往上滚往前翻，往下滚往后翻；别处的滚轮照原版翻物品
+            ScrollHandler scroll = (mouseX, mouseY, vertical) -> {
+                if (!ourTabSelected() || vertical == 0
+                    || mouseX < left - TAB_W || mouseX >= left
+                    || mouseY < top - ARROW_H - 1 || mouseY >= top + VISIBLE * STEP + 1 + ARROW_H) {
+                    return true;
+                }
+                offset = Math.min(Math.max(offset + (vertical > 0 ? -1 : 1), 0), maxOffset);
+                return false;
+            };
+            // 只在选中本模组分类页时显示；每帧按翻到的位置摆标签
+            Runnable render = () -> {
+                boolean show = ourTabSelected();
+                for (SubTab t : tabs) {
+                    int row = t.sub.ordinal() - offset;
+                    t.visible = show && row >= 0 && row < VISIBLE;
+                    t.setY(top + row * STEP);
+                }
+                up.visible = show && maxOffset > 0;
+                down.visible = show && maxOffset > 0;
+                up.active = offset > 0;
+                down.active = offset < maxOffset;
+            };
+        return new Hooks(render, scroll);
+    }
+}

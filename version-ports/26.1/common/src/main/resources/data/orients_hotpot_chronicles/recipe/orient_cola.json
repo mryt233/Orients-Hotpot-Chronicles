@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:glass_bottle",
+    "minecraft:sugar",
+    "minecraft:cocoa_beans",
+    "minecraft:honey_bottle"
+  ],
+  "result": {
+    "id": "orients_hotpot_chronicles:orient_cola",
+    "count": 1
+  }
+}

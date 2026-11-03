@@ -1,0 +1,20 @@
+// 作者：mryt233
+pluginManagement {
+    repositories {
+        maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.architectury.dev/' }
+        maven { url = 'https://maven.neoforged.net/releases/' }
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'orients-hotpot-multiloader'
+
+include 'common'
+include 'fabric'
+include 'forge'
+include 'framework:pure'
+include 'framework:loader'
+include 'framework:game'
+include 'framework:client'

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:mutton",
+  "result": {
+    "id": "orients_hotpot_chronicles:mutton_roll",
+    "count": 3
+  }
+}

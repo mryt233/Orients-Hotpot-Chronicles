@@ -1,0 +1,48 @@
+# 之晗的火锅物语 · NeoForge 元数据（mryt233 2026-10-30）
+#
+# 26.1.x 移植版（mryt233 2026-11-02）：只认 Minecraft 26.1.2（26.1 / 26.1.1 的 NeoForge 没有正式版）。
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT AND CC-BY-NC-SA-4.0"
+issueTrackerURL="https://github.com/"
+
+[[mods]]
+modId="orients_hotpot_chronicles"
+version="${version}"
+displayName="Orient's Hotpot Chronicles"
+authors="mryt233"
+description='''
+A bubbling Chongqing nine-grid hotpot on a brick stove: fuel the stove, seat a copper or iron pot,
+pour in a broth, drop ingredients into the 9x9 grid and pick them out cooked (with furnace XP).
+'''
+
+[[mixins]]
+config="orients_hotpot_chronicles.mixins.json"
+
+# 依赖：Minecraft 26.1.2 与 NeoForge 26.1.2.x，两边都是必需项
+[[dependencies.orients_hotpot_chronicles]]
+modId="neoforge"
+type="required"
+# mryt233 改：最低运行版本按实测写（独立于编译依赖）。
+versionRange="[26.1.2.71,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.orients_hotpot_chronicles]]
+modId="minecraft"
+type="required"
+versionRange="[26.1.2]"
+ordering="NONE"
+side="BOTH"
+
+[[accessTransformers]]
+file = "META-INF/accesstransformer.cfg"
+
+# 前置 orient_framework（内嵌在本 jar 里）
+[[dependencies.orients_hotpot_chronicles]]
+modId="orient_framework"
+type="required"
+versionRange="[0.1.2,0.2.0)"
+ordering="AFTER"
+side="BOTH"
+

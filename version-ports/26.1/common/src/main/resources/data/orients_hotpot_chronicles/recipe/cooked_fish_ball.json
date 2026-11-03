@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": "orients_hotpot_chronicles:fish_ball",
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_fish_ball"
+  },
+  "experience": 0.35,
+  "cookingtime": 100
+}

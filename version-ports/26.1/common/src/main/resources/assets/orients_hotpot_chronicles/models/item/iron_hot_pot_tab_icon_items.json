@@ -1,0 +1,252 @@
+{
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        225,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.625,
+        0.625,
+        0.625
+      ]
+    },
+    "ground": {
+      "translation": [
+        0,
+        2.5,
+        0
+      ],
+      "scale": [
+        0.42,
+        0.42,
+        0.42
+      ]
+    },
+    "head": {
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        75,
+        45,
+        0
+      ],
+      "translation": [
+        0,
+        2.5,
+        0
+      ],
+      "scale": [
+        0.42,
+        0.42,
+        0.42
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        45,
+        0
+      ],
+      "translation": [
+        0,
+        1.5,
+        0
+      ],
+      "scale": [
+        0.42,
+        0.42,
+        0.42
+      ]
+    },
+    "fixed": {
+      "scale": [
+        0.58,
+        0.58,
+        0.58
+      ]
+    }
+  },
+  "gui_light": "side",
+  "textures": {
+    "beef": "minecraft:item/cooked_beef",
+    "carrot": "minecraft:item/carrot",
+    "cod": "minecraft:item/cooked_cod",
+    "mutton": "minecraft:item/cooked_mutton",
+    "potato": "minecraft:item/baked_potato",
+    "particle": "minecraft:item/cooked_beef"
+  },
+  "elements": [
+    {
+      "from": [
+        6.0,
+        14.36,
+        6.0
+      ],
+      "to": [
+        10.0,
+        14.459999999999999,
+        10.0
+      ],
+      "rotation": {
+        "angle": 22.5,
+        "axis": "y",
+        "origin": [
+          8,
+          14.36,
+          8
+        ]
+      },
+      "faces": {
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#beef"
+        }
+      }
+    },
+    {
+      "from": [
+        2.0,
+        14.36,
+        2.0
+      ],
+      "to": [
+        6.0,
+        14.459999999999999,
+        6.0
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "y",
+        "origin": [
+          4.0,
+          14.36,
+          4.0
+        ]
+      },
+      "faces": {
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#carrot"
+        }
+      }
+    },
+    {
+      "from": [
+        10.0,
+        14.36,
+        10.0
+      ],
+      "to": [
+        14.0,
+        14.459999999999999,
+        14.0
+      ],
+      "rotation": {
+        "angle": 22.5,
+        "axis": "y",
+        "origin": [
+          12.0,
+          14.36,
+          12.0
+        ]
+      },
+      "faces": {
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#potato"
+        }
+      }
+    },
+    {
+      "from": [
+        10.0,
+        14.36,
+        2.0
+      ],
+      "to": [
+        14.0,
+        14.459999999999999,
+        6.0
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "y",
+        "origin": [
+          12.0,
+          14.36,
+          4.0
+        ]
+      },
+      "faces": {
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#mutton"
+        }
+      }
+    },
+    {
+      "from": [
+        2.0,
+        14.36,
+        10.0
+      ],
+      "to": [
+        6.0,
+        14.459999999999999,
+        14.0
+      ],
+      "rotation": {
+        "angle": 22.5,
+        "axis": "y",
+        "origin": [
+          4.0,
+          14.36,
+          12.0
+        ]
+      },
+      "faces": {
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#cod"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "cn.blockforge.orient.framework.compat.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "orient_framework.refmap.json",
+  "mixins": ["CriteriaTriggersAccessor"],
+  "injectors": {"defaultRequire": 1}
+}

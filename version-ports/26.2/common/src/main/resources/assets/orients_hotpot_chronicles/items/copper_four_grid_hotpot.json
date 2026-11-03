@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "orients_hotpot_chronicles:dynamic",
+    "base": "orients_hotpot_chronicles:item/copper_four_grid_hotpot_display"
+  }
+}

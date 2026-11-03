@@ -1,3 +1,4 @@
+# 作者：mryt233
 modLoader="javafml"
 loaderVersion="[47,)"
 license="MIT AND CC-BY-NC-SA-4.0"
@@ -5,13 +6,12 @@ license="MIT AND CC-BY-NC-SA-4.0"
 modId="orients_hotpot_chronicles"
 version="${version}"
 displayName="Orient's Hotpot Chronicles"
-authors="Orient"
-description='之晗的火锅物语：已发布 0.1.4-alpha 的 Forge 1.20.1 移植。'
-logoFile="assets/orients_hotpot_chronicles/icon.png"
+authors="mryt233"
+description='''A bubbling Chongqing hotpot on a brick stove.'''
 [[dependencies.orients_hotpot_chronicles]]
 modId="forge"
 mandatory=true
-versionRange="[47.1,)"
+versionRange="[47.0.0,)"
 ordering="NONE"
 side="BOTH"
 [[dependencies.orients_hotpot_chronicles]]
@@ -19,4 +19,10 @@ modId="minecraft"
 mandatory=true
 versionRange="[1.20.1]"
 ordering="NONE"
+side="BOTH"
+[[dependencies.orients_hotpot_chronicles]]
+modId="orient_framework"
+mandatory=true
+versionRange="[0.1.2,0.2.0)"
+ordering="AFTER"
 side="BOTH"

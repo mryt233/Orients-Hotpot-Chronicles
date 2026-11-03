@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "orients_hotpot_chronicles:ham_sausage",
+  "result": {
+    "id": "orients_hotpot_chronicles:ham_sausage_slice",
+    "count": 3
+  }
+}

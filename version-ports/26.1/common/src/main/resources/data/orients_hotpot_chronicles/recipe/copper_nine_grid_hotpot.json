@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ICI"
+  ],
+  "key": {
+    "I": "minecraft:copper_ingot",
+    "C": "minecraft:cauldron"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:copper_nine_grid_hotpot",
+    "count": 1
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "minecraft:custom_model_data",
+    "entries": [
+      {
+        "threshold": 1,
+        "model": {
+          "type": "minecraft:model",
+          "model": "orients_hotpot_chronicles:item/pounded_meat_beef_minced"
+        }
+      },
+      {
+        "threshold": 2,
+        "model": {
+          "type": "minecraft:model",
+          "model": "orients_hotpot_chronicles:item/pounded_meat_beef_paste"
+        }
+      },
+      {
+        "threshold": 3,
+        "model": {
+          "type": "minecraft:model",
+          "model": "orients_hotpot_chronicles:item/pounded_meat_pork_minced"
+        }
+      },
+      {
+        "threshold": 4,
+        "model": {
+          "type": "minecraft:model",
+          "model": "orients_hotpot_chronicles:item/pounded_meat_pork_paste"
+        }
+      },
+      {
+        "threshold": 5,
+        "model": {
+          "type": "minecraft:model",
+          "model": "orients_hotpot_chronicles:item/pounded_meat_mutton_minced"
+        }
+      },
+      {
+        "threshold": 6,
+        "model": {
+          "type": "minecraft:model",
+          "model": "orients_hotpot_chronicles:item/pounded_meat_mutton_paste"
+        }
+      },
+      {
+        "threshold": 7,
+        "model": {
+          "type": "minecraft:model",
+          "model": "orients_hotpot_chronicles:item/pounded_meat_fish_minced"
+        }
+      },
+      {
+        "threshold": 8,
+        "model": {
+          "type": "minecraft:model",
+          "model": "orients_hotpot_chronicles:item/pounded_meat_fish_paste"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "orients_hotpot_chronicles:item/pounded_meat"
+    },
+    "index": 0
+  }
+}

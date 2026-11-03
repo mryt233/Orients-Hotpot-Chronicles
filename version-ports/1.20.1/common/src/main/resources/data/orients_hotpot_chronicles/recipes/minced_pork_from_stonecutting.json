@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "minecraft:porkchop"
+  },
+  "result": "orients_hotpot_chronicles:minced_pork",
+  "count": 1
+}

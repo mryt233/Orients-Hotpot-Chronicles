@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "orients_hotpot_chronicles:tomato"
+    },
+    {
+      "item": "orients_hotpot_chronicles:tomato"
+    },
+    {
+      "item": "orients_hotpot_chronicles:tomato"
+    },
+    {
+      "item": "minecraft:sugar"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "item": "orients_hotpot_chronicles:tomato_hotpot_base"
+  }
+}

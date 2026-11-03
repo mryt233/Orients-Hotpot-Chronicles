@@ -1,0 +1,58 @@
+// 作者：mryt233
+plugins { id 'net.neoforged.moddev' }
+neoForge {
+    version = project.neoforge_version
+    // mryt233 改（26.2）：FireBlock.setFlammable 的访问转换，见 META-INF/accesstransformer.cfg
+    accessTransformers = files('src/main/resources/META-INF/accesstransformer.cfg')
+    mods {
+        orients_hotpot_chronicles {
+            sourceSet sourceSets.main
+            sourceSet project(':common').sourceSets.main
+        }
+    }
+    runs {
+        client { client(); gameDirectory = project.file('run-client') }
+        server { server(); gameDirectory = project.file('run-server'); programArgument '--nogui' }
+    }
+}
+dependencies {
+    implementation project(':common')
+    implementation project(':framework:client')
+}
+sourceSets.main.resources.srcDir project(':common').file('src/main/resources')
+sourceSets.main.java.srcDirs += [project(':common').file('src/client/java'), project(':common').file('src/mixin/java')]
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand version: project.version, minecraft_version: project.minecraft_version, neoforge_version: project.neoforge_version
+    }
+}
+// mryt233 改：前置单独打成 orient_framework jar（含 runtime 入口 NeoForgeFrameworkRuntime），jarJar 内嵌进本体。
+sourceSets { frameworkRuntime { java.srcDirs = ['src/runtime/java']; resources.srcDirs = ['src/runtime/resources'] } }
+configurations { frameworkRuntimeCompileOnly.extendsFrom compileClasspath }
+dependencies { frameworkRuntimeCompileOnly sourceSets.main.output }
+def frameworkRuntimeJar = tasks.register('frameworkRuntimeJar', Jar) {
+    dependsOn ':framework:pure:classes', ':framework:loader:classes', ':framework:game:classes', ':framework:client:classes',
+        'classes', 'frameworkRuntimeClasses'
+    archiveFileName = 'orient_framework-26.2-neoforge-0.1.2.jar'
+    manifest.attributes 'Automatic-Module-Name': 'cn.blockforge.orient.framework'
+    destinationDirectory = layout.buildDirectory.dir('framework')
+    from(sourceSets.main.output.classesDirs) { include 'cn/blockforge/orient/framework/**' }
+    from(sourceSets.frameworkRuntime.output)
+    for (module in ['pure', 'loader', 'game', 'client']) {
+        from(project(":framework:${module}").sourceSets.main.output.classesDirs) { include 'cn/blockforge/orient/framework/**' }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+dependencies { jarJar files(frameworkRuntimeJar) }
+tasks.named('jar') {
+    archiveFileName = "${archives_base_name}-26.2-neoforge-${version}.jar"
+    from(project(':common').sourceSets.main.output.classesDirs)
+    exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**'
+    exclude 'cn/blockforge/orient/framework/**'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+tasks.named('sourcesJar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }
+
+// mryt233 改：开发探针仅由独立测试工程编译。
+sourceSets.main.java.exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**'

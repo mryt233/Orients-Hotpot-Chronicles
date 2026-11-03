@@ -1,0 +1,11 @@
+build/
+.gradle/
+run/
+runs/
+review/
+evidence/
+*.log
+__pycache__/
+.idea/
+out/
+bin/

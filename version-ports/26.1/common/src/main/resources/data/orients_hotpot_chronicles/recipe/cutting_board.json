@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LL"
+  ],
+  "key": {
+    "L": "#minecraft:logs"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:cutting_board",
+    "count": 2
+  }
+}

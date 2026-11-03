@@ -1,0 +1,132 @@
+package cn.blockforge.generated.orientshotpotchronicles.client;
+
+import cn.blockforge.orient.framework.client.ClientItemRenderers;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Chopsticks;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.world.item.ItemDisplayContext;
+import com.mojang.blaze3d.vertex.PoseStack;
+import cn.blockforge.orient.framework.compat.DataComponents;
+import cn.blockforge.orient.framework.compat.ItemContainerContents;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.Direction;
+
+/**
+ * 物品上带着菜时的样子（手里、物品栏、掉在地上都一样）：
+ * <ul>
+ *   <li>筷子夹着菜：先画原来的筷子，再在筷子尖（贴图左下角）画一小块夹着的菜。</li>
+ *   <li>装了菜的盘子：先画原来的盘子，再按 {@link PlateFoodRenderer} 把菜摆在盘子上。</li>
+ * </ul>
+ * 有菜的物品带自定义模型数据 1（PlateItem.syncFoodModel），模型是 builtin/entity、不带显示变换，交给这里画；
+ * 这里去掉自定义模型数据再画一遍就是原来的模型（不会递归），菜用原来模型的显示变换对齐。
+ * 作者：mryt233 */
+public final class HeldFoodItemRenderer {
+    /** 筷子尖在物品模型里的位置（0..1，贴图左下角那两根筷子的尖）和夹着的菜的大小。 */
+    private static final float TIP_X = 0.24F;
+    private static final float TIP_Y = 0.2F;
+    private static final float HELD_SCALE = 0.42F;
+
+    private HeldFoodItemRenderer() {
+    }
+
+    public static void register() {
+        ClientItemRenderers.register(HotPotContent.CHOPSTICKS, HeldFoodItemRenderer::renderChopsticks);
+        for (PlateItem item : HotPotContent.PLATE_ITEMS) {
+            ClientItemRenderers.register(item, HeldFoodItemRenderer::renderPlate);
+        }
+        // 装着菜的原版碗（r99）：资源包里给 minecraft:item/bowl 加了自定义模型数据 1 → builtin/entity
+        ClientItemRenderers.register(net.minecraft.world.item.Items.BOWL, HeldFoodItemRenderer::renderBowl);
+    }
+
+    /** 去掉自定义模型数据的复制品 = 原来的模型。 */
+    private static ItemStack plain(ItemStack stack) {
+        ItemStack copy = stack.copy();
+        cn.blockforge.orient.framework.compat.ItemData.remove(copy, DataComponents.CUSTOM_MODEL_DATA);
+        return copy;
+    }
+
+    /** 先按原来的模型画一遍，再把矩阵摆到原来模型的显示变换下（物品坐标 0..1），交给 overlayDraw 画菜。 */
+    private static void withBase(ItemStack stack, ItemDisplayContext mode, PoseStack matrices,
+                                 MultiBufferSource consumers, int light, int overlay, Runnable overlayDraw) {
+        ItemRenderer items = Minecraft.getInstance().getItemRenderer();
+        ItemStack base = plain(stack);
+        // builtin 渲染前原版已经平移了 -0.5，这里挪回去，让原来的模型按自己的显示变换画
+        matrices.pushPose();
+        matrices.translate(0.5F, 0.5F, 0.5F);
+        items.renderStatic(base, mode, light, overlay, matrices, consumers, null, 0);
+        BakedModel model = items.getModel(base, null, null, 0);
+        model.getTransforms().getTransform(mode).apply(false, matrices);
+        matrices.translate(-0.5F, -0.5F, -0.5F);
+        overlayDraw.run();
+        matrices.popPose();
+    }
+
+    /** 拿在手上时夹着的菜放在筷子尖（筷子转了 180°，尖在贴图右上角），大小同原版手里拿这个食物。 */
+    private static final float HAND_TIP_X = 0.74F;
+    private static final float HAND_TIP_Y = 0.78F;
+
+    private static void renderChopsticks(ItemStack stack, ItemDisplayContext mode, PoseStack matrices,
+                                         MultiBufferSource consumers, int light, int overlay) {
+        ItemStack food = Chopsticks.held(stack);
+        boolean inHand = mode.firstPerson() || mode == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
+            || mode == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
+        if (inHand && !food.isEmpty()) {
+            // 手里拿着、夹着菜：贴图左下角是握在手里的那头，筷子尖在那儿菜会被手挡住（r92 用户截图）。
+            // 所以筷子转 180°（手握筷子头、尖朝前上方），菜按原版手持大小画在筷子尖上。
+            ItemRenderer items = Minecraft.getInstance().getItemRenderer();
+            ItemStack base = plain(stack);
+            matrices.pushPose();
+            matrices.translate(0.5F, 0.5F, 0.5F);
+            items.getModel(base, null, null, 0).getTransforms().getTransform(mode).apply(false, matrices);
+            matrices.pushPose();
+            matrices.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(180F));
+            items.renderStatic(base, ItemDisplayContext.NONE, light, overlay, matrices, consumers, null, 0);
+            matrices.popPose();
+            matrices.translate(HAND_TIP_X - 0.5F, HAND_TIP_Y - 0.5F, 0.03F);
+            items.renderStatic(food, ItemDisplayContext.NONE, light, OverlayTexture.NO_OVERLAY, matrices, consumers, null, 0);
+            matrices.popPose();
+            return;
+        }
+        withBase(stack, mode, matrices, consumers, light, overlay, () -> {
+            if (food.isEmpty()) {
+                return;
+            }
+            matrices.pushPose();
+            matrices.translate(TIP_X, TIP_Y, 0.5F + 0.04F);
+            matrices.scale(HELD_SCALE, HELD_SCALE, HELD_SCALE);
+            Minecraft.getInstance().getItemRenderer().renderStatic(food, ItemDisplayContext.NONE,
+                light, OverlayTexture.NO_OVERLAY, matrices, consumers, null, 0);
+            matrices.popPose();
+        });
+    }
+
+    /** 装着菜的碗：画立体的碗（和摆在桌上的同一个模型），再把菜叠在碗里；显示变换在 item/bowl_with_food.json。 */
+    private static void renderBowl(ItemStack stack, ItemDisplayContext mode, PoseStack matrices,
+                                   MultiBufferSource consumers, int light, int overlay) {
+        NonNullList<ItemStack> foods = NonNullList.withSize(
+            cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateSize.BOWL.capacity(), ItemStack.EMPTY);
+        cn.blockforge.orient.framework.compat.ItemData.getOrDefault(stack, DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(foods);
+        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(
+            HotPotContent.BOWL_BLOCK.defaultBlockState(), matrices, consumers, light, overlay);
+        PlateFoodRenderer.render(cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateSize.BOWL,
+            Direction.Axis.X, foods, matrices, consumers, light, null, 0, Minecraft.getInstance().getItemRenderer());
+    }
+
+    private static void renderPlate(ItemStack stack, ItemDisplayContext mode, PoseStack matrices,
+                                    MultiBufferSource consumers, int light, int overlay) {
+        if (!(stack.getItem() instanceof PlateItem item)) {
+            return;
+        }
+        NonNullList<ItemStack> foods = NonNullList.withSize(item.plate().size().capacity(), ItemStack.EMPTY);
+        cn.blockforge.orient.framework.compat.ItemData.getOrDefault(stack, DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(foods);
+        withBase(stack, mode, matrices, consumers, light, overlay, () ->
+            PlateFoodRenderer.render(item.plate().size(), Direction.Axis.X, foods, matrices, consumers, light,
+                null, 0, Minecraft.getInstance().getItemRenderer()));
+    }
+}

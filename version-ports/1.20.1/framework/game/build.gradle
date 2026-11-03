@@ -1,0 +1,25 @@
+// framework:game —— 与加载器无关的游戏公共逻辑（作者：mryt233，2026-10-30，P1 第四批）。
+plugins {
+    id 'dev.architectury.loom' version '1.10.455'
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation files(project(':framework:pure').sourceSets.main.output,
+                         project(':framework:loader').sourceSets.main.output)
+
+    // mryt233 改：W8，沿用 loader 层的 JUnit 配置。
+    testImplementation platform('org.junit:junit-bom:5.10.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('compileJava') {
+    dependsOn ':framework:pure:classes', ':framework:loader:classes'
+}
+
+test {
+    useJUnitPlatform()
+}

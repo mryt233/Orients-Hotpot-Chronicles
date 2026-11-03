@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "orients_hotpot_chronicles:dynamic",
+    "base": "orients_hotpot_chronicles:item/iron_round_yuanyang_hotpot_display"
+  }
+}

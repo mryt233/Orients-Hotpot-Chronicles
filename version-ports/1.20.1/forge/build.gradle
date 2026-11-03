@@ -1,47 +1,89 @@
-// 底本 v0.1.1-alpha，仅替换加载器。
-plugins { id 'dev.architectury.loom' version "${loom_version}" }
-version = project.mod_version
-group = project.maven_group
-repositories {
-    maven { url = 'https://maven.architectury.dev/' }
-    maven { url = 'https://maven.minecraftforge.net/releases/' }
-    mavenCentral()
+// 作者：mryt233
+plugins {
+    id 'net.neoforged.moddev.legacyforge' version '2.0.148'
 }
-dependencies {
-    minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
-    forge "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-}
-loom {
-    mixin { useLegacyMixinAp = true; defaultRefmapName = 'orients_hotpot_chronicles.refmap.json' }
-    // ：客户端与服务端日志分开，便于验收和保留证据。
-    forge { mixinConfig 'orients_hotpot_chronicles.mixins.json' }
-    runs {
-        // ：开发运行的是 Yarn 名称；成品 refmap 指向 Forge SRG 名称。
-        // 此参数只影响 runClient/runServer，不写入成品，生产继续使用 refmap。
-        configureEach {
-            vmArg '-Dmixin.env.disableRefMap=true'
-            vmArg '-Dfile.encoding=UTF-8'
-        }
-        client { runDir 'run-client' }
-    }
-}
-processResources {
-    inputs.property 'version', project.version
-    filteringCharset = 'UTF-8'
-    exclude 'fabric.mod.json'
-    filesMatching('META-INF/mods.toml') {
-        filter { line -> line.replace('${version}', project.version.toString()) }
-    }
-}
-tasks.withType(JavaCompile).configureEach { options.release = 17; options.encoding = 'UTF-8' }
-java { toolchain.languageVersion = JavaLanguageVersion.of(17); withSourcesJar() }
-base { archivesName = project.archives_base_name }
-tasks.withType(Jar).configureEach { from('LICENSE', 'ASSETS_LICENSE') }
 
-// ：任务12开发服与客户端使用各自独立目录。
-if (project.hasProperty('portTestRoot')) {
-    def testRunRoot = project.relativePath(project.file(project.property('portTestRoot')))
-    loom.runs.server.runDir = testRunRoot + '/dev'
-    loom.runs.client.runDir = testRunRoot + '/client'
+sourceSets {
+    frameworkRuntime {
+        java.srcDirs = [file('src/main/java'), rootProject.file('framework/pure/src/main/java'),
+            rootProject.file('framework/loader/src/main/java'), rootProject.file('framework/game/src/main/java'),
+            rootProject.file('framework/client/src/main/java')]
+        java.include 'cn/blockforge/orient/framework/**'
+        resources.srcDirs = [file('src/runtime/resources'), rootProject.file('framework/loader/src/main/resources')]
+    }
+    main {
+        java.srcDirs += [project(':common').file('src/client/java'), project(':common').file('src/mixin/java')]
+        java.exclude 'cn/blockforge/orient/framework/**', '**/devtest/**'
+        resources.srcDirs += project(':common').file('src/main/resources')
+    }
+}
+
+java.registerFeature('frameworkRuntime') { usingSourceSet(sourceSets.frameworkRuntime) }
+
+legacyForge {
+    version = "${project.minecraft_version}-${project.forge_version}"
+    addModdingDependenciesTo(sourceSets.frameworkRuntime)
+    runs {
+        client {
+            client()
+            gameDirectory = file('run-client')
+        }
+        server {
+            server()
+            gameDirectory = file('run-server')
+            programArgument '--nogui'
+        }
+    }
+    mods {
+        orient_framework { sourceSet sourceSets.frameworkRuntime }
+        orients_hotpot_chronicles {
+            sourceSet sourceSets.main
+            sourceSet project(':common').sourceSets.main
+        }
+    }
+}
+
+dependencies {
+    implementation files(project(':common').sourceSets.main.output, sourceSets.frameworkRuntime.output)
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    frameworkRuntimeAnnotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+mixin {
+    add sourceSets.main, 'orients_hotpot_chronicles.refmap.json'
+    add sourceSets.frameworkRuntime, 'orient_framework.refmap.json'
+    config 'orients_hotpot_chronicles.mixins.json'
+    config 'orient_framework.mixins.json'
+    config 'orients_hotpot_chronicles.forge.mixins.json'
+}
+
+tasks.named('compileJava') { dependsOn ':common:classes', 'frameworkRuntimeClasses' }
+tasks.named('processResources', ProcessResources) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    dependsOn ':common:processResources'
+    filteringCharset = 'UTF-8'
+    filesMatching('META-INF/mods.toml') { expand version: project.version }
+}
+
+def runtimeJar = tasks.register('runtimeJar', Jar) {
+    archiveBaseName = 'orient_framework-1.20.1-forge'
+    archiveVersion = '0.1.2'
+    from sourceSets.frameworkRuntime.output
+    from(layout.buildDirectory.dir('mixin')) { include 'orient_framework.refmap.json' }
+    manifest.attributes 'MixinConfigs': 'orient_framework.mixins.json'
+    manifest.attributes 'Automatic-Module-Name': 'cn.blockforge.orient.framework'
+}
+def reobfRuntimeJar = obfuscation.reobfuscate(runtimeJar, sourceSets.frameworkRuntime)
+reobfRuntimeJar.configure { dependsOn tasks.named('compileJava') }
+dependencies { jarJar files(reobfRuntimeJar) }
+
+tasks.named('jar', Jar) {
+    archiveBaseName = 'orients_hotpot_chronicles-1.20.1-forge'
+    from(project(':common').sourceSets.main.output.classesDirs)
+    manifest.attributes 'MixinConfigs': 'orients_hotpot_chronicles.mixins.json,orients_hotpot_chronicles.forge.mixins.json'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+tasks.named('sourcesJar', Jar) {
+    from project(':common').sourceSets.main.allJava
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

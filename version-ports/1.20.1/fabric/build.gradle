@@ -1,47 +1,138 @@
+// fabric：Fabric 入口 + platform / client / compat / mixin / devtest。
 plugins {
-    id 'fabric-loom' version "${loom_version}"
+    id 'fabric-loom' version '1.10.5'
 }
 
-version = project.mod_version
-group = project.maven_group
+// 把 common 的源码集注册成额外的 mod 源（mryt233 2026-10-29）：
+// 只靠 files() 依赖能编过、Java 类也能加载，但 Fabric 不会把它的 assets/ 和 data/
+// 当成模组资源扫描，结果游戏里一条配方都读不到（实测 1290 vs 1495）。
+// 资源（assets / data）统一放在 common，这里把它的资源目录并入 fabric 的资源集：
+// 合成一个模组打包，Fabric 才会去扫描这些配方和贴图（mryt233 2026-10-29）。
+sourceSets.main.resources.srcDirs += project(':common').file('src/main/resources')
+// mryt233 改：同一份原版客户端绘制在两个加载器各自编译，不混入 common 核心。
+sourceSets.main.java.srcDir project(':common').file('src/client/java')
+sourceSets.main.java.srcDir project(':common').file('src/mixin/java')
 
-repositories { mavenCentral() }
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+    // 核心工程：同映射同版本，直接当普通依赖用（mryt233 2026-10-29）。
+    // 用 implementation 而不是 modImplementation：后者会让 loom 去读 common 的 jar 元数据并重映射，
+    // 而 common 不是独立 mod，不需要 remap。发布时再用 include 把 core 打进 jar。
+    // 直接吃 common 的编译产物（classes + resources），不经 loom 的 jar 重映射：
+    // 成品 jar 是 intermediary 名，和 Yarn 名源码对不上（2026-10-29 实测 NoSuchMethodError）。
+    implementation files(project(':common').sourceSets.main.output)
+    // mryt233 加（P1 第一批）：框架契约与纯逻辑
+    implementation files(project(':framework:pure').sourceSets.main.output,
+                         project(':framework:loader').sourceSets.main.output,
+                         project(':framework:game').sourceSets.main.output,
+                         project(':framework:client').sourceSets.main.output)
+    // 注意：**不能**在这里写 include project(':common')。loom 的 include 会把 common 的
+    // 已重映射（intermediary 名）jar 嵌进来，开发期运行时会优先用那份，和 Yarn 名的源码对不上，
+    // 直接 NoSuchMethodError（mryt233 2026-10-29 实测）。打包成品的做法等打包时再定。
 }
 
 processResources {
-    inputs.property "version", project.version
-    // filter 同样按 filteringCharset 读写，不显式设成 UTF-8 时取平台默认
-    // （容器里常是 ASCII），会把 description 里的中文破坏成非法 UTF-8：
-    // Gradle 仍报 BUILD SUCCESSFUL，但最终 JAR 里的 JSON 已经坏了。
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    inputs.property 'version', project.version
     filteringCharset = 'UTF-8'
-    // 只替换版本占位符。Gradle expand 会把 JSON 字符串里的 \n 解释成真实换行，
-    // 造成源文件合法、最终 JAR 中 fabric.mod.json 却损坏。
-    filesMatching("fabric.mod.json") {
+    filesMatching('fabric.mod.json') {
         filter { line -> line.replace('${version}', project.version.toString()) }
     }
 }
 
-tasks.withType(JavaCompile).configureEach { options.release = 17; options.encoding = 'UTF-8'; options.compilerArgs += ['-Xmaxerrs', '2000'] }
-java { toolchain.languageVersion = JavaLanguageVersion.of(17); withSourcesJar() }
-base { archivesName = project.archives_base_name }
+// devtest 是开发环境专用测试命令（/hpt），不进成品和源码 jar
+tasks.named('jar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }
+tasks.named('sourcesJar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }
 
-// ：代码和原创资源分别授权，成品与源码 JAR 均携带两份许可声明。
-tasks.withType(Jar).configureEach {
-    from('LICENSE', 'ASSETS_LICENSE')
+// 先编 common 再编 fabric（用 files() 依赖不会自动建任务依赖）
+tasks.named('compileJava') { dependsOn ':common:classes', ':framework:pure:classes', ':framework:loader:classes', ':framework:game:classes', ':framework:client:classes' }
+tasks.named('processResources') { dependsOn ':common:processResources' }
+tasks.matching { it.name in ['runServer', 'runClient'] }.configureEach { dependsOn ':common:classes', ':framework:loader:classes' }
+
+// 核心类不在本工程的 sourceSet 产出里，打包时必须显式并进来，
+// 否则成品 jar 只有平台代码、没有 hotpot 核心（mryt233 2026-10-30）。
+tasks.named('jar') {
+    from(project(':common').sourceSets.main.output.classesDirs)
+    // mryt233 加（P1 第一批）：框架类随 Jar 分发
+    from(project(':framework:pure').sourceSets.main.output.classesDirs)
+    from(project(':framework:loader').sourceSets.main.output.classesDirs)
+    from(project(':framework:game').sourceSets.main.output.classesDirs)
+    from(project(':framework:client').sourceSets.main.output.classesDirs)
 }
-
-// ：客户端隔离日志与选项，服务端沿用 run。
-loom { runs { client { runDir "run-client" } } }
-
-// ：任务07/08由Luna在独立目录运行开发服务端和客户端。
-if (project.hasProperty('portTestRoot')) {
-    def testRunRoot = project.relativePath(project.file(project.property('portTestRoot')))
-    loom.runs.server.runDir = testRunRoot + '/dev'
-    loom.runs.client.runDir = testRunRoot + '/client'
+tasks.named('sourcesJar') {
+    from(project(':common').sourceSets.main.allSource)
 }
+// common 的资源目录已经并进本工程的 resources，再 from(allSource) 会出现重复条目
+tasks.withType(Jar).configureEach { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
+
+// mryt233 改：只有显式 -PhotpotTestServer=地址 才自动连开发服，常规启动进主菜单。
+// -PhotpotClientProbe 启用开发客户端取证，不进入分发包。
+loom {
+    mixin { defaultRefmapName = 'orients_hotpot_chronicles.refmap.json' }
+    runs {
+        client {
+            // 客户端和服务端各用各的运行目录，否则两边的 latest.log 会互相锁文件（实测踩过）
+            runDir 'run-client'
+            if (project.hasProperty('hotpotTestServer')) {
+                programArgs '--quickPlayMultiplayer', project.property('hotpotTestServer'), '--quickPlayPath', 'quickplay.log'
+            }
+            if (project.hasProperty('hotpotClientProbe')) {
+                vmArg '-Dhotpot.clientProbe=true'
+            }
+            if (project.hasProperty('hotpotExpreg')) {
+                vmArg '-Dhotpot.expreg=true'
+            }
+        }
+        server {
+            runDir 'run-server'
+            if (project.hasProperty('hotpotExpreg')) {
+                vmArg '-Dhotpot.expreg=true'
+            }
+        }
+    }
+}
+// 作者：mryt233；测试探针不作为生产源码。
+sourceSets.main.java.exclude "**/devtest/**"
+
+// mryt233 改：前置独立重映射，再由 include 内嵌；本体不重复携带前置类。
+tasks.named('jar', Jar) {
+    archiveBaseName = 'orients_hotpot_chronicles-1.20.1-fabric'
+    exclude 'cn/blockforge/orient/framework/**'
+}
+def frameworkJar = tasks.register('frameworkJar', Jar) {
+    dependsOn ':framework:pure:classes', ':framework:loader:classes', ':framework:game:classes', ':framework:client:classes', 'classes'
+    archiveBaseName = 'orient_framework-1.20.1-fabric'
+    archiveVersion = '0.1.2'
+    archiveClassifier = 'dev'
+    from(sourceSets.main.output.classesDirs) { include 'cn/blockforge/orient/framework/**' }
+    for (module in ['pure', 'loader', 'game', 'client']) {
+        from(project(":framework:${module}").sourceSets.main.output.classesDirs) { include 'cn/blockforge/orient/framework/**' }
+    }
+    from(project(':framework:loader').sourceSets.main.output.resourcesDir)
+    from(project(':framework:loader').sourceSets.main.output.classesDirs) { include 'orient_framework.refmap.json' }
+    from 'src/runtime/resources'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+def remapFrameworkJar = tasks.register('remapFrameworkJar', net.fabricmc.loom.task.RemapJarTask) {
+    dependsOn frameworkJar
+    inputFile = frameworkJar.flatMap { it.archiveFile }
+    archiveBaseName = 'orient_framework-1.20.1-fabric'
+    archiveVersion = '0.1.2'
+    archiveClassifier = ''
+    addNestedDependencies = false
+    nestedJars.setFrom([])
+    nestedJars.setBuiltBy([])
+}
+evaluationDependsOn(':framework:loader')
+project(':framework:loader').artifacts.add('fabricRuntimeElements', remapFrameworkJar)
+dependencies { include project(path: ':framework:loader', configuration: 'fabricRuntimeElements') }
+tasks.named('remapJar') {
+    dependsOn remapFrameworkJar
+    archiveBaseName = 'orients_hotpot_chronicles-1.20.1-fabric'
+}
+tasks.named('remapSourcesJar') { archiveBaseName = 'orients_hotpot_chronicles-1.20.1-fabric' }

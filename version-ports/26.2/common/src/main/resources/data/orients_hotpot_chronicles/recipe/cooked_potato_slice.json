@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": "orients_hotpot_chronicles:potato_slice",
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_potato_slice"
+  },
+  "experience": 0.35,
+  "cookingtime": 100
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "orients_hotpot_chronicles:beef_meatball",
+    "orients_hotpot_chronicles:beef_meatball",
+    "orients_hotpot_chronicles:cilantro"
+  ],
+  "result": {
+    "id": "orients_hotpot_chronicles:cilantro_beef_meatball",
+    "count": 2
+  }
+}

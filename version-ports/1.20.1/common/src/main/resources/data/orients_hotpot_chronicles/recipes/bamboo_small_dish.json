@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "orients_hotpot_chronicles:small_dish",
+  "pattern": [
+    "MBM"
+  ],
+  "key": {
+    "M": {
+      "item": "minecraft:bamboo"
+    },
+    "B": {
+      "item": "minecraft:bowl"
+    }
+  },
+  "result": {
+    "count": 2,
+    "item": "orients_hotpot_chronicles:bamboo_small_dish"
+  }
+}

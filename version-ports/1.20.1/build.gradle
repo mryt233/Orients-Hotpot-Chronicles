@@ -1,0 +1,43 @@
+// 之晗的火锅物语 · 多加载器根构建（mryt233 2026-10-29）
+//
+// 目录：
+//   common  —— hotpot 核心，只依赖 Minecraft 本体，0 个加载器 import（check_layering.py 守）
+//   fabric  —— Fabric 入口 + platform / client / compat / mixin / devtest
+//   neoforge—— NeoForge 入口 + 等价平台实现（待接）
+//
+// 说明：这里没有用 architectury-plugin。实测它与 architectury-loom 1.10.455 组合会在
+// common() / fabric() 里往 compileClasspath、runtimeClasspath 上声明依赖而直接报错，
+// 且那套机制的用途是「跨映射重映射」；本工程 common 与 fabric 同映射同版本，不需要。
+// 每个子工程各用 fabric-loom，靠普通 Gradle 工程依赖连接——更少抽象、更容易排查。
+
+allprojects {
+    apply plugin: 'java'
+
+    base { archivesName = rootProject.archives_base_name }
+    version = rootProject.mod_version
+    group = rootProject.maven_group
+
+    repositories {
+        maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.architectury.dev/' }
+        maven { url = 'https://maven.neoforged.net/releases/' }
+        mavenCentral()
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.release = 17
+        options.encoding = 'UTF-8'
+        // javac 默认只报前 100 个错误，迁移期看不到全貌，放宽上限（mryt233 2026-10-29）
+        options.compilerArgs += ['-Xmaxerrs', '5000']
+    }
+
+    java {
+        toolchain.languageVersion = JavaLanguageVersion.of(17)
+        withSourcesJar()
+    }
+
+    // 代码和原创资源分别授权，成品与源码 JAR 均携带两份许可声明（沿用主工程约定）
+    tasks.withType(Jar).configureEach {
+        from(rootProject.file('LICENSE'), rootProject.file('ASSETS_LICENSE'))
+    }
+}

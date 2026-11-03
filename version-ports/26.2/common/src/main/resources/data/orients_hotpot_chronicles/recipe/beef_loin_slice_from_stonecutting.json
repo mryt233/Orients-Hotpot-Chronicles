@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "orients_hotpot_chronicles:beef_loin",
+  "result": {
+    "id": "orients_hotpot_chronicles:beef_loin_slice",
+    "count": 3
+  }
+}

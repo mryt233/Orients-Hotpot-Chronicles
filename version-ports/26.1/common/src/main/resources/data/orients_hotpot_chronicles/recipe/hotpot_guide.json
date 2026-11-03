@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "orients_hotpot_chronicles:iron_kitchen_knife",
+    "minecraft:book"
+  ],
+  "result": {
+    "id": "orients_hotpot_chronicles:hotpot_guide",
+    "count": 1
+  }
+}

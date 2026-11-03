@@ -3,6 +3,9 @@
   "id": "orients_hotpot_chronicles",
   "version": "${version}",
   "name": "Orient's Hotpot Chronicles",
+  "authors": [
+    "mryt233"
+  ],
   "description": "A bubbling Chongqing nine-grid hotpot on a brick stove: fuel the stove, seat a copper or iron pot, pour in a broth, drop ingredients into the 9x9 grid and pick them out cooked (with furnace XP) - all with one pair of chopsticks.",
   "license": [
     "MIT",
@@ -22,10 +25,11 @@
     "orients_hotpot_chronicles.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.19.3",
+    "fabricloader": ">=0.14.21",
     "minecraft": "1.20.1",
     "java": ">=17",
-    "fabric-api": ">=0.92.12+1.20.1"
+    "fabric-api": ">=0.83.0",
+    "orient_framework": ">=0.1.2 <0.2.0"
   },
   "suggests": {
     "farmersdelight": "*",

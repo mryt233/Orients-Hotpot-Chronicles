@@ -1,0 +1,3 @@
+// 作者：mryt233
+apply from: rootProject.file('gradle/vanilla-module.gradle')
+dependencies { api project(':framework:game') }
