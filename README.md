@@ -8,7 +8,7 @@
 
 Have a hotpot dinner in Minecraft: build a stove, seat a pot on it, pour in a broth, light the fire, prep your ingredients, cook them and eat them with chopsticks and dipping sauce.
 
-0.2.1-alpha：Minecraft 1.21.1 · Fabric / NeoForge · 作者 / Author：蘧白川 / Orient（GitHub：[@mryt233](https://github.com/mryt233)）
+0.2.1-alpha：Minecraft 26.2 · 26.1.x · 1.21.1 · 1.20.1（Fabric / NeoForge / Forge）· 作者 / Author：蘧白川 / Orient（GitHub：[@mryt233](https://github.com/mryt233)）
 
 <p>
   <a href="LICENSE"><img src="https://img.shields.io/badge/Code-MIT-2ea44f?style=flat-square" alt="Source code license: MIT"></a>
@@ -265,21 +265,21 @@ Changes since 0.1.3-alpha-hotfix1: shrimp, Orient Cola, glass cups, Tomato and T
 
 | 项目 · Item | 要求 · Required | 现有测试版本 · Recorded tests |
 | --- | --- | --- |
-| Minecraft / 加载器 · Loader | 按上方下载表选择对应文件 · choose the matching file above | Fabric 1.20.1 / 1.20.4 / 1.21.1；Forge 1.20.1；NeoForge 1.21.1 |
-| Fabric Loader（仅 Fabric） | 1.21.1 / 1.20.4：**0.15.11+**；1.20.1：**0.19.3+** | 0.19.3 |
-| Fabric API（仅 Fabric） | 对应 Minecraft 版本；1.20.1 需 **0.92.12+** · match your Minecraft version; 1.20.1 needs **0.92.12+** | 0.92.12+1.20.1 / 0.97.3+1.20.4 / 0.116.14+1.21.1 |
-| Forge（仅 1.20.1 Forge） | **47.1+** | **47.4.28** |
-| NeoForge（仅 1.21.1 NeoForge） | **21.1.186+** | **21.1.265** |
-| Java | Minecraft 1.20.1 / 1.20.4：**17+**；1.21.1：**21+** | 17 / 21 |
+| Minecraft / 加载器 · Loader | 按上方下载表选择对应文件 · choose the matching file above | Fabric 26.2 / 26.1.x / 1.21.1 / 1.20.1；NeoForge 26.2 / 26.1.2 / 1.21.1；Forge 1.20.1 |
+| Fabric Loader（仅 Fabric） | 26.2 / 26.1.x：**0.18.4+**；1.21.1：**0.15.11+**；1.20.1：**0.14.21+** | 0.18.4 / 0.15.11 / 0.14.21 / 0.20.1 |
+| Fabric API（仅 Fabric） | 对应 Minecraft 版本 · match your Minecraft version：26.2 **0.148.3+**；26.1.x **0.143.12+**；1.20.1 **0.83.0+** | 0.148.3 / 0.161.0（26.2）；0.143.12 / 0.155.3（26.1.x）；0.116.14（1.21.1）；0.83.0 / 0.92.12（1.20.1） |
+| Forge（仅 1.20.1） | **47.0.0+** | **47.0.0 / 47.4.28** |
+| NeoForge | 26.2：**26.2.0.57+**；26.1.2：**26.1.2.71+**；1.21.1：**21.1.186+** | 26.2.0.57 / 26.2.0.93；26.1.2.71 / 26.1.2.126；21.1.186 / 21.1.265 |
+| Java | Minecraft 26.x：**25+**；1.21.1：**21+**；1.20.1：**17+** | 25 / 21 / 17 |
 | 安装位置 · Side | **客户端和服务端都要装 · both client and server** | — |
 
-Forge / NeoForge 两版不需要 Fabric API。1.20.1 Forge 的同一个 JAR 也能装在 NeoForge 1.20.1 上。
+Forge / NeoForge 版不需要 Fabric API。26.1 的 NeoForge 版只支持 Minecraft 26.1.2。
 
-The Forge / NeoForge builds do not require Fabric API. The same 1.20.1 Forge JAR also loads on NeoForge 1.20.1.
+The Forge / NeoForge builds do not require Fabric API. The 26.1 NeoForge build supports Minecraft 26.1.2 only.
 
-**各版本的小差异**：0.2.0-alpha 的 1.21.1 Fabric / NeoForge 玩法、数值、配方一致；旧移植版停留在历史版本，不包含本次新内容。1.20.1（Fabric、Forge）锅里的热气用白色云粒子（1.20.1 没有白烟粒子），生毛肚、熟毛肚算肉、狼可以吃；NeoForge 1.21.1 和 Forge 1.20.1 在数据包整个替换了牛、哞菇或草的掉落时，仍会多掉毛肚、牛脊肉、小葱、香菜、黄豆。
+**各版本的小差异**：0.2.1-alpha 的各个版本玩法、数值、配方一致；1.20.4 旧移植版停留在历史版本，不包含这些内容。1.20.1 没有白烟粒子，锅里的热气用原版烟粒子调成同样的颜色；界面背景、配方书、创造栏翻页按各 Minecraft 版本的原版样子显示。Forge / NeoForge 版在数据包整个替换了牛、哞菇或草的掉落时，仍会多掉毛肚、牛脊肉、小葱、香菜、黄豆。
 
-**Differences between builds**: the 0.2.0-alpha Fabric / NeoForge builds for 1.21.1 share gameplay, values and recipes. Legacy ports remain on older versions and do not include these additions. On 1.20.1 (Fabric, Forge) pot steam uses white cloud particles (1.20.1 has no white smoke particle), and raw and cooked tripe count as meat, so wolves can eat them. On NeoForge 1.21.1 and Forge 1.20.1, tripe, beef loin, scallions, cilantro and soybeans are still added even if a data pack replaces the cow, mooshroom or grass loot tables.
+**Differences between builds**: all 0.2.1-alpha builds share gameplay, values and recipes. The legacy 1.20.4 port remains on an older version and does not include these additions. 1.20.1 has no white smoke particle, so pot steam uses the vanilla smoke particle tinted to the same color. Screens use each Minecraft version's own vanilla look (backgrounds, recipe book, creative-tab paging). On Forge / NeoForge, tripe, beef loin, scallions, cilantro and soybeans are still added even if a data pack replaces the cow, mooshroom or grass loot tables.
 
 ### 和其他模组的兼容性 · Compatibility with other mods
 
@@ -291,23 +291,23 @@ The Forge / NeoForge builds do not require Fabric API. The same 1.20.1 Forge JAR
 
 ### Fabric
 
-1. 选择对应 Minecraft 版本的 [Fabric Loader](https://fabricmc.net/use/) 和 [Fabric API](https://modrinth.com/mod/fabric-api)（1.20.1 需要 Loader 0.19.3+、Fabric API 0.92.12+）。
+1. 选择对应 Minecraft 版本的 [Fabric Loader](https://fabricmc.net/use/) 和 [Fabric API](https://modrinth.com/mod/fabric-api)（具体版本要求见上面的「版本支持」）。
 2. 从[下载表](#downloads)选择同版本 Fabric JAR，放入客户端和服务端的 `mods` 文件夹。
 
-1. Install the [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://modrinth.com/mod/fabric-api) matching your Minecraft version (1.20.1 needs Loader 0.19.3+ and Fabric API 0.92.12+).
+1. Install the [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://modrinth.com/mod/fabric-api) matching your Minecraft version (see Compatibility above for the required versions).
 2. Select the matching Fabric JAR from the [download table](#downloads) and put it in the `mods` folder on both client and server.
 
 ### Forge / NeoForge
 
-1. Minecraft **1.20.1** 使用 [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.1+**（现有测试版本 **47.4.28**）；Minecraft **1.21.1** 使用 [NeoForge](https://neoforged.net/) **21.1.186+**。
+1. Minecraft **1.20.1** 使用 [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.0.0+**；Minecraft **1.21.1** 使用 [NeoForge](https://neoforged.net/) **21.1.186+**，**26.1.2** 使用 **26.1.2.71+**，**26.2** 使用 **26.2.0.57+**。
 2. 从[下载表](#downloads)选择匹配加载器与 MC 版本的 JAR，放入客户端和服务端的 `mods` 文件夹。**这两版不需要 Fabric API。**
 
-1. Use [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.1+** for Minecraft **1.20.1** (recorded test: **47.4.28**), or [NeoForge](https://neoforged.net/) **21.1.186+** for Minecraft **1.21.1**.
+1. Use [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.0.0+** for Minecraft **1.20.1**, or [NeoForge](https://neoforged.net/) **21.1.186+** for **1.21.1**, **26.1.2.71+** for **26.1.2**, or **26.2.0.57+** for **26.2**.
 2. Select the matching JAR from the [download table](#downloads) and put it in the `mods` folder on both client and server. **These builds do not require Fabric API.**
 
-Minecraft **1.20.1 / 1.20.4 使用 Java 17+**，**1.21.1 使用 Java 21+**。
+Minecraft **26.x 使用 Java 25+**，**1.21.1 使用 Java 21+**，**1.20.1 使用 Java 17+**。
 
-Use **Java 17+ for Minecraft 1.20.1 / 1.20.4**, or **Java 21+ for Minecraft 1.21.1**.
+Use **Java 25+ for Minecraft 26.x**, **Java 21+ for 1.21.1**, or **Java 17+ for 1.20.1**.
 
 ## 怎么玩 · How to play
 

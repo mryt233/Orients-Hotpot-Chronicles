@@ -1,9 +1,9 @@
-"""Generate texture art through an OpenAI-compatible image API (e.g. a relay for gpt-image).
+"""Generate texture art through an image-generation API (a relay exposing /v1/images endpoints).
 
 Config comes from environment variables, never from this repo:
   IMAGE_API_BASE_URL  e.g. https://your-relay.example.com/v1   (must include /v1 if the relay needs it)
   IMAGE_API_KEY       the relay's API key
-  IMAGE_MODEL         optional, default gpt-image-1
+  IMAGE_MODEL         the model id to request
 
 The prompt you pass is only the item-specific part. The script prepends
 tools/prompts/base.txt (the shared style rules) and, with --type, tools/prompts/<type>.txt.
@@ -48,7 +48,7 @@ def build_prompt(args):
 def request_image(args):
     base = env("IMAGE_API_BASE_URL").rstrip("/")
     headers = {"Authorization": f"Bearer {env('IMAGE_API_KEY')}"}
-    fields = {"model": env("IMAGE_MODEL", "gpt-image-1"), "prompt": build_prompt(args), "size": args.size, "n": 1}
+    fields = {"model": env("IMAGE_MODEL"), "prompt": build_prompt(args), "size": args.size, "n": 1}
     if args.transparent or args.type == "item":
         fields["background"] = "transparent"
 
@@ -69,7 +69,7 @@ def request_image(args):
 
 
 def pixelate(img, size, colors):
-    # BOX averages each source block, which keeps shapes cleaner than NEAREST on AI art
+    # BOX averages each source block, which keeps shapes cleaner than NEAREST on generated art
     img = img.convert("RGBA").resize((size, size), Image.BOX)
     if colors:
         alpha = img.getchannel("A").point(lambda a: 255 if a >= 128 else 0)
