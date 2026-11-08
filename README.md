@@ -17,7 +17,7 @@ Have a hotpot dinner in Minecraft: build a stove, seat a pot on it, pour in a br
 
 <p><sub>源代码 / Source code：<a href="LICENSE">MIT</a> · 原创贴图、模型、音效等 / Original creative assets：<a href="ASSETS_LICENSE">CC BY-NC-SA 4.0</a></sub></p>
 
-[简中书本教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/?lang=zh_cn&v=0.2.1-alpha-book-20261102) / [繁中書本教學](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-tw/?lang=zh_tw&v=0.2.1-alpha-book-20261102) / [English Book Guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/?lang=en&v=0.2.1-alpha-book-20261102) · [下载测试版 · Download Alpha](#downloads) · [更新日志 · Changelog](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) · [反馈问题 · Report an Issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
+[简中书本教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/?lang=zh_cn&v=book-20261108-57f65745) / [繁中書本教學](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-tw/?lang=zh_tw&v=book-20261108-57f65745) / [English Book Guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/?lang=en&v=book-20261108-57f65745) · [下载测试版 · Download Alpha](#downloads) · [更新日志 · Changelog](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) · [反馈问题 · Report an Issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
 
 </div>
 
@@ -311,7 +311,7 @@ Use **Java 25+ for Minecraft 26.x**, **Java 21+ for 1.21.1**, or **Java 17+ for 
 
 ## 怎么玩 · How to play
 
-更详细的图文说明见[简中书本教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/?lang=zh_cn&v=0.2.1-alpha-book-20261102)。 / See the [online book guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/?lang=en&v=0.2.1-alpha-book-20261102) for more pictures and details.
+更详细的图文说明见[简中书本教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/?lang=zh_cn&v=book-20261108-57f65745)。 / See the [online book guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/?lang=en&v=book-20261108-57f65745) for more pictures and details.
 
 <details>
 <summary><b>展开中文玩法</b></summary>
