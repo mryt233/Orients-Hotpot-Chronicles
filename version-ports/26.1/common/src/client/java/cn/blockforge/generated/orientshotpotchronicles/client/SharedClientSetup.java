@@ -57,6 +57,10 @@ public final class SharedClientSetup {
             if (!held.isEmpty()) {
                 lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.chopsticks.holding"), held.getHoverName())
                     .withStyle(ChatFormatting.GRAY));
+                // mryt233 改（2026-11-04）：夹着的菜蘸过就接着列蘸料和效果，不用放下筷子才看得到。
+                ClientTooltips.appendDipped(held, lines);
+                // mryt233 改（2026-11-05，r136a）：夹着的菜是在哪种汤底里煮出来的也列出来
+                ClientTooltips.appendCookedSoup(held, lines);
             }
             return;
         }
@@ -96,6 +100,11 @@ public final class SharedClientSetup {
                 line = line.copy().append(Component.literal(" ×" + counts.get(k)));
             }
             lines.add(line.copy().withStyle(ChatFormatting.GRAY));
+            // mryt233 改（2026-11-04）：这样菜蘸过的话，在它这一行下面接着列蘸料和效果。
+            // 合并计数不受影响：不同蘸料的同种菜组件不同，本来就不会并成一行。
+            ClientTooltips.appendDipped(kinds.get(k), lines);
+            // mryt233 改（2026-11-05，r136a）：再补一行「汤底：红汤锅底 · 特辣」这种说明
+            ClientTooltips.appendCookedSoup(kinds.get(k), lines);
         }
     }
 
@@ -112,7 +121,11 @@ public final class SharedClientSetup {
                 && bi.getBlock() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock pot
                 ? pot.material().layout() : cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout.NINE_GRID;
         String[] keys = {"Base", "BaseB", "BaseC", "BaseD"};
-        Component soupName = HotPotBlockEntity.soupText(layout, side -> nbt.getIntOr(keys[side], -1));
+        // mryt233 改（2026-11-05，r136a）：红汤边在提示里也带辣度档位，比如「红汤锅底（特辣）」
+        String[] spicyKeys = {"Spicy", "SpicyB", "SpicyC", "SpicyD"};
+        Component soupName = HotPotBlockEntity.soupText(layout,
+            side -> nbt.getIntOr(keys[side], -1),
+            side -> nbt.getIntOr(spicyKeys[side], 0));
         lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.pot.soup"), soupName)
             .withStyle(ChatFormatting.GRAY));
         int food = nbt.getListOrEmpty("Items").size();

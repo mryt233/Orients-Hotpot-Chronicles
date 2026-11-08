@@ -66,17 +66,22 @@ Upgrading a 0.1.0-alpha.1 world can lose or change some items (there was a major
 **Q: Can this mod integrate with other mods?**
 An integration hook exists: blocks in the `orients_hotpot_chronicles:heat_sources` block tag can act as heat sources for pots. Suggestions for other integrations are welcome on GitHub.
 
-**Q: How do 1.20.1 and NeoForge differ from 1.21.1 Fabric?**
-Gameplay is the same, with only very small differences such as steam particles and returning bowls. However, **new content usually arrives on Fabric 1.21.1 first, with other builds following later**. See [Downloads, Installation & Feedback](install.html#ports).
+**Q: How do 1.20.1, 26.1.x, and 26.2 differ from 1.21.1?**
+In 0.2.2-alpha, **1.21.1 (Fabric / NeoForge), 1.20.1 (Fabric / Forge), 26.1.x (Fabric / NeoForge), and 26.2 (Fabric / NeoForge)** are all updated simultaneously with the same gameplay and content. See [Downloads, Installation & Feedback](install.html#ports).
 
 **Q: Where should I report a bug?**
 Visit the GitHub repository: <https://github.com/mryt233/Orients-Hotpot-Chronicles> and describe it clearly in Issues (or join **QQ group 248314791**; contact info is in [Downloads, Installation & Feedback](install.html#feedback)). Please specify: Minecraft version, mod version, how to reproduce it, and preferably screenshots.
 
-## Configurable values {#config}{{dev}}
+<!-- mryt233 改，2026-11-02：0.2.0-alpha 发布，数值配置转正式。 -->
+## Configurable values {#config}{{since:0.2.0-alpha}}
 
-:::dev
-Advanced players can edit `config/orients_hotpot_chronicles.json` in the game directory, then have an administrator run **`/orientshotpot reload`**. Food hunger and saturation update immediately, using the same values for eating directly, with chopsticks, and in the pot screen. On multiplayer servers, edit only the server file. The command reports a warning count; a malformed file falls back to defaults while keeping the broken original. This is in development and **not in 0.1.4-alpha**.
-:::
+**Q: Can I change how much hunger food restores, or how fast broths cook?**
+Yes. Starting in 0.2.2-alpha, you can select this mod in the **Mods menu** (install Mod Menu on Fabric; built-in on NeoForge / Forge) and click **Config** to adjust categorized sliders and save immediately. You can also edit `config/orients_hotpot_chronicles.json` directly (adjusting food nutrition, per-sip drink nutrition, broth speed, fuel, dipping sauces, and more, with each entry's meaning, range, and unit documented). After editing the JSON file, an administrator runs **`/orientshotpot reload`** to apply changes without restarting; the reply reports how many warnings there were.
+
+- On **multiplayer servers**, edit only the server file; players receive it when joining and after each reload.
+- A bad entry (not a number, out of range, or a misspelled key) falls back to its default with a warning; if the whole file is broken, all defaults are used and **the broken file is kept as-is** so you can fix it.
+- Change recipes with a data pack, then run vanilla `/reload`.
+- Numbers in this guide are defaults; if a server changed its config, the server's values apply.
 
 ## Useful commands
 

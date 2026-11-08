@@ -444,15 +444,21 @@ async function buildPlates(ctx, s) {
       plate.position.set(bx + (px - 8) / 16, -drop / 16, bz + (pz - 8) / 16);
       root.add(plate);
       const innerL = len - 1, innerW = wid - 1;
-      // r89: every plate shows food the same size (4 px) and each cell holds up to 3
+      // r89: every plate shows food the same size (4 px) and each cell holds up to 3 — except the 1x1 dish (r135b)
       // r90 preview: other plates shingle (each next one half-overlaps the previous, sloping DOWN to the plate
-      // floor at its free end, kept inside the rim); the 1x1 dish piles straight, each one turned 15° clockwise
+      // floor at its free end, kept inside the rim); the bowls pile straight, each one turned 15° clockwise
       const cells = cols * rows, layers = 3;
       const count = s.fill === "full" ? cells * layers : cells;
       // RISE: how much higher each next item sits. Item models are 1/16 thick → 0.25 px at this size; a smaller
       // rise lets neighbours sink into each other a little (never all the way through), which reads right from
       // every angle and keeps the slope gentle (r90 user feedback: "翘得太高")
       const FOOD = 4, RISE = 0.15;
+      // r135b (mryt233): the 1x1 dish's well is only 4×4 px, so a 4 px item already pokes past the 5×5 rim once it is
+      // turned (layer 3's diagonal reaches 5.66 px). Its food shrinks to 3.0 px and turns 12° per layer: even at 24°
+      // the turned item's half-width is 1.98 px, so all three layers stay inside the well (±2 px).
+      const SMALL_DISH_FOOD = 3.0, SMALL_DISH_SPIN = -12;
+      const smallDish = size === "1x1";
+      const foodSize = smallDish ? SMALL_DISH_FOOD : FOOD;
       const inner = { x0: 8 - innerL / 2 + (px - 8), x1: 8 + innerL / 2 + (px - 8) };
       for (let i = 0; i < count; i++) {
         const c = i % cells, layer = Math.floor(i / cells);
@@ -465,10 +471,16 @@ async function buildPlates(ctx, s) {
         const holder = new THREE.Group();
         holder.add(fixed);
         holder.rotation.order = "YXZ";
-        holder.scale.setScalar(FOOD / 16);
+        holder.scale.setScalar(foodSize / 16);
         let y = 1 - drop + 0.002;
         let tiltZ = 0;
-        if (size === "1x1" || s.stack !== "shingle") {
+        if (smallDish) {
+          // straight pile, centred, turned 12° clockwise per layer (seen from above) — PlateFoodRenderer r135b
+          const spin = SMALL_DISH_SPIN * layer;
+          holder.rotation.x = Math.PI / 2;
+          holder.rotation.y = (spin * Math.PI) / 180;
+          y += layer * RISE;
+        } else if (s.stack !== "shingle") {
           // straight pile: each one a little higher, turned 15° clockwise (seen from above) from the one below
           holder.rotation.x = Math.PI / 2;
           holder.rotation.y = (-15 * layer * Math.PI) / 180;
@@ -611,7 +623,7 @@ async function buildDrink(ctx, s) {
   fixed.add(item);
   const holder = new THREE.Group();
   holder.add(fixed);
-  holder.scale.setScalar(4 / 16);
+  holder.scale.setScalar(3 / 16); // r135b: the 1x1 dish shows its food at 3 px, matching PlateFoodRenderer
   holder.rotation.x = Math.PI / 2;
   holder.position.set(0.5 + 3.5 / 16, mc((lift + 1.002) / 16), 0);
   root.add(holder);

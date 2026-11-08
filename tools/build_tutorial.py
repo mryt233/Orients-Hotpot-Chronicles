@@ -185,9 +185,9 @@ def slot(ref, count=None):
     return '<div class="slot" title="%s">%s%s</div>' % (html.escape(label), icon_img(iid), cnt)
 
 
-# 已发布版里还没有、要等下一版才发布的物品（教程基于已发布的 0.1.3-alpha，这些在配方 / 图鉴里加「0.1.4 将更新」角标）。
+# 已发布版里还没有、要等下一版才发布的物品（这些在配方 / 图鉴里加「开发版预览」角标）。
 # 发版时把已发布的从这里删掉。
-UPCOMING = set()   # 0.1.3-alpha（2026-10-25）发布时清空：牛脊肉 / 吊龙、鸳鸯锅 / 田字锅都已发布
+UPCOMING = set()   # 0.2.2-alpha（2026-11-08，mryt233 改）发布时清空：冷热豆腐、r137 新食材与蘸料原料、r139 折耳根与布围裙均已发布
 BADGE = '<span class="tag dev">开发版预览</span>'
 
 
@@ -264,7 +264,8 @@ COOK = cooking_map()
 
 # 教程以已发布版为准（2026-10-27）：配方先用已发布版冻结源码里的，开发版新加的照样带上；
 # 开发版才有的物品不要求正文讲（它们集中写在更新日志「开发版预览」，靠清单编号检查）
-RELEASE_RES = os.path.join(ROOT, "..", "version-ports", "base", "0.1.4-alpha", "src", "main", "resources")
+# mryt233 改，2026-11-02：0.2.0-alpha 没有冻结底本，正式版就是当前主工程，直接读主工程资源。
+RELEASE_RES = RES
 
 
 def use_release_recipes():
@@ -499,7 +500,8 @@ def build_items_page():
         ("食材", lambda i: True),
     ]
     all_ids = sorted({k.split(":")[1] for k in NAMES} - {"plates"})
-    hide = {"plates", "sauce_station_top", "tall_brick_stove_top", "bowl", "drink"}
+    # mryt233 改：饮料炼药锅只有方块状态，没有可列入图鉴的独立物品。
+    hide = {"plates", "sauce_station_top", "tall_brick_stove_top", "bowl", "drink", "drink_cauldron"}
     all_ids = [i for i in all_ids if i not in hide]
     seen = set()
     out = ["<h1>物品图鉴</h1>", "<p>模组里所有物品和方块（自动生成）。<code>ID</code> 是指令里用的名字，例如 <code>/give @s orients_hotpot_chronicles:brick_stove</code>。</p>"]

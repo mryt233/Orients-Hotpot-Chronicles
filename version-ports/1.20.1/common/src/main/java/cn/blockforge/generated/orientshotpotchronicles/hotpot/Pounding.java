@@ -36,13 +36,27 @@ public final class Pounding {
         return stack.is(HotPotContent.PEELED_SHRIMP);
     }
 
-    public static boolean poundable(ItemStack stack) {
-        return meatOf(stack) != null || isGarlic(stack) || isPeeledShrimp(stack);
+    /** mryt233 改（2026-11-06，清单 #123）：花生也能敲，敲三下出 2 份花生碎（蘸料台「花生碎」的原料）。 */
+    public static boolean isPeanut(ItemStack stack) {
+        return stack.is(HotPotContent.PEANUT);
     }
 
-    /** 敲完掉几个：丸子 3 个，蒜泥 2 份，虾滑 1 颗。 */
+    /** mryt233 改（2026-11-06，清单 #127）：折耳根也能敲，敲三下出 2 份折耳根碎（蘸料台第 15 种调料的原料）。 */
+    public static boolean isZheErGen(ItemStack stack) {
+        return stack.is(HotPotContent.ZHE_ER_GEN);
+    }
+
+    public static boolean poundable(ItemStack stack) {
+        return meatOf(stack) != null || isGarlic(stack) || isPeeledShrimp(stack)
+            || isPeanut(stack) || isZheErGen(stack);
+    }
+
+    /** 敲完掉几个：丸子 3 个，蒜泥 2 份，花生碎 2 份，折耳根碎 2 份，虾滑 1 颗；不能捣返回 0。 */
     public static int resultCount(ItemStack stack) {
-        return isGarlic(stack) ? 2 : isPeeledShrimp(stack) ? 1 : RESULT_COUNT;
+        if (!poundable(stack)) {
+            return 0;
+        }
+        return isGarlic(stack) ? 2 : isPeeledShrimp(stack) ? 1 : isPeanut(stack) ? 2 : isZheErGen(stack) ? 2 : RESULT_COUNT;
     }
 
     private static final java.util.List<String> MEAT_ORDER = java.util.List.of("beef", "pork", "mutton", "fish");
@@ -59,6 +73,14 @@ public final class Pounding {
         if (isPeeledShrimp(meat)) {
             // 虾仁：拍一下还是虾仁，第二下起已经是一团虾滑
             return hits >= 2 ? new ItemStack(HotPotContent.SHRIMP_PASTE) : meat;
+        }
+        if (isPeanut(meat)) {
+            // mryt233 改（2026-11-06，清单 #123）：花生敲一下还是花生，第二下起是一小堆花生碎
+            return hits >= 2 ? new ItemStack(HotPotContent.CRUSHED_PEANUTS) : meat;
+        }
+        if (isZheErGen(meat)) {
+            // mryt233 改（2026-11-06，清单 #127）：折耳根敲一下还是根，第二下起是一小撮碎末
+            return hits >= 2 ? new ItemStack(HotPotContent.MINCED_ZHE_ER_GEN) : meat;
         }
         String m = meatOf(meat);
         if (m == null || hits <= 0) {
@@ -77,6 +99,12 @@ public final class Pounding {
         }
         if (isPeeledShrimp(stack)) {
             return HotPotContent.SHRIMP_PASTE;
+        }
+        if (isPeanut(stack)) {
+            return HotPotContent.CRUSHED_PEANUTS;
+        }
+        if (isZheErGen(stack)) {
+            return HotPotContent.MINCED_ZHE_ER_GEN;
         }
         String meat = meatOf(stack);
         if (meat == null) {

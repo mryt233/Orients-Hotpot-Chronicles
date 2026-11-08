@@ -125,6 +125,21 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
         return aimsAtItem(pos, player) ? ITEM_SHAPE : SHAPE;
     }
 
+    /** mryt233 改（清单 #129）：板上食材与木墩分别显示各自名称。 */
+    @Override
+    public net.minecraft.network.chat.MutableComponent getName() {
+        Player player = PlateHolderBlock.pickPlayer.get();
+        if (player != null && player.level() != null) {
+            HitResult hit = player.pick(cn.blockforge.orient.framework.compat.PlayerCompat.blockInteractionRange(player), 1.0F, false);
+            if (hit instanceof BlockHitResult blockHit && hit.getType() == HitResult.Type.BLOCK
+                && player.level().getBlockEntity(blockHit.getBlockPos()) instanceof CuttingBoardBlockEntity board
+                && !board.item().isEmpty() && aimsAtItem(blockHit.getBlockPos(), player)) {
+                return board.item().getHoverName().copy();
+            }
+        }
+        return super.getName();
+    }
+
     /** 鼠标中键：对着板上的东西复制那样东西，否则复制砧板。 */
     @Override
     public ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter world, BlockPos pos, BlockState state) {
@@ -150,9 +165,19 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
             java.util.Map.entry(Items.POTATO, new ItemStack(HotPotContent.POTATO_SLICE, 3)),
             java.util.Map.entry(Items.PORKCHOP, new ItemStack(HotPotContent.MINCED_PORK, 1)),
             java.util.Map.entry(HotPotContent.BEEF_LOIN, new ItemStack(HotPotContent.BEEF_LOIN_SLICE, 3)),
-            java.util.Map.entry(HotPotContent.TOFU, new ItemStack(HotPotContent.TOFU_CUBE, 3)),
+            // mryt233 改（2026-11-04，清单 #108）：冷 / 热豆腐都能切，各出对应的豆腐块
+            // （热豆腐切热豆腐块，和冷豆腐切冷豆腐块一样）。
+            java.util.Map.entry(HotPotContent.COLD_TOFU, new ItemStack(HotPotContent.COLD_TOFU_CUBE, 3)),
+            java.util.Map.entry(HotPotContent.HOT_TOFU, new ItemStack(HotPotContent.HOT_TOFU_CUBE, 3)),
             java.util.Map.entry(HotPotContent.SHRIMP, new ItemStack(HotPotContent.PEELED_SHRIMP, 1)),
-            java.util.Map.entry(HotPotContent.HAM_SAUSAGE, new ItemStack(HotPotContent.HAM_SAUSAGE_SLICE, 3))
+            java.util.Map.entry(HotPotContent.HAM_SAUSAGE, new ItemStack(HotPotContent.HAM_SAUSAGE_SLICE, 3)),
+            // mryt233 改（2026-11-06，清单 #123）：辣椒一刀切成 2 份小米辣；莲藕切 3 刀、每刀 1 片藕片
+            // （和土豆一样记在 cut_piece_by_piece 标签里）；生鱿鱼一刀切成 3 份鱿鱼卷。
+            java.util.Map.entry(HotPotContent.CHILI_PEPPER, new ItemStack(HotPotContent.MILLET_CHILI, 2)),
+            java.util.Map.entry(HotPotContent.LOTUS_ROOT, new ItemStack(HotPotContent.LOTUS_ROOT_SLICE, 3)),
+            java.util.Map.entry(HotPotContent.RAW_SQUID, new ItemStack(HotPotContent.SQUID_ROLL, 3)),
+            // mryt233 改（2026-11-06，清单 #127）：折耳根一刀切成 3 段（整根 → 折耳根段，下锅涮的食材）。
+            java.util.Map.entry(HotPotContent.ZHE_ER_GEN, new ItemStack(HotPotContent.ZHE_ER_GEN_SLICE, 3))
             // ==== tools/new_item.py：新的砧板切配插在这行上面（别删这行）====
         );
 

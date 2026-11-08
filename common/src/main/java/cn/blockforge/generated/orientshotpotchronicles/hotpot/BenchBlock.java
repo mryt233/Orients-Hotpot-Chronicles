@@ -5,6 +5,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -71,14 +72,14 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
                 boolean right = (i & 2) != 0;
                 boolean single = !left && !right;
                 VoxelShape shape = rotated(new double[]{left ? 0 : 0.5, 14, 5, right ? 16 : 15.5, 16, 11}, facing);
-                // 腿是斜的，碰撞箱用包住两条腿的竖直方块近似
+                // mryt233 改：条凳腿碰撞箱与选中框收窄为 5..11，与凳面同宽，避免贴凳走动被卡住。
                 if (!left) {
                     double x0 = single ? 1.5 : 4.5;
-                    shape = Shapes.or(shape, rotated(new double[]{x0, 0, 4, x0 + 2, 14, 12}, facing));
+                    shape = Shapes.or(shape, rotated(new double[]{x0, 0, 5, x0 + 2, 14, 11}, facing));
                 }
                 if (!right) {
                     double x0 = single ? 12.5 : 9.5;
-                    shape = Shapes.or(shape, rotated(new double[]{x0, 0, 4, x0 + 2, 14, 12}, facing));
+                    shape = Shapes.or(shape, rotated(new double[]{x0, 0, 5, x0 + 2, 14, 11}, facing));
                 }
                 tall[i] = shape.optimize();
             }
@@ -171,6 +172,70 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
 
     /** 连成一条最长几格（2026-10-26 用户：条凳最长 3 格，超过就不再吸附）。 */
     public static final int MAX_LENGTH = 3;
+    /** 手持一格高条凳往上叠，整摞最多几格（2026-11-05 用户：一格高条凳搭起来当梯子用）。
+     *  mryt233 改（2026-11-07）：上限按「整摞格数」算，含被点的那一格，和高凳那边统一成 16 格。 */
+    public static final int MAX_STACK = 16;
+
+    /** 这格方块是不是一格高的条凳（<wood>_bench，tall = true）。 */
+    public static boolean isTallBench(BlockState state) {
+        return state.getBlock() instanceof BenchBlock bench && bench.tall;
+    }
+
+    /**
+     * 这格条凳是不是「已经上下搭起来了」（至少 2 层条凳叠在一起）：
+     * 单张放在火锅桌边的条凳不触发爬梯子，免得围桌走动时不小心蹭上去；一旦上下搭了 2 层及以上，就能当梯子攀爬。
+     */
+    public static boolean isStackedTallBench(BlockGetter world, BlockPos pos) {
+        if (!isTallBench(world.getBlockState(pos))) {
+            return false;
+        }
+        return isTallBench(world.getBlockState(pos.above())) || isTallBench(world.getBlockState(pos.below()));
+    }
+
+    /**
+     * 检查实体是否正贴着一摞已经叠起来的条凳（至少 2 层）：
+     * 条凳前后方向（z 5..11）比满格内缩 5 像素，玩家贴着侧面走时中心会进格；左右两端（0.5..15.5）内缩 0.5 像素，
+     * 水平扩 0.06 格即可让四面贴靠都能顺滑像爬梯子一样上下攀爬。
+     *
+     * <p>mryt233 改（2026-11-07）：① 站在凳面上（脚踩在条凳上）不算攀爬，免得单张凳旁边的叠塔把人黏住；
+     * ② 用复用的 MutableBlockPos 探测，先单格判一次「是不是条凳」就跳过绝大多数空气格，命中后再查上下，
+     * 不再每个空气格都查三遍、也不再产生大量临时 BlockPos。作者：mryt233</p>
+     */
+    public static BlockPos findClimbableStackedBench(net.minecraft.world.entity.LivingEntity entity) {
+        Level world = entity.level();
+        AABB box = entity.getBoundingBox();
+        // 站在凳面上（脚底下那格是条凳）时不算在爬
+        BlockPos feet = BlockPos.containing(entity.getX(), box.minY - 0.1, entity.getZ());
+        if (entity.onGround() && isTallBench(world.getBlockState(feet))) {
+            return null;
+        }
+        AABB probeBox = box.inflate(0.06, 0.0, 0.06);
+        int y0 = net.minecraft.util.Mth.floor(probeBox.minY + 1.0E-3);
+        int y1 = net.minecraft.util.Mth.floor(probeBox.maxY - 1.0E-3);
+        BlockPos.MutableBlockPos probe = new BlockPos.MutableBlockPos();
+        for (int y = y0; y <= y1; y++) {
+            for (int x = net.minecraft.util.Mth.floor(probeBox.minX); x <= net.minecraft.util.Mth.floor(probeBox.maxX); x++) {
+                for (int z = net.minecraft.util.Mth.floor(probeBox.minZ); z <= net.minecraft.util.Mth.floor(probeBox.maxZ); z++) {
+                    probe.set(x, y, z);
+                    if (!isTallBench(world.getBlockState(probe))) {
+                        continue;                        // 一次查询跳过绝大多数空气格
+                    }
+                    probe.move(Direction.UP);
+                    boolean stacked = isTallBench(world.getBlockState(probe));
+                    probe.move(Direction.DOWN);
+                    if (!stacked) {
+                        probe.move(Direction.DOWN);
+                        stacked = isTallBench(world.getBlockState(probe));
+                        probe.move(Direction.UP);
+                    }
+                    if (stacked) {
+                        return probe.immutable();        // 这一格属于一摞 2 层以上的条凳
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
     /**
      * 放下时决定连哪边：数一数左右两边已经连着的有几张，连上后整条不超过 {@link #MAX_LENGTH} 才连；
@@ -178,12 +243,15 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
      */
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        BlockState state = defaultBlockState().setValue(FACING, ctx.getHorizontalDirection());
-        BlockGetter world = ctx.getLevel();
-        BlockPos pos = ctx.getClickedPos();
-        Direction left = leftOf(state.getValue(FACING));
-        int l = runLength(world, pos.relative(left), left, state.getValue(FACING));
-        int r = runLength(world, pos.relative(left.getOpposite()), left.getOpposite(), state.getValue(FACING));
+        return placementStateAt(ctx.getLevel(), ctx.getClickedPos(), ctx.getHorizontalDirection());
+    }
+
+    /** 计算在 pos 处按 facing 朝向放这张凳子时的连接状态（正常放置和手持条凳往上叠共用）。 */
+    public BlockState placementStateAt(BlockGetter world, BlockPos pos, Direction facing) {
+        BlockState state = defaultBlockState().setValue(FACING, facing);
+        Direction left = leftOf(facing);
+        int l = runLength(world, pos.relative(left), left, facing);
+        int r = runLength(world, pos.relative(left.getOpposite()), left.getOpposite(), facing);
         boolean joinL = l > 0, joinR = r > 0;
         if (1 + l + r > MAX_LENGTH) {
             boolean fitL = l > 0 && 1 + l <= MAX_LENGTH, fitR = r > 0 && 1 + r <= MAX_LENGTH;
@@ -191,6 +259,17 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
             joinR = fitR && !joinL;
         }
         return state.setValue(LEFT, joinL).setValue(RIGHT, joinR);
+    }
+
+    /** 直接往另一张条凳顶面放条凳时，同样触发「步步高升」成就。 */
+    @Override
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state,
+                            net.minecraft.world.entity.LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(world, pos, state, placer, stack);
+        if (!world.isClientSide && this.tall && placer instanceof Player player
+                && isTallBench(world.getBlockState(pos.below()))) {
+            HotPotCriterion.fire(player, "tall_stool");
+        }
     }
 
     /** 邻居变了：一边还连着，要那一边的凳子也说连着我才算（谁连谁在放下时就定了）；那边没凳子了就断开。 */
@@ -202,6 +281,30 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
         return state
             .setValue(LEFT, joinedTo(world.getBlockState(pos.relative(left)), left.getOpposite(), facing))
             .setValue(RIGHT, joinedTo(world.getBlockState(pos.relative(left.getOpposite())), left, facing));
+    }
+
+    /**
+     * 条凳被拆、被活塞推走、被炸掉时，把落在这一格上的座位一起清掉（坐着的人当场被放下）。
+     * mryt233 改（2026-11-07）：以前条凳没有 onRemove，只能等座位实体下一 tick 自己发现凳子没了，
+     * 这一 tick 里人会坐在一张已经不存在的凳子上。
+     */
+    @Override
+    protected void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
+        if (!world.isClientSide && !state.is(newState.getBlock())) {
+            clearSeatsAt(world, pos);
+        }
+        super.onRemove(state, world, pos, newState, moved);
+    }
+
+    /** 清掉落在 pos 这一格（含两格交界）上的座位实体。mryt233 改（2026-11-07）新增。作者：mryt233 */
+    public static void clearSeatsAt(Level world, BlockPos pos) {
+        Vec3 center = Vec3.atBottomCenterOf(pos);
+        AABB area = new AABB(center, center).inflate(1.5, 2.0, 1.5);
+        for (SeatEntity seat : world.getEntitiesOfClass(SeatEntity.class, area, Entity::isAlive)) {
+            if (seat.sitsOn(pos)) {
+                seat.discard();
+            }
+        }
     }
 
     /** 这张凳子在 dir 方向上连着别的凳子吗（按它自己的朝向换算成 LEFT / RIGHT）。 */
@@ -258,21 +361,105 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
         return shapeOf(state);
     }
 
-    // ------------------------------------------------------------------ 坐
+    // ------------------------------------------------------------------ 往上叠 & 坐
 
-    /** 拿着方块时照常放方块（方便接着摆条凳），其余情况交给 useWithoutItem 去坐。 */
+    /**
+     * 手里拿着一格高条凳右键已放好的一格高条凳（不潜行时）：顺着这一摞往上找，直接叠到最顶上（最多 16 格），
+     * 叠好后就能当梯子爬；潜行或拿别的方块时照常按原版放置，空手或拿非方块物品交给 useWithoutItem 去坐。
+     */
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
                                               Player player, InteractionHand hand, BlockHitResult hit) {
+        if (this.tall && !player.isShiftKeyDown()
+                && stack.getItem() instanceof BlockItem held
+                && held.getBlock() instanceof BenchBlock heldBench && heldBench.tall) {
+            BlockPos target = findStackTop(world, pos);
+            if (target != null) {
+                if (!world.isClientSide) {
+                    // mryt233 改（2026-11-07）：叠之前先看目标格和这一摞最顶上——别把人顶出座位、别把方块塞进生物身体里
+                    if (!stackSpotFree(world, target, player)) {
+                        player.displayClientMessage(
+                            Component.translatable(HotPotBlockEntity.key("msg.seat_taken")), true);
+                        return ItemInteractionResult.FAIL;
+                    }
+                    BlockState placed = heldBench.placementStateAt(world, target, player.getDirection());
+                    world.setBlock(target, placed, Block.UPDATE_ALL);
+                    world.playSound(null, target,
+                        heldBench.planks().defaultBlockState().getSoundType().getPlaceSound(),
+                        net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                    if (!player.getAbilities().instabuild) {
+                        stack.consume(1, player);
+                    }
+                    HotPotCriterion.fire(player, "tall_stool");
+                }
+                return ItemInteractionResult.sidedSuccess(world.isClientSide);
+            }
+        }
         return stack.getItem() instanceof BlockItem
             ? ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
             : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+    }
+
+    /**
+     * 从被点的这一格往上找，返回这一摞顶上能放新凳的那一格。
+     * 被点的 pos 算第 1 层，整摞叠完不允许超过 {@link #MAX_STACK}；出世界高度、顶上放不下都返回 null。
+     * mryt233 改（2026-11-07）：以前从 pos 上面一格起最多走 MAX_STACK 步，整摞实际能到 18 格。
+     * 另外被点的那一格可能在这摞中间或顶上（叠高了以后玩家多半点最上面那张），光从它往上数永远只数到 1 层，
+     * 所以先往下走到这一摞的最底下，再从底下往上数满整摞。
+     */
+    private static BlockPos findStackTop(Level world, BlockPos pos) {
+        BlockPos.MutableBlockPos cursor = pos.mutable();
+        int steps = 0;                                   // 只用来防死循环，不参与层数
+        while (steps++ < MAX_STACK && isTallBench(world.getBlockState(cursor.below()))) {
+            cursor.move(Direction.DOWN);
+        }
+        // 这时 cursor 已经在整摞最底下，从最底下往上数整摞有几层（含它自己）
+        int layers = 1;
+        while (layers < MAX_STACK && isTallBench(world.getBlockState(cursor.above()))) {
+            cursor.move(Direction.UP);
+            layers++;
+        }
+        if (layers >= MAX_STACK) {
+            return null;                                 // 已经是一摞 16 格，再叠就超上限
+        }
+        BlockPos target = cursor.above().immutable();
+        if (world.isOutsideBuildHeight(target)) {
+            return null;
+        }
+        return world.getBlockState(target).canBeReplaced() ? target : null;
+    }
+
+    /**
+     * 叠凳子之前先看一眼：目标格会不会卡在生物身上；这一摞最顶上有没有人正坐着
+     * （叠上去座位会被迫丢弃，人会从半空摔下来）。
+     * mryt233 改（2026-11-07）：放在 BenchBlock 是为了不新增公共工具类，也让条凳和高凳共用同一份判断。
+     * 作者：mryt233
+     */
+    public static boolean stackSpotFree(Level world, BlockPos target, Player placer) {
+        AABB area = new AABB(target).inflate(0.05);
+        // 目标格里已经站了别的生物（放凳子的人自己不算，座位实体本身也不算——它们由下面那条判）
+        if (!world.getEntitiesOfClass(Entity.class, area,
+                e -> e != placer && e.isAlive() && !(e instanceof SeatEntity)).isEmpty()) {
+            return false;
+        }
+        Vec3 top = Vec3.atBottomCenterOf(target);
+        for (SeatEntity seat : world.getEntitiesOfClass(SeatEntity.class,
+                new AABB(top, top).inflate(1.0, 2.0, 1.0), Entity::isAlive)) {
+            if (seat.isVehicle()) {
+                return false;                            // 有人正坐在这摞最上面那张，别往人家头上压凳子
+            }
+        }
+        return true;
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player,
                                                BlockHitResult hit) {
         if (player.isShiftKeyDown() || player.isPassenger()) {
+            return InteractionResult.PASS;
+        }
+        // 凳塔中间那几层（头顶还叠着另一张条凳）不坐人，只坐最顶上或单张条凳
+        if (this.tall && isTallBench(world.getBlockState(pos.above()))) {
             return InteractionResult.PASS;
         }
         if (world.isClientSide) {

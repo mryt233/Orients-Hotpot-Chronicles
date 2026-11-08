@@ -1,4 +1,4 @@
 @echo off
-rem 作者：mryt233  双击用浏览器打开单文件版教程（一个文件，一直往下翻，左边是目录）
-rem mryt233 改：默认打开中英文合一的单文件教程。
-start "" "%~dp0Minecraft_Orients_Hotpot_Chronicles_Player_Guide.html"
+chcp 65001 >nul
+rem 作者：mryt233  双击用浏览器打开单文件书本样式教程（2026-11-06 mryt233 改：切到当前唯一维护的书本样式教程）
+start "" "%~dp0我的世界[之晗的火锅物语]模组-游玩教程（书本样式）.html"

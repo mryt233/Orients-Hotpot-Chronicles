@@ -80,6 +80,10 @@ public final class SharedClientSetup {
             if (!held.isEmpty()) {
                 lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.chopsticks.holding"), held.getHoverName())
                     .withStyle(ChatFormatting.GRAY));
+                // mryt233 改（2026-11-04，清单 #105）：筷子夹着的菜也显示蘸了什么料、各有什么效果
+                ClientTooltips.appendDipped(held, lines);
+                // mryt233 改（2026-11-05，清单 #117）：以及「在哪种汤里涮的」与汤底效果
+                ClientTooltips.appendCookedSoup(held, lines);
             }
             return;
         }
@@ -118,6 +122,10 @@ public final class SharedClientSetup {
                 line = line.copy().append(Component.literal(" ×" + counts.get(k)));
             }
             lines.add(line.copy().withStyle(ChatFormatting.GRAY));
+            // mryt233 改（2026-11-04，清单 #105）：盘 / 碗里每样蘸过的菜下面也列出蘸料与效果
+            ClientTooltips.appendDipped(kinds.get(k), lines);
+            // mryt233 改（2026-11-05，清单 #117）：以及「在哪种汤里涮的」与汤底效果
+            ClientTooltips.appendCookedSoup(kinds.get(k), lines);
         }
     }
 

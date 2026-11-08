@@ -190,6 +190,13 @@ public class SauceStationTopBlock extends net.minecraft.world.level.block.Block 
         super.playerWillDestroy(world, pos, state, player);
     }
 
+    /** mryt233 改（清单 #129）：沿用下方材质名称与同一小碗的调料判定。 */
+    @Override
+    public net.minecraft.network.chat.MutableComponent getName() {
+        net.minecraft.network.chat.MutableComponent name = SauceStationBlock.aimedName(PlateHolderBlock.pickPlayer.get());
+        return name == null ? super.getName() : name;
+    }
+
     @Override
     public ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter world, BlockPos pos, BlockState state) {
         return new ItemStack(world.getBlockState(pos.below()).getBlock());

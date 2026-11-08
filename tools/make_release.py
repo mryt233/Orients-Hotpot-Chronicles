@@ -107,7 +107,9 @@ def main(explicit=None):
         if any(x["version"] == version for x in state["releases"]):
             print(f"版本号 {version} 已经用过了，没处理 {jar.name}")
             continue
-        out = REL / NAME.format(version)
+        # mryt233 改（2026-11-03）：成品按 release/<MC>/<加载器>/mod/<版本>/ 分类放，和 build/libs/lastest 一样
+        out = REL / "release" / "1.21.1" / "fabric" / "mod" / version / NAME.format(version)
+        out.parent.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory() as tmp:
             tmp_jar = Path(tmp) / out.name
             rewrite_version(jar, tmp_jar, version)

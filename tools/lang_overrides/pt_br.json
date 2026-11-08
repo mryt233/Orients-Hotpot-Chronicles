@@ -15,5 +15,20 @@
   "block.orients_hotpot_chronicles.copper_square_yuanyang_hotpot": "Hotpot yuanyang com centro quadrado de cobre",
   "block.orients_hotpot_chronicles.iron_square_yuanyang_hotpot": "Hotpot yuanyang com centro quadrado de ferro",
   "item.orients_hotpot_chronicles.hotpot_guide": "Guia do hotpot",
-  "item.orients_hotpot_chronicles.cooked_ham_sausage_slice": "Fatia de salsicha de presunto cozida"
+  "item.orients_hotpot_chronicles.cooked_ham_sausage_slice": "Fatia de salsicha de presunto cozida",
+  "text.orients_hotpot_chronicles.msg.spicy_max": "Este caldo vermelho já atingiu o nível máximo de picância",
+  "advancements.orients_hotpot_chronicles.seated.title": "Sentado é mais gostoso",
+  "advancements.orients_hotpot_chronicles.knife_skills.title": "Talento na faca",
+  "advancements.orients_hotpot_chronicles.tofu_overcook.title": "Apressado come tofu queimando",
+  "advancements.orients_hotpot_chronicles.max_spicy.title": "Sem pimenta não dá",
+  "advancements.orients_hotpot_chronicles.cheers.description": "Brinde com alguém erguendo um copo cheio de bebida",
+  "advancements.orients_hotpot_chronicles.tall_stool.title": "Subindo na vida",
+  "text.orients_hotpot_chronicles.seasoning.crushed_peanuts.effect": "Superpulo I 10 s",
+  "tooltip.orients_hotpot_chronicles.flavor.crispy_pork": "Recém-frito: crocante puro, ou mergulhado na panela para pegar caldo",
+  "tooltip.orients_hotpot_chronicles.flavor.cooked_wide_noodles": "Escorregadios e mastigáveis: segure firme com os hashis para não escaparem",
+  "tooltip.orients_hotpot_chronicles.flavor.cooked_squid_roll": "Marcada em losangos: ao escaldar, enrola-se como uma espiga de trigo",
+  "tooltip.orients_hotpot_chronicles.flavor.three_fresh_soup_bowl": "Vieiras e camarões secos: tão saboroso que as sobrancelhas caem",
+  "advancements.orients_hotpot_chronicles.tofu_quartet.description": "Reúna cubos de tofu frios, cubos de tofu quentes e tofu seco",
+  "advancements.orients_hotpot_chronicles.soul_of_southwest.description": "Encare uma mordida da singular raiz de houttuynia (hortelã-do-peixe)",
+  "item.orients_hotpot_chronicles.cooked_zhe_er_gen_slice": "Raiz de houttuynia fatiada cozida"
 }

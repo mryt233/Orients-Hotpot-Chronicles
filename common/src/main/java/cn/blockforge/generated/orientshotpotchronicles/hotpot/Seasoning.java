@@ -1,7 +1,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Component;
@@ -16,10 +18,11 @@ import net.minecraft.world.item.Items;
 import java.util.function.Supplier;
 
 /**
- * 蘸料台上的 9 种调料（r103，用户定）。顺序 = 蘸料台小碗的顺序（阶梯式：从最上层到最下层、每层从左到右）= 补货界面的格子顺序。
+ * 蘸料台上的调料（r103，用户定）。顺序 = 蘸料台小碗的顺序（阶梯式：从最上层到最下层、每层从左到右）= 补货界面的格子顺序。
  * 每种由一种原料补货（1 个原料 = 4 份）；蘸过的菜吃下去时，碗里有几种就叠几种效果（用户：全部叠加）。
  * 葱花、香菜碎末只提味，没有效果（用户）。
  * 2026-10-23 用户改：麻酱换成味精（原料小麦，提鲜：多回 2 点饥饿值）；醋的原料改成苹果或甜菜根（一种调料可以有几种原料）。
+ * mryt233 改（2026-11-06，r137）：在蒜泥之后加蚝油、芝麻酱、花生碎、小米辣，现在共 14 种；原料表跟着改成双列。
  * 作者：mryt233 */
 public enum Seasoning {
     MSG("msg", 0xFFECECF0, () -> Items.WHEAT),
@@ -31,9 +34,42 @@ public enum Seasoning {
     SUGAR("sugar", 0xFFF0EEE8, () -> Items.SUGAR),
     CHOPPED_SCALLION("chopped_scallion", 0xFF6CB03A, () -> HotPotContent.SCALLION),
     MINCED_CILANTRO("minced_cilantro", 0xFF4E9A2C, () -> HotPotContent.CILANTRO),
-    GARLIC_PASTE("garlic_paste", 0xFFE8D696, () -> HotPotContent.GARLIC_PASTE);   // 蒜泥（2026-10-25 用户加，第 10 种）
+    GARLIC_PASTE("garlic_paste", 0xFFE8D696, () -> HotPotContent.GARLIC_PASTE),   // 蒜泥（2026-10-25 用户加，第 10 种）
+    // mryt233 改（2026-11-06）：r137 新增 4 种蘸料，共 14 种。蚝油（水下呼吸）、芝麻酱（伤害吸收）、
+    // 花生碎（跳跃提升）、小米辣（力量）；原料都是 r137 新加的蘸料原料，1 个原料照旧 4 份。
+    OYSTER_SAUCE("oyster_sauce", 0xFF5A321E, () -> HotPotContent.OYSTER_SAUCE),
+    SESAME_PASTE("sesame_paste", 0xFFC89E64, () -> HotPotContent.SESAME_PASTE),
+    CRUSHED_PEANUTS("crushed_peanuts", 0xFFDAB46E, () -> HotPotContent.CRUSHED_PEANUTS),
+    MILLET_CHILI("millet_chili", 0xFFE2281C, () -> HotPotContent.MILLET_CHILI),
+    // mryt233 改（2026-11-06，r139）：第 15 种调料——折耳根碎（西南吃法：折耳根剁碎拌进蘸水）。
+    // 象征折耳根清热解毒：给 10 秒抗性提升 I（和蒜泥同一档，但时间更长），原料是折耳根碾成的碎末。
+    MINCED_ZHE_ER_GEN("minced_zhe_er_gen", 0xFFD8D2BC, () -> HotPotContent.MINCED_ZHE_ER_GEN);
 
     public static final Seasoning[] ALL = values();
+
+    /**
+     * 原料 → 调料、每种调料的原料表：类加载时算一次（mryt233 改）。
+     * 以前 ofRaw 每次新建 15 个 List + 15 条 Stream，raws() 也被补货界面的槽位判定和原料表渲染
+     * （SauceStationScreen 每帧 drawGuide、SauceStationBlockEntity 的 changed / take）反复调用，
+     * 纯查表的事不该在每帧、每次点击的路径上分配。
+     */
+    private static final Map<Item, Seasoning> RAW_INDEX = new HashMap<>();
+    @SuppressWarnings("unchecked")
+    private static final List<Item>[] RAW_LISTS = new List[ALL.length];
+
+    static {
+        for (Seasoning s : ALL) {
+            List<Item> items = new ArrayList<>(s.raws.length);
+            for (Supplier<Item> raw : s.raws) {
+                items.add(raw.get());
+            }
+            RAW_LISTS[s.ordinal()] = List.copyOf(items);
+            for (Item raw : items) {
+                // 同一原料属于两种调料时取序号靠前的那个（和以前按 values() 顺序遍历取第一个一致）
+                RAW_INDEX.putIfAbsent(raw, s);
+            }
+        }
+    }
 
     private final String id;
     private final Supplier<Item>[] raws;
@@ -55,9 +91,9 @@ public enum Seasoning {
         return raws[0].get();
     }
 
-    /** 所有能补这种调料的原料。 */
+    /** 所有能补这种调料的原料（类加载时算好的常量表，直接返回，不再每次新建）。mryt233 改 */
     public List<Item> raws() {
-        return Arrays.stream(raws).map(Supplier::get).toList();
+        return RAW_LISTS[ordinal()];
     }
 
     /** 界面上空格子轮流显示的原料（有几种就每秒换一种）。 */
@@ -106,14 +142,9 @@ public enum Seasoning {
         }
     }
 
-    /** 这件东西是哪种调料的原料；不是返回 null。 */
+    /** 这件东西是哪种调料的原料；不是返回 null（mryt233 改：一次 Map 查表，不再遍历 15 种调料）。 */
     public static Seasoning ofRaw(ItemStack stack) {
-        for (Seasoning s : ALL) {
-            if (s.raws().stream().anyMatch(stack::is)) {
-                return s;
-            }
-        }
-        return null;
+        return stack.isEmpty() ? null : RAW_INDEX.get(stack.getItem());
     }
 
     /**
@@ -145,6 +176,16 @@ public enum Seasoning {
             case SUGAR -> addEffect(user, MobEffects.DIG_SPEED, 200, 0);
             // 蒜泥：抗性提升 I 8 秒（「蒜能辟邪」，计划里的建议；新增）
             case GARLIC_PASTE -> addEffect(user, MobEffects.DAMAGE_RESISTANCE, 160, 0);
+            // mryt233 改（2026-11-06）：r137 的 4 种新蘸料。
+            case OYSTER_SAUCE -> addEffect(user, MobEffects.WATER_BREATHING, 200, 0);   // 蚝油：水下呼吸 10 秒
+            case SESAME_PASTE -> addEffect(user, MobEffects.ABSORPTION, 200, 0);        // 芝麻酱：伤害吸收 I 10 秒
+            case CRUSHED_PEANUTS -> addEffect(user, MobEffects.JUMP, 200, 0);           // 花生碎：跳跃提升 I 10 秒
+            case MILLET_CHILI -> addEffect(user, MobEffects.DAMAGE_BOOST, 160, 0);      // 小米辣：力量 I 8 秒
+            // mryt233 改（2026-11-06，r139）：折耳根碎——清热解毒，抗性提升 I 10 秒；顺手解掉中毒（毒也是「热毒」）。
+            case MINCED_ZHE_ER_GEN -> {
+                addEffect(user, MobEffects.DAMAGE_RESISTANCE, 200, 0);
+                user.removeEffect(MobEffects.POISON);
+            }
             case CHOPPED_SCALLION, MINCED_CILANTRO -> {
             }
         }
@@ -174,6 +215,13 @@ public enum Seasoning {
         Config.rememberSeasoning("chopped_scallion", 0, 0, 0);
         Config.rememberSeasoning("minced_cilantro", 0, 0, 0);
         Config.rememberSeasoning("garlic_paste", 160, 0, 0);
+        // mryt233 改（2026-11-06）：r137 的 4 种新蘸料的默认时长 / 等级 / 多回饥饿值。
+        Config.rememberSeasoning("oyster_sauce", 200, 0, 0);
+        Config.rememberSeasoning("sesame_paste", 200, 0, 0);
+        Config.rememberSeasoning("crushed_peanuts", 200, 0, 0);
+        Config.rememberSeasoning("millet_chili", 160, 0, 0);
+        // mryt233 改（2026-11-06，r139）：折耳根碎（第 15 种）的默认时长 / 等级 / 多回饥饿值。
+        Config.rememberSeasoning("minced_zhe_er_gen", 200, 0, 0);
     }
 
     /** mask 里的每种调料都生效一次。 */

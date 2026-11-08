@@ -1,0 +1,38 @@
+{
+  "display": {
+    "icon": {
+      "item": "orients_hotpot_chronicles:iron_taiji_yuanyang_hotpot"
+    },
+    "title": {
+      "translate": "advancements.orients_hotpot_chronicles.yin_yang_balance.title"
+    },
+    "description": {
+      "translate": "advancements.orients_hotpot_chronicles.yin_yang_balance.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "pot": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "orients_hotpot_chronicles:iron_taiji_yuanyang_hotpot",
+              "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "pot"
+    ]
+  ],
+  "parent": "orients_hotpot_chronicles:yuanyang"
+}

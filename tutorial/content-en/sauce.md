@@ -23,28 +23,49 @@ Each recipe makes one station. Replace planks with iron ingots for iron, or use 
 
 **Right-click the station with an empty hand** to open its restocking screen:
 
-- **Nine slots** correspond to the nine bowls on the station (there are 10 seasonings, with room for up to 9 kinds at once).
+- **Nine slots** correspond to the nine bowls on the station (there are **15 seasonings**, with room for up to 9 kinds at once).
 - **Each slot accepts one ingredient type.** The ingredient placed in an empty slot determines its seasoning. Multiple slots can hold the same ingredient.
 - **One ingredient = four servings** of seasoning. A slot holds up to 16 ingredients, or 64 servings.
 - The **?** in the top-right opens an **ingredient reference**, showing which ingredient makes which seasoning.
 - Stocked bowls visibly show their seasoning on the station.
 
-## 10 seasonings {#seasoning}
+:::tip
+**With more seasonings, the help panel splits into two columns.** When the number of seasonings goes over **10** (there are 15 now), the effect reference opened by **?** changes from one long strip into a **tidy two-column panel** — eight seasonings on the left, seven on the right, all readable at a glance without having to scroll. Older saves with nine kinds or fewer on the station keep the original single column.
+:::
+
+## 15 seasonings {#seasoning}
+
+{{icons:oyster_sauce,sesame_paste,crushed_peanuts,millet_chili,peanut,minced_zhe_er_gen}}
 
 | Seasoning | Ingredient | Effect when eaten |
 | --- | --- | --- |
 | MSG | {{i:minecraft:wheat}} | Restores two extra hunger points |
-| Chili oil | {{i:minecraft:blaze_powder}} | Fire Resistance for 10 seconds |
-| Sweet-and-sour sauce | {{i:minecraft:sweet_berries}} | Speed for 10 seconds |
+| Chili Oil | {{i:minecraft:blaze_powder}} | Fire Resistance for 10 seconds |
+| Sweet and Sour Sauce | {{i:minecraft:sweet_berries}} | Speed for 10 seconds |
 | Honey | {{i:minecraft:honey_bottle}} | Clears spice-induced Hunger and Poison |
-| Sesame oil | {{i:minecraft:sunflower}} or {{i:minecraft:pumpkin_seeds}} | Regeneration for five seconds |
+| Sesame Oil | {{i:minecraft:sunflower}} or {{i:minecraft:pumpkin_seeds}} | Regeneration for five seconds |
 | Vinegar | {{i:minecraft:apple}} or {{i:minecraft:beetroot}} | Clears Nausea and spice-induced Hunger |
 | Sugar | {{i:minecraft:sugar}} | Haste for 10 seconds |
-| Chopped scallions | {{i:scallion}} | Flavor only; no effect |
-| Chopped cilantro | {{i:cilantro}} | Flavor only; no effect |
-| Garlic paste | {{i:garlic_paste}} | Resistance for 8 seconds |
+| Chopped Scallion | {{i:scallion}} | Flavor only; no effect |
+| Minced Cilantro | {{i:cilantro}} | Flavor only; no effect |
+| Garlic Paste | {{i:garlic_paste}} | Resistance for 8 seconds |
+| Oyster Sauce | {{i:oyster_sauce}} | Water Breathing for 10 seconds |
+| Sesame Paste | {{i:sesame_paste}} | Absorption I for 10 seconds |
+| Crushed Peanuts | {{i:crushed_peanuts}} | Jump Boost I for 10 seconds |
+| Chopped Millet Chili | {{i:millet_chili}} | Strength I for 8 seconds |
+| Minced Houttuynia | {{i:minced_zhe_er_gen}} | Resistance I for 10 seconds, cures poison |
 
 Since 0.1.4-alpha, garlic drops from grass. Pound it on a cutting board with a rolling pin 3 times to make 2 portions of garlic paste.
+
+Each of the new ingredients has its own little story:
+
+- **Oyster Sauce**: shapelessly craft vanilla **kelp + sugar + glass bottle** for 2 bottles. The kelp you pick up by the sea finally has a purpose — dip in it and you can stay underwater without holding your breath.
+- **Sesame Paste**: **peanut + wheat seeds + bowl** makes 2 bowls. One rich spoonful takes the edge off the heat.
+- **Crushed Peanuts**: breaking grass has a **15%** chance to drop a **peanut**. Put the peanut on the [cutting board](ingredients.html#board) and **pound it 3 times with a rolling pin** for 2 portions of crushed peanuts (from the second hit the board already shows crumbs).
+- **Chopped Millet Chili**: one **chili pepper** cut once on the cutting board (or in a stonecutter) makes 2 portions. Chili peppers drop from grass. See [Ingredients](ingredients.html#chili_pepper).
+- **Minced Houttuynia**: breaking grass has a **15%** chance to drop a **houttuynia root**. Put the whole root on the [cutting board](ingredients.html#board) and **pound it 3 times with a rolling pin** for 2 portions of mince. Houttuynia cools and detoxifies, so this dip cures poison and adds some resistance. See [Ingredients](ingredients.html#zhe_er_gen).
+
+{{recipe:oyster_sauce,sesame_paste}}
 
 “Cooling the spice” means clearing the Hunger effect from Spicy Red Broth. **Every seasoning in your bowl contributes its effect when you eat dipped food.**
 

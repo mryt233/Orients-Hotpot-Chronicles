@@ -1,0 +1,38 @@
+{
+  "display": {
+    "icon": {
+      "id": "orients_hotpot_chronicles:brick_stove"
+    },
+    "title": {
+      "translate": "advancements.orients_hotpot_chronicles.root.title"
+    },
+    "description": {
+      "translate": "advancements.orients_hotpot_chronicles.root.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false,
+    "background": "minecraft:textures/block/bricks.png"
+  },
+  "criteria": {
+    "stove": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "orients_hotpot_chronicles:brick_stove",
+              "orients_hotpot_chronicles:tall_brick_stove"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "stove"
+    ]
+  ]
+}

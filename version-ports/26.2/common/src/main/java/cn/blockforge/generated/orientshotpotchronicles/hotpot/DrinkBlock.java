@@ -1,6 +1,7 @@
 // mryt233 改：26.1 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;

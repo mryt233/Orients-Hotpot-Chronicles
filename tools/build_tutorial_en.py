@@ -45,8 +45,6 @@ UI = {
         "Cook these raw ingredients in a furnace, smoker, or campfire, or <b>add them to a hotpot</b>. Pots use smoker times adjusted by heat and broth; see Stoves &amp; Hotpots.",
     "模组里所有物品和方块（自动生成）。<code>ID</code> 是指令里用的名字，例如 ":
         "All items and blocks in the mod (automatically generated). <code>ID</code> is the name used in commands, for example ",
-    "0.1.4 将更新的内容（本教程基于 0.1.3-alpha，这部分还没有发布）":
-        "Coming in 0.1.4 (this guide covers 0.1.3-alpha; this content is not released yet)",
     "烹饪（熔炉 / 烟熏炉 / 营火；火锅里按烟熏炉的时间算）":
         "Cooking (furnace / smoker / campfire; hotpots use smoker times)",
     "烹饪（生 → 熟）": "Cooking (raw → cooked)",
@@ -58,7 +56,6 @@ UI = {
     "灶台与锅": "Stoves &amp; Pots",
     "合成（无序，随便摆）": "Crafting (shapeless; any arrangement)",
     "搜索（回车跳到下一处）": "Search (Enter for next match)",
-    "0.1.4 将更新": "Coming in 0.1.4",
     "配方大全": "Recipe Collection", "物品图鉴": "Item Catalog",
     "小提示": "Tip", "注意": "Note", "合成": "Crafting", "切石机": "Stonecutter",
     "烟熏炉": "Smoker", "熔炉": "Furnace", "营火": "Campfire",

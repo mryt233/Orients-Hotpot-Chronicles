@@ -2,20 +2,21 @@
   "required": true,
   "minVersion": "0.8",
   "package": "cn.blockforge.generated.orientshotpotchronicles.mixin",
-  "compatibilityLevel": "JAVA_25",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "BlockStateTableDecorMixin",
     "BowlItemMixin",
     "EntityRaycastMixin",
+    "FoodConsumeMixin",
     "LivingEntityEatMixin",
     "LootPoolAccessor",
-    "LootTableAccessor",
-    "FoodConsumeMixin"
+    "LootTableAccessor"
   ],
   "client": [
     "ClientPlayerInteractionManagerMixin",
     "CreativeInventoryScreenAccessor",
     "CreativeInventoryScreenMixin",
+    "SplashManagerMixin",
     "TableDecorModelOffsetMixin"
   ],
   "injectors": {

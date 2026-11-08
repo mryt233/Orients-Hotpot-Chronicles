@@ -7,33 +7,400 @@
    "entries": [
     {
      "icon": "orients_hotpot_chronicles:hotpot_guide",
-     "title": "五步吃上火鍋",
-     "text": "從零開始，到吃上第一口涮肉。",
-     "tip": "每一步的細節在左邊書籤對應的分類裡。",
-     "steps": [
-      "做一個灶臺，放進燃料",
-      "拿著鍋右鍵灶臺，把鍋架上去",
-      "拿著水桶右鍵鍋，倒進湯底",
-      "拿著生菜右鍵鍋，下到準星對著的那一格",
-      "菜浮起來變色就熟了，空手或拿筷子右鍵鍋撈出來吃"
+     "title": "歡迎",
+     "blocks": [
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "本教程對應已釋出的 0.2.2-alpha，用 Minecraft 1.21.1 Fabric 演示（1.21.1 NeoForge、1.20.1 Fabric / Forge、26.1.x 與 26.2 的 Fabric / NeoForge 玩法相同，見下載、安裝與回報）。這一版新加了酥肉、豆乾、腐竹、寬粉、苕皮、金針菇、青菜、蓮藕片、魷魚捲、蛋炒飯、辣椒、折耳根與冷熱豆腐，補齊 15 種沾醬小料，加入紅湯 4 檔辣度、六種湯底專屬風味、竹筷擺桌面（配白瓷迷你筷架）、長凳疊梯子、碰杯乾杯、布圍裙、指南書內搜尋、模組選單設定介面，並深度適配了 JEI / REI 與 Jade 資訊指示器。"
+       ],
+       "s": "tip"
+      },
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:brick_stove",
+        "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+        "orients_hotpot_chronicles:bamboo_chopsticks",
+        "orients_hotpot_chronicles:oak_hotpot_table",
+        "orients_hotpot_chronicles:oak_stool",
+        "orients_hotpot_chronicles:quartz_eight_slot_platter",
+        "orients_hotpot_chronicles:oak_sauce_station",
+        "orients_hotpot_chronicles:cutting_board"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "歡迎來到 之晗的火鍋物語（Orient's Hotpot Chronicles）——一個把圍著火鍋吃飯搬進 Minecraft 的 Fabric 模組。搭灶臺、架鍋、倒湯底、涮毛肚和肥牛捲，再拿筷子沾小料吃。"
+      },
+      {
+       "k": "p",
+       "t": "教程分成「怎麼玩」和「怎麼查」兩部分："
+      },
+      {
+       "k": "th",
+       "t": "你想做什麼　去哪看"
+      },
+      {
+       "k": "tr",
+       "t": "下載、安裝、各版本支援、回報　下載、安裝與回報"
+      },
+      {
+       "k": "tr",
+       "t": "第一次玩，想最快吃上一口　十分鐘吃上火鍋"
+      },
+      {
+       "k": "tr",
+       "t": "灶臺、鍋、湯底、燃料、火鍋介面　灶臺與火鍋"
+      },
+      {
+       "k": "tr",
+       "t": "火鍋桌、高桌、矮凳、長凳怎麼擺、怎麼坐　桌子與凳子"
+      },
+      {
+       "k": "tr",
+       "t": "盤子、碗、湯碗、飲料　盤子、碗與飲料"
+      },
+      {
+       "k": "tr",
+       "t": "毛肚、肥牛捲、丸子、豆腐……怎麼得到　食材與切菜"
+      },
+      {
+       "k": "tr",
+       "t": "沾醬臺和 15 種小料　沾醬"
+      },
+      {
+       "k": "tr",
+       "t": "遇到怪事　常見問題"
+      },
+      {
+       "k": "tr",
+       "t": "某個東西怎麼合成　配方大全"
+      },
+      {
+       "k": "tr",
+       "t": "想看模組裡有哪些東西　物品圖鑑"
+      },
+      {
+       "k": "tr",
+       "t": "這一版改了什麼　更新日誌"
+      },
+      {
+       "k": "sub",
+       "t": "本章目錄",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "點下面的條目直接翻過去；也可以點書頂的書籤，或者點右下角的三角一頁頁往後翻。"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+       "t": "模組一覽　灶臺與火鍋：矮灶臺和高灶臺；銅鍋、鐵鍋（九宮格、鴛鴦鍋、田字鍋）；6…",
+       "go": [
+        0,
+        1
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "minecraft:writable_book",
+       "t": "遊戲裡的火鍋指南　鐵菜刀 + 書無序合成火鍋指南（菜刀會用掉），拿著右鍵開啟紅皮書。左…",
+       "go": [
+        0,
+        2
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:hotpot_guide",
+       "t": "支援哪些版本、去哪下載　0.2.2-alpha 同步支援 Minecraft 1.21.1（…",
+       "go": [
+        0,
+        3
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:brick_stove",
+       "t": "十分鐘吃上火鍋　照著下面 6 步做，從零開始吃上第一口涮肉。每步都有配方。",
+       "go": [
+        0,
+        4
+       ]
+      }
      ]
     },
     {
-     "icon": "minecraft:golden_apple",
-     "title": "圍著鍋吃",
-     "rows": [
-      [
-       "minecraft:glistering_melon_slice",
-       "點著火的鍋，6 格內的人一直有生命恢復"
-      ],
-      [
-       "minecraft:rotten_flesh",
-       "冷鍋（沒在燒）裡的菜吃了，30% 反胃 15 秒"
-      ],
-      [
-       "orients_hotpot_chronicles:plant_protein_drink",
-       "反胃了：喝植物蛋白飲料或清湯能解"
-      ]
+     "icon": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+     "title": "模組一覽",
+     "blocks": [
+      {
+       "k": "bul",
+       "t": "灶臺與火鍋：矮灶臺和高灶臺；銅鍋、鐵鍋（九宮格、鴛鴦鍋、田字鍋）；6 種湯底；燒柴、燒煤、放營火上都能煮。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "桌椅：11 種木頭 + 9 種石料 / 金屬桌面的矮桌和高桌，配矮凳和長凳；挨著放會自己連成長桌，右鍵就能坐。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "餐具：5 種材質 × 6 種大小的盤子；原版的碗也能裝菜、盛湯；三種飲料和玻璃杯；竹筷。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "食材：毛肚、肥牛捲、羊肉捲、吊龍、蝦滑、火腿腸、馬鈴薯片、豆腐塊、丸子……用砧板、菜刀、擀麵棍加工。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "沾醬：沾醬臺配 15 種小料，自己調，沾過的菜吃下去帶效果。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "圍著鍋吃：點著的鍋給周圍 6 格的人持續回血——叫上朋友一起吃，真的有好處。",
+       "d": 0
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "教程裡的配方圖是腳本直接讀取遊戲檔案畫出來的，和遊戲完全一致。標題旁的小標籤標明內容從哪一版開始有。"
+       ],
+       "s": "tip"
+      }
+     ]
+    },
+    {
+     "icon": "minecraft:writable_book",
+     "title": "遊戲裡的火鍋指南",
+     "blocks": [
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:hotpot_guide"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "鐵菜刀 + 書無序合成火鍋指南（菜刀會用掉），拿著右鍵開啟紅皮書。左邊選分類、頂上選條目（條目多時可滾輪或拖曳橫向翻看），點右上角指南針（或按 Ctrl + F / /）還能在書內全文搜尋；箭頭、方向鍵、滾輪都能翻頁，關了再開會停在上次那頁。書裡收錄了與本網頁書本教程完全同源的 9 章 56 條內容、表格與配方。"
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:hotpot_guide",
+     "title": "支援哪些版本、去哪下載",
+     "blocks": [
+      {
+       "k": "p",
+       "t": "0.2.2-alpha 同步支援 Minecraft 1.21.1（Fabric、NeoForge）、1.20.1（Fabric、Forge）、26.1.x（Fabric、NeoForge） 和 26.2（Fabric、NeoForge）；本教程用 1.21.1 Fabric 演示；下載連結（CurseForge、Modrinth、MC 百科、GitHub）、安裝步驟、回報方式（GitHub、QQ 群）見 下載、安裝與回報。"
+      },
+      {
+       "k": "note",
+       "t": "注意事項",
+       "b": [
+        "模組還在 alpha 階段，只做過初步測試。0.1.0-alpha.1 舊存檔升級後東西可能遺失或變樣，升級前先備份存檔，最好在新存檔裡玩。"
+       ],
+       "s": "warn"
+      },
+      {
+       "k": "p",
+       "t": "有問題、有建議？ QQ 群 248314791，或去 GitHub 提交回報。"
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:brick_stove",
+     "title": "十分鐘吃上火鍋",
+     "blocks": [
+      {
+       "k": "p",
+       "t": "照著下面 6 步做，從零開始吃上第一口涮肉。每步都有配方。"
+      },
+      {
+       "k": "sub",
+       "t": "第 1 步：做灶臺",
+       "l": 2
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:brick_stove"
+       ]
+      },
+      {
+       "k": "num",
+       "t": "把灶臺放地上，空手右鍵灶臺的磚身，開啟「灶膛」介面。",
+       "n": 1,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "往燃料格放燃料——原版熔爐能燒的都行：木板、原木、木炭、煤炭、巖漿桶……燒得越旺，涮得越快（見灶臺與火鍋）。",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "sub",
+       "t": "第 2 步：做鍋，架到灶臺上",
+       "l": 2
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:iron_nine_grid_hotpot"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "鐵鍋和銅鍋玩法一樣，只差外觀。手拿鍋右鍵灶臺就架上去了，兩邊耳朵會自動朝向你的左右兩邊。"
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "想「一半辣一半不辣」？加一塊銅錠或鐵錠就能改成鴛鴦鍋、田字鍋，見灶臺與火鍋。"
+       ],
+       "s": "tip"
+      },
+      {
+       "k": "sub",
+       "t": "第 3 步：倒湯底",
+       "l": 2
+      },
+      {
+       "k": "p",
+       "t": "手拿裝湯的桶右鍵鍋，湯就倒進去了："
+      },
+      {
+       "k": "th",
+       "t": "拿著這個右鍵鍋　倒出來的湯底"
+      },
+      {
+       "k": "tr",
+       "t": "清湯：不快不慢，什麼都能涮",
+       "icon": "minecraft:water_bucket"
+      },
+      {
+       "k": "tr",
+       "t": "高湯：最慢（×0.85），奶白色",
+       "icon": "minecraft:milk_bucket"
+      },
+      {
+       "k": "tr",
+       "t": "菌湯：偏快（×1.15），返還空碗",
+       "icon": "minecraft:mushroom_stew"
+      },
+      {
+       "k": "tr",
+       "t": "紅湯：最快（×1.3），紅彤彤",
+       "icon": "minecraft:lava_bucket"
+      },
+      {
+       "k": "p",
+       "t": "倒完湯鍋會冒熱氣。沒湯的鍋不會點火。"
+      },
+      {
+       "k": "sub",
+       "t": "第 4 步：往鍋裡下菜",
+       "l": 2
+      },
+      {
+       "k": "p",
+       "t": "鍋裡有湯後，手拿生食材右鍵鍋，菜就下進湯裡。鍋分 3×3 共 9 個大格，準星對著哪格，菜就下到哪格。"
+      },
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:tripe",
+        "orients_hotpot_chronicles:fatty_beef_roll"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "剛開始不用做太複雜的——原版的生牛肉、生豬肉、生羊肉、生魚都能涮；模組裡的 生毛肚（打牛掉落）、肥牛捲（用菜刀切）更有火鍋味，做法見食材與切菜。"
+      },
+      {
+       "k": "note",
+       "t": "注意事項",
+       "b": [
+        "鍋裡只放食物。 0.1.2-alpha 裡木頭、鐵器也能放，會被煮成木炭、鐵粒；0.1.3-alpha-hotfix1 起只收食物，熟食也不能再下鍋。"
+       ],
+       "s": "warn"
+      },
+      {
+       "k": "sub",
+       "t": "第 5 步：做一雙竹筷",
+       "l": 2
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:bamboo_chopsticks"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "拿竹筷 Shift + 右鍵鍋開啟「火鍋介面」：鍋裡每格都能看見，煮熟了會變成熟的樣子。"
+      },
+      {
+       "k": "sub",
+       "t": "第 6 步：吃！",
+       "l": 2
+      },
+      {
+       "k": "bul",
+       "t": "在介面裡吃：遊標拿著筷子，左鍵點熟了的菜一口吃掉（有咀嚼聲和飽嗝）。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "不用介面直接夾：拿竹筷直接右鍵鍋，夾起準星對著那格的一樣熟食，按住右鍵吃掉。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "空手直接撈：空手（或拿碗）右鍵鍋，直接撈出對著那格的熟食。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "冷鍋別吃：沒點火的「冷鍋」涮不熟，吃裡面的東西有 30% 機率反胃 15 秒。",
+       "d": 0
+      },
+      {
+       "k": "p",
+       "t": "點著火的鍋會給 6 格內的人持續回血（生命恢復 I），叫上朋友圍著吃吧！"
+      },
+      {
+       "k": "rule"
+      },
+      {
+       "k": "sub",
+       "t": "接下來",
+       "l": 2
+      },
+      {
+       "k": "bul",
+       "t": "想擺桌子坐下吃：桌子與凳子",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "想用盤子裝菜、用碗盛湯：盤子、碗與飲料",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "想調沾醬：沾醬",
+       "d": 0
+      }
      ]
     }
    ]
@@ -44,169 +411,703 @@
    "title": "火鍋",
    "entries": [
     {
-     "icon": "orients_hotpot_chronicles:brick_stove#lit",
+     "icon": "orients_hotpot_chronicles:iron_nine_grid_hotpot#tomato",
+     "title": "灶臺與火鍋",
+     "blocks": [
+      {
+       "k": "p",
+       "t": "火鍋的核心是三樣東西：灶臺（燒火）、鍋（裝湯下菜）、湯底（決定涮多快）。這一頁把規矩講全。"
+      },
+      {
+       "k": "sub",
+       "t": "本章目錄",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "點下面的條目直接翻過去；也可以點書頂的書籤，或者點右下角的三角一頁頁往後翻。"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:brick_stove",
+       "t": "灶臺　灶台：矮的，磚面和矮火鍋桌桌面齊平。",
+       "go": [
+        1,
+        1
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:copper_nine_grid_hotpot",
+       "t": "鍋　下面可以挑著看每一種鍋：先選銅鍋還是鐵鍋，再點鍋形。",
+       "go": [
+        1,
+        2
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
+       "t": "火鍋介面　拿竹筷 Shift + 右鍵鍋開啟（直接右鍵是夾熟食，不開介面）：",
+       "go": [
+        1,
+        3
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "minecraft:campfire",
+       "t": "放在營火上　不想搭灶臺？把鍋放在點著的營火（或靈魂營火）上也能煮：",
+       "go": [
+        1,
+        4
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "minecraft:golden_apple",
+       "t": "圍著鍋吃有好處　點著火的鍋每 4 秒給 6 格內的人續 10 秒生命恢復 I。一個人…",
+       "go": [
+        1,
+        5
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+       "t": "鴛鴦鍋和田字鍋　用一塊銅錠 / 鐵錠加一口同材質的九宮格鍋，就能改成「分格鍋」：錠放…",
+       "go": [
+        1,
+        6
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "minecraft:iron_pickaxe",
+       "t": "挖掘和拆除　對著鍋挖：只挖鍋（整鍋連湯帶菜打包成一個物品，放下原樣恢復）。創造模…",
+       "go": [
+        1,
+        7
+       ]
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:brick_stove",
      "title": "灶臺",
-     "text": "燒火煮鍋。矮灶臺配矮桌，高灶臺配高桌（頭頂要空一格）。",
-     "recipes": [
-      "orients_hotpot_chronicles:brick_stove",
-      "orients_hotpot_chronicles:tall_brick_stove"
-     ],
-     "steps": [
-      "空手右鍵灶臺的磚身，開啟灶膛",
-      "放進燃料（熔爐能燒的都行）"
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:brick_stove",
+        "orients_hotpot_chronicles:tall_brick_stove"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "◆ 矮灶臺和高灶臺",
+       "l": 3
+      },
+      {
+       "k": "bul",
+       "t": "灶台：矮的，磚面和矮火鍋桌桌面齊平。",
+       "d": 0,
+       "icon": "orients_hotpot_chronicles:brick_stove"
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:brick_stove"
+       ]
+      },
+      {
+       "k": "bul",
+       "t": "高灶台：高的，灶口和鍋整體抬高 10 像素，配高火鍋桌用（磚面比高桌低 2 像素，鍋沿露出桌面 3 像素，伸手就能夠到）。",
+       "d": 0,
+       "icon": "orients_hotpot_chronicles:tall_brick_stove"
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:tall_brick_stove"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "高灶臺會多佔上面一格（一個看不見的方塊），放高灶臺時頭頂那格要是空的。"
+      },
+      {
+       "k": "sub",
+       "t": "◆ 燒火規則",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "右鍵灶臺磚身（或沒鍋時右鍵灶臺）開啟灶膛介面放燃料。燃料是原版熔爐能燒的任何東西，燃燒時間也和熔爐一樣；火力分三檔："
+      },
+      {
+       "k": "th",
+       "t": "燃料　火力　時長（同熔爐）"
+      },
+      {
+       "k": "tr",
+       "t": "木頭類（木板、原木、木棍等）　×0.65　如木板 15 秒"
+      },
+      {
+       "k": "tr",
+       "t": "煤炭、木炭　×1.0　80 秒"
+      },
+      {
+       "k": "tr",
+       "t": "岩漿桶　×1.6　1000 秒"
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "只有鍋裡有生食材要煮時，才耗燃料。 鍋裡有湯、灶膛有燃料，但沒生食材時是「空燒」：火照樣點著，湯照樣沸騰，不耗燃料——你可以點好火慢慢佈置桌面，不用心疼煤。沒湯的鍋不點火。"
+       ],
+       "s": "tip"
+      },
+      {
+       "k": "p",
+       "t": "灶膛介面沒有溫度條和倒計時，看火苗大小就知道燒得怎麼樣。"
+      }
      ]
     },
     {
-     "icon": "minecraft:coal",
-     "title": "燃料和火力",
-     "text": "只有鍋裡有生菜要煮時才耗燃料，空燒不耗。",
-     "rows": [
-      [
-       "minecraft:oak_planks",
-       "木頭類：火力 ×0.65"
-      ],
-      [
-       "minecraft:coal",
-       "煤炭、木炭：火力 ×1.0"
-      ],
-      [
-       "minecraft:lava_bucket",
-       "岩漿桶：火力 ×1.6"
-      ],
-      [
-       "minecraft:campfire",
-       "點著的篝火：火力 ×1.0，不耗燃料"
-      ]
-     ]
-    },
-    {
-     "icon": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
-     "text": "9 個大格，每格 9 份，一鍋最多 81 份菜。銅鍋、鐵鍋只是樣子不同。",
-     "recipes": [
-      "orients_hotpot_chronicles:iron_nine_grid_hotpot",
-      "orients_hotpot_chronicles:copper_nine_grid_hotpot"
-     ],
-     "steps": [
-      "拿著鍋右鍵灶臺或篝火，或直接放地上",
-      "空手潛行右鍵鍋：連湯帶菜收進揹包"
-     ]
-    },
-    {
-     "icon": "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
-     "title": "分格鍋",
-     "text": "九宮格鍋加銅錠 / 鐵錠改出來，每邊一種湯底。",
-     "tip": "倒湯、舀湯時，準星對著哪一邊就是哪一邊。",
-     "rows": [
-      [
-       "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
-       "錠放鍋左邊：太極鴛鴦鍋"
-      ],
-      [
-       "orients_hotpot_chronicles:copper_round_yuanyang_hotpot",
-       "錠放鍋下面：圓心鴛鴦鍋"
-      ],
-      [
-       "orients_hotpot_chronicles:copper_split_yuanyang_hotpot",
-       "錠放鍋上面：直隔鴛鴦鍋"
-      ],
-      [
-       "orients_hotpot_chronicles:copper_square_yuanyang_hotpot",
-       "上下各一塊：方心鴛鴦鍋"
-      ],
-      [
-       "orients_hotpot_chronicles:copper_four_grid_hotpot",
-       "左右各一塊：田字鍋（4 種湯）"
-      ]
-     ],
-     "recipes": [
-      "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
-      "orients_hotpot_chronicles:copper_round_yuanyang_hotpot",
-      "orients_hotpot_chronicles:copper_split_yuanyang_hotpot",
-      "orients_hotpot_chronicles:copper_square_yuanyang_hotpot",
-      "orients_hotpot_chronicles:copper_four_grid_hotpot"
-     ]
-    },
-    {
-     "icon": "minecraft:water_bucket",
-     "title": "湯底",
-     "text": "拿著桶右鍵鍋倒湯，空桶右鍵鍋舀回來。湯底決定涮多快。",
-     "tip": "沒有湯的鍋不點火。",
-     "rows": [
-      [
-       "minecraft:water_bucket",
-       "清湯 ×1.0"
-      ],
-      [
-       "minecraft:milk_bucket",
-       "高湯 ×0.85，最慢"
-      ],
-      [
-       "minecraft:mushroom_stew",
-       "菌湯 ×1.15（碗會還你）"
-      ],
-      [
-       "minecraft:lava_bucket",
-       "紅湯 ×1.3，最快"
-      ],
-      [
-       "orients_hotpot_chronicles:tomato_soup_bucket",
-       "番茄湯 ×1.1"
-      ],
-      [
-       "orients_hotpot_chronicles:three_fresh_soup_bucket",
-       "三鮮湯 ×1.0"
-      ]
-     ]
-    },
-    {
-     "icon": "orients_hotpot_chronicles:tomato_hotpot_base",
-     "title": "鍋底料",
-     "get": "番茄打草掉落",
-     "text": "清湯里加鍋底料，變成番茄鍋 / 三鮮鍋（只能加進清湯）。",
-     "recipes": [
-      "orients_hotpot_chronicles:tomato_hotpot_base",
-      "orients_hotpot_chronicles:three_fresh_hotpot_base",
-      "orients_hotpot_chronicles:tomato_soup_bucket",
-      "orients_hotpot_chronicles:three_fresh_soup_bucket"
-     ],
-     "steps": [
-      "空桶右鍵番茄 / 三鮮鍋：舀出湯底桶",
-      "湯底桶倒回鍋裡就是那種湯，不能倒在地上"
-     ]
-    },
-    {
-     "icon": "orients_hotpot_chronicles:beef_loin_slice",
-     "title": "下菜和撈菜",
-     "text": "能在煙燻爐裡烤熟的，都能涮熟。熟食不能再下鍋。",
-     "tip": "一格里幾樣菜輪流浮起，撈到的就是你看到的那一樣。",
-     "rows": [
-      [
-       "minecraft:beef",
-       "拿生菜右鍵鍋：下到準星對著的那一格"
-      ],
-      [
-       "orients_hotpot_chronicles:quartz_two_slot_plate",
-       "拿一盤菜右鍵鍋：生的全倒進去"
-      ],
-      [
-       "minecraft:bowl",
-       "空手或碗右鍵鍋：撈出那格正浮著的熟菜"
-      ],
-      [
-       "orients_hotpot_chronicles:bamboo_chopsticks",
-       "筷子右鍵鍋：夾起正浮著的熟菜"
-      ]
+     "icon": "orients_hotpot_chronicles:copper_nine_grid_hotpot",
+     "title": "鍋",
+     "blocks": [
+      {
+       "k": "sub",
+       "t": "◆ 鍋的樣子",
+       "l": 3
+      },
+      {
+       "k": "th",
+       "t": "鍋　說明"
+      },
+      {
+       "k": "tr",
+       "t": "鐵製九宮格火鍋 / 銅製九宮格火鍋　九宮格鍋：整鍋一種湯，9 個大格。銅、鐵只是外觀不同",
+       "icon": "orients_hotpot_chronicles:iron_nine_grid_hotpot"
+      },
+      {
+       "k": "tr",
+       "t": "鴛鴦鍋、田字鍋　0.1.3-alpha-hotfix1 起加入，見下面「鴛鴦鍋和田字鍋」"
+      },
+      {
+       "k": "p",
+       "t": "下面可以挑著看每一種鍋：先選銅鍋還是鐵鍋，再點鍋形。"
+      },
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:copper_nine_grid_hotpot",
+        "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+        "orients_hotpot_chronicles:copper_round_yuanyang_hotpot",
+        "orients_hotpot_chronicles:copper_split_yuanyang_hotpot",
+        "orients_hotpot_chronicles:copper_four_grid_hotpot",
+        "orients_hotpot_chronicles:copper_square_yuanyang_hotpot"
+       ]
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+        "orients_hotpot_chronicles:copper_nine_grid_hotpot"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "鍋是獨立方塊：能坐在灶臺上，能直接放地上，也能架在點著的營火上。"
+      },
+      {
+       "k": "sub",
+       "t": "◆ 鍋的容量",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "九宮格鍋有 9 個大格，每大格裡是 3×3 共 9 小格，一鍋最多放 81 份食材。準星對著哪個大格，菜就下進哪個大格；那一格滿了就放不進去了。"
+      },
+      {
+       "k": "sub",
+       "t": "◆ 湯底",
+       "l": 3
+      },
+      {
+       "k": "th",
+       "t": "倒進去的　湯底　涮的速度　說明"
+      },
+      {
+       "k": "tr",
+       "t": "清湯　×1.00　清亮",
+       "icon": "minecraft:water_bucket"
+      },
+      {
+       "k": "tr",
+       "t": "高湯　×0.85　奶白，最慢",
+       "icon": "minecraft:milk_bucket"
+      },
+      {
+       "k": "tr",
+       "t": "菌湯　×1.15　倒完還碗",
+       "icon": "minecraft:mushroom_stew"
+      },
+      {
+       "k": "tr",
+       "t": "紅湯　×1.30　最快，紅彤彤",
+       "icon": "minecraft:lava_bucket"
+      },
+      {
+       "k": "tr",
+       "t": "番茄湯　×1.10　番茄鍋底料 + 水桶做成湯底桶再倒，或清湯裡加鍋底料",
+       "icon": "orients_hotpot_chronicles:tomato_soup_bucket"
+      },
+      {
+       "k": "tr",
+       "t": "三鮮湯　×1.00　三鮮鍋底料同樣做法",
+       "icon": "orients_hotpot_chronicles:three_fresh_soup_bucket"
+      },
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:tomato_hotpot_base",
+        "orients_hotpot_chronicles:three_fresh_hotpot_base"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "鍋底料：番茄鍋底料用番茄做，三鮮鍋底料用三鮮料做（做法見配方大全）。清湯裡加一份鍋底料就變成那種鍋；做好的湯底桶倒進鍋裡也一樣。0.1.4-alpha 起加。"
+      },
+      {
+       "k": "bul",
+       "t": "倒湯：手拿桶（或蘑菇煲）右鍵鍋。一鍋同時只有一種湯（鴛鴦鍋另說）。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "舀湯：空桶右鍵鍋把湯舀回桶裡。菌湯要用碗舀，而且鍋裡沒有菜才行；鍋裡有菜先取出來。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "盛一碗湯喝：用碗右鍵鍋，先盛熟菜；沒熟菜就盛湯，見盤子、碗與飲料。",
+       "d": 0
+      },
+      {
+       "k": "sub",
+       "t": "◆ 紅湯的 4 檔辣度",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "紅湯也能「點辣」——不是加辣椒粉，是真的往鍋裡扔辣椒。"
+      },
+      {
+       "k": "th",
+       "t": "檔位　加辣後的效果（鍋裡涮熟的菜吃下去）"
+      },
+      {
+       "k": "tr",
+       "t": "微辣（剛倒進鍋）　力量 I 6 秒、速度 I 6 秒，不挨餓"
+      },
+      {
+       "k": "tr",
+       "t": "中辣　力量 II 9 秒、速度 I 9 秒"
+      },
+      {
+       "k": "tr",
+       "t": "特辣　力量 II 12 秒、速度 I 10 秒，另有抗火 15 秒與飢餓 I 6 秒（吃辣開胃易餓）"
+      },
+      {
+       "k": "tr",
+       "t": "3 級特辣（變態辣）　力量 II 15 秒、速度 I 12 秒、抗火 30 秒、飢餓 I 8 秒；吃完嘴上還會冒 2 秒小火苗（有抗火，不扣血；穿布圍裙可防冒火）"
+      },
+      {
+       "k": "p",
+       "t": "怎麼調："
+      },
+      {
+       "k": "num",
+       "t": "手拿辣椒辣椒，右鍵紅湯區：辣度升 1 檔，鍋面騰起一簇火苗，頭頂報「紅湯辣度已提升至：特辣」這樣的提示。已經是變態辣了再點，只提示不消耗。",
+       "n": 1,
+       "d": 0,
+       "icon": "orients_hotpot_chronicles:chili_pepper"
+      },
+      {
+       "k": "num",
+       "t": "手拿冰塊救場：普通冰降 1 檔、浮冰降 2 檔、藍冰一步壓回微辣。鍋面冒白汽、濺水花。",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "拿辣椒或冰塊點別的湯底，會提示「只有紅湯鍋底才能用辣椒或冰塊調整辣度」，不會被當成食材塞進鍋。",
+       "n": 3,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "鴛鴦鍋、田字鍋每邊單獨記辣度：只調你點的那一邊，另一邊照舊。倒湯、舀湯、換湯底、把湯倒乾淨，辣度都歸零，重新從微辣開始。",
+       "n": 4,
+       "d": 0
+      },
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:spicy_red_broth_bowl"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "用碗從鍋裡盛出來的一碗紅湯也帶著盛出那一刻的辣度，喝下去同樣按檔位給效果。鍋裡煮出來的菜，指著看會寫「紅湯鍋底 · 特辣」這樣一行。"
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "辣度和「辣油」「蜂蜜」「醋」配合著玩：辣油加抗火，蜂蜜和醋能清掉紅湯帶來的飢餓。沾了蜂蜜或醋的菜，吃下去不會被辣到犯餓，火苗也不會冒。"
+       ],
+       "s": "tip"
+      },
+      {
+       "k": "sub",
+       "t": "◆ 湯底給菜添的味道",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "在哪種湯裡煮出來的菜，就帶著那鍋湯的滋味——指著煮好的菜，提示裡會多一行「湯底：菌湯」（紅湯還會寫辣度），吃下去額外有這份效果："
+      },
+      {
+       "k": "th",
+       "t": "湯底　涮熟的菜吃下去額外給"
+      },
+      {
+       "k": "tr",
+       "t": "清湯　移動速度 I 15 秒（原汁原味、輕盈健步）+ 飽和 1 tick（清爽解膩）"
+      },
+      {
+       "k": "tr",
+       "t": "高湯　抗性提升 I 15 秒 + 傷害吸收 I 30 秒（牛骨老雞濃湯、堅韌滋補，不再有緩慢）"
+      },
+      {
+       "k": "tr",
+       "t": "菌湯　生命恢復 I 10 秒（山珍菌菇、活血養生）"
+      },
+      {
+       "k": "tr",
+       "t": "紅湯　按鍋裡那一邊的辣度給力量 + 速度，特辣起再追加抗火與飢餓，見上表"
+      },
+      {
+       "k": "tr",
+       "t": "番茄湯　挖掘加速 I 15 秒（酸甜生津、精力充沛），還順手解掉反胃"
+      },
+      {
+       "k": "tr",
+       "t": "三鮮湯　水下呼吸 20 秒 + 幸運 I 30 秒（乾貝海米、時來運轉）"
+      },
+      {
+       "k": "p",
+       "t": "自己撈起來吃、用筷子夾著吃、盛到碗裡再吃都一樣算。想反覆回血就把一批菜下進菌湯，想下水摸魚就用三鮮湯涮一鍋帶著走。"
+      },
+      {
+       "k": "p",
+       "t": "指著看的時候，菜餚與湯碗的物品懸浮窗會在湯底名稱下方縮排顯示吃下或喝下能獲得的狀態效果與持續時長，例如「力量 II (0:15)」「移動速度 I (0:12)」——藍色是增益，紅色是負面（紅湯的飢餓）。沾過蜂蜜或醋的菜不會再加飢餓，提示裡也就不寫了。從鍋裡盛出來的一碗湯喝下去的效果，提示裡同樣列出來。"
+      },
+      {
+       "k": "sub",
+       "t": "◆ 食材怎麼熟",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "鍋裡的生食材按對應的煙燻爐 / 營火配方變成熟食（煙燻爐能烤熟的都能涮熟）："
+      },
+      {
+       "k": "note",
+       "t": "",
+       "b": [
+        "一份菜的用時 = 煙燻爐裡的烹飪時間 ÷（燃料火力 × 湯底倍率）"
+       ],
+       "s": "quote"
+      },
+      {
+       "k": "p",
+       "t": "比如生牛肉在煙燻爐裡要 5 秒，煤炭 + 清湯涮就是 5 秒；換成紅湯（×1.3）約 3.8 秒；用木頭燒（×0.65）要 7.7 秒左右。肥牛捲、馬鈴薯片、丸子這些小件食材本身只要整塊肉的一半，涮得更快。"
+      },
+      {
+       "k": "p",
+       "t": "具體每樣食材的烹飪時間在配方大全的「烹飪」表裡。"
+      },
+      {
+       "k": "note",
+       "t": "注意事項",
+       "b": [
+        "鍋裡只放食物。0.1.2-alpha 裡木頭、礦石、鐵器也能放，會被煮成木炭、鐵粒；0.1.3-alpha-hotfix1 起鍋只收食物（能吃的，或煙燻爐/營火能烤的）。熟食不能再下鍋。"
+       ],
+       "s": "warn"
+      },
+      {
+       "k": "sub",
+       "t": "◆ 往鍋裡放東西的操作",
+       "l": 3
+      },
+      {
+       "k": "th",
+       "t": "你手裡拿著　右鍵鍋會發生什麼"
+      },
+      {
+       "k": "tr",
+       "t": "生食材　放進準星對著的那格"
+      },
+      {
+       "k": "tr",
+       "t": "一盤菜（裝了菜的盤子）　盤裡的生食材倒進鍋（隨機進有空位的大格），熟的留在盤裡"
+      },
+      {
+       "k": "tr",
+       "t": "夾著生食材的竹筷　把菜放進你點的那格（下鍋）"
+      },
+      {
+       "k": "tr",
+       "t": "夾著熟菜的竹筷　吃掉（飽了也能吃；想放回碗盤用潛行右鍵）"
+      },
+      {
+       "k": "tr",
+       "t": "竹筷（空的）　從準星對著的那格夾起一樣熟食（沒有會提示），夾起來按住右鍵吃"
+      },
+      {
+       "k": "tr",
+       "t": "竹筷 + 潛行（Shift）　開啟火鍋介面"
+      },
+      {
+       "k": "tr",
+       "t": "桶　倒湯（鍋裡沒湯）/ 舀湯（空桶且鍋裡有湯）"
+      },
+      {
+       "k": "tr",
+       "t": "碗　盛熟菜或盛湯"
+      },
+      {
+       "k": "tr",
+       "t": "空手　撈出準星對著那格的熟食"
+      },
+      {
+       "k": "tr",
+       "t": "空手 + 潛行（Shift）　把鍋（連湯帶菜）收進背包（單放或營火上的鍋 0.1.3-alpha-hotfix1 起也行）"
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "筷子或空手直接撈，撈的是此刻浮上來、你看見的那樣；它還生著就提示「這樣還沒煮熟」。空碗先盛看見的熟菜，再盛滿其他熟菜，最多 3 樣。"
+       ],
+       "s": "tip"
+      },
+      {
+       "k": "sub",
+       "t": "◆ 用漏斗接鍋",
+       "l": 3
+      },
+      {
+       "k": "bul",
+       "t": "鍋上方的漏斗只往鍋裡放能下鍋的生食材，一格一份；別的東西留在漏斗裡。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "鍋（或灶臺）下方的漏斗只抽走煮熟的菜，生的留在鍋裡繼續煮。",
+       "d": 0
+      }
      ]
     },
     {
      "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
      "title": "火鍋介面",
-     "text": "拿著筷子潛行右鍵鍋開啟，鍋裡每份菜都看得見。",
-     "steps": [
-      "游標拿著筷子左鍵熟菜：吃一口",
-      "雙擊：收起同樣的熟菜",
-      "手裡拿著蘸料，吃的時候自動蘸一口",
-      "吃飽了照樣吃得下；夾著菜右鍵盤子想放回就潛行"
+     "blocks": [
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:bamboo_chopsticks"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "拿竹筷 Shift + 右鍵鍋開啟（直接右鍵是夾熟食，不開介面）："
+      },
+      {
+       "k": "bul",
+       "t": "鍋裡每樣菜都看得見，生的和熟的外觀不同。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "遊標拿著筷子左鍵點熟食一口吃掉（回飢餓和飽和，飽了也能吃）。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "雙擊：把同樣的熟食收在遊標上（和原版物品欄一樣）。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "滑鼠指著食材看名字，沾過料的會寫「沾了：……」。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "主手或副手拿沾醬，在介面裡吃東西都會自動沾一口。",
+       "d": 0
+      },
+      {
+       "k": "sub",
+       "t": "◆ 冷鍋",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "鍋如果不在點著的灶臺或營火上就是冷鍋：湯不沸騰，食材浮在水面。在冷鍋裡吃東西有 30% 機率反胃 15 秒。喝一瓶植物蛋白飲料、一碗清湯或沾醋能解。"
+      }
+     ]
+    },
+    {
+     "icon": "minecraft:campfire",
+     "title": "放在營火上",
+     "blocks": [
+      {
+       "k": "p",
+       "t": "不想搭灶臺？把鍋放在點著的營火（或靈魂營火）上也能煮："
+      },
+      {
+       "k": "bul",
+       "t": "0.1.2-alpha 裡鍋直接坐在營火上；0.1.3-alpha-hotfix1 起鍋底長出鐵支架踩在營火上，不懸空，火苗也不穿進鍋裡。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "火力同煤炭，不耗燃料，也給周圍的人回血；介面裡顯示正在加熱。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "營火熄滅或挖掉，鍋就變成冷鍋。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "0.1.2-alpha 裡收鍋只能挖；0.1.3-alpha-hotfix1 起可以空手 Shift + 右鍵整鍋收起（連湯帶菜）。",
+       "d": 0
+      }
+     ]
+    },
+    {
+     "icon": "minecraft:golden_apple",
+     "title": "圍著鍋吃有好處",
+     "blocks": [
+      {
+       "k": "p",
+       "t": "點著火的鍋每 4 秒給 6 格內的人續 10 秒生命恢復 I。一個人待在鍋邊血常滿，一群人圍著吃更熱鬧。"
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+     "title": "鴛鴦鍋和田字鍋",
+     "blocks": [
+      {
+       "k": "p",
+       "t": "用一塊銅錠 / 鐵錠加一口同材質的九宮格鍋，就能改成「分格鍋」：錠放鍋左邊 = 太極鴛鴦鍋，下邊 = 圓心鴛鴦鍋，上邊 = 直隔鴛鴦鍋，左右各一塊 = 田字鍋，上下各一塊 = 方心鴛鴦鍋。一口分格鍋分幾邊就有幾種湯，每邊一種湯底，倒湯、舀湯時準星對著哪邊就是哪邊；每格用自己那邊的湯煮，沒湯的那邊不煮。鍋身和九宮格鍋一樣，能放地上、營火上、矮灶臺和高灶臺上。"
+      },
+      {
+       "k": "th",
+       "t": "鍋　怎麼分　湯底數　每邊能放幾樣"
+      },
+      {
+       "k": "tr",
+       "t": "太極鴛鴦鍋　太極圖那樣的 S 形隔板　2　左右各 28"
+      },
+      {
+       "k": "tr",
+       "t": "圓心鴛鴦鍋　中間一圈　2　圈外 44、圈裡 9"
+      },
+      {
+       "k": "tr",
+       "t": "直隔鴛鴦鍋　中間一道直隔板　2　左右各 36"
+      },
+      {
+       "k": "tr",
+       "t": "田字火鍋　十字隔板分四塊　4　每塊 16"
+      },
+      {
+       "k": "tr",
+       "t": "方心鴛鴦鍋　中間一圈，圈裡是正方形　2　圈外 44、圈裡 9"
+      },
+      {
+       "k": "note",
+       "t": "注意事項",
+       "b": [
+        "0.1.4-alpha 起，「S 形鴛鴦鍋」改名叫太極鴛鴦鍋，「O 形」改名叫圓心鴛鴦鍋，物品 ID 也一起改了。0.1.3 及以前的舊存檔裡已經擺出來的這四種鍋會消失（銅、鐵各兩種）。"
+       ],
+       "s": "warn"
+      },
+      {
+       "k": "p",
+       "t": "拿竹筷（Shift + 右鍵鍋）開啟介面，小格子從鍋邊排滿；靠近隔板放不下整格的地方空著，露出湯和鍋底。鍋裡每邊有幾個位置漂著食材（太極每邊 4 個、圓心圈外 6 圈裡 2、直隔每邊 3、田字每塊 2），同一個位置的幾樣東西輪流浮上來。"
+      },
+      {
+       "k": "p",
+       "t": "介面裡雙擊熟食收同種、拿碗盛菜，只收同一種湯底裡的：兩邊湯底一樣就一起收，不一樣只收你點的那一邊。"
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+        "orients_hotpot_chronicles:copper_round_yuanyang_hotpot",
+        "orients_hotpot_chronicles:copper_split_yuanyang_hotpot",
+        "orients_hotpot_chronicles:copper_four_grid_hotpot",
+        "orients_hotpot_chronicles:copper_square_yuanyang_hotpot"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "鐵製配方一樣，把銅錠換成鐵錠、銅鍋換成鐵鍋。"
+      }
+     ]
+    },
+    {
+     "icon": "minecraft:iron_pickaxe",
+     "title": "挖掘和拆除",
+     "blocks": [
+      {
+       "k": "bul",
+       "t": "對著鍋挖：只挖鍋（整鍋連湯帶菜打包成一個物品，放下原樣恢復）。創造模式對著鍋按中鍵，拿到的也是連湯帶菜的整鍋。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "單獨擺的鍋下面是空氣也放得住，不會掉。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "對著灶臺磚身挖：整個灶臺一起挖，鍋也打包掉落。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "鍋物品提示會寫湯底和食材份數（已熟幾份）。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "想拆下鍋不挖灶臺：空手 Shift + 右鍵鍋。",
+       "d": 0
+      }
      ]
     }
    ]
@@ -217,281 +1118,1555 @@
    "title": "食材",
    "entries": [
     {
-     "icon": "orients_hotpot_chronicles:cutting_board",
-     "text": "切菜、搗丸子都在砧板上。拿著要加工的東西右鍵放上去，空手右鍵拿回。",
-     "recipes": [
-      "orients_hotpot_chronicles:cutting_board"
-     ]
-    },
-    {
      "icon": "orients_hotpot_chronicles:iron_kitchen_knife",
-     "text": "拿菜刀右鍵砧板切一刀。也能當武器。切石機也能一次切好。",
-     "rows": [
-      [
-       "minecraft:beef",
-       "生牛肉 → 3 個肥牛卷"
-      ],
-      [
-       "minecraft:mutton",
-       "生羊肉 → 3 個羊肉卷"
-      ],
-      [
-       "orients_hotpot_chronicles:beef_loin",
-       "牛脊肉 → 3 片吊龍"
-      ],
-      [
-       "minecraft:potato",
-       "土豆（3 刀）→ 3 份土豆片"
-      ],
-      [
-       "orients_hotpot_chronicles:tofu",
-       "豆腐 → 3 份豆腐塊"
-      ],
-      [
-       "orients_hotpot_chronicles:shrimp",
-       "蝦 → 1 個蝦仁（剝殼去頭）"
-      ]
-     ],
-     "recipes": [
-      "orients_hotpot_chronicles:iron_kitchen_knife"
-     ]
-    },
-    {
-     "icon": "orients_hotpot_chronicles:raw_ham_sausage",
-     "title": "火腿腸",
-     "text": "豬排先用菜刀切成豬肉末，再和原版小麥合成 3 根。生火腿腸下鍋煮熟就是火腿腸；火腿腸能切片，片還能再加熱一次。",
-     "rows": [
-      [
-       "minecraft:porkchop",
-       "菜刀切成 1 份豬肉末"
-      ],
-      [
-       "orients_hotpot_chronicles:minced_pork",
-       "豬肉末：火腿腸的中間原料"
-      ],
-      [
-       "minecraft:wheat",
-       "豬肉末 + 小麥：3 根生火腿腸"
-      ],
-      [
-       "orients_hotpot_chronicles:ham_sausage",
-       "生火腿腸煮 / 烤：火腿腸（回 3）"
-      ],
-      [
-       "orients_hotpot_chronicles:ham_sausage_slice",
-       "火腿腸切一刀：3 片（回 1）"
-      ],
-      [
-       "orients_hotpot_chronicles:cooked_ham_sausage_slice",
-       "腸片再加熱：熟火腿腸片（回 2）"
-      ]
-     ],
-     "recipes": [
-      "orients_hotpot_chronicles:raw_ham_sausage"
-     ]
-    },
-    {
-     "icon": "orients_hotpot_chronicles:rolling_pin",
-     "text": "拿擀麵杖右鍵砧板，敲三下。",
-     "rows": [
-      [
-       "minecraft:beef",
-       "生牛 / 豬 / 羊肉 → 3 個丸子"
-      ],
-      [
-       "minecraft:cod",
-       "生鱈魚 / 鮭魚 → 3 個魚丸"
-      ],
-      [
-       "orients_hotpot_chronicles:garlic",
-       "大蒜 → 2 份蒜泥"
-      ],
-      [
-       "orients_hotpot_chronicles:peeled_shrimp",
-       "蝦仁 → 1 顆蝦滑"
-      ]
-     ],
-     "recipes": [
-      "orients_hotpot_chronicles:rolling_pin"
-     ]
-    },
-    {
-     "icon": "orients_hotpot_chronicles:beef_meatball",
-     "title": "丸子",
-     "text": "熟丸子回 3 飢餓。2 個丸子 + 1 顆香菜合成香菜丸子，熟的回 4。",
-     "recipes": [
-      "orients_hotpot_chronicles:cilantro_beef_meatball"
+     "title": "食材與切菜",
+     "blocks": [
+      {
+       "k": "p",
+       "t": "火鍋的靈魂是菜。這一頁講模組裡的食材從哪來、怎麼加工、煮熟後回多少飢餓。"
+      },
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:tripe",
+        "orients_hotpot_chronicles:fatty_beef_roll",
+        "orients_hotpot_chronicles:mutton_roll",
+        "orients_hotpot_chronicles:beef_loin_slice",
+        "orients_hotpot_chronicles:potato_slice",
+        "orients_hotpot_chronicles:cold_tofu_cube",
+        "orients_hotpot_chronicles:beef_meatball",
+        "orients_hotpot_chronicles:fish_ball",
+        "orients_hotpot_chronicles:scallion",
+        "orients_hotpot_chronicles:cilantro",
+        "orients_hotpot_chronicles:soybean"
+       ]
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "所有生食材下鍋都能涮熟，也能放進熔爐、煙燻爐、營火裡烤熟——熟了回多少飢餓見下面的表。熟食不能再下鍋。"
+       ],
+       "s": "tip"
+      },
+      {
+       "k": "sub",
+       "t": "本章目錄",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "點下面的條目直接翻過去；也可以點書頂的書籤，或者點右下角的三角一頁頁往後翻。"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:tripe",
+       "t": "毛肚　來源：殺牛或哞菇掉落，數量規則和原版牛肉一樣（1～3 塊，搶奪每級多…",
+       "go": [
+        2,
+        1
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:beef_loin",
+       "t": "牛脊肉和吊龍　牛脊肉：殺牛或哞菇有 25% 機率多掉一塊（搶奪每級 +10%；著火…",
+       "go": [
+        2,
+        2
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cutting_board",
+       "t": "砧板、菜刀、擀麵棍　要加工食材，先做三樣廚具：",
+       "go": [
+        2,
+        3
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "minecraft:beef",
+       "t": "切菜　把東西放上砧板，拿鐵菜刀右鍵砧板切一刀：",
+       "go": [
+        2,
+        4
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:beef_meatball",
+       "t": "搗丸子　能搗的肉：生牛肉、生豬肉、生羊肉、生鱈魚、生鮭魚。",
+       "go": [
+        2,
+        5
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:shrimp",
+       "t": "蝦、蝦仁、蝦滑　蝦：釣魚有機會釣到，大約六分之一。",
+       "go": [
+        2,
+        6
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:ham_sausage_slice",
+       "t": "豬絞肉和火腿腸　生豬肉放上砧板，拿鐵菜刀切一刀，得到 1 份豬絞肉；切石機也行。（擀…",
+       "go": [
+        2,
+        7
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cold_tofu",
+       "t": "豆腐和黃豆　黃豆：打矮草 / 芒草有 15% 掉一顆（不用剪刀）。",
+       "go": [
+        2,
+        8
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:crispy_pork",
+       "t": "酥肉　現炸的小酥肉，是火鍋桌上最先被搶光的那盤。",
+       "go": [
+        2,
+        9
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:dried_tofu",
+       "t": "豆乾、腐竹與苕皮　冷豆腐和馬鈴薯片別只拿來涮，壓一壓、切一切，就是四樣最會兜湯的火鍋料…",
+       "go": [
+        2,
+        10
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:enoki_mushroom",
+       "t": "菌菇、蔬菜與水產　金針菇：2 個棕色蘑菇在合成格裡合成 2 份；打掉棕色 / 紅色蘑菇…",
+       "go": [
+        2,
+        11
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:egg_fried_rice",
+       "t": "蛋炒飯　1 個原版小麥 + 1 個雞蛋 + 1 顆小蔥 + 1 個碗，在背包…",
+       "go": [
+        2,
+        12
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:chili_pepper",
+       "t": "辣椒　打矮草 / 芒草有 15% 掉一根辣椒，不用剪刀。",
+       "go": [
+        2,
+        13
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:zhe_er_gen",
+       "t": "折耳根　打矮草 / 芒草有 15% 掉一棵折耳根（魚腥草的根），不用剪刀，和…",
+       "go": [
+        2,
+        14
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:scallion",
+       "t": "小蔥和香菜　打矮草 / 芒草下半格（不用剪刀），各有 25% 掉小蔥和香菜。",
+       "go": [
+        2,
+        15
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "minecraft:cooked_beef",
+       "t": "食物回飢餓速查　拿不準一樣菜要涮多久？記住四檔就夠：吊龍、毛肚、金針菇、青菜最快，肥…",
+       "go": [
+        2,
+        16
+       ]
+      }
      ]
     },
     {
      "icon": "orients_hotpot_chronicles:tripe",
-     "title": "牛身上的",
-     "rows": [
-      [
-       "orients_hotpot_chronicles:tripe",
-       "毛肚：殺牛掉落，熟的回 5，涮得快"
-      ],
-      [
-       "orients_hotpot_chronicles:beef_loin",
-       "牛脊肉：殺牛 25% 多掉一塊，熟的回 8"
-      ],
-      [
-       "orients_hotpot_chronicles:beef_loin_slice",
-       "吊龍：牛脊肉切的，涮得最快"
-      ]
+     "title": "毛肚",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:tripe",
+        "orients_hotpot_chronicles:cooked_tripe"
+       ]
+      },
+      {
+       "k": "bul",
+       "t": "來源：殺牛或哞菇掉落，數量規則和原版牛肉一樣（1～3 塊，搶奪每級多 0～1，著火死的直接掉熟的）。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "生毛肚回 2 點飢餓，熟毛肚回 5 點。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "涮火鍋最合適：在鍋裡只要 2.5 秒左右就熟（比整塊牛肉快一半）。",
+       "d": 0
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:cooked_tripe"
+       ]
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:beef_loin",
+     "title": "牛脊肉和吊龍",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:beef_loin",
+        "orients_hotpot_chronicles:cooked_beef_loin",
+        "orients_hotpot_chronicles:beef_loin_slice",
+        "orients_hotpot_chronicles:cooked_beef_loin_slice"
+       ]
+      },
+      {
+       "k": "bul",
+       "t": "牛脊肉：殺牛或哞菇有 25% 機率多掉一塊（搶奪每級 +10%；著火死的掉熟牛脊肉）。生吃回 3 飢餓；整塊烤成熟牛脊肉回 8 點飢餓，和原版熟牛排一樣。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "吊龍：把牛脊肉放砧板上用菜刀切，或放進切石機，一塊切出 3 片吊龍。生的回 1 點飢餓；熟的吊龍回 3 點飢餓。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "吊龍在鍋裡涮得最快（比肥牛捲快一半），涮幾秒就熟。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "熟牛脊肉不能再切。",
+       "d": 0
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:beef_loin_slice",
+        "orients_hotpot_chronicles:cooked_beef_loin"
+       ]
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:cutting_board",
+     "title": "砧板、菜刀、擀麵棍",
+     "blocks": [
+      {
+       "k": "p",
+       "t": "要加工食材，先做三樣廚具："
+      },
+      {
+       "k": "sub",
+       "t": "◆ 砧板",
+       "l": 3
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "砧板的朝向、拿在手裡看得見、對著板上食物只挖食物、物品欄圖示不發暗，都是 0.1.3-alpha-hotfix1 起的改進；0.1.2-alpha 裡砧板沒有朝向，拿在手裡幾乎看不見，板上的東西和砧板一起被挖。"
+       ],
+       "s": "tip"
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:cutting_board"
+       ]
+      },
+      {
+       "k": "bul",
+       "t": "兩個任意原木橫著擺一排，出 2 塊砧板。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "有朝向：按你放的方向擺，板上的東西轉到朝著你。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "拿能切、能搗的東西右鍵砧板放上去；空手右鍵拿回來。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "對著板上的東西挖，只掉那樣東西，砧板留著。",
+       "d": 0
+      },
+      {
+       "k": "sub",
+       "t": "◆ 鐵菜刀",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:iron_kitchen_knife"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "方頭中式菜刀，耐久 250，也能當武器（傷害 4）。"
+      },
+      {
+       "k": "sub",
+       "t": "◆ 擀麵棍",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:rolling_pin"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "耐久 120，用來搗丸子。"
+      }
+     ]
+    },
+    {
+     "icon": "minecraft:beef",
+     "title": "切菜",
+     "blocks": [
+      {
+       "k": "p",
+       "t": "把東西放上砧板，拿鐵菜刀右鍵砧板切一刀："
+      },
+      {
+       "k": "th",
+       "t": "放上砧板　要幾刀　切出來　熟的每份回"
+      },
+      {
+       "k": "tr",
+       "t": "1 刀　3 個 肥牛捲　3",
+       "icon": "minecraft:beef"
+      },
+      {
+       "k": "tr",
+       "t": "1 刀　3 個 羊肉捲　3",
+       "icon": "minecraft:mutton"
+      },
+      {
+       "k": "tr",
+       "t": "1 刀　3 片 吊龍　3",
+       "icon": "orients_hotpot_chronicles:beef_loin"
+      },
+      {
+       "k": "tr",
+       "t": "3 刀，每刀 1 份　3 份 馬鈴薯片（每份三片）　2",
+       "icon": "minecraft:potato"
+      },
+      {
+       "k": "tr",
+       "t": "1 刀　3 塊 豆腐塊（冷）　2",
+       "icon": "orients_hotpot_chronicles:cold_tofu"
+      },
+      {
+       "k": "tr",
+       "t": "1 刀　3 塊 豆腐塊（熱）（已經是熟的）　2",
+       "icon": "orients_hotpot_chronicles:hot_tofu"
+      },
+      {
+       "k": "p",
+       "t": "懶人做法：丟進切石機也能一次切好。"
+      },
+      {
+       "k": "note",
+       "t": "注意事項",
+       "b": [
+        "0.1.2-alpha 裡馬鈴薯和豆腐放不上砧板（已知問題，只能用切石機），0.1.3-alpha-hotfix1 已修好。"
+       ],
+       "s": "warn"
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:fatty_beef_roll",
+        "orients_hotpot_chronicles:mutton_roll",
+        "orients_hotpot_chronicles:potato_slice",
+        "orients_hotpot_chronicles:cold_tofu_cube"
+       ]
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:beef_meatball",
+     "title": "搗丸子",
+     "blocks": [
+      {
+       "k": "p",
+       "t": "能搗的肉：生牛肉、生豬肉、生羊肉、生鱈魚、生鮭魚。"
+      },
+      {
+       "k": "num",
+       "t": "把肉放上砧板。",
+       "n": 1,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "拿擀麵棍右鍵砧板搗三下：第 1 下捶碎，第 2 下成肉漿，第 3 下出 3 個生丸子。",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "丸子是立體小球，熟的每個回 3 點飢餓。",
+       "n": 3,
+       "d": 0
+      },
+      {
+       "k": "th",
+       "t": "原料　生丸子"
+      },
+      {
+       "k": "tr",
+       "t": "生牛肉　牛肉丸",
+       "icon": "orients_hotpot_chronicles:beef_meatball"
+      },
+      {
+       "k": "tr",
+       "t": "生豬肉　豬肉丸",
+       "icon": "orients_hotpot_chronicles:pork_meatball"
+      },
+      {
+       "k": "tr",
+       "t": "生羊肉　羊肉丸",
+       "icon": "orients_hotpot_chronicles:mutton_meatball"
+      },
+      {
+       "k": "tr",
+       "t": "生鱈魚 / 生鮭魚　魚丸",
+       "icon": "orients_hotpot_chronicles:fish_ball"
+      },
+      {
+       "k": "sub",
+       "t": "◆ 香菜丸子",
+       "l": 3
+      },
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:cilantro"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "2 個生丸子 + 1 顆 香菜 在工作臺無序合成出 2 個香菜丸子（四種丸子都有香菜版）。熟的每個回 4 點飢餓。"
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:cilantro_beef_meatball"
+       ]
+      }
      ]
     },
     {
      "icon": "orients_hotpot_chronicles:shrimp",
-     "title": "蝦",
-     "get": "釣魚釣到",
-     "text": "帶殼的蝦、蝦仁、蝦滑都能下鍋涮。",
-     "rows": [
-      [
-       "orients_hotpot_chronicles:shrimp",
-       "菜刀切一刀：剝成蝦仁"
-      ],
-      [
-       "orients_hotpot_chronicles:peeled_shrimp",
-       "擀麵杖拍三下：成一顆蝦滑"
-      ],
-      [
-       "orients_hotpot_chronicles:cooked_shrimp_paste",
-       "熟的回：蝦 3、蝦仁 3、蝦滑 4"
-      ]
+     "title": "蝦、蝦仁、蝦滑",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:shrimp",
+        "orients_hotpot_chronicles:peeled_shrimp",
+        "orients_hotpot_chronicles:shrimp_paste"
+       ]
+      },
+      {
+       "k": "bul",
+       "t": "蝦：釣魚有機會釣到，大約六分之一。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "蝦仁：蝦放砧板上用菜刀切；切石機也行。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "蝦滑：蝦仁用擀麵棍在砧板上拍 3 下。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "三樣都能下鍋涮、也能烤，熟的分別回 3 / 3 / 4 點飢餓；熟蝦、熟蝦仁的說明裡還有一句小字。",
+       "d": 0
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:peeled_shrimp",
+        "orients_hotpot_chronicles:cooked_shrimp_paste"
+       ]
+      }
      ]
     },
     {
-     "icon": "orients_hotpot_chronicles:tofu",
-     "text": "3 黃豆 + 水桶合成，水桶還你。切成豆腐塊再涮。",
-     "recipes": [
-      "orients_hotpot_chronicles:tofu"
+     "icon": "orients_hotpot_chronicles:ham_sausage_slice",
+     "title": "豬絞肉和火腿腸",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:minced_pork",
+        "orients_hotpot_chronicles:raw_ham_sausage",
+        "orients_hotpot_chronicles:ham_sausage",
+        "orients_hotpot_chronicles:ham_sausage_slice",
+        "orients_hotpot_chronicles:cooked_ham_sausage_slice"
+       ]
+      },
+      {
+       "k": "num",
+       "t": "生豬肉放上砧板，拿鐵菜刀切一刀，得到 1 份豬絞肉；切石機也行。（擀麵棍搗豬肉丸照舊。）",
+       "n": 1,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "豬絞肉 + 1 個原版小麥無序合成，出 3 根生火腿腸。",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "生火腿腸下鍋，或用熔爐、煙燻爐、營火加熱，得到火腿腸。",
+       "n": 3,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "火腿腸放砧板上用菜刀切一刀，出 3 片火腿腸片；切石機也能切。生火腿腸不能上砧板切。",
+       "n": 4,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "火腿腸片還能再加熱一次（下鍋、熔爐、煙燻爐、營火都行），變成熟火腿腸片；熟火腿腸片不能再下鍋。",
+       "n": 5,
+       "d": 0
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:minced_pork",
+        "orients_hotpot_chronicles:raw_ham_sausage",
+        "orients_hotpot_chronicles:ham_sausage",
+        "orients_hotpot_chronicles:ham_sausage_slice",
+        "orients_hotpot_chronicles:cooked_ham_sausage_slice"
+       ]
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "順序記成：生豬肉 → 豬絞肉 → 生火腿腸 → 火腿腸 → 火腿腸片 → 熟火腿腸片。豬絞肉是加工原料，不能直接吃。"
+       ],
+       "s": "tip"
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:cold_tofu",
+     "title": "豆腐和黃豆",
+     "blocks": [
+      {
+       "k": "bul",
+       "t": "黃豆：打矮草 / 芒草有 15% 掉一顆（不用剪刀）。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "豆腐（冷）：3 個黃豆 + 1 個水桶在工作臺無序合成，得 1 塊冷豆腐，水桶還給你。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "冷豆腐放砧板上一刀切成 3 塊豆腐塊（冷），涮熟每塊回 2 點飢餓。",
+       "d": 0
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:cold_tofu"
+       ]
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "0.2.2-alpha 起豆腐分冷熱（0.2.1-alpha 及更早叫「豆腐」「豆腐塊」「熟豆腐塊」，整塊豆腐煮熟後還是同一個物品）：",
+        "豆腐（冷）、豆腐（熱）、豆腐塊（熱）",
+        "• 整塊豆腐（冷）下鍋煮 10 秒變成豆腐（熱）：已經熟了，用筷子夾、空手撈都行，放不回鍋裡。",
+        "• 熱豆腐一直留在鍋裡不管，從下鍋算起 30 秒會碎成豆腐塊（熱），塊數和原來一樣。想吃整塊的熱豆腐就早點夾。",
+        "• 熱豆腐也能放砧板切成 3 塊豆腐塊（熱）；冷豆腐塊用熔爐、煙燻爐、營火或鍋裡煮，同樣變成熱豆腐塊。",
+        "• 服主可以在設定檔裡改這兩個時間：cooking.tofu_cook_ticks（煮熟，預設 200 刻 = 10 秒）、cooking.tofu_overcook_ticks（從下鍋算起碎塊，預設 600 刻 = 30 秒），改完 /orientshotpot reload 生效。"
+       ],
+       "s": "tip"
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:crispy_pork",
+     "title": "酥肉",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:raw_crispy_pork",
+        "orients_hotpot_chronicles:crispy_pork",
+        "orients_hotpot_chronicles:boiled_crispy_pork"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "現炸的小酥肉，是火鍋桌上最先被搶光的那盤。"
+      },
+      {
+       "k": "num",
+       "t": "豬絞肉 + 原版小麥 + 1 個雞蛋在背包合成格裡隨便擺（無序合成），出 3 份生酥肉，回 1 點飢餓——還帶著花椒和蛋糊的生坯，別急著吃。",
+       "n": 1,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "生酥肉丟進熔爐（10 秒）/ 煙燻爐（5 秒）/ 營火（30 秒），或者直接下火鍋，出來就是酥肉，回 4 點飢餓。外殼金黃起酥，直接抓著吃最香。",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "現炸的酥肉還能再下鍋涮一次：清湯加煤炭燒著，大約 7.5 秒後變成煮酥肉，回 6 點飢餓。外軟裡嫩，一口咬開全是湯。",
+       "n": 3,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "煮酥肉就是終點了，不能再下鍋（會提示），想吃就趁熱夾。",
+       "n": 4,
+       "d": 0
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:raw_crispy_pork",
+        "orients_hotpot_chronicles:crispy_pork"
+       ]
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "順序記成：生豬肉 → 豬絞肉 → 生酥肉 → 酥肉 → 煮酥肉。想兩種口感都嚐到，就一半烤了直接吃、一半留著涮鍋。"
+       ],
+       "s": "tip"
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:dried_tofu",
+     "title": "豆乾、腐竹與苕皮",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:dried_tofu",
+        "orients_hotpot_chronicles:cooked_dried_tofu",
+        "orients_hotpot_chronicles:tofu_skin",
+        "orients_hotpot_chronicles:cooked_tofu_skin",
+        "orients_hotpot_chronicles:wide_noodles",
+        "orients_hotpot_chronicles:cooked_wide_noodles",
+        "orients_hotpot_chronicles:sweet_potato_skin",
+        "orients_hotpot_chronicles:cooked_sweet_potato_skin"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "冷豆腐和馬鈴薯片別只拿來涮，壓一壓、切一切，就是四樣最會兜湯的火鍋料："
+      },
+      {
+       "k": "th",
+       "t": "做這個　怎麼擺　出幾份　生的回　熟的回"
+      },
+      {
+       "k": "tr",
+       "t": "2 塊冷豆腐橫著擺一排　3 份　2　4",
+       "icon": "orients_hotpot_chronicles:dried_tofu"
+      },
+      {
+       "k": "tr",
+       "t": "2 塊冷豆腐豎著擺一列　3 份　2　4",
+       "icon": "orients_hotpot_chronicles:tofu_skin"
+      },
+      {
+       "k": "tr",
+       "t": "2 份馬鈴薯片橫著擺一排　3 份　1　4",
+       "icon": "orients_hotpot_chronicles:wide_noodles"
+      },
+      {
+       "k": "tr",
+       "t": "2 份馬鈴薯片豎著擺一列　3 份　1　4",
+       "icon": "orients_hotpot_chronicles:sweet_potato_skin"
+      },
+      {
+       "k": "bul",
+       "t": "豆乾壓得緊實，涮完越嚼越有豆香；腐竹乾巴巴的，下鍋幾秒就軟，褶皺裡全是湯。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "寬粉滑溜溜，用筷子夾要留神別滑回鍋裡；苕皮帶一點馬鈴薯的甜。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "四樣都能下鍋涮，也能熔爐 / 煙燻爐 / 營火烤熟。鍋裡大約 5～7.5 秒：腐竹、苕皮 5 秒，豆乾、寬粉 7.5 秒。",
+       "d": 0
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:dried_tofu",
+        "orients_hotpot_chronicles:tofu_skin",
+        "orients_hotpot_chronicles:wide_noodles",
+        "orients_hotpot_chronicles:sweet_potato_skin",
+        "orients_hotpot_chronicles:cooked_dried_tofu",
+        "orients_hotpot_chronicles:cooked_tofu_skin",
+        "orients_hotpot_chronicles:cooked_wide_noodles",
+        "orients_hotpot_chronicles:cooked_sweet_potato_skin"
+       ]
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "橫著擺和豎著擺是兩個不同的配方：冷豆腐橫排出豆乾、豎排出腐竹；馬鈴薯片橫排出寬粉、豎排出苕皮。擺錯方向就是另一樣東西。"
+       ],
+       "s": "tip"
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:enoki_mushroom",
+     "title": "菌菇、蔬菜與水產",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:enoki_mushroom",
+        "orients_hotpot_chronicles:cooked_enoki_mushroom",
+        "orients_hotpot_chronicles:greens",
+        "orients_hotpot_chronicles:cooked_greens",
+        "orients_hotpot_chronicles:lotus_root",
+        "orients_hotpot_chronicles:lotus_root_slice",
+        "orients_hotpot_chronicles:cooked_lotus_root_slice",
+        "orients_hotpot_chronicles:raw_squid",
+        "orients_hotpot_chronicles:squid_roll",
+        "orients_hotpot_chronicles:cooked_squid_roll"
+       ]
+      },
+      {
+       "k": "bul",
+       "t": "金針菇：2 個棕色蘑菇在合成格裡合成 2 份；打掉棕色 / 紅色蘑菇（那一朵一朵的小蘑菇）也有 50% 掉一把。涮 2.5 秒就熟，熟金針菇回 3 點飢餓——細長一束，專吸鍋底。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "青菜：打短草 / 高草有 15% 掉一棵，不用剪刀。整棵涮 2.5 秒變熟青菜，回 3 點飢餓；一桌紅湯裡最清爽的那口。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "蓮藕：打睡蓮有 50% 掉一節（用剪刀剪不掉）。整節藕不能下鍋，放砧板上用菜刀切 3 刀、每刀 1 片，或者丟切石機一次切出 3 片蓮藕片。蓮藕片涮 5 秒，熟蓮藕片回 3 點飢餓，脆嫩回甜，孔裡藏湯。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "生魷魚：殺魷魚 / 發光魷魚掉 1～2 隻（搶奪每級多 0～1）。整隻同樣不能下鍋，砧板上一刀（或切石機）切出 3 份魷魚捲，已經打好麥穗花刀；涮 5 秒變熟魷魚捲，回 4 點飢餓，一燙就捲成花。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "這些也都能烤：熔爐 10 秒、煙燻爐 5 秒、營火 30 秒，烤的和涮的味道一樣。",
+       "d": 0
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:enoki_mushroom",
+        "orients_hotpot_chronicles:lotus_root_slice",
+        "orients_hotpot_chronicles:squid_roll",
+        "orients_hotpot_chronicles:cooked_enoki_mushroom",
+        "orients_hotpot_chronicles:cooked_greens",
+        "orients_hotpot_chronicles:cooked_lotus_root_slice",
+        "orients_hotpot_chronicles:cooked_squid_roll"
+       ]
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "金針菇、青菜是最快熟的一檔（和吊龍、毛肚一樣快）；蓮藕片、魷魚捲算中等；豆乾、寬粉稍慢一點。整節蓮藕和整隻生魷魚直接往鍋裡點會提示先切開。"
+       ],
+       "s": "tip"
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:egg_fried_rice",
+     "title": "蛋炒飯",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:egg_fried_rice"
+       ]
+      },
+      {
+       "k": "num",
+       "t": "1 個原版小麥 + 1 個雞蛋 + 1 顆小蔥 + 1 個碗，在背包合成格裡隨便擺，出 1 碗蛋炒飯。",
+       "n": 1,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "它回 7 點飢餓，金裹銀、粒粒分明，翠綠蔥花一拌，配火鍋正好解辣。",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "蛋炒飯是做好的成品，不下鍋涮；碗是配方的一部分，一頓吃完。",
+       "n": 3,
+       "d": 0
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:egg_fried_rice"
+       ]
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:chili_pepper",
+     "title": "辣椒",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:chili_pepper",
+        "orients_hotpot_chronicles:millet_chili"
+       ]
+      },
+      {
+       "k": "num",
+       "t": "打矮草 / 芒草有 15% 掉一根辣椒，不用剪刀。",
+       "n": 1,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "能直接吃（回 1 點飢餓），辣得乾脆；也能放砧板上用菜刀切一刀（或丟切石機），出 2 份小米辣。",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "小米辣是沾醬臺的第 14 種佐料：沾了它吃東西帶力量 I 8 秒。",
+       "n": 3,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "辣椒最要緊的用處是給紅湯鍋加辣：手裡拿著辣椒右鍵紅湯區，辣度就升一檔，最多到變態辣；拿冰塊能降回來。詳見灶臺與火鍋。",
+       "n": 4,
+       "d": 0
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:millet_chili"
+       ]
+      },
+      {
+       "k": "note",
+       "t": "注意事項",
+       "b": [
+        "辣椒和小米辣都不下鍋：拿它們點鍋只會調辣度或者提示，不會被當成食材塞進格子。想涮辣味，就往紅湯裡加辣。"
+       ],
+       "s": "warn"
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:zhe_er_gen",
+     "title": "折耳根",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:zhe_er_gen",
+        "orients_hotpot_chronicles:zhe_er_gen_slice",
+        "orients_hotpot_chronicles:cooked_zhe_er_gen_slice",
+        "orients_hotpot_chronicles:minced_zhe_er_gen"
+       ]
+      },
+      {
+       "k": "num",
+       "t": "打矮草 / 芒草有 15% 掉一棵折耳根（魚腥草的根），不用剪刀，和青菜、花生一個機率。",
+       "n": 1,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "折耳根能直接吃（回 1 點飢餓），白嫩根節、脆生生的，帶一股西南人最懂的腥香。",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "拿整根放砧板上用菜刀切一刀（或丟切石機），出 3 段折耳根段；整根不能直接下鍋，得先切成段。",
+       "n": 3,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "折耳根段丟進火鍋涮 10 秒（200 刻）變熟折耳根段（回 3 點飢餓）；熔爐、煙燻爐、營火也能烤熟。",
+       "n": 4,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "整根還能拿擀麵棍在砧板上敲 3 下：第 1 下還是根、第 2 下起變成碎末，第 3 下掉 2 份折耳根碎。",
+       "n": 5,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "折耳根碎是沾醬臺的第 15 種佐料：沾了它吃東西帶抗性提升 I 10 秒，並解毒——折耳根本來就是清熱解毒的。",
+       "n": 6,
+       "d": 0
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:zhe_er_gen_slice",
+        "orients_hotpot_chronicles:cooked_zhe_er_gen_slice"
+       ]
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "腥氣煮掉大半：生折耳根味道衝，涮熟以後只剩一點回甘；不習慣生吃的話，涮 10 秒再吃就是最穩的入門。"
+       ],
+       "s": "tip"
+      }
      ]
     },
     {
      "icon": "orients_hotpot_chronicles:scallion",
-     "title": "打草和樹葉",
-     "text": "不用剪刀，打短草、高草就掉。",
-     "rows": [
-      [
-       "orients_hotpot_chronicles:scallion",
-       "小蔥：25%"
-      ],
-      [
-       "orients_hotpot_chronicles:cilantro",
-       "香菜：25%"
-      ],
-      [
-       "orients_hotpot_chronicles:soybean",
-       "黃豆：15%"
-      ],
-      [
-       "orients_hotpot_chronicles:garlic",
-       "大蒜"
-      ],
-      [
-       "orients_hotpot_chronicles:tomato",
-       "番茄"
-      ],
-      [
-       "orients_hotpot_chronicles:orange",
-       "橙子：橡木、深色橡木樹葉掉（同蘋果）"
-      ]
+     "title": "小蔥和香菜",
+     "blocks": [
+      {
+       "k": "bul",
+       "t": "打矮草 / 芒草下半格（不用剪刀），各有 25% 掉小蔥和香菜。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "能直接吃（回 1 點飢餓），也是沾醬原料，香菜還能做香菜丸子。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "打草還會掉：番茄（做番茄鍋底料）、大蒜（蒜泥的原料）、黃豆（做豆腐）。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "熟海帶：原版海帶丟進火鍋裡煮出來（熔爐、煙燻爐、營火照舊出海帶乾），回 2 點飢餓。",
+       "d": 0
+      }
      ]
     },
     {
-     "icon": "orients_hotpot_chronicles:cooked_kelp",
-     "text": "海帶下鍋煮成熟海帶（熔爐裡還是幹海帶）。"
+     "icon": "minecraft:cooked_beef",
+     "title": "食物回飢餓速查",
+     "blocks": [
+      {
+       "k": "th",
+       "t": "食物　生　熟"
+      },
+      {
+       "k": "tr",
+       "t": "毛肚　2　5"
+      },
+      {
+       "k": "tr",
+       "t": "牛脊肉　3　8"
+      },
+      {
+       "k": "tr",
+       "t": "吊龍　1　3"
+      },
+      {
+       "k": "tr",
+       "t": "肥牛捲 / 羊肉捲　1　3"
+      },
+      {
+       "k": "tr",
+       "t": "馬鈴薯片　1　2"
+      },
+      {
+       "k": "tr",
+       "t": "豆腐（冷 / 熱）/ 豆腐塊（冷 / 熱）　2 / 1　2 / 2"
+      },
+      {
+       "k": "tr",
+       "t": "牛肉丸 / 豬肉丸 / 羊肉丸 / 魚丸　1　3"
+      },
+      {
+       "k": "tr",
+       "t": "香菜丸子（四種）　1　4"
+      },
+      {
+       "k": "tr",
+       "t": "黃豆　1　—"
+      },
+      {
+       "k": "tr",
+       "t": "小蔥 / 香菜　1　—"
+      },
+      {
+       "k": "tr",
+       "t": "蝦 / 蝦仁 / 蝦滑　—　3 / 3 / 4"
+      },
+      {
+       "k": "tr",
+       "t": "熟海帶　—　2"
+      },
+      {
+       "k": "tr",
+       "t": "生火腿腸 / 火腿腸　1　3"
+      },
+      {
+       "k": "tr",
+       "t": "火腿腸片 / 熟火腿腸片　1　2"
+      },
+      {
+       "k": "tr",
+       "t": "生酥肉 / 酥肉 / 煮酥肉　1　4 / 6"
+      },
+      {
+       "k": "tr",
+       "t": "豆乾 / 熟豆乾　2　4"
+      },
+      {
+       "k": "tr",
+       "t": "腐竹 / 熟腐竹　2　4"
+      },
+      {
+       "k": "tr",
+       "t": "寬粉 / 熟寬粉　1　4"
+      },
+      {
+       "k": "tr",
+       "t": "苕皮 / 熟苕皮　1　4"
+      },
+      {
+       "k": "tr",
+       "t": "金針菇 / 熟金針菇　1　3"
+      },
+      {
+       "k": "tr",
+       "t": "青菜 / 熟青菜　1　3"
+      },
+      {
+       "k": "tr",
+       "t": "蓮藕 / 蓮藕片 / 熟蓮藕片　2 / 1　3"
+      },
+      {
+       "k": "tr",
+       "t": "生魷魚 / 魷魚捲 / 熟魷魚捲　2 / 1　4"
+      },
+      {
+       "k": "tr",
+       "t": "蛋炒飯　—　7"
+      },
+      {
+       "k": "tr",
+       "t": "辣椒 / 小米辣　1　—"
+      },
+      {
+       "k": "tr",
+       "t": "花生 / 花生碎　1　—"
+      },
+      {
+       "k": "tr",
+       "t": "蠔油 / 芝麻醬　1 / 2　—"
+      },
+      {
+       "k": "tr",
+       "t": "折耳根 / 折耳根段 / 熟折耳根段　1 / 1　3"
+      },
+      {
+       "k": "tr",
+       "t": "折耳根碎　1　—"
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "拿不準一樣菜要涮多久？記住四檔就夠：吊龍、毛肚、金針菇、青菜最快，肥牛捲、羊肉捲、馬鈴薯片、豆腐塊、火腿腸片、蝦仁、蓮藕片、魷魚捲、腐竹、苕皮快熟，豆乾、寬粉、丸子、酥肉中等，整塊牛脊肉、折耳根段最慢。具體秒數見配方大全的「烹調」表，想改還能在設定檔裡調。"
+       ],
+       "s": "tip"
+      }
+     ]
     }
    ]
   },
   {
    "id": "sauce",
    "icon": "orients_hotpot_chronicles:oak_sauce_station",
-   "title": "蘸料",
+   "title": "沾醬",
    "entries": [
     {
-     "icon": "orients_hotpot_chronicles:oak_sauce_station",
-     "text": "臺上 9 個小碗。11 種木頭加鐵的，佔兩格高。",
-     "recipes": [
-      "orients_hotpot_chronicles:oak_sauce_station",
-      "orients_hotpot_chronicles:iron_sauce_station"
-     ],
-     "steps": [
-      "空手右鍵蘸料臺：開啟補貨介面",
-      "每格放一種原料，1 個原料 = 4 份調料",
-      "右上角的「?」是原料對照表"
+     "icon": "orients_hotpot_chronicles:dipping_sauce",
+     "title": "沾醬",
+     "blocks": [
+      {
+       "k": "p",
+       "t": "涮火鍋，沾醬是另一半靈魂。模組裡是自助沾醬臺的玩法：臺上擺著 9 個小碗，拿碗去自己配——想放什麼放什麼，每種小料帶不同效果，全部疊加。"
+      },
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:oak_sauce_station",
+        "orients_hotpot_chronicles:iron_sauce_station",
+        "orients_hotpot_chronicles:dipping_sauce"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "本章目錄",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "點下面的條目直接翻過去；也可以點書頂的書籤，或者點右下角的三角一頁頁往後翻。"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:oak_sauce_station",
+       "t": "沾醬臺　樣子：階梯式小臺子，三層臺階前低後高，每層 3 個白瓷小碗，一共 9…",
+       "go": [
+        3,
+        1
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:millet_chili",
+       "t": "15 種小料　蒜泥用大蒜打草掉，放砧板上用擀麵棍敲 3 下出 2 份（0.1.4-…",
+       "go": [
+        3,
+        2
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "minecraft:bowl",
+       "t": "打沾醬　拿一隻碗（碗）右鍵臺上有貨的小碗，碗裡就盛進一份佐料，變成「沾醬」。",
+       "go": [
+        3,
+        3
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
+       "t": "怎麼沾　有三種沾法：",
+       "go": [
+        3,
+        4
+       ]
+      }
      ]
     },
     {
-     "icon": "orients_hotpot_chronicles:garlic_paste",
-     "title": "十種小料",
-     "text": "一碗里加幾種，吃下去就有幾種效果。",
-     "rows": [
-      [
-       "minecraft:wheat",
-       "味精：多回 2 飢餓"
-      ],
-      [
-       "minecraft:blaze_powder",
-       "辣油：抗火 10 秒"
-      ],
-      [
-       "minecraft:sweet_berries",
-       "酸甜醬：速度 10 秒"
-      ],
-      [
-       "minecraft:honey_bottle",
-       "蜂蜜：解辣、解毒"
-      ],
-      [
-       "minecraft:sunflower",
-       "香油：生命恢復 5 秒"
-      ],
-      [
-       "minecraft:apple",
-       "醋：解反胃、解辣"
-      ],
-      [
-       "minecraft:sugar",
-       "白糖：急迫 10 秒"
-      ],
-      [
-       "orients_hotpot_chronicles:scallion",
-       "蔥花：只提味"
-      ],
-      [
-       "orients_hotpot_chronicles:cilantro",
-       "香菜碎末：只提味"
-      ],
-      [
-       "orients_hotpot_chronicles:garlic_paste",
-       "蒜泥：抗性提升 8 秒"
-      ]
+     "icon": "orients_hotpot_chronicles:oak_sauce_station",
+     "title": "沾醬臺",
+     "blocks": [
+      {
+       "k": "bul",
+       "t": "樣子：階梯式小臺子，三層臺階前低後高，每層 3 個白瓷小碗，一共 9 個。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "高度：1.5 格高，佔 2 格（頭頂那格被看不見的方塊佔住），能一級級踩上去。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "材質：11 種木頭各一個，外加鐵的，一共 12 種。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "朝向：正面朝著放它的人。",
+       "d": 0
+      },
+      {
+       "k": "sub",
+       "t": "◆ 配方",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "做一次出 1 個。鐵的把木板換成鐵錠，木頭的換成對應木板。"
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:oak_sauce_station",
+        "orients_hotpot_chronicles:iron_sauce_station"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "◆ 補貨：裝原料",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "空手右鍵沾醬臺開啟補貨介面："
+      },
+      {
+       "k": "bul",
+       "t": "介面裡有 9 個格子，對應臺上 9 個小碗（小料一共 15 種，一次最多擺 9 種）。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "每格只收一種原料，放什麼原料就裝那種佐料；同一種原料能佔好幾格。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "1 個原料 = 4 份佐料，一格最多放 16 個原料（共 64 份）。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "點右上角的「?」能看原料對照表。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "放了原料的小碗，臺上能看見對應的佐料。",
+       "d": 0
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "小料變多了，幫助面板會自動分兩列。 佐料種類超過 10 種（現在一共 15 種）時，按「?」彈出的佐料效果說明會從長長的一長條改成整整齊齊的雙列面板，左列放前 8 種、右列放後 7 種，一眼掃完不用往下滾。桌上只擺了 9 種以內的舊存檔還是原來的單列樣子。"
+       ],
+       "s": "tip"
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:millet_chili",
+     "title": "15 種小料",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:oyster_sauce",
+        "orients_hotpot_chronicles:sesame_paste",
+        "orients_hotpot_chronicles:crushed_peanuts",
+        "orients_hotpot_chronicles:millet_chili",
+        "orients_hotpot_chronicles:peanut",
+        "orients_hotpot_chronicles:minced_zhe_er_gen"
+       ]
+      },
+      {
+       "k": "th",
+       "t": "小料　放什麼原料　吃下去的效果"
+      },
+      {
+       "k": "tr",
+       "t": "味精　小麥　多回 2 點飢餓",
+       "icon": "minecraft:wheat"
+      },
+      {
+       "k": "tr",
+       "t": "辣油　烈焰粉　抗火 10 秒",
+       "icon": "minecraft:blaze_powder"
+      },
+      {
+       "k": "tr",
+       "t": "酸甜醬　甜莓　速度 10 秒",
+       "icon": "minecraft:sweet_berries"
+      },
+      {
+       "k": "tr",
+       "t": "蜂蜜　蜂蜜瓶　解辣、解毒",
+       "icon": "minecraft:honey_bottle"
+      },
+      {
+       "k": "tr",
+       "t": "香油　向日葵 或 南瓜種子　生命恢復 5 秒",
+       "icon": "minecraft:sunflower"
+      },
+      {
+       "k": "tr",
+       "t": "醋　蘋果 或 甜菜根　解反胃、解辣",
+       "icon": "minecraft:apple"
+      },
+      {
+       "k": "tr",
+       "t": "白糖　糖　挖掘加速 10 秒",
+       "icon": "minecraft:sugar"
+      },
+      {
+       "k": "tr",
+       "t": "蔥花　小蔥　只提味，沒有效果",
+       "icon": "orients_hotpot_chronicles:scallion"
+      },
+      {
+       "k": "tr",
+       "t": "香菜碎末　香菜　只提味，沒有效果",
+       "icon": "orients_hotpot_chronicles:cilantro"
+      },
+      {
+       "k": "tr",
+       "t": "蒜泥　蒜泥　抗性提升 8 秒",
+       "icon": "orients_hotpot_chronicles:garlic_paste"
+      },
+      {
+       "k": "tr",
+       "t": "蠔油　蠔油　水下呼吸 10 秒",
+       "icon": "orients_hotpot_chronicles:oyster_sauce"
+      },
+      {
+       "k": "tr",
+       "t": "芝麻醬　芝麻醬　傷害吸收 I 10 秒",
+       "icon": "orients_hotpot_chronicles:sesame_paste"
+      },
+      {
+       "k": "tr",
+       "t": "花生碎　花生碎　跳躍提升 I 10 秒",
+       "icon": "orients_hotpot_chronicles:crushed_peanuts"
+      },
+      {
+       "k": "tr",
+       "t": "小米辣　小米辣　力量 I 8 秒",
+       "icon": "orients_hotpot_chronicles:millet_chili"
+      },
+      {
+       "k": "tr",
+       "t": "折耳根碎　折耳根碎　抗性提升 I 10 秒，解毒",
+       "icon": "orients_hotpot_chronicles:minced_zhe_er_gen"
+      },
+      {
+       "k": "p",
+       "t": "蒜泥用大蒜打草掉，放砧板上用擀麵棍敲 3 下出 2 份（0.1.4-alpha 起）。"
+      },
+      {
+       "k": "p",
+       "t": "後五種原料各有一個小來頭："
+      },
+      {
+       "k": "bul",
+       "t": "蠔油：原版海帶 + 糖 + 玻璃瓶無序合成，出 2 瓶。海邊隨手撈的海帶終於有了去處，沾了它下水都不憋氣。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "芝麻醬：花生 + 小麥種子 + 碗合成 2 碗。醇厚的一勺，能把辣壓下去一半。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "花生碎：打草有 15% 掉花生，花生放砧板上用擀麵棍敲 3 下，出 2 份花生碎（第 2 下開始板上就顯碎粒了）。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "小米辣：一根辣椒在砧板上切一刀（或丟切石機）出 2 份小米辣，辣椒打草掉。詳見食材與切菜。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "折耳根碎：打草有 15% 掉折耳根，整根放砧板上用擀麵棍敲 3 下，出 2 份折耳根碎。折耳根本來就是清熱解毒的東西，沾了它能解中毒、還多點抗性。詳見食材與切菜。",
+       "d": 0
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:oyster_sauce",
+        "orients_hotpot_chronicles:sesame_paste"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "「解辣」就是清掉紅湯帶來的飢餓。加了幾種小料，沾過的菜吃下去就同時帶幾種效果。"
+      }
      ]
     },
     {
      "icon": "minecraft:bowl",
-     "title": "打蘸料",
-     "steps": [
-      "拿碗右鍵臺上有貨的小碗：盛進一份",
-      "拿著這碗蘸料再點別的小碗：繼續加",
-      "同一種一碗只加一次，一碗蘸 9 口"
+     "title": "打沾醬",
+     "blocks": [
+      {
+       "k": "num",
+       "t": "拿一隻碗（碗）右鍵臺上有貨的小碗，碗裡就盛進一份佐料，變成「沾醬」。",
+       "n": 1,
+       "d": 0,
+       "icon": "minecraft:bowl"
+      },
+      {
+       "k": "num",
+       "t": "想加別的？拿著這碗沾醬右鍵臺上別的小碗繼續加。",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "規矩：",
+       "n": 3,
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "同一種小料每碗只能加一次。",
+       "d": 1
+      },
+      {
+       "k": "bul",
+       "t": "一碗沾醬能沾 9 口。",
+       "d": 1
+      },
+      {
+       "k": "bul",
+       "t": "吃了幾口後還能繼續加沒加過的小料，剩下的口數不變。",
+       "d": 1
+      },
+      {
+       "k": "bul",
+       "t": "點到空碗會提示「是空的」，去補貨。",
+       "d": 1
+      },
+      {
+       "k": "num",
+       "t": "指著沾醬能看到加了哪幾種、還剩幾口。",
+       "n": 4,
+       "d": 0
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "推薦組合：香油 + 醋 + 蔥花 + 香菜碎末——生命恢復、解辣解反胃，還有蔥香。吃紅湯配蜂蜜或醋，吃了不辣。"
+       ],
+       "s": "tip"
+      }
      ]
     },
     {
      "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
-     "title": "怎麼蘸",
-     "tip": "蘸過的菜不管怎麼吃，效果都算。",
-     "rows": [
-      [
-       "minecraft:bowl",
-       "蘸料擺桌上，筷子夾著菜右鍵它"
-      ],
-      [
-       "orients_hotpot_chronicles:bamboo_chopsticks",
-       "主手或副手拿蘸料，吃的時候自動蘸"
-      ]
+     "title": "怎麼沾",
+     "blocks": [
+      {
+       "k": "p",
+       "t": "有三種沾法："
+      },
+      {
+       "k": "sub",
+       "t": "◆ ① 桌上沾",
+       "l": 3
+      },
+      {
+       "k": "num",
+       "t": "打好的沾醬擺在桌上（手拿沾醬右鍵桌面，和放盤子一樣）。",
+       "n": 1,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "竹筷夾著菜右鍵桌上的沾醬碗沾一口（空筷子點會提示先夾菜）。",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "菜上會帶效果，指著能看到「沾了：……」。沾完最後一口變回空碗。",
+       "n": 3,
+       "d": 0
+      },
+      {
+       "k": "sub",
+       "t": "◆ ② 鍋邊自動沾",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "主手或副手拿著沾醬，在火鍋介面裡用筷子吃東西會自動沾一口；對著空氣吃筷子上的菜時也一樣會自動沾。"
+      },
+      {
+       "k": "sub",
+       "t": "◆ ③ 筷子直接吃",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "夾著沾過的菜，對空氣按住右鍵吃，效果照樣生效——不管怎麼吃，沾過的菜都帶效果。"
+      },
+      {
+       "k": "p",
+       "t": "沾一口少 1 次；9 口吃完變回空碗。"
+      }
      ]
     }
    ]
@@ -502,220 +2677,3056 @@
    "title": "餐具",
    "entries": [
     {
-     "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
-     "rows": [
-      [
-       "orients_hotpot_chronicles:iron_nine_grid_hotpot",
-       "右鍵鍋：夾正浮著的熟菜；潛行右鍵：開介面"
-      ],
-      [
-       "orients_hotpot_chronicles:quartz_small_dish",
-       "右鍵碗、盤：夾最後放的那樣"
-      ],
-      [
-       "minecraft:beef",
-       "夾著生菜右鍵鍋：下鍋"
-      ],
-      [
-       "orients_hotpot_chronicles:cooked_beef_meatball",
-       "夾著熟菜按住右鍵：吃掉"
-      ]
-     ],
-     "recipes": [
-      "orients_hotpot_chronicles:bamboo_chopsticks"
+     "icon": "orients_hotpot_chronicles:quartz_eight_slot_platter",
+     "title": "盤子、碗與飲料",
+     "blocks": [
+      {
+       "k": "p",
+       "t": "火鍋桌上要擺滿：盤子裝生菜，碗盛湯，飲料解辣，筷子夾菜。"
+      },
+      {
+       "k": "sub",
+       "t": "本章目錄",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "點下面的條目直接翻過去；也可以點書頂的書籤，或者點右下角的三角一頁頁往後翻。"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:quartz_small_dish",
+       "t": "盤子　5 種材質 × 6 種大小 = 30 種盤子：",
+       "go": [
+        4,
+        1
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:clear_broth_bowl",
+       "t": "碗和湯碗　普通的碗（碗）也能上桌：",
+       "go": [
+        4,
+        2
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:orange_drink",
+       "t": "飲料　一瓶喝 4 口，飽了也能喝，喝完留下空瓶，空瓶也能擺桌上。",
+       "go": [
+        4,
+        3
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cloth_apron",
+       "t": "布圍裙　吃火鍋最怕滾油、沸湯濺上來，也怕一口變態辣辣到嘴上冒火。布圍裙就是為…",
+       "go": [
+        4,
+        4
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
+       "t": "筷子　開鍋介面：拿竹筷 Shift + 右鍵鍋。",
+       "go": [
+        4,
+        5
+       ]
+      }
      ]
     },
     {
      "icon": "orients_hotpot_chronicles:quartz_small_dish",
      "title": "盤子",
-     "text": "5 種材質 × 6 種大小。每格裝 3 樣菜，擺在桌上或地上。",
-     "recipes": [
-      "orients_hotpot_chronicles:quartz_small_dish",
-      "orients_hotpot_chronicles:quartz_two_slot_plate",
-      "orients_hotpot_chronicles:quartz_four_slot_square_plate",
-      "orients_hotpot_chronicles:quartz_eight_slot_platter"
-     ],
-     "steps": [
-      "拿食物右鍵盤子：放進去",
-      "空手右鍵：連盤帶菜拿起來",
-      "空手潛行右鍵：取出一樣"
+     "blocks": [
+      {
+       "k": "sub",
+       "t": "◆ 盤子的種類",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "5 種材質 × 6 種大小 = 30 種盤子："
+      },
+      {
+       "k": "th",
+       "t": "材質　做小碟用的原料"
+      },
+      {
+       "k": "tr",
+       "t": "石英　地獄石英",
+       "icon": "minecraft:quartz"
+      },
+      {
+       "k": "tr",
+       "t": "竹編　竹子",
+       "icon": "minecraft:bamboo"
+      },
+      {
+       "k": "tr",
+       "t": "紅陶　紅磚頭",
+       "icon": "minecraft:brick"
+      },
+      {
+       "k": "tr",
+       "t": "銅　銅錠",
+       "icon": "minecraft:copper_ingot"
+      },
+      {
+       "k": "tr",
+       "t": "鐵　鐵錠",
+       "icon": "minecraft:iron_ingot"
+      },
+      {
+       "k": "th",
+       "t": "大小　樣子　能裝幾樣菜"
+      },
+      {
+       "k": "tr",
+       "t": "小碟（1×1）　一格　3 樣"
+      },
+      {
+       "k": "tr",
+       "t": "雙格盤（1×2）　兩格長　6 樣"
+      },
+      {
+       "k": "tr",
+       "t": "三格長盤（1×3）　三格長　9 樣"
+      },
+      {
+       "k": "tr",
+       "t": "四格方盤（2×2）　方的　12 樣"
+      },
+      {
+       "k": "tr",
+       "t": "五格長盤（1×5）　五格長　15 樣"
+      },
+      {
+       "k": "tr",
+       "t": "八格大盤（2×4）　大的　24 樣"
+      },
+      {
+       "k": "p",
+       "t": "每一格最多裝 3 樣菜（任何菜都行），盤子容量 = 格數 × 3。"
+      },
+      {
+       "k": "sub",
+       "t": "◆ 合成",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "先做小碟：「材料 碗 材料」橫著擺一排（中間放碗），出 2 個小碟。大盤用同材質的小碟拼。下面以石英為例："
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:quartz_small_dish",
+        "orients_hotpot_chronicles:bamboo_small_dish",
+        "orients_hotpot_chronicles:terracotta_small_dish",
+        "orients_hotpot_chronicles:copper_small_dish",
+        "orients_hotpot_chronicles:iron_small_dish"
+       ]
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:quartz_two_slot_plate",
+        "orients_hotpot_chronicles:quartz_three_slot_long_plate",
+        "orients_hotpot_chronicles:quartz_four_slot_square_plate",
+        "orients_hotpot_chronicles:quartz_five_slot_long_plate",
+        "orients_hotpot_chronicles:quartz_eight_slot_platter"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "◆ 擺放",
+       "l": 3
+      },
+      {
+       "k": "bul",
+       "t": "拿盤子右鍵桌面或地面就擺上去了。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "一格空間裡可以擺好幾個，不能重疊，不同樣能混著放：小碟一格 5 個、長盤一格 2 個、方盤一格 1 個。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "盤子會自動貼桌面：矮桌上下移 5 像素，高桌上上移 7 像素。",
+       "d": 0
+      },
+      {
+       "k": "sub",
+       "t": "◆ 往盤子裡放菜和拿菜",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "操作都對準星對著的那一個盤子生效："
+      },
+      {
+       "k": "th",
+       "t": "你手裡拿著　右鍵盤子"
+      },
+      {
+       "k": "tr",
+       "t": "盤子　再擺一個盤子"
+      },
+      {
+       "k": "tr",
+       "t": "食物　放一樣菜進盤子（一格最多 3 樣）"
+      },
+      {
+       "k": "tr",
+       "t": "竹筷　夾走最後放的菜；竹筷夾著熟菜時右鍵盤子 = 吃掉（想放回去用潛行右鍵）"
+      },
+      {
+       "k": "tr",
+       "t": "空手　把盤子（連菜）拿起來"
+      },
+      {
+       "k": "tr",
+       "t": "空手 + 潛行　取出最後放的一樣菜到背包（盤子留著）"
+      },
+      {
+       "k": "bul",
+       "t": "挖盤子：只挖對著的那個，菜會一起掉出來。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "滑鼠中鍵：複製準星對著的盤子，連菜一起。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "裝了菜的盤子，物品欄圖示和拿在手裡都會畫出裡面的菜；提示像收納袋，同樣的菜合併寫「×數量」。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "端著菜下鍋：拿裝了菜的盤子右鍵鍋，裡面的生食材倒進鍋，熟的留在盤裡。",
+       "d": 0
+      }
      ]
     },
     {
-     "icon": "minecraft:bowl",
-     "title": "碗",
-     "text": "原版碗能擺桌上裝 3 樣菜；右鍵鍋先盛熟菜，沒熟菜就盛湯。",
-     "rows": [
-      [
-       "orients_hotpot_chronicles:clear_broth_bowl",
-       "清湯：解反胃"
-      ],
-      [
-       "orients_hotpot_chronicles:rich_stock_bowl",
-       "高湯：更抗餓"
-      ],
-      [
-       "orients_hotpot_chronicles:mushroom_broth_bowl",
-       "菌湯：生命恢復"
-      ],
-      [
-       "orients_hotpot_chronicles:spicy_red_broth_bowl",
-       "紅湯：力量，但有點辣"
-      ],
-      [
-       "orients_hotpot_chronicles:tomato_soup_bowl",
-       "番茄湯：解反胃"
-      ],
-      [
-       "orients_hotpot_chronicles:three_fresh_soup_bowl",
-       "三鮮湯：更抗餓"
-      ]
+     "icon": "orients_hotpot_chronicles:clear_broth_bowl",
+     "title": "碗和湯碗",
+     "blocks": [
+      {
+       "k": "sub",
+       "t": "◆ 碗的新用法",
+       "l": 3
+      },
+      {
+       "k": "icons",
+       "ids": [
+        "minecraft:bowl"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "普通的碗（碗）也能上桌："
+      },
+      {
+       "k": "bul",
+       "t": "擺在桌上：和盤子一樣擺，一隻碗能裝 3 樣菜，當小盤子用。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "拿碗右鍵鍋：先盛熟菜（最多 3 樣）；鍋裡沒熟菜就盛湯（湯盛不完，鍋裡的湯不會少）。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "裝了菜的碗右鍵鍋，整碗倒進鍋裡。",
+       "d": 0
+      },
+      {
+       "k": "sub",
+       "t": "◆ 六種湯碗",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "盛出來的湯是單獨的湯碗，喝了都回 4 點飢餓，還各帶效果："
+      },
+      {
+       "k": "th",
+       "t": "湯碗　效果"
+      },
+      {
+       "k": "tr",
+       "t": "移動速度 I 15 秒 + 飽和 1 tick；解反胃（原汁原味、輕盈健步）",
+       "icon": "orients_hotpot_chronicles:clear_broth_bowl"
+      },
+      {
+       "k": "tr",
+       "t": "抗性提升 I 15 秒 + 傷害吸收 I 30 秒（已移除緩慢負面效果；飽和度高，牛骨老雞、堅韌滋補）",
+       "icon": "orients_hotpot_chronicles:rich_stock_bowl"
+      },
+      {
+       "k": "tr",
+       "t": "生命恢復 I，10 秒（山珍菌菇、活血養生）",
+       "icon": "orients_hotpot_chronicles:mushroom_broth_bowl"
+      },
+      {
+       "k": "tr",
+       "t": "力量 + 速度（微辣力量 I 6 秒 + 速度 I 6 秒；中辣力量 II 9 秒 + 速度 I 9 秒；特辣力量 II 12 秒 + 速度 I 10 秒 + 抗火 15 秒 + 飢餓 I 6 秒；3 級特辣力量 II 15 秒 + 速度 I 12 秒 + 抗火 30 秒 + 飢餓 I 8 秒）。盛出時鍋裡的辣度會帶過來，見湯底辣度",
+       "icon": "orients_hotpot_chronicles:spicy_red_broth_bowl"
+      },
+      {
+       "k": "tr",
+       "t": "挖掘加速 I 15 秒；解除反胃（酸甜生津、精力充沛）",
+       "icon": "orients_hotpot_chronicles:tomato_soup_bowl"
+      },
+      {
+       "k": "tr",
+       "t": "水下呼吸 20 秒 + 幸運 I 30 秒（乾貝海米、時來運轉）",
+       "icon": "orients_hotpot_chronicles:three_fresh_soup_bowl"
+      },
+      {
+       "k": "p",
+       "t": "喝完變回空碗，也能擺在桌上。"
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "換湯底時用空桶舀，一律用桶。菌湯用碗舀成湯碗是另一回事。"
+       ],
+       "s": "tip"
+      }
      ]
-    }
-   ]
-  },
-  {
-   "id": "drinks",
-   "icon": "orients_hotpot_chronicles:orient_cola",
-   "title": "飲料",
-   "entries": [
+    },
     {
      "icon": "orients_hotpot_chronicles:orange_drink",
-     "text": "一瓶 4 口，速度 15 秒，解辣。",
-     "recipes": [
-      "orients_hotpot_chronicles:orange_drink"
+     "title": "飲料",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:orange_drink",
+        "orients_hotpot_chronicles:plant_protein_drink",
+        "orients_hotpot_chronicles:orient_cola",
+        "orients_hotpot_chronicles:glass_cup"
+       ]
+      },
+      {
+       "k": "th",
+       "t": "飲料　每一口的效果"
+      },
+      {
+       "k": "tr",
+       "t": "回 2 點飢餓；速度 15 秒；解辣（清掉飢餓效果）",
+       "icon": "orients_hotpot_chronicles:orange_drink"
+      },
+      {
+       "k": "tr",
+       "t": "回 2 點飢餓；解辣，解除反胃",
+       "icon": "orients_hotpot_chronicles:plant_protein_drink"
+      },
+      {
+       "k": "tr",
+       "t": "回 2 點飢餓；速度、挖掘加速各 15 秒；瓶子會冒氣泡",
+       "icon": "orients_hotpot_chronicles:orient_cola"
+      },
+      {
+       "k": "bul",
+       "t": "一瓶喝 4 口，飽了也能喝，喝完留下空瓶，空瓶也能擺桌上。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "飲料能擺在桌上右鍵喝；提示會寫「還剩幾口」。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "三種飲料都有配方了：柳橙飲料用柳橙，植物蛋白飲料用黃豆，之晗可樂用可可豆和蜂蜜。柳橙從橡木、黑橡木樹葉掉。",
+       "d": 0
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:orange_drink",
+        "orients_hotpot_chronicles:plant_protein_drink",
+        "orients_hotpot_chronicles:orient_cola"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "◆ 玻璃杯",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:glass_cup"
+       ]
+      },
+      {
+       "k": "bul",
+       "t": "拿飲料右鍵空杯倒一杯（一杯柳橙飲料一杯植物蛋白飲料一杯之晗可樂），一杯一口，喝完變回空杯，能擺桌上。",
+       "d": 0,
+       "icon": "orients_hotpot_chronicles:orange_drink_cup"
+      },
+      {
+       "k": "bul",
+       "t": "瓶子喝完留下空瓶（柳橙飲料空瓶植物蛋白飲料空瓶），空瓶能擺桌上，也能拿去舀鍋釜裡的飲料。",
+       "d": 0,
+       "icon": "orients_hotpot_chronicles:empty_orange_drink_bottle"
+      },
+      {
+       "k": "bul",
+       "t": "一杯水、一杯牛奶（一杯水一杯牛奶）：拿水桶 / 奶桶右鍵空杯，桶不會空；空杯對著水源右鍵也能舀水。喝水沒效果，牛奶清掉所有效果，都不回飢餓。",
+       "d": 0,
+       "icon": "orients_hotpot_chronicles:water_cup"
+      },
+      {
+       "k": "sub",
+       "t": "◆ 碰杯乾杯",
+       "l": 3
+      },
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:glass_cup",
+        "orients_hotpot_chronicles:orange_drink_cup",
+        "orients_hotpot_chronicles:orient_cola_cup"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "手裡端著裝了飲品的滿杯（柳橙汁、植物蛋白飲料、之晗可樂、水、牛奶都算），有三種碰杯方式："
+      },
+      {
+       "k": "num",
+       "t": "對著一塊喝酒的朋友右鍵：兩人同時碰杯（對方主手或副手也得端著滿杯）。",
+       "n": 1,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "身邊沒人也行：按住 Shift 對空氣右鍵，自己舉杯歡呼一下（4 格內有端著杯子的玩家就先跟他碰）。",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "對桌上擺好的滿杯右鍵：杯子照桌上一磕，也算。",
+       "n": 3,
+       "d": 0
+      },
+      {
+       "k": "p",
+       "t": "碰杯的那一刻：「叮——」一聲清脆的雙層響（玻璃輕響 + 高音叮），杯口濺起一小圈水花，還飄幾顆歡快的小音符。碰過的兩個人各得 30 秒幸運 I + 5 秒生命恢復 I，杯子底部記一筆——這杯接下來喝的第一口額外多回 1 點飢餓值（提示會寫「已乾杯 · 飲用額外 +1 飢餓值」）。"
+      },
+      {
+       "k": "p",
+       "t": "喝完這杯變回空杯，加成也就用掉了，想再來就再碰一次。碰杯會解鎖成就「乾杯！」。"
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "圍桌吃火鍋最合適先碰一輪：幸運加滿，撈丸子都更準。一個人玩也沒關係，Shift + 右鍵對著空氣舉杯，效果一樣。"
+       ],
+       "s": "tip"
+      },
+      {
+       "k": "sub",
+       "t": "◆ 飲料倒進鍋釜",
+       "l": 3
+      },
+      {
+       "k": "bul",
+       "t": "拿飲料瓶或滿杯右鍵原版鍋釜，飲料倒進去：一鍋只裝一種，最多 12 口（3 滿瓶），每 4 口水面高一檔，水換成飲料的顏色，可樂鍋會冒氣泡。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "空杯舀一口；原版玻璃瓶或這種飲料的空瓶舀一瓶（最多 4 口）。舀空變回空鍋釜，倒別的飲料會提示「裝的是別的飲料」。",
+       "d": 0
+      }
      ]
     },
     {
-     "icon": "orients_hotpot_chronicles:plant_protein_drink",
-     "text": "一瓶 4 口，解辣、解反胃。作者推薦。",
-     "recipes": [
-      "orients_hotpot_chronicles:plant_protein_drink"
+     "icon": "orients_hotpot_chronicles:cloth_apron",
+     "title": "布圍裙",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:cloth_apron"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "吃火鍋最怕滾油、沸湯濺上來，也怕一口變態辣辣到嘴上冒火。布圍裙就是為這兩件事做的。"
+      },
+      {
+       "k": "bul",
+       "t": "穿在哪：胸甲槽位，穿上內層看不見但是防具（防禦 3、耐久 80，和原版皮革胸甲一個檔次），會正常吃耐久、能附魔。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "合成：工作臺 3×3 裡，頂上一根線當掛脖繩，中間一行和底下一行共 6 塊白色羊毛排成圍裙的形狀。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "修：鐵砧上拿白色羊毛或線修，和合成材料對得上。",
+       "d": 0
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:cloth_apron"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "穿上它以後："
+      },
+      {
+       "k": "num",
+       "t": "不怕 3 級特辣：吃紅湯 3 級特辣（變態辣）的菜、喝 3 級特辣的紅湯碗，嘴上不會再冒那 2 秒火苗（沒穿時照舊會冒，純節目效果、不扣血）。",
+       "n": 1,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "擋濺油沸湯：站在點燃的灶臺、點燃的營火、火方塊或岩漿 4 格範圍內時，火焰、營火、岩漿、熱地板這幾種灼燒傷害不再掉血，濺到身上的火苗也會被布料滅掉。走在普通岩漿裡、被怪物打、摔傷這些照常算，圍裙是布做的，擋的是近處濺起來的油花與蒸汽。",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "離鍋太遠就不生效：防濺油只在身邊 4 格內有熱源的時候起作用；鍋端走了、灶膛熄了，布圍裙就只是件普通的布衣裳。"
+       ],
+       "s": "tip"
+      }
      ]
     },
     {
-     "icon": "orients_hotpot_chronicles:orient_cola",
-     "text": "一瓶 4 口，速度、急迫各 15 秒。",
-     "recipes": [
-      "orients_hotpot_chronicles:orient_cola"
-     ]
-    },
-    {
-     "icon": "orients_hotpot_chronicles:glass_cup",
-     "text": "拿著飲料右鍵空杯（揹包裡或桌上）倒一杯，一杯一口，喝完還是空杯。",
-     "recipes": [
-      "orients_hotpot_chronicles:glass_cup"
-     ]
-    },
-    {
-     "icon": "orients_hotpot_chronicles:water_cup",
-     "title": "水和牛奶",
-     "rows": [
-      [
-       "minecraft:water_bucket",
-       "水桶倒空杯：一杯水，桶不會空"
-      ],
-      [
-       "minecraft:milk_bucket",
-       "奶桶倒空杯：一杯牛奶，清掉所有效果"
-      ],
-      [
-       "orients_hotpot_chronicles:glass_cup",
-       "空杯對著水源右鍵也能舀水"
-      ]
-     ]
-    },
-    {
-     "icon": "minecraft:cauldron",
-     "title": "倒進煉藥鍋",
-     "rows": [
-      [
-       "orients_hotpot_chronicles:orange_drink",
-       "飲料瓶、滿杯右鍵煉藥鍋倒進去"
-      ],
-      [
-       "minecraft:cauldron",
-       "一鍋一種飲料，最多 12 口"
-      ],
-      [
-       "orients_hotpot_chronicles:glass_cup",
-       "空杯舀一口，玻璃瓶舀一瓶"
-      ]
-     ]
-    },
-    {
-     "icon": "minecraft:glass_bottle",
-     "title": "喝和擺",
-     "rows": [
-      [
-       "orients_hotpot_chronicles:orange_drink",
-       "吃飽了也能喝"
-      ],
-      [
-       "orients_hotpot_chronicles:oak_hotpot_table",
-       "飲料、杯子都能擺桌上，右鍵喝"
-      ],
-      [
-       "orients_hotpot_chronicles:empty_orange_drink_bottle",
-       "喝完留下空瓶"
-      ]
+     "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
+     "title": "筷子",
+     "blocks": [
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:bamboo_chopsticks"
+       ]
+      },
+      {
+       "k": "bul",
+       "t": "開鍋介面：拿竹筷 Shift + 右鍵鍋。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "從鍋裡夾熟食：直接右鍵鍋夾起準星那格的一樣熟食（沒熟食會提示）。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "從碗、盤子裡夾菜：右鍵碗或盤子夾走最後放的那樣菜。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "放進鍋裡：夾著生食材右鍵鍋下鍋。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "吃：夾著熟菜按住右鍵吃掉，飽了也能吃（飢餓條不漲，飽和度照常增加）。沾過料效果也算上。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "放回碗盤：夾著菜潛行右鍵碗或盤子，菜放回去，筷子留在手上。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "沾醬：夾著菜右鍵桌上的沾醬碗沾一口，見沾醬。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "架在碗沿、盤沿上：拿空竹筷 Shift + 右鍵桌上的碗或盤子（夾著菜時先放菜，再按一次才架），筷子就橫躺在碗口上；空手右鍵把筷子拿回來。挖掉碗時筷子一起掉。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "直接擺在桌面上：對著火鍋桌 / 高火鍋桌頂面的空位按住 Shift + 右鍵，筷子和夾著的菜一起擺到桌上，而且筷尖下面會自動墊起一隻精緻的白瓷迷你筷架——下面一小塊底座，兩頭微微翹起擋住筷子，中間一道淺凹槽剛好把筷尖擱住，不會被桌面蹭髒。右鍵或挖掉就把竹筷原樣收回來，不會額外掉出筷架物品。",
+       "d": 0
+      },
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:bamboo_chopsticks",
+        "orients_hotpot_chronicles:chopstick_rest"
+       ]
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "擺桌面和架碗沿是兩個位置：碗、盤子上是架在沿口；桌頂空位上是配迷你筷架平攤在桌上。想換位置，先空手右鍵收回來再擺。"
+       ],
+       "s": "tip"
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "飽了也能吃：本模組所有食物（生熟食材、湯碗、毛肚、小蔥、香菜、飲料等）飢餓條滿了也能吃，飢餓條不再漲、飽和度照常增加，最多到 20。裝了 Always Eat 也不衝突。"
+       ],
+       "s": "tip"
+      }
      ]
     }
    ]
   },
   {
-   "id": "furniture",
-   "icon": "orients_hotpot_chronicles:oak_hotpot_table",
+   "id": "tables",
+   "icon": "orients_hotpot_chronicles:oak_bench",
    "title": "桌凳",
    "entries": [
     {
+     "icon": "orients_hotpot_chronicles:oak_bench",
+     "title": "桌子與凳子",
+     "blocks": [
+      {
+       "k": "p",
+       "t": "火鍋得圍著桌子吃。模組裡有兩套桌凳：矮的一套（貼近地面，像家裡火鍋桌）和高的一套（1.5 格高，像店裡的高腳桌），每套都有 11 種木頭："
+      },
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:oak_hotpot_table",
+        "orients_hotpot_chronicles:spruce_hotpot_table",
+        "orients_hotpot_chronicles:birch_hotpot_table",
+        "orients_hotpot_chronicles:jungle_hotpot_table",
+        "orients_hotpot_chronicles:acacia_hotpot_table",
+        "orients_hotpot_chronicles:dark_oak_hotpot_table",
+        "orients_hotpot_chronicles:mangrove_hotpot_table",
+        "orients_hotpot_chronicles:cherry_hotpot_table",
+        "orients_hotpot_chronicles:bamboo_hotpot_table",
+        "orients_hotpot_chronicles:crimson_hotpot_table",
+        "orients_hotpot_chronicles:warped_hotpot_table"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "橡木、杉木、樺木、叢林木、相思木、黑橡木、紅樹林木、櫻花木、竹、緋紅蕈木、扭曲蕈木——桌子貼圖用的就是原版木板，配方也只是換成對應的木板。"
+      },
+      {
+       "k": "sub",
+       "t": "本章目錄",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "點下面的條目直接翻過去；也可以點書頂的書籤，或者點右下角的三角一頁頁往後翻。"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:oak_hotpot_table",
+       "t": "矮火鍋桌　桌面和矮灶臺的磚面齊平，灶臺能直接嵌在桌子中間，像一張整桌。",
+       "go": [
+        5,
+        1
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:oak_tall_hotpot_table",
+       "t": "高火鍋桌　1.5 格高，桌面懸出一圈，下面是桌腿，朝外也收進 4 像素留腿部空…",
+       "go": [
+        5,
+        2
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:smooth_stone_hotpot_table",
+       "t": "石料和金屬火鍋桌　木頭的之外還有 9 種桌面：平滑石頭、拋光安山岩 / 閃長岩 / 花…",
+       "go": [
+        5,
+        3
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:oak_stool",
+       "t": "矮凳和長凳　兩種凳子都有 11 種木頭，配方只是換對應木板。",
+       "go": [
+        5,
+        4
+       ]
+      }
+     ]
+    },
+    {
      "icon": "orients_hotpot_chronicles:oak_hotpot_table",
-     "text": "桌面和矮灶臺齊平，挨著的桌子、灶臺會連成一張長桌。",
-     "recipes": [
-      "orients_hotpot_chronicles:oak_hotpot_table"
+     "title": "矮火鍋桌",
+     "blocks": [
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:oak_hotpot_table"
+       ]
+      },
+      {
+       "k": "bul",
+       "t": "桌面和矮灶臺的磚面齊平，灶臺能直接嵌在桌子中間，像一張整桌。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "桌面下面像倒放的樓梯，朝外一側往裡收 4 像素，給膝蓋留位置。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "會自己連：哪邊挨著另一張桌子（矮桌、高桌都行）或灶臺就自己鋪滿，連成長桌。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "木頭桌子會著火，能用斧頭快速挖。",
+       "d": 0
+      }
      ]
     },
     {
      "icon": "orients_hotpot_chronicles:oak_tall_hotpot_table",
-     "text": "1.5 格高，配高灶臺。灶口對著桌子時那邊露出火。",
-     "recipes": [
-      "orients_hotpot_chronicles:oak_tall_hotpot_table"
+     "title": "高火鍋桌",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:oak_tall_hotpot_table"
+       ]
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:oak_tall_hotpot_table"
+       ]
+      },
+      {
+       "k": "bul",
+       "t": "1.5 格高，桌面懸出一圈，下面是桌腿，朝外也收進 4 像素留腿部空間。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "下面一格是磚塊，上面是木板（配方裡有 3 個磚塊）。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "和高灶臺搭配：灶臺火口正對桌子時，桌子那側會去掉磚身只留木頭，方便看火。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "同樣會自己連，和矮桌、灶臺都能連。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "方塊比一格高，準星對著桌面上的東西也能選得中（盤子、碗放在高桌上不會點不到）。",
+       "d": 0
+      },
+      {
+       "k": "sub",
+       "t": "◆ 桌上擺東西",
+       "l": 3
+      },
+      {
+       "k": "bul",
+       "t": "盤子、碗、飲料、沾醬碗都放桌面上，見盤子、碗與飲料。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "小擺件（燈籠、花盆、蠟燭、蛋糕等）放火鍋桌上會貼住桌面，不再浮空。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "其他普通方塊：矮桌上浮空 5 像素，高桌上嵌進 7 像素，當裝飾也不錯。",
+       "d": 0
+      }
      ]
     },
     {
      "icon": "orients_hotpot_chronicles:smooth_stone_hotpot_table",
-     "title": "石料桌",
-     "text": "9 種桌面：平滑石頭、磨製石頭、石英、切制銅、鐵，下面是紅磚。",
-     "recipes": [
-      "orients_hotpot_chronicles:smooth_stone_hotpot_table",
-      "orients_hotpot_chronicles:smooth_stone_tall_hotpot_table"
+     "title": "石料和金屬火鍋桌",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:smooth_stone_hotpot_table",
+        "orients_hotpot_chronicles:polished_granite_hotpot_table",
+        "orients_hotpot_chronicles:polished_deepslate_hotpot_table",
+        "orients_hotpot_chronicles:quartz_hotpot_table",
+        "orients_hotpot_chronicles:cut_copper_hotpot_table",
+        "orients_hotpot_chronicles:iron_hotpot_table"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "木頭的之外還有 9 種桌面：平滑石頭、拋光安山岩 / 閃長岩 / 花崗岩 / 深板岩 / 黑石、石英、切製銅、鐵；矮桌、高桌各一套，一共 18 張。桌身還是紅磚，桌板換成這些材料。"
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:smooth_stone_hotpot_table"
+       ]
+      }
      ]
     },
     {
      "icon": "orients_hotpot_chronicles:oak_stool",
-     "title": "凳子",
-     "text": "板凳配矮桌，條凳配高桌。同一條線挨著的會連成長凳，最長 3 格。",
-     "recipes": [
-      "orients_hotpot_chronicles:oak_stool",
-      "orients_hotpot_chronicles:oak_bench"
-     ],
-     "steps": [
-      "空手右鍵凳子：坐下",
-      "潛行：起身"
+     "title": "矮凳和長凳",
+     "blocks": [
+      {
+       "k": "th",
+       "t": "凳子　高度　配方一次出"
+      },
+      {
+       "k": "tr",
+       "t": "矮，坐高約 7/16 格　3 個",
+       "icon": "orients_hotpot_chronicles:oak_stool"
+      },
+      {
+       "k": "tr",
+       "t": "一格高，凳面和桌面齊平；坐高 1.25 格　3 個",
+       "icon": "orients_hotpot_chronicles:oak_bench"
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:oak_stool",
+        "orients_hotpot_chronicles:oak_bench"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "兩種凳子都有 11 種木頭，配方只是換對應木板。"
+      },
+      {
+       "k": "sub",
+       "t": "◆ 擺放",
+       "l": 3
+      },
+      {
+       "k": "bul",
+       "t": "朝向：放的時候面朝哪邊，凳子（和坐上去的人）就面朝哪邊。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "連成長凳：同一直線上挨著的兩個凳子（高矮一樣）會自己連成長凳，中間腿去掉、兩頭腿往裡收，垂直放的不連。一條最長連 3 格，再往旁邊放就不連了。0.1.2-alpha 裡放的時候朝向一樣才連；0.1.3-alpha-hotfix1 起不管站哪邊放都會連。",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "長凳腿是斜著的「A」字腿，由程式碼畫出來；碰撞與選取範圍和凳面同寬，貼著長凳走動不會卡腳。",
+       "d": 0
+      },
+      {
+       "k": "sub",
+       "t": "◆ 長凳疊起來能當梯子",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "一條長凳就是一格高，疊起來正好是一級級臺階。"
+      },
+      {
+       "k": "num",
+       "t": "手拿長凳（不潛行）右鍵已經放好的長凳，它會自動順著這一摞往上找，直接疊到最頂上，一次消耗 1 條。",
+       "n": 1,
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "也可以直接對著凳子的頂面放，效果一樣。",
+       "d": 1
+      },
+      {
+       "k": "bul",
+       "t": "最多疊 16 層，再高就放不上了。",
+       "d": 1
+      },
+      {
+       "k": "num",
+       "t": "疊到 2 層以上，這一摞就成了梯子：貼著凳子任意一面往前走或按跳躍，就能像爬梯子一樣一級級上下。單擺一張不會觸發，免得圍著桌子走動時不小心爬上去。",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "頂層照樣能坐：空手右鍵最上面那張，坐姿和普通長凳一樣。中間層（頭頂還壓著凳子）坐不了。",
+       "n": 3,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "坐著的時候別人往你頭頂疊凳子，你會自動起身，把位置讓出來。",
+       "n": 4,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "拆凳子照常挖，坐在上面的人會被放下。",
+       "n": 5,
+       "d": 0
+      },
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:oak_bench",
+        "orients_hotpot_chronicles:bamboo_bench"
+       ]
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "疊長凳順手，拆也順手：想夠高處的東西、想在火鍋桌邊搭個「上鋪」，幾條長凳就夠。把長凳往長凳上疊、或者順著凳塔往上爬，都會解鎖成就「步步高升」。"
+       ],
+       "s": "tip"
+      },
+      {
+       "k": "sub",
+       "t": "◆ 怎麼坐",
+       "l": 3
+      },
+      {
+       "k": "num",
+       "t": "空手（或手裡拿不是方塊的東西）右鍵凳子就坐上去了。",
+       "n": 1,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "點凳子中間坐中間；點兩格交界處坐兩格中間。",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "兩個人之間至少隔一整格，不會擠在一起。",
+       "n": 3,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "Shift（潛行）起身，站到凳子後面。",
+       "n": 4,
+       "d": 0
+      },
+      {
+       "k": "note",
+       "t": "小提醒",
+       "b": [
+        "搭配推薦：「長凳 + 高桌 + 高灶臺」是一套，「矮凳 + 矮桌 + 矮灶臺」是一套，別混著搭，高度才對得上。"
+       ],
+       "s": "tip"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "reference",
+   "icon": "minecraft:knowledge_book",
+   "title": "查閱",
+   "entries": [
+    {
+     "icon": "orients_hotpot_chronicles:brick_stove",
+     "title": "灶台與鍋具",
+     "blocks": [
+      {
+       "k": "sub",
+       "t": "灶台",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:brick_stove"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "高灶台",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:tall_brick_stove"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "九宮格火鍋（2 種）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:copper_nine_grid_hotpot",
+        "orients_hotpot_chronicles:iron_nine_grid_hotpot"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "鴛鴦鍋／田字鍋（10 種）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:copper_four_grid_hotpot",
+        "orients_hotpot_chronicles:copper_round_yuanyang_hotpot",
+        "orients_hotpot_chronicles:copper_split_yuanyang_hotpot",
+        "orients_hotpot_chronicles:copper_square_yuanyang_hotpot",
+        "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+        "orients_hotpot_chronicles:iron_four_grid_hotpot",
+        "orients_hotpot_chronicles:iron_round_yuanyang_hotpot",
+        "orients_hotpot_chronicles:iron_split_yuanyang_hotpot",
+        "orients_hotpot_chronicles:iron_square_yuanyang_hotpot",
+        "orients_hotpot_chronicles:iron_taiji_yuanyang_hotpot"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "竹筷",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:bamboo_chopsticks"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "三鮮鍋底料",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:three_fresh_hotpot_base"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "三鮮湯底桶",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:three_fresh_soup_bucket"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "番茄鍋底料",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:tomato_hotpot_base"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "番茄湯底桶",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:tomato_soup_bucket"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "本章目錄",
+       "l": 3
+      },
+      {
+       "k": "p",
+       "t": "點下面的條目直接翻過去；也可以點書頂的書籤，或者點右下角的三角一頁頁往後翻。"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:oak_hotpot_table",
+       "t": "桌凳　",
+       "go": [
+        6,
+        1
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:quartz_small_dish",
+       "t": "盤子　",
+       "go": [
+        6,
+        2
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:oak_sauce_station",
+       "t": "醬料台　",
+       "go": [
+        6,
+        3
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_kitchen_knife",
+       "t": "廚具與食材　",
+       "go": [
+        6,
+        4
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "minecraft:stonecutter",
+       "t": "切石機　",
+       "go": [
+        6,
+        5
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "minecraft:furnace",
+       "t": "烹調　",
+       "go": [
+        6,
+        6
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "minecraft:book",
+       "t": "物品圖鑑　模組內的所有物品與方塊（自動產生）。ID 是指令使用的識別名稱，例如…",
+       "go": [
+        6,
+        7
+       ]
+      }
      ]
     },
     {
-     "icon": "minecraft:lantern",
-     "title": "桌上擺什麼",
-     "rows": [
-      [
-       "orients_hotpot_chronicles:quartz_small_dish",
-       "盤子、碗、飲料、蘸料"
-      ],
-      [
-       "minecraft:lantern",
-       "燈籠、花盆、蠟燭：貼住桌面"
-      ]
+     "icon": "orients_hotpot_chronicles:oak_hotpot_table",
+     "title": "桌凳",
+     "blocks": [
+      {
+       "k": "sub",
+       "t": "火鍋桌（20 種）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:oak_hotpot_table",
+        "orients_hotpot_chronicles:acacia_hotpot_table",
+        "orients_hotpot_chronicles:bamboo_hotpot_table",
+        "orients_hotpot_chronicles:birch_hotpot_table",
+        "orients_hotpot_chronicles:cherry_hotpot_table",
+        "orients_hotpot_chronicles:crimson_hotpot_table",
+        "orients_hotpot_chronicles:cut_copper_hotpot_table",
+        "orients_hotpot_chronicles:dark_oak_hotpot_table",
+        "orients_hotpot_chronicles:iron_hotpot_table",
+        "orients_hotpot_chronicles:jungle_hotpot_table",
+        "orients_hotpot_chronicles:mangrove_hotpot_table",
+        "orients_hotpot_chronicles:polished_andesite_hotpot_table",
+        "orients_hotpot_chronicles:polished_blackstone_hotpot_table",
+        "orients_hotpot_chronicles:polished_deepslate_hotpot_table",
+        "orients_hotpot_chronicles:polished_diorite_hotpot_table",
+        "orients_hotpot_chronicles:polished_granite_hotpot_table",
+        "orients_hotpot_chronicles:quartz_hotpot_table",
+        "orients_hotpot_chronicles:smooth_stone_hotpot_table",
+        "orients_hotpot_chronicles:spruce_hotpot_table",
+        "orients_hotpot_chronicles:warped_hotpot_table"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "高火鍋桌（20 種）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:oak_tall_hotpot_table",
+        "orients_hotpot_chronicles:acacia_tall_hotpot_table",
+        "orients_hotpot_chronicles:bamboo_tall_hotpot_table",
+        "orients_hotpot_chronicles:birch_tall_hotpot_table",
+        "orients_hotpot_chronicles:cherry_tall_hotpot_table",
+        "orients_hotpot_chronicles:crimson_tall_hotpot_table",
+        "orients_hotpot_chronicles:cut_copper_tall_hotpot_table",
+        "orients_hotpot_chronicles:dark_oak_tall_hotpot_table",
+        "orients_hotpot_chronicles:iron_tall_hotpot_table",
+        "orients_hotpot_chronicles:jungle_tall_hotpot_table",
+        "orients_hotpot_chronicles:mangrove_tall_hotpot_table",
+        "orients_hotpot_chronicles:polished_andesite_tall_hotpot_table",
+        "orients_hotpot_chronicles:polished_blackstone_tall_hotpot_table",
+        "orients_hotpot_chronicles:polished_deepslate_tall_hotpot_table",
+        "orients_hotpot_chronicles:polished_diorite_tall_hotpot_table",
+        "orients_hotpot_chronicles:polished_granite_tall_hotpot_table",
+        "orients_hotpot_chronicles:quartz_tall_hotpot_table",
+        "orients_hotpot_chronicles:smooth_stone_tall_hotpot_table",
+        "orients_hotpot_chronicles:spruce_tall_hotpot_table",
+        "orients_hotpot_chronicles:warped_tall_hotpot_table"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "板凳（11 種）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:oak_stool",
+        "orients_hotpot_chronicles:acacia_stool",
+        "orients_hotpot_chronicles:bamboo_stool",
+        "orients_hotpot_chronicles:birch_stool",
+        "orients_hotpot_chronicles:cherry_stool",
+        "orients_hotpot_chronicles:crimson_stool",
+        "orients_hotpot_chronicles:dark_oak_stool",
+        "orients_hotpot_chronicles:jungle_stool",
+        "orients_hotpot_chronicles:mangrove_stool",
+        "orients_hotpot_chronicles:spruce_stool",
+        "orients_hotpot_chronicles:warped_stool"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "長凳（11 種）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:oak_bench",
+        "orients_hotpot_chronicles:acacia_bench",
+        "orients_hotpot_chronicles:bamboo_bench",
+        "orients_hotpot_chronicles:birch_bench",
+        "orients_hotpot_chronicles:cherry_bench",
+        "orients_hotpot_chronicles:crimson_bench",
+        "orients_hotpot_chronicles:dark_oak_bench",
+        "orients_hotpot_chronicles:jungle_bench",
+        "orients_hotpot_chronicles:mangrove_bench",
+        "orients_hotpot_chronicles:spruce_bench",
+        "orients_hotpot_chronicles:warped_bench"
+       ]
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:quartz_small_dish",
+     "title": "盤子",
+     "blocks": [
+      {
+       "k": "sub",
+       "t": "小碟（5 種）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:bamboo_small_dish",
+        "orients_hotpot_chronicles:copper_small_dish",
+        "orients_hotpot_chronicles:iron_small_dish",
+        "orients_hotpot_chronicles:quartz_small_dish",
+        "orients_hotpot_chronicles:terracotta_small_dish"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "八格大盤（5 種）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:bamboo_eight_slot_platter",
+        "orients_hotpot_chronicles:copper_eight_slot_platter",
+        "orients_hotpot_chronicles:iron_eight_slot_platter",
+        "orients_hotpot_chronicles:quartz_eight_slot_platter",
+        "orients_hotpot_chronicles:terracotta_eight_slot_platter"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "五格長盤（5 種）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:bamboo_five_slot_long_plate",
+        "orients_hotpot_chronicles:copper_five_slot_long_plate",
+        "orients_hotpot_chronicles:iron_five_slot_long_plate",
+        "orients_hotpot_chronicles:quartz_five_slot_long_plate",
+        "orients_hotpot_chronicles:terracotta_five_slot_long_plate"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "四格方盤（5 種）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:bamboo_four_slot_square_plate",
+        "orients_hotpot_chronicles:copper_four_slot_square_plate",
+        "orients_hotpot_chronicles:iron_four_slot_square_plate",
+        "orients_hotpot_chronicles:quartz_four_slot_square_plate",
+        "orients_hotpot_chronicles:terracotta_four_slot_square_plate"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "三格長盤（5 種）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:bamboo_three_slot_long_plate",
+        "orients_hotpot_chronicles:copper_three_slot_long_plate",
+        "orients_hotpot_chronicles:iron_three_slot_long_plate",
+        "orients_hotpot_chronicles:quartz_three_slot_long_plate",
+        "orients_hotpot_chronicles:terracotta_three_slot_long_plate"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "雙格盤（5 種）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:bamboo_two_slot_plate",
+        "orients_hotpot_chronicles:copper_two_slot_plate",
+        "orients_hotpot_chronicles:iron_two_slot_plate",
+        "orients_hotpot_chronicles:quartz_two_slot_plate",
+        "orients_hotpot_chronicles:terracotta_two_slot_plate"
+       ]
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:oak_sauce_station",
+     "title": "醬料台",
+     "blocks": [
+      {
+       "k": "sub",
+       "t": "沾醬台（12 種）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:oak_sauce_station",
+        "orients_hotpot_chronicles:acacia_sauce_station",
+        "orients_hotpot_chronicles:bamboo_sauce_station",
+        "orients_hotpot_chronicles:birch_sauce_station",
+        "orients_hotpot_chronicles:cherry_sauce_station",
+        "orients_hotpot_chronicles:crimson_sauce_station",
+        "orients_hotpot_chronicles:dark_oak_sauce_station",
+        "orients_hotpot_chronicles:iron_sauce_station",
+        "orients_hotpot_chronicles:jungle_sauce_station",
+        "orients_hotpot_chronicles:mangrove_sauce_station",
+        "orients_hotpot_chronicles:spruce_sauce_station",
+        "orients_hotpot_chronicles:warped_sauce_station"
+       ]
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:iron_kitchen_knife",
+     "title": "廚具與食材",
+     "blocks": [
+      {
+       "k": "sub",
+       "t": "香菜丸子（4 種）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:cilantro_beef_meatball",
+        "orients_hotpot_chronicles:cilantro_fish_ball",
+        "orients_hotpot_chronicles:cilantro_mutton_meatball",
+        "orients_hotpot_chronicles:cilantro_pork_meatball"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "布圍裙",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:cloth_apron"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "豆腐（冷）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:cold_tofu"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "砧板",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:cutting_board"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "豆乾",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:dried_tofu"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "蛋炒飯",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:egg_fried_rice"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "金針菇",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:enoki_mushroom"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "玻璃杯",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:glass_cup"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "火鍋指南",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:hotpot_guide"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "鐵菜刀",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:iron_kitchen_knife"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "柳橙飲料",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:orange_drink"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "之晗可樂",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:orient_cola"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "蠔油",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:oyster_sauce"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "植物蛋白飲料",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:plant_protein_drink"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "生酥肉",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:raw_crispy_pork"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "生火腿腸",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:raw_ham_sausage"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "擀麵棍",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:rolling_pin"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "芝麻醬",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:sesame_paste"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "苕皮",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:sweet_potato_skin"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "腐竹",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:tofu_skin"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "寬粉",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:wide_noodles"
+       ]
+      }
+     ]
+    },
+    {
+     "icon": "minecraft:stonecutter",
+     "title": "切石機",
+     "blocks": [
+      {
+       "k": "sub",
+       "t": "切石機（13 種）",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:beef_loin_slice",
+        "orients_hotpot_chronicles:cold_tofu_cube",
+        "orients_hotpot_chronicles:fatty_beef_roll",
+        "orients_hotpot_chronicles:ham_sausage_slice",
+        "orients_hotpot_chronicles:hot_tofu_cube",
+        "orients_hotpot_chronicles:lotus_root_slice",
+        "orients_hotpot_chronicles:millet_chili",
+        "orients_hotpot_chronicles:minced_pork",
+        "orients_hotpot_chronicles:mutton_roll",
+        "orients_hotpot_chronicles:peeled_shrimp",
+        "orients_hotpot_chronicles:potato_slice",
+        "orients_hotpot_chronicles:squid_roll",
+        "orients_hotpot_chronicles:zhe_er_gen_slice"
+       ]
+      }
+     ]
+    },
+    {
+     "icon": "minecraft:furnace",
+     "title": "烹調",
+     "blocks": [
+      {
+       "k": "sub",
+       "t": "生 → 熟（30 種）",
+       "l": 3
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:beef_loin",
+       "t": "熟牛脊肉　熔爐 10 秒　煙燻爐 5 秒　營火 30 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:beef_loin_slice",
+       "t": "熟吊龍　熔爐 2.5 秒　煙燻爐 1.25 秒　營火 7.5 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:beef_meatball",
+       "t": "熟牛肉丸　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cilantro_beef_meatball",
+       "t": "熟香菜牛肉丸　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cilantro_fish_ball",
+       "t": "熟香菜魚丸　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cilantro_mutton_meatball",
+       "t": "熟香菜羊肉丸　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cilantro_pork_meatball",
+       "t": "熟香菜豬肉丸　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cold_tofu_cube",
+       "t": "豆腐塊（熱）　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:dried_tofu",
+       "t": "熟豆乾　熔爐 10 秒　煙燻爐 5 秒　營火 30 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:enoki_mushroom",
+       "t": "熟金針菇　熔爐 10 秒　煙燻爐 5 秒　營火 30 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:fatty_beef_roll",
+       "t": "熟肥牛捲　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:fish_ball",
+       "t": "熟魚丸　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:greens",
+       "t": "熟青菜　熔爐 10 秒　煙燻爐 5 秒　營火 30 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:ham_sausage_slice",
+       "t": "熟火腿腸片　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:lotus_root_slice",
+       "t": "熟蓮藕片　熔爐 10 秒　煙燻爐 5 秒　營火 30 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:mutton_meatball",
+       "t": "熟羊肉丸　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:mutton_roll",
+       "t": "熟羊肉捲　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:peeled_shrimp",
+       "t": "熟蝦仁　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:pork_meatball",
+       "t": "熟豬肉丸　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:potato_slice",
+       "t": "熟馬鈴薯片　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:raw_crispy_pork",
+       "t": "酥肉　熔爐 10 秒　煙燻爐 5 秒　營火 30 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:raw_ham_sausage",
+       "t": "火腿腸　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:shrimp",
+       "t": "熟蝦　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:shrimp_paste",
+       "t": "熟蝦滑　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:squid_roll",
+       "t": "熟魷魚捲　熔爐 10 秒　煙燻爐 5 秒　營火 30 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:sweet_potato_skin",
+       "t": "熟苕皮　熔爐 10 秒　煙燻爐 5 秒　營火 30 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:tofu_skin",
+       "t": "熟腐竹　熔爐 10 秒　煙燻爐 5 秒　營火 30 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:tripe",
+       "t": "熟毛肚　熔爐 5 秒　煙燻爐 2.5 秒　營火 15 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:wide_noodles",
+       "t": "熟寬粉　熔爐 10 秒　煙燻爐 5 秒　營火 30 秒"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:zhe_er_gen_slice",
+       "t": "熟折耳根段　熔爐 10 秒　煙燻爐 5 秒　營火 30 秒"
+      }
+     ]
+    },
+    {
+     "icon": "minecraft:book",
+     "title": "物品圖鑑",
+     "blocks": [
+      {
+       "k": "p",
+       "t": "模組內的所有物品與方塊（自動產生）。ID 是指令使用的識別名稱，例如 /give @s orients_hotpot_chronicles:brick_stove。"
+      },
+      {
+       "k": "sub",
+       "t": "灶台與鍋具（17 種）",
+       "l": 2
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:brick_stove",
+       "t": "灶台　brick_stove"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:copper_four_grid_hotpot",
+       "t": "銅製田字火鍋　copper_four_grid_hotpot"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:copper_nine_grid_hotpot",
+       "t": "銅製九宮格火鍋　copper_nine_grid_hotpot"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:copper_round_yuanyang_hotpot",
+       "t": "銅製圓心鴛鴦鍋　copper_round_yuanyang_hotpot"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:copper_split_yuanyang_hotpot",
+       "t": "銅製直隔鴛鴦鍋　copper_split_yuanyang_hotpot"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:copper_square_yuanyang_hotpot",
+       "t": "銅製方心鴛鴦鍋　copper_square_yuanyang_hotpot"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+       "t": "銅製太極鴛鴦鍋　copper_taiji_yuanyang_hotpot"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:hotpot_guide",
+       "t": "火鍋指南　hotpot_guide"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_four_grid_hotpot",
+       "t": "鐵製田字火鍋　iron_four_grid_hotpot"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+       "t": "鐵製九宮格火鍋　iron_nine_grid_hotpot"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_round_yuanyang_hotpot",
+       "t": "鐵製圓心鴛鴦鍋　iron_round_yuanyang_hotpot"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_split_yuanyang_hotpot",
+       "t": "鐵製直隔鴛鴦鍋　iron_split_yuanyang_hotpot"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_square_yuanyang_hotpot",
+       "t": "鐵製方心鴛鴦鍋　iron_square_yuanyang_hotpot"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_taiji_yuanyang_hotpot",
+       "t": "鐵製太極鴛鴦鍋　iron_taiji_yuanyang_hotpot"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:tall_brick_stove",
+       "t": "高灶台　tall_brick_stove"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:three_fresh_hotpot_base",
+       "t": "三鮮鍋底料　three_fresh_hotpot_base"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:tomato_hotpot_base",
+       "t": "番茄鍋底料　tomato_hotpot_base"
+      },
+      {
+       "k": "sub",
+       "t": "火鍋桌（40 種）",
+       "l": 2
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:acacia_hotpot_table",
+       "t": "相思木火鍋桌　acacia_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:acacia_tall_hotpot_table",
+       "t": "相思木高火鍋桌　acacia_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:bamboo_hotpot_table",
+       "t": "竹火鍋桌　bamboo_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:bamboo_tall_hotpot_table",
+       "t": "竹高火鍋桌　bamboo_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:birch_hotpot_table",
+       "t": "樺木火鍋桌　birch_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:birch_tall_hotpot_table",
+       "t": "樺木高火鍋桌　birch_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cherry_hotpot_table",
+       "t": "櫻花木火鍋桌　cherry_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cherry_tall_hotpot_table",
+       "t": "櫻花木高火鍋桌　cherry_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:crimson_hotpot_table",
+       "t": "緋紅蕈木火鍋桌　crimson_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:crimson_tall_hotpot_table",
+       "t": "緋紅蕈木高火鍋桌　crimson_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cut_copper_hotpot_table",
+       "t": "切製銅火鍋桌　cut_copper_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cut_copper_tall_hotpot_table",
+       "t": "切製銅高火鍋桌　cut_copper_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:dark_oak_hotpot_table",
+       "t": "黑橡木火鍋桌　dark_oak_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:dark_oak_tall_hotpot_table",
+       "t": "黑橡木高火鍋桌　dark_oak_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_hotpot_table",
+       "t": "鐵火鍋桌　iron_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_tall_hotpot_table",
+       "t": "鐵高火鍋桌　iron_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:jungle_hotpot_table",
+       "t": "叢林木火鍋桌　jungle_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:jungle_tall_hotpot_table",
+       "t": "叢林木高火鍋桌　jungle_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:mangrove_hotpot_table",
+       "t": "紅樹林木火鍋桌　mangrove_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:mangrove_tall_hotpot_table",
+       "t": "紅樹林木高火鍋桌　mangrove_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:oak_hotpot_table",
+       "t": "橡木火鍋桌　oak_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:oak_tall_hotpot_table",
+       "t": "橡木高火鍋桌　oak_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:polished_andesite_hotpot_table",
+       "t": "拋光安山岩火鍋桌　polished_andesite_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:polished_andesite_tall_hotpot_table",
+       "t": "拋光安山岩高火鍋桌　polished_andesite_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:polished_blackstone_hotpot_table",
+       "t": "拋光黑石火鍋桌　polished_blackstone_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:polished_blackstone_tall_hotpot_table",
+       "t": "拋光黑石高火鍋桌　polished_blackstone_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:polished_deepslate_hotpot_table",
+       "t": "拋光深板岩火鍋桌　polished_deepslate_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:polished_deepslate_tall_hotpot_table",
+       "t": "拋光深板岩高火鍋桌　polished_deepslate_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:polished_diorite_hotpot_table",
+       "t": "拋光閃長岩火鍋桌　polished_diorite_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:polished_diorite_tall_hotpot_table",
+       "t": "拋光閃長岩高火鍋桌　polished_diorite_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:polished_granite_hotpot_table",
+       "t": "拋光花崗岩火鍋桌　polished_granite_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:polished_granite_tall_hotpot_table",
+       "t": "拋光花崗岩高火鍋桌　polished_granite_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:quartz_hotpot_table",
+       "t": "石英火鍋桌　quartz_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:quartz_tall_hotpot_table",
+       "t": "石英高火鍋桌　quartz_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:smooth_stone_hotpot_table",
+       "t": "平滑石頭火鍋桌　smooth_stone_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:smooth_stone_tall_hotpot_table",
+       "t": "平滑石頭高火鍋桌　smooth_stone_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:spruce_hotpot_table",
+       "t": "杉木火鍋桌　spruce_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:spruce_tall_hotpot_table",
+       "t": "杉木高火鍋桌　spruce_tall_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:warped_hotpot_table",
+       "t": "扭曲蕈木火鍋桌　warped_hotpot_table"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:warped_tall_hotpot_table",
+       "t": "扭曲蕈木高火鍋桌　warped_tall_hotpot_table"
+      },
+      {
+       "k": "sub",
+       "t": "凳子（22 種）",
+       "l": 2
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:acacia_bench",
+       "t": "相思木長凳　acacia_bench"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:acacia_stool",
+       "t": "相思木板凳　acacia_stool"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:bamboo_bench",
+       "t": "竹長凳　bamboo_bench"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:bamboo_stool",
+       "t": "竹板凳　bamboo_stool"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:birch_bench",
+       "t": "樺木長凳　birch_bench"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:birch_stool",
+       "t": "樺木板凳　birch_stool"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cherry_bench",
+       "t": "櫻花木長凳　cherry_bench"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cherry_stool",
+       "t": "櫻花木板凳　cherry_stool"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:crimson_bench",
+       "t": "緋紅蕈木長凳　crimson_bench"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:crimson_stool",
+       "t": "緋紅蕈木板凳　crimson_stool"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:dark_oak_bench",
+       "t": "黑橡木長凳　dark_oak_bench"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:dark_oak_stool",
+       "t": "黑橡木板凳　dark_oak_stool"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:jungle_bench",
+       "t": "叢林木長凳　jungle_bench"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:jungle_stool",
+       "t": "叢林木板凳　jungle_stool"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:mangrove_bench",
+       "t": "紅樹林木長凳　mangrove_bench"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:mangrove_stool",
+       "t": "紅樹林木板凳　mangrove_stool"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:oak_bench",
+       "t": "橡木長凳　oak_bench"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:oak_stool",
+       "t": "橡木板凳　oak_stool"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:spruce_bench",
+       "t": "杉木長凳　spruce_bench"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:spruce_stool",
+       "t": "杉木板凳　spruce_stool"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:warped_bench",
+       "t": "扭曲蕈木長凳　warped_bench"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:warped_stool",
+       "t": "扭曲蕈木板凳　warped_stool"
+      },
+      {
+       "k": "sub",
+       "t": "盤子（30 種）",
+       "l": 2
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:bamboo_eight_slot_platter",
+       "t": "竹編八格大盤　bamboo_eight_slot_platter"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:bamboo_five_slot_long_plate",
+       "t": "竹編五格長盤　bamboo_five_slot_long_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:bamboo_four_slot_square_plate",
+       "t": "竹編四格方盤　bamboo_four_slot_square_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:bamboo_small_dish",
+       "t": "竹編小碟　bamboo_small_dish"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:bamboo_three_slot_long_plate",
+       "t": "竹編三格長盤　bamboo_three_slot_long_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:bamboo_two_slot_plate",
+       "t": "竹編雙格盤　bamboo_two_slot_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:copper_eight_slot_platter",
+       "t": "銅八格大盤　copper_eight_slot_platter"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:copper_five_slot_long_plate",
+       "t": "銅五格長盤　copper_five_slot_long_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:copper_four_slot_square_plate",
+       "t": "銅四格方盤　copper_four_slot_square_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:copper_small_dish",
+       "t": "銅小碟　copper_small_dish"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:copper_three_slot_long_plate",
+       "t": "銅三格長盤　copper_three_slot_long_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:copper_two_slot_plate",
+       "t": "銅雙格盤　copper_two_slot_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_eight_slot_platter",
+       "t": "鐵八格大盤　iron_eight_slot_platter"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_five_slot_long_plate",
+       "t": "鐵五格長盤　iron_five_slot_long_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_four_slot_square_plate",
+       "t": "鐵四格方盤　iron_four_slot_square_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_small_dish",
+       "t": "鐵小碟　iron_small_dish"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_three_slot_long_plate",
+       "t": "鐵三格長盤　iron_three_slot_long_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_two_slot_plate",
+       "t": "鐵雙格盤　iron_two_slot_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:quartz_eight_slot_platter",
+       "t": "石英八格大盤　quartz_eight_slot_platter"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:quartz_five_slot_long_plate",
+       "t": "石英五格長盤　quartz_five_slot_long_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:quartz_four_slot_square_plate",
+       "t": "石英四格方盤　quartz_four_slot_square_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:quartz_small_dish",
+       "t": "石英小碟　quartz_small_dish"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:quartz_three_slot_long_plate",
+       "t": "石英三格長盤　quartz_three_slot_long_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:quartz_two_slot_plate",
+       "t": "石英雙格盤　quartz_two_slot_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:terracotta_eight_slot_platter",
+       "t": "紅陶八格大盤　terracotta_eight_slot_platter"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:terracotta_five_slot_long_plate",
+       "t": "紅陶五格長盤　terracotta_five_slot_long_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:terracotta_four_slot_square_plate",
+       "t": "紅陶四格方盤　terracotta_four_slot_square_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:terracotta_small_dish",
+       "t": "紅陶小碟　terracotta_small_dish"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:terracotta_three_slot_long_plate",
+       "t": "紅陶三格長盤　terracotta_three_slot_long_plate"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:terracotta_two_slot_plate",
+       "t": "紅陶雙格盤　terracotta_two_slot_plate"
+      },
+      {
+       "k": "sub",
+       "t": "醬料台（12 種）",
+       "l": 2
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:acacia_sauce_station",
+       "t": "相思木沾醬台　acacia_sauce_station"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:bamboo_sauce_station",
+       "t": "竹沾醬台　bamboo_sauce_station"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:birch_sauce_station",
+       "t": "樺木沾醬台　birch_sauce_station"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cherry_sauce_station",
+       "t": "櫻花木沾醬台　cherry_sauce_station"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:crimson_sauce_station",
+       "t": "緋紅蕈木沾醬台　crimson_sauce_station"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:dark_oak_sauce_station",
+       "t": "黑橡木沾醬台　dark_oak_sauce_station"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_sauce_station",
+       "t": "鐵沾醬台　iron_sauce_station"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:jungle_sauce_station",
+       "t": "叢林木沾醬台　jungle_sauce_station"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:mangrove_sauce_station",
+       "t": "紅樹林木沾醬台　mangrove_sauce_station"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:oak_sauce_station",
+       "t": "橡木沾醬台　oak_sauce_station"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:spruce_sauce_station",
+       "t": "杉木沾醬台　spruce_sauce_station"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:warped_sauce_station",
+       "t": "扭曲蕈木沾醬台　warped_sauce_station"
+      },
+      {
+       "k": "sub",
+       "t": "湯碗與飲料（10 種）",
+       "l": 2
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:clear_broth_bowl",
+       "t": "一碗清湯　clear_broth_bowl"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:dipping_sauce",
+       "t": "沾醬　dipping_sauce"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:empty_orange_drink_bottle",
+       "t": "柳橙飲料空瓶　empty_orange_drink_bottle"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:empty_plant_protein_drink_bottle",
+       "t": "植物蛋白飲料空瓶　empty_plant_protein_drink_bottle"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:mushroom_broth_bowl",
+       "t": "一碗菌湯　mushroom_broth_bowl"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:orange_drink",
+       "t": "柳橙飲料　orange_drink"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:orange_drink_cup",
+       "t": "一杯柳橙飲料　orange_drink_cup"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:plant_protein_drink",
+       "t": "植物蛋白飲料　plant_protein_drink"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:plant_protein_drink_cup",
+       "t": "一杯植物蛋白飲料　plant_protein_drink_cup"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:spicy_red_broth_bowl",
+       "t": "一碗紅湯　spicy_red_broth_bowl"
+      },
+      {
+       "k": "sub",
+       "t": "工具（4 種）",
+       "l": 2
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
+       "t": "竹筷　bamboo_chopsticks"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cutting_board",
+       "t": "砧板　cutting_board"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:iron_kitchen_knife",
+       "t": "鐵菜刀　iron_kitchen_knife"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:rolling_pin",
+       "t": "擀麵棍　rolling_pin"
+      },
+      {
+       "k": "sub",
+       "t": "食材（98 種）",
+       "l": 2
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:beef_loin",
+       "t": "牛脊肉　beef_loin"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:beef_loin_slice",
+       "t": "吊龍　beef_loin_slice"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:beef_meatball",
+       "t": "牛肉丸　beef_meatball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:boiled_crispy_pork",
+       "t": "煮酥肉　boiled_crispy_pork"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:chili_pepper",
+       "t": "辣椒　chili_pepper"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:chopstick_rest",
+       "t": "竹筷（配迷你筷架）　chopstick_rest"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cilantro",
+       "t": "香菜　cilantro"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cilantro_beef_meatball",
+       "t": "香菜牛肉丸　cilantro_beef_meatball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cilantro_fish_ball",
+       "t": "香菜魚丸　cilantro_fish_ball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cilantro_mutton_meatball",
+       "t": "香菜羊肉丸　cilantro_mutton_meatball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cilantro_pork_meatball",
+       "t": "香菜豬肉丸　cilantro_pork_meatball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cloth_apron",
+       "t": "布圍裙　cloth_apron"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cold_tofu",
+       "t": "豆腐（冷）　cold_tofu"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cold_tofu_cube",
+       "t": "豆腐塊（冷）　cold_tofu_cube"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_beef_loin",
+       "t": "熟牛脊肉　cooked_beef_loin"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_beef_loin_slice",
+       "t": "熟吊龍　cooked_beef_loin_slice"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_beef_meatball",
+       "t": "熟牛肉丸　cooked_beef_meatball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_cilantro_beef_meatball",
+       "t": "熟香菜牛肉丸　cooked_cilantro_beef_meatball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_cilantro_fish_ball",
+       "t": "熟香菜魚丸　cooked_cilantro_fish_ball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_cilantro_mutton_meatball",
+       "t": "熟香菜羊肉丸　cooked_cilantro_mutton_meatball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_cilantro_pork_meatball",
+       "t": "熟香菜豬肉丸　cooked_cilantro_pork_meatball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_dried_tofu",
+       "t": "熟豆乾　cooked_dried_tofu"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_enoki_mushroom",
+       "t": "熟金針菇　cooked_enoki_mushroom"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_fatty_beef_roll",
+       "t": "熟肥牛捲　cooked_fatty_beef_roll"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_fish_ball",
+       "t": "熟魚丸　cooked_fish_ball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_greens",
+       "t": "熟青菜　cooked_greens"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_ham_sausage_slice",
+       "t": "熟火腿腸片　cooked_ham_sausage_slice"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_kelp",
+       "t": "熟海帶　cooked_kelp"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_lotus_root_slice",
+       "t": "熟蓮藕片　cooked_lotus_root_slice"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_mutton_meatball",
+       "t": "熟羊肉丸　cooked_mutton_meatball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_mutton_roll",
+       "t": "熟羊肉捲　cooked_mutton_roll"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_peeled_shrimp",
+       "t": "熟蝦仁　cooked_peeled_shrimp"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_pork_meatball",
+       "t": "熟豬肉丸　cooked_pork_meatball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_potato_slice",
+       "t": "熟馬鈴薯片　cooked_potato_slice"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_shrimp",
+       "t": "熟蝦　cooked_shrimp"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_shrimp_paste",
+       "t": "熟蝦滑　cooked_shrimp_paste"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_squid_roll",
+       "t": "熟魷魚捲　cooked_squid_roll"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_sweet_potato_skin",
+       "t": "熟苕皮　cooked_sweet_potato_skin"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_tofu_skin",
+       "t": "熟腐竹　cooked_tofu_skin"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_tripe",
+       "t": "熟毛肚　cooked_tripe"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_wide_noodles",
+       "t": "熟寬粉　cooked_wide_noodles"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:cooked_zhe_er_gen_slice",
+       "t": "熟折耳根段　cooked_zhe_er_gen_slice"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:crispy_pork",
+       "t": "酥肉　crispy_pork"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:crushed_peanuts",
+       "t": "花生碎　crushed_peanuts"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:glass_cup",
+       "t": "玻璃杯　cup"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:dried_tofu",
+       "t": "豆乾　dried_tofu"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:egg_fried_rice",
+       "t": "蛋炒飯　egg_fried_rice"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:empty_orient_cola_bottle",
+       "t": "之晗可樂空瓶　empty_orient_cola_bottle"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:enoki_mushroom",
+       "t": "金針菇　enoki_mushroom"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:fatty_beef_roll",
+       "t": "肥牛捲　fatty_beef_roll"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:fish_ball",
+       "t": "魚丸　fish_ball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:garlic",
+       "t": "大蒜　garlic"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:garlic_paste",
+       "t": "蒜泥　garlic_paste"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:glass_cup",
+       "t": "玻璃杯　glass_cup"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:greens",
+       "t": "青菜　greens"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:ham_sausage",
+       "t": "火腿腸　ham_sausage"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:ham_sausage_slice",
+       "t": "火腿腸片　ham_sausage_slice"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:hot_tofu",
+       "t": "豆腐（熱）　hot_tofu"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:hot_tofu_cube",
+       "t": "豆腐塊（熱）　hot_tofu_cube"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:lotus_root",
+       "t": "蓮藕　lotus_root"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:lotus_root_slice",
+       "t": "蓮藕片　lotus_root_slice"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:milk_cup",
+       "t": "一杯牛奶　milk_cup"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:millet_chili",
+       "t": "小米辣　millet_chili"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:minced_pork",
+       "t": "豬絞肉　minced_pork"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:minced_zhe_er_gen",
+       "t": "折耳根碎　minced_zhe_er_gen"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:mutton_meatball",
+       "t": "羊肉丸　mutton_meatball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:mutton_roll",
+       "t": "羊肉捲　mutton_roll"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:orange",
+       "t": "柳橙　orange"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:orient_cola",
+       "t": "之晗可樂　orient_cola"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:orient_cola_cup",
+       "t": "一杯之晗可樂　orient_cola_cup"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:oyster_sauce",
+       "t": "蠔油　oyster_sauce"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:peanut",
+       "t": "花生　peanut"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:peeled_shrimp",
+       "t": "蝦仁　peeled_shrimp"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:pork_meatball",
+       "t": "豬肉丸　pork_meatball"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:potato_slice",
+       "t": "馬鈴薯片　potato_slice"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:pounded_meat",
+       "t": "搗碎的肉　pounded_meat"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:raw_crispy_pork",
+       "t": "生酥肉　raw_crispy_pork"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:raw_ham_sausage",
+       "t": "生火腿腸　raw_ham_sausage"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:raw_squid",
+       "t": "生魷魚　raw_squid"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:rich_stock_bowl",
+       "t": "一碗高湯　rich_stock_bowl"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:scallion",
+       "t": "小蔥　scallion"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:sesame_paste",
+       "t": "芝麻醬　sesame_paste"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:shrimp",
+       "t": "蝦　shrimp"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:shrimp_paste",
+       "t": "蝦滑　shrimp_paste"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:soybean",
+       "t": "黃豆　soybean"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:squid_roll",
+       "t": "魷魚捲　squid_roll"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:sweet_potato_skin",
+       "t": "苕皮　sweet_potato_skin"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:three_fresh_soup_bowl",
+       "t": "一碗三鮮湯　three_fresh_soup_bowl"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:three_fresh_soup_bucket",
+       "t": "三鮮湯底桶　three_fresh_soup_bucket"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:tofu_skin",
+       "t": "腐竹　tofu_skin"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:tomato",
+       "t": "番茄　tomato"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:tomato_soup_bowl",
+       "t": "一碗番茄湯　tomato_soup_bowl"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:tomato_soup_bucket",
+       "t": "番茄湯底桶　tomato_soup_bucket"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:tripe",
+       "t": "生毛肚　tripe"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:water_cup",
+       "t": "一杯水　water_cup"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:wide_noodles",
+       "t": "寬粉　wide_noodles"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:zhe_er_gen",
+       "t": "折耳根　zhe_er_gen"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:zhe_er_gen_slice",
+       "t": "折耳根段　zhe_er_gen_slice"
+      }
      ]
     }
    ]

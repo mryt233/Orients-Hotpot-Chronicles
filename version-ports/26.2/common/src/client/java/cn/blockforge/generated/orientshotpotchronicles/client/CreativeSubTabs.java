@@ -82,6 +82,8 @@ public final class CreativeSubTabs {
             || stack.is(HotPotContent.TOMATO_SOUP_BUCKET) || stack.is(HotPotContent.THREE_FRESH_SOUP_BUCKET)) {
             return Sub.FOOD;   // 锅底料、汤底桶不能直接吃，下面按「能吃」认不出来（2026-10-26）
         }
+        // mryt233 改（2026-11-06，r137）：r137 新增的 27 个物品全部由 HotPotContent.foodItem 注册，
+        // 都带 DataComponents.FOOD 且不是 BlockItem，下面的条件会把它们自动归进「食物」子类，不用逐个列名字。
         if (stack.is(HotPotContent.RAW_TRIPE) || stack.is(HotPotContent.COOKED_TRIPE)
             || stack.is(HotPotContent.MINCED_PORK)
             || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkItem

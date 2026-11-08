@@ -56,6 +56,10 @@ public class PlateItem extends BlockItem {
     /**
      * 手里这件东西摆到桌上是什么（r99 起不只盘子）：盘子 → 盘子；原版的碗 → 碗（装的菜跟着）；
      * 汤碗 → 碗（整件记着）；橙子饮料 / 空瓶 → 瓶子（整件记着）。不能摆返回 null。
+     * <p>
+     * 竹筷<b>有意不在这里返回</b>（r136b，2026-11-05 用户）：拿筷子点普通碗盘时要继续走「夹菜 / 放菜」那条路，
+     * 若这里返回筷架方块，点盘子就会被当成「再摆一个盘子」。竹筷上桌由
+     * {@link ChopsticksItem#useOn} 自己调 {@link #placeOn} 摆 {@link HotPotContent#CHOPSTICK_REST_BLOCK}。
      */
     @org.jetbrains.annotations.Nullable
     public static PlateBlock placedFor(ItemStack stack) {
@@ -75,12 +79,17 @@ public class PlateItem extends BlockItem {
         return null;
     }
 
-    /** 整件摆上去（拿起来原样还回去）的东西：汤碗、饮料、空瓶。 */
+    /**
+     * 整件摆上去（拿起来原样还回去）的东西：汤碗、饮料、空瓶、玻璃杯；
+     * 还有直接摆在桌面上的竹筷（r136b，2026-11-05 用户）——这样空手拿起来或挖掉时，
+     * 原样还回这双筷子以及它夹着的那道菜。
+     */
     public static boolean keepsSelf(ItemStack stack) {
         return stack.getItem() instanceof SoupBowlItem || stack.getItem() instanceof DippingSauceItem
             || stack.getItem() instanceof DrinkItem
             || stack.getItem() instanceof EmptyBottleItem
-            || stack.getItem() instanceof CupItem;
+            || stack.getItem() instanceof CupItem
+            || stack.is(HotPotContent.CHOPSTICKS);
     }
 
     @Override

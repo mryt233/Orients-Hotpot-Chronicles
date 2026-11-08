@@ -14,7 +14,15 @@
     "orient_framework.config.read_failed": "讀取設定失敗（%s），全部使用預設值；原檔案保留",
     "orient_framework.config.write_failed": "寫入設定失敗（%s），原檔案保留",
     "orient_framework.disconnect.protocol": "Orient 框架網路協定不一致（伺服器 %s，用戶端 %s）。請安裝與伺服器相同版本的模組。",
-    "orient_framework.disconnect.missing_channels": "伺服器需要的網路通道你的用戶端沒有：%s。請安裝與伺服器相同版本的模組。"
+    "orient_framework.disconnect.missing_channels": "伺服器需要的網路通道你的用戶端沒有：%s。請安裝與伺服器相同版本的模組。",
+    "item.orients_hotpot_chronicles.zhe_er_gen": "折耳根",
+    "item.orients_hotpot_chronicles.zhe_er_gen_slice": "折耳根段",
+    "item.orients_hotpot_chronicles.cooked_zhe_er_gen_slice": "熟折耳根段",
+    "item.orients_hotpot_chronicles.minced_zhe_er_gen": "折耳根碎",
+    "item.orients_hotpot_chronicles.cloth_apron": "布圍裙",
+    "text.orients_hotpot_chronicles.tooltip.cloth_apron": "防止熱湯濺油與火苗燙傷",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen": "折耳根碎",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen.effect": "抗性提升 I 10 秒，解毒"
   },
   "ja_jp": {
     "text.orients_hotpot_chronicles.msg.config_reloaded": "火鍋の数値を再読み込みし、クライアントに同期しました。警告 %s 件。",
@@ -31,7 +39,15 @@
     "orient_framework.config.read_failed": "設定を読み込めませんでした（%s）。既定値を使用し、元のファイルは残します",
     "orient_framework.config.write_failed": "設定を書き込めませんでした（%s）。元のファイルは残します",
     "orient_framework.disconnect.protocol": "Orient Framework のネットワークプロトコルが一致しません（サーバー %s、クライアント %s）。サーバーと同じバージョンの MOD を導入してください。",
-    "orient_framework.disconnect.missing_channels": "このサーバーに必要なネットワークチャンネルがクライアントにありません：%s。サーバーと同じバージョンの MOD を導入してください。"
+    "orient_framework.disconnect.missing_channels": "このサーバーに必要なネットワークチャンネルがクライアントにありません：%s。サーバーと同じバージョンの MOD を導入してください。",
+    "item.orients_hotpot_chronicles.zhe_er_gen": "ドクダミの根",
+    "item.orients_hotpot_chronicles.zhe_er_gen_slice": "ドクダミの根の切り身",
+    "item.orients_hotpot_chronicles.cooked_zhe_er_gen_slice": "茹でたドクダミの根",
+    "item.orients_hotpot_chronicles.minced_zhe_er_gen": "ドクダミの根のみじん切り",
+    "item.orients_hotpot_chronicles.cloth_apron": "布エプロン",
+    "text.orients_hotpot_chronicles.tooltip.cloth_apron": "熱い汁の飛び散りと火の粉のやけどを防ぐ",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen": "ドクダミのみじん切り",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen.effect": "耐性 I 10 秒、毒を解除"
   },
   "ko_kr": {
     "text.orients_hotpot_chronicles.msg.config_reloaded": "훠궈 수치를 다시 불러오고 클라이언트에 동기화했습니다. 경고 %s건.",
@@ -48,7 +64,15 @@
     "orient_framework.config.read_failed": "설정을 읽지 못했습니다(%s). 기본값을 사용하며 원본 파일은 보존합니다",
     "orient_framework.config.write_failed": "설정을 쓰지 못했습니다(%s). 원본 파일은 보존합니다",
     "orient_framework.disconnect.protocol": "Orient Framework 네트워크 프로토콜이 일치하지 않습니다(서버 %s, 클라이언트 %s). 서버와 같은 버전의 모드를 설치하세요.",
-    "orient_framework.disconnect.missing_channels": "이 서버에 필요한 네트워크 채널이 클라이언트에 없습니다: %s. 서버와 같은 버전의 모드를 설치하세요."
+    "orient_framework.disconnect.missing_channels": "이 서버에 필요한 네트워크 채널이 클라이언트에 없습니다: %s. 서버와 같은 버전의 모드를 설치하세요.",
+    "item.orients_hotpot_chronicles.zhe_er_gen": "어성초 뿌리",
+    "item.orients_hotpot_chronicles.zhe_er_gen_slice": "어성초 뿌리 토막",
+    "item.orients_hotpot_chronicles.cooked_zhe_er_gen_slice": "익힌 어성초 뿌리",
+    "item.orients_hotpot_chronicles.minced_zhe_er_gen": "어성초 다진 것",
+    "item.orients_hotpot_chronicles.cloth_apron": "천 에이프런",
+    "text.orients_hotpot_chronicles.tooltip.cloth_apron": "뜨거운 국물이 튀는 것과 불꽃 화상을 막아 줍니다",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen": "다진 어성초",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen.effect": "저항 I 10초, 독 해제"
   },
   "ru_ru": {
     "text.orients_hotpot_chronicles.msg.config_reloaded": "Значения мода перезагружены и отправлены клиентам. Предупреждений: %s.",
@@ -65,7 +89,15 @@
     "orient_framework.config.read_failed": "Не удалось прочитать настройки (%s); используются значения по умолчанию, исходный файл сохранён",
     "orient_framework.config.write_failed": "Не удалось записать настройки (%s); исходный файл сохранён",
     "orient_framework.disconnect.protocol": "Несовпадение сетевого протокола Orient Framework (сервер %s, клиент %s). Установите те же версии модов, что и на сервере.",
-    "orient_framework.disconnect.missing_channels": "Серверу нужны сетевые каналы, которых нет у вашего клиента: %s. Установите те же версии модов, что и на сервере."
+    "orient_framework.disconnect.missing_channels": "Серверу нужны сетевые каналы, которых нет у вашего клиента: %s. Установите те же версии модов, что и на сервере.",
+    "item.orients_hotpot_chronicles.zhe_er_gen": "Корень хуттуинии",
+    "item.orients_hotpot_chronicles.zhe_er_gen_slice": "Нарезанный корень хуттуинии",
+    "item.orients_hotpot_chronicles.cooked_zhe_er_gen_slice": "Варёный корень хуттуинии",
+    "item.orients_hotpot_chronicles.minced_zhe_er_gen": "Измельчённая хуттуиния",
+    "item.orients_hotpot_chronicles.cloth_apron": "Тканевый фартук",
+    "text.orients_hotpot_chronicles.tooltip.cloth_apron": "Защищает от брызг горячего бульона и ожогов от пламени",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen": "Измельчённая хуттуиния",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen.effect": "Сопротивление I (10 с), снимает отравление"
   },
   "de_de": {
     "text.orients_hotpot_chronicles.msg.config_reloaded": "Hotpot-Werte neu geladen und an die Clients übertragen. %s Warnung(en).",
@@ -82,7 +114,15 @@
     "orient_framework.config.read_failed": "Konfiguration konnte nicht gelesen werden (%s); Standardwerte werden verwendet, Originaldatei bleibt erhalten",
     "orient_framework.config.write_failed": "Konfiguration konnte nicht geschrieben werden (%s); Originaldatei bleibt erhalten",
     "orient_framework.disconnect.protocol": "Netzwerkprotokoll von Orient Framework passt nicht (Server %s, Client %s). Installiere dieselben Mod-Versionen wie der Server.",
-    "orient_framework.disconnect.missing_channels": "Der Server benötigt Netzwerkkanäle, die deinem Client fehlen: %s. Installiere dieselben Mod-Versionen wie der Server."
+    "orient_framework.disconnect.missing_channels": "Der Server benötigt Netzwerkkanäle, die deinem Client fehlen: %s. Installiere dieselben Mod-Versionen wie der Server.",
+    "item.orients_hotpot_chronicles.zhe_er_gen": "Houttuynia-Wurzel",
+    "item.orients_hotpot_chronicles.zhe_er_gen_slice": "Geschnittene Houttuynia-Wurzel",
+    "item.orients_hotpot_chronicles.cooked_zhe_er_gen_slice": "Gekochte Houttuynia-Wurzel",
+    "item.orients_hotpot_chronicles.minced_zhe_er_gen": "Gehackte Houttuynia",
+    "item.orients_hotpot_chronicles.cloth_apron": "Stoffschürze",
+    "text.orients_hotpot_chronicles.tooltip.cloth_apron": "Schützt vor Spritzern heißer Brühe und Flammenverbrennungen",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen": "Gehackte Houttuynia",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen.effect": "Widerstand I (10 s), heilt Vergiftung"
   },
   "fr_fr": {
     "text.orients_hotpot_chronicles.msg.config_reloaded": "Valeurs du hotpot rechargées et synchronisées avec les clients. %s avertissement(s).",
@@ -99,7 +139,15 @@
     "orient_framework.config.read_failed": "Impossible de lire la configuration (%s) ; valeurs par défaut utilisées, fichier d'origine conservé",
     "orient_framework.config.write_failed": "Impossible d'écrire la configuration (%s) ; fichier d'origine conservé",
     "orient_framework.disconnect.protocol": "Protocole réseau d'Orient Framework incompatible (serveur %s, client %s). Installez les mêmes versions de mods que le serveur.",
-    "orient_framework.disconnect.missing_channels": "Ce serveur requiert des canaux réseau absents de votre client : %s. Installez les mêmes versions de mods que le serveur."
+    "orient_framework.disconnect.missing_channels": "Ce serveur requiert des canaux réseau absents de votre client : %s. Installez les mêmes versions de mods que le serveur.",
+    "item.orients_hotpot_chronicles.zhe_er_gen": "Racine de houttuynia",
+    "item.orients_hotpot_chronicles.zhe_er_gen_slice": "Racine de houttuynia tranchée",
+    "item.orients_hotpot_chronicles.cooked_zhe_er_gen_slice": "Racine de houttuynia cuite",
+    "item.orients_hotpot_chronicles.minced_zhe_er_gen": "Houttuynia hachée",
+    "item.orients_hotpot_chronicles.cloth_apron": "Tablier en tissu",
+    "text.orients_hotpot_chronicles.tooltip.cloth_apron": "Protège des éclaboussures de bouillon chaud et des brûlures de flamme",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen": "Houttuynia hachée",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen.effect": "Résistance I (10 s), guérit l'empoisonnement"
   },
   "es_es": {
     "text.orients_hotpot_chronicles.msg.config_reloaded": "Valores del hotpot recargados y sincronizados con los clientes. %s advertencia(s).",
@@ -116,7 +164,15 @@
     "orient_framework.config.read_failed": "No se pudo leer la configuración (%s); se usan los valores predeterminados y se conserva el archivo original",
     "orient_framework.config.write_failed": "No se pudo escribir la configuración (%s); se conserva el archivo original",
     "orient_framework.disconnect.protocol": "El protocolo de red de Orient Framework no coincide (servidor %s, cliente %s). Instala las mismas versiones de mods que el servidor.",
-    "orient_framework.disconnect.missing_channels": "Este servidor requiere canales de red que tu cliente no tiene: %s. Instala las mismas versiones de mods que el servidor."
+    "orient_framework.disconnect.missing_channels": "Este servidor requiere canales de red que tu cliente no tiene: %s. Instala las mismas versiones de mods que el servidor.",
+    "item.orients_hotpot_chronicles.zhe_er_gen": "Raíz de houttuynia",
+    "item.orients_hotpot_chronicles.zhe_er_gen_slice": "Raíz de houttuynia en rodajas",
+    "item.orients_hotpot_chronicles.cooked_zhe_er_gen_slice": "Raíz de houttuynia cocida",
+    "item.orients_hotpot_chronicles.minced_zhe_er_gen": "Houttuynia picada",
+    "item.orients_hotpot_chronicles.cloth_apron": "Delantal de tela",
+    "text.orients_hotpot_chronicles.tooltip.cloth_apron": "Protege de las salpicaduras de caldo caliente y de las quemaduras de llama",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen": "Houttuynia picada",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen.effect": "Resistencia I (10 s), cura el veneno"
   },
   "pt_br": {
     "text.orients_hotpot_chronicles.msg.config_reloaded": "Valores do hotpot recarregados e sincronizados com os clientes. %s aviso(s).",
@@ -133,6 +189,14 @@
     "orient_framework.config.read_failed": "Não foi possível ler a configuração (%s); usando valores padrão, arquivo original mantido",
     "orient_framework.config.write_failed": "Não foi possível gravar a configuração (%s); arquivo original mantido",
     "orient_framework.disconnect.protocol": "Protocolo de rede do Orient Framework incompatível (servidor %s, cliente %s). Instale as mesmas versões de mods do servidor.",
-    "orient_framework.disconnect.missing_channels": "Este servidor exige canais de rede que seu cliente não tem: %s. Instale as mesmas versões de mods do servidor."
+    "orient_framework.disconnect.missing_channels": "Este servidor exige canais de rede que seu cliente não tem: %s. Instale as mesmas versões de mods do servidor.",
+    "item.orients_hotpot_chronicles.zhe_er_gen": "Raiz de houttuynia",
+    "item.orients_hotpot_chronicles.zhe_er_gen_slice": "Raiz de houttuynia fatiada",
+    "item.orients_hotpot_chronicles.cooked_zhe_er_gen_slice": "Raiz de houttuynia cozida",
+    "item.orients_hotpot_chronicles.minced_zhe_er_gen": "Houttuynia picada",
+    "item.orients_hotpot_chronicles.cloth_apron": "Avental de tecido",
+    "text.orients_hotpot_chronicles.tooltip.cloth_apron": "Protege de respingos de caldo quente e queimaduras de chama",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen": "Houttuynia picada",
+    "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen.effect": "Resistência I (10 s), cura veneno"
   }
 }

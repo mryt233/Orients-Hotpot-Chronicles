@@ -65,18 +65,22 @@
 **Q：这个模组能和别的模组联动吗？**
 留了接口：方块标签 `orients_hotpot_chronicles:heat_sources` 里的方块能当锅的热源。其他联动欢迎去 GitHub 提建议。
 
-**Q：1.20.1、NeoForge 版和 1.21.1 Fabric 有什么区别？**
-玩法一样，只有热气粒子、吃完还碗这类很小的差别，但**新内容通常 Fabric 1.21.1 先有，其他版本晚一步**。详见[下载、安装与反馈](install.html#ports)。
+**Q：1.20.1、26.1.x、26.2 版和 1.21.1 有什么区别？**
+0.2.2-alpha 起 **1.21.1（Fabric / NeoForge）、1.20.1（Fabric / Forge）、26.1.x（Fabric / NeoForge）和 26.2（Fabric / NeoForge）** 全部同步更新，玩法与内容一致。详见[下载、安装与反馈](install.html#ports)。
 
 **Q：发现 bug 去哪里报？**
 去 GitHub：<https://github.com/mryt233/Orients-Hotpot-Chronicles> 提 Issue（也可以进 **QQ 群 248314791**，联系方式见[下载、安装与反馈](install.html#feedback)）。请写清：游戏版本、模组版本、怎么触发、最好有截图。
 
-<!-- mryt233 改，2026-10-30：#78、#81 仍属未发布的 r130。 -->
-## 数值配置 {#config}{{dev}}
+<!-- mryt233 改，2026-11-02：0.2.0-alpha 发布，数值配置转正式。 -->
+## 数值配置 {#config}{{since:0.2.0-alpha}}
 
-:::dev
-高级玩家可改游戏目录的 `config/orients_hotpot_chronicles.json`，再由管理员执行 **`/orientshotpot reload`**。食物饥饿值、饱和度也会立即更新，直接吃、筷子夹着吃和锅界面里吃用同一份数值。多人服只改服务端；警告条数会在命令回执里报告。整个文件写坏时会用默认值，坏文件原样保留。这是开发中功能，**0.1.4-alpha 里还没有**。
-:::
+**Q：能改食物回多少饥饿、汤底多快吗？**
+能。0.2.2-alpha 起可以直接从**模组列表**（Fabric 需装 Mod Menu，NeoForge / Forge 原生自带）选中本模组点「**配置**」，用滑块按分类调整并保存；也可以直接改 `config/orients_hotpot_chronicles.json` 配置文件（里面能调食物营养、饮料每口营养、汤底速度、燃料和蘸料等数值，每项都写了含义、范围和单位）。改完配置文件由管理员执行 **`/orientshotpot reload`**，不用重启就生效；回执会报告有几条警告。
+
+- **多人服**只改服务端，玩家进服和重载时会自动同步。
+- 某一项写错（不是数字、超范围、键名拼错）只回退那一项并警告；整个文件写坏就全部用默认值，**坏文件原样保留**方便修。
+- 配方用数据包改，再执行原版 `/reload`。
+- 教程里写的数值都是默认值，服务器改过配置以服务器为准。
 
 ## 实用指令
 

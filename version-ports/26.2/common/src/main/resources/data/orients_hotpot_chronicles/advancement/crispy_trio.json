@@ -1,0 +1,37 @@
+{
+  "display": {
+    "icon": {
+      "id": "orients_hotpot_chronicles:cooked_tripe"
+    },
+    "title": {
+      "translate": "advancements.orients_hotpot_chronicles.crispy_trio.title"
+    },
+    "description": {
+      "translate": "advancements.orients_hotpot_chronicles.crispy_trio.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "any": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "orients_hotpot_chronicles:cooked_tripe"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "any"
+    ]
+  ],
+  "parent": "orients_hotpot_chronicles:tripe"
+}

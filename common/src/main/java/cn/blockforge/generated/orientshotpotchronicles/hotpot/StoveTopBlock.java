@@ -80,6 +80,11 @@ public class StoveTopBlock extends Block implements PartOutline {
         SHAPES[Below.POT_Z.ordinal()] = StoveBlock.shapeFor(StoveBlock.TALL_LIFT, true, Direction.Axis.Z).move(0, -1, 0);
     }
 
+    /**
+     * mryt233 改（2026-11-05）：硬度 2.0、抗性 6.0，与下面的高灶台一致；不强制工具（照 {@link StoveBlock}）。
+     * 挖掘工具见 data/minecraft/tags/block/mineable/pickaxe.json，上半截自己的条目就是为它加的：
+     * 玩家对着上半截举镐时，挖快了还是慢由这个方块自己所在的标签决定。
+     */
     public StoveTopBlock() {
         super(BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_RED)
@@ -198,6 +203,13 @@ public class StoveTopBlock extends Block implements PartOutline {
             world.destroyBlock(pos.below(), drop, player);
         }
         return super.playerWillDestroy(world, pos, state, player);
+    }
+
+    /** mryt233 改：上半截也显示准星所指的锅名或下方高灶台本名。 */
+    @Override
+    public net.minecraft.network.chat.MutableComponent getName() {
+        net.minecraft.network.chat.MutableComponent name = StoveBlock.aimedName(PlateHolderBlock.pickPlayer.get());
+        return name == null ? super.getName() : name;
     }
 
     @Override

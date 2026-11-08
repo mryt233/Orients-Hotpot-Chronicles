@@ -39,7 +39,12 @@ public class TallHotPotTableBlock extends HotPotTableBlock {
     }
 
     public TallHotPotTableBlock(Block planks) {
-        super(planks);
+        this(planks, false);
+    }
+
+    /** mryt233 改（2026-11-05）：石料 / 金属桌面的高桌同矮桌，硬度 2.0、抗性 6.0（见 {@link HotPotTableBlock}）。 */
+    public TallHotPotTableBlock(Block like, boolean hardSurface) {
+        super(like, hardSurface);
         registerDefaultState(defaultBlockState().setValue(OPEN, false));
     }
 

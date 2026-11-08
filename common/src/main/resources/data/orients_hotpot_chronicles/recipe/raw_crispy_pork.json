@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "food",
+  "ingredients": [
+    {
+      "item": "orients_hotpot_chronicles:minced_pork"
+    },
+    {
+      "item": "minecraft:wheat"
+    },
+    {
+      "item": "minecraft:egg"
+    }
+  ],
+  "result": {
+    "id": "orients_hotpot_chronicles:raw_crispy_pork",
+    "count": 3
+  }
+}

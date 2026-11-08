@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "orients_hotpot_chronicles:chili_pepper",
+  "result": {
+    "id": "orients_hotpot_chronicles:millet_chili",
+    "count": 2
+  }
+}

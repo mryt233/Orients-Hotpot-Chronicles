@@ -15,7 +15,8 @@
     "ClientPlayerInteractionManagerMixin",
     "CreativeInventoryScreenAccessor",
     "CreativeInventoryScreenMixin",
-    "HandledScreenMixin"
+    "HandledScreenMixin",
+    "SplashManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

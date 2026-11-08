@@ -152,12 +152,37 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
     /** 客户端填：当前玩家（鼠标中键选方块时用来找准星对着哪个盘子）；服务端一直是 null。 */
     public static java.util.function.Supplier<Player> pickPlayer = () -> null;
 
+    /** mryt233 改：指示器名称与选中框、复制物品共用餐具命中判定。 */
+    @Override
+    public net.minecraft.network.chat.MutableComponent getName() {
+        Player player = pickPlayer.get();
+        if (player != null && player.level() != null) {
+            HitResult hit = player.pick(player.blockInteractionRange(), 1.0F, false);
+            if (hit instanceof BlockHitResult blockHit && hit.getType() == HitResult.Type.BLOCK
+                && player.level().getBlockEntity(blockHit.getBlockPos()) instanceof PlateHolderBlockEntity be) {
+                PlateHolderBlockEntity.Placed plate = aimedAt(blockHit.getBlockPos(), blockHit, be);
+                if (plate != null) {
+                    ItemStack item = plate.toItem();
+                    if (!item.isEmpty()) {
+                        return item.getHoverName().copy();
+                    }
+                }
+            }
+        }
+        return super.getName();
+    }
+
     /** 鼠标中键：复制准星对着的那个盘子，里面的菜一起带上（r94）。 */
     @Override
     public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
         Player player = pickPlayer.get();
         if (player != null && world.getBlockEntity(pos) instanceof PlateHolderBlockEntity be) {
-            PlateHolderBlockEntity.Placed plate = aimed(player, pos, be);
+            PlateHolderBlockEntity.Placed plate = null;
+            HitResult hit = player.pick(player.blockInteractionRange(), 1.0F, false);
+            if (hit instanceof BlockHitResult blockHit && hit.getType() == HitResult.Type.BLOCK
+                && blockHit.getBlockPos().equals(pos)) {
+                plate = aimedAt(pos, blockHit, be);
+            }
             if (plate == null && !be.plates().isEmpty()) {
                 plate = be.plates().get(0);
             }
@@ -166,6 +191,17 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
             }
         }
         return ItemStack.EMPTY;
+    }
+
+    /** mryt233 改：名称、复制物品与 Jade 共用当前准星命中的餐具。 */
+    @org.jetbrains.annotations.Nullable
+    public static PlateHolderBlockEntity.Placed aimedAt(BlockPos pos, BlockHitResult hit, PlateHolderBlockEntity be) {
+        double[] at = local(pos, hit);
+        PlateHolderBlockEntity.Placed plate = be.at(at[0], at[1]);
+        if (plate == null && !be.plates().isEmpty()) {
+            plate = be.plates().get(0);
+        }
+        return plate;
     }
 
     /** 选中框只框准星对着的那个盘子（连盘里的菜 / 那瓶饮料 / 那只碗）。 */
@@ -223,6 +259,11 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
             return;
         }
         BlockState plateState = modelState(plate);
+        if (plate.plate instanceof ChopstickRestBlock) {
+            // 迷你筷架没有单独的方块模型 json（由渲染器按代码画），挖掉时的碎屑改用竹板，
+            // 免得拿一个查不到模型的方块状态去生成粒子（r136b，2026-11-05 用户）
+            plateState = net.minecraft.world.level.block.Blocks.BAMBOO_PLANKS.defaultBlockState();
+        }
         world.levelEvent(null, net.minecraft.world.level.block.LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(plateState));
         if (!player.isCreative()) {
             Block.popResource(world, pos, plate.toItem());
@@ -240,7 +281,8 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
 
     /** 点到的位置在这一格里的 x、z（像素）。 */
     private static double[] local(BlockPos pos, BlockHitResult hit) {
-        Vec3 v = hit.getLocation().subtract(Vec3.atLowerCornerOf(pos)).scale(16);
+        Vec3 n = Vec3.atLowerCornerOf(hit.getDirection().getNormal());
+        Vec3 v = hit.getLocation().subtract(n.scale(0.001)).subtract(Vec3.atLowerCornerOf(pos)).scale(16);
         return new double[]{v.x, v.z};
     }
 
@@ -269,6 +311,17 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
                 target.self = new ItemStack(HotPotContent.cupFor(fromBucket));
                 be.changed();
                 world.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 0.6F, 1.2F);
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
+        // 拿着装满饮品的玻璃杯右键桌上摆着的满杯：跟桌上这杯碰一下（r136b，2026-11-05 用户，新增）
+        if (stack.getItem() instanceof CupItem handCup && handCup.kind() != null
+            && target != null && target.plate instanceof CupBlock
+            && target.self.getItem() instanceof CupItem tableCup && tableCup.kind() != null) {
+            if (!world.isClientSide) {
+                Vec3 at3 = Vec3.atCenterOf(pos).add(0, (lift(state) + PlateSize.CUP_H + 1.0) / 16.0, 0);
+                CupItem.cheers(world, player, stack, null, target.self, at3);
+                be.changed();   // 桌上的杯子也带上 CHEERED，客户端拿到的物品栈才是新的
             }
             return ItemInteractionResult.SUCCESS;
         }

@@ -16,6 +16,7 @@
     "ClientPlayerInteractionManagerMixin",
     "CreativeInventoryScreenAccessor",
     "CreativeInventoryScreenMixin",
+    "SplashManagerMixin",
     "TableDecorModelOffsetMixin"
   ],
   "injectors": {

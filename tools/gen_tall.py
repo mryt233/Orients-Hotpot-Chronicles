@@ -271,7 +271,9 @@ def main():
             "result": {"id": f"{MODID}:{wood}_bench", "count": 3}})
         write(data / MODID / f"loot_table/blocks/{wood}_tall_hotpot_table.json", loot(f"{wood}_tall_hotpot_table"))
         write(data / MODID / f"loot_table/blocks/{wood}_bench.json", loot(f"{wood}_bench"))
-    for tag_file, ids in [("mineable/pickaxe.json", ["tall_brick_stove"]),
+    # mryt233 改（2026-11-05）：高灶台的「上半截」tall_brick_stove_top 也补进 pickaxe —— 玩家对着上半截挖时，
+    # 挖得快不快由上半截自己所在的标签决定，少了它拿镐子挖也跟空手一样慢。
+    for tag_file, ids in [("mineable/pickaxe.json", ["tall_brick_stove", "tall_brick_stove_top"]),
                           ("mineable/axe.json", [f"{w}_tall_hotpot_table" for w in WOODS] + [f"{w}_bench" for w in WOODS])]:
         f = data / "minecraft/tags/block" / tag_file
         tag = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {"replace": False, "values": []}

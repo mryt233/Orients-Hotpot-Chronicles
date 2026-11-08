@@ -38,14 +38,30 @@ public class SeatEntity extends Entity {
         return seat;
     }
 
+    /**
+     * mryt233 改（2026-11-05，清单 #120）：上面又被叠了一张条凳时自动起身。
+     * 以前只判「坐着的那两格还是不是条凳」，凳塔叠高以后人会坐在凳塔中间层里（头卡在上一层的凳面下）。
+     * 现在额外判「这一格头顶是不是也成了条凳」，是就丢弃座位，让玩家落回地面。
+     */
     @Override
     public void tick() {
         super.tick();
         if (!level().isClientSide && (!isVehicle()
             || !(level().getBlockState(a).getBlock() instanceof BenchBlock)
-            || !(level().getBlockState(b).getBlock() instanceof BenchBlock))) {
+            || !(level().getBlockState(b).getBlock() instanceof BenchBlock)
+            || BenchBlock.isTallBench(level().getBlockState(a.above()))
+            || BenchBlock.isTallBench(level().getBlockState(b.above())))) {
             discard();
         }
+    }
+
+    /**
+     * 这个座位是不是落在 pos 这一格上（含两格交界时的一侧）。
+     * mryt233 改（2026-11-05，清单 #120）：{@link BenchBlock#clearSeatsAt} 拆凳时用，
+     * 以前只能靠座位实体自己下一 tick 发现凳子没了。
+     */
+    public boolean sitsOn(BlockPos pos) {
+        return a.equals(pos) || b.equals(pos);
     }
 
     /** 坐的人屁股正好落在凳面上（实体自身就放在凳面高度）。 */

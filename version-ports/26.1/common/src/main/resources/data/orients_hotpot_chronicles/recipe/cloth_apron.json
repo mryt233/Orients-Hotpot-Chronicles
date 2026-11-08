@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "S  ",
+    "WWW",
+    "WWW"
+  ],
+  "key": {
+    "S": "minecraft:string",
+    "W": "minecraft:white_wool"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:cloth_apron",
+    "count": 1
+  }
+}

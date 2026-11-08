@@ -29,10 +29,15 @@ import net.minecraft.world.level.material.PushReaction;
  * 点它（打蘸料、开补货界面）原样转给下面的蘸料台，挖它 = 挖蘸料台；下面不是蘸料台了它自己消失。
  * 作者：mryt233 */
 public class SauceStationTopBlock extends net.minecraft.world.level.block.Block implements PartOutline {
+    /**
+     * mryt233 改（2026-11-05）：硬度 2.0 与下面蘸料台一致（木 3.0 / 铁 6.0 的爆炸抗性那一半由
+     * {@link #getDestroyProgress} 转发给下面的方块算，这里只保底）；不强制工具。
+     * 挖它会连下面整个蘸料台一起挖掉（见 {@link #playerWillDestroy}），掉落由下面那块决定。
+     */
     public SauceStationTopBlock() {
         super(BlockBehaviour.Properties.of()
             .mapColor(MapColor.WOOD)
-            .strength(2.0F, 3.0F)
+            .strength(2.0F, 6.0F)
             .sound(SoundType.WOOD)
             .noOcclusion()
             .noLootTable()
@@ -190,8 +195,18 @@ public class SauceStationTopBlock extends net.minecraft.world.level.block.Block 
         return super.playerWillDestroy(world, pos, state, player);
     }
 
+    /** mryt233 改：沿用下方材质名称与同一小碗的调料判定。 */
+    @Override
+    public net.minecraft.network.chat.MutableComponent getName() {
+        net.minecraft.network.chat.MutableComponent name = SauceStationBlock.aimedName(PlateHolderBlock.pickPlayer.get());
+        return name == null ? super.getName() : name;
+    }
+
     @Override
     public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
-        return new ItemStack(world.getBlockState(pos.below()).getBlock());
+        BlockState below = world.getBlockState(pos.below());
+        return below.getBlock() instanceof SauceStationBlock
+            ? below.getBlock().getCloneItemStack(world, pos.below(), below)
+            : super.getCloneItemStack(world, pos, state);
     }
 }

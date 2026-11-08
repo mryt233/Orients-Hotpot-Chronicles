@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smoking",
+  "category": "food",
+  "ingredient": "orients_hotpot_chronicles:dried_tofu",
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_dried_tofu"
+  },
+  "experience": 0.35,
+  "cookingtime": 100
+}

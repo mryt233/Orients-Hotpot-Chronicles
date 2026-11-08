@@ -1,0 +1,31 @@
+{
+  "display": {
+    "icon": {
+      "item": "orients_hotpot_chronicles:dipping_sauce"
+    },
+    "title": {
+      "translate": "advancements.orients_hotpot_chronicles.sauce_alchemist.title"
+    },
+    "description": {
+      "translate": "advancements.orients_hotpot_chronicles.sauce_alchemist.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "five": {
+      "trigger": "orients_hotpot_chronicles:hotpot",
+      "conditions": {
+        "event": "sauce_master_5"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "five"
+    ]
+  ],
+  "parent": "orients_hotpot_chronicles:sauce_master"
+}

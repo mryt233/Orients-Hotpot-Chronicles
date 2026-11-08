@@ -52,3 +52,20 @@ experiments/server-*/.gradle/
 experiments/*installer*.jar
 
 installer.log
+
+# mryt233 改（2026-11-08）：内部看板、一次性脚本与教程每版快照只留本地
+tutorial/versions/
+tutorial/dev_plan_dashboard.html
+tutorial/texture_gallery.html
+tools/gen_dev_plan_dashboard.py
+tools/gen_texture_gallery.py
+tools/inject_spotlight.py
+tools/watch_tasks.py
+tools/batch_gen_ai_textures.py
+tools/process_ai_to_pixkit.py
+tools/apply_v3_textures.py
+tools/generate_refined_textures.py
+tools/gen_r137_meats_tofu.py
+tools/gen_r137_veggies_seafood.py
+tools/test_build_textures.py
+tools/vanilla_bowl.png

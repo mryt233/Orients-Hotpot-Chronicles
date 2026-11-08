@@ -58,16 +58,26 @@ public class StoveBlockEntity extends HotPotBlockEntity {
 
     // ------------------------------------------------------------------ tick
 
-    /** 先消耗灶火，再让父类推进锅内烹饪。 */
+    /**
+     * 先消耗灶火，再让父类推进锅内烹饪。
+     * mryt233 改（2026-11-07）：块状态取一次、锅取一次、81 格只扫一次。
+     * 以前同一条「锅里还有没有生食材」每刻被问三遍（soupIdle / wantsHeat / soupIdle），
+     * 每次都要 heatedPot() 各查一次方块实体并完整扫 81 格。
+     */
     @Override
     protected void serverTick(Level world) {
         boolean changed = false;
-        // r83 放下的高灶台还没有「上半截」，补上（每秒查一次）
-        if (world.getGameTime() % 20L == 0L && getBlockState().getBlock() instanceof StoveBlock stove) {
+        BlockState state = world.getBlockState(worldPosition);
+        // r83 放下的高灶台还没有「上半截」，补上（每秒查一次）；矮灶台 placeTop 自己会直接返回，这里先判掉省一次调用
+        if (world.getGameTime() % 20L == 0L && state.getBlock() instanceof StoveBlock stove && stove.lift() > 0) {
             stove.placeTop(world, worldPosition);
         }
+        HotPotBlockEntity pot = heatedPot();
+        boolean potHasSoup = pot != null && pot.hasSoup();
+        boolean potHasRaw = potHasSoup && pot.hasRawIngredient();
+        boolean soupIdle = potHasSoup && !potHasRaw;
         // 只有真在煮生食材时才耗燃料。锅里有汤但没有生食材：正在烧的这份燃料暂停不减，灶火和沸腾照常
-        if (burnTicks > 0 && !soupIdle()) {
+        if (burnTicks > 0 && !soupIdle) {
             burnTicks--;
             if (burnTicks == 0) {
                 fuelType = -1;
@@ -76,17 +86,16 @@ public class StoveBlockEntity extends HotPotBlockEntity {
             }
         }
         // 像熔炉一样：只有锅里确实还有要煮的东西时才烧掉下一份燃料。
-        if (burnTicks <= 0 && wantsHeat() && consumeFuel()) {
+        if (burnTicks <= 0 && potHasRaw && consumeFuel()) {
             changed = true;
         }
         // 灶膛有燃料、锅里有汤：哪怕一份燃料都没点，也直接点火沸腾，不消耗燃料
-        boolean idle = burnTicks <= 0 && soupIdle() && HotPotFuel.burnTicksOf(fuel.getItem(0)) > 0;
+        boolean idle = burnTicks <= 0 && soupIdle && HotPotFuel.burnTicksOf(fuel.getItem(0)) > 0;
         if (idle != idleFlame) {
             idleFlame = idle;
             changed = true;
         }
         boolean lit = burnTicks > 0 || idleFlame;
-        BlockState state = world.getBlockState(worldPosition);
         if (StoveBlock.isStove(state) && state.getValue(StoveBlock.LIT) != lit) {
             world.setBlock(worldPosition, state.setValue(StoveBlock.LIT, lit), Block.UPDATE_CLIENTS);
         }
@@ -95,7 +104,7 @@ public class StoveBlockEntity extends HotPotBlockEntity {
         } else if (burnTicks > 0 && world.getGameTime() % 20L == 0L) {
             setChanged();
         }
-        if (lit && world.getGameTime() % WARMTH_INTERVAL == 0L && heatedPot() != null) {
+        if (lit && world.getGameTime() % WARMTH_INTERVAL == 0L && pot != null) {
             giveWarmth(world, worldPosition);
         }
         super.serverTick(world);
@@ -126,23 +135,8 @@ public class StoveBlockEntity extends HotPotBlockEntity {
         return null;
     }
 
-    /** 锅里有汤但没有要煮的生食材（空汤或全是熟的）：火可以烧着、汤可以沸腾，但不耗燃料。 */
-    private boolean soupIdle() {
-        HotPotBlockEntity pot = heatedPot();
-        return pot != null && pot.hasSoup() && !pot.hasRawIngredient();
-    }
-
-    /** 是否真的需要点火：锅里有汤，并且还有没煮熟的食材。 */
-    private boolean wantsHeat() {
-        if (hasPot()) {
-            return hasSoup() && hasRawIngredient();
-        }
-        // 兼容旧式独立锅：它坐在灶台正上方，由这台灶台提供热源。
-        if (level != null && level.getBlockEntity(worldPosition.above()) instanceof HotPotBlockEntity pot) {
-            return pot.hasSoup() && pot.hasRawIngredient();
-        }
-        return false;
-    }
+    // mryt233 改（2026-11-07）：原来的 soupIdle() / wantsHeat() 已并入 serverTick 里那次统一判定——
+    // 它们各自都会再调 heatedPot() 并把 81 格完整扫一遍，每刻被问三遍纯属浪费，所以整段删除。
 
     /**
      * 从灶膛里取出下一份燃料点燃。燃烧时长直接取该物品的原版熔炉数值；
@@ -174,19 +168,24 @@ public class StoveBlockEntity extends HotPotBlockEntity {
 
     // ------------------------------------------------------------------ 锅状态
 
-    /** 将锅材质写入灶台自身的 POT 状态，不创建第二个方块。 */
-    public void attachPot(HotPotMaterial material, net.minecraft.core.Direction.Axis handleAxis) {
+    /**
+     * 将锅材质写入灶台自身的 POT 状态，不创建第二个方块。
+     * mryt233 改（2026-11-07）：返回是否真的装上。调用方要据此决定要不要读锅内容、扣锅物品；
+     * 以前是 void，装不上也照扣，等于把玩家一整锅东西吞掉。
+     */
+    public boolean attachPot(HotPotMaterial material, net.minecraft.core.Direction.Axis handleAxis) {
         if (level == null || level.isClientSide || material == null) {
-            return;
+            return false;
         }
         BlockState state = level.getBlockState(worldPosition);
         if (!StoveBlock.isStove(state) || state.getValue(StoveBlock.POT).hasPot()) {
-            return;
+            return false;
         }
         level.setBlock(worldPosition, state.setValue(StoveBlock.POT, StovePot.of(material))
             .setValue(StoveBlock.SOUP, SoupVisual.NONE)
             .setValue(StoveBlock.POT_AXIS, handleAxis), Block.UPDATE_CLIENTS);
         markDirtyAndSync();
+        return true;
     }
 
     /**

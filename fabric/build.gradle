@@ -13,6 +13,8 @@ sourceSets.main.resources.srcDirs += project(':common').file('src/main/resources
 sourceSets.main.java.srcDir project(':common').file('src/client/java')
 sourceSets.main.java.srcDir project(':common').file('src/mixin/java')
 sourceSets.main.java.srcDir project(':common').file('src/devtest/java')
+// mryt233 改：JEI / REI / Mod Menu 的编译期签名接口，不进分发包。
+sourceSets.main.java.srcDir project(':common').file('src/compatApi/java')
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -44,9 +46,10 @@ processResources {
     }
 }
 
-// devtest 是开发环境专用测试命令（/hpt），不进成品和源码 jar
-tasks.named('jar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }
-tasks.named('sourcesJar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }
+// devtest 是开发环境专用测试命令（/hpt），不进成品和源码 jar（mryt233）
+// r135f：JEI / REI 的编译期签名接口同样只用于编译，成品与源码 jar 都不带
+tasks.named('jar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**', 'mezz/jei/**', 'me/shedaniel/**', 'com/terraformersmc/**', 'snownee/jade/**' }
+tasks.named('sourcesJar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**', 'mezz/jei/**', 'me/shedaniel/**', 'com/terraformersmc/**', 'snownee/jade/**' }
 
 // 先编 common 再编 fabric（用 files() 依赖不会自动建任务依赖）
 tasks.named('compileJava') { dependsOn ':common:classes', ':framework:pure:classes', ':framework:loader:classes', ':framework:game:classes', ':framework:client:classes' }

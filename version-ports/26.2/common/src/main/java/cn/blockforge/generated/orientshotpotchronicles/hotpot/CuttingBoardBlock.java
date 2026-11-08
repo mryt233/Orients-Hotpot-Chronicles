@@ -1,6 +1,7 @@
 // mryt233 改：26.1 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import cn.blockforge.orient.framework.game.PartOutline;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.Block;
@@ -38,6 +39,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.network.chat.Component;
 
 /**
  * 砧板（2026-10-23 用户定：只做一种；生牛肉 / 生羊肉放上去，拿铁菜刀点一下切成 3 卷）。
@@ -57,7 +59,7 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
     public static final float TOP = 3F / 16F;
 
     /** 朝向 = 放的人站的那一边（2026-10-23 用户：砧板要有朝向，板上的东西朝着玩家）。 */
-    public static final net.minecraft.world.level.block.state.properties.EnumProperty<net.minecraft.core.Direction> FACING = net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<net.minecraft.core.Direction> FACING = net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
 
     public CuttingBoardBlock(BlockBehaviour.Properties settings) {
         super(settings);
@@ -126,6 +128,21 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
         return aimsAtItem(pos, player) ? ITEM_SHAPE : SHAPE;
     }
 
+    /** mryt233 改：板上食材与木墩分别显示各自名称。 */
+    @Override
+    public net.minecraft.network.chat.MutableComponent getName() {
+        Player player = PlateHolderBlock.pickPlayer.get();
+        if (player != null && player.level() != null) {
+            HitResult hit = player.pick(player.blockInteractionRange(), 1.0F, false);
+            if (hit instanceof BlockHitResult blockHit && hit.getType() == HitResult.Type.BLOCK
+                && player.level().getBlockEntity(blockHit.getBlockPos()) instanceof CuttingBoardBlockEntity board
+                && !board.item().isEmpty() && aimsAtItem(blockHit.getBlockPos(), player)) {
+                return board.item().getHoverName().copy();
+            }
+        }
+        return super.getName();
+    }
+
     /** 鼠标中键：对着板上的东西复制那样东西，否则复制砧板。 */
     @Override
     public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
@@ -151,9 +168,18 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
             java.util.Map.entry(Items.POTATO, new ItemStack(HotPotContent.POTATO_SLICE, 3)),
             java.util.Map.entry(Items.PORKCHOP, new ItemStack(HotPotContent.MINCED_PORK, 1)),
             java.util.Map.entry(HotPotContent.BEEF_LOIN, new ItemStack(HotPotContent.BEEF_LOIN_SLICE, 3)),
-            java.util.Map.entry(HotPotContent.TOFU, new ItemStack(HotPotContent.TOFU_CUBE, 3)),
+            // mryt233 改（2026-11-04）：冷 / 热豆腐都能切，各出对应的豆腐块（热豆腐切热豆腐块，和冷豆腐切冷豆腐块一样）。
+            java.util.Map.entry(HotPotContent.COLD_TOFU, new ItemStack(HotPotContent.COLD_TOFU_CUBE, 3)),
+            java.util.Map.entry(HotPotContent.HOT_TOFU, new ItemStack(HotPotContent.HOT_TOFU_CUBE, 3)),
             java.util.Map.entry(HotPotContent.SHRIMP, new ItemStack(HotPotContent.PEELED_SHRIMP, 1)),
-            java.util.Map.entry(HotPotContent.HAM_SAUSAGE, new ItemStack(HotPotContent.HAM_SAUSAGE_SLICE, 3))
+            java.util.Map.entry(HotPotContent.HAM_SAUSAGE, new ItemStack(HotPotContent.HAM_SAUSAGE_SLICE, 3)),
+            // mryt233 改（2026-11-06，r137）：辣椒一刀切成 2 份小米辣；莲藕切 3 刀、每刀 1 片藕片（和土豆一样
+            // 记在 cut_piece_by_piece 标签里）；生鱿鱼一刀切成 3 份鱿鱼卷。
+            java.util.Map.entry(HotPotContent.CHILI_PEPPER, new ItemStack(HotPotContent.MILLET_CHILI, 2)),
+            java.util.Map.entry(HotPotContent.LOTUS_ROOT, new ItemStack(HotPotContent.LOTUS_ROOT_SLICE, 3)),
+            java.util.Map.entry(HotPotContent.RAW_SQUID, new ItemStack(HotPotContent.SQUID_ROLL, 3)),
+            // mryt233 改（2026-11-06，r139）：折耳根一刀切成 3 段（整根 → 折耳根段，下锅涮的食材）。
+            java.util.Map.entry(HotPotContent.ZHE_ER_GEN, new ItemStack(HotPotContent.ZHE_ER_GEN_SLICE, 3))
             // ==== tools/new_item.py：新的砧板切配插在这行上面（别删这行）====
         );
 
@@ -166,14 +192,34 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
         }
     }
 
+    /**
+     * 数据包里的切石机配方查一次就记住了（按物品缓存）：同一样东西永远切出同样的产物，
+     * 但以前每右键一次、客户端和服务端各扫一遍整张 STONECUTTING 配方表（整合包里几十上百条）。
+     * 注意：整合包跑 /reload 换了配方后，缓存要跟着清，所以缓存键里带上配方管理器的身份。
+     * 作者：mryt233
+     */
+    private record CutKey(Object recipeSource, Item item) {
+    }
+
+    private static final java.util.Map<CutKey, ItemStack> CUT_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
+
     /** 这件东西在砧板上切出什么（照切石机配方，数据包里没有就用内置表）；不能切返回空。 */
     public static ItemStack cutResult(Level world, ItemStack stack) {
         if (stack.isEmpty() || !stack.is(CUTTABLE)) {
             return ItemStack.EMPTY;
         }
-        return RecipeSync.find(world, RecipeType.STONECUTTING, stack)
+        // mryt233 改（2026-11-07，26.x）：26.x 不再提供全球配方管理器，配方统一从 RecipeSync 取；
+        // 缓存键用「配方来源对象 + 物品」，/reload 换了配方来源时缓存自动失效。
+        CutKey key = new CutKey(RecipeSync.source(world), stack.getItem());
+        ItemStack cached = CUT_CACHE.get(key);
+        if (cached != null) {
+            return cached.copy();          // 调用方会改数量，给的必须是拷贝
+        }
+        ItemStack result = RecipeSync.find(world, RecipeType.STONECUTTING, stack)
             .map(entry -> entry.value().assemble(new SingleRecipeInput(stack)).copy())
             .orElseGet(() -> BuiltinCuts.of(stack.getItem()));
+        CUT_CACHE.put(key, result.copy());
+        return result;
     }
 
     @Override
@@ -186,15 +232,36 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
             return pound(stack, world, pos, player, hand, board);
         }
         if (stack.is(HotPotContent.KITCHEN_KNIFE)) {
-            // 捣过的肉（已经捶碎 / 成浆）不能再切
-            ItemStack result = Pounding.poundable(board.item()) && board.cuts() > 0 ? ItemStack.EMPTY : cutResult(world, board.item());
+            // mryt233 改（2026-11-07）：捣的进度和切的进度分开记账以后，这里看的是「捣了几下」：
+            // 敲一下（pounds = 1）只是捶了一下，折耳根这类还能正常切；捣到第二下起已经捶碎 / 成浆，
+            // 就不再当食材切了。以前共用 cuts，敲一下就被当成「切过」，菜刀永远切不动，也不给提示。
+            if (Pounding.poundable(board.item()) && board.pounds() >= 2) {
+                if (!world.isClientSide()) {
+                    // 带兜底文案：万一语言文件还没补这个键，玩家看到的也是人话而不是键名
+                    player.sendOverlayMessage(
+                        Component.translatableWithFallback(HotPotBlockEntity.key("msg.board_pounded"),
+                            "这摊东西已经捶成浆了，切不动，换擀面杖把它捶成丸子吧"));
+                }
+                return InteractionResult.SUCCESS;
+            }
+            ItemStack result = cutResult(world, board.item());
             if (result.isEmpty()) {
-                return InteractionResult.TRY_WITH_EMPTY_HAND;
+                // mryt233 改（2026-11-07）：切不动时回 SUCCESS 而不是 PASS——PASS 会让原版接着调手里菜刀的
+                // useOn，刀照样掉耐久却没有产物，玩家只会觉得「点了没反应、刀还坏了」。
+                if (!board.item().isEmpty() && !world.isClientSide()) {
+                    player.sendOverlayMessage(
+                        Component.translatableWithFallback(HotPotBlockEntity.key("msg.board_not_cuttable"),
+                            "这样东西在砧板上切不出东西"));
+                }
+                return board.item().isEmpty()
+                    ? InteractionResult.PASS
+                    : InteractionResult.SUCCESS;
             }
             if (!world.isClientSide()) {
                 ItemStack cut = board.item();
                 if (cut.is(CUT_PIECE_BY_PIECE) && result.getCount() > 1) {
-                    int done = board.cuts() + 1;
+                    // 一刀一刀切的东西只按纯切刀数记账（不含捣的下数）
+                    int done = board.cutCount() + 1;
                     if (done >= result.getCount()) {
                         board.setItem(ItemStack.EMPTY);
                     } else {
@@ -233,13 +300,14 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
             return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
         if (!world.isClientSide()) {
-            int hits = board.cuts() + 1;
+            // mryt233 改（2026-11-07）：捣的进度用 pounds 单独记，不再借用 cuts（切 / 捣分开记账）
+            int hits = board.pounds() + 1;
             if (hits >= Pounding.HITS) {
                 board.setItem(ItemStack.EMPTY);
                 Containers.dropItemStack(world, pos.getX() + 0.5, pos.getY() + TOP + 0.1, pos.getZ() + 0.5,
                     new ItemStack(ball, Pounding.resultCount(meat)));
             } else {
-                board.setCuts(hits);
+                board.setPounds(hits);
             }
             stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
             world.playSound((Player) null, pos, SoundEvents.WOOD_HIT, SoundSource.BLOCKS, 1.0F, 0.7F);

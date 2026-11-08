@@ -61,12 +61,12 @@ public class HotPotTableBlock extends Block {
         return new double[]{lo, hi};
     }
 
-    public HotPotTableBlock(Block planks, net.minecraft.world.level.block.state.BlockBehaviour.Properties properties) {
+    public HotPotTableBlock(Block like, boolean hardSurface, net.minecraft.world.level.block.state.BlockBehaviour.Properties properties) {
         super(properties
-            .mapColor(planks.defaultMapColor())
+            .mapColor(like.defaultMapColor())
             .instrument(NoteBlockInstrument.BASS)
-            .strength(2.0F, 3.0F)
-            .sound(planks.defaultBlockState().getSoundType())
+            .strength(2.0F, hardSurface ? 6.0F : 3.0F)
+            .sound(like.defaultBlockState().getSoundType())
             .noOcclusion());
         registerDefaultState(defaultBlockState()
             .setValue(NORTH, false)

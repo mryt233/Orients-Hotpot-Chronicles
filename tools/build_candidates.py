@@ -1,20 +1,26 @@
-"""P3 候选打包（B 方案）：框架 Runtime + 火锅内容两份候选 JAR，仅本地实验，不发布。作者：mryt233
+"""双端打包：统一生成内嵌框架 Runtime 的单 JAR（文件名带 MC 版本 1.21.1），按版本类型自动归档；不自动发布。作者：mryt233
 
 用法：
-    python tools/build_candidates.py                 # 用已编译产物打包
+    python tools/build_candidates.py                 # 用已编译产物打包（默认内嵌单 JAR）
     python tools/build_candidates.py --compile       # 先跑 Gradle 编译再打包
-    python tools/build_candidates.py list            # 列出产物
-输出：build/exp-pkg/candidate/
-  orient_framework-fabric-0.1.0.jar / orient_framework-neoforge-0.1.0.jar
-  orients_hotpot_chronicles-fabric-<mod_version>.jar / ...-neoforge-<mod_version>.jar
-Runtime 只含框架类与通用平台实现；火锅候选不含任何 cn/blockforge/orient/framework 类，
-元数据里声明对 orient_framework 的兼容版本范围。
+    python tools/build_candidates.py --release       # 兼容原参数，同样生成内嵌单 JAR
+    python tools/build_candidates.py list            # 列出构建缓存产物
+中间拆分产物保留在 build/exp-pkg/candidate/（仅构建内部使用）。
+输出位置与命名（统一带 1.21.1，单文件直接放进 mods 即可）：
+  - 开发版（1.0.0-rN）：
+      本体单 JAR -> build/libs/lastest/dev/1.21.1/<loader>/mod/rN-rM/orients_hotpot_chronicles-1.21.1-<loader>-1.0.0-rN.jar
+      独立前置留档 -> build/libs/lastest/dev/1.21.1/<loader>/framework/rN-rM/orient_framework-<loader>-<runtime>.jar
+  - 预览版 / 准备公开版（0.x.y-alpha / 0.x.y-beta 等）：同版本号集中放同一文件夹，不按加载器拆分目录
+      本体单 JAR -> build/libs/lastest/per/1.21.1/<version>/orients_hotpot_chronicles-1.21.1-<loader>-<version>.jar
+      同时写入 -> build/libs/releases/<version>/orients_hotpot_chronicles-1.21.1-<loader>-<version>.jar
+Runtime 版本读取 ApiVersion.java；开发版、预览版、正式版均为内嵌前置的单 JAR，无需另装独立前置。
 """
 from __future__ import annotations
 
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import zipfile
@@ -23,6 +29,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "build/exp-pkg/candidate"
 RELEASE_DIR = ROOT / "build/libs/releases"
+DEV_DIR = ROOT / "build/libs/lastest/dev/1.21.1"
+PER_DIR = ROOT / "build/libs/lastest/per/1.21.1"
+MC_VERSION = "1.21.1"
 JAVA_HOME = "C:/Users/10536/.jdks/jdk-21.0.12.1+1"
 
 FRAMEWORK_OUTPUTS = [
@@ -38,8 +47,10 @@ NEOFORGE_RUNTIME_SRC = ROOT / "neoforge/src/runtime/java"
 NEOFORGE_JAR = ROOT / "neoforge/build/moddev/artifacts/neoforge-21.1.265.jar"
 JAVAC = Path("C:/Users/10536/.jdks/jdk-21.0.12.1+1/bin/javac.exe")
 JAVA_HOME_PATH = Path("C:/Users/10536/.jdks/jdk-21.0.12.1+1")
+# mryt233 改（2026-11-04）：只取 1.21.1 用的 FML 4.x。26.x 移植把 FML 11.x（Java 25 编译）也下进了 Gradle 缓存，
+# 全塞进编译路径会让 javac 读到 11.x 的类而报「类文件版本 69.0，应为 65.0」。
 FML_JARS = [str(p) for p in (Path.home() / ".gradle/caches/modules-2/files-2.1/net.neoforged.fancymodloader").rglob("*.jar")
-            if "sources" not in p.name and "javadoc" not in p.name]
+            if "sources" not in p.name and "javadoc" not in p.name and p.parent.parent.name.startswith("4.")]
 EVENTBUS_JARS = [str(p) for p in (Path.home() / ".gradle/caches/modules-2/files-2.1/net.neoforged/bus").rglob("*.jar")
                  if "sources" not in p.name]
 
@@ -285,9 +296,13 @@ def compile_sources() -> None:
 
 
 def build_release() -> dict[str, Path]:
-    """公开版：把 Runtime 作为嵌套 jar 打进内容 jar，玩家只装一个（开发版仍分开）。"""
+    """mryt233 改（2026-11-08）：统一内嵌 Runtime 单 JAR + 统一带 MC 版本号（1.21.1）命名；开发版只写 dev/，预览版写 per/ 与 releases/。"""
     build()
     version = mod_version()
+    dev_match = re.match(r"^\d+\.\d+\.\d+-r(\d+)", version)
+    if dev_match:
+        first = int(dev_match.group(1)) // 50 * 50
+        bucket = f"r{first}-r{first + 49}"
     results: dict[str, Path] = {}
     for loader in ("fabric", "neoforge"):
         content = OUT / f"orients_hotpot_chronicles-{loader}-{version}.jar"
@@ -295,28 +310,43 @@ def build_release() -> dict[str, Path]:
         if not content.is_file() or not runtime.is_file():
             raise SystemExit(f"缺少候选：{content.name} / {runtime.name}")
         entries = read_jar(content)
+        nested = f"META-INF/jars/{runtime.name}"
+        entries[nested] = runtime.read_bytes()
         if loader == "fabric":
-            nested = f"META-INF/jars/{runtime.name}"
-            entries[nested] = runtime.read_bytes()
             meta = json.loads(entries["fabric.mod.json"].decode("utf-8"))
             meta["jars"] = [{"file": nested}]
             entries["fabric.mod.json"] = json.dumps(meta, indent=2, ensure_ascii=False).encode()
         else:
-            nested = f"META-INF/jarjar/{runtime.name}"
-            entries[nested] = runtime.read_bytes()
+            # mryt233 改：两端统一内嵌目录；NeoForge 仍由 JarJar 元数据里的 path 定位依赖。
             metadata = {"jars": [{
                 "identifier": {"group": "cn.blockforge.orient", "artifact": "orient_framework"},
                 "version": {"range": RUNTIME_RANGE, "artifactVersion": RUNTIME_VERSION},
                 "path": nested,
             }]}
             entries["META-INF/jarjar/metadata.json"] = json.dumps(metadata, indent=2).encode()
-        out = RELEASE_DIR / version / loader / content.name
-        out.parent.mkdir(parents=True, exist_ok=True)
-        write_jar(out, entries)
-        results[f"release-{loader}"] = out
-    print(f"公开版单 jar（内嵌 Runtime {RUNTIME_VERSION}）：")
+        jar_name = f"orients_hotpot_chronicles-{MC_VERSION}-{loader}-{version}.jar"
+        if dev_match:
+            mod_dir = DEV_DIR / loader / "mod" / bucket
+            framework_dir = DEV_DIR / loader / "framework" / bucket
+            mod_dir.mkdir(parents=True, exist_ok=True)
+            framework_dir.mkdir(parents=True, exist_ok=True)
+            archived = mod_dir / jar_name
+            write_jar(archived, entries)
+            results[f"dev-{loader}"] = archived
+            archived_runtime = framework_dir / runtime.name
+            shutil.copy2(runtime, archived_runtime)
+            results[f"framework-{loader}"] = archived_runtime
+        else:
+            per_out = PER_DIR / version / jar_name
+            write_jar(per_out, entries)
+            results[f"per-{loader}"] = per_out
+            rel_out = RELEASE_DIR / version / jar_name
+            rel_out.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(per_out, rel_out)
+            results[f"release-{loader}"] = rel_out
+    print(f"完整单 jar（内嵌 Runtime {RUNTIME_VERSION}；统一命名含 {MC_VERSION}）：")
     for key, path in results.items():
-        print(f"  {key:14} {path.relative_to(ROOT).as_posix()}  {path.stat().st_size // 1024} KB")
+        print(f"  {key:16} {path.relative_to(ROOT).as_posix()}  {path.stat().st_size // 1024} KB")
     return results
 
 
@@ -328,10 +358,8 @@ def main() -> int:
         return 0
     if "--compile" in args:
         compile_sources()
-    if "--release" in args:
-        build_release()
-        return 0
-    build()
+    # mryt233 改：--release 保留兼容，默认调用也执行一次拆分与内嵌打包。
+    build_release()
     return 0
 
 

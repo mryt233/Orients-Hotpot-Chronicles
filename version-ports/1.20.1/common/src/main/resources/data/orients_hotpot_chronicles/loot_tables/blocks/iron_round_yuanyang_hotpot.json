@@ -6,8 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "orients_hotpot_chronicles:iron_round_yuanyang_hotpot",
-          "functions": []
+          "name": "orients_hotpot_chronicles:iron_round_yuanyang_hotpot"
         }
       ],
       "rolls": 1.0

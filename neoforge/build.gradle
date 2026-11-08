@@ -68,9 +68,13 @@ sourceSets.main.resources.srcDirs += project(':common').file('src/main/resources
 sourceSets.main.java.srcDir project(':common').file('src/client/java')
 sourceSets.main.java.srcDir project(':common').file('src/mixin/java')
 sourceSets.main.java.srcDir project(':common').file('src/devtest/java')
+// mryt233 加（r135f）：JEI / REI 的编译期签名接口，只用于编译，不进成品 jar、也不联网下载依赖。
+sourceSets.main.java.srcDir project(':common').file('src/compatApi/java')
 // mryt233 加：和 Fabric 一样，开发命令只用于 run，不分发给玩家。
-tasks.named('jar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }
-tasks.named('sourcesJar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }
+// r135f：JEI / REI 的编译期签名接口同样只用于编译，成品与源码 jar 都不带
+// mryt233 改：共享目录中的 Mod Menu 签名桩也只参与编译。
+tasks.named('jar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**', 'mezz/jei/**', 'me/shedaniel/**', 'com/terraformersmc/**', 'snownee/jade/**' }
+tasks.named('sourcesJar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**', 'mezz/jei/**', 'me/shedaniel/**', 'com/terraformersmc/**', 'snownee/jade/**' }
 
 dependencies {
     implementation files(project(':common').sourceSets.main.output)

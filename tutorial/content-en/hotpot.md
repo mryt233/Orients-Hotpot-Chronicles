@@ -74,6 +74,48 @@ A nine-grid pot has nine large cells, each containing a 3×3 set of smaller slot
 - **Remove broth:** **right-click with an empty bucket** to recover its original contents (water returns as a water bucket). Mushroom broth requires a **bowl** and **no food remaining in the pot**; take all food out first.
 - **Serve soup to drink:** right-click with a bowl. Cooked food is collected first; if there is none, you get soup. See [Tableware & Drinks](tableware.html#bowl).
 
+### Four heat levels for Spicy Red Broth {#spicy_level}{{since:0.2.2-alpha}}
+
+Spicy Red Broth can be "turned up" — not with chili powder, but by **actually throwing chili peppers into the pot**.
+
+| Level | Effect on food cooked in that pot |
+| --- | --- |
+| **Mild** (just poured) | Strength I for 6 s, Speed I for 6 s, no Hunger |
+| **Medium Spicy** | Strength II for 9 s, Speed I for 9 s |
+| **Extra Spicy** | Strength II for 12 s, Speed I for 10 s, Fire Resistance 15 s and Hunger I 6 s (spice opens the appetite and burns it off) |
+| **Level 3 Extreme Spicy** | Strength II for 15 s, Speed I for 12 s, Fire Resistance 30 s, Hunger I 8 s; your mouth also catches fire for 2 s afterwards (you have Fire Resistance, so no damage; wearing a cloth apron prevents the flame) |
+
+How to adjust it:
+
+1. **Hold a {{i:chili_pepper}} chili pepper and right-click the red broth area**: the heat goes up one level, a burst of flame rises from the pot, and the action bar reports something like "Broth spiciness increased to: Extra Spicy". At Insane Spicy it only shows a hint and the pepper is not used up.
+2. **Ice to the rescue**: plain **Ice** lowers the heat by 1 level, **Packed Ice** by 2, and **Blue Ice** drops it straight back to Mild. White steam and splashes rise from the pot.
+3. Clicking **a different broth** with chili or ice shows "Only spicy red broth can be adjusted with chili or ice" and nothing is put into the pot.
+4. Yuanyang and four-grid pots **track each side separately**: only the side you click changes. Pouring broth, scooping it, swapping broths or emptying the pot all reset the heat to Mild.
+
+A bowl of {{i:spicy_red_broth_bowl}} scooped from the pot also keeps **the heat level at the moment it was scooped** and gives the matching effects when drunk. Cooked food from the pot shows a line like "Broth: Spicy Red Broth · Extra Spicy" in its tooltip.
+
+:::tip
+Play the heat levels against **chili oil**, **honey** and **vinegar**: chili oil adds Fire Resistance, while honey and vinegar clear the Hunger that spicy broth brings. Food dipped in honey or vinegar will not leave you hungry from the heat, and your mouth will not catch fire.
+:::
+
+### What the broth adds to your food {#dish_flavor}{{since:0.2.2-alpha}}
+
+Food cooked in a pot **carries the flavour of that broth** — hover over it and the tooltip adds a line like "**Broth: Mushroom Broth**" (spicy red broth also shows the heat level). Eating it grants an extra effect:
+
+| Broth | Extra effect from food cooked in it |
+| --- | --- |
+| **Clear broth** | Speed I for 15 s (clean and light on your feet) plus 1 tick of Saturation |
+| **Rich stock** | Resistance I for 15 s plus Absorption I for 30 s (beef bones and old hen, sturdy and nourishing — **no more Slowness**) |
+| **Mushroom broth** | Regeneration I for 10 s (mountain mushrooms, gets the blood moving) |
+| **Spicy red broth** | Strength plus Speed by the heat level of that side; Extra Spicy and above add Fire Resistance and Hunger, see the table above |
+| **Tomato broth** | Haste I for 15 s (sweet and tart, keeps you sharp), and clears Nausea |
+| **Three Delicacies Broth** | Water Breathing for 20 s plus Luck I for 30 s (dried scallops and shrimp, fortune smiles) |
+
+It works the same whether you pick it up by hand, eat it with chopsticks, or put it in a bowl first. Simmer a batch in mushroom broth to keep healing, or cook a pot of Three Delicacies Broth and take it diving.
+
+<!-- mryt233 改，2026-11-06（清单#124）：the tooltip now lists each effect and its duration. -->
+Hovering over a dish or soup bowl, the item tooltip **indents and lists every status effect it grants and how long it lasts** right below the broth name, one per line, such as "Strength II (0:15)" or "Speed I (0:12)" — blue for benefits, red for drawbacks (Hunger from spicy red broth). Food dipped in honey or vinegar no longer adds Hunger, so it is not listed either. A bowl of broth scooped from the pot lists its effects the same way.
+
 ### How food cooks
 
 Raw ingredients turn into cooked food using their **smoker / campfire recipes**. Anything that can be cooked in a smoker can be cooked in the pot. Cooking time is:
@@ -95,7 +137,7 @@ See the cooking section of the [Recipe Collection](recipes.html) for each ingred
 | Raw ingredient | Adds it to the large cell under your crosshair |
 | A [plate](tableware.html) of food | Tips **raw** ingredients into randomly chosen large cells with space; cooked food stays on the plate |
 | Bamboo chopsticks holding **raw** ingredient | Places that food in the targeted large cell (into the pot) |
-| Bamboo chopsticks holding **cooked** food | Eats it (if you are still hungry; if full, right-clicking a bowl or plate puts it back) |
+| Bamboo chopsticks holding **cooked** food | Eats it (works even when full; sneak + right-click a bowl or plate to put it back) |
 | Bamboo chopsticks (empty) | **Picks up a cooked portion** from the targeted cell (notifies you if there is none); hold right-click to eat once picked up |
 | Bamboo chopsticks + sneak (Shift) | **Opens the hotpot screen** |
 | Bucket | Adds broth to an empty pot, or scoops broth with an empty bucket |
@@ -107,9 +149,10 @@ See the cooking section of the [Recipe Collection](recipes.html) for each ingred
 **Chopsticks and empty hands take the food currently visible at the surface**; if it is still raw, you are told it is not cooked yet. A bowl first takes the visible cooked portion, then other cooked food, up to 3 portions.
 :::
 
-:::dev
-The development build lets you keep eating with chopsticks even when full; the hunger bar stays full but saturation is still added. Returning food to a bowl or plate uses sneak + right-click — **food is returned first, and only empty chopsticks rest on the rim** — so the two actions do not conflict. Follow the table above for 0.1.4-alpha. See the [Development Preview](preview.html#chopsticks).
-:::
+### Hoppers and pots {#hopper}{{since:0.2.0-alpha}}
+
+- **A hopper above the pot** only inserts **raw ingredients that can be cooked**, one portion per slot; anything else stays in the hopper.
+- **A hopper below the pot (or stove)** only pulls out **cooked food**; raw food stays in the pot to keep cooking.
 
 ## The hotpot screen {#screen}
 
@@ -118,21 +161,21 @@ The development build lets you keep eating with chopsticks even when full; the h
 **Hold bamboo chopsticks and Shift + right-click the pot** to open it (right-clicking directly picks up a cooked portion without opening the screen). Inside the screen:
 
 - Every portion is visible, with different appearances for raw and cooked food.
-- With chopsticks on your cursor, **left-click cooked food** to eat it in one bite, restoring hunger and saturation just like vanilla food.
+- With chopsticks on your cursor, **left-click cooked food** to eat it in one bite, restoring hunger and saturation just like vanilla food (works even when full).
 - Double-click to collect matching cooked food onto your cursor, like double-clicking in the vanilla inventory.
 - **Hover over food** to see its name. Dipped food also lists “Dipped: …”.
 - Holding [dipping sauce](sauce.html) in your **main hand or off hand** will **automatically dip each bite** eaten in this screen.
 
 ### Cold pots
 
-A pot is **cold** when it is **not on a burning stove or lit campfire**. The broth is still and ingredients float in it. Eating from a cold pot with chopsticks has a 30% chance of causing **Nausea for 15 seconds**—avoid cold food to keep from upsetting your stomach. A [Plant Protein Drink](tableware.html#drink) clears Nausea.
+A pot is **cold** when it is **not on a burning stove or lit campfire**. The broth is still and ingredients float in it. Eating from a cold pot with chopsticks has a 30% chance of causing **Nausea for 15 seconds**—avoid cold food to keep from upsetting your stomach. Drinking a [Plant Protein Drink](tableware.html#drink), a bowl of clear broth, or dipping with vinegar clears it.
 
 ## Cooking on a campfire {#campfire}{{since:0.1.1-alpha}}
 
 You can cook without a stove by placing the pot **on a lit campfire or soul campfire**:
 
 - In 0.1.2-alpha, the pot sits directly on the campfire. From 0.1.3-alpha-hotfix1, four slender iron supports rest on the campfire logs, so the pot no longer appears to float and flames no longer pass through it.
-- Heat equals coal, **no fuel is consumed**, and nearby players are healed too.
+- Heat equals coal, **no fuel is consumed**, and nearby players are healed too; the screen shows that the pot is heating.
 - Extinguishing or breaking the campfire makes the pot cold.
 - In 0.1.2-alpha, you had to **mine** this pot to pick it up. From 0.1.3-alpha-hotfix1, **Shift + right-click with an empty hand** packs it with broth and food, just like a stove-mounted pot.
 

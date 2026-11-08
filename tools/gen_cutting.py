@@ -390,7 +390,10 @@ def data_files():
     tag = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {"replace": False, "values": []}
     # 合并写、不覆盖：土豆 / 豆腐由 gen_ingredients.py 加。r106～r110 这里整份覆盖，跑完把土豆、豆腐挤掉了，
     # 砧板切不了土豆片、豆腐块（用户报，调整）；这里也列上，两个脚本谁后跑都齐全
-    for v in ["minecraft:beef", "minecraft:mutton", "minecraft:porkchop", "minecraft:potato", f"{MODID}:tofu", f"{MODID}:beef_loin", f"{MODID}:shrimp"]:   # 虾、猪排由各自加工方案共用此标签
+    # mryt233 改（2026-11-04）：豆腐改名分冷热（cold_tofu / hot_tofu），两种都能上砧板，旧 ID 不再写。
+    for v in ["minecraft:beef", "minecraft:mutton", "minecraft:porkchop", "minecraft:potato", f"{MODID}:cold_tofu", f"{MODID}:hot_tofu", f"{MODID}:beef_loin", f"{MODID}:shrimp"]:   # 虾、猪排由各自加工方案共用此标签
+    if f"{MODID}:tofu" in tag["values"]:
+        tag["values"].remove(f"{MODID}:tofu")   # mryt233 改（2026-11-04）：清掉改名前的旧条目
         if v not in tag["values"]:
             tag["values"].append(v)
     write(f, tag)

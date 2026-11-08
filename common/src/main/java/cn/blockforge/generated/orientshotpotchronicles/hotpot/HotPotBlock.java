@@ -101,13 +101,19 @@ public class HotPotBlock extends Block implements EntityBlock {
         return material;
     }
 
+    /**
+     * mryt233 改（2026-11-05）：锅统一硬度 2.0、抗性 6.0（12 口锅，铜铁一样），挖掘工具见
+     * data/minecraft/tags/block/mineable/pickaxe.json。
+     *
+     * <p>以前铜锅照铜块 3.0、铁锅照铁块 5.0，并且强制要求正确工具：铁锅空手挖极慢，而且
+     * 挖不下时会走 {@link #playerWillDestroy} 的「撒出食材」分支。现在不强制工具，镐子只加速，
+     * 空手也能把锅挖下来，整锅（汤底 + 食材）由战利品表的 copy_components 原样打包，一件不丢。</p>
+     */
     public static BlockBehaviour.Properties settingsFor(HotPotMaterial material) {
-        // 硬度、工具要求同原版铜块 / 铁块；挖掘工具与石镐要求见 data/minecraft/tags/block/
         return BlockBehaviour.Properties.of()
             .mapColor(material.mapColor())
             .instrument(material.instrument())
-            .requiresCorrectToolForDrops()
-            .strength(material.hardness(), 6.0F)
+            .strength(2.0F, 6.0F)
             .sound(material.sounds())
             .noOcclusion()
             .dynamicShape();
@@ -126,9 +132,9 @@ public class HotPotBlock extends Block implements EntityBlock {
         if (world.isClientSide || !StoveBlock.isStove(world.getBlockState(pos.below()))) {
             return;
         }
+        // mryt233 改（2026-11-07）：看 attachPot 的返回值——只有真装上了才读锅内容、拆掉这只独立的锅。
         if (world.getBlockEntity(pos.below()) instanceof StoveBlockEntity stove
-            && !world.getBlockState(pos.below()).getValue(StoveBlock.POT).hasPot()) {
-            stove.attachPot(material, state.getValue(AXIS));
+            && stove.attachPot(material, state.getValue(AXIS))) {
             stove.loadPotContents(stack);
             world.removeBlock(pos, false);
         }
@@ -181,7 +187,7 @@ public class HotPotBlock extends Block implements EntityBlock {
             }
             return InteractionResult.SUCCESS;
         }
-        int bigCell = HotPotInteraction.cellFromHit(be, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE);
+        int bigCell = HotPotInteraction.cellFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE);
         if (world.isClientSide) {
             HotPotInteraction.clientChopsticksAim.accept(be, bigCell);   // 空手也捞看到的那样（2026-10-26）
         }
@@ -202,7 +208,7 @@ public class HotPotBlock extends Block implements EntityBlock {
         if (hooked != null) {
             return hooked;
         }
-        int bigCell = HotPotInteraction.cellFromHit(be, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE);
+        int bigCell = HotPotInteraction.cellFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE);
         int cookedSlot = be.firstCookedSlotInCell(bigCell);
 
         if (isPlate(stack)) {
@@ -213,7 +219,7 @@ public class HotPotBlock extends Block implements EntityBlock {
         }
         if (be.canScoopWith(stack)) {
             if (!world.isClientSide) {
-                be.scoopSoup(player, hand, HotPotInteraction.sideFromHit(be, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE));
+                be.scoopSoup(player, hand, HotPotInteraction.sideFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE));
             }
             return ItemInteractionResult.SUCCESS;
         }
@@ -256,8 +262,17 @@ public class HotPotBlock extends Block implements EntityBlock {
             return ItemInteractionResult.SUCCESS;
         }
         if (SoupBase.fromStack(stack) != null) {
-            if (!world.isClientSide && !be.pourSoup(player, hand, HotPotInteraction.sideFromHit(be, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE))) {
+            if (!world.isClientSide && !be.pourSoup(player, hand, HotPotInteraction.sideFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE))) {
                 return ItemInteractionResult.FAIL;
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
+        // mryt233 改（2026-11-05，r136a）：辣椒加辣、冰块降辣——排在倒汤底之后、下锅食材之前，
+        // 免得辣椒被当成生食材塞进锅槽里（HotPotCooking.acceptable 里也明确拒收辣椒）。
+        if (HotPotBlockEntity.isSpicyModifier(stack)) {
+            if (!world.isClientSide) {
+                be.adjustSpiciness(player, hand,
+                    HotPotInteraction.sideFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE));
             }
             return ItemInteractionResult.SUCCESS;
         }
@@ -298,7 +313,9 @@ public class HotPotBlock extends Block implements EntityBlock {
 
     /**
      * 正常挖下来时，汤底和食材由战利品表（copy_components）打包进锅物品，不再散落一地。
-     * 只有空手等挖不下锅的情况，锅本身不掉，才把食材撒出来，免得白白消失。
+     * 只有挖不下锅（{@link #settingsFor} 里没有强制工具，本模组的锅现在走不到这一步；留着给以后
+     * 万一加上工具限制的锅）的情况，锅本身不掉，才把食材撒出来，免得白白消失。
+     * mryt233 改（2026-11-05）：锅不再要求正确工具，空手挖也算「挖得下来」，整锅打包。
      */
     @Override
     public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {

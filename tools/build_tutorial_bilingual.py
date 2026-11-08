@@ -54,7 +54,7 @@ def main():
 <input id="q" type="search" aria-label="搜索教程" autocomplete="off">
 <select id="language" aria-label="语言选择">
 <option value="zh-CN" lang="zh-CN">简体中文</option>
-<option value="zh-TW" lang="zh-TW">zh_tw</option>
+<option value="zh-TW" lang="zh-TW">繁體中文</option>
 <option value="en" lang="en">English</option></select></header>
 <div class="wrap"><nav id="nav" aria-label="目录"></nav><main></main></div>
 <noscript>请启用 JavaScript 查看教程及切换语言。請啟用 JavaScript 閱讀指南及切換語言。 Enable JavaScript to view this guide and switch languages.</noscript>
@@ -62,8 +62,8 @@ def main():
 <script type="application/json" id="translations">{payload}</script>
 <script type="application/json" id="images">{image_json}</script>
 <script>{js}</script></body></html>'''
-    if any(term in page for term in ("台灣", "台湾", "繁體中文", "繁体中文")):
-        raise ValueError("Use zh_tw for public language labels")
+    if any(term in page for term in ("台灣", "台湾")):
+        raise ValueError("Do not use region names in public language labels")
     OUTPUT.write_text(page, encoding="utf-8")
     print(f"Trilingual guide: {OUTPUT} ({OUTPUT.stat().st_size:,} bytes; {len(images)} shared images)")
 

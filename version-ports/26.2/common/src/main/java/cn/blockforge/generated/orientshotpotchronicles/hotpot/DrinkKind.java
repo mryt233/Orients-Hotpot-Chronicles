@@ -24,6 +24,9 @@ public enum DrinkKind implements StringRepresentable {
     WATER("water"),               // 2026-10-27 只有杯装；新增
     MILK("milk");
 
+    /** mryt233 改（2026-11-05）：每口正面效果的默认时长（tick，15 秒），注册时记进配置模板。 */
+    private static final int DEFAULT_EFFECT_TICKS = 300;
+
     private final String id;
 
     DrinkKind(String id) {
@@ -49,7 +52,12 @@ public enum DrinkKind implements StringRepresentable {
         return this != WATER && this != MILK;
     }
 
-    /** 喝一口的额外效果（饥饿值另算）。 */
+    /**
+     * 喝一口的额外效果（饥饿值另算）。
+     * mryt233 改（2026-11-05）：效果的时长和等级改成每次现读配置 drink.&lt;饮料&gt;.duration / .amplifier，
+     * 改完 /orientshotpot reload 立即生效（以前写死 300 刻）；时长配成 0 或更小就不加这个效果。
+     * 之晗可乐的速度和急迫共用同一组时长、等级。
+     */
     public void applySip(LivingEntity user) {
         if (this == WATER) {
             return;
@@ -59,13 +67,35 @@ public enum DrinkKind implements StringRepresentable {
             return;
         }
         user.removeEffect(MobEffects.HUNGER);   // 几种饮料都解辣：红汤的饥饿
+        int ticks = effectTicks();
+        int amplifier = Config.drinkInt(id, "amplifier", 0);
         switch (this) {
-            case ORANGE_DRINK -> user.addEffect(new MobEffectInstance(MobEffects.SPEED, 300, 0));
+            case ORANGE_DRINK -> addEffect(user, MobEffects.SPEED, ticks, amplifier);
             case PLANT_PROTEIN_DRINK -> user.removeEffect(MobEffects.NAUSEA);   // 解冷锅的反胃
-            case ORIENT_COLA -> {   // 提神：速度 I + 急迫 I 各 15 秒（计划里的建议）
-                user.addEffect(new MobEffectInstance(MobEffects.SPEED, 300, 0));
-                user.addEffect(new MobEffectInstance(MobEffects.HASTE, 300, 0));
+            case ORIENT_COLA -> {   // 提神：速度 + 急迫，各用同一组时长与等级（计划里的建议）
+                addEffect(user, MobEffects.SPEED, ticks, amplifier);
+                addEffect(user, MobEffects.HASTE, ticks, amplifier);
             }
         }
+    }
+
+    /** 这种饮料每口正面效果的时长；配置 drink.&lt;饮料&gt;.duration 优先。 */
+    private int effectTicks() {
+        return Config.drinkInt(id, "duration", DEFAULT_EFFECT_TICKS);
+    }
+
+    /** mryt233 改（2026-11-05）：时长 &lt;= 0 表示这条效果在配置里关掉了。 */
+    private static void addEffect(LivingEntity user, net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect> effect,
+                                  int ticks, int amplifier) {
+        if (ticks <= 0) {
+            return;
+        }
+        user.addEffect(new MobEffectInstance(effect, ticks, amplifier));
+    }
+
+    static {
+        // mryt233 改（2026-11-05）：有正面效果的饮料把默认时长和等级记进配置模板，改的时候不用碰代码。
+        Config.rememberDrinkEffect("orange_drink", DEFAULT_EFFECT_TICKS, 0);
+        Config.rememberDrinkEffect("orient_cola", DEFAULT_EFFECT_TICKS, 0);
     }
 }

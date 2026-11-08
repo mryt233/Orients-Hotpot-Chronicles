@@ -17,8 +17,14 @@ import net.minecraft.core.BlockPos;
  * 作者：mryt233 */
 public class CuttingBoardBlockEntity extends BlockEntity {
     private ItemStack item = ItemStack.EMPTY;
-    /** 一刀一刀切的东西已经切了几刀 / 捣丸子已经捣了几下（换东西时清零）。 */
+    /**
+     * 一刀一刀切的东西已经切了几刀。
+     * mryt233 改（2026-11-07）：以前「切了几刀」和「捣了几下」共用一个计数器，折耳根这类既能切又能捣的
+     * 食材敲一下就被当成「切过了」，之后菜刀永远切不动（玩家看不到任何提示）。现在两个计数器分开存。
+     */
     private int cuts;
+    /** 擀面杖已经捣了几下（和 cuts 分开记账，见上）。 */
+    private int pounds;
     /** 板上食物的朝向（放食物时人站的那一边），和砧板自己的 facing 分开（用户 0.1.2-alpha 后要求）。 */
     private net.minecraft.core.Direction itemFacing = net.minecraft.core.Direction.SOUTH;
 
@@ -30,17 +36,44 @@ public class CuttingBoardBlockEntity extends BlockEntity {
         return item;
     }
 
+    /**
+     * 板上的「进度阶段数」= 切了几刀 + 捣了几下。
+     * 客户端渲染器（client/CuttingBoardRenderer）按这个值决定画哪一阶段的贴图，所以必须是两者之和，
+     * 不能直接返回纯切刀数，否则捣丸子阶段（捶碎 / 肉浆 / 蒜泥 / 折耳根碎末）就画不出来了（mryt233 改 2026-11-07）。
+     */
     public int cuts() {
+        return cuts + pounds;
+    }
+
+    /** 纯切了几刀（不含捣的下数）：一刀一刀切的东西靠它判断切到第几刀了。 */
+    public int cutCount() {
         return cuts;
     }
 
-    public void setCuts(int cuts) {
-        this.cuts = cuts;
+    /** 擀面杖捣了几下。 */
+    public int pounds() {
+        return pounds;
+    }
+
+    /** 数据变了：存档 + 同步给客户端（渲染器按它画板上的东西和阶段）。作者：mryt233 */
+    private void sync() {
         setChanged();
         // 捣丸子的阶段要画出来（捶碎 / 肉浆），同步给客户端
         if (level != null && !level.isClientSide()) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
+    }
+
+    /** 切了几刀（纯切刀数）。mryt233 改（2026-11-07）：走统一的 sync()。 */
+    public void setCuts(int cuts) {
+        this.cuts = cuts;
+        sync();
+    }
+
+    /** 擀面杖捣了几下。mryt233 改（2026-11-07）：捣的进度单独记，不再借用 cuts。 */
+    public void setPounds(int pounds) {
+        this.pounds = pounds;
+        sync();
     }
 
     public net.minecraft.core.Direction itemFacing() {
@@ -52,13 +85,12 @@ public class CuttingBoardBlockEntity extends BlockEntity {
         setItem(stack);
     }
 
+    /** 换东西：两个进度计数一起清零。mryt233 改（2026-11-07）：走统一的 sync()。 */
     public void setItem(ItemStack stack) {
         item = stack;
         cuts = 0;
-        setChanged();
-        if (level != null && !level.isClientSide()) {
-            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
-        }
+        pounds = 0;
+        sync();
     }
 
     @Override
@@ -70,6 +102,8 @@ public class CuttingBoardBlockEntity extends BlockEntity {
         // 板空了也要写点东西：原版客户端收到空的方块实体数据会直接跳过，板上的东西就一直画着
         // （用户报：捣完丸子、切完肉卷，板上的东西都不消失——凡是把板拿空的都这样；修复）
         nbt.putInt("Cuts", cuts);
+        // mryt233 改（2026-11-07）：捣的下数单独存一个键，老存档没有 Pounds 时按 0 读（等价于没捣过）
+        nbt.putInt("Pounds", pounds);
         nbt.putString("ItemFacing", itemFacing.getSerializedName());
     }
 
@@ -78,6 +112,8 @@ public class CuttingBoardBlockEntity extends BlockEntity {
         super.loadAdditional(nbt);
         item = nbt.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY);
         cuts = nbt.getIntOr("Cuts", 0);
+        // mryt233 改（2026-11-07，26.x）：捣的下数单独存一个键，老存档没有 Pounds 时按 0 读
+        pounds = nbt.getIntOr("Pounds", 0);
         net.minecraft.core.Direction f = net.minecraft.core.Direction.byName(nbt.getStringOr("ItemFacing", "south"));
         itemFacing = f != null && f.getAxis().isHorizontal() ? f : net.minecraft.core.Direction.SOUTH;
     }

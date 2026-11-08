@@ -87,11 +87,13 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
     }
 
     public StoveBlock(double lift) {
-        // 破坏、工具、音效同原版砖块（Blocks.BRICKS）；挖掘工具见 data/minecraft/tags/block/mineable/pickaxe.json
+        // 破坏、音效同原版砖块（Blocks.BRICKS）；挖掘工具见 data/minecraft/tags/block/mineable/pickaxe.json。
+        // mryt233 改（2026-11-05）：不强制工具。灶台里可能坐着整口锅和燃料，空手或拿错工具挖也要照常
+        // 掉出灶台（掉落逻辑见 StoveBlock#playerWillDestroy），不能因为没拿镐子就把玩家的东西吞掉；
+        // 镐子只是挖得快。上半截 tall_brick_stove_top 也照这里，见 StoveTopBlock。
         super(BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_RED)
             .instrument(NoteBlockInstrument.BASEDRUM)
-            .requiresCorrectToolForDrops()
             .strength(2.0F, 6.0F)
             .sound(SoundType.STONE)
             .noOcclusion()
@@ -247,7 +249,7 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
 
         if (world.isClientSide && potHit && hasPot && player.getMainHandItem().isEmpty()) {
             // 空手捞看到的那样（2026-10-26）：先把这一刻浮在准星那格上的是哪样报给服务端
-            HotPotInteraction.clientChopsticksAim.accept(stove, HotPotInteraction.cellFromHit(stove, pos, hit,
+            HotPotInteraction.clientChopsticksAim.accept(stove, HotPotInteraction.cellFromHit(stove, player, pos, hit,
                 HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE));
         }
         if (!world.isClientSide) {
@@ -259,7 +261,7 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
                     stove.openFuelScreen(player);
                 } else {
                     // 空手点锅体：先按准星格收取熟食，没有可取的才提示状态。
-                    int bigCell = HotPotInteraction.cellFromHit(stove, pos, hit,
+                    int bigCell = HotPotInteraction.cellFromHit(stove, player, pos, hit,
                         HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE);
                     if (!stove.collectShown(player, bigCell)) {
                         player.displayClientMessage(stove.statusText(), true);
@@ -305,8 +307,14 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
                     return ItemInteractionResult.FAIL;
                 }
                 if (!world.isClientSide) {
-                    stove.attachPot(pot.material(),
-                        HotPotBlock.handleAxisFor(player.getDirection()));
+                    // mryt233 改（2026-11-07）：装不上就整件事作废——不读锅内容、不扣锅物品。
+                    // 以前 attachPot 是 void，静默失败也照样 loadPotContents + shrink(1)，
+                    // 玩家的整锅东西会凭空蒸发。
+                    if (!stove.attachPot(pot.material(), HotPotBlock.handleAxisFor(player.getDirection()))) {
+                        player.displayClientMessage(
+                            Component.translatable(HotPotBlockEntity.key("msg.stove_has_pot")), true);
+                        return ItemInteractionResult.FAIL;
+                    }
                     stove.loadPotContents(stack);
                     if (!player.getAbilities().instabuild) {
                         stack.shrink(1);
@@ -323,6 +331,8 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
         boolean servingTool = HotPotInteraction.isServingTool(stack);
         boolean soupSource = SoupBase.fromStack(stack) != null;
         boolean ingredient = HotPotCooking.acceptable(world, stack);
+        // mryt233 改（2026-11-05，r136a）：辣椒加辣、冰块降辣也算「冲着锅去的」，否则会被放行去开灶膛界面
+        boolean spicyModifier = HotPotBlockEntity.isSpicyModifier(stack);
         boolean scoop = stove.canScoopWith(stack);
         boolean plate = HotPotBlock.isPlate(stack);
 
@@ -334,11 +344,11 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
         // 只有“确实点在锅体上、灶上确实有锅、而且手里拿的是跟锅有关的物品”才走锅交互。
         // 其余情况一律放行给 onUse 打开灶膛界面：以前这里对食材/工具直接 FAIL，
         // 锅装上后又几乎盖满台面，结果就是拿着东西右键打不开灶台、也加不进燃料。
-        if (!potHit || !hasPot || !(plate || scoop || servingTool || soupSource || ingredient)) {
+        if (!potHit || !hasPot || !(plate || scoop || servingTool || soupSource || ingredient || spicyModifier)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
-        int bigCell = HotPotInteraction.cellFromHit(stove, pos, hit,
+        int bigCell = HotPotInteraction.cellFromHit(stove, player, pos, hit,
                     HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE);
         int cookedSlot = stove.firstCookedSlotInCell(bigCell);
         if (plate) {
@@ -349,7 +359,7 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
         }
         if (scoop) {
             if (!world.isClientSide) {
-                stove.scoopSoup(player, hand, HotPotInteraction.sideFromHit(stove, pos, hit, HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE));
+                stove.scoopSoup(player, hand, HotPotInteraction.sideFromHit(stove, player, pos, hit, HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE));
             }
             return ItemInteractionResult.SUCCESS;
         }
@@ -391,8 +401,16 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
             return ItemInteractionResult.SUCCESS;
         }
         if (soupSource) {
-            if (!world.isClientSide && !stove.pourSoup(player, hand, HotPotInteraction.sideFromHit(stove, pos, hit, HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE))) {
+            if (!world.isClientSide && !stove.pourSoup(player, hand, HotPotInteraction.sideFromHit(stove, player, pos, hit, HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE))) {
                 return ItemInteractionResult.FAIL;
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
+        // mryt233 改（2026-11-05，r136a）：辣椒加辣、冰块降辣，排在倒汤底之后、下锅食材之前
+        if (spicyModifier) {
+            if (!world.isClientSide) {
+                stove.adjustSpiciness(player, hand,
+                    HotPotInteraction.sideFromHit(stove, player, pos, hit, HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE));
             }
             return ItemInteractionResult.SUCCESS;
         }
@@ -402,10 +420,11 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
         return ItemInteractionResult.SUCCESS;
     }
 
-    /** 手里这件东西是不是冲着锅去的（捞取工具、汤底、食材）。 */
+    /** 手里这件东西是不是冲着锅去的（捞取工具、汤底、食材、调辣度的辣椒 / 冰块）。 */
     private static boolean potRelated(Level world, ItemStack stack) {
         return HotPotInteraction.isServingTool(stack)
             || SoupBase.fromStack(stack) != null
+            || HotPotBlockEntity.isSpicyModifier(stack)   // mryt233 改（2026-11-05，r136a）
             || HotPotCooking.acceptable(world, stack);
     }
 
@@ -445,15 +464,41 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
         return here && isPotHit(state, pos, blockHit);
     }
 
+    /** mryt233 改：上下两格共用锅 / 灶身的名称判定，直接取描述键避免递归。 */
+    static net.minecraft.network.chat.MutableComponent aimedName(Player player) {
+        if (player != null && player.level() != null) {
+            HitResult hit = player.pick(player.blockInteractionRange(), 1.0F, false);
+            if (hit instanceof BlockHitResult blockHit && hit.getType() == HitResult.Type.BLOCK) {
+                BlockPos hitPos = blockHit.getBlockPos();
+                BlockPos stovePos = player.level().getBlockState(hitPos).is(HotPotContent.STOVE_TOP)
+                    ? hitPos.below() : hitPos;
+                BlockState stoveState = player.level().getBlockState(stovePos);
+                if (isStove(stoveState)) {
+                    HotPotMaterial material = stoveState.getValue(POT).material();
+                    if (material != null && isPotHit(stoveState, stovePos, blockHit)) {
+                        return HotPotContent.blockFor(material).getName();
+                    }
+                    return Component.translatable(stoveState.getBlock().getDescriptionId());
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public net.minecraft.network.chat.MutableComponent getName() {
+        net.minecraft.network.chat.MutableComponent name = aimedName(PlateHolderBlock.pickPlayer.get());
+        return name == null ? super.getName() : name;
+    }
+
     /** 鼠标中键：对着锅复制锅，对着灶身复制灶台（2026-10-23 用户：锅和灶台是两个独立的东西）。 */
     @Override
     public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
         Player player = PlateHolderBlock.pickPlayer.get();
         HotPotMaterial material = state.getValue(POT).material();
         if (player != null && material != null && aimsAtPot(state, pos, player)) {
-            // 创造模式复制整锅（汤底 + 食材，同 Shift+右键端下来的；用户 2026-10-26 报：中键只复制空锅）；
-            // 生存模式照原版在物品栏里找同样的锅，给带内容的锅就对不上普通空锅了
-            if (player.isCreative() && world.getBlockEntity(pos) instanceof StoveBlockEntity stove) {
+            // mryt233 改：两种模式均保留锅内组件，供指示器显示汤底；空锅不附加内容组件。
+            if (world.getBlockEntity(pos) instanceof StoveBlockEntity stove) {
                 return stove.toPotItem(material);
             }
             return new ItemStack(HotPotContent.blockFor(material));
@@ -461,7 +506,11 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
         return super.getCloneItemStack(world, pos, state);
     }
 
-    /** 对着锅挖时，用锅自己的硬度和工具要求（铜锅同铜块、铁锅同铁块）。 */
+    /**
+     * 对着锅挖时，用锅自己的硬度和工具要求（12 口锅统一 2.0 / 6.0、不强制工具，见
+     * {@link HotPotBlock#settingsFor}）；对着灶身挖就按灶台自己的。
+     * mryt233 改（2026-11-05）：以前铜锅照铜块、铁锅照铁块，铁锅空手挖极慢。
+     */
     @Override
     protected float getDestroyProgress(BlockState state, Player player,
                                        BlockGetter world, BlockPos pos) {

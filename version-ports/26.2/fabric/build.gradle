@@ -9,6 +9,8 @@ dependencies {
 }
 sourceSets.main.resources.srcDir project(':common').file('src/main/resources')
 sourceSets.main.java.srcDirs += [project(':common').file('src/client/java'), project(':common').file('src/mixin/java')]
+// mryt233 改：JEI / REI / Mod Menu / Jade 的编译期签名桩只参与编译，成品与源码 jar 都排除（见下方 exclude）。
+sourceSets.main.java.srcDirs += [project(':common').file('src/compatApi/java')]
 processResources {
     inputs.property 'version', project.version
     filesMatching('fabric.mod.json') { expand version: project.version }
@@ -16,7 +18,7 @@ processResources {
 // mryt233 改：前置单独打成 orient_framework jar，内嵌进本体（META-INF/jars，fabric.mod.json 的 jars 已登记）。
 def frameworkJar = tasks.register('frameworkJar', Jar) {
     dependsOn ':framework:pure:classes', ':framework:loader:classes', ':framework:game:classes', ':framework:client:classes', 'classes'
-    archiveFileName = 'orient_framework-26.2-fabric-0.1.2.jar'
+    archiveFileName = 'orient_framework-26.2-fabric-0.1.3.jar'
     manifest.attributes 'Automatic-Module-Name': 'cn.blockforge.orient.framework'
     destinationDirectory = layout.buildDirectory.dir('framework')
     from(sourceSets.main.output.classesDirs) { include 'cn/blockforge/orient/framework/**' }
@@ -32,10 +34,12 @@ tasks.named('jar') {
     from(project(':common').sourceSets.main.output.classesDirs)
     exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**'
     exclude 'cn/blockforge/orient/framework/**'
+    // mryt233 改：compatApi 签名桩不进成品，运行时用玩家自己装的那份。
+    exclude 'mezz/jei/**', 'me/shedaniel/**', 'com/terraformersmc/**', 'snownee/jade/**'
     from(frameworkJar) { into 'META-INF/jars' }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
-tasks.named('sourcesJar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**' }
+tasks.named('sourcesJar') { exclude 'cn/blockforge/generated/orientshotpotchronicles/devtest/**', 'mezz/jei/**', 'me/shedaniel/**', 'com/terraformersmc/**', 'snownee/jade/**' }
 loom {
     runs {
         client { runDir 'run-client' }

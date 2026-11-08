@@ -3,6 +3,7 @@ package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.network.chat.MutableComponent;
@@ -83,14 +84,56 @@ public class DippingSauceItem extends Item {
         return out;
     }
 
+    /**
+     * mryt233 改（2026-11-04）：没有蘸料（口数 <= 0）的蘸料物品是非法状态——创造栏不再发它，
+     * 但 /give 一个不带组件的、存档里留下的、别的模组给的，都可能混进来。在背包里一 tick 就换成原版空碗。
+     * mryt233 改（2026-11-07）：改成在当前槽位原地换成空碗。以前是先 setCount(0) 再补一只碗，
+     * 两步之间客户端还显示原物；而且躺在非玩家容器里（箱子、方块实体、别的模组的容器）时
+     * 只清数量、不补碗，等于把碗一起吞掉。
+     */
+    @Override
+    public void inventoryTick(ItemStack stack, net.minecraft.server.level.ServerLevel world,
+                              net.minecraft.world.entity.Entity entity, net.minecraft.world.entity.EquipmentSlot slot) {
+        // mryt233 改（26.1）：26.x 的 inventoryTick 只给 EquipmentSlot（不再给背包下标），
+        // 装备槽（副手）里的空蘸料直接换碗；背包里的那一份由 PlayerTick 的背包兜底处理。
+        if (contents(stack).bites() > 0) {
+            return;
+        }
+        if (!(entity instanceof net.minecraft.world.entity.player.Player player)) {
+            // mryt233 改（2026-11-07）：非玩家容器不处理，避免吞物品
+            return;
+        }
+        player.setItemSlot(slot, new ItemStack(Items.BOWL));
+    }
+
+    /** mryt233 改（2026-11-04）：手里这碗要是空的（非法状态）就换成空碗。inventoryTick 只在东西进背包时才跑，
+     *  拿在手里、一开始就是空的那种靠这里兜住。 */
+    private static boolean emptyBowlIfInvalid(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (contents(stack).bites() > 0) {
+            return false;
+        }
+        if (!player.level().isClientSide()) {   // 换碗只在服务端做，客户端等同步（mryt233 改）
+            player.setItemInHand(hand, new ItemStack(net.minecraft.world.item.Items.BOWL));
+        }
+        return true;
+    }
+
     @Override
     public InteractionResult useOn(UseOnContext context) {
+        if (context.getPlayer() != null && emptyBowlIfInvalid(context.getPlayer(), context.getHand())) {
+            return InteractionResult.SUCCESS;
+        }
         return PlateItem.placeOn(context, HotPotContent.BOWL_BLOCK, true);
     }
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display, java.util.function.Consumer<Component> tooltip, TooltipFlag type) {
         SauceContents c = contents(stack);
+        // mryt233 改（2026-11-04）：口数为 0 的是非法状态（进背包就会被换成空碗），说明里不显示「还能蘸 0 口」。
+        if (c.bites() <= 0) {
+            return;
+        }
         // 每种配料一行，带效果（用户 2026-10-25：蘸料的属性要显示对应调料和 buff）
         java.util.List<Component> effects = new java.util.ArrayList<>();
         Seasoning.appendEffects(c.mask(), effects);

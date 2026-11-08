@@ -21,6 +21,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import cn.blockforge.orient.framework.compat.ItemInteractionResult;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -66,6 +67,24 @@ public class DrinkCauldronBlock extends AbstractCauldronBlock  implements cn.blo
     @Override
     public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
         return state.getValue(SIPS);
+    }
+
+    /** mryt233 改（清单 #129）：指示器标出炼药锅当前装的饮料。 */
+    @Override
+    public net.minecraft.network.chat.MutableComponent getName() {
+        Player player = PlateHolderBlock.pickPlayer.get();
+        if (player != null && player.level() != null) {
+            HitResult hit = player.pick(cn.blockforge.orient.framework.compat.PlayerCompat.blockInteractionRange(player), 1.0F, false);
+            if (hit instanceof BlockHitResult blockHit && hit.getType() == HitResult.Type.BLOCK) {
+                BlockState state = player.level().getBlockState(blockHit.getBlockPos());
+                if (state.getBlock() instanceof DrinkCauldronBlock) {
+                    DrinkKind kind = state.getValue(KIND);
+                    return Blocks.CAULDRON.getName().append("（")
+                        .append(HotPotContent.drinkFor(kind).getDescription()).append("）");
+                }
+            }
+        }
+        return super.getName();
     }
 
     @Override

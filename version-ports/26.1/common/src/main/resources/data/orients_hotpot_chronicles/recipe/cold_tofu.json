@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "orients_hotpot_chronicles:soybean",
+    "orients_hotpot_chronicles:soybean",
+    "orients_hotpot_chronicles:soybean",
+    "minecraft:water_bucket"
+  ],
+  "result": {
+    "id": "orients_hotpot_chronicles:cold_tofu",
+    "count": 1
+  }
+}

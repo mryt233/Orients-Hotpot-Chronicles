@@ -1,5 +1,5 @@
 {
-  "_说明": "内容清单（mryt233 建，gen_content_manifest.py 生成）：81 个物品。每条记录描述一个物品，check_content.py 用它核对贴图 / 模型 / 配方 / 语言 / 指南是否齐全，并核对 hunger / saturation 与代码是否一致。改数值可以直接改这里的 hunger / saturation，再跑 gen_food_numbers.py --apply 写回代码。",
+  "_说明": "内容清单（mryt233 建，gen_content_manifest.py 生成）：115 个物品。每条记录描述一个物品，check_content.py 用它核对贴图 / 模型 / 配方 / 语言 / 指南是否齐全，并核对 hunger / saturation 与代码是否一致。改数值可以直接改这里的 hunger / saturation，再跑 gen_food_numbers.py --apply 写回代码。",
   "_字段": {
     "id": "物品 ID（不含命名空间）",
     "block": "是不是方块物品（有 block 模型）",
@@ -50,6 +50,15 @@
       "guide": true
     },
     {
+      "id": "boiled_crispy_pork",
+      "block": true,
+      "food": true,
+      "hunger": 6,
+      "saturation": 0.8,
+      "recipes": [],
+      "guide": false
+    },
+    {
       "id": "brick_stove",
       "block": false,
       "food": false,
@@ -59,9 +68,20 @@
       "guide": true
     },
     {
+      "id": "chili_pepper",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.1,
+      "recipes": [],
+      "guide": false
+    },
+    {
       "id": "cilantro",
       "block": false,
-      "food": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.1,
       "recipes": [],
       "guide": true
     },
@@ -115,6 +135,37 @@
       "food": false,
       "recipes": [],
       "guide": true
+    },
+    {
+      "id": "cloth_apron",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "cloth_apron"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cold_tofu",
+      "block": false,
+      "food": true,
+      "hunger": 2,
+      "saturation": 0.4,
+      "recipes": [
+        "cold_tofu"
+      ],
+      "guide": true
+    },
+    {
+      "id": "cold_tofu_cube",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [
+        "cold_tofu_cube_from_stonecutting"
+      ],
+      "guide": false
     },
     {
       "id": "cooked_beef_loin",
@@ -215,6 +266,34 @@
       "guide": false
     },
     {
+      "id": "cooked_dried_tofu",
+      "block": true,
+      "food": true,
+      "hunger": 4,
+      "saturation": 0.6,
+      "cook_ticks": 600,
+      "recipes": [
+        "cooked_dried_tofu",
+        "cooked_dried_tofu_from_campfire_cooking",
+        "cooked_dried_tofu_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_enoki_mushroom",
+      "block": true,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.5,
+      "cook_ticks": 600,
+      "recipes": [
+        "cooked_enoki_mushroom",
+        "cooked_enoki_mushroom_from_campfire_cooking",
+        "cooked_enoki_mushroom_from_smoking"
+      ],
+      "guide": false
+    },
+    {
       "id": "cooked_fatty_beef_roll",
       "block": false,
       "food": true,
@@ -243,6 +322,20 @@
       "guide": false
     },
     {
+      "id": "cooked_greens",
+      "block": true,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.5,
+      "cook_ticks": 600,
+      "recipes": [
+        "cooked_greens",
+        "cooked_greens_from_campfire_cooking",
+        "cooked_greens_from_smoking"
+      ],
+      "guide": false
+    },
+    {
       "id": "cooked_ham_sausage_slice",
       "block": false,
       "food": true,
@@ -264,6 +357,20 @@
       "saturation": 0.3,
       "recipes": [],
       "guide": true
+    },
+    {
+      "id": "cooked_lotus_root_slice",
+      "block": true,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.6,
+      "cook_ticks": 600,
+      "recipes": [
+        "cooked_lotus_root_slice",
+        "cooked_lotus_root_slice_from_campfire_cooking",
+        "cooked_lotus_root_slice_from_smoking"
+      ],
+      "guide": false
     },
     {
       "id": "cooked_mutton_meatball",
@@ -364,29 +471,110 @@
       "guide": true
     },
     {
-      "id": "cooked_tofu_cube",
-      "block": false,
+      "id": "cooked_squid_roll",
+      "block": true,
       "food": true,
-      "hunger": 2,
+      "hunger": 4,
       "saturation": 0.6,
-      "cook_ticks": 300,
+      "cook_ticks": 600,
       "recipes": [
-        "cooked_tofu_cube",
-        "cooked_tofu_cube_from_campfire_cooking",
-        "cooked_tofu_cube_from_smoking"
+        "cooked_squid_roll",
+        "cooked_squid_roll_from_campfire_cooking",
+        "cooked_squid_roll_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_sweet_potato_skin",
+      "block": true,
+      "food": true,
+      "hunger": 4,
+      "saturation": 0.6,
+      "cook_ticks": 600,
+      "recipes": [
+        "cooked_sweet_potato_skin",
+        "cooked_sweet_potato_skin_from_campfire_cooking",
+        "cooked_sweet_potato_skin_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_tofu_skin",
+      "block": true,
+      "food": true,
+      "hunger": 4,
+      "saturation": 0.6,
+      "cook_ticks": 600,
+      "recipes": [
+        "cooked_tofu_skin",
+        "cooked_tofu_skin_from_campfire_cooking",
+        "cooked_tofu_skin_from_smoking"
       ],
       "guide": false
     },
     {
       "id": "cooked_tripe",
       "block": false,
-      "food": false,
+      "food": true,
+      "hunger": 5,
+      "saturation": 0.6,
       "cook_ticks": 300,
       "recipes": [
         "cooked_tripe",
         "cooked_tripe_from_campfire_cooking",
         "cooked_tripe_from_smoking"
       ],
+      "guide": false
+    },
+    {
+      "id": "cooked_wide_noodles",
+      "block": true,
+      "food": true,
+      "hunger": 4,
+      "saturation": 0.6,
+      "cook_ticks": 600,
+      "recipes": [
+        "cooked_wide_noodles",
+        "cooked_wide_noodles_from_campfire_cooking",
+        "cooked_wide_noodles_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "cooked_zhe_er_gen_slice",
+      "block": false,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.5,
+      "cook_ticks": 600,
+      "recipes": [
+        "cooked_zhe_er_gen_slice",
+        "cooked_zhe_er_gen_slice_from_campfire_cooking",
+        "cooked_zhe_er_gen_slice_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "crispy_pork",
+      "block": true,
+      "food": true,
+      "hunger": 4,
+      "saturation": 0.6,
+      "cook_ticks": 600,
+      "recipes": [
+        "crispy_pork",
+        "crispy_pork_from_campfire_cooking",
+        "crispy_pork_from_smoking"
+      ],
+      "guide": false
+    },
+    {
+      "id": "crushed_peanuts",
+      "block": true,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.2,
+      "recipes": [],
       "guide": false
     },
     {
@@ -403,6 +591,28 @@
       "block": false,
       "food": false,
       "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "dried_tofu",
+      "block": true,
+      "food": true,
+      "hunger": 2,
+      "saturation": 0.3,
+      "recipes": [
+        "dried_tofu"
+      ],
+      "guide": false
+    },
+    {
+      "id": "egg_fried_rice",
+      "block": true,
+      "food": true,
+      "hunger": 7,
+      "saturation": 0.8,
+      "recipes": [
+        "egg_fried_rice"
+      ],
       "guide": false
     },
     {
@@ -424,6 +634,17 @@
       "block": false,
       "food": false,
       "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "enoki_mushroom",
+      "block": true,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.2,
+      "recipes": [
+        "enoki_mushroom"
+      ],
       "guide": false
     },
     {
@@ -474,6 +695,15 @@
       "guide": true
     },
     {
+      "id": "greens",
+      "block": true,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.2,
+      "recipes": [],
+      "guide": false
+    },
+    {
       "id": "ham_sausage",
       "block": false,
       "food": true,
@@ -503,6 +733,30 @@
       "guide": true
     },
     {
+      "id": "hot_tofu",
+      "block": false,
+      "food": true,
+      "hunger": 2,
+      "saturation": 0.4,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "hot_tofu_cube",
+      "block": false,
+      "food": true,
+      "hunger": 2,
+      "saturation": 0.6,
+      "cook_ticks": 300,
+      "recipes": [
+        "hot_tofu_cube",
+        "hot_tofu_cube_from_campfire_cooking",
+        "hot_tofu_cube_from_smoking",
+        "hot_tofu_cube_from_stonecutting"
+      ],
+      "guide": false
+    },
+    {
       "id": "hotpot_guide",
       "block": false,
       "food": false,
@@ -521,10 +775,41 @@
       "guide": true
     },
     {
+      "id": "lotus_root",
+      "block": true,
+      "food": true,
+      "hunger": 2,
+      "saturation": 0.3,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "lotus_root_slice",
+      "block": true,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.2,
+      "recipes": [
+        "lotus_root_slice_from_stonecutting"
+      ],
+      "guide": false
+    },
+    {
       "id": "milk_cup",
       "block": false,
       "food": false,
       "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "millet_chili",
+      "block": true,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.1,
+      "recipes": [
+        "millet_chili_from_stonecutting"
+      ],
       "guide": false
     },
     {
@@ -535,6 +820,15 @@
         "minced_pork_from_stonecutting"
       ],
       "guide": true
+    },
+    {
+      "id": "minced_zhe_er_gen",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.1,
+      "recipes": [],
+      "guide": false
     },
     {
       "id": "mushroom_broth_bowl",
@@ -605,6 +899,26 @@
       "guide": false
     },
     {
+      "id": "oyster_sauce",
+      "block": true,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.2,
+      "recipes": [
+        "oyster_sauce"
+      ],
+      "guide": false
+    },
+    {
+      "id": "peanut",
+      "block": true,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.2,
+      "recipes": [],
+      "guide": false
+    },
+    {
       "id": "peeled_shrimp",
       "block": false,
       "food": true,
@@ -659,6 +973,17 @@
       "guide": false
     },
     {
+      "id": "raw_crispy_pork",
+      "block": true,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.3,
+      "recipes": [
+        "raw_crispy_pork"
+      ],
+      "guide": false
+    },
+    {
       "id": "raw_ham_sausage",
       "block": false,
       "food": true,
@@ -671,6 +996,15 @@
         "raw_ham_sausage"
       ],
       "guide": true
+    },
+    {
+      "id": "raw_squid",
+      "block": true,
+      "food": true,
+      "hunger": 2,
+      "saturation": 0.2,
+      "recipes": [],
+      "guide": false
     },
     {
       "id": "rich_stock_bowl",
@@ -691,9 +1025,22 @@
     {
       "id": "scallion",
       "block": false,
-      "food": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.1,
       "recipes": [],
       "guide": true
+    },
+    {
+      "id": "sesame_paste",
+      "block": true,
+      "food": true,
+      "hunger": 2,
+      "saturation": 0.3,
+      "recipes": [
+        "sesame_paste"
+      ],
+      "guide": false
     },
     {
       "id": "shrimp",
@@ -730,6 +1077,28 @@
       "guide": true
     },
     {
+      "id": "squid_roll",
+      "block": true,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.2,
+      "recipes": [
+        "squid_roll_from_stonecutting"
+      ],
+      "guide": false
+    },
+    {
+      "id": "sweet_potato_skin",
+      "block": true,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.2,
+      "recipes": [
+        "sweet_potato_skin"
+      ],
+      "guide": false
+    },
+    {
       "id": "tall_brick_stove",
       "block": false,
       "food": false,
@@ -764,24 +1133,13 @@
       "guide": true
     },
     {
-      "id": "tofu",
-      "block": false,
+      "id": "tofu_skin",
+      "block": true,
       "food": true,
       "hunger": 2,
-      "saturation": 0.4,
-      "recipes": [
-        "tofu"
-      ],
-      "guide": true
-    },
-    {
-      "id": "tofu_cube",
-      "block": false,
-      "food": true,
-      "hunger": 1,
       "saturation": 0.3,
       "recipes": [
-        "tofu_cube_from_stonecutting"
+        "tofu_skin"
       ],
       "guide": false
     },
@@ -822,7 +1180,9 @@
     {
       "id": "tripe",
       "block": false,
-      "food": false,
+      "food": true,
+      "hunger": 2,
+      "saturation": 0.3,
       "recipes": [],
       "guide": true
     },
@@ -832,6 +1192,37 @@
       "food": false,
       "recipes": [],
       "guide": true
+    },
+    {
+      "id": "wide_noodles",
+      "block": true,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.2,
+      "recipes": [
+        "wide_noodles"
+      ],
+      "guide": false
+    },
+    {
+      "id": "zhe_er_gen",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.15,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "zhe_er_gen_slice",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.15,
+      "recipes": [
+        "zhe_er_gen_slice_from_stonecutting"
+      ],
+      "guide": false
     }
   ]
 }

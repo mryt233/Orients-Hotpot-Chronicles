@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": {
+    "item": "orients_hotpot_chronicles:tofu_skin"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_tofu_skin"
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

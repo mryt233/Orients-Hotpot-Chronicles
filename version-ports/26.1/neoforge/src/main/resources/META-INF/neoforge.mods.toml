@@ -42,7 +42,7 @@ file = "META-INF/accesstransformer.cfg"
 [[dependencies.orients_hotpot_chronicles]]
 modId="orient_framework"
 type="required"
-versionRange="[0.1.2,0.2.0)"
+versionRange="[0.1.3,0.2.0)"
 ordering="AFTER"
 side="BOTH"
 

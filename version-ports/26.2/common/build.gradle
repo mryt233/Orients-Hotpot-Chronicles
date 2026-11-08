@@ -3,4 +3,12 @@ apply from: rootProject.file('gradle/vanilla-module.gradle')
 dependencies {
     api project(':framework:game')
     compileOnly project(':framework:client')
+    // mryt233 改（2026-11-08）：配置旧键迁移的单元测试要 JUnit，写法与 mod/common/build.gradle 一致。
+    testImplementation platform('org.junit:junit-bom:5.10.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
 }

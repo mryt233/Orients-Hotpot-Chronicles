@@ -3,15 +3,17 @@ package cn.blockforge.generated.orientshotpotchronicles.client;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveScreenHandler;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +31,16 @@ import static cn.blockforge.generated.orientshotpotchronicles.client.GuiKit.*;
 public class StoveScreen extends AbstractContainerScreen<StoveScreenHandler> {
     // 灶膛砖面直接用原版砖块贴图，和灶台方块一致
     private static final ResourceLocation STOVE_SIDE = ResourceLocation.withDefaultNamespace("textures/block/bricks.png");
-    /** 灶台正面贴图（和方块用的同一张）：没烧 / 烧着（竖排 16 帧动画）；方块正面看得见的是最下面 11 行。 */
-    private static final ResourceLocation FRONT = HotPot.id("textures/block/stove_front.png");
-    private static final ResourceLocation FRONT_LIT = HotPot.id("textures/block/stove_front_lit.png");
-    private static final int FRONT_FRAMES = 16, FRONT_ROWS = 11;
+    /**
+     * 灶台正面贴图（和方块用的同一张）：没烧 / 烧着（竖排 16 帧动画）；方块正面看得见的是最下面 11 行。
+     * mryt233 改（2026-11-04）：一律从方块图集取精灵，不再直接 blit 贴图文件。
+     * 以前写死 16×256 / 16 帧，玩家整合包的资源包把这张图换成单帧 16×16 后，
+     * 切出来的只剩第一行被拉长，灶膛窗口就是满框粉白竖条纹（用户截图）。图集精灵会自己按实际帧数播放，
+     * 换帧数 / 换贴图都不会再错位。
+     */
+    private static final ResourceLocation FRONT = HotPot.id("block/stove_front");
+    private static final ResourceLocation FRONT_LIT = HotPot.id("block/stove_front_lit");
+    private static final int FRONT_ROWS = 11;
 
     private static final int W = 176;
     private static final int H = 166;
@@ -74,12 +82,11 @@ public class StoveScreen extends AbstractContainerScreen<StoveScreenHandler> {
 
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
-        double t = Util.getMillis() / 1000.0;
         context.pose().pushPose();
         context.pose().translate(this.leftPos, this.topPos, 0);
 
         frame(context, W, H, 3, false);
-        drawHearth(context, t);
+        drawHearth(context);
 
         int fx = StoveScreenHandler.FUEL_X;
         int fy = StoveScreenHandler.FUEL_Y;
@@ -105,14 +112,21 @@ public class StoveScreen extends AbstractContainerScreen<StoveScreenHandler> {
      * 照方块拱门手画的版本用户也说怪。调整）。方块正面看得见的是贴图第 5～16 行（炉口在下面），放大 3 倍、
      * 居中，窗口只框这一块；烧着用 stove_front_lit（16 帧，每帧 2 刻，和方块一样跳），没烧用 stove_front。
      */
-    private void drawHearth(GuiGraphics c, double t) {
+    private void drawHearth(GuiGraphics c) {
         // 窗口就是灶台正面那一块（16×11 放大 3 倍），不再另外铺砖——砖纹和贴图里的砖对不上，拼在一起很怪（用户截图）
+        // mryt233 改（2026-11-04）：用方块图集里的精灵，只取下面 11/16 那一截；动画由图集按实际帧数处理。
         boolean burning = menu.burnTicks() > 0;
         int s = 3, w = 16 * s, h = FRONT_ROWS * s;
         int x = HX + (HW - w) / 2, y = HY + (HH - h) / 2;
-        int frame = burning ? (int) ((Util.getMillis() / 100) % FRONT_FRAMES) : 0;
-        c.blit(burning ? FRONT_LIT : FRONT, x, y, w, h, 0, frame * 16 + (16 - FRONT_ROWS), 16, FRONT_ROWS,
-            16, burning ? 16 * FRONT_FRAMES : 16);
+        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
+            .apply(burning ? FRONT_LIT : FRONT);
+        // 按精灵在图集里的像素位置只切下面 11/16 那一截来画（高清资源包的 32、64 像素贴图也按比例切）。
+        // 不用 blit(..., sprite, 四个小数) ——那是染色的重载；也不用裁剪框——这里坐标已平移到窗口左上角。
+        int sw = sprite.contents().width(), sh = sprite.contents().height();
+        int atlasW = Math.round(sw / (sprite.getU1() - sprite.getU0()));
+        int atlasH = Math.round(sh / (sprite.getV1() - sprite.getV0()));
+        int skip = sh * (16 - FRONT_ROWS) / 16;
+        c.blit(sprite.atlasLocation(), x, y, w, h, sprite.getX(), sprite.getY() + skip, sw, sh - skip, atlasW, atlasH);
         c.fill(x - 1, y - 1, x + w + 1, y, RIM_LINE);
         c.fill(x - 1, y + h, x + w + 1, y + h + 1, RIM_LINE);
         c.fill(x - 1, y, x, y + h, RIM_LINE);

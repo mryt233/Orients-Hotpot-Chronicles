@@ -1,0 +1,67 @@
+{
+  "display": {
+    "icon": {
+      "id": "orients_hotpot_chronicles:dried_tofu"
+    },
+    "title": {
+      "translate": "advancements.orients_hotpot_chronicles.tofu_quartet.title"
+    },
+    "description": {
+      "translate": "advancements.orients_hotpot_chronicles.tofu_quartet.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "cold": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "orients_hotpot_chronicles:cold_tofu_cube"
+            ]
+          }
+        ]
+      }
+    },
+    "hot": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "orients_hotpot_chronicles:hot_tofu_cube"
+            ]
+          }
+        ]
+      }
+    },
+    "dried": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "orients_hotpot_chronicles:dried_tofu"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "cold"
+    ],
+    [
+      "hot"
+    ],
+    [
+      "dried"
+    ]
+  ],
+  "parent": "orients_hotpot_chronicles:tofu_overcook"
+}

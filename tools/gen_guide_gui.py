@@ -179,7 +179,7 @@ def build():
     return img
 
 
-ICONS = ["hotpot_guide", "tomato_hotpot_base", "iron_kitchen_knife", "garlic_paste", "bamboo_chopsticks", "orange", "tofu"]
+ICONS = ["hotpot_guide", "tomato_hotpot_base", "iron_kitchen_knife", "garlic_paste", "bamboo_chopsticks", "orange", "cold_tofu"]
 
 
 def icon(name):

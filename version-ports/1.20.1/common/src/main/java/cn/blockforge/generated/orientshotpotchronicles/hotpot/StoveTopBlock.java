@@ -200,6 +200,13 @@ public class StoveTopBlock extends Block implements PartOutline , cn.blockforge.
         super.playerWillDestroy(world, pos, state, player);
     }
 
+    /** mryt233 改（清单 #129）：上半截也显示准星所指的锅名或下方高灶台本名。 */
+    @Override
+    public net.minecraft.network.chat.MutableComponent getName() {
+        net.minecraft.network.chat.MutableComponent name = StoveBlock.aimedName(PlateHolderBlock.pickPlayer.get());
+        return name == null ? super.getName() : name;
+    }
+
     @Override
     public ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter world, BlockPos pos, BlockState state) {
         BlockState below = world.getBlockState(pos.below());

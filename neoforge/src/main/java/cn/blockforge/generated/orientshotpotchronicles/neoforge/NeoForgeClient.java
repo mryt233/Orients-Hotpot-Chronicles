@@ -32,7 +32,15 @@ public final class NeoForgeClient {
     private static net.minecraft.client.gui.screens.Screen tabsScreen;
     private static CreativeSubTabs.Hooks tabs;
 
-    public NeoForgeClient(IEventBus modBus) {
+    /**
+     * mryt233 改（2026-11-05，r135e）：多接收一个 {@link ModContainer}，用来注册 NeoForge 原生配置界面扩展点——
+     * 主菜单 Mods -> 选中本模组 -> 「Config」按钮就能直接打开 {@link HotPotConfigScreen}（不依赖 Mod Menu）。
+     */
+    public NeoForgeClient(IEventBus modBus, net.neoforged.fml.ModContainer container) {
+        if (container != null) {
+            container.registerExtensionPoint(net.neoforged.neoforge.client.gui.IConfigScreenFactory.class,
+                (mc, parent) -> new HotPotConfigScreen(parent));
+        }
         modBus.addListener(NeoForgeClient::setup);
         modBus.addListener(NeoForgeClient::screens);
         modBus.addListener(NeoForgeClient::renderers);

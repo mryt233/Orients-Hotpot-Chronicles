@@ -37,6 +37,9 @@ public final class HeldFoodItemRenderer {
 
     public static void register() {
         ClientItemRenderers.register(HotPotContent.CHOPSTICKS, HeldFoodItemRenderer::renderChopsticks);
+        // mryt233 改（2026-11-05）：筷子夹着菜画的是正对镜头的平面贴图，物品栏里要用正面平光，
+        // 不然 GUI 会按 3D 方块侧光打灯，格子里整个发暗（用户 26.2 截图）。
+        DynamicItemModel.registerFlat(HotPotContent.CHOPSTICKS);
         for (PlateItem item : HotPotContent.PLATE_ITEMS) {
             ClientItemRenderers.register(item, HeldFoodItemRenderer::renderPlate);
         }

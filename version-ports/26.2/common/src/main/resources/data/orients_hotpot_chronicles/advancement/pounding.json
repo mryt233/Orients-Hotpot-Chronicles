@@ -1,0 +1,42 @@
+{
+  "display": {
+    "icon": {
+      "id": "orients_hotpot_chronicles:rolling_pin"
+    },
+    "title": {
+      "translate": "advancements.orients_hotpot_chronicles.pounding.title"
+    },
+    "description": {
+      "translate": "advancements.orients_hotpot_chronicles.pounding.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ball": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "orients_hotpot_chronicles:beef_meatball",
+              "orients_hotpot_chronicles:pork_meatball",
+              "orients_hotpot_chronicles:mutton_meatball",
+              "orients_hotpot_chronicles:fish_ball",
+              "orients_hotpot_chronicles:shrimp_paste",
+              "orients_hotpot_chronicles:garlic_paste"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ball"
+    ]
+  ],
+  "parent": "orients_hotpot_chronicles:knife_skills"
+}

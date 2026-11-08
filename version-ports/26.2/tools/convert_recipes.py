@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 NS = 'orients_hotpot_chronicles'
-BASE = ROOT.parent / '26.1/common/src/main/resources/data' / NS / 'recipe'
+BASE = ROOT.parents[1] / 'mod/common/src/main/resources/data' / NS / 'recipe'
 OUT = ROOT / 'common/src/main/resources/data' / NS / 'recipe'
 
 

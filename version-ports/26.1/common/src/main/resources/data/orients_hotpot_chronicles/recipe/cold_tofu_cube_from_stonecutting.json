@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "orients_hotpot_chronicles:cold_tofu",
+  "result": {
+    "id": "orients_hotpot_chronicles:cold_tofu_cube",
+    "count": 3
+  }
+}

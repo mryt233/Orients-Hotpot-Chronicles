@@ -1,26 +1,27 @@
-<!-- 作者：mryt233；zh_tw 在地化，原文：mryt233。发布前由 mryt233 同步并审核。 -->
-<!-- mryt233 改：依简体原文补齐正式版与开发预览；保留原译者署名。 -->
-# 下載、安裝與反饋
+<!-- 作者：mryt233；zh_tw 在地化，原文：mryt233。發布前由 mryt233 同步並審核。 -->
+<!-- mryt233 改，2026-11-08：依簡體原文同步 0.2.2-alpha 多版本發布說明；保留原譯者署名。 -->
+# 下載、安裝與回報
 
 ## 支援的版本 {#versions}
 
-模組一共支援 **2 個 Minecraft 版本、4 種載入器組合**。最新版 **0.1.4-alpha**：
+最新版 **0.2.2-alpha** 同步支援 **Minecraft 1.21.1、1.20.1、26.1.x 和 26.2** 的主流載入器，所有 jar 都**內嵌了前置框架 `orient_framework`**，下載一個直接放進 `mods` 就行：
 
 | Minecraft | 載入器 | Java | 還需要裝 |
 | --- | --- | --- | --- |
-| **1.21.1** | **Fabric**（教程用它演示，**0.1.4-alpha**） | 21 或更高 | Fabric Loader 0.15.11+、**Fabric API**（0.116.14+1.21.1） |
-| 1.21.1 | NeoForge（0.1.3-alpha-hotfix1） | 21 或更高 | NeoForge 21.1.264 或更高 |
-| 1.20.1 | Fabric（0.1.3-alpha-hotfix1） | 17 或更高 | Fabric Loader 0.15.11+、**Fabric API**（0.92.12+1.20.1） |
-| 1.20.1 | Forge（0.1.3-alpha-hotfix1） | 17 或更高 | Forge 47.1 以上（測試用 47.4.28） |
+| **1.21.1** | **Fabric**（教程用它演示，**0.2.2-alpha**） | 21 或更高 | Fabric Loader 0.15.11+、**Fabric API**（0.116.14+1.21.1） |
+| **1.21.1** | **NeoForge**（**0.2.2-alpha**） | 21 或更高 | NeoForge 21.1.186 或更高 |
+| **1.20.1** | **Fabric**（**0.2.2-alpha**） | 17 或更高 | Fabric Loader 0.15.11+、**Fabric API**（0.92.12+1.20.1） |
+| **1.20.1** | **Forge**（**0.2.2-alpha**） | 17 或更高 | Forge 47.1 以上（測試用 47.4.28） |
+| **26.1.x** | **Fabric / NeoForge**（**0.2.2-alpha**） | 25 或更高 | 對應 26.1.x 的 Fabric Loader + Fabric API，或 NeoForge |
+| **26.2** | **Fabric / NeoForge**（**0.2.2-alpha**） | 25 或更高 | 對應 26.2 的 Fabric Loader + Fabric API，或 NeoForge |
 
 :::tip
-**本教程用 1.21.1 Fabric 演示。** 其他三個版本玩法、配方、數值都一樣，照著玩就行；少數細小差別見下面「[移植版有什麼不一樣](#ports)」。
+**本教程用 1.21.1 Fabric 演示。** 0.2.2-alpha 起上述所有版本的玩法、食材、小料、家具與設定功能完全同步；細微底層差異見下面「[各版本有什麼不一樣](#ports)」。
 :::
 
-- **0.1.4-alpha 目前只有 1.21.1 Fabric**；1.21.1 NeoForge、1.20.1 Fabric / Forge 還停在 0.1.3-alpha-hotfix1，晚一步跟上。
-- 1.20.1 的 Forge 版同一個 jar 也在 NeoForge 1.20.1（47.1.106）伺服器端做過初步檢查，用戶端和連線還沒驗證。
-- **1.20.4 Fabric** 有個舊的 0.1.1-alpha 版，已不再更新，教程不包含。
-- 用戶端和伺服器端都要裝同一個 jar。
+- **舊版存檔與設定相容**：0.2.2-alpha 將舊版 `tofu` 拆分為 `cold_tofu`（冷豆腐）和 `hot_tofu`（熱豆腐），舊存檔裡的 `config/orients_hotpot_chronicles.json` 中的 `tofu` 設定鍵會自動無損遷移，升級前仍建議備份存檔。
+- 1.20.4 Fabric 仍停在舊版 0.1.1-alpha，不再維護。
+- 多人連線時，用戶端和伺服器端都要裝對應載入器的同版本 jar。
 
 ## 去哪裡下載 {#download}
 
@@ -31,19 +32,19 @@
 | **MC 百科** | <https://www.mcmod.cn/class/32185.html> | 中文模組百科：看介紹、留言討論 |
 | **GitHub Releases** | <https://github.com/mryt233/Orients-Hotpot-Chronicles/releases> | 每個版本一頁，裡面放各載入器的 jar |
 
-**下載認準兩點：Minecraft 版本、載入器。** 檔名裡寫著，比如 `orients_hotpot_chronicles-1.21.1-fabric-0.1.4-alpha.jar`，選錯版本進不去遊戲。
+**下載認準兩點：Minecraft 版本、載入器。** 檔名裡寫著，比如 `orients_hotpot_chronicles-1.21.1-fabric-0.2.2-alpha.jar`、`orients_hotpot_chronicles-1.21.1-neoforge-0.2.2-alpha.jar`，選錯版本進不去遊戲。
 
 ## 怎麼裝 {#install}
 
-### Fabric（1.21.1 / 1.20.1）
+### Fabric（1.21.1 / 1.20.1 / 26.1.x / 26.2）
 
 1. 用 [Fabric Loader](https://fabricmc.net/use/) 裝出對應版本的遊戲。
 2. 下載**同版本**的 [Fabric API](https://modrinth.com/mod/fabric-api)。
-3. 把 Fabric API 和本模組 jar 放進 `.minecraft/mods`，啟動遊戲。
+3. 把 Fabric API 和本模組 jar 放進 `.minecraft/mods`，啟動遊戲。（如想在模組列表裡點「設定」調數值，可順手裝上 **Mod Menu**。）
 
-### NeoForge（1.21.1）
+### NeoForge（1.21.1 / 26.1.x / 26.2）
 
-1. 裝好 [NeoForge](https://neoforged.net/) 21.1.264 或更高。
+1. 裝好對應 Minecraft 版本的 [NeoForge](https://neoforged.net/)（1.21.1 需 21.1.186 或更高）。
 2. 把模組 NeoForge jar 放進 `mods` 資料夾，啟動遊戲。**不需要 Fabric API。**
 
 ### Forge（1.20.1）
@@ -57,24 +58,22 @@
 模組還在 **alpha** 階段，只做過初步測試。0.1.0-alpha.1 舊存檔升級後東西可能遺失或變樣，**先備份存檔，最好在新存檔玩**。
 :::
 
-## 移植版有什麼不一樣 {#ports}
+## 各版本有什麼不一樣 {#ports}
 
-1.20.1（Fabric / Forge）和 1.21.1 NeoForge 是從 1.21.1 Fabric 版移植的，**玩法、配方、數值、貼圖一樣**，差別很小：
+0.2.2-alpha 的 **1.21.1、1.20.1、26.1.x、26.2** 全部對齊了同一套玩法與新內容，只有極少數受原版底層限制的細微差別：
 
-| 項目 | 1.21.1 Fabric | 1.20.1 |
+| 項目 | 1.21.1 / 26.1.x / 26.2 | 1.20.1（Fabric / Forge） |
 | --- | --- | --- |
 | 鍋裡冒的熱氣 | 白煙粒子 | 雲粒子（白色往上飄，略大一點） |
-| 吃完還碗 | 讀食物自帶屬性 | 照原版規則還碗 |
+| 吃完還碗 | 讀食物自帶屬性 | 照原版與模組規則返還空碗 |
 
-**新內容通常 Fabric 1.21.1 先有，移植版晚一步跟上**。發布頁和教程版本標籤會寫清。
-
-## 反饋、交流 {#feedback}
+## 回報、交流 {#feedback}
 
 遇到 bug、有疑問或建議，歡迎告訴作者：
 
 | 渠道 | 聯絡方式 |
 | --- | --- |
-| **GitHub Issues** | [提交反饋](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)（報 bug、提建議、提問） |
+| **GitHub Issues** | [提交回報](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)（報 bug、提建議、提問） |
 | **QQ 交流群** | **248314791**（作者沒回就是在睡覺） |
 | **B 站** | 蘧白川 |
 | **電子信箱** | orientcheung233@gmail.com |

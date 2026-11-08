@@ -91,6 +91,14 @@ def main():
         # 盘子格：本身看不见（渲染器画盘子），模型只给挖的时候的碎屑用
         write(root / "blockstates/plates.json", {"multipart": [{"apply": {"model": f"{MODID}:block/plates"}}]})
         write(root / "models/block/plates.json", {"textures": {"particle": "minecraft:block/quartz_block_side"}})
+        # mryt233 改（2026-11-05）：直接摆在桌面上的竹筷（ChopstickRestBlock，r136b）也由渲染器画筷子+迷你筷架，
+        # 方块状态指向同一个空模型，避免客户端 ModelBakery 报缺 blockstate。
+        write(root / "blockstates/chopstick_rest.json", {
+            "variants": {
+                "axis=x": {"model": f"{MODID}:block/plates"},
+                "axis=z": {"model": f"{MODID}:block/plates", "y": 90},
+            }
+        })
         for mat, (floor_tex, rim_tex, _) in MATERIALS.items():
             for size in SIZES:
                 name = f"{mat}_{PLATE_IDS[size]}"

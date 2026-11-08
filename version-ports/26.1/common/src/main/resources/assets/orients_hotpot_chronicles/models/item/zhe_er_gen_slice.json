@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "orients_hotpot_chronicles:item/zhe_er_gen_slice"
+  }
+}

@@ -87,6 +87,9 @@ public class DrinkItem extends Item {
         if (user instanceof Player player) {
             player.getFoodData().eat(sipFood());
             player.awardStat(Stats.ITEM_USED.get(this));
+            // mryt233 改（2026-11-06，r139）：喝下作者推荐的饮料触发成就 authors_pick。
+            // 这里走模组自己的 HotPotCriterion，不依赖原版 consume_item 判定（自定义结算不一定会触发它）。
+            HotPotCriterion.fire(player, "drink_author");
         }
         kind.applySip(user);
         if (user instanceof Player player && player.getAbilities().instabuild) {

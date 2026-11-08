@@ -12,7 +12,9 @@ sourceSets {
         resources.srcDirs = [file('src/runtime/resources'), rootProject.file('framework/loader/src/main/resources')]
     }
     main {
-        java.srcDirs += [project(':common').file('src/client/java'), project(':common').file('src/mixin/java')]
+        java.srcDirs += [project(':common').file('src/client/java'), project(':common').file('src/mixin/java'),
+            // 作者：mryt233（0.2.2-alpha）：Mod Menu / JEI / REI / Jade 的编译期签名桩，只参与编译。
+            project(':common').file('src/compatApi/java')]
         java.exclude 'cn/blockforge/orient/framework/**', '**/devtest/**'
         resources.srcDirs += project(':common').file('src/main/resources')
     }
@@ -67,7 +69,7 @@ tasks.named('processResources', ProcessResources) {
 
 def runtimeJar = tasks.register('runtimeJar', Jar) {
     archiveBaseName = 'orient_framework-1.20.1-forge'
-    archiveVersion = '0.1.2'
+    archiveVersion = '0.1.3'
     from sourceSets.frameworkRuntime.output
     from(layout.buildDirectory.dir('mixin')) { include 'orient_framework.refmap.json' }
     manifest.attributes 'MixinConfigs': 'orient_framework.mixins.json'
@@ -77,13 +79,16 @@ def reobfRuntimeJar = obfuscation.reobfuscate(runtimeJar, sourceSets.frameworkRu
 reobfRuntimeJar.configure { dependsOn tasks.named('compileJava') }
 dependencies { jarJar files(reobfRuntimeJar) }
 
+// 作者：mryt233（0.2.2-alpha）：JEI / REI / Jade / Mod Menu 的编译期签名桩不进分发包。
 tasks.named('jar', Jar) {
+    exclude 'mezz/jei/**', 'me/shedaniel/**', 'snownee/jade/**', 'com/terraformersmc/**'
     archiveBaseName = 'orients_hotpot_chronicles-1.20.1-forge'
     from(project(':common').sourceSets.main.output.classesDirs)
     manifest.attributes 'MixinConfigs': 'orients_hotpot_chronicles.mixins.json,orients_hotpot_chronicles.forge.mixins.json'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 tasks.named('sourcesJar', Jar) {
+    exclude 'mezz/jei/**', 'me/shedaniel/**', 'snownee/jade/**', 'com/terraformersmc/**'
     from project(':common').sourceSets.main.allJava
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

@@ -44,11 +44,17 @@ public final class SauceRender {
         {{6.2F, 6.6F}, {9.4F, 9.0F}}, {{7.4F, 6.0F}, {8.8F, 7.6F}}, {{6.0F, 8.6F}, {9.6F, 6.4F}},
         {{7.8F, 9.4F}, {6.6F, 7.6F}}, {{8.4F, 6.8F}, {7.0F, 9.6F}}, {{9.2F, 8.2F}, {6.4F, 9.0F}},
         {{7.6F, 7.0F}, {8.6F, 9.6F}}, {{6.8F, 6.2F}, {9.0F, 7.0F}, {7.4F, 8.8F}}, {{8.2F, 8.4F}, {6.0F, 7.2F}, {9.6F, 9.4F}},
-        {{7.0F, 8.0F}, {9.0F, 6.0F}}};   // 蒜泥（2026-10-25）
+        {{7.0F, 8.0F}, {9.0F, 6.0F}},                       // 蒜泥（2026-10-25）
+        {{6.4F, 6.8F}, {8.2F, 9.2F}},                       // 蚝油（r137）
+        {{8.8F, 6.2F}, {7.2F, 8.0F}},                       // 芝麻酱（r137）
+        {{6.0F, 9.0F}, {9.4F, 7.4F}, {7.6F, 6.4F}},         // 花生碎（r137）
+        {{8.6F, 8.8F}, {6.6F, 6.2F}},                       // 小米辣（r137）
+        {{7.2F, 9.4F}, {9.2F, 6.6F}, {6.2F, 7.8F}}};        // 折耳根碎（r139）
 
     /**
      * 碗里的调料面（mask 为空就不画）。2026-10-23 用户说不像蘸料（原来是一层平涂的色），改成：
      * 有光泽的酱面（贴图按几种调料的平均色染色）+ 每种放进去的调料撒两三个它自己颜色的小点。
+     * mryt233 改：小点表按下标取，表比枚举短时退回最后一组，加新调料不会再把渲染打崩。
      */
     public static void surface(int mask, PoseStack matrices, MultiBufferSource consumers, int light) {
         int color = Seasoning.mixColor(mask);
@@ -65,7 +71,9 @@ public final class SauceRender {
             }
             int dot = darkenIfPale(s.color());
             float size = (s == Seasoning.CHOPPED_SCALLION || s == Seasoning.MINCED_CILANTRO ? 0.7F : 0.5F) / 16F;
-            for (float[] d : DOTS[s.ordinal()]) {
+            // 表跟着枚举一起长；万一以后加调料忘了补表，退回最后一组点，不要越界崩端
+            float[][] dots = DOTS[Math.min(s.ordinal(), DOTS.length - 1)];
+            for (float[] d : dots) {
                 float x = d[0] / 16F, z = d[1] / 16F;
                 quad(vc, e, light, dot, x, y + 0.001F, z, x + size, y + 0.001F, z + size);
             }

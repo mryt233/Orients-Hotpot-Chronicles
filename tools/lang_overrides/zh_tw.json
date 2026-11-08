@@ -56,5 +56,15 @@
   "text.orients_hotpot_chronicles.screen.sauce.restock": "補充沾醬台",
   "text.orients_hotpot_chronicles.screen.sauce.overview_hint": "九個碗和檯上一一對應",
   "item.orients_hotpot_chronicles.orange": "柳橙",
-  "item.orients_hotpot_chronicles.orange_drink_cup": "一杯柳橙飲料"
+  "item.orients_hotpot_chronicles.orange_drink_cup": "一杯柳橙飲料",
+  "text.orients_hotpot_chronicles.msg.spicy_max": "這鍋紅湯已經是最高辣度了",
+  "item.orients_hotpot_chronicles.lotus_root_slice": "蓮藕片",
+  "item.orients_hotpot_chronicles.cooked_lotus_root_slice": "熟蓮藕片",
+  "tooltip.orients_hotpot_chronicles.flavor.boiled_crispy_pork": "吸飽了火鍋濃湯，外軟內嫩",
+  "tooltip.orients_hotpot_chronicles.flavor.cooked_tofu_skin": "滿口豆香，兜住了半匙湯汁",
+  "tooltip.orients_hotpot_chronicles.flavor.cooked_lotus_root_slice": "脆嫩回甘，孔裡全藏著香濃鍋底",
+  "tooltip.orients_hotpot_chronicles.flavor.three_fresh_soup_bowl": "乾貝海米吊的鮮，鮮到眉毛都掉",
+  "advancements.orients_hotpot_chronicles.sauce_alchemist.description": "品嚐一碗融合了五種以上佐料的終極沾醬",
+  "advancements.orients_hotpot_chronicles.warm_gathering.description": "在火鍋桌旁的長凳上享受熱氣騰騰的火鍋",
+  "text.orients_hotpot_chronicles.msg.board_pounded": "這攤東西已經捶成漿了，切不動，換擀麵棍把它捶成丸子吧"
 }

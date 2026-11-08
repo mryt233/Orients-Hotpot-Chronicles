@@ -28,6 +28,14 @@ SAUCES = [
     ("chopped_scallion", None),           # 葱花（小葱）
     ("minced_cilantro", None),            # 香菜碎末（香菜）
     ("garlic_paste", (232, 214, 150)),    # 蒜泥（2026-10-25 用户加；大蒜用擀面杖敲。2026-10-26 照新贴图改成米黄，调整）
+    # mryt233 改（2026-11-07）：r137 / r139 新加的 5 种调料以前只有 textures/item 的原料贴图，
+    # 台上碗面要的 block/sauce_<id> 一直没生成，游戏里就成了粉黑格子。这里补齐，颜色照 Seasoning 的 ARGB 去掉 alpha。
+    # 加调料时这里和 Seasoning.java 一起改，不然新调料在蘸料台上还是缺图。
+    ("oyster_sauce", (90, 50, 30)),          # 蚝油（r137）
+    ("sesame_paste", (200, 158, 100)),       # 芝麻酱（r137）
+    ("crushed_peanuts", (218, 180, 110)),    # 花生碎（r137）
+    ("millet_chili", (226, 40, 28)),         # 小米辣（r137）
+    ("minced_zhe_er_gen", (216, 210, 188)),  # 折耳根碎（r139）
 ]
 # 用户 2026-10-23 定：每种原版木头一个（台身该木头的木板、台面白色石英）+ 一个铁的（原版铁块）。ID = <木头>_sauce_station / iron_sauce_station
 WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped"]
@@ -296,8 +304,10 @@ def game_files():
         f = data / MODID / f"loot_table/blocks/{ident}.json"
         f.parent.mkdir(parents=True, exist_ok=True)
         f.write_text(json.dumps(loot, indent=2) + "\n", encoding="utf-8")
-    for tag_file, ids in [("mineable/axe.json", [f"{w}_sauce_station" for w in WOODS]),
-                          ("mineable/pickaxe.json", ["iron_sauce_station"])]:
+    # mryt233 改（2026-11-05）：蘸料台的「上半截」sauce_station_top 两种都要 —— 木头蘸料台的上半截跟木头走斧，
+    # 铁蘸料台的上半截跟铁走镐（挖上半截时挖掘速度按上半截自己所在的标签算）。
+    for tag_file, ids in [("mineable/axe.json", [f"{w}_sauce_station" for w in WOODS] + ["sauce_station_top"]),
+                          ("mineable/pickaxe.json", ["iron_sauce_station", "sauce_station_top"])]:
         f = data / "minecraft/tags/block" / tag_file
         tag = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {"replace": False, "values": []}
         for i in ids:

@@ -4,11 +4,10 @@ import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.Map;
-
 /**
  * 燃料档位：只决定灶火强度（影响烹饪速度），燃烧时长则完全沿用
- * 原版熔炉的燃料数据（{@link AbstractFurnaceBlockEntity#createFuelTimeMap()}）。
+ * 原版熔炉的燃料数据（{@link AbstractFurnaceBlockEntity#getFuel()}；1.21.1 里这张表由原版自己
+ * 缓存并在数据包重载时由 {@link AbstractFurnaceBlockEntity#invalidateCache()} 重建）。
  * 木材 &lt; 煤炭/木炭 &lt; 岩浆桶。
  *
  * <p>同一个档位里所有燃料的燃烧时长各不相同，比如木板 300 tick、原木 300 tick、
@@ -33,12 +32,6 @@ public enum HotPotFuel {
     public static HotPotFuel customSource(ItemStack stack) {
         return stack.isEmpty() ? null : CUSTOM_SOURCES.get(stack.getItem());
     }
-
-    /**
-     * 原版熔炉燃料表，首次使用时构建并缓存。Fabric 会把
-     * {@code FuelRegistry} 里注册的燃料并入这张表，所以联动模组的数据也能生效。
-     */
-    private static volatile Map<Item, Integer> vanillaFuels;
 
     private final String nameKey;
     private final float power;
@@ -74,7 +67,12 @@ public enum HotPotFuel {
         return id >= 0 && id < BY_ID.length ? BY_ID[id] : null;
     }
 
-    /** 该物品在原版熔炉里的燃烧时长（tick）；不能当燃料时返回 0。 */
+    /**
+     * 该物品在原版熔炉里的燃烧时长（tick）；不能当燃料时返回 0。
+     * <p>mryt233 改（2026-11-07）：不再自己缓存一份燃料表。原版 AbstractFurnaceBlockEntity.getFuel()
+     * 内部已经是 volatile 缓存并在数据包重载时由 invalidateCache() 重建；
+     * 这里再存一层 Map 引用会永远拿第一次的旧表，导致 reload 后新增 / 移除的燃料不生效。</p>
+     */
     public static int burnTicksOf(net.minecraft.world.level.Level world, ItemStack stack) {
         if (stack.isEmpty()) {
             return 0;
@@ -101,6 +99,5 @@ public enum HotPotFuel {
         }
         return WOOD;
     }
-
 
 }

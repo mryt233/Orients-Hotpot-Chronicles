@@ -14,6 +14,18 @@
     ],
     "client": [
       "cn.blockforge.generated.orientshotpotchronicles.client.HotPotClient"
+    ],
+    "jei_mod_plugin": [
+      "cn.blockforge.generated.orientshotpotchronicles.client.compat.jei.HotPotJeiPlugin"
+    ],
+    "modmenu": [
+      "cn.blockforge.generated.orientshotpotchronicles.fabric.client.HotPotModMenuCompat"
+    ],
+    "jade": [
+      "cn.blockforge.generated.orientshotpotchronicles.compat.jade.HotPotJadePlugin"
+    ],
+    "rei_client": [
+      "cn.blockforge.generated.orientshotpotchronicles.client.compat.rei.HotPotReiClientPlugin"
     ]
   },
   "mixins": [
@@ -27,6 +39,10 @@
   },
   "suggests": {
     "farmersdelight": "*",
-    "crocosmia": "*"
+    "crocosmia": "*",
+    "jei": "*",
+    "roughlyenoughitems": "*",
+    "modmenu": "*",
+    "jade": "*"
   }
 }

@@ -198,7 +198,8 @@ public class HotPotBlock extends Block implements EntityBlock , cn.blockforge.or
             }
             return InteractionResult.SUCCESS;
         }
-        int bigCell = HotPotInteraction.cellFromHit(be, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE);
+        int bigCell = HotPotInteraction.cellFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN,
+            HotPotInteraction.STANDALONE_INNER_SIZE);   // mryt233 改（清单 #107）：多传 player，按视线与汤面交点算格
         if (world.isClientSide) {
             HotPotInteraction.clientChopsticksAim.accept(be, bigCell);   // 空手也捞看到的那样（2026-10-26）
         }
@@ -219,7 +220,8 @@ public class HotPotBlock extends Block implements EntityBlock , cn.blockforge.or
         if (hooked != null) {
             return hooked;
         }
-        int bigCell = HotPotInteraction.cellFromHit(be, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE);
+        int bigCell = HotPotInteraction.cellFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN,
+            HotPotInteraction.STANDALONE_INNER_SIZE);   // mryt233 改（清单 #107）：多传 player，按视线与汤面交点算格
         int cookedSlot = be.firstCookedSlotInCell(bigCell);
 
         if (isPlate(stack)) {
@@ -230,7 +232,7 @@ public class HotPotBlock extends Block implements EntityBlock , cn.blockforge.or
         }
         if (be.canScoopWith(stack)) {
             if (!world.isClientSide) {
-                be.scoopSoup(player, hand, HotPotInteraction.sideFromHit(be, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE));
+                be.scoopSoup(player, hand, HotPotInteraction.sideFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE));
             }
             return ItemInteractionResult.SUCCESS;
         }
@@ -272,8 +274,15 @@ public class HotPotBlock extends Block implements EntityBlock , cn.blockforge.or
             }
             return ItemInteractionResult.SUCCESS;
         }
+        // mryt233 改（2026-11-05，清单 #116）：辣椒加辣、冰块降辣——排在倒汤底之后、下锅食材之前
+        if (HotPotBlockEntity.isSpicyModifier(stack)) {
+            if (!world.isClientSide && !be.adjustSpiciness(player, hand, HotPotInteraction.sideFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE))) {
+                return ItemInteractionResult.FAIL;
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
         if (SoupBase.fromStack(stack) != null) {
-            if (!world.isClientSide && !be.pourSoup(player, hand, HotPotInteraction.sideFromHit(be, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE))) {
+            if (!world.isClientSide && !be.pourSoup(player, hand, HotPotInteraction.sideFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE))) {
                 return ItemInteractionResult.FAIL;
             }
             return ItemInteractionResult.SUCCESS;

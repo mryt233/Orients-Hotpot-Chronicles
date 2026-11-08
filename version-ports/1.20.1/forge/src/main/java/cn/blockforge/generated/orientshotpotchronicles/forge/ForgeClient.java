@@ -30,6 +30,12 @@ public final class ForgeClient {
     private static CreativeSubTabs.Hooks tabs;
 
     public ForgeClient(IEventBus modBus) {
+        // mryt233 改（0.2.2-alpha，清单 #128/#114）：Forge 端在模组菜单的「Config」按钮上打开游戏内设置界面。
+        // 1.20.1 Forge 用 ModLoadingContext#registerExtensionPoint + ConfigScreenHandler.ConfigScreenFactory。
+        net.minecraftforge.fml.ModLoadingContext.get().registerExtensionPoint(
+            net.minecraftforge.client.ConfigScreenHandler.ConfigScreenFactory.class,
+            () -> new net.minecraftforge.client.ConfigScreenHandler.ConfigScreenFactory(
+                (mc, parent) -> new cn.blockforge.generated.orientshotpotchronicles.client.HotPotConfigScreen(parent)));
         modBus.addListener(ForgeClient::setup);
         modBus.addListener(ForgeClient::renderers);
         MinecraftForge.EVENT_BUS.addListener(ForgeClient::tooltips);

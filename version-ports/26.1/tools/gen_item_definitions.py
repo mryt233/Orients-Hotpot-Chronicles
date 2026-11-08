@@ -7,7 +7,7 @@
 - overrides 按 custom_model_data   → minecraft:range_dispatch，property minecraft:custom_model_data（index 0）
 - overrides 按 orients_hotpot_chronicles:soup → range_dispatch，property orients_hotpot_chronicles:soup
 旧 overrides 的规则是「取最后一个满足 值 >= 门槛 的」，range_dispatch 是「取不超过值的最大门槛」，门槛递增时两者一致。
-物品清单从方块状态 / 物品模型和语言文件里的 item.<ns>.* / block.<ns>.* 推不全，所以用 1.20.1 探针导出的注册表（197 个物品）。
+物品清单使用本工程 tools/item_ids.json 固定的 197 个注册物品，不依赖其他版本的测试目录。
 """
 import json
 import sys
@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'common/src/main/resources/assets' / NS
 MODELS = ASSETS / 'models'
 OUT = ASSETS / 'items'
-ITEM_LIST = ROOT.parent / '1.20.1/review/fabric-runtime/server-dev/hotpot-probe.json'
+ITEM_LIST = ROOT / 'tools/item_ids.json'
 
 
 def load_model(ref):
@@ -50,6 +50,29 @@ def collect_display(ref, depth=0):
     merged = collect_display(model['parent'], depth + 1) if 'parent' in model else {}
     merged.update(model.get('display', {}))
     return merged
+
+
+# mryt233 改（2026-11-05）：_display 模型要继承原模型的 gui_light。
+# 模型不写 gui_light 时原版按 side（3D 方块侧光）打光，平面物品（夹着菜的筷子）在物品栏里
+# 得不到正面直射光，整个格子看着发暗；这里是 26.2 / 26.1「筷子夹东西物品栏变暗」的修复。
+GUI_LIGHT_FORCED = {
+    'orients_hotpot_chronicles:item/chopsticks_with_food': 'front',
+}
+
+
+def collect_gui_light(ref, depth=0):
+    """顺着父模型链找 gui_light（子模型优先）；对照表里的平面物品固定 front，找不到返回 None。"""
+    forced = GUI_LIGHT_FORCED.get(ref)
+    if forced:
+        return forced
+    if depth > 10 or ref.replace('minecraft:', '') == 'builtin/entity':
+        return None
+    model = load_model(ref)
+    if not model:
+        return None
+    if model.get('gui_light'):
+        return model['gui_light']
+    return collect_gui_light(model['parent'], depth + 1) if 'parent' in model else None
 
 
 # mryt233 改：只有 display 变换的模型没有 textures，粒子槽解析不到会报 Missing texture references in model ...: particle。
@@ -97,6 +120,11 @@ def write_display_model(ref):
     target = MODELS / (path + '_display.json')
     # mryt233 改：补上粒子贴图，不然客户端报 Missing texture references in model <ref>_display: particle。
     data = {'textures': {'particle': particle_texture(ref)}, 'display': collect_display(ref)}
+    # mryt233 改（2026-11-05）：带上 gui_light，平面物品用正面平光（front），3D 方块模型（锅、碗、盘）照原模型用 side。
+    gui_light = collect_gui_light(ref)
+    if gui_light:
+        data['gui_light'] = gui_light
+
     target.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     return f'{ns}:{path}_display'
 
@@ -187,7 +215,7 @@ def definition(item_id):
 
 
 def main():
-    items = [i['id'].split(':', 1)[1] for i in json.loads(ITEM_LIST.read_text(encoding='utf-8'))['items']]
+    items = json.loads(ITEM_LIST.read_text(encoding='utf-8'))['items']
     OUT.mkdir(parents=True, exist_ok=True)
     written = dynamic = dispatched = 0
     for item_id in sorted(items):

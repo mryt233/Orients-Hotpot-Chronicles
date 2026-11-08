@@ -36,7 +36,10 @@ public final class HotPotEffects {
         boolean soupVisible = be.hasSoup() && be.hasPot();
         heat += ((lit && soupVisible ? 1F : 0F) - heat) * 0.08F;
 
-        if (stoveShape && lit && world.getRandom().nextInt(2) == 0) {
+        // mryt233 改（2026-11-05，r135e）：本机粒子强度 0.0F～1.0F，0 就是整段粒子全关
+        float pScale = Config.particleScale();
+        // mryt233 改（2026-11-05，r135e）：灶膛口火苗按强度缩放（原 50% 概率）
+        if (stoveShape && lit && pScale > 0F && world.getRandom().nextFloat() < 0.5F * pScale) {
             Direction facing = state.getValue(StoveBlock.FACING);
             double side = (world.getRandom().nextDouble() - 0.5) * 0.36;
             double x = pos.getX() + 0.5 + facing.getStepX() * 0.43 + facing.getStepZ() * side;
@@ -46,7 +49,8 @@ public final class HotPotEffects {
         // 气泡由汤面的沸腾贴图表现（原版 BUBBLE_POP 是蓝色水泡，放在红汤上不对）；
         // 这里只从汤面（与模型同高：灶上 14.32/16、独立 5.6/16）缓缓冒出稀疏的热气。
         // 火星子：从锅和灶口砖墙之间那圈缝（四个面随机）往上冒；没装锅时从整个灶口里冒
-        if (stoveShape && lit && world.getRandom().nextFloat() < 0.35F) {
+        // mryt233 改（2026-11-05，r135e）：锅边火星子按强度缩放（原 35% 概率）
+        if (stoveShape && lit && pScale > 0F && world.getRandom().nextFloat() < 0.35F * pScale) {
             double x;
             double z;
             double y;
@@ -71,8 +75,9 @@ public final class HotPotEffects {
         }
         // 大滚时热气又密又急：火越旺，冒得越多、升得越快
         double surface = pos.getY() + lift + (stoveShape ? 14.32 : 5.6) / 16.0;
-        if (soupVisible && heat > 0.08F) {
-            int puffs = world.getRandom().nextFloat() < heat * 0.6F ? 1 + (world.getRandom().nextFloat() < heat * 0.5F ? 1 : 0) : 0;
+        if (soupVisible && heat > 0.08F && pScale > 0F) {
+            // mryt233 改（2026-11-05，r135e）：汤面热气的两段概率都乘上粒子强度
+            int puffs = world.getRandom().nextFloat() < heat * 0.6F * pScale ? 1 + (world.getRandom().nextFloat() < heat * 0.5F * pScale ? 1 : 0) : 0;
             for (int i = 0; i < puffs; i++) {
                 double ox = (world.getRandom().nextDouble() - 0.5) * 0.55;
                 double oz = (world.getRandom().nextDouble() - 0.5) * 0.55;

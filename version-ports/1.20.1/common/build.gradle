@@ -16,6 +16,15 @@ dependencies {
                          project(':framework:loader').sourceSets.main.output,
                          project(':framework:game').sourceSets.main.output,
                          project(':framework:client').sourceSets.main.output)
+
+    // 作者：mryt233（0.2.2-alpha）：配置旧键迁移的单元测试（只测纯 Gson 逻辑，写法同 framework:pure）。
+    testImplementation platform('org.junit:junit-bom:5.10.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 tasks.named('compileJava') {

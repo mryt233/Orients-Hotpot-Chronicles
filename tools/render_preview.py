@@ -95,8 +95,8 @@ def lerp(a, b, t):
 
 def draw_model(img, model, ox, oy):
     draw = ImageDraw.Draw(img)
-    els = sorted(model["elements"], key=lambda e: (e["from"][1] + e["to"][1]) / 2 * 0.001
-                 + (e["from"][0] + e["to"][0] + e["from"][2] + e["to"][2]))
+    els = sorted(model["elements"], key=lambda e: (e["from"][0] + e["to"][0] + e["from"][2] + e["to"][2]
+                 + (e["from"][1] + e["to"][1]) * 1.5))
     for el in els:
         for face in ("up", "south", "east"):
             f = el.get("faces", {}).get(face)

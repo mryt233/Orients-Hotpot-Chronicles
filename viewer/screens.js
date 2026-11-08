@@ -724,6 +724,13 @@ const SAUCE_SEASONINGS = [
   ["chopped_scallion", [`${NS}:scallion`], 0xff6cb03a, "小葱"],
   ["minced_cilantro", [`${NS}:cilantro`], 0xff4e9a2c, "香菜"],
   ["garlic_paste", [`${NS}:garlic_paste`], 0xffe8d696, "蒜泥"],
+  // mryt233 改（2026-11-06，r137）：蚝油、芝麻酱、花生碎、小米辣，共 14 种（和 hotpot/Seasoning 同序同色）
+  ["oyster_sauce", [`${NS}:oyster_sauce`], 0xff5a321e, "蚝油"],
+  ["sesame_paste", [`${NS}:sesame_paste`], 0xffc89e64, "芝麻酱"],
+  ["crushed_peanuts", [`${NS}:crushed_peanuts`], 0xffdab46e, "花生碎"],
+  ["millet_chili", [`${NS}:millet_chili`], 0xffe2281c, "小米辣"],
+  // mryt233 改（2026-11-06，r139）：折耳根碎，共 15 种（第 15 种；和 hotpot/Seasoning 同序同色）
+  ["minced_zhe_er_gen", [`${NS}:minced_zhe_er_gen`], 0xffd8d2bc, "折耳根碎"],
 ];
 const SAUCE_KEY = (k) => `text.${NS}.${k}`;
 // 2026-10-23: the 9 raw slots form a 3×3 grid matching the bowls on the station (row 0 = top step, left → right),
@@ -731,8 +738,14 @@ const SAUCE_KEY = (k) => `text.${NS}.${k}`;
 const SS = { W: 176, H: 178, GRID_X: 44, GRID_Y: 18, STEP_X: 30, STEP_Y: 22, INV_X: 8, INV_Y: 96, HOTBAR_Y: 154, MAX: 64 };
 const ssX = (i) => SS.GRID_X + (i % 3) * SS.STEP_X;
 const ssY = (i) => SS.GRID_Y + Math.floor(i / 3) * SS.STEP_Y;
-// ingredients table (Java: GAP, GUIDE_ROW_Y, GUIDE_ROW_H, ICONS_W); the canvas reserves GUIDE_MAX, the panel is drawn at its real width
-const SG = { GAP: 2, ROW_Y: 17, ROW_H: 16, ICONS_W: 34, MAX_W: 200 };   // ROW_Y 17 since garlic paste made it 10 rows
+// ingredients table (Java: GAP, ICONS_W, GUIDE_COL1/2_ROW_Y/H, GUIDE_COL_GAP).
+// mryt233 改（2026-11-06，r137）：14 种调料时按 Java 的双列布局——每列最多 7 行、行高 18、从 22 开始（22 + 7 × 18 = 148 < 178）；
+// 10 种以内沿用原来的单列（起点 17、行高 16）。面板画实际宽度，画布按下面估算的宽度预留。
+const SG = { GAP: 2, ICONS_W: 34, COL_GAP: 10, MAX_COLS: 2,
+  COL2_ROW_Y: 22, COL2_ROW_H: 18, COL1_ROW_Y: 17, COL1_ROW_H: 16,
+  // 画布预留宽度：Java 里窗口宽度有限，整块会往左挪；网页里没有窗口限制，按估算值预留就行（双列实测约 290～320）
+  MAX_W: 320 };
+
 // what is in each of the 9 bowls for the preview (seasoning index, -1 = empty bowl)
 const SAUCE_LAYOUTS = {
   each: [0, 1, 2, 3, 4, 5, 6, 7, 8],
@@ -761,6 +774,7 @@ const sauceStation = {
   name: "蘸料台补货界面",
   blocks: ["oak_sauce_station", "spruce_sauce_station", "birch_sauce_station", "jungle_sauce_station", "acacia_sauce_station", "dark_oak_sauce_station", "mangrove_sauce_station", "cherry_sauce_station", "bamboo_sauce_station", "crimson_sauce_station", "warped_sauce_station", "iron_sauce_station"],
   open: "右键蘸料台先打开「蘸料台总览」，点「补充蘸料台」进到这里（11 种木头 + 铁台都一样）；拿碗右键台上的小碗才是打蘸料。9 格排成 3×3 = 台上 9 个小碗（第一行是最上层，从左到右），空碗放什么原料都行。右上角「?」打开原料表",
+  // 原料表打开时画布要留出面板的位置；面板实际宽度按下面估算（网页里没有窗口宽度限制，不放不下就往左挪）
   size: (s) => [s.guide === "open" ? SS.W + SG.GAP + SG.MAX_W : SS.W, SS.H],
   textures: [],
   params: [
@@ -817,18 +831,25 @@ const sauceStation = {
     if (s.guide === "open") this.guide(g, SS.W + SG.GAP, 0);
   },
 
-  // ingredients table: one row per seasoning — raw item icons (up to two side by side), name, effect (grey)
+  // ingredients table: one row per seasoning — raw item icons (up to two side by side), name, effect (grey).
+  // mryt233 改（2026-11-06，r137）：超过 10 种调料分左右两列（每列最多 ceil(n/2) 行），和 SauceStationScreen.drawGuide 一致：
+  // 第 i 种在第 i / rowsPerCol 列、第 i % rowsPerCol 行，横坐标 px + 7 + col * (colW + COL_GAP)，纵坐标 py + rowY + row * rowH。
   guide(g, px, py) {
     const title = g.tr(SAUCE_KEY("screen.sauce.guide"));
     const rows = SAUCE_SEASONINGS.map(([id, raws]) => ({ raws, name: g.tr(SAUCE_KEY(`seasoning.${id}`)), effect: g.tr(SAUCE_KEY(`seasoning.${id}.effect`)) }));
-    const textW = Math.max(g.width(title), ...rows.map((r) => SG.ICONS_W + 4 + g.width(r.name) + 4 + g.width(r.effect)));
-    const gw = Math.max(7 + Math.ceil(textW) + 7, 12 + Math.ceil(g.width(title)) + 14);
+    const colW = Math.max(...rows.map((r) => SG.ICONS_W + 4 + g.width(r.name) + 4 + g.width(r.effect)));
+    const cols = rows.length > 10 ? 2 : 1;
+    const rowsPerCol = Math.ceil(rows.length / cols);
+    const rowY = cols > 1 ? SG.COL2_ROW_Y : SG.COL1_ROW_Y;
+    const rowH = cols > 1 ? SG.COL2_ROW_H : SG.COL1_ROW_H;
+    const gw = Math.max(7 + Math.ceil(colW) * cols + SG.COL_GAP * (cols - 1) + 7, 12 + Math.ceil(g.width(title)) + 14);
     woodPanel(g, gw, SS.H, px, py);
     g.text(title, px + 12, py + 7, TITLE, true);
     rows.forEach((r, i) => {
-      const ry = py + SG.ROW_Y + i * SG.ROW_H;
-      r.raws.slice(0, 2).forEach((id, k) => g.item(id, px + 7 + k * 17, ry));
-      const tx = px + 7 + SG.ICONS_W + 4;
+      const rx = px + 7 + Math.floor(i / rowsPerCol) * (Math.ceil(colW) + SG.COL_GAP);
+      const ry = py + rowY + (i % rowsPerCol) * rowH;
+      r.raws.slice(0, 2).forEach((id, k) => g.item(id, rx + k * 17, ry));
+      const tx = rx + SG.ICONS_W + 4;
       g.text(r.name, tx, ry + 4, LABEL, true);
       g.text(r.effect, tx + g.width(r.name) + 4, ry + 4, S_HINT, true);
     });
@@ -900,14 +921,19 @@ const sauceOverview = {
   },
 };
 
-// ===================================================================== hot pot guide book (2026-10-25, mryt233; redone 2026-10-26)
+// ===================================================================== hot pot guide book (2026-10-25, mryt233; redone 2026-10-26; blocks 2026-11-05)
 // Web port of client/GuideBookScreen: an open red book (textures/gui/guide_book.png from tools/gen_guide_gui.py), category
 // bookmarks down the left, entry bookmarks along the top (hover = stick out + name), one spread per entry.
-// Content = assets/<ns>/guide/zh_cn.json (tools/gen_guide_book.py from tools/guide_content.py). Same layout numbers as the
-// Java (book 272×180, columns x 16 / 144, width 112, from y 12, height 144; rows 14, recipe block 66). The bookmarks and
-// page arrows are clickable here too. Differences: no bold, recipes show the first item of a tag, no item tooltips.
-const GB = { W: 272, H: 180, LEFT_X: 16, RIGHT_X: 144, COL_W: 112, COL_Y: 12, COL_H: 144, RECIPE_H: 66, BX: 28, BY: 24 };
-const GB_COL = { text: 0xff2a1a0e, heading: 0xff5a2a10, muted: 0xff7a6040, tip: 0xff2e5e1e, number: 0xff1e6e78, rule: 0x40603820 };
+// Content = assets/<ns>/guide/zh_cn.json (tools/gen_guide_book.py, generated from the web book tutorial's own sources).
+// An entry is a list of blocks in source order (sub / p / note / th / tr / bul / num / icons / recipes / code / rule) that
+// flow from the left page to the right page and on to the next spread, same as the Java. Layout numbers are shared with the
+// Java (book 272×180, columns x 16 / 144, width 112, from y 12, height 144; icon row 18, recipe block 66); the bookmarks,
+// the table-of-contents rows and the page arrows are clickable here too.
+// Differences: no bold, recipes show the first item of a tag, no item tooltips.
+const GB = { W: 272, H: 180, LEFT_X: 16, RIGHT_X: 144, COL_W: 112, COL_Y: 12, COL_H: 144, RECIPE_H: 66, BX: 28, BY: 24,
+  CAT_W: 28, TAB_H: 24, ENTRY_W: 24, ENTRY_STEP: 26 };
+const GB_COL = { text: 0xff2a1a0e, heading: 0xff5a2a10, muted: 0xff7a6040, tip: 0xff2e5e1e, warn: 0xff8a3a12,
+  number: 0xff1e6e78, rule: 0x40603820, codeBg: 0x18603820 };
 const GB_TEX = `${NS}:gui/guide_book`;
 const GB_PROJECT = (new URLSearchParams(location.hash.slice(1)).get("p")) || "mod";
 const GUIDE = await fetch(`/api/file?p=${encodeURIComponent(GB_PROJECT)}&f=src/main/resources/assets/${NS}/guide/zh_cn.json`)
@@ -920,9 +946,10 @@ function gbItemName(g, id) {
   for (const k of [`item.${ns}.${path}`, `block.${ns}.${path}`]) if (g.lang[k]) return g.lang[k];
   return path;
 }
-// result item → 9 cells of item ids (first matching item of a tag), like GuideBookScreen.drawRecipe
+// result item → { cells: 9 item ids (first item of a tag), count, kind: "grid" | "stonecutter" | "furnace", input }
+// (= GuideBookScreen.findRecipe / drawRecipe: crafting first, then stonecutting / smelting / smoking / campfire)
+const GB_CRAFT = /crafting_(shaped|shapeless)|soup_bucket/;
 function gbRecipe(id) {
-  const r = GB_INDEX.recipes.find((x) => /crafting_(shaped|shapeless)|soup_bucket/.test(x.json.type) && ((x.json.result || {}).id || (x.json.result || {}).item) === id);
   const pick = (ing) => {
     if (!ing) return null;
     if (Array.isArray(ing)) return pick(ing[0]);
@@ -930,12 +957,18 @@ function gbRecipe(id) {
     if (ing.tag) return ((GB_INDEX.itemTags || {})[ing.tag] || [])[0] || null;
     return null;
   };
-  const cells = Array(9).fill(null);
-  if (!r) return { cells, count: 1 };
+  const outOf = (x) => (x.json.result || {}).id || (x.json.result || {}).item;
+  const r = GB_INDEX.recipes.find((x) => GB_CRAFT.test(x.json.type) && outOf(x) === id)
+    || GB_INDEX.recipes.find((x) => /stonecutting|smelting|smoking|campfire_cooking/.test(x.json.type) && outOf(x) === id);
+  if (!r) return { cells: Array(9).fill(null), count: 1, kind: "grid", input: null };
   const j = r.json;
-  if (j.pattern) j.pattern.forEach((row, y) => [...row].forEach((ch, x) => { if (ch !== " ") cells[y * 3 + x] = pick(j.key[ch]); }));
-  else (j.ingredients || []).forEach((ing, i) => { if (i < 9) cells[i] = pick(ing); });
-  return { cells, count: (j.result && j.result.count) || 1 };
+  const kind = GB_CRAFT.test(j.type) ? "grid" : /stonecutting/.test(j.type) ? "stonecutter" : "furnace";
+  const cells = Array(9).fill(null);
+  if (kind === "grid") {
+    if (j.pattern) j.pattern.forEach((row, y) => [...row].forEach((ch, x) => { if (ch !== " ") cells[y * 3 + x] = pick(j.key[ch]); }));
+    else (j.ingredients || []).forEach((ing, i) => { if (i < 9) cells[i] = pick(ing); });
+  }
+  return { cells, count: (j.result && j.result.count) || 1, kind, input: pick(j.ingredient) };
 }
 // "<pot>#<soup>" (a pot holding that broth) → the pot item model with that soup surface, e.g. iron_hot_pot_tomato;
 // "<id>#lit" → the "<id>_lit" item model (the lit stove) (= GuideBookScreen.stack)
@@ -947,46 +980,111 @@ function gbIcon(id) {
 function gbTitle(g, e) {
   return e.title || gbItemName(g, e.icon);
 }
-// = GuideBookScreen.layout + pour: columns of { kind, h, lines, ... }
+// = GuideBookScreen.layout: one header block + the entry's blocks in source order, poured into columns
+const GB_ICON_STEP = 18, GB_ICON_PER_ROW = 6;
+function gbWrap(g, text, w) {
+  return g.wrap(text === null || text === undefined ? "" : String(text), w);
+}
 function gbLayout(g, e) {
-  const left = [], right = [];
-  const rowsLeft = !!(e.recipes || e.steps);
-  const title = g.wrap(gbTitle(g, e), GB.COL_W - 20);
-  left.push({ kind: "header", h: Math.max(18, title.length * 9 + 6) + 6, lines: title, icon: e.icon });
-  const text = (s, color, out) => g.wrap(s, GB.COL_W).forEach((t) => out.push({ kind: "text", h: 9, lines: [t], color }));
-  if (e.get) { text(e.get, GB_COL.muted, left); left.push({ kind: "gap", h: 3 }); }
-  if (e.text) { text(e.text, GB_COL.text, left); left.push({ kind: "gap", h: 5 }); }
-  const rows = [];
-  if (e.rows) {
-    for (const [icon, s] of e.rows) {
-      const lines = g.wrap(s, GB.COL_W - 15);
-      rows.push({ kind: "row", h: lines.length === 1 ? 14 : lines.length * 9 + 5, lines, icon });
-    }
-    rows.push({ kind: "gap", h: 3 });
-  }
-  (rowsLeft ? left : right).push(...rows);
-  if (e.recipes) right.push({ kind: "recipe", h: GB.RECIPE_H, recipes: e.recipes });
-  if (e.steps) {
-    e.steps.forEach((s, i) => { const lines = g.wrap(s, GB.COL_W - 11); right.push({ kind: "step", h: lines.length * 9 + 3, lines, n: String(i + 1) }); });
-    right.push({ kind: "gap", h: 3 });
-  }
-  if (e.tip) { const lines = g.wrap(e.tip, GB.COL_W - 6); right.push({ kind: "tip", h: lines.length * 9 + 2, lines }); }
-  const cols = [];
-  const pour = (elems, newCol) => {
-    if (!elems.length) return;
-    let cur;
-    if (newCol || !cols.length) { cur = []; cols.push(cur); } else cur = cols[cols.length - 1];
-    let used = cur.reduce((a, x) => a + x.h, 0);
-    for (const el of elems) {
-      if (used + el.h > GB.COL_H && cur.length) {
-        cur = []; cols.push(cur); used = 0;
-        if (el.kind === "gap") continue;
-      }
-      cur.push(el); used += el.h;
-    }
+  const flow = [];
+  const title = gbWrap(g, gbTitle(g, e), GB.COL_W - 20);
+  flow.push({ kind: "header", h: Math.max(24, title.length * 9 + 10), lines: title, icon: e.icon });
+  const text = (s, color, after) => {
+    if (!s) return;
+    for (const t of gbWrap(g, s, GB.COL_W)) flow.push({ kind: "text", h: 9, lines: [t], color });
+    flow.push({ kind: "gap", h: after });
   };
-  pour(left, true);
-  pour(right, cols.length % 2 === 1);
+  const note = (head, body, kind) => {
+    const color = kind === "warn" ? GB_COL.warn : kind === "dev" ? GB_COL.number : kind === "quote" ? GB_COL.muted : GB_COL.tip;
+    const lines = [];
+    if (head) lines.push(...gbWrap(g, head, GB.COL_W - 10));
+    for (const t of body || []) if (t) lines.push(...gbWrap(g, t, GB.COL_W - 10));
+    if (lines.length) flow.push({ kind: "note", h: lines.length * 9 + 6, lines, color });
+  };
+  // old guide_content.py entries still work
+  if (!e.blocks) {
+    if (e.get) text(e.get, GB_COL.muted, 3);
+    if (e.text) text(e.text, GB_COL.text, 5);
+    if (e.rows) {
+      for (const [icon, s] of e.rows) {
+        const lines = gbWrap(g, s, GB.COL_W - 15);
+        flow.push({ kind: "row", h: lines.length === 1 ? 14 : lines.length * 9 + 5, lines, icon });
+      }
+      flow.push({ kind: "gap", h: 3 });
+    }
+    if (e.recipes) flow.push({ kind: "recipe", h: GB.RECIPE_H, recipes: e.recipes });
+    if (e.steps) e.steps.forEach((s, i) => {
+      const lines = gbWrap(g, s, GB.COL_W - 11);
+      flow.push({ kind: "num", h: lines.length * 9 + 3, lines, n: String(i + 1), color: GB_COL.text, indent: 0 });
+    });
+    if (e.tip) note("", [e.tip], "tip");
+  } else {
+    for (const b of e.blocks) {
+      if (b.k === "sub") {
+        const lines = gbWrap(g, b.t, GB.COL_W - 4);
+        flow.push({ kind: "sub", h: lines.length * 9 + 5, lines, color: GB_COL.heading });
+      } else if (b.k === "p") text(b.t, GB_COL.text, 4);
+      else if (b.k === "note") note(b.t, b.b, b.s || "tip");
+      else if (b.k === "th") {
+        const lines = gbWrap(g, b.t, GB.COL_W);
+        flow.push({ kind: "th", h: lines.length * 9 + 4, lines, color: GB_COL.heading });
+      } else if (b.k === "tr") {
+        const lines = gbWrap(g, b.t, GB.COL_W - 15);
+        flow.push({ kind: "row", h: lines.length <= 1 ? 14 : lines.length * 9 + 5, lines, icon: b.icon,
+          color: b.go ? GB_COL.number : GB_COL.text, go: b.go });
+      } else if (b.k === "bul" || b.k === "num") {
+        const indent = Math.max(0, Math.min(3, b.d || 0)) * 4;
+        const textX = b.icon ? (b.k === "bul" ? 15 : 22) : (b.k === "bul" ? 8 : 11);
+        const lines = gbWrap(g, b.t, Math.max(40, GB.COL_W - textX - indent));
+        flow.push({ kind: b.k, h: Math.max(b.icon ? 12 : 0, lines.length * 9 + 3), lines, n: b.k === "bul" ? "•" : String(b.n || 1),
+          color: GB_COL.text, indent, icon: b.icon || null });
+      } else if (b.k === "icons") {
+        const ids = b.ids || [];
+        if (ids.length) flow.push({ kind: "icons", h: Math.ceil(ids.length / GB_ICON_PER_ROW) * GB_ICON_STEP + 2, ids });
+      } else if (b.k === "recipes") flow.push({ kind: "recipe", h: GB.RECIPE_H, recipes: b.ids });
+      else if (b.k === "code") {
+        const lines = [];
+        for (const l of b.l) lines.push(...gbWrap(g, l, GB.COL_W - 6));
+        flow.push({ kind: "code", h: lines.length * 9 + 6, lines, color: GB_COL.muted });
+      } else if (b.k === "rule") flow.push({ kind: "rule", h: 7 });
+    }
+  }
+  // a block taller than a page (long English paragraphs, notes) is cut by lines, like GuideBookScreen.splitBlock
+  const splitBlock = (el) => {
+    if (el.h <= GB.COL_H) return [el];
+    if (el.kind === "icons") {
+      const out = [], per = Math.max(1, Math.floor((GB.COL_H - 2) / GB_ICON_STEP) * GB_ICON_PER_ROW);
+      for (let i = 0; i < el.ids.length; i += per) {
+        const ids = el.ids.slice(i, i + per);
+        out.push({ kind: "icons", h: Math.ceil(ids.length / GB_ICON_PER_ROW) * GB_ICON_STEP + 2, ids });
+      }
+      return out;
+    }
+    const pad = el.kind === "note" ? 6 : el.kind === "row" ? 5 : el.kind === "bul" || el.kind === "num" ? 3 : 0;
+    const maxLines = Math.max(1, Math.floor((GB.COL_H - pad) / 9));
+    if (el.lines.length <= maxLines) return [el];
+    const out = [];
+    for (let i = 0; i < el.lines.length; i += maxLines) {
+      const lines = el.lines.slice(i, i + maxLines);
+      const part = { ...el, lines, h: Math.max(pad + lines.length * 9, el.kind === "row" ? 9 : 0) };
+      if (i > 0) { part.icon = null; part.n = ""; part.go = null; }
+      out.push(part);
+    }
+    return out;
+  };
+  const cols = [];
+  let cur = [], used = 0;
+  for (const el of flow) {
+    for (const part of splitBlock(el)) {
+      if (used + part.h > GB.COL_H && cur.length) {
+        cols.push(cur);
+        cur = []; used = 0;
+        if (part.kind === "gap") continue;
+      }
+      cur.push(part); used += part.h;
+    }
+  }
+  cols.push(cur);
   return cols;
 }
 function gbState(s) {
@@ -998,26 +1096,129 @@ function gbState(s) {
 function gbIn(m, x, y, w, h) {
   return m && m[0] >= x && m[0] < x + w && m[1] >= y && m[1] < y + h;
 }
+// mryt233 改（2026-11-07）：固定步距、独立书签滚动与全文搜索，和游戏内书本保持一致。
+function gbStrip(s) {
+  const { cat, entry, entries } = gbState(s), searchX = GB.BX + GB.W - 6 - GB.ENTRY_W;
+  const total = Math.max(0, entries.length * GB.ENTRY_STEP - 2), overflow = total > searchX - (GB.BX + 6) - 6;
+  const left = GB.BX + (overflow ? 14 : 6), right = searchX - (overflow ? 10 : 6), max = Math.max(0, total - (right - left));
+  const key = `${cat}:${entry}`;
+  if (s._stripEntry !== key) {
+    s._stripEntry = key;
+    s._entryScroll = entry * GB.ENTRY_STEP + GB.ENTRY_W / 2 - (right - left) / 2;
+  }
+  s._entryScroll = Math.max(0, Math.min(max, s._entryScroll || 0));
+  return { left, right, max, searchX, x: (i) => left + i * GB.ENTRY_STEP - Math.round(s._entryScroll) };
+}
+const GB_FIND = { x: GB.BX + 18, y: GB.BY + 16, w: 236, h: 148, row: 25, listH: 100 };
+function gbFind(g, s) {
+  const q = (s._searchQuery || "").trim().toLowerCase();
+  if (s._findQuery === q) return;
+  s._findQuery = q; s._hitScroll = 0; s._hits = [];
+  if (!q) return;
+  const parts = (v) => Array.isArray(v) ? v.flatMap(parts) : typeof v === "string" ? [v] : [];
+  for (let ci = 0; ci < GB_CATS.length; ci++) for (let ei = 0; ei < GB_CATS[ci].entries.length; ei++) {
+    const c = GB_CATS[ci], e = c.entries[ei], title = `${c.title} · ${gbTitle(g, e)}`;
+    const text = [gbItemName(g, e.icon.split("#")[0])];
+    for (const b of e.blocks || []) {
+      text.push(...parts(b.t), ...parts(b.b), ...parts(b.l));
+      if (b.icon) text.push(gbItemName(g, b.icon.split("#")[0]));
+      for (const id of b.ids || []) text.push(gbItemName(g, id.split("#")[0]));
+    }
+    if (!e.blocks) {
+      for (const k of ["get", "text", "steps", "tip"]) text.push(...parts(e[k]));
+      for (const [id, label] of e.rows || []) text.push(gbItemName(g, id), label);
+      for (const id of e.recipes || []) text.push(gbItemName(g, id));
+    }
+    const body = text.join(" "), at = body.toLowerCase().indexOf(q), titleHit = title.toLowerCase().includes(q);
+    if (at < 0 && !titleHit) continue;
+    const from = Math.max(0, at - 12);
+    const cols = gbLayout(g, e), offsets = [];
+    let laid = "";
+    for (const col of cols) {
+      offsets.push(laid.length);
+      for (const el of col) {
+        laid += (el.lines || []).join("");
+        for (const id of [el.icon, ...(el.ids || []), ...(el.recipes || [])].filter(Boolean)) laid += " " + gbItemName(g, id.split("#")[0]);
+        if (el.kind !== "text") laid += " ";
+      }
+    }
+    const hit = laid.toLowerCase().indexOf(q);
+    let spread = 0;
+    offsets.forEach((offset, i) => { if (hit >= offset) spread = Math.floor(i / 2); });
+    s._hits.push({ cat: ci, entry: ei, title, icon: e.icon, snippet: (from ? "…" : "") + body.slice(from), rank: titleHit ? 0 : 1, spread });
+  }
+  s._hits.sort((a, b) => a.rank - b.rank);
+}
+function gbSearchJump(s, hit) {
+  s.cat = String(hit.cat); s.entry = String(hit.entry); s.spread = String(hit.spread); s._searchOpen = false;
+}
+function gbFit(g, text, width) {
+  if (g.width(text) <= width) return text;
+  const chars = [...text];
+  while (chars.length && g.width(chars.join("") + "…") > width) chars.pop();
+  return chars.join("") + "…";
+}
+function gbDrawSearch(g, s, mouse) {
+  gbFind(g, s);
+  const { x, y, w, h, row, listH } = GB_FIND;
+  g.fill(x + 3, y + 3, x + w + 3, y + h + 3, 0x602a1a0e);
+  g.fill(x, y, x + w, y + h, GB_COL.text);
+  g.fill(x + 1, y + 1, x + w - 1, y + h - 1, 0xfff5ecd8);
+  g.fill(x + 3, y + 3, x + w - 3, y + h - 3, 0xffdfc9a3);
+  g.fill(x + 4, y + 4, x + w - 4, y + h - 4, 0xfff5ecd8);
+  g.item("minecraft:compass", x + 7, y + 7);
+  g.text("×", x + w - 16, y + 10, gbIn(mouse, x + w - 20, y + 5, 16, 18) ? GB_COL.warn : GB_COL.heading);
+  g.fill(x + 6, y + 26, x + w - 6, y + 27, 0xffdfc9a3);
+  g.enableScissor(x + 5, y + 31, x + w - 5, y + 31 + listH);
+  for (let i = 0; i < s._hits.length; i++) {
+    const ry = y + 31 + i * row - (s._hitScroll || 0), hit = s._hits[i];
+    if (ry + row <= y + 31 || ry >= y + 31 + listH) continue;
+    if (gbIn(mouse, x + 5, ry, w - 10, row)) g.fill(x + 5, ry, x + w - 5, ry + row, 0x40dfc9a3);
+    g.item(gbIcon(hit.icon), x + 7, ry + 4);
+    g.text(gbFit(g, hit.title, w - 38), x + 28, ry + 2, GB_COL.heading);
+    g.text(gbFit(g, hit.snippet, w - 38), x + 28, ry + 13, GB_COL.muted);
+  }
+  if (!s._hits.length) g.text((s._searchQuery || "").trim() ? "没有找到相关条目" : "输入关键词查找物品、玩法或配方", x + 8, y + 36, GB_COL.muted);
+  g.disableScissor();
+  const max = Math.max(0, s._hits.length * row - listH);
+  if (max) {
+    const thumb = Math.max(8, Math.floor(listH * listH / (s._hits.length * row)));
+    const top = y + 31 + Math.floor((s._hitScroll || 0) * (listH - thumb) / max);
+    g.fill(x + w - 5, top, x + w - 4, top + thumb, GB_COL.muted);
+  }
+  g.text(`${s._hits.length} 条结果 · 回车打开首项`, x + 8, y + h - 13, GB_COL.muted);
+}
 const guideBook = {
   id: "hotpot_guide",
   name: "火锅指南（教程书）",
   blocks: [],
-  open: "拿着「火锅指南」右键打开。左边书签切分类、顶上书签切条目（鼠标放上去伸出来并显示名字），左下 / 右下三角、← → 键、滚轮翻页。这里也能直接点书签和三角",
+  open: "右键打开指南。顶部滚轮或两端箭头横向滑动条目，右上角指南针、Ctrl+F 或 / 搜索全文；正文区域滚轮翻页。设置从模组菜单配置按钮进入（Fabric 需 Mod Menu）。",
   size: [GB.BX + GB.W + 3, GB.BY + GB.H + 3],
   textures: [GB_TEX],
   params: [
     { key: "cat", label: "分类", options: GB_CATS.map((c, i) => [String(i), c.title]), default: "0" },
-    { key: "entry", label: "条目", options: [...Array(9)].map((_, i) => [String(i), String(i + 1)]), default: "0" },
+    { key: "entry", label: "条目", options: [...Array(Math.max(1, ...GB_CATS.map((c) => c.entries.length)))].map((_, i) => [String(i), String(i + 1)]), default: "0" },
     { key: "spread", label: "跨页", options: [["0", "1"], ["1", "2"], ["2", "3"]], default: "0" },
   ],
   icons() {
-    const ids = new Set();
+    const ids = new Set(["minecraft:compass"]);
+    const rec = (r) => {
+      ids.add(r);
+      const d = gbRecipe(r);
+      d.cells.forEach((x) => x && ids.add(x));
+      if (d.input) ids.add(d.input);
+    };
     for (const c of GB_CATS) {
       ids.add(gbIcon(c.icon));
       for (const e of c.entries) {
         ids.add(gbIcon(e.icon));
         (e.rows || []).forEach((r) => ids.add(r[0]));
-        (e.recipes || []).forEach((r) => { ids.add(r); gbRecipe(r).cells.forEach((x) => x && ids.add(x)); });
+        (e.recipes || []).forEach(rec);
+        for (const b of e.blocks || []) {
+          if (b.icon) ids.add(gbIcon(b.icon));
+          (b.ids || []).forEach((x) => ids.add(gbIcon(x)));
+          (b.recipes || []).forEach(rec);
+        }
       }
     }
     return [...ids];
@@ -1032,22 +1233,45 @@ const guideBook = {
     const spreads = Math.max(1, Math.ceil(cols.length / 2));
     const spread = Math.min(parseInt(s.spread, 10) || 0, spreads - 1);
     s._spreads = spreads;
+    // category bookmarks: 9 categories still fit inside the 180-pixel book (step shrinks when there are many)
+    const catStep = GB_CATS.length <= 1 ? GB.TAB_H
+      : Math.min(GB.TAB_H, Math.max(9, Math.floor((GB.H - GB.TAB_H - 6) / (GB_CATS.length - 1))));
+    const catH = GB.TAB_H;
+    const catY = (i) => by + 6 + i * catStep;
+    const strip = gbStrip(s), entX = strip.x;
     let hoverCat = -1, hoverEntry = -1;
     GB_CATS.forEach((c, i) => {
-      const ty = by + 10 + i * 24;
-      const hover = gbIn(mouse, bx - 28, ty, 28, 24);
+      const ty = catY(i);
+      const hover = !s._searchOpen && gbIn(mouse, bx - GB.CAT_W, ty, GB.CAT_W, catH);
       if (hover) hoverCat = i;
-      g.texture(GB_TEX, bx - 24 - (i === cat || hover ? 4 : 0), ty, 280, i === cat ? 24 : 0, 28, 24, 512, 256);
+      g.texture(GB_TEX, bx - 24 - (i === cat || hover ? 4 : 0), ty, 280, i === cat ? 24 : 0, GB.CAT_W, GB.TAB_H, 512, 256);
     });
+    g.enableScissor(strip.left, by - 26, strip.right, by);
     entries.forEach((x, i) => {
-      const tx = bx + 14 + i * 26;
-      const hover = gbIn(mouse, tx, by - 24, 24, 24);
+      const tx = entX(i);
+      const hover = !s._searchOpen && gbIn(mouse, strip.left, by - 26, strip.right - strip.left, 26)
+        && gbIn(mouse, tx, by - 23, GB.ENTRY_W, 23);
       if (hover) hoverEntry = i;
-      g.texture(GB_TEX, tx, by - 20 - (i === entry || hover ? 3 : 0), 312, i === entry ? 24 : 0, 24, 24, 512, 256);
+      g.texture(GB_TEX, tx, by - 20 - (i === entry || hover ? 3 : 0), 312, i === entry ? 24 : 0, GB.ENTRY_W, GB.TAB_H, 512, 256);
     });
+    g.disableScissor();
+    const hoverSearch = gbIn(mouse, strip.searchX, by - 23, GB.ENTRY_W, 23);
+    g.enableScissor(strip.searchX, by - 26, strip.searchX + GB.ENTRY_W, by);
+    g.texture(GB_TEX, strip.searchX, by - 20 - (s._searchOpen || hoverSearch ? 3 : 0), 312, s._searchOpen ? 24 : 0, GB.ENTRY_W, GB.TAB_H, 512, 256);
+    g.disableScissor();
     g.texture(GB_TEX, bx, by, 0, 0, GB.W + 3, GB.H + 3, 512, 256);
-    GB_CATS.forEach((c, i) => g.item(gbIcon(c.icon), bx - 19 - (i === cat || i === hoverCat ? 4 : 0), by + 10 + i * 24 + 4));
-    entries.forEach((x, i) => g.item(gbIcon(x.icon), bx + 14 + i * 26 + 4, by - 16 - (i === entry || i === hoverEntry ? 3 : 0)));
+    GB_CATS.forEach((c, i) => g.item(gbIcon(c.icon), bx - 19 - (i === cat || i === hoverCat ? 4 : 0), catY(i) + 4));
+    g.enableScissor(strip.left, by - 26, strip.right, by);
+    entries.forEach((x, i) => g.item(gbIcon(x.icon), entX(i) + 4, by - 18 - (i === entry || i === hoverEntry ? 3 : 0)));
+    g.disableScissor();
+    g.enableScissor(strip.searchX, by - 26, strip.searchX + GB.ENTRY_W, by);
+    g.item("minecraft:compass", strip.searchX + 4, by - 18 - (s._searchOpen || hoverSearch ? 3 : 0));
+    g.disableScissor();
+    if (strip.max > 0) {
+      g.text("<", bx + 6, by - 16, GB_COL.heading);
+      g.text(">", strip.right + 1, by - 16, GB_COL.heading);
+    }
+    const links = [];   // table-of-contents rows: [x, y, w, h, cat, entry], clicked in click()
     for (let k = 0; k < 2 && spread * 2 + k < cols.length; k++) {
       const x = bx + (k === 0 ? GB.LEFT_X : GB.RIGHT_X);
       let y = by + GB.COL_Y;
@@ -1058,31 +1282,67 @@ const guideBook = {
           for (const t of el.lines) { g.text(t, x + 20, ty, GB_COL.heading); ty += 9; }
           g.fill(x, y + el.h - 4, x + GB.COL_W, y + el.h - 3, GB_COL.rule);
         } else if (el.kind === "text") g.text(el.lines[0], x, y, el.color);
-        else if (el.kind === "row") {
-          const img = g.icons.get(el.icon);
+        else if (el.kind === "sub") {
+          let ty = y + 1;
+          for (const t of el.lines) { g.text(t, x, ty, el.color); ty += 9; }
+          g.fill(x, y + el.h - 3, x + GB.COL_W, y + el.h - 2, GB_COL.rule);
+        } else if (el.kind === "note") {
+          g.fill(x, y, x + 2, y + el.h - 2, el.color);
+          let ty = y + 1;
+          for (const t of el.lines) { g.text(t, x + 6, ty, el.color); ty += 9; }
+        } else if (el.kind === "th") {
+          let ty = y;
+          for (const t of el.lines) { g.text(t, x, ty, el.color); ty += 9; }
+          g.fill(x, y + el.h - 3, x + GB.COL_W, y + el.h - 2, GB_COL.rule);
+        } else if (el.kind === "row") {
+          const img = g.icons.get(gbIcon(el.icon || ""));
           if (img) g.g.drawImage(img, (g.ox + x) * g.s, (g.oy + y + 1) * g.s, 12 * g.s, 12 * g.s);
           let ty = y + (el.lines.length === 1 ? 3 : 2);
-          for (const t of el.lines) { g.text(t, x + 15, ty, GB_COL.text); ty += 9; }
-        } else if (el.kind === "step") {
-          g.text(el.n, x + 1, y, GB_COL.number);
+          for (const t of el.lines) { g.text(t, x + 15, ty, el.color || GB_COL.text); ty += 9; }
+          if (el.go) links.push([x, y, GB.COL_W, el.h, el.go[0], el.go[1]]);
+        } else if (el.kind === "bul" || el.kind === "num") {
+          const off = el.indent || 0;
+          g.text(el.n, x + off + 1, y, el.kind === "num" ? GB_COL.number : GB_COL.muted);
+          let textX = el.kind === "num" ? 11 : 8;
+          if (el.icon) {
+            const img = g.icons.get(gbIcon(el.icon));
+            if (img) g.g.drawImage(img, (g.ox + x + off + (el.kind === "num" ? 7 : 4)) * g.s, (g.oy + y) * g.s, 12 * g.s, 12 * g.s);
+            textX = el.kind === "num" ? 22 : 15;
+          }
           let ty = y;
-          for (const t of el.lines) { g.text(t, x + 11, ty, GB_COL.text); ty += 9; }
-        } else if (el.kind === "tip") {
-          g.fill(x, y, x + 2, y + el.h - 2, GB_COL.tip);
-          let ty = y;
-          for (const t of el.lines) { g.text(t, x + 6, ty, GB_COL.tip); ty += 9; }
+          for (const t of el.lines) { g.text(t, x + off + textX, ty, el.color); ty += 9; }
+        } else if (el.kind === "icons") {
+          el.ids.forEach((id, i) => g.item(gbIcon(id), x + (i % GB_ICON_PER_ROW) * GB_ICON_STEP, y + 1 + Math.floor(i / GB_ICON_PER_ROW) * GB_ICON_STEP));
+        } else if (el.kind === "code") {
+          g.fill(x - 1, y, x + GB.COL_W, y + el.h - 3, GB_COL.codeBg);
+          let ty = y + 2;
+          for (const t of el.lines) { g.text(t, x + 2, ty, el.color); ty += 9; }
+        } else if (el.kind === "rule") {
+          g.fill(x, y + 3, x + GB.COL_W, y + 4, GB_COL.rule);
         } else if (el.kind === "recipe") {
           const idx = Math.floor(time / 2000) % el.recipes.length;
           const id = el.recipes[idx];
-          const { cells, count } = gbRecipe(id);
+          const { cells, count, kind, input } = gbRecipe(id);
           const gx = x + 10, gy = y + 1;
-          for (let i = 0; i < 9; i++) {
-            g.texture(GB_TEX, gx + (i % 3) * 18, gy + Math.floor(i / 3) * 18, 340, 0, 18, 18, 512, 256);
-            if (cells[i]) g.item(cells[i], gx + (i % 3) * 18 + 1, gy + Math.floor(i / 3) * 18 + 1);
+          if (kind === "grid") {
+            for (let i = 0; i < 9; i++) {
+              g.texture(GB_TEX, gx + (i % 3) * 18, gy + Math.floor(i / 3) * 18, 340, 0, 18, 18, 512, 256);
+              if (cells[i]) g.item(cells[i], gx + (i % 3) * 18 + 1, gy + Math.floor(i / 3) * 18 + 1);
+            }
+            g.texture(GB_TEX, gx + 58, gy + 23, 340, 18, 12, 8, 512, 256);
+            g.texture(GB_TEX, gx + 74, gy + 18, 340, 0, 18, 18, 512, 256);
+            g.item(id, gx + 75, gy + 19, count);
+          } else {
+            // stonecutter / furnace: one ingredient, arrow, one result; small label above (= GuideBookScreen.drawRecipe)
+            const sx = gx + 12, sy = gy + 4;
+            g.texture(GB_TEX, sx, sy, 340, 0, 18, 18, 512, 256);
+            if (input) g.item(input, sx + 1, sy + 1);
+            g.texture(GB_TEX, sx + 26, sy + 5, 340, 18, 12, 8, 512, 256);
+            g.texture(GB_TEX, gx + 44, gy + 4, 340, 0, 18, 18, 512, 256);
+            g.item(id, gx + 45, gy + 5, count);
+            const how = kind === "stonecutter" ? g.tr("block.minecraft.stonecutter") : g.tr("block.minecraft.furnace");
+            g.text(how, x + (GB.COL_W - g.width(how)) / 2, gy + 28, GB_COL.muted);
           }
-          g.texture(GB_TEX, gx + 58, gy + 23, 340, 18, 12, 8, 512, 256);
-          g.texture(GB_TEX, gx + 74, gy + 18, 340, 0, 18, 18, 512, 256);
-          g.item(id, gx + 75, gy + 19, count);
           const name = gbItemName(g, id), cnt = el.recipes.length > 1 ? `  ${idx + 1}/${el.recipes.length}` : "";
           const lx = x + (GB.COL_W - g.width(name) - g.width(cnt)) / 2;
           g.text(name, lx, y + 57, GB_COL.number);
@@ -1091,21 +1351,45 @@ const guideBook = {
         y += el.h;
       }
     }
+    s._links = links;
     const atStart = cat === 0 && entry === 0 && spread === 0;
     const atEnd = cat === GB_CATS.length - 1 && entry === entries.length - 1 && spread === spreads - 1;
     if (!atStart) g.texture(GB_TEX, bx + GB.LEFT_X, by + 159, gbIn(mouse, bx + GB.LEFT_X - 2, by + 158, 13, 11) ? 370 : 360, 0, 9, 9, 512, 256);
     if (!atEnd) g.texture(GB_TEX, bx + GB.W - GB.LEFT_X - 9, by + 159, gbIn(mouse, bx + GB.W - GB.LEFT_X - 11, by + 158, 13, 11) ? 370 : 360, 9, 9, 9, 512, 256);
     if (spreads > 1) { const p = `${spread + 1} / ${spreads}`; g.text(p, bx + GB.RIGHT_X + GB.COL_W / 2 - g.width(p) / 2, by + 160, GB_COL.muted); }
-    if (hoverCat >= 0) g.tooltip([GB_CATS[hoverCat].title], mouse[0], mouse[1], w, GB.BY + GB.H);
+    if (s._searchOpen) gbDrawSearch(g, s, mouse);
+    if (hoverSearch) g.tooltip(["搜索"], mouse[0], mouse[1], w, GB.BY + GB.H);
+    else if (s._searchOpen) return;
+    else if (hoverCat >= 0) g.tooltip([GB_CATS[hoverCat].title], mouse[0], mouse[1], w, GB.BY + GB.H);
     else if (hoverEntry >= 0) g.tooltip([gbTitle(g, entries[hoverEntry])], mouse[0], mouse[1], w, GB.BY + GB.H);
   },
-  // clicks: bookmarks and page arrows change the preview state (= GuideBookScreen.mouseClicked); true = redraw
+  // clicks: bookmarks, table-of-contents rows and page arrows change the preview state (= GuideBookScreen.mouseClicked); true = redraw
   click(s, mx, my) {
     const { BX: bx, BY: by } = GB;
     const m = [mx, my];
-    for (let i = 0; i < GB_CATS.length; i++) if (gbIn(m, bx - 28, by + 10 + i * 24, 28, 24)) { s.cat = String(i); s.entry = "0"; s.spread = "0"; return true; }
+    const strip = gbStrip(s);
+    if (gbIn(m, strip.searchX, by - 23, GB.ENTRY_W, 23)) { s._searchOpen = !s._searchOpen; return true; }
+    if (s._searchOpen) {
+      const { x, y, w, row, listH } = GB_FIND;
+      if (gbIn(m, x + w - 20, y + 5, 16, 18)) { s._searchOpen = false; return true; }
+      if (gbIn(m, x + 5, y + 31, w - 10, listH)) {
+        const hit = (s._hits || [])[Math.floor((my - y - 31 + (s._hitScroll || 0)) / row)];
+        if (hit) { gbSearchJump(s, hit); return true; }
+      }
+      return false;
+    }
+    if (strip.max > 0) {
+      if (gbIn(m, bx + 6, by - 26, 8, 26)) { s._entryScroll = Math.max(0, s._entryScroll - GB.ENTRY_STEP * 3); return true; }
+      if (gbIn(m, strip.right, by - 26, 8, 26)) { s._entryScroll = Math.min(strip.max, s._entryScroll + GB.ENTRY_STEP * 3); return true; }
+    }
+    const catStep = GB_CATS.length <= 1 ? GB.TAB_H
+      : Math.min(GB.TAB_H, Math.max(9, Math.floor((GB.H - GB.TAB_H - 6) / (GB_CATS.length - 1))));
+    const catH = GB.TAB_H;
+    for (let i = 0; i < GB_CATS.length; i++) if (gbIn(m, bx - GB.CAT_W, by + 6 + i * catStep, GB.CAT_W, catH)) { s.cat = String(i); s.entry = "0"; s.spread = "0"; return true; }
     const { cat, entry, entries } = gbState(s);
-    for (let i = 0; i < entries.length; i++) if (gbIn(m, bx + 14 + i * 26, by - 24, 24, 24)) { s.entry = String(i); s.spread = "0"; return true; }
+    for (let i = 0; i < entries.length; i++) if (gbIn(m, strip.left, by - 26, strip.right - strip.left, 26)
+      && gbIn(m, strip.x(i), by - 23, GB.ENTRY_W, 23)) { s.entry = String(i); s.spread = "0"; return true; }
+    for (const [x, y, w2, h, c2, e2] of s._links || []) if (gbIn(m, x, y, w2, h)) { s.cat = String(c2); s.entry = String(e2); s.spread = "0"; return true; }
     const spreads = s._spreads || 1;
     const spread = Math.min(parseInt(s.spread, 10) || 0, spreads - 1);
     const go = (c, en, sp) => { s.cat = String(c); s.entry = String(en); s.spread = String(sp); return true; };
@@ -1120,6 +1404,41 @@ const guideBook = {
       if (cat < GB_CATS.length - 1) return go(cat + 1, 0, 0);
     }
     return false;
+  },
+  wheel(s, mx, my, dx, dy) {
+    const strip = gbStrip(s), { x, y, w, row, listH } = GB_FIND;
+    if (s._searchOpen) {
+      if (gbIn([mx, my], x + 5, y + 31, w - 10, listH)) s._hitScroll = Math.max(0,
+        Math.min(Math.max(0, (s._hits || []).length * row - listH), (s._hitScroll || 0) + Math.sign(dy) * row));
+      return true;
+    }
+    if (gbIn([mx, my], GB.BX, GB.BY - 26, GB.W, 28)) {
+      s._entryScroll = Math.max(0, Math.min(strip.max, s._entryScroll + Math.sign(dy || dx) * GB.ENTRY_STEP * 2));
+      return true;
+    }
+    if (dy) this.click(s, dy > 0 ? GB.BX + GB.W - GB.LEFT_X - 5 : GB.BX + GB.LEFT_X, GB.BY + 162);
+    return true;
+  },
+  key(s, event) {
+    if (event.isComposing) return false;
+    if (((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "f") || (!s._searchOpen && event.key === "/")) {
+      s._searchOpen = !s._searchOpen; return true;
+    }
+    if (s._searchOpen) {
+      if (event.key === "Escape") { s._searchOpen = false; return true; }
+      if (event.key === "Enter") { if ((s._hits || []).length) gbSearchJump(s, s._hits[0]); return true; }
+      return false;
+    }
+    if (["ArrowLeft", "PageUp", "ArrowRight", "PageDown"].includes(event.key)) {
+      this.click(s, ["ArrowRight", "PageDown"].includes(event.key) ? GB.BX + GB.W - GB.LEFT_X - 5 : GB.BX + GB.LEFT_X, GB.BY + 162);
+      return true;
+    }
+    return false;
+  },
+  textInput(s) {
+    if (!s._searchOpen) return null;
+    return { x: GB_FIND.x + 29, y: GB_FIND.y + 11, w: GB_FIND.w - 54, value: s._searchQuery || "",
+      label: "书内搜索", placeholder: "搜索：物品、玩法、配方……", change: (value) => { s._searchQuery = value; } };
   },
 };
 

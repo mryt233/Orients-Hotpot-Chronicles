@@ -52,6 +52,29 @@ def collect_display(ref, depth=0):
     return merged
 
 
+# mryt233 改（2026-11-05）：_display 模型要继承原模型的 gui_light。
+# 模型不写 gui_light 时原版按 side（3D 方块侧光）打光，平面物品（夹着菜的筷子）在物品栏里
+# 得不到正面直射光，整个格子看着发暗；这里是 26.2 / 26.1「筷子夹东西物品栏变暗」的修复。
+GUI_LIGHT_FORCED = {
+    'orients_hotpot_chronicles:item/chopsticks_with_food': 'front',
+}
+
+
+def collect_gui_light(ref, depth=0):
+    """顺着父模型链找 gui_light（子模型优先）；对照表里的平面物品固定 front，找不到返回 None。"""
+    forced = GUI_LIGHT_FORCED.get(ref)
+    if forced:
+        return forced
+    if depth > 10 or ref.replace('minecraft:', '') == 'builtin/entity':
+        return None
+    model = load_model(ref)
+    if not model:
+        return None
+    if model.get('gui_light'):
+        return model['gui_light']
+    return collect_gui_light(model['parent'], depth + 1) if 'parent' in model else None
+
+
 # mryt233 改：只有 display 变换的模型没有 textures，粒子槽解析不到会报 Missing texture references in model ...: particle。
 # 下面这几个动态物品画的是碗 / 盘子，原模型（builtin/entity）自己没写 textures，粒子贴图取同族方块模型里已有的。
 PARTICLE_FALLBACKS = {
@@ -98,6 +121,11 @@ def write_display_model(ref):
     target = MODELS / (path + '_display.json')
     # mryt233 改：补上粒子贴图，不然客户端报 Missing texture references in model <ref>_display: particle。
     data = {'textures': {'particle': particle_texture(ref)}, 'display': collect_display(ref)}
+    # mryt233 改（2026-11-05）：带上 gui_light，平面物品用正面平光（front），3D 方块模型（锅、碗、盘）照原模型用 side。
+    gui_light = collect_gui_light(ref)
+    if gui_light:
+        data['gui_light'] = gui_light
+
     target.write_bytes((json.dumps(data, indent=2, ensure_ascii=False) + '\n').encode('utf-8'))
     return f'{ns}:{path}_display'
 

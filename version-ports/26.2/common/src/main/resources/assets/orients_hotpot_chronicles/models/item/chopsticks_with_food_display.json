@@ -2,5 +2,6 @@
   "textures": {
     "particle": "orients_hotpot_chronicles:item/bamboo_chopsticks"
   },
-  "display": {}
+  "display": {},
+  "gui_light": "front"
 }

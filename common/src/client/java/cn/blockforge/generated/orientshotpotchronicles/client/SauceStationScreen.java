@@ -35,11 +35,39 @@ public class SauceStationScreen extends AbstractContainerScreen<SauceStationScre
     private static final int MAX = SauceStationBlockEntity.MAX_RAW * SauceStationBlockEntity.PORTIONS_PER_RAW;
     /** 次要的字（层名、效果）：标签色压暗一点。 */
     static final int HINT = 0xFFA88C5C;
-    /** 原料表：离主界面 2 像素，标题下每种一行 16 像素，原料图标最多两个并排。 */
-    // 原料表 10 行（2026-10-25 加蒜泥）：第一行从 17 开始才放得下（17 + 10 × 16 = 177，面板高 178；调整，原来 18）
-    private static final int GAP = 2, GUIDE_ROW_Y = 17, GUIDE_ROW_H = 16, ICONS_W = 34;
+    /**
+     * 原料表：离主界面 2 像素，标题下每种一行 18 像素（图标 16×16 清晰不重叠），原料图标最多两个并排。
+     *
+     * <p>mryt233 改（2026-11-06，r137）：调料从 10 种涨到 14 种，按单列 16 行高画在 178 高的面板里会超出底边
+     * （17 + 14 × 16 = 241）。改成多列：每列最多 8 行（22 + 7 × 18 = 148，图标底边 164 &lt; 178），列数按调料种数反推；
+     * 10 种以内仍按原来的单列画（22 + 10 × 18 = 202 会超出，所以 10 种以内用原来的行高 16 / 起始 17）。
+     * </p>
+     * mryt233 改（2026-11-07）：列数还受窗口宽度限制——窄窗口（界面缩放 4）里两列会画到屏幕右边界之外，
+     * 放不下就退成一列，再放不下就把效果文字截断（见 {@link #drawGuide}）。
+     */
+    private static final int GAP = 2, ICONS_W = 34;
+    /** 多列时每行高度、第一行的纵坐标（8 行：22 + 7 × 18 = 148，图标底边 164 &lt; 178）。 */
+    private static final int GUIDE_COL2_ROW_Y = 22, GUIDE_COL2_ROW_H = 18;
+    /** 单列时沿用原来的行距（起点 17、行高 16，10 种以内放得下）。 */
+    private static final int GUIDE_COL1_ROW_Y = 17, GUIDE_COL1_ROW_H = 16;
+    /** 两列之间的距离（第 2 列的横坐标偏移 = colW + GUIDE_COL_GAP）。 */
+    private static final int GUIDE_COL_GAP = 10;
+    /** 每列最多几行：第 8 行在 22 + 7 × 18 = 148，图标底边 164，面板高 178 放得下；第 9 行底边 182 就顶出面板了。 */
+    private static final int MAX_ROWS_PER_COL = 8;
+    /** 一列最窄多宽：原料图标 34 + 名字至少留 10 像素（再窄名字就截成看不出是哪种调料了，只能到这道线为止）。 */
+    private static final int MIN_COL_W = 44;
     private static boolean guideOpen;
     private int guideW;
+    /** 单列一行的宽度（图标 + 名字 + 效果，取所有调料里最宽的一行）。 */
+    private int colW;
+    /** 实际排版用的每列宽度：窗口窄到放不下自然宽度时比 {@link #colW} 小，名字 / 效果文字按它截断。 */
+    private int guideColW;
+    /** 分几列（14 种时 2 列）、每列几行。 */
+    private int cols = 1;
+    private int rowsPerCol = Seasoning.ALL.length;
+    /** 原料表第一行的纵坐标与行高（分列方式不同，取值不同，见 {@link #init}）。 */
+    private int guideRowY = GUIDE_COL1_ROW_Y;
+    private int guideRowH = GUIDE_COL1_ROW_H;
 
     public SauceStationScreen(SauceStationScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
@@ -53,14 +81,35 @@ public class SauceStationScreen extends AbstractContainerScreen<SauceStationScre
     @Override
     protected void init() {
         super.init();
-        int textW = font.width(guideTitle());
+        // mryt233 改（2026-11-06，r137）：先算单列一行的宽度，再决定分几列（14 种调料 → 2 列 × 7 行）。
+        colW = 0;
         for (Seasoning s : Seasoning.ALL) {
-            textW = Math.max(textW, ICONS_W + 4 + font.width(Component.translatable(s.nameKey()))
+            colW = Math.max(colW, ICONS_W + 4 + font.width(Component.translatable(s.nameKey()))
                 + 4 + font.width(effect(s)));
         }
-        guideW = Math.max(7 + textW + 7, 12 + font.width(guideTitle()) + 14);
+        // 原料表要画 Seasoning.ALL.length 行，每列最多 MAX_ROWS_PER_COL 行；超过就加一列，别把行往下挤。
+        // mryt233 改（2026-11-07）：以前写死「超过 10 种就 2 列」，调料加到 17 种时第二列会溢出面板底边；
+        // 而且窄窗口（界面缩放 4）里两列会整张画到屏幕右边界之外，现在按窗口宽度收窄列宽、截断名字和效果文字。
+        int maxW = guideMaxWidth();
+        int len = Seasoning.ALL.length;
+        // 列数只由「每列最多几行」决定：减列会把行数顶到面板底边外去（宁可横向截断，也不能纵向溢出）
+        cols = Math.max(1, (len + MAX_ROWS_PER_COL - 1) / MAX_ROWS_PER_COL);
+        rowsPerCol = (len + cols - 1) / cols;
+        boolean multi = cols > 1 || len > 8;
+        guideRowY = multi ? GUIDE_COL2_ROW_Y : GUIDE_COL1_ROW_Y;
+        guideRowH = multi ? GUIDE_COL2_ROW_H : GUIDE_COL1_ROW_H;
+        int titleW = 12 + font.width(guideTitle()) + 14;
+        int natural = 14 + colW * cols + GUIDE_COL_GAP * (cols - 1);
+        // 自然宽度超过窗口能给的就压到 maxW（窄窗口里表不画到屏幕右边界之外）；
+        // 但面板不能比「每列最窄 MIN_COL_W」的内容还窄，否则文字会从面板右边溢出去
+        int narrowest = 14 + MIN_COL_W * cols + GUIDE_COL_GAP * (cols - 1);
+        guideW = Math.max(narrowest, Math.min(maxW, Math.max(natural, titleW)));
+        int available = (guideW - 14 - GUIDE_COL_GAP * (cols - 1)) / cols;
+        guideColW = Math.max(MIN_COL_W, Math.min(colW, available));
         if (guideOpen) {
-            leftPos = (width - W - GAP - guideW) / 2;
+            // 整块（主面板 + 表）居中；窗口放不下就一路往左推，宁可主面板从左边出去，也别让表画到屏幕外
+            int centered = (width - W - GAP - guideW) / 2;
+            leftPos = Math.min(centered, width - 2 - W - GAP - guideW);
         }
         addRenderableWidget(Button.builder(Component.literal("?"), b -> {
                 guideOpen = !guideOpen;
@@ -114,20 +163,44 @@ public class SauceStationScreen extends AbstractContainerScreen<SauceStationScre
         }
     }
 
-    /** 原料表：每种调料一行——原料图标（几种并排）、调料名、效果（灰字）。 */
+    /** 原料表在窗口里最多能占多宽（主面板 176 + 间隔 2，两边各留 2 像素）。 */
+    private int guideMaxWidth() {
+        return Math.max(120, width - W - GAP - 4);
+    }
+
+    /**
+     * 原料表：每种调料一行——原料图标（几种并排）、调料名、效果（灰字）。
+     * mryt233 改（2026-11-06，r137）：分成左右几列，每列最多 {@link #rowsPerCol} 行，
+     * 第 i 种调料在第 i / rowsPerCol 列、第 i % rowsPerCol 行。
+     * mryt233 改（2026-11-07）：效果文字按这一列剩下的宽度截断，窄窗口里不会画到屏幕右边界之外。
+     */
     private void drawGuide(GuiGraphics g, int px, int py) {
         panel(g, px, py, guideW, H);
         g.drawString(font, guideTitle(), px + 12, py + 7, TITLE, true);
-        for (Seasoning s : Seasoning.ALL) {
-            int ry = py + GUIDE_ROW_Y + s.ordinal() * GUIDE_ROW_H;
+        for (int i = 0; i < Seasoning.ALL.length; i++) {
+            Seasoning s = Seasoning.ALL[i];
+            int col = i / rowsPerCol;
+            int row = i % rowsPerCol;
+            int rx = px + 7 + col * (guideColW + GUIDE_COL_GAP);
+            int ry = py + guideRowY + row * guideRowH;
             List<Item> raws = s.raws();
             for (int k = 0; k < raws.size() && k < 2; k++) {
-                g.renderItem(new ItemStack(raws.get(k)), px + 7 + k * 17, ry);
+                g.renderItem(new ItemStack(raws.get(k)), rx + k * 17, ry);
             }
-            int tx = px + 7 + ICONS_W + 4;
-            Component name = Component.translatable(s.nameKey());
+            int tx = rx + ICONS_W + 4;
+            // 名字在这一列里放不下就先截名字（窄窗口），别让名字把效果文字整个顶出列外
+            String name = font.plainSubstrByWidth(Component.translatable(s.nameKey()).getString(),
+                Math.max(8, rx + guideColW - 3 - tx));
+            int nameW = font.width(name);
             g.drawString(font, name, tx, ry + 4, LABEL, true);
-            g.drawString(font, effect(s), tx + font.width(name) + 4, ry + 4, HINT, true);
+            // 效果文字的可用宽度 = 这一列右边界 - 现在的位置（两边各留 3 像素），放不下就截断
+            int room = rx + guideColW - 3 - (tx + nameW + 4);
+            if (room > 12) {
+                String text = font.substrByWidth(effect(s), room).getString();
+                if (!text.isEmpty()) {
+                    g.drawString(font, text, tx + nameW + 4, ry + 4, HINT, true);
+                }
+            }
         }
     }
 

@@ -1,0 +1,31 @@
+{
+  "display": {
+    "icon": {
+      "item": "orients_hotpot_chronicles:oak_bench"
+    },
+    "title": {
+      "translate": "advancements.orients_hotpot_chronicles.seated.title"
+    },
+    "description": {
+      "translate": "advancements.orients_hotpot_chronicles.seated.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "seated": {
+      "trigger": "orients_hotpot_chronicles:hotpot",
+      "conditions": {
+        "event": "eat_seated"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "seated"
+    ]
+  ],
+  "parent": "orients_hotpot_chronicles:dipped"
+}

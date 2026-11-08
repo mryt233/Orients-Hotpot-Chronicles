@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "T",
+    "T"
+  ],
+  "key": {
+    "T": "orients_hotpot_chronicles:cold_tofu"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:tofu_skin",
+    "count": 3
+  }
+}

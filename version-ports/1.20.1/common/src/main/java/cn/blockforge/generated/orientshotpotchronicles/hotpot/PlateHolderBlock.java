@@ -1,5 +1,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+import cn.blockforge.orient.framework.compat.ItemInteractionBlock;
+import cn.blockforge.orient.framework.compat.ItemInteractionResult;
+import cn.blockforge.orient.framework.compat.ItemStackCompat;
+import cn.blockforge.orient.framework.compat.PlayerCompat;
 import cn.blockforge.orient.framework.game.PartOutline;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.Block;
@@ -19,7 +23,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionHand;
-import cn.blockforge.orient.framework.compat.ItemInteractionResult;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.core.BlockPos;
@@ -43,7 +46,7 @@ import net.minecraft.world.level.LevelReader;
  * </ul>
  * 挖掉这一格：所有盘子带着菜掉出来。
  */
-public class PlateHolderBlock extends Block implements EntityBlock, PartOutline , cn.blockforge.orient.framework.compat.ItemInteractionBlock {
+public class PlateHolderBlock extends Block implements EntityBlock, PartOutline, ItemInteractionBlock {
     /** 下面是火锅桌（桌面 11/16，盘子下移 5 像素）。 */
     public static final BooleanProperty ON_TABLE = BooleanProperty.create("on_table");
     /** 下面是高火锅桌（桌面 23/16，盘子上移 7 像素）。 */
@@ -152,12 +155,17 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
     /** 客户端填：当前玩家（鼠标中键选方块时用来找准星对着哪个盘子）；服务端一直是 null。 */
     public static java.util.function.Supplier<Player> pickPlayer = () -> null;
 
-    /** 鼠标中键：复制准星对着的那个盘子，里面的菜一起带上（r94）。 */
+    /** 鼠标中键：复制准星对着的那个盘子，里面的菜一起带上（r94）。mryt233 改（清单 #129）：与名称共用 aimedAt。 */
     @Override
-    public ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter world, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
         Player player = pickPlayer.get();
         if (player != null && world.getBlockEntity(pos) instanceof PlateHolderBlockEntity be) {
-            PlateHolderBlockEntity.Placed plate = aimed(player, pos, be);
+            PlateHolderBlockEntity.Placed plate = null;
+            HitResult hit = player.pick(PlayerCompat.blockInteractionRange(player), 1.0F, false);
+            if (hit instanceof BlockHitResult blockHit && hit.getType() == HitResult.Type.BLOCK
+                && blockHit.getBlockPos().equals(pos)) {
+                plate = aimedAt(pos, blockHit, be);
+            }
             if (plate == null && !be.plates().isEmpty()) {
                 plate = be.plates().get(0);
             }
@@ -166,6 +174,41 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
             }
         }
         return ItemStack.EMPTY;
+    }
+
+    /**
+     * mryt233 改（2026-11-07，清单 #129）：复合方块按准星部位显示名称——指着桌上哪只碗 / 盘子 / 杯子 /
+     * 竹筷，指示器就显示那样东西自己的名字，而不是笼统的「盘子格」。
+     * 名称通过客户端玩家供应器取准星，专用服务端或未命中时回退静态名。
+     */
+    @Override
+    public net.minecraft.network.chat.MutableComponent getName() {
+        Player player = pickPlayer.get();
+        if (player != null && player.level() != null) {
+            HitResult hit = player.pick(PlayerCompat.blockInteractionRange(player), 1.0F, false);
+            if (hit instanceof BlockHitResult blockHit && hit.getType() == HitResult.Type.BLOCK
+                && player.level().getBlockEntity(blockHit.getBlockPos()) instanceof PlateHolderBlockEntity be) {
+                PlateHolderBlockEntity.Placed plate = aimedAt(blockHit.getBlockPos(), blockHit, be);
+                if (plate != null) {
+                    ItemStack item = plate.toItem();
+                    if (!item.isEmpty()) {
+                        return item.getHoverName().copy();
+                    }
+                }
+            }
+        }
+        return super.getName();
+    }
+
+    /** mryt233 改（清单 #129）：名称、复制物品与 Jade 共用当前准星命中的餐具。 */
+    @org.jetbrains.annotations.Nullable
+    public static PlateHolderBlockEntity.Placed aimedAt(BlockPos pos, BlockHitResult hit, PlateHolderBlockEntity be) {
+        double[] at = local(pos, hit);
+        PlateHolderBlockEntity.Placed plate = be.at(at[0], at[1]);
+        if (plate == null && !be.plates().isEmpty()) {
+            plate = be.plates().get(0);
+        }
+        return plate;
     }
 
     /** 选中框只框准星对着的那个盘子（连盘里的菜 / 那瓶饮料 / 那只碗）。 */
@@ -205,7 +248,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
     /** 准星对着的是这一格里的哪个盘子（服务端和客户端同一套射线）。 */
     @org.jetbrains.annotations.Nullable
     public static PlateHolderBlockEntity.Placed aimed(Player player, BlockPos pos, PlateHolderBlockEntity be) {
-        HitResult hit = player.pick(cn.blockforge.orient.framework.compat.PlayerCompat.blockInteractionRange(player), 1.0F, false);
+        HitResult hit = player.pick(PlayerCompat.blockInteractionRange(player), 1.0F, false);
         if (!(hit instanceof BlockHitResult blockHit) || hit.getType() != HitResult.Type.BLOCK) {
             return null;
         }
@@ -244,7 +287,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
         return new double[]{v.x, v.z};
     }
 
-    @Override
+    /** mryt233 改（1.20.1 适配）：来自 {@link ItemInteractionBlock} 的接口默认方法。 */
     public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
                                               Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(world.getBlockEntity(pos) instanceof PlateHolderBlockEntity be)) {
@@ -278,7 +321,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
             if (!world.isClientSide) {
                 if (be.tryAdd(placing, HotPotBlock.handleAxisFor(player.getDirection()), at[0], at[1], stack,
                     PlateItem.keepsSelf(stack))) {
-                    cn.blockforge.orient.framework.compat.ItemStackCompat.consume(stack, 1, player);
+                    ItemStackCompat.consume(stack, 1, player);
                     world.playSound(null, pos, placing.defaultBlockState().getSoundType().getPlaceSound(),
                         SoundSource.BLOCKS, 1.0F, 1.0F);
                 } else {
@@ -351,7 +394,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
         if (PlateItem.holdsFood(world, stack)) {
             if (!world.isClientSide) {
                 if (plate.add(stack)) {
-                    cn.blockforge.orient.framework.compat.ItemStackCompat.consume(stack, 1, player);
+                    ItemStackCompat.consume(stack, 1, player);
                     be.changed();
                     world.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.35F, 1.2F);
                 } else {
@@ -364,7 +407,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
     }
 
     /** 空手右键：把点到的那个盘子连菜拿起来；潜行时改成取出最后放的那样菜。 */
-    @Override
+    /** mryt233 改（1.20.1 适配）：来自 {@link ItemInteractionBlock} 的接口默认方法。 */
     public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         if (!player.getMainHandItem().isEmpty() || !(world.getBlockEntity(pos) instanceof PlateHolderBlockEntity be)) {
             return InteractionResult.PASS;
@@ -409,11 +452,15 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
         }
         return InteractionResult.SUCCESS;
     }
-
-    /** mryt233 改：1.20.1 的单回调交互入口。 */
+    /**
+     * mryt233 改（0.2.2-alpha，1.20.1 适配）：1.20.1 只有单个
+     * {@code use(BlockState, Level, BlockPos, Player, InteractionHand, BlockHitResult)} 回调，
+     * 没有 1.21.1 分开的 useItemOn / useWithoutItem；这里转给框架的
+     * {@link ItemInteractionBlock#dispatchUse}（按物品 → 空手的顺序分派）。
+     */
     @Override
-    public net.minecraft.world.InteractionResult use(BlockState state, Level world, BlockPos pos,
-            Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
+                                 InteractionHand hand, BlockHitResult hit) {
         return dispatchUse(state, world, pos, player, hand, hit);
     }
 }

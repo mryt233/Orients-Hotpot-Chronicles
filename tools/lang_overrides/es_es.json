@@ -15,5 +15,22 @@
   "block.orients_hotpot_chronicles.iron_square_yuanyang_hotpot": "Hotpot yuanyang con centro cuadrado de hierro",
   "item.orients_hotpot_chronicles.hotpot_guide": "Guía del hotpot",
   "item.orients_hotpot_chronicles.ham_sausage_slice": "Rodaja de salchicha de jamón",
-  "item.orients_hotpot_chronicles.cooked_ham_sausage_slice": "Rodaja de salchicha de jamón cocida"
+  "item.orients_hotpot_chronicles.cooked_ham_sausage_slice": "Rodaja de salchicha de jamón cocida",
+  "text.orients_hotpot_chronicles.msg.spicy_max": "Este caldo rojo ya ha alcanzado el nivel máximo de picante",
+  "advancements.orients_hotpot_chronicles.seated.title": "Sentado sabe mejor",
+  "advancements.orients_hotpot_chronicles.knife_skills.title": "Destreza con el cuchillo",
+  "advancements.orients_hotpot_chronicles.max_spicy.title": "Sin picante no hay gloria",
+  "advancements.orients_hotpot_chronicles.tall_stool.title": "Hacia lo más alto",
+  "advancements.orients_hotpot_chronicles.tall_stool.description": "Apila taburetes altos de madera y trepa por ellos",
+  "item.orients_hotpot_chronicles.crushed_peanuts": "Cacahuetes picados",
+  "item.orients_hotpot_chronicles.millet_chili": "Chile picado",
+  "text.orients_hotpot_chronicles.seasoning.crushed_peanuts": "Cacahuetes picados",
+  "text.orients_hotpot_chronicles.seasoning.crushed_peanuts.effect": "Salto aumentado I 10 s",
+  "text.orients_hotpot_chronicles.seasoning.millet_chili": "Chile picado",
+  "tooltip.orients_hotpot_chronicles.flavor.cooked_wide_noodles": "Resbaladizos y tiernos: sujétalos bien con los palillos para que no se escurran",
+  "tooltip.orients_hotpot_chronicles.flavor.cooked_tofu_skin": "Puro aroma a soja, guardando media cucharada de caldo entre sus pliegues",
+  "tooltip.orients_hotpot_chronicles.flavor.three_fresh_soup_bowl": "Vieiras y gambas secas: tan sabroso que se te caen las cejas",
+  "advancements.orients_hotpot_chronicles.tofu_quartet.description": "Reúne dados de tofu fríos, dados de tofu calientes y tofu seco",
+  "advancements.orients_hotpot_chronicles.soul_of_southwest.description": "Atrévete con un bocado de la singular raíz de houttuynia (menta de pescado)",
+  "item.orients_hotpot_chronicles.cooked_zhe_er_gen_slice": "Raíz de houttuynia en rodajas cocida"
 }

@@ -2,7 +2,6 @@ package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotInteraction;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
@@ -37,17 +36,26 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
     private static final float COLD_FLOAT = 0.009F;
     // 水面/内底高度与锅腔范围都跟着模型走：独立锅腔 1.5..14.5、汤面 y=5.6、内底 y=1.25；
     // 灶上锅坐进 7.6/16 深的锅槽，锅腔 1.837..14.163，汤面 y=14.32、内底 y=9.1。
-    private static final float STANDALONE_SURFACE = 5.6F / 16.0F;
-    private static final float STANDALONE_FLOOR = 1.25F / 16.0F;
-    private static final float STOVE_SURFACE = 14.32F / 16.0F;
-    private static final float STOVE_FLOOR = 9.1F / 16.0F;
+    // mryt233 改（2026-11-04）：汤面高度改用 HotPotInteraction 里那份（服务端算准星格子也用同一个值，别各写一个数）。
+    private static final float STANDALONE_SURFACE = (float) cn.blockforge.generated.orientshotpotchronicles
+        .hotpot.HotPotInteraction.STANDALONE_SURFACE;
+    private static final float STANDALONE_FLOOR = (float) cn.blockforge.generated.orientshotpotchronicles
+        .hotpot.HotPotInteraction.STANDALONE_FLOOR;
+    private static final float STOVE_SURFACE = (float) cn.blockforge.generated.orientshotpotchronicles
+        .hotpot.HotPotInteraction.STOVE_SURFACE;
+    private static final float STOVE_FLOOR = (float) cn.blockforge.generated.orientshotpotchronicles
+        .hotpot.HotPotInteraction.STOVE_FLOOR;
 
     /** 漂在汤面上的食材大小（物品模型的倍率）。 */
     private static final float FOOD_SCALE = 0.24F;
 
     private final ItemRenderer itemRenderer;
-    /** 每帧复用的格子缓冲（渲染只在渲染线程跑；以前每帧每口锅 new 一个，代码检查 W5）。 */
-    private final int[] slotBuffer = new int[HotPotBlockEntity.SLOTS];
+    /**
+     * 每帧复用的格子缓冲（渲染与右键瞄准都只在客户端主线程跑）：[大格][这一格里的第几个小格]。
+     * mryt233 改：以前每帧对 9 个大格各扫一遍 81 格（多汤锅 9 × 81 = 729 次 getItem），现在一次扫完。
+     */
+    private final int[][] cellSlots = new int[9][HotPotBlockEntity.SLOTS];
+    private final int[] cellSlotCount = new int[9];
     /** 汤面贴图的 ID 按汤底预先拼好，不再每帧拼字符串（代码检查 W5）。 */
     private static final ResourceLocation[] STILL = new ResourceLocation[SoupBase.values().length];
     private static final ResourceLocation[] BOILING = new ResourceLocation[SoupBase.values().length];
@@ -102,9 +110,9 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
                 be.bubbleSeconds(tickDelta), be.getBlockPos().hashCode() & 0x3FF, matrices, vertexConsumers, light);
         }
 
-        int[] slots = slotBuffer;
+        collectSlots(be, layout);
         for (int bigCell = 0; bigCell < 9; bigCell++) {
-            int n = visibleSlots(be, bigCell, slots);
+            int n = cellSlotCount[bigCell];
             if (n == 0) {
                 continue;
             }
@@ -115,7 +123,8 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
             }
             boolean cellSoup = be.baseOfSide(side) >= 0;
             float cellY = cellSoup ? soupY : floorY;
-            double[] center = PotLayout.toWorld(layout.cellCenter(bigCell)[0], layout.cellCenter(bigCell)[1], rotated && layout.multiSoup());
+            double[] cc = layout.cellCenter(bigCell);   // 以前这一句里调了两次，每次都 new 一个 double[2]
+            double[] center = PotLayout.toWorld(cc[0], cc[1], rotated && layout.multiSoup());
             // 相位只跟大格有关：九个大格各自错开浮动，换食材时节奏不会跳
             float phase = bigCell * 1.37F;
             double angle = OMEGA * ticks + phase;
@@ -124,7 +133,7 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
 
             // 一格里有几样食材就轮流显示：每个浮动周期在最低点（sin = -1）换下一样；冷锅按慢节奏换
             double cycle = displayCycle(be, side, bigCell, tickDelta);
-            int slot = slots[Math.floorMod((int) Math.floor(cycle), n)];
+            int slot = cellSlots[bigCell][Math.floorMod((int) Math.floor(cycle), n)];
             ItemStack stack = be.getItem(slot);
             // 换的前后一小段：当前这样沉进汤里，下一样再浮上来（大小不变）
             float dip = 0F;
@@ -257,40 +266,49 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
         if (bigCell < 0 || bigCell > 8 || !layout.usesCell(bigCell)) {
             return -1;
         }
-        int[] slots = new int[HotPotBlockEntity.SLOTS];
-        int n = visibleSlots(be, bigCell, slots);
         int side = layout.sideOfCell(bigCell);
-        if (n == 0 || side == PotLayout.NONE) {
+        if (side == PotLayout.NONE) {
             return -1;
         }
-        return slots[Math.floorMod((int) Math.floor(displayCycle(be, side, bigCell, partial)), n)];
+        // 和渲染共用一份「大格 → 小格」结果，不再每次右键都 new 一个 int[81]
+        int[][] slots = SLOT_SCRATCH.get();
+        int[] counts = COUNT_SCRATCH.get();
+        collectSlots(be, layout, slots, counts);
+        int n = counts[bigCell];
+        if (n == 0) {
+            return -1;
+        }
+        return slots[bigCell][Math.floorMod((int) Math.floor(displayCycle(be, side, bigCell, partial)), n)];
     }
 
-    /** 大格里有东西的小格，按行优先写进 out，返回个数。 */
-    private static int visibleSlots(HotPotBlockEntity be, int bigCell, int[] out) {
-        PotLayout layout = be.layout();
-        if (layout.multiSoup()) {
-            // 鸳鸯 / 田字锅：归到这个位置的小格（PotLayout.spotOfSlot），按格号顺序轮流显示
-            int n = 0;
-            for (int slot = 0; slot < HotPotBlockEntity.SLOTS; slot++) {
-                if (layout.spotOfSlot(slot) == bigCell && !be.getItem(slot).isEmpty()) {
-                    out[n++] = slot;
-                }
+    /** 右键瞄准用的临时缓冲（只在客户端主线程用；单独一份，不去踩渲染器实例上的状态）。 */
+    private static final ThreadLocal<int[][]> SLOT_SCRATCH = ThreadLocal.withInitial(
+        () -> new int[9][HotPotBlockEntity.SLOTS]);
+    private static final ThreadLocal<int[]> COUNT_SCRATCH = ThreadLocal.withInitial(() -> new int[9]);
+
+    /**
+     * 一次扫完 81 格，把有东西的小格按大格分好，写进 slots / counts（渲染每帧、右键瞄准都走这一份）。
+     * mryt233 改：以前按大格各扫一遍（多汤锅 9 × 81 次 getItem），现在只扫一遍。
+     */
+    private static void collectSlots(HotPotBlockEntity be, PotLayout layout, int[][] slots, int[] counts) {
+        java.util.Arrays.fill(counts, 0);
+        boolean multi = layout.multiSoup();
+        for (int slot = 0; slot < HotPotBlockEntity.SLOTS; slot++) {
+            if (be.getItem(slot).isEmpty()) {
+                continue;
             }
-            return n;
-        }
-        int baseRow = (bigCell / 3) * 3;
-        int baseCol = (bigCell % 3) * 3;
-        int n = 0;
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-                int slot = (baseRow + row) * 9 + baseCol + col;
-                if (!be.getItem(slot).isEmpty()) {
-                    out[n++] = slot;
-                }
+            // 九宫格：81 格本来就是 9 大格各 9 格；鸳鸯 / 田字：按 spotOfSlot 归位
+            int cell = multi ? layout.spotOfSlot(slot) : PotLayout.cellOfSlot(slot);
+            if (cell < 0 || cell > 8) {
+                continue;
             }
+            slots[cell][counts[cell]++] = slot;
         }
-        return n;
+    }
+
+    /** 渲染用的那一份（渲染器实例上的缓冲，不分配）。 */
+    private void collectSlots(HotPotBlockEntity be, PotLayout layout) {
+        collectSlots(be, layout, cellSlots, cellSlotCount);
     }
 
     /**

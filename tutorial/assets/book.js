@@ -1,14 +1,35 @@
 // 作者：mryt233（2026-10-27）指南样式教程：书签切换、分栏翻页（同 GuideBookScreen：一页翻完到下一条目，再到下一分类）、原版样式鼠标提示
 (function () {
-  var B = window.BOOK, IMG = window.IMG;
+  var IMG = window.IMG;
   var $ = function (id) { return document.getElementById(id); };
+  // 多语言（mryt233 改，2026-11-02）：三种语言的书都在页面里，地球按钮切换；记在本机，换语言时停在同一条目
+  var BOOKS = window.BOOKS, LANG = "zh_cn", B, SIDX, UI;
+  function U(t) { return (UI && UI[t]) || t; }
+  function pickLang() {
+    var m = /[?&]lang=(\w+)/.exec(location.search) || /-(zh_cn|zh_tw|en)$/.exec(location.hash);
+    if (m && BOOKS[m[1]]) return m[1];
+    try { var s = localStorage.getItem("hpt-book-lang"); if (s && BOOKS[s]) return s; } catch (x) {}
+    var nl = (navigator.language || "").toLowerCase();
+    return nl.indexOf("zh") === 0 ? (/tw|hk|mo|hant/.test(nl) ? "zh_tw" : "zh_cn") : "en";
+  }
+  function useLang(l) {
+    LANG = l; B = BOOKS[l].meta; SIDX = BOOKS[l].sidx; UI = BOOKS[l].ui;
+    document.documentElement.lang = { zh_cn: "zh-CN", zh_tw: "zh-TW", en: "en" }[l] || l;
+    document.title = U("_我的世界[之晗的火锅物语]模组-游玩教程");
+    document.querySelectorAll("[data-ui]").forEach(function (n) { n.textContent = U("_" + n.dataset.ui); });
+    document.querySelectorAll("[data-ui-label]").forEach(function (n) { n.setAttribute("aria-label", U("_" + n.dataset.uiLabel)); });
+    document.querySelectorAll("[data-ui-ph]").forEach(function (n) { n.placeholder = U("_" + n.dataset.uiPh); });
+    var lb = $("lang"); if (lb) lb.dataset.tip = U("_语言");
+  }
+  function pid(id) { return LANG + "-" + id; }
+  useLang(pickLang());
   var flow = $("flow"), view = $("view"), cats = $("cats"), tabs = $("tabs"), tip = $("tip");
   var st = { c: 0, e: 0, p: 0, pages: 1 };
 
   function fillImgs(root) {
     root.querySelectorAll("img[data-k]").forEach(function (i) { if (!i.src) i.src = IMG[i.dataset.k]; });
   }
-  function iconHTML(id) { var n = $(id); return n ? n.innerHTML : ""; }
+  function iconHTML(id) { var n = $(pid(id)); return n ? n.innerHTML : ""; }
 
   // 一屏几页：宽屏两页（左右），窄屏一页
   function mobile() { return window.matchMedia("(max-width:820px)").matches; }
@@ -31,7 +52,7 @@
       var b = document.createElement("button");
       b.className = (i === st.c ? "on " : "") + (c.todo ? "todo" : "");
       b.innerHTML = iconHTML("ci-" + i);
-      b.dataset.tip = c.t + (c.todo ? "\n样稿里还没排" : "");
+      b.dataset.tip = c.t + "";
       b.onclick = function () { go(i, 0, 0); };   // 手机菜单里点分类：书翻过去，菜单留着让你再挑条目
       cats.appendChild(b);
     });
@@ -45,7 +66,7 @@
       tabs.appendChild(b);
     });
     $("menu-ic").innerHTML = iconHTML("ci-" + st.c);   // 三横线旁边放当前分类的图标
-    $("menu").setAttribute("aria-label", "目录：" + B[st.c].t);
+    $("menu").setAttribute("aria-label", U("目录：") + B[st.c].t);
     // 手机：书顶「三横线」书签右边一排条目小书签，左右滑动挑
     var mt = $("mtabs");
     mt.innerHTML = "";
@@ -60,6 +81,9 @@
     fillImgs(cats); fillImgs(tabs); fillImgs(mt); fillImgs($("menu-ic"));
     var on = mt.querySelector(".on");
     if (on && mobile()) mt.scrollLeft = Math.max(0, on.offsetLeft - mt.clientWidth / 2 + on.offsetWidth / 2);
+    // 电脑：条目多了书签会在书顶横向滚动，切换条目时把选中的那个挪到中间（mryt233 改，2026-11-06）
+    var ton = tabs.querySelector(".on");
+    if (ton && !mobile()) tabs.scrollLeft = Math.max(0, ton.offsetLeft - tabs.clientWidth / 2 + ton.offsetWidth / 2);
   }
 
 
@@ -76,7 +100,7 @@
       : '<div class="grid g3">' + v.cells.map(function (c) { return slotHTML(c); }).join("") + "</div>";
     el.querySelector(".rg-b").innerHTML = grid + '<i class="arr"></i>' + slotHTML(v.out.slice(0, 2), v.out[2]) +
       '<div class="rg-pv">' + (v.out[0] ? '<img src="' + IMG[v.out[0]] + '" alt="">' : "") + "<b>" + esc(v.out[1]) + "</b>" +
-      (v.note ? "<small>" + esc(v.note) + "</small>" : "") + (v.dev ? '<span class="tag dev">开发版预览</span>' : "") + "</div>";
+      (v.note ? "<small>" + esc(v.note) + "</small>" : "") + (v.dev ? '<span class="tag dev">' + esc(U("开发版预览")) + "</span>" : "") + "</div>";
     el.querySelectorAll(".rg-chips button").forEach(function (b, i) { b.classList.toggle("on", i === el._i); b.classList.toggle("pin", i === el._i && el._pin); });
   }
   function renderGroups(root) {
@@ -89,7 +113,7 @@
         return '<button data-i="' + i + '" data-tip="' + esc(m[1] + (v.mat && v.out[1] !== m[1] ? " → " + v.out[1] : "")) + '"' + (v.dev ? ' class="dev"' : "") + ">" +
           (m[0] ? '<img src="' + IMG[m[0]] + '" alt="">' : "?") + "</button>";
       }).join("") + "</div>" : "";
-      el.innerHTML = '<div class="rg-t">' + esc(g.title) + (allDev ? '<span class="tag dev">开发版预览</span>' : "") + "</div>" +
+      el.innerHTML = '<div class="rg-t">' + esc(g.title) + (allDev ? '<span class="tag dev">' + esc(U("开发版预览")) + "</span>" : "") + "</div>" +
         '<div class="rg-b rbody"></div>' + chips;
       el.querySelectorAll(".rg-chips button").forEach(function (b) {
         b.onclick = function () {
@@ -111,15 +135,15 @@
       function draw() {
         var p = pots.filter(function (x) { return x.k === k; })[0], a = swap ? "top" : "iso", b = swap ? "iso" : "top";
         el.innerHTML =
-          '<div class="pv-stage"><img class="pv-main" src="' + img(mat, k, a) + '" alt="" title="点一下换个角度">' +
-          '<img class="pv-alt" src="' + img(mat, k, b) + '" alt="" title="点一下换个角度"></div>' +
-          '<div class="pv-info"><b>' + (mat === "copper" ? "铜制" : "铁制") + esc(p.n) + "</b>" + (p.dev ? '<span class="tag dev">开发版预览</span>' : "") +
-          "<p>" + esc(p.d) + '</p><p class="pv-r">做法：' + esc(p.r) + "</p></div>" +
+          '<div class="pv-stage"><img class="pv-main" src="' + img(mat, k, a) + '" alt="" title="' + esc(U("点一下换个角度")) + '">' +
+          '<img class="pv-alt" src="' + img(mat, k, b) + '" alt="" title="' + esc(U("点一下换个角度")) + '"></div>' +
+          '<div class="pv-info"><b>' + U(mat === "copper" ? "铜制" : "铁制") + esc(p.n) + "</b>" + (p.dev ? '<span class="tag dev">' + esc(U("开发版预览")) + "</span>" : "") +
+          "<p>" + esc(p.d) + '</p><p class="pv-r">' + esc(U("做法：")) + esc(p.r) + "</p></div>" +
           '<div class="pv-row pv-mats">' + ["copper", "iron"].map(function (m) {
-            return '<button data-m="' + m + '" class="' + (m === mat ? "on" : "") + '"><img src="' + img(m, "nine_grid_hotpot", "iso") + '" alt="">' + (m === "copper" ? "铜锅" : "铁锅") + "</button>";
+            return '<button data-m="' + m + '" class="' + (m === mat ? "on" : "") + '"><img src="' + img(m, "nine_grid_hotpot", "iso") + '" alt="">' + U(m === "copper" ? "铜锅" : "铁锅") + "</button>";
           }).join("") + "</div>" +
           '<div class="pv-row pv-shapes">' + pots.map(function (x) {
-            return '<button data-k="' + x.k + '" class="' + (x.k === k ? "on" : "") + (x.dev ? " dev" : "") + '" data-tip="' + esc(x.n) + (x.dev ? "\n开发版预览" : "") + '"><img src="' + img(mat, x.k, "top") + '" alt=""></button>';
+            return '<button data-k="' + x.k + '" class="' + (x.k === k ? "on" : "") + (x.dev ? " dev" : "") + '" data-tip="' + esc(x.n) + (x.dev ? "\n" + U("开发版预览") : "") + '"><img src="' + img(mat, x.k, "top") + '" alt=""></button>';
           }).join("") + "</div>";
         el.querySelectorAll(".pv-mats button").forEach(function (b) { b.onclick = function () { mat = b.dataset.m; draw(); }; });
         el.querySelectorAll(".pv-shapes button").forEach(function (b) { b.onclick = function () { k = b.dataset.k; draw(); }; });
@@ -153,7 +177,7 @@
   var sndOn = true;
   try { sndOn = localStorage.getItem("hpt-book-sound") !== "off"; } catch (x) {}
   var sndBtn = $("snd");
-  function drawSnd() { sndBtn.className = "snd" + (sndOn ? "" : " off"); sndBtn.dataset.tip = sndOn ? "翻页音效：开（点一下关掉）" : "翻页音效：关（点一下打开）"; }
+  function drawSnd() { sndBtn.className = "snd" + (sndOn ? "" : " off"); sndBtn.dataset.tip = U(sndOn ? "翻页音效：开（点一下关掉）" : "翻页音效：关（点一下打开）"); }
   sndBtn.onclick = function () {
     sndOn = !sndOn; drawSnd();
     try { localStorage.setItem("hpt-book-sound", sndOn ? "on" : "off"); } catch (x) {}
@@ -255,7 +279,7 @@
     var changed = c !== st.c || e !== st.e || !flow.childElementCount;
     st.c = c; st.e = e; st.p = p;
     if (changed) {
-      flow.innerHTML = $("t-" + c + "-" + e).innerHTML;
+      flow.innerHTML = $(pid("t-" + c + "-" + e)).innerHTML;
       if (booted && !turning) {   // 手机上没有翻纸，正文从翻页方向浮入
         flow.classList.remove("enter", "back"); void flow.offsetWidth;
         flow.classList.add("enter"); if (!fwd) flow.classList.add("back");
@@ -275,7 +299,7 @@
       var t = document.getElementById(anchor);
       if (t && flow.contains(t)) { st.p = Math.floor(t.offsetLeft / metrics().step); layout(false); }
     }
-    try { history.replaceState(null, "", "#" + c + "-" + e + "-" + st.p); } catch (x) {}
+    try { history.replaceState(null, "", "#" + c + "-" + e + "-" + st.p + "-" + LANG); } catch (x) {}
   }
 
   // ---------- 搜索（右上角放大镜书签；手机在书顶那排最右边） ----------
@@ -321,9 +345,9 @@
   function esc2(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
   function runFind() {
     var q = fq.value.trim(), low = q.toLowerCase();
-    if (!q) { flist.innerHTML = '<p class="fb-hint">输入想找的东西，比如「毛肚」「鸳鸯锅」「蘸料」「配方」。</p>'; return; }
+    if (!q) { flist.innerHTML = '<p class="fb-hint">' + esc2(U("输入想找的东西，比如「毛肚」「鸳鸯锅」「蘸料」「配方」。")) + "</p>"; return; }
     var out = [];
-    (window.SIDX || []).forEach(function (d) {
+    (SIDX || []).forEach(function (d) {
       var title = B[d.c].e[d.e], tl = title.toLowerCase(), x = d.x, i = x.toLowerCase().indexOf(low);
       var inTitle = tl.indexOf(low) >= 0 || B[d.c].t.toLowerCase().indexOf(low) >= 0;
       if (i < 0 && !inTitle) return;
@@ -337,7 +361,7 @@
         (snip ? "<small>" + snip + "</small>" : "") + "</span></button>" });
     });
     out.sort(function (a, b) { return a.score - b.score; });
-    flist.innerHTML = out.length ? out.slice(0, 40).map(function (o) { return o.html; }).join("") : '<p class="fb-hint">没有找到「' + esc2(q) + "」。</p>";
+    flist.innerHTML = out.length ? out.slice(0, 40).map(function (o) { return o.html; }).join("") : '<p class="fb-hint">' + esc2(U("没有找到「")) + esc2(q) + esc2(U("」。")) + "</p>";
     fillImgs(flist);
   }
   fq.addEventListener("input", runFind);
@@ -407,6 +431,14 @@
     area.addEventListener("click", function (ev) { if (swallow) { ev.preventDefault(); ev.stopPropagation(); swallow = false; } }, true);
     area.addEventListener("dragstart", function (ev) { if (on) ev.preventDefault(); });
   })();
+  // 电脑：鼠标滚轮在书顶书签栏上时改成左右滚（条目多的时候不用拖滚动条；mryt233 改，2026-11-06）
+  // 只有书签真的超出宽度才接管滚轮：手机 / 窄窗里这条是抽屉里的竖排列表，
+  // 这时不拦滚轮，否则抽屉里的鼠标滚轮会被吃掉、滚不动（mryt233 改，2026-11-06）
+  tabs.addEventListener("wheel", function (e) {
+    if (!e.deltaY || tabs.scrollWidth <= tabs.clientWidth) return;
+    e.preventDefault();
+    tabs.scrollLeft += e.deltaY;
+  }, { passive: false });
   $("menu").onclick = function () { menu(!$("drawer").classList.contains("open")); };
   $("backdrop").onclick = function () { menu(false); };
   document.addEventListener("keydown", function (ev) {
@@ -420,7 +452,7 @@
     var a = ev.target.closest("a");
     if (!a) return;
     if (a.dataset.go) { ev.preventDefault(); var g = a.dataset.go.split(","); go(+g[0], +g[1], 0, g[2] || null); }
-    else if (a.dataset.todo) { ev.preventDefault(); showTip(a, "这一章样稿里还没排", ev); setTimeout(hideTip, 1200); }
+    else if (a.dataset.todo) { ev.preventDefault(); showTip(a, "…", ev); setTimeout(hideTip, 1200); }
     else if (/^https?:/.test(a.getAttribute("href") || "")) a.target = "_blank";
   });
 
@@ -459,6 +491,30 @@
     if (mobile() !== wasMobile) { wasMobile = mobile(); menu(false); drawTabs(); }
     layout(false);
   });
+  // 换语言：地球按钮弹出语言表；三种语言的书目录结构相同，换完停在同一分类、同一条目
+  (function () {
+    var btn = $("lang"), box = $("lang-menu");
+    if (!btn) return;
+    box.innerHTML = window.LANGS.map(function (l) { return '<button data-l="' + l.k + '">' + esc(l.n) + "</button>"; }).join("");
+    function mark() { box.querySelectorAll("button").forEach(function (b) { b.classList.toggle("on", b.dataset.l === LANG); }); }
+    function open(on) { box.hidden = !on; btn.classList.toggle("on", on); if (on) mark(); }
+    btn.onclick = function (ev) { ev.stopPropagation(); open(box.hidden); };
+    box.onclick = function (ev) {
+      var b = ev.target.closest("button"); if (!b) return;
+      open(false);
+      if (b.dataset.l === LANG) return;
+      try { localStorage.setItem("hpt-book-lang", b.dataset.l); } catch (x) {}
+      var c = st.c, e = st.e;
+      useLang(b.dataset.l); drawSnd();
+      if (!B[c]) c = 0;
+      if (B[c].e[e] === undefined) e = 0;
+      flow.innerHTML = ""; st.c = -1;
+      apply(c, e, 0, null, true, false);
+      if (!findbox.hidden) runFind();
+      flip();
+    };
+    document.addEventListener("click", function (ev) { if (!box.hidden && !ev.target.closest(".langw")) open(false); });
+  })();
   var h = (location.hash.slice(1) || "0-0-0").split("-").map(Number);
   var c0 = B[h[0]] ? h[0] : 0, e0 = B[c0].e[h[1]] !== undefined ? h[1] : 0;
   go(c0, e0, h[2] || 0);

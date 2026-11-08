@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": {
+    "item": "orients_hotpot_chronicles:enoki_mushroom"
+  },
+  "result": "orients_hotpot_chronicles:cooked_enoki_mushroom",
+  "experience": 0.35,
+  "cookingtime": 200
+}

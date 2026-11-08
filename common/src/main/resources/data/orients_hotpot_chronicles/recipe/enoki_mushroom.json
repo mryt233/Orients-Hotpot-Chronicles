@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "food",
+  "ingredients": [
+    {
+      "item": "minecraft:brown_mushroom"
+    },
+    {
+      "item": "minecraft:brown_mushroom"
+    }
+  ],
+  "result": {
+    "id": "orients_hotpot_chronicles:enoki_mushroom",
+    "count": 2
+  }
+}

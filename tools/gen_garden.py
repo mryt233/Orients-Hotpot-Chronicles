@@ -1,4 +1,5 @@
 """橙子、大蒜、蒜泥、熟海带（2026-10-25 用户：橙子饮料要有原料；大蒜 + 蒜泥进蘸料台）；大蒜作物画法留着（用户：作物先保留，install crop 才装）。
+辣椒（2026-11-05，r136a）：红汤辣度系统的调味料，打草掉，拿着右键红汤锅加辣。
 
     python tools/gen_garden.py            # 出对比图 tools/out/garden/sheet.png（放大 8 倍，旁边放原版苹果 / 胡萝卜作参照）
     python tools/gen_garden.py install    # 写进两份资源：物品贴图 + 物品模型 + 作物方块贴图
@@ -243,6 +244,104 @@ def tomato():
     return im
 
 
+# ------------------------------------------------------------------ 辣椒（2026-11-05，r136a：红汤辣度系统的调味料）
+CHILI = [(146, 16, 12, 255), (188, 28, 20, 255), (220, 52, 32, 255), (242, 96, 66, 255)]
+CHILI_OUT = (78, 10, 8, 255)
+CHILI_STEM = [(48, 96, 30, 255), (74, 132, 44, 255)]
+
+
+def chili_pepper():
+    """1 号候选（默认）：一根斜放弯钩鲜红朝天椒（16×16，原版像素风）。
+    从左上果蒂斜向右下再微微往上翘尖，修长利落（不会像草莓），居中对齐，深红描边 + 左上高光 + 翠绿果蒂与弯柄。"""
+    im = blank()
+    px = im.load()
+    # 用中心线采样点画一根修长弯曲的红椒（果蒂在左上 (5,4)，椒身弯向右下，尖端在 (13,12)）
+    import math
+    for y in range(16):
+        for x in range(16):
+            fx, fy = x + 0.5, y + 0.5
+            # 参数 t in [0, 1] 沿椒身弧线
+            best_t, best_d = 0.0, 99.0
+            for i in range(41):
+                t = i / 40.0
+                # 弧线：从 (5.2, 4.8) 弯向 (8.2, 9.6) 再收尖到 (12.8, 12.2)
+                ax = 5.2 + 4.8 * t + 2.8 * (t ** 1.6)
+                ay = 4.8 + 9.2 * t - 1.8 * (t ** 2.2)
+                d = math.hypot(fx - ax, fy - ay)
+                if d < best_d:
+                    best_d, best_t = d, t
+            # 半径从果肩 2.15 收细到椒尖 0.55
+            radius = 2.15 * (1.0 - 0.74 * (best_t ** 0.85))
+            if best_t < 0.08:
+                radius *= 0.75 + 0.25 * (best_t / 0.08)
+            if best_d <= radius:
+                # 左上侧受光亮，右下侧背光暗
+                light = (fx - (5.2 + 7.6 * best_t)) * 0.45 + (fy - (4.8 + 7.4 * best_t)) * 0.55
+                lvl = 2 if light < -0.25 else (1 if light < 0.45 else 0)
+                if -0.95 < light < -0.35 and 0.12 < best_t < 0.68:
+                    lvl = 3
+                px[x, y] = CHILI[lvl]
+    outline(im, CHILI_OUT)
+    # 翠绿果萼包住左上果肩 + 弯向上的小绿柄
+    for x, y in [(4, 4), (5, 4), (6, 4), (4, 5), (5, 5)]:
+        px[x, y] = CHILI_STEM[0]
+    for x, y in [(3, 3), (4, 3), (3, 2), (4, 2)]:
+        px[x, y] = CHILI_STEM[1]
+    for x, y in [(2, 3), (3, 4), (5, 3)]:
+        px[x, y] = (30, 62, 18, 255)
+    return im
+
+
+def chili_pepper_v2():
+    """2 号候选：竖向微弯的饱满牛角椒（果蒂在右上，椒尖朝左下弯）。"""
+    im = blank()
+    px = im.load()
+    import math
+    for y in range(16):
+        for x in range(16):
+            fx, fy = x + 0.5, y + 0.5
+            best_t, best_d = 0.0, 99.0
+            for i in range(41):
+                t = i / 40.0
+                ax = 9.8 - 2.2 * t - 2.6 * (t ** 1.8)
+                ay = 4.5 + 8.8 * t
+                d = math.hypot(fx - ax, fy - ay)
+                if d < best_d:
+                    best_d, best_t = d, t
+            radius = 2.35 * (1.0 - 0.75 * (best_t ** 0.9))
+            if best_d <= radius:
+                light = (fx - (9.8 - 4.8 * best_t)) * 0.6 + (fy - (4.5 + 8.8 * best_t)) * 0.3
+                lvl = 2 if light < -0.2 else (1 if light < 0.5 else 0)
+                if -1.0 < light < -0.35 and 0.12 < best_t < 0.65:
+                    lvl = 3
+                px[x, y] = CHILI[lvl]
+    outline(im, CHILI_OUT)
+    for x, y in [(9, 4), (10, 4), (11, 4), (9, 5), (10, 5)]:
+        px[x, y] = CHILI_STEM[0]
+    for x, y in [(10, 3), (11, 3), (11, 2)]:
+        px[x, y] = CHILI_STEM[1]
+    for x, y in [(9, 3), (11, 1), (12, 2)]:
+        px[x, y] = (30, 62, 18, 255)
+    return im
+
+
+def chili_pepper_v3():
+    """3 号候选：两根依偎的小米辣 / 朝天椒（一长一短斜放，层次丰富）。"""
+    im = chili_pepper()
+    px = im.load()
+    # 在右上侧添一小根副椒
+    for x, y in [(8, 4), (9, 5), (10, 6), (11, 7), (12, 8)]:
+        px[x, y] = CHILI[2]
+    for x, y in [(9, 4), (10, 5), (11, 6), (12, 7)]:
+        px[x, y] = CHILI[1]
+    for x, y in [(7, 3), (8, 3)]:
+        px[x, y] = CHILI_STEM[1]
+    for x, y in [(7, 2), (9, 3), (10, 4), (11, 5), (12, 6), (13, 7), (13, 8)]:
+        if not px[x, y][3]:
+            px[x, y] = CHILI_OUT
+    return im
+
+
 def hotpot_base(top, mid, low, flecks):
     """一块锅底料（2026-10-26 用户：做成立方体，要看着是立体的，有圆角，不能完全方）：一块圆角的方块，
     斜着往下看（同原版方块在物品栏里的角度）：顶面亮、左面中、右面暗，棱和角是圆的、颜色过渡；顶上一道油光，撒几粒料。
@@ -387,7 +486,8 @@ def three_fresh_soup_bucket():
 
 
 ITEMS = {"orange": orange, "tomato_soup_bucket": tomato_soup_bucket, "three_fresh_soup_bucket": three_fresh_soup_bucket, "hotpot_guide": hotpot_guide, "tomato": tomato, "tomato_hotpot_base": tomato_hotpot_base,
-         "three_fresh_hotpot_base": three_fresh_hotpot_base, "garlic": garlic, "garlic_paste": garlic_paste, "cooked_kelp": cooked_kelp}
+         "three_fresh_hotpot_base": three_fresh_hotpot_base, "garlic": garlic, "garlic_paste": garlic_paste, "cooked_kelp": cooked_kelp,
+         "chili_pepper": chili_pepper}
 
 
 def sheet():
@@ -402,7 +502,8 @@ def sheet():
              ("garlic", garlic()), ("garlic_paste", garlic_paste()), ("golden_garlic", golden_garlic()),
              ("potato", Image.open(VANILLA / "item/potato.png").convert("RGBA")),
              ("cooked_kelp", cooked_kelp()), ("kelp", Image.open(VANILLA / "item/kelp.png").convert("RGBA")),
-             ("dried_kelp", Image.open(VANILLA / "item/dried_kelp.png").convert("RGBA"))]
+             ("dried_kelp", Image.open(VANILLA / "item/dried_kelp.png").convert("RGBA")),
+             ("chili_pepper", chili_pepper())]
     tiles += [("garlic_stage%d" % i, garlic_stage(i)) for i in range(4)]
     tiles += [("carrots_stage3", Image.open(VANILLA / "block/carrots_stage3.png").convert("RGBA"))]
     s = 8

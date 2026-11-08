@@ -33,6 +33,11 @@ public final class NeoForgeClient {
             event.register(HotPot.id("dynamic"), DynamicItemModel.Unbaked.CODEC));
         modBus.addListener((net.neoforged.neoforge.client.event.RegisterRangeSelectItemModelPropertyEvent event) ->
             event.register(HotPot.id("soup"), SoupItemProperty.CODEC));
+        // mryt233 改（26.1，移植同步清单 #128）：NeoForge 的模组列表「Config」按钮直接打开设置界面。
+        net.neoforged.fml.ModContainer container =
+            net.neoforged.fml.ModList.get().getModContainerById(HotPot.MOD_ID).orElseThrow();
+        container.registerExtensionPoint(net.neoforged.neoforge.client.gui.IConfigScreenFactory.class,
+            (mc, parent) -> new HotPotConfigScreen(parent));
         NeoForge.EVENT_BUS.addListener(NeoForgeClient::tooltips);
         NeoForge.EVENT_BUS.addListener(NeoForgeClient::disconnect);
         NeoForge.EVENT_BUS.addListener(NeoForgeClient::outline);

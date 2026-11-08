@@ -36,6 +36,11 @@ public final class RecipeSync {
         clientRecipes = List.of();
     }
 
+    /** 当前配方来源的身份对象，给「配方变了就失效」的缓存当键用。作者：mryt233 */
+    public static Object source(Level level) {
+        return level instanceof ServerLevel server ? server.recipeAccess() : clientRecipes;
+    }
+
     public static Iterable<RecipeHolder<?>> recipes(Level level) {
         return level instanceof ServerLevel server ? server.recipeAccess().getRecipes() : clientRecipes;
     }

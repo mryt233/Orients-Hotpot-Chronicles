@@ -4,6 +4,7 @@ import cn.blockforge.orient.framework.game.PartOutline;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -21,6 +22,7 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
@@ -209,6 +211,47 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
         }
         int col = Math.min(2, Math.max(0, (int) ((1 - lx) * 3)));
         return (2 - tier) * 3 + col;
+    }
+
+    /**
+     * mryt233 改（2026-11-07，清单 #129）：名称与图标只显示所瞄小碗中仍有存货的调料；
+     * 空碗 / 台身退回材质台名。
+     */
+    private static Seasoning aimedSeasoning(BlockState state, net.minecraft.world.level.LevelReader world,
+                                            BlockPos pos, BlockHitResult hit) {
+        int bowl = aimed(state, pos, hit);
+        if (bowl >= 0 && world.getBlockEntity(pos) instanceof SauceStationBlockEntity be
+            && be.available(bowl) > 0) {
+            return be.kind(bowl);
+        }
+        return null;
+    }
+
+    /** 上下两格共用台名 + 调料名的判定（上半截直接调这里，不再调台子自身 getName 以免递归）。 */
+    static net.minecraft.network.chat.MutableComponent aimedName(Player player) {
+        if (player != null && player.level() != null) {
+            HitResult hit = player.pick(cn.blockforge.orient.framework.compat.PlayerCompat.blockInteractionRange(player), 1.0F, false);
+            if (hit instanceof BlockHitResult blockHit && hit.getType() == HitResult.Type.BLOCK) {
+                BlockPos hitPos = blockHit.getBlockPos();
+                BlockPos stationPos = player.level().getBlockState(hitPos).is(HotPotContent.SAUCE_STATION_TOP)
+                    ? hitPos.below() : hitPos;
+                BlockState stationState = player.level().getBlockState(stationPos);
+                if (stationState.getBlock() instanceof SauceStationBlock) {
+                    net.minecraft.network.chat.MutableComponent name =
+                        Component.translatable(stationState.getBlock().getDescriptionId());
+                    Seasoning seasoning = aimedSeasoning(stationState, player.level(), stationPos, blockHit);
+                    return seasoning == null ? name
+                        : name.append(" · ").append(Component.translatable(seasoning.nameKey()));
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public net.minecraft.network.chat.MutableComponent getName() {
+        net.minecraft.network.chat.MutableComponent name = aimedName(PlateHolderBlock.pickPlayer.get());
+        return name == null ? super.getName() : name;
     }
 
     @Override

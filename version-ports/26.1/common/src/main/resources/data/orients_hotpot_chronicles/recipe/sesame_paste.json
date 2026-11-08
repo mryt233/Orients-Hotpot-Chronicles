@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "orients_hotpot_chronicles:peanut",
+    "minecraft:wheat_seeds",
+    "minecraft:bowl"
+  ],
+  "result": {
+    "id": "orients_hotpot_chronicles:sesame_paste",
+    "count": 2
+  }
+}

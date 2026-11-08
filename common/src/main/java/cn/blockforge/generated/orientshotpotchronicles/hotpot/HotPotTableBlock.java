@@ -61,11 +61,21 @@ public class HotPotTableBlock extends Block {
     }
 
     public HotPotTableBlock(Block planks) {
+        this(planks, false);
+    }
+
+    /**
+     * mryt233 改（2026-11-05）：木头桌面照木板（2.0 / 3.0），石料 / 金属桌面照石头、金属把爆炸抗性抬到 6.0。
+     * 硬度两种都统一定成 2.0：深板岩、铁块原本分别是 3.0、5.0 且要求正确工具，空手拆桌子太慢；
+     * 桌子的战利品表本来就不要求工具，这里把硬度拉开差异没意义。挖掘工具见
+     * data/minecraft/tags/block/mineable/axe.json（木头）、pickaxe.json（石料 / 金属）。
+     */
+    public HotPotTableBlock(Block like, boolean hardSurface) {
         super(BlockBehaviour.Properties.of()
-            .mapColor(planks.defaultMapColor())
+            .mapColor(like.defaultMapColor())
             .instrument(NoteBlockInstrument.BASS)
-            .strength(2.0F, 3.0F)
-            .sound(planks.defaultBlockState().getSoundType())
+            .strength(2.0F, hardSurface ? 6.0F : 3.0F)
+            .sound(like.defaultBlockState().getSoundType())
             .noOcclusion());
         registerDefaultState(defaultBlockState()
             .setValue(NORTH, false)

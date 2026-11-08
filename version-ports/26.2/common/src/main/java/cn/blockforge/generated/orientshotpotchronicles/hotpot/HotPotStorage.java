@@ -25,6 +25,11 @@ import java.nio.ByteBuffer;
 public final class HotPotStorage {
     /** 存档里每边汤底的字段名（第 0 边沿用老存档的 Base）。 */
     static final String[] BASE_KEYS = {"Base", "BaseB", "BaseC", "BaseD"};
+    /**
+     * mryt233 改（2026-11-05）：存档里每边红汤辣度档位（r136a）的字段名，第 0 边沿用老式短名 Spicy。
+     * 旧存档没有这几个键时一律读成 0 档（微辣），不报错。
+     */
+    static final String[] SPICY_KEYS = {"Spicy", "SpicyB", "SpicyC", "SpicyD"};
 
     private HotPotStorage() {
     }
@@ -40,13 +45,20 @@ public final class HotPotStorage {
         int slots = HotPotBlockEntity.SLOTS;
         for (int side = 0; side < be.bases.length; side++) {
             nbt.putInt(BASE_KEYS[side], be.bases[side]);
+            // mryt233 改（2026-11-05）：每边的红汤辣度档位（r136a），区块存档和整锅打包（pot_contents）都要带着
+            nbt.putInt(SPICY_KEYS[side], be.spicyLevels[side]);
         }
-        nbt.putIntArray("Doneness", be.doneness);
+        // mryt233 改（2026-11-07）：IntArrayTag 是直接存数组引用（不 clone），
+        // 不拷贝就会让 NBT 别名着方块实体的活数组：打包成锅物品之后再清空锅，
+        // 熟度 / 过头计时会被一起抹掉。这里的出口虽然都还会再 copy 一次，但不该靠那个巧合。
+        nbt.putIntArray("Doneness", be.doneness.clone());
         byte[] cookedBytes = new byte[slots];
         for (int i = 0; i < slots; i++) {
             cookedBytes[i] = (byte) (be.cooked[i] ? 1 : 0);
         }
         nbt.store("Cooked", Codec.BYTE_BUFFER, ByteBuffer.wrap(cookedBytes));
+        // mryt233 改（2026-11-04）：熟了以后在锅里继续煮的刻数（豆腐煮过头碎块用），重启不丢。
+        nbt.putIntArray("Overcook", be.overcook.clone());   // mryt233 改（2026-11-07）：同上，防御性拷贝
         int[] xp = new int[slots];
         for (int i = 0; i < slots; i++) {
             xp[i] = Math.round(be.xpValue[i] * 100F);
@@ -71,8 +83,13 @@ public final class HotPotStorage {
         int slots = HotPotBlockEntity.SLOTS;
         for (int side = 0; side < be.bases.length; side++) {
             be.bases[side] = nbt.getIntOr(BASE_KEYS[side], -1);
+            // mryt233 改（2026-11-05）：旧存档没有辣度键 = 微辣（0 档）；超出 0..3 的值夹回来
+            int spicy = nbt.getIntOr(SPICY_KEYS[side], 0);
+            be.spicyLevels[side] = Math.max(0, Math.min(3, spicy));
         }
         java.util.Arrays.fill(be.doneness, 0);
+        // mryt233 改（2026-11-07）：getIntArray 返回的是标签内部那个数组，这里用 System.arraycopy
+        // 逐份拷进方块实体自己的数组（写侧对应地 clone 再放进标签），两边都不互相持有引用。
         int[] loaded = nbt.getIntArray("Doneness").orElseGet(() -> new int[0]);
         System.arraycopy(loaded, 0, be.doneness, 0, Math.min(loaded.length, slots));
         java.util.Arrays.fill(be.cooked, false);
@@ -82,8 +99,11 @@ public final class HotPotStorage {
         for (int i = 0; i < slots; i++) {
             be.cooked[i] = i < cookedBytes.length && cookedBytes[i] != 0;
         }
+        java.util.Arrays.fill(be.overcook, 0);
+        int[] overdue = nbt.getIntArray("Overcook").orElseGet(() -> new int[0]);   // mryt233 改（2026-11-07）：同上，靠 System.arraycopy 拷进自有数组
+        System.arraycopy(overdue, 0, be.overcook, 0, Math.min(overdue.length, slots));
         java.util.Arrays.fill(be.xpValue, 0F);
-        int[] xp = nbt.getIntArray("SlotXp").orElseGet(() -> new int[0]);
+        int[] xp = nbt.getIntArray("SlotXp").orElseGet(() -> new int[0]);   // mryt233 改（2026-11-07）：同上，逐项换算写进自有数组
         for (int i = 0; i < Math.min(xp.length, slots); i++) {
             be.xpValue[i] = xp[i] / 100F;
         }

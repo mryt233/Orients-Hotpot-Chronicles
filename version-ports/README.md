@@ -1,14 +1,14 @@
 # Version ports · 版本与加载器
 
-Minecraft 1.21.1 (Fabric + NeoForge) is the repository-root project. The directories below are the ports of **0.2.1-alpha**; each Minecraft version is one independent multi-loader Gradle project (framework + common + one directory per loader). All files of one mod version share one Release.
+Minecraft 1.21.1 (Fabric + NeoForge) is the repository-root project. The directories below are the ports of **0.2.2-alpha**; each Minecraft version is one independent multi-loader Gradle project (framework + common + one directory per loader). All files of one mod version share one Release.
 
-Minecraft 1.21.1（Fabric + NeoForge）位于仓库根目录；下列目录是 **0.2.1-alpha** 的移植版，每个 Minecraft 版本是一个独立的多加载器 Gradle 工程（前置框架 + 公共代码 + 每个加载器一个目录）。同一模组版本的所有文件集中在一个发布页。
+Minecraft 1.21.1（Fabric + NeoForge）位于仓库根目录；下列目录是 **0.2.2-alpha** 的移植版，每个 Minecraft 版本是一个独立的多加载器 Gradle 工程（前置框架 + 公共代码 + 每个加载器一个目录）。同一模组版本的所有文件集中在一个发布页。
 
 | Minecraft | Loader / 加载器 | Mod / 模组 | Java | Source / 源码 | Download / 下载 |
 | --- | --- | --- | --- | --- | --- |
-| 26.2 | Fabric, NeoForge | 0.2.1-alpha | 25+ | [26.2/README.md](26.2/README.md) | [Release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.1-alpha) |
-| 26.1, 26.1.1, 26.1.2 (NeoForge: 26.1.2 only) | Fabric, NeoForge | 0.2.1-alpha | 25+ | [26.1/README.md](26.1/README.md) | [Release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.1-alpha) |
-| 1.20.1 | Fabric, Forge | 0.2.1-alpha | 17+ | [1.20.1/README.md](1.20.1/README.md) | [Release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.1-alpha) |
+| 26.2 | Fabric, NeoForge | 0.2.2-alpha | 25+ | [26.2/README.md](26.2/README.md) | [Release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.2-alpha) |
+| 26.1, 26.1.1, 26.1.2 (NeoForge: 26.1.2 only) | Fabric, NeoForge | 0.2.2-alpha | 25+ | [26.1/README.md](26.1/README.md) | [Release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.2-alpha) |
+| 1.20.1 | Fabric, Forge | 0.2.2-alpha | 17+ | [1.20.1/README.md](1.20.1/README.md) | [Release](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.2.2-alpha) |
 
 Fabric builds need Fabric API for the same Minecraft version; Forge / NeoForge builds do not. Install on both client and server. Requirements, test scope and SHA-256 are in each project's README.
 

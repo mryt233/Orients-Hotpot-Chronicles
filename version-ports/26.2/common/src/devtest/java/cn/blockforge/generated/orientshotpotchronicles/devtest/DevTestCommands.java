@@ -124,7 +124,7 @@ public final class DevTestCommands {
         BlockPos pos = BlockPosArgument.getBlockPos(ctx, "pos");
         Vec3 hit = Vec3Argument.getVec3(ctx, "hit");
         p.setShiftKeyDown(BoolArgumentType.getBool(ctx, "sneak"));
-        p.moveTo(hit.x, hit.y + 1.0, hit.z - 1.5, 0F, 30F);
+        p.snapTo(hit.x, hit.y + 1.0, hit.z - 1.5, 0F, 30F);
         InteractionResult r = p.gameMode.useItemOn(p, p.level(), p.getMainHandItem(), InteractionHand.MAIN_HAND,
             new BlockHitResult(hit, Direction.UP, pos, false));
         String text = "use -> " + r;

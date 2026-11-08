@@ -120,6 +120,11 @@ public final class HotPotContent {
     /** 摆在桌上的玻璃杯（只带模型，2026-10-25）。 */
     public static final CupBlock CUP_BLOCK = reg().blocks().registerFactory(
         HotPot.id("cup"), properties -> new CupBlock(properties));
+    // mryt233 改（2026-11-07）：直接摆在桌上的竹筷（带迷你筷架，借用 PlateHolderBlock 摆放，
+    // 方块类见 ChopstickRestBlock）。26.x 用框架的 registerFactory，构造器收 Properties。
+    /** 直接摆在桌上的竹筷（带迷你筷架，借用 PlateHolderBlock 摆放，见 ChopstickRestBlock）。 */
+    public static final ChopstickRestBlock CHOPSTICK_REST_BLOCK = reg().blocks().registerFactory(
+        HotPot.id("chopstick_rest"), properties -> new ChopstickRestBlock(properties));
 
     /** 装着饮料的炼药锅（2026-10-27，见 DrinkCauldronBlock；没有物品，拆了掉原版炼药锅）。 */
     public static final DrinkCauldronBlock DRINK_CAULDRON = reg().blocks().registerFactory(
@@ -173,15 +178,16 @@ public final class HotPotContent {
         // 石料 / 金属桌面的火锅桌（2026-10-26 用户：平滑石头、磨制安山岩……铁块；桌面是这种材质，下面红砖）：
         // 矮桌、高桌各一张，模型等由 tools/gen_stone_tables.py 生成，ID = <材质>_hotpot_table / <材质>_tall_hotpot_table。
         // 声音、地图颜色取那种原版方块；不会着火。新增
+        // mryt233 改（2026-11-05）：石料 / 金属桌面传 true，硬度 2.0、抗性 6.0，空手也能挖（以前照铁块 5.0 太慢）。
         for (String[] m : STONE_TABLES) {
             net.minecraft.world.level.block.Block material = BuiltInRegistries.BLOCK.getValue(Identifier.withDefaultNamespace(m[1]));
             HotPotTableBlock table = reg().blocks().registerFactory(
-                HotPot.id(m[0] + "_hotpot_table"), properties -> new HotPotTableBlock(material, properties));
+                HotPot.id(m[0] + "_hotpot_table"), properties -> new HotPotTableBlock(material, true, properties));
             HOTPOT_TABLES.add(table);
             HOTPOT_TABLE_ITEMS.add(reg().items().registerFactory(
                 HotPot.id(m[0] + "_hotpot_table"), properties -> new BlockItem(table, properties.useBlockDescriptionPrefix())));
             TallHotPotTableBlock tall = reg().blocks().registerFactory(
-                HotPot.id(m[0] + "_tall_hotpot_table"), properties -> new TallHotPotTableBlock(material, properties));
+                HotPot.id(m[0] + "_tall_hotpot_table"), properties -> new TallHotPotTableBlock(material, true, properties));
             TALL_TABLES.add(tall);
             TALL_TABLE_ITEMS.add(reg().items().registerFactory(
                 HotPot.id(m[0] + "_tall_hotpot_table"), properties -> new BlockItem(tall, properties.useBlockDescriptionPrefix())));
@@ -210,11 +216,14 @@ public final class HotPotContent {
     public static final BlockItem COPPER_FOUR_POT_ITEM = potItem(COPPER_FOUR_POT);
     public static final BlockItem IRON_FOUR_POT_ITEM = potItem(IRON_FOUR_POT);
 
-    /** 毛肚（牛掉落，r93）：生的回 2 点饥饿；熟的回 5 点。熔炉 / 烟熏炉 / 营火都能烤，锅里涮得比牛肉快一半（熔炉配方 100 tick）。 */
-    public static final Item RAW_TRIPE = reg().items().registerFactory( HotPot.id("tripe"), properties -> new Item(properties.food(new net.minecraft.world.food.FoodProperties.Builder()
-            .nutrition(2).saturationModifier(0.3F).alwaysEdible().build())));
-    public static final Item COOKED_TRIPE = reg().items().registerFactory( HotPot.id("cooked_tripe"), properties -> new Item(properties.food(new net.minecraft.world.food.FoodProperties.Builder()
-            .nutrition(5).saturationModifier(0.6F).alwaysEdible().build())));
+    /**
+     * 毛肚（牛掉落，r93）：生的回 2 点饥饿；熟的回 5 点。熔炉 / 烟熏炉 / 营火都能烤，锅里涮得比牛肉快一半（熔炉配方 100 tick）。
+     *
+     * <p>mryt233 改（2026-11-05）：毛肚以前直接 new Item 写死营养值，配置里的 food.tripe / food.cooked_tripe
+     * 改不动它。改成走 {@link #foodItem}，和别的食物一样进配置、吃的时候现读、能热重载。</p>
+     */
+    public static final Item RAW_TRIPE = foodItem("tripe", 2, 0.3F);
+    public static final Item COOKED_TRIPE = foodItem("cooked_tripe", 5, 0.6F);
 
     /**
      * 切菜（2026-10-23 用户定，新增）：生牛肉 / 生羊肉在砧板上用铁菜刀点一下（或切石机）切成 3 卷；
@@ -240,6 +249,8 @@ public final class HotPotContent {
                     new net.minecraft.world.entity.ai.attributes.AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, 3, net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_VALUE), net.minecraft.world.entity.EquipmentSlotGroup.MAINHAND)
                 .add(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED,
                     new net.minecraft.world.entity.ai.attributes.AttributeModifier(Item.BASE_ATTACK_SPEED_ID, -2.2F, net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_VALUE), net.minecraft.world.entity.EquipmentSlotGroup.MAINHAND).build())));
+    // mryt233 改（2026-11-05）：砧板照原版橡木木板（硬度 2.0、抗性 3.0、不强制工具），挖掘工具见
+    // data/minecraft/tags/block/mineable/axe.json；板上放着的东西挖的时候单独掉（见 CuttingBoardBlock#onRemove）。
     public static final CuttingBoardBlock CUTTING_BOARD = reg().blocks().registerFactory( HotPot.id("cutting_board"), net.minecraft.world.level.block.state.BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.OAK_PLANKS).noOcclusion().dynamicShape(), CuttingBoardBlock::new);   // 选中框随板上有没有东西变（坑：形状跟着方块实体变就要 dynamicBounds）
     public static final BlockItem CUTTING_BOARD_ITEM = reg().items().registerFactory( HotPot.id("cutting_board"), properties -> new BlockItem(CUTTING_BOARD, properties.useBlockDescriptionPrefix()));
     public static BlockEntityType<CuttingBoardBlockEntity> CUTTING_BOARD_BE;
@@ -251,8 +262,14 @@ public final class HotPotContent {
     public static final Item POTATO_SLICE = foodItem("potato_slice", 1, 0.3F);
     public static final Item COOKED_POTATO_SLICE = foodItem("cooked_potato_slice", 2, 0.6F);
     public static final Item SOYBEAN = foodItem("soybean", 1, 0.1F);
-    public static final Item TOFU = foodItem("tofu", 2, 0.4F);
-    public static final Item TOFU_CUBE = foodItem("tofu_cube", 1, 0.3F);
+    // mryt233 改（2026-11-04）：豆腐分冷热（用户定）。整块冷豆腐在锅里煮成热豆腐，热豆腐煮过头碎成热豆腐块。
+    // 旧 ID（tofu / tofu_cube / cooked_tofu_cube）一并改掉，alpha 期间不做旧存档兼容。
+    public static final Item COLD_TOFU = foodItem("cold_tofu", 2, 0.4F);
+    public static final Item HOT_TOFU = foodItem("hot_tofu", 2, 0.4F);
+    public static final Item COLD_TOFU_CUBE = foodItem("cold_tofu_cube", 1, 0.3F);
+    /** 豆腐在锅里煮成热豆腐的刻数（10 秒），以及从下锅算起煮过头的总刻数（30 秒）；都能在配置里改。 */
+    public static final int TOFU_COOK_TICKS = 200;
+    public static final int TOFU_OVERCOOK_TICKS = 600;
     /**
      * 橙子（2026-10-25 用户：橙子饮料要有原料）：橡木 / 深色橡木树叶像掉苹果一样掉（OrangeLoot），能吃，数值同苹果。
      * 大蒜：打草掉（GarnishLoot，同小葱 / 香菜 / 黄豆；用户：作物先保留）；在砧板上用擀面杖敲三下出 2 份蒜泥（Pounding），
@@ -280,9 +297,75 @@ public final class HotPotContent {
     public static final Item HAM_SAUSAGE_SLICE = foodItem("ham_sausage_slice", 1, 0.3F);
     /** 熟火腿肠片：火腿肠片再加热一次（2026-10-29 用户）。 */
     public static final Item COOKED_HAM_SAUSAGE_SLICE = foodItem("cooked_ham_sausage_slice", 2, 0.5F);
+    // ---- mryt233 改（2026-11-06）：r137 新增 4 种蘸料原料与 10 组第二梯队火锅食材 ----
+    /** 蚝油、芝麻酱、花生、花生碎、小米辣（辣椒在砧板上切 1 刀出 2 份小米辣；花生用擀面杖敲 3 下出 2 份花生碎）。 */
+    public static final Item OYSTER_SAUCE = foodItem("oyster_sauce", 1, 0.2F);
+    public static final Item SESAME_PASTE = foodItem("sesame_paste", 2, 0.3F);
+    public static final Item PEANUT = foodItem("peanut", 1, 0.2F);
+    public static final Item CRUSHED_PEANUTS = foodItem("crushed_peanuts", 1, 0.2F);
+    public static final Item MILLET_CHILI = foodItem("millet_chili", 1, 0.1F);
+
+    /** 酥肉链：猪肉末 + 小麦 → 3 份生酥肉（raw_crispy_pork）→ 烧炼/下锅成酥肉（crispy_pork，回 4）→ 再下锅涮成煮酥肉（boiled_crispy_pork，回 6）。 */
+    public static final Item RAW_CRISPY_PORK = foodItem("raw_crispy_pork", 1, 0.3F);
+    public static final Item CRISPY_PORK = foodItem("crispy_pork", 4, 0.6F);
+    public static final Item BOILED_CRISPY_PORK = foodItem("boiled_crispy_pork", 6, 0.8F);
+
+    /** 豆干与腐竹：冷豆腐合成/加工 → 豆干（dried_tofu）与腐竹（tofu_skin），下锅/烧炼成熟豆干、熟腐竹。 */
+    public static final Item DRIED_TOFU = foodItem("dried_tofu", 2, 0.3F);
+    public static final Item COOKED_DRIED_TOFU = foodItem("cooked_dried_tofu", 4, 0.6F);
+    public static final Item TOFU_SKIN = foodItem("tofu_skin", 2, 0.3F);
+    public static final Item COOKED_TOFU_SKIN = foodItem("cooked_tofu_skin", 4, 0.6F);
+
+    /** 宽粉与苕皮：土豆片加工 → 宽粉（wide_noodles）与苕皮（sweet_potato_skin），下锅/烧炼成熟宽粉、熟苕皮。 */
+    public static final Item WIDE_NOODLES = foodItem("wide_noodles", 1, 0.2F);
+    public static final Item COOKED_WIDE_NOODLES = foodItem("cooked_wide_noodles", 4, 0.6F);
+    public static final Item SWEET_POTATO_SKIN = foodItem("sweet_potato_skin", 1, 0.2F);
+    public static final Item COOKED_SWEET_POTATO_SKIN = foodItem("cooked_sweet_potato_skin", 4, 0.6F);
+
+    /** 金针菇、青菜、莲藕与藕片、生鱿鱼与鱿鱼卷、蛋炒饭。 */
+    public static final Item ENOKI_MUSHROOM = foodItem("enoki_mushroom", 1, 0.2F);
+    public static final Item COOKED_ENOKI_MUSHROOM = foodItem("cooked_enoki_mushroom", 3, 0.5F);
+    public static final Item GREENS = foodItem("greens", 1, 0.2F);
+    public static final Item COOKED_GREENS = foodItem("cooked_greens", 3, 0.5F);
+    public static final Item LOTUS_ROOT = foodItem("lotus_root", 2, 0.3F);
+    public static final Item LOTUS_ROOT_SLICE = foodItem("lotus_root_slice", 1, 0.2F);
+    public static final Item COOKED_LOTUS_ROOT_SLICE = foodItem("cooked_lotus_root_slice", 3, 0.6F);
+    public static final Item RAW_SQUID = foodItem("raw_squid", 2, 0.2F);
+    public static final Item SQUID_ROLL = foodItem("squid_roll", 1, 0.2F);
+    public static final Item COOKED_SQUID_ROLL = foodItem("cooked_squid_roll", 4, 0.6F);
+    public static final Item EGG_FRIED_RICE = foodItem("egg_fried_rice", 7, 0.8F);
+
+    // ---- mryt233 改（2026-11-06）：r139 新增折耳根（鱼腥草）与布围裙 ----
+    /**
+     * 折耳根（鱼腥草，2026-11-06 用户定，西南火锅灵魂食材）：打草掉（GarnishLoot 15%，和青菜、花生一样）。
+     * 生折耳根能直接吃（白嫩根节，脆、带腥香），也能放砧板上切一刀出 3 段；段下锅涮 10 秒变熟段。
+     * 折耳根碎是蘸料台第 15 种调料（Seasoning.MINCED_ZHE_ER_GEN）的原料：整根在砧板上用擀面杖敲 3 下出 2 份碎末。
+     */
+    public static final Item ZHE_ER_GEN = foodItem("zhe_er_gen", 1, 0.15F);
+    /** 折耳根段：砧板一刀切成 3 段（切石机同样是 3 段），下火锅煮。生吃回 1。 */
+    public static final Item ZHE_ER_GEN_SLICE = foodItem("zhe_er_gen_slice", 1, 0.15F);
+    /** 熟折耳根段：锅里涮 ~10 秒（200 刻）的产物，回 3。腥气煮掉大半，只剩一点回甘。 */
+    public static final Item COOKED_ZHE_ER_GEN_SLICE = foodItem("cooked_zhe_er_gen_slice", 3, 0.5F);
+    /** 折耳根碎：擀面杖敲 3 下出 2 份（Pounding），蘸料台第 15 种调料「折耳根碎」的原料。 */
+    public static final Item MINCED_ZHE_ER_GEN = foodItem("minced_zhe_er_gen", 1, 0.1F);
+    /**
+     * 布围裙（2026-11-06 用户定，塑料围裙方案已取消，只做布的）：胸甲部位，属性照原版皮革防具
+     * （防御 3、耐久 80、附魔性 15、皮革装备音），修复材料用白色羊毛或线（见材质里的 repairIngredient
+     * 标签 cloth_apron_repair，配方见 recipes/cloth_apron.json）。
+     *
+     * <p>防护特性：穿上它时（{@link ClothApronItem}）① 变态辣菜品吃下去不再往嘴上点火苗；
+     * ② 站在烧着的火锅 / 灶台旁不再被热油沸水溅到（热的灶台边不受伤、不点着）。</p>
+     */
+    public static final Item CLOTH_APRON = reg().items().registerFactory( HotPot.id("cloth_apron"),
+        ClothApronItem::new);
+
     // ==== tools/new_item.py：新物品的注册插在这行上面（mryt233 2026-11-01，别删这行）====
     /** 番茄（2026-10-25）：打草掉（GarnishLoot，同大蒜 15%），能吃；做番茄锅底料。 */
     public static final Item TOMATO = foodItem("tomato", 2, 0.3F);
+    // mryt233 改（2026-11-05）：辣椒（r136a）。打草掉（GarnishLoot 15%），能直接吃；拿在手里右键红汤锅提升辣度档位。
+    // 辣椒不参与下锅涮煮，只做红汤的辣度调味（HotPotCooking.acceptable 里明确拒收）。
+    /** 辣椒（2026-11-05 用户定）：打草掉（GarnishLoot，15%），能直接吃；拿着右键红汤锅提升辣度档位。 */
+    public static final Item CHILI_PEPPER = foodItem("chili_pepper", 1, 0.1F);
     /** 游戏内教程书「火锅指南」（2026-10-25 用户）：菜刀 + 书无序合成，右键打开（GuideBookItem / client.GuideBookScreen）。 */
     public static final Item HOTPOT_GUIDE = reg().items().registerFactory( HotPot.id("hotpot_guide"), properties -> new GuideBookItem(properties));
     /** 锅底料（2026-10-25）：拿着右键锅 = 倒进新汤底（SoupBase.TOMATO / THREE_FRESH），一块一锅。 */
@@ -296,7 +379,8 @@ public final class HotPotContent {
     public static final Item THREE_FRESH_SOUP_BUCKET = reg().items().registerFactory( HotPot.id("three_fresh_soup_bucket"), properties -> new Item(properties.stacksTo(1)));
     /** 熟海带（2026-10-25 用户）：原版海带在锅里煮出来（HotPotCooking.potResult），熔炉 / 烟熏炉照旧是干海带；回 2。 */
     public static final Item COOKED_KELP = foodItem("cooked_kelp", 2, 0.3F);
-    public static final Item COOKED_TOFU_CUBE = foodItem("cooked_tofu_cube", 2, 0.6F);
+    /** 热豆腐块（2026-11-04 改名）：原熟豆腐块，数值不变。 */
+    public static final Item HOT_TOFU_CUBE = foodItem("hot_tofu_cube", 2, 0.6F);
 
     /**
      * 丸子（2026-10-23 用户定）：木棒在砧板上捣三下出 3 个生丸子（Pounding）；熟的每个回 3，香菜版（2 生丸子 + 1 香菜 → 2 个）每个回 4。
@@ -397,11 +481,13 @@ public final class HotPotContent {
         HotPot.id("bamboo_chopsticks"), properties -> new ChopsticksItem(properties));
 
     // ------------------------------------------------------------------ 蘸料（r103，用户定的玩法见 Seasoning / SauceStationBlock）
-    /** 小葱、香菜：打草掉落（各 25%），能吃回 1 点饥饿值；放进蘸料台变成葱花、香菜碎末。 */
-    public static final Item SCALLION = reg().items().registerFactory( HotPot.id("scallion"), properties -> new Item(properties.food(new net.minecraft.world.food.FoodProperties.Builder()
-            .nutrition(1).saturationModifier(0.1F).alwaysEdible().build())));
-    public static final Item CILANTRO = reg().items().registerFactory( HotPot.id("cilantro"), properties -> new Item(properties.food(new net.minecraft.world.food.FoodProperties.Builder()
-            .nutrition(1).saturationModifier(0.1F).alwaysEdible().build())));
+    /**
+     * 小葱、香菜：打草掉落（各 25%），能吃回 1 点饥饿值；放进蘸料台变成葱花、香菜碎末。
+     *
+     * <p>mryt233 改（2026-11-05）：同毛肚，改成走 {@link #foodItem}，营养值进配置、能热重载。</p>
+     */
+    public static final Item SCALLION = foodItem("scallion", 1, 0.1F);
+    public static final Item CILANTRO = foodItem("cilantro", 1, 0.1F);
     /** 一碗蘸料里放了哪几种、还能蘸几口。 */
     public static final DataComponentType<SauceContents> SAUCE = reg().components().register( HotPot.id("sauce"),
         DataComponentType.<SauceContents>builder().persistent(SauceContents.CODEC).networkSynchronized(SauceContents.PACKET_CODEC).build());
@@ -409,6 +495,21 @@ public final class HotPotContent {
     public static final DataComponentType<Integer> DIPPED = reg().components().register( HotPot.id("dipped"),
         DataComponentType.<Integer>builder().persistent(com.mojang.serialization.Codec.INT)
             .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
+    // mryt233 改（2026-11-05）：汤底风味加成（r136a）。菜记着自己是在哪种汤底里煮出来的，
+    // 吃下去时按汤底（红汤再按辣度档位）补一份状态效果，见 SoupBase.dishBonusEffects(int) 与 LivingEntityEatMixin。
+    /** 这道菜是在哪种汤底里煮出来的（SoupBase.textureKey()，如 "spicy"、"mushroom"）；吃下时给汤底风味加成。 */
+    public static final DataComponentType<String> COOKED_IN_SOUP = reg().components().register(HotPot.id("cooked_in_soup"),
+        DataComponentType.<String>builder().persistent(com.mojang.serialization.Codec.STRING)
+            .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.STRING_UTF8).build());
+    /** 红汤辣度档位（0=微辣，1=中辣，2=特辣，3=变态辣）：记在红汤煮出的菜或盛出的红汤碗上。 */
+    public static final DataComponentType<Integer> SPICY_LEVEL = reg().components().register(HotPot.id("spicy_level"),
+        DataComponentType.<Integer>builder().persistent(com.mojang.serialization.Codec.INT)
+            .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
+    // mryt233 改（2026-11-05）：给并行任务 r136b 预留的组件与方块引用（干杯标记、桌面迷你筷架）。
+    /** 玻璃杯是否已经碰过杯（干杯标记，喝下时多回 1 饥饿值）。 */
+    public static final DataComponentType<Boolean> CHEERED = reg().components().register(HotPot.id("cheered"),
+        DataComponentType.<Boolean>builder().persistent(com.mojang.serialization.Codec.BOOL)
+            .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.BOOL).build());
     public static final DippingSauceItem DIPPING_SAUCE = reg().items().registerFactory(
         HotPot.id("dipping_sauce"), properties -> new DippingSauceItem(properties));
     /** 蘸料台：11 种原版木头各一个 + 铁的（用户定）；ID = <木头>_sauce_station / iron_sauce_station。 */
@@ -422,7 +523,9 @@ public final class HotPotContent {
             boolean iron = body.equals("iron");
             net.minecraft.world.level.block.Block like = iron ? net.minecraft.world.level.block.Blocks.IRON_BLOCK
                 : BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.withDefaultNamespace(body + "_planks"));
-            SauceStationBlock station = reg().blocks().registerFactory( HotPot.id(body + "_sauce_station"), net.minecraft.world.level.block.state.BlockBehaviour.Properties.ofFullCopy(like).noOcclusion(), SauceStationBlock::new);
+            // mryt233 改（2026-11-05）：属性统一由 SauceStationBlock.settingsFor 给，木头 2.0/3.0、铁 2.0/6.0，都不强制工具。
+            SauceStationBlock station = reg().blocks().registerFactory( HotPot.id(body + "_sauce_station"),
+                SauceStationBlock.settingsFor(like, iron), SauceStationBlock::new);
             SAUCE_STATIONS.add(station);
             SAUCE_STATION_ITEMS.add(reg().items().registerFactory( HotPot.id(body + "_sauce_station"), properties -> new BlockItem(station, properties.useBlockDescriptionPrefix())));
         }
@@ -495,9 +598,10 @@ public final class HotPotContent {
                 entries.accept(POTATO_SLICE);
                 entries.accept(COOKED_POTATO_SLICE);
                 entries.accept(SOYBEAN);
-                entries.accept(TOFU);
-                entries.accept(TOFU_CUBE);
-                entries.accept(COOKED_TOFU_CUBE);
+                entries.accept(COLD_TOFU);
+                entries.accept(HOT_TOFU);
+                entries.accept(COLD_TOFU_CUBE);
+                entries.accept(HOT_TOFU_CUBE);
                 for (Item ball : new Item[]{BEEF_MEATBALL, COOKED_BEEF_MEATBALL, CILANTRO_BEEF_MEATBALL, COOKED_CILANTRO_BEEF_MEATBALL, PORK_MEATBALL, COOKED_PORK_MEATBALL, CILANTRO_PORK_MEATBALL, COOKED_CILANTRO_PORK_MEATBALL, MUTTON_MEATBALL, COOKED_MUTTON_MEATBALL, CILANTRO_MUTTON_MEATBALL, COOKED_CILANTRO_MUTTON_MEATBALL, FISH_BALL, COOKED_FISH_BALL, CILANTRO_FISH_BALL, COOKED_CILANTRO_FISH_BALL}) {
                     entries.accept(ball);
                 }
@@ -509,6 +613,21 @@ public final class HotPotContent {
                 entries.accept(HAM_SAUSAGE);
                 entries.accept(HAM_SAUSAGE_SLICE);
                 entries.accept(COOKED_HAM_SAUSAGE_SLICE);
+                // mryt233 改（2026-11-06）：r137 的 22 样新食材，接在火腿肠片后面，按生 → 熟成对排列。
+                for (Item food : new Item[]{RAW_CRISPY_PORK, CRISPY_PORK, BOILED_CRISPY_PORK,
+                    DRIED_TOFU, COOKED_DRIED_TOFU, TOFU_SKIN, COOKED_TOFU_SKIN,
+                    WIDE_NOODLES, COOKED_WIDE_NOODLES, SWEET_POTATO_SKIN, COOKED_SWEET_POTATO_SKIN,
+                    ENOKI_MUSHROOM, COOKED_ENOKI_MUSHROOM, GREENS, COOKED_GREENS,
+                    LOTUS_ROOT, LOTUS_ROOT_SLICE, COOKED_LOTUS_ROOT_SLICE,
+                    RAW_SQUID, SQUID_ROLL, COOKED_SQUID_ROLL, EGG_FRIED_RICE}) {
+                    entries.accept(food);
+                }
+                // mryt233 改（2026-11-06）：r139 折耳根四样（生 / 段 / 熟段 / 碎）接在 r137 食材后面，按生 → 熟的顺序。
+                for (Item zheErGen : new Item[]{ZHE_ER_GEN, ZHE_ER_GEN_SLICE, COOKED_ZHE_ER_GEN_SLICE, MINCED_ZHE_ER_GEN}) {
+                    entries.accept(zheErGen);
+                }
+                // 布围裙：防溅油装备，排在厨具（菜刀 / 擀面杖 / 砧板）后面
+                entries.accept(CLOTH_APRON);
                 // ==== tools/new_item.py：新物品进创造栏插在这行上面（别删这行）====
                 entries.accept(HOTPOT_GUIDE);
                 entries.accept(KITCHEN_KNIFE);
@@ -534,11 +653,18 @@ public final class HotPotContent {
                 entries.accept(GARLIC_PASTE);
                 entries.accept(COOKED_KELP);
                 entries.accept(TOMATO);
+                entries.accept(CHILI_PEPPER);   // mryt233 改（2026-11-05）：辣椒（r136a）排在番茄后面
+                // mryt233 改（2026-11-06）：r137 的 5 种蘸料原料，接在辣椒后面（都是能在蘸料台上用的原料）。
+                for (Item raw : new Item[]{OYSTER_SAUCE, SESAME_PASTE, PEANUT, CRUSHED_PEANUTS, MILLET_CHILI}) {
+                    entries.accept(raw);
+                }
                 entries.accept(TOMATO_HOTPOT_BASE);
                 entries.accept(THREE_FRESH_HOTPOT_BASE);
                 entries.accept(TOMATO_SOUP_BUCKET);
                 entries.accept(THREE_FRESH_SOUP_BUCKET);
-                entries.accept(DIPPING_SAUCE);
+                // mryt233 改（2026-11-04）：不再放空的蘸料。默认物品没有 sauce 组件，显示「蘸料 · 还能蘸 0 口」，
+                // 玩家截图报过；蘸料本来就只能在蘸料台上打，创造栏不放。
+                // 万一还有地方拿到空蘸料，DippingSauceItem 会把它换成空碗（见那边的兜底）。
                 HOTPOT_TABLE_ITEMS.forEach(entries::accept);
                 BENCH_ITEMS.forEach(entries::accept);
                 TALL_TABLE_ITEMS.forEach(entries::accept);
@@ -584,6 +710,17 @@ public final class HotPotContent {
         OrangeLoot.register();
         DrinkCauldronBlock.registerEmptyCauldron();
         HotPotCooking.potResult(net.minecraft.world.item.Items.KELP, COOKED_KELP);
+        // mryt233 改（2026-11-04）：豆腐改造（用户定）。
+        // 整块冷豆腐在锅里煮成热豆腐（不用原版熔炉配方，锅专用产物）；
+        // 热豆腐是熟的、放不回锅，继续煮到配置的时长就碎成热豆腐块。
+        Config.rememberTofuCooking(TOFU_COOK_TICKS, TOFU_OVERCOOK_TICKS);
+        HotPotCooking.potResult(COLD_TOFU, HOT_TOFU);
+        HotPotCooking.overcook(HOT_TOFU, HOT_TOFU_CUBE);
+        // mryt233 改（2026-11-06）：酥肉二次下锅（r137）。生酥肉烧炼 / 涮成酥肉之后，酥肉本身还能再涮成煮酥肉；
+        // 它登记在锅专用产物表里，HotPotCooking.isCookedFood 会先放行，不会把它当成不能下锅的终态熟食。
+        HotPotCooking.potResult(CRISPY_PORK, BOILED_CRISPY_PORK);
+        // mryt233 改（2026-11-06，r139）：折耳根段在锅里涮成熟折耳根段（锅专用产物，不用熔炉配方）。
+        HotPotCooking.potResult(ZHE_ER_GEN_SLICE, COOKED_ZHE_ER_GEN_SLICE);
         HotPotCriterion.register();
         SoupBucketRecipe.register();
         HotPot.LOGGER.info("[Orient的火锅物语] 内容已注册（组合灶台 + 铜锅 + 铁锅 + 独立分类）");

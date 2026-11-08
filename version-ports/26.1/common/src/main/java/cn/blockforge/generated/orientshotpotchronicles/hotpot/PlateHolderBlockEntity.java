@@ -44,9 +44,13 @@ public class PlateHolderBlockEntity extends BlockEntity {
         /** 架在碗沿 / 盘沿上的筷子（连夹着的菜；2026-10-27 用户，新增）：拿筷子 Shift+右键碗、盘子架上去，空手右键拿回来。 */
         public ItemStack chopsticks = ItemStack.EMPTY;
 
-        /** 能不能架筷子：碗（空碗、汤碗、装菜的碗、蘸料碗）和盘子能，瓶子、杯子不能。 */
+        /**
+         * 能不能架筷子：碗（空碗、汤碗、装菜的碗、蘸料碗）和盘子能，瓶子、杯子不能；
+         * 已经摆在桌上的筷子本身（{@link ChopstickRestBlock}）也不能再叠架第二双（r136b，2026-11-05 用户）。
+         */
         public boolean restsChopsticks() {
-            return !(plate instanceof DrinkBlock) && !(plate instanceof CupBlock);
+            return !(plate instanceof DrinkBlock) && !(plate instanceof CupBlock)
+                && !(plate instanceof ChopstickRestBlock);
         }
 
         Placed(PlateBlock plate, double x, double z, Direction.Axis axis) {
@@ -98,7 +102,11 @@ public class PlateHolderBlockEntity extends BlockEntity {
             return ItemStack.EMPTY;
         }
 
-        /** 能不能往里放菜：汤碗、瓶子不行。 */
+        /**
+         * 能不能往里放菜：汤碗、瓶子不行。
+         * 摆在桌上的筷子（{@link ChopstickRestBlock}）self 里存的就是这双 bamboo_chopsticks、不为空，
+         * 所以这里天然返回 false，不会往筷子上塞盘子菜（r136b，2026-11-05 用户）。
+         */
         public boolean holdsFood() {
             return self.isEmpty();
         }
@@ -171,10 +179,14 @@ public class PlateHolderBlockEntity extends BlockEntity {
     public Placed at(double px, double pz) {
         Placed best = null;
         double bestD = 2.0;
+        double bestCenterD = Double.POSITIVE_INFINITY;
         for (Placed p : plates) {
             double d = p.distanceTo(px, pz);
-            if (d <= bestD) {
+            double dx = px - p.x, dz = pz - p.z;
+            double centerD = dx * dx + dz * dz;
+            if (d < bestD || (d == bestD && centerD < bestCenterD)) {
                 bestD = d;
+                bestCenterD = centerD;
                 best = p;
             }
         }
@@ -195,8 +207,20 @@ public class PlateHolderBlockEntity extends BlockEntity {
     }
 
     /** 一个盘子（连盘里的菜）的形状，选中框只框准星对着的那个时用。 */
-    /** 摆着的这件有多高（像素）：一般按盘子大小；之晗可乐（原名 之晗可乐，2026-10-26 用户改名）的玻璃汽水瓶只有 11.75（2026-10-26）。 */
+    /**
+     * 摆在桌上的那双竹筷（连迷你筷架）占多高：迷你筷架 1.5 像素，筷子搁在上面再抬一点，
+     * 选中框和碰撞按 3.0 像素算，正好把筷架和筷子一起框住（r136b，2026-11-05 用户）。
+     */
+    public static final double TABLE_CHOPSTICKS_H = 3.0;
+
+    /**
+     * 摆着的这件有多高（像素）：一般按盘子大小；之晗可乐（原名 之晗可乐，2026-10-26 用户改名）的玻璃汽水瓶只有 11.75（2026-10-26）；
+     * 直接摆在桌上的竹筷（{@link ChopstickRestBlock}）按筷架 + 筷子算（r136b，2026-11-05 用户）。
+     */
     public static double heightOf(Placed p) {
+        if (p.plate instanceof ChopstickRestBlock) {
+            return TABLE_CHOPSTICKS_H;
+        }
         DrinkKind kind = p.self.getItem() instanceof DrinkItem d ? d.kind()
             : p.self.getItem() instanceof EmptyBottleItem e ? e.kind() : null;
         return kind == null ? p.plate.size().height() : kind.bottleHeight();

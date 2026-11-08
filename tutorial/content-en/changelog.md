@@ -2,15 +2,91 @@
 <!-- mryt233 改，2026-10-30：补齐 #30–#71 正式版记录；r130 单列开发版。 -->
 # Changelog
 
-This page is updated with each release, **newest first**. The Development Preview describes completed work that is not yet released. **Gameplay in this guide follows released 0.1.4-alpha.**
+This page is updated with each release, **newest first**. The Development Preview describes completed work that is not yet released. **Gameplay in this guide follows released 0.2.2-alpha.**
 
 :::tip
 **Maintenance note (players can skip this):** every game change gets a numbered entry in the unreleased section of `docs/移植同步清单.md`. The `<!--清单#N-->` markers in `preview.md` link to those entries. `python tools/build_tutorial.py` checks for omissions. At release time, move the preview into the release history and start a new preview.
 :::
 
+<!-- mryt233 改，2026-11-08：0.2.2-alpha 发布，开发版预览改名为版本号，再开一段空的预览。 -->
 ## Development Preview {{dev}} {#unreleased}
 
-**Development build r132 (preview build 0.2.0-alpha) is not released:** Minced Pork and the sausage preparation chain, eating while full (chopsticks and all of this mod's foods), reloadable numeric configuration (including drink nutrition), loader wiring, hoppers feeding pots, plus resilience, compatibility, long-distance teleport crash and server freeze fixes. See the [Development Preview](preview.html) for illustrated instructions and entries #72–#101.
+The next development build is being updated; new content will appear in the [Development Preview](preview.html) first.
+
+<!-- mryt233 改，2026-11-08：0.2.2-alpha 正式版发布记录（r134～r145，清单 #103～#131）。 -->
+## 0.2.2-alpha{{since:0.2.2-alpha}} {#v022}
+
+Released on 2026-11-08. **Simultaneous multi-version release for Minecraft 1.21.1 (Fabric, NeoForge), 1.20.1 (Fabric, Forge), 26.1.x (Fabric, NeoForge), and 26.2 (Fabric, NeoForge).** Every jar bundles the required `orient_framework` library—just drop the jar into `mods`. Legacy `tofu` config keys migrate automatically to `cold_tofu` and `hot_tofu`.
+
+### New ingredients, seasonings, and cloth apron
+
+{{icons:raw_crispy_pork,crispy_pork,boiled_crispy_pork,dried_tofu,tofu_skin,wide_noodles,sweet_potato_skin,enoki_mushroom,greens,lotus_root_slice,squid_roll,egg_fried_rice,chili_pepper,zhe_er_gen,cloth_apron}}
+
+- **Crispy Pork** (Minced Pork + wheat + egg → {{i:raw_crispy_pork}} → {{i:crispy_pork}} → simmer again for {{i:boiled_crispy_pork}}), **Dried Tofu / Tofu Skin / Wide Potato Noodles / Sweet Potato Skin** (crafted from cold tofu or potato slices in a row or column), **Enoki Mushrooms / Bok Choy / Lotus Root & Slices / Raw Squid & Squid Rolls**, **Egg Fried Rice**, **Chili Peppers & Houttuynia Root (Zhe'ergen)** (dropped from grass, with redrawn Houttuynia and Raw Squid Roll textures; slice Houttuynia for the pot or pound into mince), plus their cooked forms. ([Ingredients & Food Preparation](ingredients.html#crispy_pork))<!--清单#116--><!--清单#123--><!--清单#127-->
+- **Hot and cold tofu & overcooking into cubes:** crafting soybeans makes {{i:cold_tofu}}, simmering 10 s makes {{i:hot_tofu}}, and leaving it in the pot for 30 s breaks it into {{i:hot_tofu_cube}}; legacy `tofu` config keys migrate automatically. ([Ingredients & Food Preparation](ingredients.html#tofu))<!--清单#108--><!--清单#109-->
+- **5 new seasonings (15 total) & two-column help panel:** {{i:oyster_sauce}}, {{i:sesame_paste}}, {{i:crushed_peanuts}} (pound {{i:peanut}} dropped from grass), {{i:millet_chili}}, and {{i:minced_zhe_er_gen}}; the Sauce Station `?` reference splits into two columns when over 10 seasonings; chopsticks and plates also list dipped seasonings and effects in tooltips, and 0-sip sauce bowls no longer appear. ([Dipping Sauces](sauce.html#seasoning))<!--清单#105--><!--清单#106--><!--清单#123--><!--清单#127-->
+- **Cloth Apron** ({{i:cloth_apron}}): chestplate-slot apron (1 string + 6 white wool) that suppresses Level 3 Extreme Spicy mouth flames, blocks fire / campfire / lava / hot-floor splash burns within 4 blocks of a heat source, and unlocks the "Aproned Up" advancement. ([Tableware & Drinks](tableware.html#apron))<!--清单#127-->
+
+### 4-level spicy broth, six broth flavors, and table interactions
+
+{{icons:bamboo_chopsticks,chopstick_rest,oak_bench,orient_cola_cup,dipping_sauce}}
+
+- **Chili peppers & 4-level Spicy Red Broth:** right-click a Spicy Red Broth section with {{i:chili_pepper}} to raise the heat level (Mild / Medium / Extra / Level 3 Extreme Spicy) or with ice / packed ice / blue ice to cool it down; scooped soup bowls and cooked dishes carry that heat level. ([Stoves & Hotpots](hotpot.html#spicy_level))<!--清单#116-->
+- **Six broth flavor bonuses & effect tooltips:** cooked dishes and soup bowls grant distinct broth effects (Spicy Red: Strength + Speed + Fire Resistance at high heat; Clear: Speed + clears Nausea; Rich Stock: Resistance + Absorption with Slowness removed; Mushroom: Regeneration; Tomato: Haste + clears Nausea; Three-Delicacy: Water Breathing + Luck), with exact effects and `m:ss` durations listed in tooltips. ([Stoves & Hotpots](hotpot.html#dish_flavor))<!--清单#117--><!--清单#124--><!--清单#125-->
+- **Chopsticks on the tabletop (with mini porcelain rest):** hold Shift + right-click an empty spot on a low or tall hotpot table to lay chopsticks and their held food on a white porcelain mini chopstick rest. ([Tableware & Drinks](tableware.html#chopsticks))<!--清单#119-->
+- **Stackable bench ladders & smoother collision:** right-click a placed bench while holding a bench to stack up to 16 high; stacks of 2 or more work as ladders on any side while the top bench can still be sat on. Full-height bench legs now match the seat width for collision and selection so walking alongside benches stays smooth. ([Tables & Seating](tables.html#climb))<!--清单#120--><!--清单#130-->
+- **Toasting (Cheers!) & octagonal beveled glass cups:** hold a filled glass cup and right-click a cup-holding player, Shift + right-click the air, or right-click a filled cup on a table to clink glasses for 30 s Luck I + 5 s Regeneration I and +1 bonus hunger on the next sip; all 6 glass cup models and textures are redesigned. ([Tableware & Drinks](tableware.html#cheers))<!--清单#118--><!--清单#122-->
+
+### Guide search, mod menu settings, JEI / REI, and Jade overlay integration
+
+- **Full Hotpot Guide parity & in-book search:** the in-game guide now matches all 9 chapters and 56 entries of the web book tutorial (including tables) in 3 languages, with horizontally scrolling top bookmarks and a top-right compass (`Ctrl + F` / `/`) for full-text search. ([What's in the mod?](index.html#guide))<!--清单#113--><!--清单#128-->
+- **Mod menu visual settings screen & expanded config:** open "Config" from the mod list to adjust 4 tabs of sliders (including 0%–100% steam/smoke particle intensity, broth speeds, 19 ingredient cook times, and soup/seasoning/drink/food values; requires Mod Menu on Fabric, built-in on NeoForge / Forge). ([FAQ](faq.html#config))<!--清单#110--><!--清单#114--><!--清单#128-->
+- **JEI & REI recipe viewer integration:** browse Hotpot Simmering, Cutting Board Slicing, and Rolling Pin Pounding recipe categories and workstation catalysts directly in JEI or REI.<!--清单#115-->
+- **Jade & block info overlay integration:** tabletop tableware, drink bottles and cups, stove-mounted pots, cutting-board ingredients, sauce stations, and drink cauldrons show per-part names, clean item icons, and detailed contents (seasoning icons/effects/bites, plate/bowl food counts and dipped sauces/broths, chopstick food, and cooked/raw pot ingredients), updating frame-by-frame across items in single-player and multiplayer. ([Tableware & Drinks](tableware.html#plate))<!--清单#129--><!--清单#130--><!--清单#131-->
+- **24 advancements & quality-of-life improvements:** dedicated "Orient's Hotpot Chronicles" advancement tab with 24 advancements (and fixed "Author's Pick" trigger); ray-plane intersection for accurate low-angle pot cell targeting; tighter food placement on 1×1 small dishes; block-atlas stove firebox rendering for HD/animated resource packs; main-menu splash text; pickaxe/axe mining tags; and Traditional Chinese `zh_tw` terminology refinements.<!--清单#103--><!--清单#104--><!--清单#107--><!--清单#109--><!--清单#111--><!--清单#112--><!--清单#121--><!--清单#124--><!--清单#126-->
+- **Fixed ladders / vines not climbable and axes mining wood slower**: removed leftover data from an unused experiment, so vanilla climbing (ladders, vines, scaffolding) and axe mining speed work normally again, and no recipe errors appear when entering a world.<!--清单#132-->
+<!-- mryt233 改，2026-11-02：0.2.1-alpha 只放宽 NeoForge 最低版本。 -->
+## 0.2.1-alpha{{since:0.2.1-alpha}} {#v021}
+
+Released on 2026-11-02. **Gameplay and content are exactly the same as 0.2.0-alpha.** The only change is that the 1.21.1 NeoForge build now needs NeoForge **21.1.186** or later instead of 21.1.265, so older NeoForge versions work too. Fabric requirements are unchanged (Fabric Loader 0.15.11+ and Fabric API). The files are `orients_hotpot_chronicles-1.21.1-fabric-0.2.1-alpha.jar` and `orients_hotpot_chronicles-1.21.1-neoforge-0.2.1-alpha.jar`. See [Downloads, Installation & Feedback](install.html#versions).<!--清单#102-->
+
+## 0.2.0-alpha{{since:0.2.0-alpha}} {#v020}
+
+Released on 2026-11-02. **Available only for Minecraft 1.21.1 Fabric and NeoForge.** Both jars bundle the required framework; just put one in your mods folder. 1.20.1 Fabric / Forge stays on 0.1.4-alpha and 1.20.4 Fabric on 0.1.1-alpha; these older ports are no longer maintained. No item or block IDs were removed or renamed compared with 0.1.4-alpha, but backing up your world before upgrading is still recommended.
+
+### New content
+
+{{icons:minced_pork,raw_ham_sausage,ham_sausage,ham_sausage_slice,cooked_ham_sausage_slice}}
+
+- **Minced Pork and ham sausages:** cut a raw porkchop into Minced Pork; craft Minced Pork + wheat into 3 Raw Ham Sausages; cook them into Ham Sausages; cut those into 3 Ham Sausage Slices; heat the slices again for Cooked Ham Sausage Slices. ([Ingredients & Food Preparation](ingredients.html#sausage))<!--清单#72--><!--清单#75--><!--清单#76--><!--清单#77-->
+- **Eat even when full:** every food in this mod can be eaten with a full hunger bar; the hunger bar does not rise, while saturation is still added up to 20. Compatible with Always Eat. ([Plates, Bowls & Drinks](tableware.html#chopsticks))<!--清单#74--><!--清单#99-->
+- **Hoppers and pots:** a hopper above the pot only inserts cookable raw ingredients; a hopper below only pulls out cooked food. ([Stoves & Hotpots](hotpot.html#hopper))<!--清单#95-->
+- **Numeric configuration:** `config/orients_hotpot_chronicles.json` adjusts food and drink nutrition, broth speed, fuel, dipping sauces, and more. An administrator running `/orientshotpot reload` applies it immediately, and multiplayer servers sync it automatically. ([FAQ](faq.html#config))<!--清单#78--><!--清单#81--><!--清单#96-->
+- **NeoForge matches Fabric:** both 1.21.1 loaders now share one codebase and the same content.<!--清单#83-->
+
+{{recipe:raw_ham_sausage}}
+
+### Changes
+
+- **Putting food back:** **sneak + right-click** a bowl or plate while holding food to put it back (the chopsticks stay in hand); only empty chopsticks rest on the rim, so the two no longer conflict.<!--清单#84-->
+- **Food in the pot:** when several portions take turns at the surface, they keep the same size; the current one sinks and the next floats up, with no sudden swap when lighting or putting out the fire.<!--清单#92--><!--清单#98-->
+- **Campfire pots:** the screen shows the pot heating instead of “no fire”.<!--清单#93-->
+- **Tall stove pots:** mining the pot from above a tall stove removes only the pot.<!--清单#94-->
+- **Cutting board:** still works with built-in recipes if a modpack removes the stonecutter recipes.<!--清单#73-->
+- **Recipe viewers:** tags such as “cuttable ingredients” and “heat sources” show readable names.<!--清单#82-->
+- **Config warnings** follow each player’s language; on Fabric servers, a client/server version mismatch is reported when joining.<!--清单#100-->
+- **Translation review:** sausage names in several languages are more accurate, and Traditional Chinese wording now matches official terms.<!--清单#101-->
+
+### Fixes
+
+- **Server freezes:** servers with tall stoves or sauce stations no longer freeze when players join or teleport.<!--清单#89-->
+- **Long-distance teleport crash:** after respawning or teleporting far away, the client no longer crashes on stoves left in old chunks.<!--清单#88-->
+- **Stove fuel:** fuel added while no pot is on the stove survives restarts; stove and sauce station screens close when you walk away or the block is broken.<!--清单#90-->
+- **Cooking time after restart:** uncooked food in the pot continues with the correct remaining time.<!--清单#91-->
+- **Pot bubbles:** no more fast-then-slow jump while heating up, and smooth at high frame rates.<!--清单#87-->
+- **Compatibility:** broths and fuels from other mods are recognized by cooking; a failing compatibility module only skips itself.<!--清单#80--><!--清单#85-->
+- **NeoForge chopsticks** no longer error when picking up food; chopsticks holding food in old worlds still load.<!--清单#86-->
+- Internal cleanup: add-on extension points and lighter pot calculation and syncing; gameplay unchanged.<!--清单#79--><!--清单#97-->
 
 ## 0.1.4-alpha{{since:0.1.4-alpha}} {#v014}
 

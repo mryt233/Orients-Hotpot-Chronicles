@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.item.ModelRenderProperties;
 import net.minecraft.resources.Identifier;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -32,6 +33,11 @@ import org.joml.Vector3fc;
 public final class DynamicItemModel implements ItemModel {
     private static final Map<Item, ClientItemRenderers.Renderer> RENDERERS = new IdentityHashMap<>();
     private static final Vector3fc[] EXTENTS = {new Vector3f(0, 0, 0), new Vector3f(1, 1, 1)};
+    /**
+     * 平面物品：画出来是一张正对镜头的 2D 图（筷子、筷子夹着的菜），GUI 里要用正面平光。
+     * mryt233 改（2026-11-05）：客户端初始化时由 {@link #registerFlat} 登记，见 {@code HeldFoodItemRenderer}。
+     */
+    private static final Set<Item> FLAT_ITEMS = java.util.Collections.newSetFromMap(new IdentityHashMap<>());
     private static final FrameRenderer FRAME_RENDERER = new FrameRenderer();
     private final Matrix4fc transform;
     /** 基础模型里的显示变换（物品栏 / 手持 / 地上的角度和大小）；没给 base 时为 null。 */
@@ -43,6 +49,14 @@ public final class DynamicItemModel implements ItemModel {
     }
 
     public static void install() { ClientItemRenderers.install(RENDERERS::put); }
+
+    /**
+     * 登记“平面动态物品”（画出来是一张正对镜头的 2D 图），GUI 里强制用正面平光。
+     * mryt233 改（2026-11-05）：夹着菜的筷子在物品栏里发暗，原因见 {@link #update} 末尾。
+     */
+    public static void registerFlat(Item... items) {
+        for (Item item : items) { FLAT_ITEMS.add(item); }
+    }
 
     @Override
     public void update(ItemStackRenderState output, ItemStack item, ItemModelResolver resolver,
@@ -61,6 +75,15 @@ public final class DynamicItemModel implements ItemModel {
         // mryt233 改：和原版 SpecialModelWrapper 一样，按显示场景套用基础模型的 display 变换。
         // 以前漏了这一步，鸳鸯锅、装菜的盘子等在物品栏里只剩一条扁平的方块（1.21.1 的 BEWLR 是按模型 display 摆的）。
         if (properties != null) { properties.applyToLayer(layer, context); }
+        // mryt233 改（2026-11-05）：平面动态物品（夹着菜的筷子等）在 GUI 里必须用正面平光。
+        // ModelRenderProperties.applyToLayer 会把上面的 setUsesBlockLight(false) 覆盖成模型自己的 gui_light
+        // （模型没写 gui_light 时默认 side，也就是 3D 方块侧光）。GUI 的 GuiItemAtlas 只看第一个图层的
+        // usesBlockLight 二选一：true → Lighting.Entry.ITEMS_3D（侧光），false → ITEMS_FLAT（正面平光）。
+        // 筷子和它夹的菜都是朝向正前方的 2D 平面贴图，侧光下正面吃不到直射光，物品栏里整个发暗（用户 26.2 截图）。
+        // 所以覆盖动作之后，按“这个物品是不是平面物品”再定一次，平面物品一律走 ITEMS_FLAT。
+        if (context == ItemDisplayContext.GUI && FLAT_ITEMS.contains(item.getItem())) {
+            layer.setUsesBlockLight(false);
+        }
     }
 
     /** base：带 display 变换的原物品模型（1.21.1 时父模型是 builtin/entity 的那个），由 tools/gen_item_definitions.py 写入。 */

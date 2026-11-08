@@ -61,6 +61,11 @@ public class HotPotBlockEntity extends BlockEntity
     final int[] cookDur = new int[SLOTS];
     final float[] xpValue = new float[SLOTS];
     final boolean[] cooked = new boolean[SLOTS];
+    /**
+     * mryt233 改（2026-11-04）：熟了以后还在锅里继续煮的刻数（豆腐煮过头碎成豆腐块用）。
+     * 只对登记过 `HotPotCooking.overcook` 的熟食累加；煮熟那一刻清 0，取走 / 换掉时一起重置。存档里是 Overcook 数组。
+     */
+    final int[] overcook = new int[SLOTS];
     final ItemStack[] tracked = new ItemStack[SLOTS];
     float pendingXp = 0F;
     /**
@@ -68,6 +73,12 @@ public class HotPotBlockEntity extends BlockEntity
      * 汤底不和格局绑定，任何汤底（包括以后新加的）都能倒进任何一边。调整（原来是单个 base）。
      */
     final int[] bases = {-1, -1, -1, -1};
+    /**
+     * mryt233 改（2026-11-05）：每边的红汤辣度档位（r136a），和 {@link #bases} 一一对应：
+     * 0 = 微辣（刚倒进红汤的档位）、1 = 中辣、2 = 特辣、3 = 3 级特辣。
+     * 只有红汤边有意义；倒汤 / 舀汤 / 清空汤底时归 0。存档字段见 HotPotStorage.SPICY_KEYS。
+     */
+    final int[] spicyLevels = {0, 0, 0, 0};
     /** 客户端缓动热度，用于让食材起伏和蒸汽自然启停。 */
     private float clientHeat = 0F;
     /** 气泡累计相位（秒）：随热度连续累加，避免用「全局时间÷随热度变化的周期」造成相位跳变（2026-10-30）。 */
@@ -252,6 +263,7 @@ public class HotPotBlockEntity extends BlockEntity
     /** 清空汤底并同步空锅外观，拆锅或重新安装时使用。 */
     protected void clearSoupState() {
         java.util.Arrays.fill(bases, -1);
+        java.util.Arrays.fill(spicyLevels, 0);   // mryt233 改（2026-11-05）：汤底没了，辣度一起归零（r136a）
         updateSoupVisual();
         markDirtyAndSync();
     }
@@ -327,6 +339,7 @@ public class HotPotBlockEntity extends BlockEntity
             // 菌汤：桶装不了蘑菇煲，就是把汤倒掉，桶还是空桶（r99）
             dropContents(side);
             setBaseOfSide(side, -1);
+            setSpicyOfSide(side, 0);   // mryt233 改（2026-11-05）：倒掉汤底，辣度归零（r136a）
             updateSoupVisual();
             level.playSound(null, worldPosition, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.6F, 1.0F);
             markDirtyAndSync();
@@ -334,6 +347,7 @@ public class HotPotBlockEntity extends BlockEntity
         }
         dropContents(side);
         setBaseOfSide(side, -1);
+        setSpicyOfSide(side, 0);   // mryt233 改（2026-11-05）：舀走汤底，辣度归零（r136a）
         updateSoupVisual();
         player.setItemInHand(hand, net.minecraft.world.item.ItemUtils.createFilledResult(stack, player, new ItemStack(soup.source())));
         net.minecraft.sounds.SoundEvent sound = soup == SoupBase.SPICY ? SoundEvents.BUCKET_FILL_LAVA
@@ -396,6 +410,14 @@ public class HotPotBlockEntity extends BlockEntity
         ItemStack result;
         if (!scooped.isEmpty()) {
             HotPotCriterion.fire(player, "pot_cooked");
+            // mryt233 改（2026-11-05，r136a）：碗里盛到的熟虾也算「煮虾」成就。
+            // pot_cooked 之外再记一次；豆腐块是煮过头的，盛到碗里不再另记（免得重复触发）
+            for (ItemStack food : scooped) {
+                if (food.is(HotPotContent.COOKED_SHRIMP) || food.is(HotPotContent.COOKED_PEELED_SHRIMP)
+                    || food.is(HotPotContent.COOKED_SHRIMP_PASTE)) {
+                    HotPotCriterion.fire(player, "cook_shrimp");
+                }
+            }
             result = new ItemStack(net.minecraft.world.item.Items.BOWL);
             result.set(net.minecraft.core.component.DataComponents.CONTAINER,
                 net.minecraft.world.item.component.ItemContainerContents.fromItems(scooped));
@@ -407,6 +429,13 @@ public class HotPotBlockEntity extends BlockEntity
             level.playSound(null, worldPosition, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.35F, 1.2F);
         } else if (SoupBase.byId(bowlSoup(bigCell)) != null) {
             result = new ItemStack(HotPotContent.SOUP_BOWLS.get(bowlSoup(bigCell)));
+            // mryt233 改（2026-11-05）：盛出来的红汤碗带着这一边的辣度档位，喝的时候按它给效果（r136a）
+            if (bowlSoup(bigCell) == SoupBase.SPICY.ordinal()) {
+                int spicy = spicyOfSide(soupSideOf(bigCell, bowlSoup(bigCell)));
+                if (spicy > 0) {
+                    result.set(HotPotContent.SPICY_LEVEL, spicy);
+                }
+            }
             level.playSound(null, worldPosition, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
         } else {
             player.sendOverlayMessage(Component.translatable(key("msg.bowl_nothing")));
@@ -446,6 +475,7 @@ public class HotPotBlockEntity extends BlockEntity
                 return false;
             }
             setBaseOfSide(side, soup.ordinal());
+            setSpicyOfSide(side, 0);   // mryt233 改（2026-11-05）：换汤底，辣度回到 0 档（r136a）
             consumeHand(player, hand, net.minecraft.world.item.Items.AIR);
             updateSoupVisual();
             level.playSound(null, worldPosition, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.5F, 1.3F);
@@ -457,12 +487,153 @@ public class HotPotBlockEntity extends BlockEntity
             return false;
         }
         setBaseOfSide(side, soup.ordinal());
+        setSpicyOfSide(side, 0);   // mryt233 改（2026-11-05）：倒新汤，辣度回到 0 档（微辣）（r136a）
         consumeHand(player, hand, soup.remainder());
         updateSoupVisual();
         level.playSound(null, worldPosition, SoundEvents.BUCKET_EMPTY,
             SoundSource.BLOCKS, 1.0F, 1.15F);
         markDirtyAndSync();
         return true;
+    }
+
+    // ------------------------------------------------------------------ 红汤辣度（r136a，mryt233 2026-11-05）
+
+    /** 辣度最高档：3 = 3 级特辣。 */
+    public static final int SPICY_MAX = 3;
+
+    /** 某一边的辣度档位（0 = 微辣）；不用 / 越界的边按 0 算。 */
+    public int spicyOfSide(int side) {
+        return side >= 0 && side < spicyLevels.length ? spicyLevels[side] : 0;
+    }
+
+    /** 把某一边的辣度档位夹到 0..3 后写进去（客户端只读快照，不调用）。 */
+    public void setSpicyOfSide(int side, int level) {
+        if (side >= 0 && side < spicyLevels.length) {
+            spicyLevels[side] = Math.max(0, Math.min(SPICY_MAX, level));
+        }
+    }
+
+    /** 这档辣度的名字（0 微辣、1 中辣、2 特辣、3 级特辣），语言键由语言文件提供。 */
+    public static Component spicyLevelText(int level) {
+        return Component.translatable(key("spicy." + Math.max(0, Math.min(SPICY_MAX, level))));
+    }
+
+    /**
+     * mryt233 改（2026-11-05）：手里这件是不是「调辣度的东西」——辣椒加辣，冰块 / 浮冰 / 蓝冰降辣。
+     * HotPotBlock / StoveBlock 用它决定要不要先试调辣度，再考虑下锅当食材。
+     */
+    public static boolean isSpicyModifier(ItemStack stack) {
+        return stack.is(HotPotContent.CHILI_PEPPER) || stack.is(net.minecraft.world.item.Items.ICE)
+            || stack.is(net.minecraft.world.item.Items.PACKED_ICE) || stack.is(net.minecraft.world.item.Items.BLUE_ICE);
+    }
+
+    /** 冰块降辣几档：普通冰 1 档、浮冰 2 档、蓝冰直接压到 0 档（用户定的，见任务单）。 */
+    private static int iceDrop(ItemStack stack) {
+        if (stack.is(net.minecraft.world.item.Items.BLUE_ICE)) {
+            return SPICY_MAX;
+        }
+        if (stack.is(net.minecraft.world.item.Items.PACKED_ICE)) {
+            return 2;
+        }
+        return 1;
+    }
+
+    /**
+     * 拿着辣椒 / 冰块点红汤锅：辣椒加 1 档、冰块降 1~3 档（r136a）。
+     * 只对红汤边有效；别的汤底上拿着这两样会提示「只有红汤锅底才能调整辣度」并吃掉这次点击。
+     * 返回 true = 这次点击已经处理掉了（调用方直接算成功，不要再当食材下锅）。
+     */
+    public boolean adjustSpiciness(Player player, InteractionHand hand, int side) {
+        if (level == null || level.isClientSide() || !hasPot()) {
+            return false;
+        }
+        if (!layout().multiSoup()) {
+            side = PotLayout.SIDE_A;
+        }
+        ItemStack stack = player.getItemInHand(hand);
+        boolean chili = stack.is(HotPotContent.CHILI_PEPPER);
+        boolean ice = stack.is(net.minecraft.world.item.Items.ICE)
+            || stack.is(net.minecraft.world.item.Items.PACKED_ICE)
+            || stack.is(net.minecraft.world.item.Items.BLUE_ICE);
+        if (!chili && !ice) {
+            return false;
+        }
+        // 不是红汤（含这一边还没倒汤）：提示一句就吃掉这次点击，别让辣椒 / 冰块被当成食材塞进锅槽
+        if (SoupBase.byId(baseOfSide(side)) != SoupBase.SPICY) {
+            player.sendOverlayMessage(Component.translatable(key("msg.spicy_need_red_broth")));
+            return true;
+        }
+        int spicy = spicyOfSide(side);
+        if (chili) {
+            if (spicy >= SPICY_MAX) {
+                player.sendOverlayMessage(Component.translatable(key("msg.spicy_max")));
+                return true;
+            }
+            setSpicyOfSide(side, spicy + 1);
+            consumeHand(player, hand, net.minecraft.world.item.Items.AIR);
+            level.playSound(null, worldPosition, SoundEvents.BLAZE_SHOOT, SoundSource.BLOCKS, 0.5F, 1.2F);
+            spawnSpicyParticles(true);
+            player.sendOverlayMessage(Component.translatable(key("msg.spicy_up"), spicyLevelText(spicy + 1)));
+            if (spicy + 1 >= SPICY_MAX) {
+                HotPotCriterion.fire(player, "max_spicy");   // 成就：吃辣吃到 3 级特辣（r136d 里配进度）
+            }
+        } else {
+            if (spicy <= 0) {
+                player.sendOverlayMessage(Component.translatable(key("msg.spicy_min")));
+                return true;
+            }
+            int next = Math.max(0, spicy - iceDrop(stack));
+            setSpicyOfSide(side, next);
+            consumeHand(player, hand, net.minecraft.world.item.Items.AIR);
+            level.playSound(null, worldPosition, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 1.3F);
+            spawnSpicyParticles(false);
+            player.sendOverlayMessage(Component.translatable(key("msg.spicy_down"), spicyLevelText(next)));
+        }
+        markDirtyAndSync();
+        return true;
+    }
+
+    /** 加辣 / 降辣时锅面上的那几颗粒子：加辣火苗 + 岩浆，降辣白云 + 水花。 */
+    private void spawnSpicyParticles(boolean up) {
+        if (!(level instanceof ServerLevel server)) {
+            return;
+        }
+        Vec3 at = Vec3.atCenterOf(worldPosition).add(0, 0.95, 0);
+        if (up) {
+            server.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME,
+                at.x, at.y, at.z, 14, 0.38, 0.12, 0.38, 0.02);
+            server.sendParticles(net.minecraft.core.particles.ParticleTypes.LAVA,
+                at.x, at.y, at.z, 3, 0.3, 0.1, 0.3, 0.0);
+        } else {
+            server.sendParticles(net.minecraft.core.particles.ParticleTypes.CLOUD,
+                at.x, at.y, at.z, 14, 0.38, 0.12, 0.38, 0.02);
+            server.sendParticles(net.minecraft.core.particles.ParticleTypes.SPLASH,
+                at.x, at.y, at.z, 8, 0.3, 0.1, 0.3, 0.0);
+        }
+    }
+
+    /**
+     * 用碗盛的这一碗汤实际来自哪一边：准星那格那一边有这种汤就取那边，没有就取第一处有这种汤的边。
+     * （{@link HotPotSoup#bowlSoup} 的逻辑，这里要的是「哪一边」而不是「哪种汤」。）
+     */
+    private int soupSideOf(int bigCell, int soupId) {
+        PotLayout layout = layout();
+        int aimed = layout.sideOfCell(Math.max(0, bigCell));
+        if (aimed != PotLayout.NONE && baseOfSide(aimed) == soupId) {
+            return aimed;
+        }
+        for (int side = 0; side < layout.sides(); side++) {
+            if (baseOfSide(side) == soupId) {
+                return side;
+            }
+        }
+        return aimed;
+    }
+
+    /** 这一格所在那一边的辣度（九宫格锅就是唯一那一边）。 */
+    public int spicyOfSlot(int slot) {
+        int side = layout().sideOfSlot(slot);
+        return side == PotLayout.NONE ? 0 : spicyOfSide(side);
     }
 
     /** 筷子上夹着的食物放进锅里指定的小格（熟食、汤底原料放不进）。 */
@@ -580,9 +751,12 @@ public class HotPotBlockEntity extends BlockEntity
      * 只有实际移出的数量会结算经验，调用者重复发包也不会复制物品。
      */
     public boolean collectCookedSlot(Player player, int slot) {
+        // mryt233 改（2026-11-05，r136a）：捞起来的是熟虾 / 热豆腐块，记一条对应的成就
+        ItemStack taking = slot >= 0 && slot < SLOTS ? ingredients.getItem(slot) : ItemStack.EMPTY;
         int delivered = transferCookedSlot(player, slot);
         if (delivered > 0) {
             HotPotCriterion.fire(player, "pot_cooked");
+            HotPotCookingRun.fireTakeCriteria(player, taking);
             finishCollection();
         }
         return delivered > 0;
@@ -602,6 +776,8 @@ public class HotPotBlockEntity extends BlockEntity
             return false;
         }
         float slotXp = xpValue[slot];
+        // mryt233 改（2026-11-05，r136a）：夹起来的是熟虾 / 热豆腐块，记一条对应的成就
+        HotPotCookingRun.fireTakeCriteria(player, stored);
         Chopsticks.hold(chopsticks, stored.copyWithCount(1));
         if (stored.getCount() > 1) {
             ItemStack rest = stored.copyWithCount(stored.getCount() - 1);
@@ -749,6 +925,7 @@ public class HotPotBlockEntity extends BlockEntity
         tracked[slot] = stack.copy();
         doneness[slot] = 0;
         cooked[slot] = false;
+        overcook[slot] = 0;
         xpValue[slot] = 0F;
         cookDur[slot] = stack.isEmpty() ? 0 : HotPotCooking.cookTicks(level, stack);
     }
@@ -951,20 +1128,44 @@ public class HotPotBlockEntity extends BlockEntity
         return soup == null ? Component.translatable(key("soup.none")) : Component.translatable(soup.nameKey());
     }
 
-    /** 汤底那一栏：九宫格锅一种；鸳鸯 / 田字锅按边列出来，用「/」隔开。 */
+    /**
+     * 汤底名字后面带上辣度，比如「红汤锅底（特辣）」。
+     * mryt233 改（2026-11-05，r136a）：红汤是按档位加效果的，界面和提示里看得见档位才调得明白。
+     */
+    public static Component soupNameWithSpicy(int id, int spicy) {
+        Component name = soupName(id);
+        if (SoupBase.byId(id) != SoupBase.SPICY || spicy < 0) {
+            return name;   // 不是红汤，或者调用方不知道辣度（<0）就不带后缀
+        }
+        // 照任务单的样子写「红汤锅底（特辣）」；这里只包中文全角括号，汤底名和辣度名都还能各自翻译
+        return name.copy().append(Component.literal("（")).append(spicyLevelText(spicy))
+            .append(Component.literal("）"));
+    }
+
+    /**
+     * 汤底那一栏：九宫格锅一种；鸳鸯 / 田字锅按边列出来，用「/」隔开。
+     * mryt233 改（2026-11-05）：多了辣度版重载 {@link #soupText(PotLayout, java.util.function.IntUnaryOperator, java.util.function.IntUnaryOperator)}，
+     * 红汤边会在名字后面带档位；不知道辣度的地方（旧的两参版本）照旧只写汤底名。
+     */
     public static Component soupText(PotLayout layout, java.util.function.IntUnaryOperator baseOfSide) {
+        return soupText(layout, baseOfSide, side -> -1);
+    }
+
+    /** 带辣度档位的汤底那一栏（见 {@link #soupNameWithSpicy}）。 */
+    public static Component soupText(PotLayout layout, java.util.function.IntUnaryOperator baseOfSide,
+                                     java.util.function.IntUnaryOperator spicyOfSide) {
         net.minecraft.network.chat.MutableComponent text = Component.empty();
         for (int side = 0; side < layout.sides(); side++) {
             if (side > 0) {
                 text.append(Component.literal(" / "));
             }
-            text.append(soupName(baseOfSide.applyAsInt(side)));
+            text.append(soupNameWithSpicy(baseOfSide.applyAsInt(side), spicyOfSide.applyAsInt(side)));
         }
         return text;
     }
 
     public Component statusText() {
-        Component soupText = soupText(layout(), this::baseOfSide);
+        Component soupText = soupText(layout(), this::baseOfSide, this::spicyOfSide);   // mryt233 改（2026-11-05）：红汤带辣度档位（r136a）
         StoveBlockEntity stove = stoveBelow();
         Component fireText;
         if (stove == null && heatSourceBelow()) {
@@ -1024,7 +1225,9 @@ public class HotPotBlockEntity extends BlockEntity
     // ------------------------------------------------------------------ 整锅打包 / 冷热
 
     /** 存进锅物品里的字段名，复制方块（Ctrl+中键）时要从方块实体数据里去掉，免得重复。 */
-    private static final String[] POT_DATA_KEYS = {"Base", "BaseB", "BaseC", "BaseD", "Doneness", "Cooked", "SlotXp", "PendingXp", "Items"};
+    private static final String[] POT_DATA_KEYS = {"Base", "BaseB", "BaseC", "BaseD",
+        "Spicy", "SpicyB", "SpicyC", "SpicyD",   // mryt233 改（2026-11-05）：每边辣度档位也由 pot_contents 打包（r136a）
+        "Doneness", "Cooked", "Overcook", "SlotXp", "PendingXp", "Items"};
 
     /** 锅里有没有东西（汤底或食材）。 */
     public boolean hasPotContents() {
@@ -1061,6 +1264,7 @@ public class HotPotBlockEntity extends BlockEntity
         }
         pendingXp = 0F;
         java.util.Arrays.fill(bases, -1);
+        java.util.Arrays.fill(spicyLevels, 0);   // mryt233 改（2026-11-05）：整锅打包后清空，辣度也清掉（r136a）
         setChanged();
     }
 

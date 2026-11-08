@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "food",
+  "pattern": [
+    "PP"
+  ],
+  "key": {
+    "P": {
+      "item": "orients_hotpot_chronicles:potato_slice"
+    }
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:wide_noodles",
+    "count": 3
+  }
+}

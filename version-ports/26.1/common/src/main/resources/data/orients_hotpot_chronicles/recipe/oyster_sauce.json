@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:kelp",
+    "minecraft:sugar",
+    "minecraft:glass_bottle"
+  ],
+  "result": {
+    "id": "orients_hotpot_chronicles:oyster_sauce",
+    "count": 2
+  }
+}

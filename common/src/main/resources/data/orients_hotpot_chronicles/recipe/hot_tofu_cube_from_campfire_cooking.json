@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "ingredient": {
+    "item": "orients_hotpot_chronicles:cold_tofu_cube"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:hot_tofu_cube"
+  },
+  "experience": 0.35,
+  "cookingtime": 300
+}

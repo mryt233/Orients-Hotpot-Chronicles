@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "food",
+  "ingredients": [
+    {
+      "item": "minecraft:wheat"
+    },
+    {
+      "item": "minecraft:egg"
+    },
+    {
+      "item": "orients_hotpot_chronicles:scallion"
+    },
+    {
+      "item": "minecraft:bowl"
+    }
+  ],
+  "result": {
+    "id": "orients_hotpot_chronicles:egg_fried_rice",
+    "count": 1
+  }
+}

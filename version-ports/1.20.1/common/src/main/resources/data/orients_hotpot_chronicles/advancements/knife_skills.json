@@ -1,0 +1,40 @@
+{
+  "display": {
+    "icon": {
+      "item": "orients_hotpot_chronicles:iron_kitchen_knife"
+    },
+    "title": {
+      "translate": "advancements.orients_hotpot_chronicles.knife_skills.title"
+    },
+    "description": {
+      "translate": "advancements.orients_hotpot_chronicles.knife_skills.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "slice": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "orients_hotpot_chronicles:beef_loin_slice",
+              "orients_hotpot_chronicles:fatty_beef_roll",
+              "orients_hotpot_chronicles:mutton_roll",
+              "orients_hotpot_chronicles:ham_sausage_slice"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "slice"
+    ]
+  ],
+  "parent": "orients_hotpot_chronicles:root"
+}

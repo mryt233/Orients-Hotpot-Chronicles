@@ -62,7 +62,25 @@ Both come in 11 wood types. Use the corresponding planks in the recipes.
 
 - **Facing:** seating and seated players face the direction you were looking when placing it.
 - **Connecting:** adjacent seats in a straight line connect automatically when they are the same height, even with different woods. Middle legs disappear and end legs move inward. Perpendicular seats do not connect. **Each connected run is limited to 3 blocks**; a further seat starts a separate run. In 0.1.2-alpha, seats must **face the same direction**; placing from the opposite side leaves them offset. From 0.1.3-alpha-hotfix1, they connect along the same line regardless of which side you stand on.
-- Tall benches have angled A-frame legs, drawn by code because vanilla models cannot rotate at such small angles.
+- Tall benches have angled A-frame legs, drawn by code because vanilla models cannot rotate at such small angles; their collision and selection width matches the seat top so walking alongside benches stays smooth.
+
+### Stacking benches into a ladder {#climb}{{since:0.2.2-alpha}}
+
+One bench is exactly one block high, so a stack of them makes a perfect ladder of steps.
+
+1. **Hold a bench (not sneaking) and right-click a placed bench**: it walks up the stack and lands on **the very top**, using one bench each time.
+   - Aiming at the **top face** and placing normally does the same thing.
+   - Up to **16 levels**; higher than that will not go.
+2. Once a stack is **two or more high**, it works as a **ladder**: walk or jump against **any side** of it and you climb up and down just like a vanilla ladder. A single bench does not trigger this, so you will not accidentally climb while walking around the table.
+3. **The top level still seats you**: right-click the top bench with an empty hand just like a normal one. Middle levels (with a bench above them) cannot be sat on.
+4. If someone stacks a bench above you while you are sitting, you get up automatically to make room.
+5. Breaking works as usual; anyone sitting there is dismounted.
+
+{{icons:oak_bench,bamboo_bench}}
+
+:::tip
+Stacking is quick and so is taking it apart: a few benches are all you need to reach something high or build an "upper bunk" next to the hotpot table. Stacking a bench onto a bench, or climbing the stack, unlocks the "**Skyward Climb**" advancement.
+:::
 
 ### Sitting down {#sit}
 

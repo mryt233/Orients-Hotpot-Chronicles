@@ -25,6 +25,13 @@ public final class GarnishLoot {
     public static final float SOYBEAN_CHANCE = 0.15F;
     /** 大蒜（2026-10-25 用户：和小葱、黄豆、香菜一样打草掉）：同黄豆 15%。 */
     public static final float GARLIC_CHANCE = 0.15F;
+    /** mryt233 改（2026-11-05，清单 #116）：辣椒也打草掉，同大蒜 15%。 */
+    public static final float CHILI_CHANCE = 0.15F;
+    /** mryt233 改（2026-11-06，清单 #123）：花生、青菜也打草掉，概率同黄豆 / 大蒜 15%。 */
+    public static final float PEANUT_CHANCE = 0.15F;
+    public static final float GREENS_CHANCE = 0.15F;
+    /** mryt233 改（2026-11-06，清单 #127）：折耳根也打草掉（西南田埂上到处是），概率同青菜 15%。 */
+    public static final float ZHE_ER_GEN_CHANCE = 0.15F;
 
     private GarnishLoot() {
     }
@@ -39,12 +46,21 @@ public final class GarnishLoot {
             if (!shortGrass && !tallGrass) {
                 return;
             }
-            for (Item item : new Item[]{HotPotContent.SCALLION, HotPotContent.CILANTRO, HotPotContent.SOYBEAN, HotPotContent.GARLIC, HotPotContent.TOMATO}) {
+            // mryt233 改（2026-11-05，清单 #116）：辣椒加进打草掉落，和番茄、大蒜一样 15%。
+            // mryt233 改（2026-11-06，清单 #123）：花生、青菜也打草掉，同样是 15%。
+            // mryt233 改（2026-11-06，清单 #127）：折耳根也进打草掉落，15%。
+            for (Item item : new Item[]{HotPotContent.SCALLION, HotPotContent.CILANTRO, HotPotContent.SOYBEAN, HotPotContent.GARLIC,
+                HotPotContent.TOMATO, HotPotContent.CHILI_PEPPER, HotPotContent.PEANUT, HotPotContent.GREENS,
+                HotPotContent.ZHE_ER_GEN}) {
                 LootPool.Builder pool = LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1))
                     .when(MatchTool.toolMatches(ItemPredicate.Builder.item().of(Items.SHEARS)).invert())
                     .when(LootItemRandomChanceCondition.randomChance(item == HotPotContent.SOYBEAN ? SOYBEAN_CHANCE
-                        : item == HotPotContent.GARLIC || item == HotPotContent.TOMATO ? GARLIC_CHANCE : CHANCE))
+                        : item == HotPotContent.GARLIC || item == HotPotContent.TOMATO ? GARLIC_CHANCE
+                        : item == HotPotContent.CHILI_PEPPER ? CHILI_CHANCE
+                        : item == HotPotContent.PEANUT ? PEANUT_CHANCE
+                        : item == HotPotContent.GREENS ? GREENS_CHANCE
+                        : item == HotPotContent.ZHE_ER_GEN ? ZHE_ER_GEN_CHANCE : CHANCE))
                     .add(LootItem.lootTableItem(item));
                 if (tallGrass) {
                     pool.when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(Blocks.TALL_GRASS)

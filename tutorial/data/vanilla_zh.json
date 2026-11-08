@@ -22,6 +22,7 @@
  "minecraft:crimson_planks": "绯红木板",
  "minecraft:cut_copper": "切制铜块",
  "minecraft:dark_oak_planks": "深色橡木木板",
+ "minecraft:egg": "鸡蛋",
  "minecraft:furnace": "熔炉",
  "minecraft:glass": "玻璃",
  "minecraft:glass_bottle": "玻璃瓶",
@@ -49,10 +50,13 @@
  "minecraft:smooth_stone": "平滑石头",
  "minecraft:spruce_planks": "云杉木板",
  "minecraft:stick": "木棍",
+ "minecraft:string": "线",
  "minecraft:sugar": "糖",
  "minecraft:sunflower": "向日葵",
  "minecraft:sweet_berries": "甜浆果",
  "minecraft:warped_planks": "诡异木板",
  "minecraft:water_bucket": "水桶",
- "minecraft:wheat": "小麦"
+ "minecraft:wheat": "小麦",
+ "minecraft:wheat_seeds": "小麦种子",
+ "minecraft:white_wool": "白色羊毛"
 }

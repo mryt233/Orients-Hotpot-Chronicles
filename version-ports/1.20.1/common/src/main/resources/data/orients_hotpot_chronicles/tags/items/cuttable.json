@@ -5,9 +5,14 @@
     "minecraft:mutton",
     "orients_hotpot_chronicles:beef_loin",
     "minecraft:potato",
-    "orients_hotpot_chronicles:tofu",
     "orients_hotpot_chronicles:shrimp",
     "minecraft:porkchop",
-    "orients_hotpot_chronicles:ham_sausage"
+    "orients_hotpot_chronicles:ham_sausage",
+    "orients_hotpot_chronicles:cold_tofu",
+    "orients_hotpot_chronicles:hot_tofu",
+    "orients_hotpot_chronicles:chili_pepper",
+    "orients_hotpot_chronicles:lotus_root",
+    "orients_hotpot_chronicles:raw_squid",
+    "orients_hotpot_chronicles:zhe_er_gen"
   ]
 }

@@ -2,8 +2,12 @@
 
   土豆片 potato_slice / 熟土豆片 cooked_potato_slice   原版土豆在砧板上切 3 片（切石机也行），熟的每片回 2
   黄豆 soybean                                          打草掉（像小葱 / 香菜），以后再考虑做成作物
-  豆腐 tofu                                             3 黄豆 + 水桶在工作台做一整块（桶留下）
-  豆腐块 tofu_cube / 熟豆腐块 cooked_tofu_cube           一整块豆腐在砧板上切 3 块
+  豆腐（冷） cold_tofu                                  3 黄豆 + 水桶在工作台做一整块（桶留下）
+  豆腐（热） hot_tofu                                   整块冷豆腐在锅里煮 10 秒（锅专用产物，见 HotPotContent）
+  豆腐块（冷） cold_tofu_cube / 豆腐块（热） hot_tofu_cube   一整块豆腐在砧板上切 3 块；煮熟过头也会碎成热的
+
+  mryt233 改（2026-11-04）：豆腐分冷热（用户定）。冷豆腐 / 冷豆腐块沿用原来的贴图配色，
+  热豆腐是新做的一张偏暖、略黄的「煮过」配色（照熟豆腐块和豆腐块的色差），热豆腐块沿用原熟豆腐块的图。
 
     python tools/gen_ingredients.py
 作者：mryt233（2026-11-01 mryt233 改：改用 tools/pixkit 公共库；JSON 统一写 LF，贴图逐字节不变）
@@ -81,10 +85,13 @@ TOFU_TOP = [(2, (6, 7, 8), ()), (3, (4, 5, 9, 10), (6, 7, 8)), (4, (2, 3, 11, 12
             (5, (0, 1, 13, 14), tuple(range(2, 13)))]
 
 
+# mryt233 改（2026-11-04）：豆腐改名分冷热。冷豆腐 / 冷豆腐块 = 原来的配色；
+# 热豆腐是新做的一张「煮过」配色 —— 比冷豆腐整体偏暖、略黄，色差照原来熟豆腐块和豆腐块的比例取。
 TOFU = {
-    "tofu": ((252, 250, 240), (230, 226, 210), (208, 202, 184)),
-    "tofu_cube": ((252, 250, 240), (230, 226, 210), (208, 202, 184)),
-    "cooked_tofu_cube": ((244, 222, 168), (222, 192, 132), (196, 162, 104)),   # 汤里煮过：吸了汤，微黄
+    "cold_tofu": ((252, 250, 240), (230, 226, 210), (208, 202, 184)),
+    "hot_tofu": ((248, 233, 196), (226, 205, 160), (200, 175, 126)),            # 煮过：偏暖、略黄
+    "cold_tofu_cube": ((252, 250, 240), (230, 226, 210), (208, 202, 184)),
+    "hot_tofu_cube": ((244, 222, 168), (222, 192, 132), (196, 162, 104)),      # 汤里煮过：吸了汤，微黄
 }
 
 
@@ -92,14 +99,15 @@ def tofu_texture(name):
     """一整块：扁扁的大方块；豆腐块：三小块，每块单独描边后从后往前叠，才分得开。"""
     top, left, right = TOFU[name]
     im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    cubes = [(7.5, 2, 14, 6)] if name == "tofu" else [(10.5, 1.0, 8, 4), (4.5, 4.5, 8, 4), (9.5, 7.5, 8, 4)]
+    whole = name in ("cold_tofu", "hot_tofu")
+    cubes = [(7.5, 2, 14, 6)] if whole else [(10.5, 1.0, 8, 4), (4.5, 4.5, 8, 4), (9.5, 7.5, 8, 4)]
     rnd = random.Random(len(name))
     for cx, ty, w, h in cubes:
         layer = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
         cube(ImageDraw.Draw(layer), cx, ty, w, h, top + (255,), left + (255,), right + (255,))
         canvas.speckle(layer, rnd, 0.05, 0.92, fn=shade)                               # 细细的气孔
         outline(layer, shade(right, 0.62))
-        if name == "tofu":
+        if whole:
             px = layer.load()
             for y in range(0, 2):
                 for x in range(16):
@@ -147,17 +155,22 @@ DATA = RES / "data"
 
 def data_files():
     rec = DATA / MODID / "recipe"
-    for raw, out in [("minecraft:potato", "potato_slice"), (f"{MODID}:tofu", "tofu_cube")]:
+    # mryt233 改（2026-11-04）：豆腐改名分冷热（用户定）。
+    # 切石机：冷豆腐 → 冷豆腐块（3），热豆腐 → 热豆腐块（3，和冷豆腐一样的切法）。
+    # 烧炼 / 烟熏 / 营火只做「冷豆腐块 → 热豆腐块」；整块热豆腐是锅煮出来的（HotPotContent.potResult），没有熔炉配方。
+    for raw, out in [("minecraft:potato", "potato_slice"), (f"{MODID}:cold_tofu", "cold_tofu_cube"),
+                     (f"{MODID}:hot_tofu", "hot_tofu_cube")]:
         write(rec / f"{out}_from_stonecutting.json", {"type": "minecraft:stonecutting", "ingredient": {"item": raw},
                                                      "result": {"id": f"{MODID}:{out}", "count": 3}})
-        for kind, time, suffix in [("smelting", 100, ""), ("smoking", 50, "_from_smoking"), ("campfire_cooking", 300, "_from_campfire_cooking")]:
-            write(rec / f"cooked_{out}{suffix}.json", {"type": f"minecraft:{kind}", "category": "food", "ingredient": {"item": f"{MODID}:{out}"},
-                                                        "result": {"id": f"{MODID}:cooked_{out}"}, "experience": 0.35, "cookingtime": time})
-    # 3 黄豆 + 水桶 → 1 块豆腐（水桶合成后自动还回空桶）
-    write(rec / "tofu.json", {"type": "minecraft:crafting_shapeless", "category": "misc",
-                              "ingredients": [{"item": f"{MODID}:soybean"}] * 3 + [{"item": "minecraft:water_bucket"}],
-                              "result": {"id": f"{MODID}:tofu", "count": 1}})
-    for tag, add in [("cuttable", ["minecraft:potato", f"{MODID}:tofu"]), ("cut_piece_by_piece", ["minecraft:potato"])]:
+    for kind, time, suffix in [("smelting", 100, ""), ("smoking", 50, "_from_smoking"), ("campfire_cooking", 300, "_from_campfire_cooking")]:
+        write(rec / f"hot_tofu_cube{suffix}.json", {"type": f"minecraft:{kind}", "category": "food", "ingredient": {"item": f"{MODID}:cold_tofu_cube"},
+                                                    "result": {"id": f"{MODID}:hot_tofu_cube"}, "experience": 0.35, "cookingtime": time})
+    # 3 黄豆 + 水桶 → 1 块冷豆腐（水桶合成后自动还回空桶）
+    write(rec / "cold_tofu.json", {"type": "minecraft:crafting_shapeless", "category": "misc",
+                                   "ingredients": [{"item": f"{MODID}:soybean"}] * 3 + [{"item": "minecraft:water_bucket"}],
+                                   "result": {"id": f"{MODID}:cold_tofu", "count": 1}})
+    for tag, add in [("cuttable", ["minecraft:potato", f"{MODID}:cold_tofu", f"{MODID}:hot_tofu"]),
+                     ("cut_piece_by_piece", ["minecraft:potato"])]:
         f = DATA / MODID / f"tags/item/{tag}.json"
         t = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {"replace": False, "values": []}
         for v in add:

@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "minecraft:potato"
+    "minecraft:potato",
+    "orients_hotpot_chronicles:lotus_root"
   ]
 }
