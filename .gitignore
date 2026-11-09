@@ -73,3 +73,18 @@ tools/vanilla_bowl.png
 # mryt233 改（2026-11-09）：原来只写在本机 .git/info/exclude，搬进来换台电脑也生效。
 tools/translate_baseline/
 tutorial/qa-*/
+
+# mryt233 改（2026-11-09）：experiments/ 默认整体忽略，只放行已有 5 个小工程的源码和构建脚本
+# （新起名字的实验目录、运行目录、安装器、构建产物都不会被带进仓库；要新增实验工程时在这里加一行放行）
+experiments/*
+!experiments/harness-client/
+!experiments/harness-client-neoforge/
+!experiments/runtime-src/
+!experiments/server-fabric/
+!experiments/server-neoforge/
+experiments/harness-*/*
+!experiments/harness-*/build.gradle
+!experiments/harness-*/settings.gradle
+!experiments/harness-*/src/
+experiments/server-*/*
+!experiments/server-*/build.gradle
