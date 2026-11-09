@@ -1,6 +1,6 @@
 # 框架 API 规格（草案 v0.2）
 
-作者：mryt233，2026-10-30。对应《Orient框架计划书 v3.1》。**只定义接口边界与契约，不实现代码。** v0.2 按 GPT 评审 P1-01/02/03 修订。标 🧪 的条目由 EXP-PKG / P1 实验决定。
+作者：mryt233，2026-10-30。对应《Orient框架计划书 v3.1》。**只定义接口边界与契约，不实现代码。** v0.2 按评审意见 P1-01/02/03 修订。标 🧪 的条目由 EXP-PKG / P1 实验决定。
 
 ## 1. 版本与包
 
@@ -49,7 +49,7 @@ public interface MenuOpener {
 }
 ```
 
-- **不提供 `installBridges(ScreenBridge, LootBridge, ContentBridge)`**（GPT 评审：这三个是旧版混合体，其中 Screen/Content 含火锅业务）。平台实现通过框架入口注入：
+- **不提供 `installBridges(ScreenBridge, LootBridge, ContentBridge)`**（评审意见：这三个是旧版混合体，其中 Screen/Content 含火锅业务）。平台实现通过框架入口注入：
   `Framework.install(Platform)`（在 mod 初始化最早期调用一次；重复注入抛异常）。
 - 业务界面（锅/灶膛/蘸料）由 `content/hotpot` 的 `HotpotScreens` 组装 `MenuProviderLike` 后调用 `Platform.menus().open(...)`；loader 不感知这些类型。
 - **`LootEventBridge` 是实例能力**（评审修正）：`Framework.lootEvents()` 提供规范实例，平台实现的 `Platform.lootEvents()` 必须返回同一实例；内容登记与平台消费共用它，禁止静态旁路。
@@ -77,14 +77,14 @@ public interface NetworkApi {
 }
 ```
 
-- C2S 与 S2C **统一用 `ProtocolPolicy`**，不再一边布尔一边缺省（GPT 评审）。
+- C2S 与 S2C **统一用 `ProtocolPolicy`**，不再一边布尔一边缺省（评审意见）。
 - `required` 语义即 `ProtocolPolicy.REQUIRED`；`optional` 即 `OPTIONAL`。
 
 - `required=true`：协议不匹配时在连接阶段**明确拒绝**（错误信息含 payload id + 双方版本）。
 - `required=false`：不匹配时跳过，不踢人；对应功能降级，客户端不得假定状态一致。
 - **握手阶段**：协议版本在连接建立期交换——NeoForge 用 configuration 阶段（`configurationToServer`/`configurationToClient`）或 `registrar.versioned(...)`；Fabric 无内建机制，用配置阶段自定义 payload 或首个 play 包 🧪。版本字段与 payload 组一起定义，不做全局隐式默认。
 - **断线清理**：客户端断开时清空所有「服务端下发」的缓存（配置快照、协议版本、功能开关）；重连重新握手（现有 `Config.clearClient` 行为 ✅）。
-- **协商不等于授权**（GPT P1 约束 3）：每个 C2S 处理器仍须在服务端校验距离、目标方块实体类型、槽位范围、权限与状态；不得因「已协商」跳过校验。现有 `ChopsticksAimPayload` / `OpenSauceRestockPayload` 的距离与类型检查就是模板 ✅。
+- **协商不等于授权**（P1 约束 3）：每个 C2S 处理器仍须在服务端校验距离、目标方块实体类型、槽位范围、权限与状态；不得因「已协商」跳过校验。现有 `ChopsticksAimPayload` / `OpenSauceRestockPayload` 的距离与类型检查就是模板 ✅。
 - **功能降级矩阵**：每个 optional payload 在规格里登记「缺失时客户端/服务端各自行为」，避免状态分歧；required payload 缺失即拒绝连接。
 - 接收处理器统一在主线程执行（平台负责）。
 
@@ -193,7 +193,7 @@ public record ModuleDeclaration(String modId, String contentNamespace,
 3. Fabric 协议协商：配置阶段 payload vs 首包；版本字段放置待实验。
 4. 客户端/服务端重载入口的精确映射（Fabric/NeoForge 各自事件）待 P1 验证。
 
-## 10. 修订摘要（v0.2，回应 GPT P1-01/02/03）与 P1 可执行条件
+## 10. 修订摘要（v0.2，回应评审意见 P1-01/02/03）与 P1 可执行条件
 
 ### 10.1 本次修改
 1. **P1-01**：声明阶段规则改为「框架约束」表述——构造期读取可行（EXP-REG ✅），禁止注册表修改、禁止依赖未完成注册的对象值；区分平台限制与框架人为约束。

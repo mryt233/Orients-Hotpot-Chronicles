@@ -12,7 +12,7 @@
       独立前置留档 -> build/libs/lastest/dev/1.21.1/<loader>/framework/rN-rM/orient_framework-<loader>-<runtime>.jar
   - 预览版 / 准备公开版（0.x.y-alpha / 0.x.y-beta 等）：同版本号集中放同一文件夹，不按加载器拆分目录
       本体单 JAR -> build/libs/lastest/per/1.21.1/<version>/orients_hotpot_chronicles-1.21.1-<loader>-<version>.jar
-      同时写入 -> build/libs/releases/<version>/orients_hotpot_chronicles-1.21.1-<loader>-<version>.jar
+      mryt233 改（2026-11-09）：预览版只写上述目录。
 Runtime 版本读取 ApiVersion.java；开发版、预览版、正式版均为内嵌前置的单 JAR，无需另装独立前置。
 """
 from __future__ import annotations
@@ -296,7 +296,7 @@ def compile_sources() -> None:
 
 
 def build_release() -> dict[str, Path]:
-    """mryt233 改（2026-11-08）：统一内嵌 Runtime 单 JAR + 统一带 MC 版本号（1.21.1）命名；开发版只写 dev/，预览版写 per/ 与 releases/。"""
+    """mryt233 改（2026-11-09）：统一内嵌 Runtime 单 JAR + 统一带 MC 版本号（1.21.1）命名；开发版只写 dev/，预览版只写 per/。"""
     build()
     version = mod_version()
     dev_match = re.match(r"^\d+\.\d+\.\d+-r(\d+)", version)
@@ -340,10 +340,6 @@ def build_release() -> dict[str, Path]:
             per_out = PER_DIR / version / jar_name
             write_jar(per_out, entries)
             results[f"per-{loader}"] = per_out
-            rel_out = RELEASE_DIR / version / jar_name
-            rel_out.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(per_out, rel_out)
-            results[f"release-{loader}"] = rel_out
     print(f"完整单 jar（内嵌 Runtime {RUNTIME_VERSION}；统一命名含 {MC_VERSION}）：")
     for key, path in results.items():
         print(f"  {key:16} {path.relative_to(ROOT).as_posix()}  {path.stat().st_size // 1024} KB")

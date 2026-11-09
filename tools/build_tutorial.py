@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-把 mod/tutorial/content/*.md 编成一个静态教程网站（mod/tutorial/site/），双击 index.html 就能看。
+读取教程数据并检查覆盖警告，供书本教程和游戏内指南复用；普通网页版仅在 --legacy-web 时生成。
 作者：mryt233
 
 做了三件事：
@@ -558,6 +558,8 @@ def shell(slug, title, body, nav_html, search_index_json):
 
 
 def main():
+    # mryt233 改（2026-11-09）：普通网页版改为显式启用，默认保留数据读取与覆盖检查。
+    legacy_web = "--legacy-web" in sys.argv[1:]
     use_release_recipes()
     # 把教程提到的原版物品名先准备好
     vanilla = set()
@@ -581,9 +583,10 @@ def main():
     vanilla.add("minecraft:oak_log")
     refresh_vanilla(sorted(vanilla))
 
-    os.makedirs(SITE, exist_ok=True)
-    if os.path.isdir(os.path.join(SITE, "img")):
-        shutil.rmtree(os.path.join(SITE, "img"))
+    if legacy_web:
+        os.makedirs(SITE, exist_ok=True)
+        if os.path.isdir(os.path.join(SITE, "img")):
+            shutil.rmtree(os.path.join(SITE, "img"))
 
     bodies = {}
     for slug, title, _ in PAGES:
@@ -602,40 +605,44 @@ def main():
             body = render_md(open(p, encoding="utf-8").read())
         bodies[slug] = body
 
-    nav = ""
-    group = None
-    for slug, title, g in PAGES:
-        if g != group:
-            nav += ('</ul>' if group else '') + '<h3>%s</h3><ul>' % g
-            group = g
-        nav += '<li><a href="%s.html" data-slug="%s">%s</a></li>' % (slug, slug, title)
-    nav += "</ul>"
+    if legacy_web:
+        nav = ""
+        group = None
+        for slug, title, g in PAGES:
+            if g != group:
+                nav += ('</ul>' if group else '') + '<h3>%s</h3><ul>' % g
+                group = g
+            nav += '<li><a href="%s.html" data-slug="%s">%s</a></li>' % (slug, slug, title)
+        nav += "</ul>"
 
-    search = []
-    for slug, title, _ in PAGES:
-        if slug in bodies:
-            text = re.sub(r"<[^>]+>", " ", bodies[slug])
-            text = re.sub(r"\s+", " ", html.unescape(text))
-            search.append({"slug": slug, "title": title, "text": text})
-    sj = json.dumps(search, ensure_ascii=False).replace("</", "<\\/")
-    for slug, title, _ in PAGES:
-        if slug not in bodies:
-            continue
-        open(os.path.join(SITE, slug + ".html"), "w", encoding="utf-8").write(shell(slug, title, bodies[slug], nav, sj))
+        search = []
+        for slug, title, _ in PAGES:
+            if slug in bodies:
+                text = re.sub(r"<[^>]+>", " ", bodies[slug])
+                text = re.sub(r"\s+", " ", html.unescape(text))
+                search.append({"slug": slug, "title": title, "text": text})
+        sj = json.dumps(search, ensure_ascii=False).replace("</", "<\\/")
+        for slug, title, _ in PAGES:
+            if slug not in bodies:
+                continue
+            open(os.path.join(SITE, slug + ".html"), "w", encoding="utf-8").write(shell(slug, title, bodies[slug], nav, sj))
 
-    shutil.copy(os.path.join(TUT, "assets", "style.css"), os.path.join(SITE, "style.css"))
-    shutil.copy(os.path.join(TUT, "assets", "app.js"), os.path.join(SITE, "app.js"))
-    os.makedirs(os.path.join(SITE, "img", "icons"), exist_ok=True)
-    for i in used_icons:
-        src = os.path.join(ICONS, i.replace(":", "__") + ".png")
-        if os.path.exists(src):
-            shutil.copy(src, os.path.join(SITE, "img", "icons"))
-    for f in glob.glob(os.path.join(TUT, "img", "*")):
-        if os.path.isfile(f):
-            shutil.copy(f, os.path.join(SITE, "img"))
+        shutil.copy(os.path.join(TUT, "assets", "style.css"), os.path.join(SITE, "style.css"))
+        shutil.copy(os.path.join(TUT, "assets", "app.js"), os.path.join(SITE, "app.js"))
+        os.makedirs(os.path.join(SITE, "img", "icons"), exist_ok=True)
+        for i in used_icons:
+            src = os.path.join(ICONS, i.replace(":", "__") + ".png")
+            if os.path.exists(src):
+                shutil.copy(src, os.path.join(SITE, "img", "icons"))
+        for f in glob.glob(os.path.join(TUT, "img", "*")):
+            if os.path.isfile(f):
+                shutil.copy(f, os.path.join(SITE, "img"))
     check_coverage(bodies)
-    build_single(bodies)
-    print("已生成 %d 页 → %s" % (len(bodies), os.path.join(SITE, "index.html")))
+    if legacy_web:
+        build_single(bodies)
+        print("已生成 %d 页 → %s" % (len(bodies), os.path.join(SITE, "index.html")))
+    else:
+        print("普通网页版已停用，只读数据和检查警告；要生成旧网页加 --legacy-web")
     for w in sorted(set(warnings)):
         print("警告：" + w)
     return 0

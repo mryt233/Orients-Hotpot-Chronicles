@@ -52,7 +52,8 @@ class PackagingTests(unittest.TestCase):
                         patch.object(packaging, "build") as build, contextlib.redirect_stdout(io.StringIO()):
                     results = packaging.build_release()
                 build.assert_called_once_with()
-                self.assertEqual(len(results), 4)
+                # mryt233 改（2026-11-09）：开发版保留四份归档，预览版只输出双端单 JAR。
+                self.assertEqual(len(results), 4 if bucket else 2)
                 self.assertEqual(history.read_bytes(), b"keep history")
                 for loader in ("fabric", "neoforge"):
                     expected_name = f"orients_hotpot_chronicles-1.21.1-{loader}-{version}.jar"
@@ -83,7 +84,7 @@ class PackagingTests(unittest.TestCase):
                     else:
                         self.assertEqual(list(dev.rglob("*.jar")), [history])
                         self.assertEqual((per / version / expected_name).read_bytes(), full.read_bytes())
-                        self.assertEqual((release / version / expected_name).read_bytes(), full.read_bytes())
+                        self.assertFalse(release.exists())
 
     def test_missing_candidates_fail_before_single_jar(self):
         with tempfile.TemporaryDirectory() as folder, \

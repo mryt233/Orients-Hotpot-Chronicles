@@ -69,3 +69,7 @@ tools/gen_r137_meats_tofu.py
 tools/gen_r137_veggies_seafood.py
 tools/test_build_textures.py
 tools/vanilla_bowl.png
+
+# mryt233 改（2026-11-09）：原来只写在本机 .git/info/exclude，搬进来换台电脑也生效。
+tools/translate_baseline/
+tutorial/qa-*/
