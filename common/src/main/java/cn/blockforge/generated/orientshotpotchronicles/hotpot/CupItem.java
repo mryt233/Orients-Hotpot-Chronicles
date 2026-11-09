@@ -257,8 +257,10 @@ public class CupItem extends Item {
         if (user instanceof Player player) {
             if (kind.hasBottle()) {
                 player.getFoodData().eat(DrinkItem.sipFood());   // 水、牛奶不回饥饿值（同原版）；数值同饮料瓶，读配置（W7）
-                // mryt233 改（2026-11-06，r139）：杯装饮品喝下触发成就 authors_pick（水、牛奶不算，瓶装饮料才算）
-                HotPotCriterion.fire(player, "drink_author");
+                // mryt233 改（r146d）：杯装也只认植物蛋白饮料；其他饮料仍照常结算营养。
+                if (kind == DrinkKind.PLANT_PROTEIN_DRINK) {
+                    HotPotCriterion.fire(player, "drink_author");
+                }
             }
             if (cheered) {
                 player.getFoodData().eat(1, 0.4F);

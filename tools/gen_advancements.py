@@ -59,7 +59,7 @@ ADVANCEMENTS = [
     # 千锤百炼：肉丸 / 鱼丸 / 虾滑 / 蒜泥
     ("pounding", "knife_skills", "rolling_pin", "task", False,
      {"ball": has_any("beef_meatball", "pork_meatball", "mutton_meatball", "fish_ball", "shrimp_paste", "garlic_paste")}),
-    # 作者推荐：四种饮品喝下任一。mryt233 改（2026-11-06，r139）：原来用原版 consume_item 判定，
+    # 作者推荐：只喝植物蛋白饮料，瓶装一口或杯装都算。mryt233 改（r146d）：原来用原版 consume_item 判定，
     # 饮料 / 杯子是自定义 finishUsingItem 结算的，1.21.1 上不一定触发；改走模组自己的 hotpot 触发器，
     # 由 DrinkItem / CupItem 喝下时 fire("drink_author")。
     ("authors_pick", "root", "plant_protein_drink", "task", False,

@@ -11,7 +11,21 @@ This page is updated with each release, **newest first**. The Development Previe
 <!-- mryt233 改，2026-11-08：0.2.2-alpha 发布，开发版预览改名为版本号，再开一段空的预览。 -->
 ## Development Preview {{dev}} {#unreleased}
 
+<!-- mryt233 改：r146d。 -->
+- **Bottle placement sounds**: full and partly drunk bottles play a bottle placement sound together with a gentle liquid sound. Orient Cola uses a clearer glass sound; empty bottles only play the bottle sound. This applies to both empty and occupied table surfaces.<!--清单#137-->
+- **Author's Pick fixed**: only plant protein drink unlocks this advancement, whether you take a sip from a bottle or drink a cup. Orange drink, Orient Cola, water and milk do not count.<!--清单#138-->
+<!-- mryt233 改：r146e。 -->
+- **Chopsticks tabletop placement and bowl-resting polish**: straight, parallel two-tone bamboo sticks with tips resting across a white porcelain saddle rest and ends resting on the table; four directions on the tabletop follow the player, clicking nearby finds an empty spot. Click any rim of a bowl or plate to rest them aligned to 22.5°; chopsticks holding food rest with the food when clicked on the rim, while clicking the center still places the food or dips into sauce.<!--清单#139-->
+<!-- mryt233 改（r146f） -->
+- **Single-column paginated sauce station list**: the panel is narrowed and names and effects wrap across lines; turn pages with bottom arrows or the scroll wheel, page numbers are remembered during the current session, and JEI / REI avoid this area automatically.<!--清单#140-->
+
 The next development build is being updated; new content will appear in the [Development Preview](preview.html) first.
+<!-- mryt233 改，2026-11-09：r146b 布围裙三款 + 穿戴只围前面。 -->
+- **Three cloth apron styles**: linen / blue print / brown trim, all with the same effect; recolour any style with a dye in a crafting grid while keeping durability, enchantments and custom names; when worn it hangs from your chest to just above the knees and the hem swings with your legs. ([Plates, Bowls & Drinks](tableware.html#apron_styles))<!--清单#136-->
+<!-- mryt233 改，2026-11-09：r146a 三项（菜刀朝向、设置界面、芝麻酱蚝油上桌）。 -->
+- **Fixed the iron kitchen knife orientation**: handle at lower left, tip at upper right and edge facing lower right are now painted into the texture, so inventory / held / guide / web / viewer all match and the model no longer flips; regenerating the texture cannot flip it back. ([Ingredients](ingredients.html#board))<!--清单#133-->
+- **Settings screen split into Common / Advanced**: Common holds the particle slider and the few values players change most; everything else is grouped into collapsible sections. Each row has [- value unit +], Shift steps by 10, clicking the value lets you type (invalid input turns red), a per-row reset appears only when changed, Reset All asks for confirmation, and hovering shows a plain-language hint. ([FAQ](faq.html#config))<!--清单#134-->
+- **Sesame paste and oyster sauce can be placed on the table (decoration only)**: Shift + right-click a table top to place it, right-click empty-handed to take it back, and mining takes only that bottle; a bottle on the table cannot be dipped into or season food — to add this seasoning, use the sauce station as before. ([Sauces](sauce.html#bottle))<!--清单#135-->
 
 <!-- mryt233 改，2026-11-08：0.2.2-alpha 正式版发布记录（r134～r145，清单 #103～#131）。 -->
 ## 0.2.2-alpha{{since:0.2.2-alpha}} {#v022}

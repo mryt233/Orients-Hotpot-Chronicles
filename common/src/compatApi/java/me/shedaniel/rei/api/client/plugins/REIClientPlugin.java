@@ -12,6 +12,9 @@ import me.shedaniel.rei.api.common.plugins.REIPlugin;
  * 作者：mryt233 */
 
 public interface REIClientPlugin extends REIPlugin<REIClientPlugin> {
+    // mryt233 改（r146f）：动态排除区注册签名。
+    default void registerScreens(me.shedaniel.rei.api.client.registry.screen.ScreenRegistry registry) { }
+
     default void registerCategories(CategoryRegistry registry) {
     }
 

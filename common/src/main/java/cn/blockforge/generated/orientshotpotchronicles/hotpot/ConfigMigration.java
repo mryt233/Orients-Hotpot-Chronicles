@@ -87,6 +87,9 @@ final class ConfigMigration {
     static List<String> migrate(JsonObject root) {
         List<String> moved = new ArrayList<>();
         migrateSoupBowlSlowKeys(root, moved);
+        // mryt233 改（2026-11-09，r146c）：桌上蘸料瓶改成「只摆放」，sauce_bottle.<调料>.uses 整组作废，
+        // 直接从老配置里删掉（否则每次 reload 都报「不认识的配置项」）。
+        migrateSauceBottleKeys(root, moved);
         JsonObject food = child(root, "food");
         if (food == null) {
             return moved;
@@ -127,6 +130,25 @@ final class ConfigMigration {
         renameKey(food, "tofu_cube", "cold_tofu_cube", "food.", moved);
         renameKey(food, "cooked_tofu_cube", "hot_tofu_cube", "food.", moved);
         return moved;
+    }
+
+    /**
+     * mryt233 改（2026-11-09，r146c）：桌上蘸料瓶不再计次数，{@code sauce_bottle.<调料>.uses} 整组作废。
+     * 老配置里留着这一组的话，每次读配置都会报一条「不支持的配置项」，所以这里直接删掉整组。
+     * 组不规范（不是对象）时也删——里面的东西已经没有任何代码读取。
+     */
+    private static void migrateSauceBottleKeys(JsonObject root, List<String> moved) {
+        if (!root.has("sauce_bottle")) {
+            return;
+        }
+        JsonElement removed = root.remove("sauce_bottle");
+        if (removed != null && removed.isJsonObject()) {
+            for (String id : List.copyOf(removed.getAsJsonObject().keySet())) {
+                moved.add("sauce_bottle." + id + " (dropped)");
+            }
+        } else {
+            moved.add("sauce_bottle (dropped)");
+        }
     }
 
     /**

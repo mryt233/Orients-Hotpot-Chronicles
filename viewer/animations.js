@@ -426,6 +426,21 @@ const PLATE_LAYOUTS = [
   [["1x3", 8, 4], ["1x3", 8, 12]],
   [["1x3", 8, 3.5], ["1x2", 5.5, 12.5], ["1x1", 13.5, 12.5]],
 ];
+// 摆在桌上的芝麻酱 / 蚝油瓶（r146a，mryt233 改 2026-11-08）：和碗、盘子一样借「盘子格」摆，模型是
+// models/block/sauce_bottle_<调料>.json（tools/gen_sauce_bottle.py），瓶身 4×4、高 6 / 8 像素
+// （= Java 的 SauceBottleKind#bottleHeight，选中框与碰撞也按它算）。摆在桌上时和盘子一起按 drop 下移贴桌面。
+const SAUCE_BOTTLES = ["sesame_paste", "oyster_sauce"];
+// 两瓶的中心位置（格内像素）：瓶身 4×4，中心 4.5 / 11.5 正好并排不重叠
+const SAUCE_BOTTLE_X = [4.5, 11.5];
+async function addSauceBottles(ctx, root, bx, bz, lift) {
+  const ns = ctx.modid;
+  for (let i = 0; i < SAUCE_BOTTLES.length; i++) {
+    const model = await ctx.buildModel(`${ns}:block/sauce_bottle_${SAUCE_BOTTLES[i]}`);
+    model.position.set(bx + (SAUCE_BOTTLE_X[i] - 8) / 16, lift / 16, bz);
+    root.add(model);
+  }
+}
+
 async function buildPlates(ctx, s) {
   const root = new THREE.Group();
   const onTable = s.place === "table";
@@ -443,6 +458,7 @@ async function buildPlates(ctx, s) {
       const plate = await ctx.buildBlock(`${s.material}_${PLATE_IDS[size]}`, { axis: "x" });
       plate.position.set(bx + (px - 8) / 16, -drop / 16, bz + (pz - 8) / 16);
       root.add(plate);
+      if (s.chop !== "none") await addRestingChopsticks(ctx, root, bx+(px-8)/16, -drop+1.75, bz+(pz-8)/16, s.chop === "food", Number(s.yaw));
       const innerL = len - 1, innerW = wid - 1;
       // r89: every plate shows food the same size (4 px) and each cell holds up to 3 — except the 1x1 dish (r135b)
       // r90 preview: other plates shingle (each next one half-overlaps the previous, sloping DOWN to the plate
@@ -506,6 +522,25 @@ async function buildPlates(ctx, s) {
       }
     }
   }
+  // r146a（mryt233 改 2026-11-08）：最后一排空出来的那一格摆两个蘸料瓶（芝麻酱 / 蚝油），旁边放一只蘸料碗比大小，
+  // 说明它们和碗、盘子一样借「盘子格」贴着桌面摆，摆着就能给菜加料。
+  const bx = 0, bz = 2 * 1.2 - 0.6;
+  if (onTable) {
+    const t = await ctx.buildBlock(`${s.wood}_hotpot_table`, { north: "true", east: "true", south: "true", west: "true" });
+    t.position.set(bx, -1, bz);
+    root.add(t);
+  }
+  await addSauceBottles(ctx, root, bx, bz, -drop);
+  // 旁边再摆一只蘸料碗（碗在格子正中的那块），比一比大小：瓶子和碗、盘子是同一个用法
+  const scaleBlockX = bx + 1;
+  if (onTable) {
+    const t2 = await ctx.buildBlock(`${s.wood}_hotpot_table`, { north: "true", east: "true", south: "true", west: "true" });
+    t2.position.set(scaleBlockX, -1, bz);
+    root.add(t2);
+  }
+  const scaleBowl = await ctx.buildModel(`${ctx.modid}:block/bowl_b`);
+  scaleBowl.position.set(scaleBlockX, -drop / 16, bz);
+  root.add(scaleBowl);
   return { object: root, tick() {}, frame() {} };
 }
 
@@ -537,7 +572,7 @@ async function buildBowls(ctx, s) {
       const bowl = await ctx.buildModel(`${ns}:block/bowl_${s.shape}${soup ? "_soup_" + what : ""}`);
       bowl.position.set(bx + ox / 16, lift / 16, bz);
       root.add(bowl);
-      if (s.chop !== "none") await addRestingChopsticks(ctx, root, bx + ox / 16, lift + 3, bz, s.chop === "food");
+      if (s.chop !== "none") await addRestingChopsticks(ctx, root, bx + ox / 16, lift + 3, bz, s.chop === "food", Number(s.yaw));
       if (soup) continue;
       for (let layer = 0; layer < what; layer++) {
         const item = await ctx.buildItem(BOWL_FOODS[layer]);
@@ -558,33 +593,78 @@ async function buildBowls(ctx, s) {
   return { object: root, tick() {}, frame() {} };
 }
 
-// Chopsticks resting on a bowl / plate rim (2026-10-27, PlateHolderRenderer.renderChopsticks): the chopsticks item
-// laid flat 0.3 px above the rim (rimY px), turned 45° so the diagonal sprite runs straight, 0.6 of the item size,
-// tip (and the food on it) over the bowl's centre, the other end across the rim; with food the cooked beef sits on the tip (HeldFoodItemRenderer TIP_X/Y, size 0.42).
-async function addRestingChopsticks(ctx, root, x, rimY, z, withFood) {
-  const S = 0.6;
-  const lay = new THREE.Group();
-  lay.rotation.order = "YXZ";
-  lay.rotation.y = Math.PI / 4;
-  lay.rotation.x = Math.PI / 2;
-  lay.scale.setScalar(S);
-  lay.position.set(x, mc((rimY + 0.3) / 16), z);
-  // move the chopstick tip (where the food is) over the bowl's centre; the other end rests on the rim
-  const shift = new THREE.Group();
-  shift.position.set(-0.26, 0.3, 0);
-  lay.add(shift);
-  const fixed = new THREE.Group();
-  fixed.rotation.y = Math.PI; // item/generated "fixed" display
-  fixed.add(await ctx.buildItem(`${ctx.modid}:bamboo_chopsticks`));
-  shift.add(fixed);
+// mryt233 改（r146e）：逐项对应 PlateHolderRenderer 的尺寸、接触点、颜色和变换。
+const CHOP = { length: 8.5, thick: 0.55, tip: 0.38, gap: 1, handle: 8.5 * 0.45,
+  restLen: 3.8, restDepth: 1.2, restH: 1.2, lip: 1.6 };
+const CHOP_TILT = Math.atan(CHOP.restH / (CHOP.length * 0.88));
+const CHOP_TAIL = 8 - CHOP.length * Math.cos(CHOP_TILT) / 2;
+const CHOP_REST = CHOP_TAIL + CHOP.restH / Math.tan(CHOP_TILT) + 0.55;
+function chopBox(root, x0, x1, y0, y1, z0, z1, material) {
+  const box = new THREE.Mesh(new THREE.BoxGeometry((x1-x0)/16, (y1-y0)/16, (z1-z0)/16), material);
+  box.position.set((x0+x1)/32, (y0+y1)/32, (z0+z1)/32);
+  root.add(box);
+}
+async function bambooPair(ctx, root, withFood) {
+  for (const side of [-1, 1]) {
+    const z = side * (CHOP.gap + CHOP.thick) / 2;
+    // 纹理的两个色区：与 Java 的 u=0.25 / 0.75，v=0.5 相同。
+    const texture = await ctx.texture(`${ctx.modid}:block/resting_bamboo`);
+    for (const [x0, x1, thick, u] of [[0, CHOP.handle, CHOP.thick, 0.25], [CHOP.handle, CHOP.length, CHOP.tip, 0.75]]) {
+      const geometry = new THREE.BoxGeometry((x1-x0)/16, thick/16, thick/16);
+      const uv = geometry.getAttribute("uv");
+      for (let i=0; i<uv.count; i++) uv.setXY(i, u, 0.5);
+      const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({map:texture}));
+      mesh.position.set((x0+x1)/32, thick/32, z/16);
+      root.add(mesh);
+    }
+  }
   if (withFood) {
     const food = new THREE.Group();
-    food.add(await ctx.buildItem("minecraft:cooked_beef"));
-    food.scale.setScalar(0.42);
-    food.position.set(-(0.24 - 0.5), 0.2 - 0.5, -0.04); // tip of the sprite, mirrored by the fixed 180° turn
-    shift.add(food);
+    const fixed = new THREE.Group();
+    fixed.rotation.y = Math.PI;
+    fixed.add(await ctx.buildItem("minecraft:cooked_beef"));
+    food.add(fixed);
+    food.scale.setScalar(0.175);
+    food.position.set(CHOP.length/16, (CHOP.tip/2+1.4)/16, 0);
+    root.add(food);
   }
+}
+async function addRestingChopsticks(ctx, root, x, rimY, z, withFood, yaw=0) {
+  const lay = new THREE.Group();
+  lay.rotation.y = (-90-yaw)*Math.PI/180;
+  lay.position.set(x, mc(rimY/16), z);
+  const tail = new THREE.Group();
+  tail.position.x = -CHOP.length/16;
+  lay.add(tail);
+  await bambooPair(ctx, tail, withFood);
   root.add(lay);
+}
+async function buildTableChopsticks(ctx, s) {
+  const root = new THREE.Group();
+  const table = await ctx.buildBlock(`${s.wood}_hotpot_table`, {north:"true",east:"true",south:"true",west:"true"});
+  table.position.y = -1;
+  root.add(table);
+  const lay = new THREE.Group();
+  lay.position.y = mc(-5/16);
+  const yaw = {south:0, west:90, north:180, east:270}[s.facing];
+  lay.rotation.y = (-90-yaw)*Math.PI/180;
+  const model = new THREE.Group();
+  model.position.set(-0.5,0,-0.5);
+  lay.add(model);
+  const porcelain = new THREE.MeshBasicMaterial({map:await ctx.texture("minecraft:block/quartz_block_bottom")});
+  const wood = new THREE.MeshBasicMaterial({map:await ctx.texture("minecraft:block/dark_oak_planks")});
+  const cx=CHOP_REST, hl=CHOP.restLen/2, hd=CHOP.restDepth/2;
+  chopBox(model,cx-hd-0.1,cx+hd+0.1,0,0.35,8-hl-0.1,8+hl+0.1,wood);
+  chopBox(model,cx-hd+0.05,cx+hd-0.05,0.35,CHOP.restH,8-hl+0.15,8+hl-0.15,porcelain);
+  chopBox(model,cx-hd+0.05,cx+hd-0.05,0.35,CHOP.lip,8-hl,8-hl+0.4,porcelain);
+  chopBox(model,cx-hd+0.05,cx+hd-0.05,0.35,CHOP.lip,8+hl-0.4,8+hl,porcelain);
+  const tail = new THREE.Group();
+  tail.position.set(CHOP_TAIL/16,0,0.5);
+  tail.rotation.z = CHOP_TILT;
+  model.add(tail);
+  await bambooPair(ctx,tail,s.food==="on");
+  root.add(lay);
+  return {object:root,tick(){},frame(){}};
 }
 
 // 果橙多 (r99 preview, mryt233): the drink bottle on a table next to a 1x1 dish of food and a bowl for scale.
@@ -817,6 +897,13 @@ export const blockExtras = [
 
 export default [
   {
+    id:"table_chopsticks",name:"桌上竹筷 + 筷架",
+    desc:"两根 8.5 像素的平行竹条，尾端贴桌，前端由横放的白瓷鞍形筷架托住；四向筷尖朝外，占地 9.5×4.5 像素（r146e）。",
+    params:[WOOD,{key:"facing",label:"筷尖朝向",options:[["south","南"],["west","西"],["north","北"],["east","东"]],default:"south"},
+      {key:"food",label:"夹菜",options:[["off","空筷子"],["on","熟牛肉"]],default:"off"}],
+    build:buildTableChopsticks,
+  },
+  {
     id: "stove_pot",
     name: "灶台上煮火锅",
     desc: "锅坐在灶台上、灶膛点火：汤面大滚（沸腾贴图 + 立体气泡和滚包）、食材在汤面上下翻滚、热气上升、炉口冒火苗。「灶火」切到熄灭：冷锅里的食材浮在汤面上很慢地上下漂（约 6 秒一个来回），随火力平滑过渡",
@@ -857,8 +944,10 @@ export default [
   {
     id: "plates",
     name: "盘子",
-    desc: "一格里能摆几个盘子：一个四格方盘 / 两个五格长盘 / 五个小碟 / 两个八格大盘 / 两个三格长盘 / 混着摆；每格放一样食物，摆在火锅桌上时贴着桌面",
+    desc: "一格里能摆几个盘子：一个四格方盘 / 两个五格长盘 / 五个小碟 / 两个八格大盘 / 两个三格长盘 / 混着摆；每格放一样食物，摆在火锅桌上时贴着桌面。最后一排另摆了两个蘸料瓶（芝麻酱是带白标签的矮玻璃罐、蚝油是细高的深色瓶）和一只碗，它们和碗、盘子一样借这个「盘子格」摆，摆着就能给菜加料（r146a）",
     params: [
+      {key:"chop",label:"筷子",options:[["none","不架"],["empty","架空筷子"],["food","架夹着菜的筷子"]],default:"none"},
+      {key:"yaw",label:"筷尖角度",options:[["0","南 0°"],["22.5","南偏西 22.5°"],["90","西 90°"],["180","北 180°"],["270","东 270°"]],default:"0"},
       { key: "material", label: "材质", options: [["quartz", "石英"], ["bamboo", "竹编"], ["terracotta", "红陶"], ["copper", "铜"], ["iron", "铁"]], default: "quartz" },
       { key: "place", label: "摆在", options: [["table", "火锅桌上"], ["ground", "地上"]], default: "table" },
       { key: "fill", label: "食物", options: [["full", "装满（叠 3 层）"], ["half", "每格一样"]], default: "full" },
@@ -874,7 +963,8 @@ export default [
     params: [
       { key: "shape", label: "碗形", options: [["b", "b 敞口碗（游戏里用的）"], ["a", "a 直壁碗（留档）"]], default: "b" },
       { key: "place", label: "摆在", options: [["table", "矮火锅桌上"], ["tall", "高火锅桌上"], ["ground", "地上"]], default: "table" },
-      { key: "chop", label: "筷子", options: [["none", "不架"], ["empty", "架空筷子"], ["food", "架夹着菜的筷子"]], default: "none" },
+      {key:"chop",label:"筷子",options:[["none","不架"],["empty","架空筷子"],["food","架夹着菜的筷子"]],default:"none"},
+      {key:"yaw",label:"筷尖角度",options:[["0","南 0°"],["22.5","南偏西 22.5°"],["90","西 90°"],["180","北 180°"],["270","东 270°"]],default:"0"},
       WOOD,
     ],
     build: buildBowls,

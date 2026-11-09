@@ -73,14 +73,19 @@ public class ChopsticksItem extends Item {
         BlockState state = world.getBlockState(pos);
         // Shift+右键桌上的碗 / 盘子：筷子（连夹着的菜）架在碗沿上（2026-10-27 用户：只架碗和盘子，不架锅）
         if (state.is(HotPotContent.PLATE_HOLDER) && world.getBlockEntity(pos) instanceof PlateHolderBlockEntity holder) {
-            PlateHolderBlockEntity.Placed plate = PlateHolderBlock.aimed(player, pos, holder);
+            // mryt233 改（r146e）：以实际点击坐标决定碗沿，避免用第二次射线串选旁边餐具。
+            double hx = (context.getClickLocation().x - pos.getX()) * 16;
+            double hz = (context.getClickLocation().z - pos.getZ()) * 16;
+            PlateHolderBlockEntity.Placed plate = holder.at(hx, hz);
             if (plate == null) {
                 // 点在盘子格的空白位置：把这一双竹筷（连夹着的菜）直接摆在桌上，渲染器会在筷尖下画迷你筷架。
                 // 空白处没有盘子可放菜，所以夹着菜也照摆（r136b，2026-11-05 用户，新增）
                 return placeTableChopsticks(context);
             }
-            // 修复：潜行会绕过方块 useItemOn；有菜时先走原本放菜/蘸料分支，空筷子才架碗沿。
-            if (!Chopsticks.held(context.getItemInHand()).isEmpty()) {
+            // mryt233 改：潜行绕过方块 useItemOn；夹菜点中心仍放菜/蘸料，点沿口连菜一起架放。
+            double dx = hx - plate.x, dz = hz - plate.z;
+            boolean rim = Math.max(Math.abs(dx) / plate.halfX(), Math.abs(dz) / plate.halfZ()) >= 0.65;
+            if (!Chopsticks.held(context.getItemInHand()).isEmpty() && !rim) {
                 return ((PlateHolderBlock) state.getBlock()).useItemOn(context.getItemInHand(), state, world,
                     pos, player, context.getHand(), hit).result();
             }
@@ -89,6 +94,8 @@ public class ChopsticksItem extends Item {
             }
             if (!world.isClientSide) {
                 plate.chopsticks = context.getItemInHand().copy();
+                double yaw = rim ? Math.toDegrees(Math.atan2(dx, -dz)) : player.getYRot();
+                plate.chopsticksYaw = (float) ((Math.round(yaw / 22.5) * 22.5 % 360 + 360) % 360);
                 player.setItemInHand(context.getHand(), ItemStack.EMPTY);
                 holder.changed();
                 world.playSound(null, pos, SoundEvents.BAMBOO_PLACE,
@@ -132,7 +139,8 @@ public class ChopsticksItem extends Item {
             double hx = (context.getClickLocation().x - pos.getX()) * 16;
             double hz = (context.getClickLocation().z - pos.getZ()) * 16;
             Direction.Axis axis = HotPotBlock.handleAxisFor(context.getHorizontalDirection());
-            if (holder.tryAdd(HotPotContent.CHOPSTICK_REST_BLOCK, axis, hx, hz, context.getItemInHand(), true)) {
+            if (holder.tryAdd(HotPotContent.CHOPSTICK_REST_BLOCK, axis, hx, hz, context.getItemInHand(), true,
+                context.getHorizontalDirection())) {
                 world.playSound(null, pos, SoundEvents.BAMBOO_PLACE, SoundSource.BLOCKS, 0.6F, 1.4F);
                 context.getItemInHand().consume(1, player);
                 return InteractionResult.SUCCESS;

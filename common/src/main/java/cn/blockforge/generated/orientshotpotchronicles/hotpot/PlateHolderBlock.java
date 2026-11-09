@@ -235,6 +235,11 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
             DrinkKind kind = p.self.getItem() instanceof CupItem cup ? cup.kind() : null;
             state = state.setValue(DrinkBlock.EMPTY, kind == null).setValue(CupBlock.KIND, kind == null ? DrinkKind.ORANGE_DRINK : kind);
         }
+        // mryt233 改（r146a，2026-11-08）：桌上的芝麻酱 / 蚝油瓶按 kind 选模型（渲染和挖掉时的碎屑共用）
+        if (p.plate instanceof SauceBottleBlock) {
+            SauceBottleKind kind = SauceBottleItem.kindOf(p.self);
+            state = state.setValue(SauceBottleBlock.KIND, kind == null ? SauceBottleKind.SESAME_PASTE : kind);
+        }
         return state;
     }
 
@@ -331,9 +336,14 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
             if (!world.isClientSide) {
                 if (be.tryAdd(placing, HotPotBlock.handleAxisFor(player.getDirection()), at[0], at[1], stack,
                     PlateItem.keepsSelf(stack))) {
+                    // mryt233 改（r146d）：先按原物品辨认空瓶 / 饮料，再扣除，避免最后一个物品变成空栈。
+                    if (placing instanceof DrinkBlock) {
+                        DrinkBlock.playPlaceSound(world, pos, stack);
+                    } else {
+                        world.playSound(null, pos, placing.defaultBlockState().getSoundType().getPlaceSound(),
+                            SoundSource.BLOCKS, 1.0F, 1.0F);
+                    }
                     stack.consume(1, player);
-                    world.playSound(null, pos, placing.defaultBlockState().getSoundType().getPlaceSound(),
-                        SoundSource.BLOCKS, 1.0F, 1.0F);
                 } else {
                     player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.plate_no_room")), true);
                 }

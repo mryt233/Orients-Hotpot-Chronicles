@@ -16,7 +16,8 @@
     "sauce_station_top",
     "*_hot_pot_tomato",
     "*_hot_pot_three_fresh",
-    "cup"
+    "cup",
+    "sauce_bottle"
   ],
   "categories": [
     {
@@ -114,6 +115,7 @@
         "折耳根",
         "cloth_apron",
         "围裙",
+        "apron",
         "_roll",
         "肉卷",
         "potato",

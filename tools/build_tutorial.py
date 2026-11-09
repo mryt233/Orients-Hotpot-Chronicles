@@ -40,7 +40,10 @@ ICONS = os.path.join(TUT, "img", "icons")
 WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped"]
 WOOD_ZH = {"oak": "橡木", "spruce": "云杉木", "birch": "白桦木", "jungle": "丛林木", "acacia": "金合欢木", "dark_oak": "深色橡木",
            "mangrove": "红树木", "cherry": "樱花木", "bamboo": "竹", "crimson": "绯红木", "warped": "诡异木"}
-TAG_ICON = {"minecraft:logs": ("minecraft:oak_log", "任意原木")}
+TAG_ICON = {"minecraft:logs": ("minecraft:oak_log", "任意原木"),
+            # mryt233 改（2026-11-09，r146b）：布围裙换款配方的材料是 #cloth_aprons 标签，
+            # 代表图标用米白款，提示文字写「任意一款布围裙」
+            "orients_hotpot_chronicles:cloth_aprons": ("orients_hotpot_chronicles:cloth_apron", "任意一款布围裙")}
 
 PAGES = [  # (文件名, 导航标题, 分组)
     ("index", "欢迎", "开始"),
@@ -240,6 +243,17 @@ def cook_block(raw_id, entries):
             % (rlabel_badge, slot((raw_id, name_of(raw_id))), ARROW, slot((prod, name_of(prod))), rows))
 
 
+def recolour_recipe(r):
+    """布围裙换款：任意一款 + 染料（无序）→ 指定款。mryt233 改（2026-11-09，r146b）。"""
+    apron = r.get("apron") or {}
+    dye = r.get("dye") or {}
+    rid = result_id(r)
+    return ('<div class="rcp"><div class="rlabel">合成（无序：任意一款围裙 + 染料，耐久和附魔保留）</div>'
+            '<div class="rbody"><div class="grid" style="--cols:2">%s%s</div>%s%s</div></div>'
+            % (slot(ing_ref(apron)), slot(ing_ref(dye)), ARROW,
+               slot((rid, name_of(rid)), result_count(r))))
+
+
 def stonecut(r):
     ing = ing_ref(r["ingredient"])
     rid = result_id(r)
@@ -300,8 +314,13 @@ def recipes_for(item_id):
     out = []
     for rid, r in RECIPE_DB.items():
         t = r["type"].replace("minecraft:", "")
+        # mryt233 改（2026-11-09，r146b）：模组自己的配方类型带命名空间（orients_hotpot_chronicles:apron_recolor），
+        # 判断时只取最后一段，否则 «apron_recolor» 永远匹配不上。
+        short = t.rsplit(":", 1)[-1]
         # 模组自己的合成类型（如汤底桶 soup_bucket）有 pattern / ingredients 的，也按工作台格子画（2026-10-27）
-        if (t in ("crafting_shaped", "crafting_shapeless", "stonecutting") or "pattern" in r or "ingredients" in r) and result_id(r) == item_id:
+        # 布围裙换款配方（apron_recolor）字段是 apron / dye / result，也认成工作台配方，画成「两格无序」。
+        if (t in ("crafting_shaped", "crafting_shapeless", "stonecutting")
+                or "pattern" in r or "ingredients" in r or short == "apron_recolor") and result_id(r) == item_id:
             out.append(r)
     return out
 
@@ -310,8 +329,13 @@ def recipe_html(item_id):
     item_id = full_id(item_id)
     parts = []
     for r in recipes_for(item_id):
-        t = r["type"].replace("minecraft:", "")
-        parts.append(stonecut(r) if t == "stonecutting" else grid_recipe(r))
+        t = r["type"].replace("minecraft:", "").rsplit(":", 1)[-1]
+        if t == "apron_recolor":
+            parts.append(recolour_recipe(r))
+        elif t == "stonecutting":
+            parts.append(stonecut(r))
+        else:
+            parts.append(grid_recipe(r))
     for raw, c in COOK.items():
         if c["产物"] == item_id:
             order = ["熔炉", "烟熏炉", "营火"]
@@ -448,7 +472,7 @@ def build_recipes_page():
     by_result = {}
     for rid, r in RECIPE_DB.items():
         t = r["type"].replace("minecraft:", "")
-        if t in ("crafting_shaped", "crafting_shapeless", "stonecutting"):
+        if t.rsplit(":", 1)[-1] in ("crafting_shaped", "crafting_shapeless", "stonecutting", "apron_recolor"):
             by_result.setdefault(result_id(r).split(":")[1], []).append(r)
     ids = sorted(by_result)
     out = ["<h1>配方大全</h1>",
@@ -501,7 +525,7 @@ def build_items_page():
     ]
     all_ids = sorted({k.split(":")[1] for k in NAMES} - {"plates"})
     # mryt233 改：饮料炼药锅只有方块状态，没有可列入图鉴的独立物品。
-    hide = {"plates", "sauce_station_top", "tall_brick_stove_top", "bowl", "drink", "drink_cauldron"}
+    hide = {"plates", "sauce_station_top", "tall_brick_stove_top", "bowl", "drink", "drink_cauldron", "sauce_bottle"}
     all_ids = [i for i in all_ids if i not in hide]
     seen = set()
     out = ["<h1>物品图鉴</h1>", "<p>模组里所有物品和方块（自动生成）。<code>ID</code> 是指令里用的名字，例如 <code>/give @s orients_hotpot_chronicles:brick_stove</code>。</p>"]
@@ -620,7 +644,7 @@ def main():
 def check_coverage(bodies):
     """教程有没有跟上游戏。"""
     text_all = "".join(open(f, encoding="utf-8").read() for f in glob.glob(os.path.join(CONTENT, "*.md")))
-    hide = {"plates", "sauce_station_top", "tall_brick_stove_top", "bowl", "drink"}
+    hide = {"plates", "sauce_station_top", "tall_brick_stove_top", "bowl", "drink", "sauce_bottle"}
     released = release_item_ids()
     for full, zh in NAMES.items():
         i = full.split(":")[1]

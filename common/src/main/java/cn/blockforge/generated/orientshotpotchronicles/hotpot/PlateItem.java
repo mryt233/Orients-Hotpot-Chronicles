@@ -50,6 +50,11 @@ public class PlateItem extends BlockItem {
 
     /** 能不能装进盘子：能下锅的生食材，或者本身能吃的东西（熟食也能装）；汤碗、橙子饮料这种整件摆的不算。 */
     public static boolean holdsFood(Level world, ItemStack stack) {
+        // mryt233 改（r146a，2026-11-08）：芝麻酱 / 蚝油瓶本身能吃，但它不是「菜」，
+        // 拿着它点桌上的盘子不该塞进去（给菜加料走瓶子那条交互）。
+        if (stack.getItem() instanceof SauceBottleItem) {
+            return false;
+        }
         return !stack.isEmpty() && placedFor(stack) == null && (stack.has(DataComponents.FOOD) || HotPotCooking.acceptable(world, stack));
     }
 
@@ -134,14 +139,20 @@ public class PlateItem extends BlockItem {
         double hz = (context.getClickLocation().z - target.getZ()) * 16;
         ItemStack stack = context.getItemInHand();
         Direction.Axis axis = HotPotBlock.handleAxisFor(context.getHorizontalDirection());
-        if (!be.tryAdd(plate, axis, hx, hz, stack, keepSelf)) {
+        // mryt233 改（r146e）：新建盘子格的首双竹筷也记录筷尖朝向。
+        if (!be.tryAdd(plate, axis, hx, hz, stack, keepSelf, context.getHorizontalDirection())) {
             context.getPlayer().displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.plate_no_room")), true);
             if (be.plates().isEmpty()) {
                 world.removeBlock(target, false);
             }
             return InteractionResult.FAIL;
         }
-        world.playSound(null, target, plate.defaultBlockState().getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
+        // mryt233 改（r146d）：只替换饮料瓶上桌的声音，杯子和其他餐具沿用原声。
+        if (plate instanceof DrinkBlock) {
+            DrinkBlock.playPlaceSound(world, target, stack);
+        } else {
+            world.playSound(null, target, plate.defaultBlockState().getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
+        }
         stack.consume(1, context.getPlayer());
         return InteractionResult.SUCCESS;
     }

@@ -738,13 +738,28 @@ const SAUCE_KEY = (k) => `text.${NS}.${k}`;
 const SS = { W: 176, H: 178, GRID_X: 44, GRID_Y: 18, STEP_X: 30, STEP_Y: 22, INV_X: 8, INV_Y: 96, HOTBAR_Y: 154, MAX: 64 };
 const ssX = (i) => SS.GRID_X + (i % 3) * SS.STEP_X;
 const ssY = (i) => SS.GRID_Y + Math.floor(i / 3) * SS.STEP_Y;
-// ingredients table (Java: GAP, ICONS_W, GUIDE_COL1/2_ROW_Y/H, GUIDE_COL_GAP).
-// mryt233 改（2026-11-06，r137）：14 种调料时按 Java 的双列布局——每列最多 7 行、行高 18、从 22 开始（22 + 7 × 18 = 148 < 178）；
-// 10 种以内沿用原来的单列（起点 17、行高 16）。面板画实际宽度，画布按下面估算的宽度预留。
-const SG = { GAP: 2, ICONS_W: 34, COL_GAP: 10, MAX_COLS: 2,
-  COL2_ROW_Y: 22, COL2_ROW_H: 18, COL1_ROW_Y: 17, COL1_ROW_H: 16,
-  // 画布预留宽度：Java 里窗口宽度有限，整块会往左挪；网页里没有窗口限制，按估算值预留就行（双列实测约 290～320）
-  MAX_W: 320 };
+// mryt233 改（r146f）：与 Java 相同的固定单列宽度、内容区、动态行高与分页。
+const SG = { GAP: 2, ICONS_W: 34, W: 176, TOP: 22, BOTTOM: SS.H - 24, TEXT_W: 124 };
+
+// mryt233 改（r146f）：网页字体比游戏偏窄；排版用原版 1.21.1 字形步进，避免最后一味的效果错误地挤在首行。
+const SG_ASCII_ADVANCES = [4,2,4,6,6,6,6,2,4,4,4,6,2,6,2,6,6,6,6,6,6,6,6,6,6,6,2,2,5,6,5,6,7,6,6,6,6,6,6,6,6,4,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,4,6,4,6,6,3,6,6,6,6,6,5,6,6,2,6,5,3,6,6,6,6,6,6,6,4,6,6,6,6,6,6,4,2,4,7];
+function sgWidth(text) {
+  return [...text].reduce((width, char) => {
+    const code = char.codePointAt(0);
+    return width + (code >= 32 && code <= 126 ? SG_ASCII_ADVANCES[code - 32] : 9);
+  }, 0);
+}
+function sgWrap(text) {
+  const lines = [];
+  let line = "";
+  for (const token of String(text).match(/[⺀-￿]|\s+|[^\s⺀-￿]+/g) || []) {
+    if (line && sgWidth(line + token) > SG.TEXT_W) {
+      lines.push(line.trimEnd()); line = token.trimStart();
+    } else line += token;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
 
 // what is in each of the 9 bowls for the preview (seasoning index, -1 = empty bowl)
 const SAUCE_LAYOUTS = {
@@ -774,8 +789,8 @@ const sauceStation = {
   name: "蘸料台补货界面",
   blocks: ["oak_sauce_station", "spruce_sauce_station", "birch_sauce_station", "jungle_sauce_station", "acacia_sauce_station", "dark_oak_sauce_station", "mangrove_sauce_station", "cherry_sauce_station", "bamboo_sauce_station", "crimson_sauce_station", "warped_sauce_station", "iron_sauce_station"],
   open: "右键蘸料台先打开「蘸料台总览」，点「补充蘸料台」进到这里（11 种木头 + 铁台都一样）；拿碗右键台上的小碗才是打蘸料。9 格排成 3×3 = 台上 9 个小碗（第一行是最上层，从左到右），空碗放什么原料都行。右上角「?」打开原料表",
-  // 原料表打开时画布要留出面板的位置；面板实际宽度按下面估算（网页里没有窗口宽度限制，不放不下就往左挪）
-  size: (s) => [s.guide === "open" ? SS.W + SG.GAP + SG.MAX_W : SS.W, SS.H],
+  // mryt233 改（r146f）：原料表与主面板等宽，组合宽 354。
+  size: (s) => [s.guide === "open" ? SS.W + SG.GAP + SG.W : SS.W, SS.H],
   textures: [],
   params: [
     { key: "layout", label: "碗里放的", options: [["each", "九种各一碗"], ["mixed", "随便放（有重复、有空碗）"]], default: "mixed" },
@@ -828,31 +843,61 @@ const sauceStation = {
     });
     inventoryFrames(g, SS.INV_X, SS.INV_Y, SS.HOTBAR_Y);
     g.text("物品栏", 8, SS.INV_Y - 11, LABEL, true);
-    if (s.guide === "open") this.guide(g, SS.W + SG.GAP, 0);
+    if (s.guide === "open") this.guide(g, s, SS.W + SG.GAP, 0);
   },
 
-  // ingredients table: one row per seasoning — raw item icons (up to two side by side), name, effect (grey).
-  // mryt233 改（2026-11-06，r137）：超过 10 种调料分左右两列（每列最多 ceil(n/2) 行），和 SauceStationScreen.drawGuide 一致：
-  // 第 i 种在第 i / rowsPerCol 列、第 i % rowsPerCol 行，横坐标 px + 7 + col * (colW + COL_GAP)，纵坐标 py + rowY + row * rowH。
-  guide(g, px, py) {
-    const title = g.tr(SAUCE_KEY("screen.sauce.guide"));
-    const rows = SAUCE_SEASONINGS.map(([id, raws]) => ({ raws, name: g.tr(SAUCE_KEY(`seasoning.${id}`)), effect: g.tr(SAUCE_KEY(`seasoning.${id}.effect`)) }));
-    const colW = Math.max(...rows.map((r) => SG.ICONS_W + 4 + g.width(r.name) + 4 + g.width(r.effect)));
-    const cols = rows.length > 10 ? 2 : 1;
-    const rowsPerCol = Math.ceil(rows.length / cols);
-    const rowY = cols > 1 ? SG.COL2_ROW_Y : SG.COL1_ROW_Y;
-    const rowH = cols > 1 ? SG.COL2_ROW_H : SG.COL1_ROW_H;
-    const gw = Math.max(7 + Math.ceil(colW) * cols + SG.COL_GAP * (cols - 1) + 7, 12 + Math.ceil(g.width(title)) + 14);
-    woodPanel(g, gw, SS.H, px, py);
-    g.text(title, px + 12, py + 7, TITLE, true);
-    rows.forEach((r, i) => {
-      const rx = px + 7 + Math.floor(i / rowsPerCol) * (Math.ceil(colW) + SG.COL_GAP);
-      const ry = py + rowY + (i % rowsPerCol) * rowH;
-      r.raws.slice(0, 2).forEach((id, k) => g.item(id, rx + k * 17, ry));
-      const tx = rx + SG.ICONS_W + 4;
-      g.text(r.name, tx, ry + 4, LABEL, true);
-      g.text(r.effect, tx + g.width(r.name) + 4, ry + 4, S_HINT, true);
+  // mryt233 改（r146f）：文字和图标顺序不变，换行不截断；页面高度按 Java 的 9 像素行距计算。
+  guide(g, s, px, py) {
+    const pages = [[]];
+    let used = 0;
+    SAUCE_SEASONINGS.forEach(([id, raws]) => {
+      const name = g.tr(SAUCE_KEY(`seasoning.${id}`)), effect = g.tr(SAUCE_KEY(`seasoning.${id}.effect`));
+      const inline = sgWidth(name) + 4 + sgWidth(effect) <= SG.TEXT_W;
+      const names = sgWrap(name), effects = sgWrap(effect);
+      const height = Math.max(18, (inline ? 1 : names.length + effects.length) * 9 + 4);
+      if (pages.at(-1).length && used + height > SG.BOTTOM - SG.TOP) { pages.push([]); used = 0; }
+      pages.at(-1).push({ raws, names, effects, inline, height });
+      used += height;
     });
+    s.guidePage = Math.max(0, Math.min(s.guidePage || 0, pages.length - 1));
+    s.guidePageCount = pages.length;
+    woodPanel(g, SG.W, SS.H, px, py);
+    g.text(g.tr(SAUCE_KEY("screen.sauce.guide")), px + 12, py + 7, TITLE, true);
+    let ry = py + SG.TOP;
+    pages[s.guidePage].forEach((r) => {
+      r.raws.slice(0, 2).forEach((id, k) => g.item(id, px + 7 + k * 17, ry));
+      const tx = px + 7 + SG.ICONS_W + 4;
+      r.names.forEach((line, i) => g.text(line, tx, ry + 2 + i * 9, LABEL, true));
+      if (r.inline) g.text(r.effects[0], tx + sgWidth(r.names[0]) + 4, ry + 2, S_HINT, true);
+      else r.effects.forEach((line, i) => g.text(line, tx, ry + 2 + (r.names.length + i) * 9, S_HINT, true));
+      ry += r.height;
+    });
+    vanillaButton(g, px + 7, py + SS.H - 21, 16, 14, "<");
+    vanillaButton(g, px + SG.W - 23, py + SS.H - 21, 16, 14, ">");
+    // 边界页按钮禁用，同 Java Button.active。
+    if (!s.guidePage) g.fill(px + 7, py + SS.H - 21, px + 23, py + SS.H - 7, 0x80000000);
+    if (s.guidePage === pages.length - 1) g.fill(px + SG.W - 23, py + SS.H - 21, px + SG.W - 7, py + SS.H - 7, 0x80000000);
+    const page = g.tr(SAUCE_KEY("screen.sauce.page"), s.guidePage + 1, pages.length);
+    g.text(page, px + (SG.W - g.width(page)) / 2, py + SS.H - 18, LABEL, true);
+  },
+
+  click(s, mx, my) {
+    if (mx >= SS.W - 26 && mx < SS.W - 14 && my >= 4 && my < 16) {
+      s.guide = s.guide === "open" ? "closed" : "open";
+      return true;
+    }
+    if (s.guide !== "open" || my < SS.H - 21 || my >= SS.H - 7) return false;
+    const x = mx - SS.W - SG.GAP;
+    if (x >= 7 && x < 23) s.guidePage = Math.max(0, (s.guidePage || 0) - 1);
+    else if (x >= SG.W - 23 && x < SG.W - 7) s.guidePage = Math.min(s.guidePageCount - 1, (s.guidePage || 0) + 1);
+    else return false;
+    return true;
+  },
+
+  wheel(s, mx, my, dx, dy) {
+    if (s.guide !== "open" || !dy || mx < SS.W + SG.GAP || mx >= SS.W + SG.GAP + SG.W || my < 0 || my >= SS.H) return false;
+    s.guidePage = Math.max(0, Math.min(s.guidePageCount - 1, (s.guidePage || 0) + (dy > 0 ? 1 : -1)));
+    return true;
   },
 
   slotOverlay(g, slot) {
@@ -1442,4 +1487,661 @@ const guideBook = {
   },
 };
 
-export default [hotpot, stove, sauceOverview, sauceStation, guideBook];
+
+// ===================================================================== settings (r146a, mryt233)
+// Web port of client/HotPotConfigScreen (r146a 重做版): two tabs — 常用 (particle slider + the few things
+// players actually touch) and 高级 (everything else in collapsible groups, collapsed by default).
+// 和 Java 一样的规矩：面板宽度随画布自适应、每行只放一项、名字换行不截断、超出滚轮 / 滚动条、
+// [- 数值 +]（Shift 一次走 10 步）、点数值可直接键入（输错标红、不让保存）、↺ 只在当前值 ≠ 默认值时出现、
+// 「恢复默认」点一次变确认态再点一次才生效。默认值 / 范围全部照 Config.rememberXxx 和 Config.rule() 抄。
+// 网页预览不写任何配置文件：改过的数值只存在本界面的 preview state 里；键入沿用 canvas 的 key 事件（Java 是 EditBox）。
+const CF = { W: 520, H: 390, TAB_W: 100, TAB_H: 20, TAB_GAP: 4, BTN: 16, VALUE_W: 108, RESET_W: 14,
+  CTRL_GAP: 2, ROW_MIN_H: 30, HEADER_H: 20, BOTTOM_H: 20, SCROLL_W: 5, SCROLL_STEP: 24, LIST_TOP: 60 };
+const CF_COL = { text: 0xffe8c88a, muted: 0xffa88c5c, hover: 0xff6a4418, stripe: 0x18ffffff,
+  panel: 0xff2a190c, bad: 0xffff6a6a, confirm: 0xffff9a5a, valueBg: 0xff1a0e05, valueBgHover: 0xff3a2410,
+  typedBg: 0xff3a2410 };
+const CF_KEY = (s) => "text." + NS + ".config." + s;
+const CF_UNIT = { tick: "config.unit.tick", multiplier: "config.unit.multiplier", point: "config.unit.point",
+  level: "config.unit.level", "": "" };
+// 悬停那句白话（= Config.fieldHelp 的补句；游戏里走 config.help.<键>，预览里先用这几句兜底）
+const CF_HELP = {
+  power: "灶火有多旺：越大，同一份菜涮熟得越快。1 = 和现在一样快，2 = 快一倍。",
+  burn_ticks: "这种燃料能烧多久（20 tick = 1 秒）。原版燃料照原版自己的时长走，这里只对联动模组登记的燃料生效。",
+  speed: "这种汤底把菜涮熟的速度：1 = 标准，1.3 = 快三成。",
+  fallback_ticks: "没在配置里单独写时间的食材，按这个时长涮熟（20 tick = 1 秒）。",
+  fallback_xp: "这类食材出锅时给的经验值。",
+  xp_per_item: "有配方食材至少给的经验值。",
+  tofu_cook_ticks: "整块冷豆腐放进锅里要煮多久才变热豆腐（20 tick = 1 秒）。",
+  tofu_overcook_ticks: "豆腐从下锅到煮碎的总时间，必须比煮熟时间长（20 tick = 1 秒）。",
+  cook_ticks: "这种食材要涮多久才熟（20 tick = 1 秒）。",
+  hunger: "吃下去回多少饥饿点数；2 点 = 一个鸡腿图标。",
+  saturation: "回多少饱和度系数（不是点数）；越大越顶饿，0.6 就够一顿。",
+  duration: "效果持续多少 tick，0 = 不加这个效果（20 tick = 1 秒）。",
+  amplifier: "效果等级：0 = I 级，1 = II 级，最多到 9（X 级）。",
+  second_duration: "第二条效果（副效果）持续多少 tick，0 = 不加。",
+  second_amplifier: "副效果的等级：0 = I 级。",
+  fire_duration: "红汤「抗火」持续多少 tick（只有红汤用，特辣起生效）。",
+  fire_amplifier: "红汤「抗火」的等级。",
+  hunger_duration: "红汤负面「饥饿」持续多少 tick（只有红汤用，特辣起生效）。",
+  hunger_amplifier: "红汤负面「饥饿」的等级。",
+  sip_hunger: "饮料每口回多少饥饿点数。",
+  sip_saturation: "饮料每口的饱和度系数。",
+};
+// 常用页：粒子强度（滑块）+ 这几项（= Java commonFields()）
+// help = 悬停那句白话的键（= 游戏里 config.help.<key>，主会话补进语言文件与 Config.fieldHelp）
+const CF_COMMON = [
+  { path: ["fuel", "coal", "power"], name: "煤炭 · 灶火功率", def: 1.0, min: 0.1, max: 10, step: 0.05, unit: "multiplier", help: "power" },
+  { path: ["cooking", "fallback_ticks"], name: "涮煮兜底时间", def: 200, min: 1, max: 100000, step: 10, unit: "tick", help: "fallback_ticks" },
+  { path: ["soup_speed", "spicy"], name: "红汤锅底 · 加热倍率", def: 1.3, min: 0.1, max: 10, step: 0.05, unit: "multiplier", help: "speed" },
+  { path: ["soup_speed", "clear"], name: "清汤锅底 · 加热倍率", def: 1.0, min: 0.1, max: 10, step: 0.05, unit: "multiplier", help: "speed" },
+  { path: ["soup_speed", "rich_stock"], name: "高汤锅底 · 加热倍率", def: 0.85, min: 0.1, max: 10, step: 0.05, unit: "multiplier", help: "speed" },
+];
+// 生食材默认涮煮刻数（= HotPotCooking.DEFAULT_ITEM_COOK_TICKS）
+const CF_ITEMS = [
+  ["beef_loin_slice", 50],
+  ["tripe", 50],
+  ["enoki_mushroom", 50],
+  ["greens", 50],
+  ["fatty_beef_roll", 100],
+  ["mutton_roll", 100],
+  ["potato_slice", 100],
+  ["cold_tofu_cube", 100],
+  ["ham_sausage_slice", 100],
+  ["peeled_shrimp", 100],
+  ["lotus_root_slice", 100],
+  ["squid_roll", 100],
+  ["tofu_skin", 100],
+  ["sweet_potato_skin", 100],
+  ["shrimp", 150],
+  ["shrimp_paste", 150],
+  ["raw_ham_sausage", 150],
+  ["dried_tofu", 150],
+  ["wide_noodles", 150],
+  ["raw_crispy_pork", 150],
+  ["crispy_pork", 150],
+  ["beef_loin", 200],
+  ["beef_meatball", 200],
+  ["pork_meatball", 200],
+  ["mutton_meatball", 200],
+  ["fish_ball", 200],
+  ["cilantro_beef_meatball", 200],
+  ["cilantro_pork_meatball", 200],
+  ["cilantro_mutton_meatball", 200],
+  ["cilantro_fish_ball", 200],
+  ["zhe_er_gen_slice", 200],
+];
+// 食物营养（= HotPotContent 的 foodItem(id, 饥饿, 饱和系数)）
+const CF_FOODS = [
+  ["tripe", 2, 0.3],
+  ["cooked_tripe", 5, 0.6],
+  ["fatty_beef_roll", 1, 0.3],
+  ["cooked_fatty_beef_roll", 3, 0.6],
+  ["mutton_roll", 1, 0.3],
+  ["cooked_mutton_roll", 3, 0.6],
+  ["beef_loin", 3, 0.3],
+  ["cooked_beef_loin", 8, 0.8],
+  ["beef_loin_slice", 1, 0.3],
+  ["cooked_beef_loin_slice", 3, 0.6],
+  ["potato_slice", 1, 0.3],
+  ["cooked_potato_slice", 2, 0.6],
+  ["soybean", 1, 0.1],
+  ["cold_tofu", 2, 0.4],
+  ["hot_tofu", 2, 0.4],
+  ["cold_tofu_cube", 1, 0.3],
+  ["orange", 4, 0.3],
+  ["garlic", 1, 0.1],
+  ["garlic_paste", 1, 0.1],
+  ["shrimp", 1, 0.2],
+  ["cooked_shrimp", 3, 0.5],
+  ["peeled_shrimp", 1, 0.2],
+  ["cooked_peeled_shrimp", 3, 0.6],
+  ["shrimp_paste", 1, 0.2],
+  ["cooked_shrimp_paste", 4, 0.6],
+  ["raw_ham_sausage", 1, 0.3],
+  ["ham_sausage", 3, 0.6],
+  ["ham_sausage_slice", 1, 0.3],
+  ["cooked_ham_sausage_slice", 2, 0.5],
+  ["oyster_sauce", 1, 0.2],
+  ["sesame_paste", 2, 0.3],
+  ["peanut", 1, 0.2],
+  ["crushed_peanuts", 1, 0.2],
+  ["millet_chili", 1, 0.1],
+  ["raw_crispy_pork", 1, 0.3],
+  ["crispy_pork", 4, 0.6],
+  ["boiled_crispy_pork", 6, 0.8],
+  ["dried_tofu", 2, 0.3],
+  ["cooked_dried_tofu", 4, 0.6],
+  ["tofu_skin", 2, 0.3],
+  ["cooked_tofu_skin", 4, 0.6],
+  ["wide_noodles", 1, 0.2],
+  ["cooked_wide_noodles", 4, 0.6],
+  ["sweet_potato_skin", 1, 0.2],
+  ["cooked_sweet_potato_skin", 4, 0.6],
+  ["enoki_mushroom", 1, 0.2],
+  ["cooked_enoki_mushroom", 3, 0.5],
+  ["greens", 1, 0.2],
+  ["cooked_greens", 3, 0.5],
+  ["lotus_root", 2, 0.3],
+  ["lotus_root_slice", 1, 0.2],
+  ["cooked_lotus_root_slice", 3, 0.6],
+  ["raw_squid", 2, 0.2],
+  ["squid_roll", 1, 0.2],
+  ["cooked_squid_roll", 4, 0.6],
+  ["egg_fried_rice", 7, 0.8],
+  ["zhe_er_gen", 1, 0.15],
+  ["zhe_er_gen_slice", 1, 0.15],
+  ["cooked_zhe_er_gen_slice", 3, 0.5],
+  ["minced_zhe_er_gen", 1, 0.1],
+  ["tomato", 2, 0.3],
+  ["chili_pepper", 1, 0.1],
+  ["cooked_kelp", 2, 0.3],
+  ["hot_tofu_cube", 2, 0.6],
+  ["beef_meatball", 1, 0.3],
+  ["pork_meatball", 1, 0.3],
+  ["mutton_meatball", 1, 0.3],
+  ["fish_ball", 1, 0.3],
+  ["cilantro_beef_meatball", 1, 0.3],
+  ["cilantro_pork_meatball", 1, 0.3],
+  ["cilantro_mutton_meatball", 1, 0.3],
+  ["cilantro_fish_ball", 1, 0.3],
+  ["cooked_beef_meatball", 3, 0.6],
+  ["cooked_pork_meatball", 3, 0.6],
+  ["cooked_mutton_meatball", 3, 0.6],
+  ["cooked_fish_ball", 3, 0.6],
+  ["cooked_cilantro_beef_meatball", 4, 0.6],
+  ["cooked_cilantro_pork_meatball", 4, 0.6],
+  ["cooked_cilantro_mutton_meatball", 4, 0.6],
+  ["cooked_cilantro_fish_ball", 4, 0.6],
+  ["scallion", 1, 0.1],
+  ["cilantro", 1, 0.1],
+];
+const CF_SOUPS = [["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["spicy", "红汤"],
+  ["tomato", "番茄汤"], ["three_fresh", "三鲜汤"]];
+const CF_SOUP_SPEED = { clear: 1.0, rich_stock: 0.85, mushroom: 1.15, spicy: 1.3, tomato: 1.1, three_fresh: 1.0 };
+const CF_FUELS = [["wood", "柴火", 0.65, 300], ["coal", "煤炭", 1.0, 1600], ["lava", "岩浆", 1.6, 20000]];
+const CF_SEASONINGS = [["msg", "味精", 0, 0, 2], ["chili_oil", "辣油", 200, 0, 0], ["sweet_sour_sauce", "酸甜酱", 200, 0, 0],
+  ["honey", "蜂蜜", 0, 0, 0], ["sesame_oil", "香油", 100, 0, 0], ["vinegar", "醋", 0, 0, 0], ["sugar", "白糖", 200, 0, 0],
+  ["chopped_scallion", "葱花", 0, 0, 0], ["minced_cilantro", "香菜碎末", 0, 0, 0], ["garlic_paste", "蒜泥", 160, 0, 0],
+  ["oyster_sauce", "蚝油", 200, 0, 0], ["sesame_paste", "芝麻酱", 200, 0, 0], ["crushed_peanuts", "花生碎", 200, 0, 0],
+  ["millet_chili", "小米辣", 160, 0, 0], ["minced_zhe_er_gen", "折耳根碎", 200, 0, 0]];
+const CF_BOWL_KEYS = ["hunger", "saturation", "duration", "amplifier", "second_duration", "second_amplifier",
+  "fire_duration", "fire_amplifier", "hunger_duration", "hunger_amplifier"];
+// 汤碗默认值（= SoupBase 里 rememberSoupBowl 的参数，顺序同 CF_BOWL_KEYS）
+const CF_BOWLS = [
+  ["clear", [4, 0.6, 300, 0, 1, 0, 0, 0, 0, 0]],
+  ["rich_stock", [4, 0.9, 300, 0, 600, 0, 0, 0, 0, 0]],
+  ["mushroom", [4, 0.6, 200, 0, 0, 0, 0, 0, 0, 0]],
+  ["spicy", [4, 0.6, 120, 0, 120, 0, 300, 0, 120, 0]],
+  ["tomato", [4, 0.6, 300, 0, 0, 0, 0, 0, 0, 0]],
+  ["three_fresh", [4, 0.9, 400, 0, 600, 0, 0, 0, 0, 0]],
+];
+const CF_DRINKS = [["orange_drink", "橙子饮料", 300, 0], ["plant_protein_drink", "植物蛋白饮料", 300, 0],
+  ["orient_cola", "之晗可乐", 300, 0]];
+// 高级页的分组（= Java sections()）
+function cfGroupDefs() {
+  const unitOf = (k2) => k2 === "saturation" ? "" : k2.endsWith("amplifier") ? "level" : k2 === "hunger" ? "point" : "tick";
+  const rangeOf = (k2) => k2 === "saturation" ? [0, 10, 0.05] : k2.endsWith("amplifier") ? [0, 9, 1]
+    : k2 === "hunger" ? [0, 100, 1] : [0, 100000, 20];
+  return [
+    { id: "cooking", title: "涮煮时间", fields: [
+      { path: ["cooking", "fallback_ticks"], name: "涮煮兜底时间", def: 200, min: 1, max: 100000, step: 10, unit: "tick", help: "fallback_ticks" },
+      { path: ["cooking", "fallback_xp"], name: "无配方出锅经验", def: 0.15, min: 0, max: 100, step: 0.05, unit: "point", help: "fallback_xp" },
+      { path: ["cooking", "xp_per_item"], name: "有配方出锅经验下限", def: 0.7, min: 0, max: 100, step: 0.05, unit: "point", help: "xp_per_item" },
+      { path: ["cooking", "tofu_cook_ticks"], name: "冷豆腐煮熟刻数", def: 200, min: 1, max: 100000, step: 10, unit: "tick", help: "tofu_cook_ticks" },
+      { path: ["cooking", "tofu_overcook_ticks"], name: "豆腐煮过头刻数", def: 600, min: 1, max: 100000, step: 10, unit: "tick", help: "tofu_overcook_ticks" },
+    ] },
+    { id: "items", title: "食材涮煮时间", fields: CF_ITEMS.map(([id, ticks]) => ({
+      path: ["cooking", "items", id], name: id + " · 涮煮刻数", def: ticks, min: 1, max: 100000, step: 20,
+      unit: "tick", item: NS + ":" + id, help: "cook_ticks" })) },
+    { id: "soup", title: "汤底加热倍率", fields: CF_SOUPS.map(([id, name]) => ({
+      path: ["soup_speed", id], name: name + "锅底 · 加热倍率", def: CF_SOUP_SPEED[id], min: 0.1, max: 10,
+      step: 0.05, unit: "multiplier", help: "speed" })) },
+    { id: "fuel", title: "燃料档位", fields: CF_FUELS.flatMap(([id, name, power, burn]) => [
+      { path: ["fuel", id, "power"], name: name + " · 灶火功率", def: power, min: 0.1, max: 10, step: 0.05, unit: "multiplier", help: "power" },
+      { path: ["fuel", id, "burn_ticks"], name: name + " · 联动时长", def: burn, min: 0, max: 100000, step: 200, unit: "tick", help: "burn_ticks" },
+    ]) },
+    { id: "bowl", title: "汤碗", fields: CF_BOWLS.flatMap(([id, defaults]) => CF_BOWL_KEYS.map((key, i) => {
+      const r = rangeOf(key);
+      return { path: ["soup_bowl", id, key], name: CF_SOUPS.find((x) => x[0] === id)[1] + " · " + key,
+        def: defaults[i], min: r[0], max: r[1], step: r[2], unit: unitOf(key), help: key };
+    })) },
+    { id: "seasoning", title: "蘸料", fields: CF_SEASONINGS.flatMap(([id, name, dur, amp, hunger]) => id === "msg"
+      ? [{ path: ["seasoning", id, "hunger"], name: name + " · 额外饥饿", def: hunger, min: 0, max: 100, step: 1, unit: "point", help: "hunger" }]
+      : [{ path: ["seasoning", id, "duration"], name: name + " · 持续", def: dur, min: 0, max: 100000, step: 20, unit: "tick", help: "duration" },
+         { path: ["seasoning", id, "amplifier"], name: name + " · 等级", def: amp, min: 0, max: 9, step: 1, unit: "level", help: "amplifier" }]) },
+    { id: "drink", title: "饮料", fields: [
+      { path: ["drink", "sip", "hunger"], name: "每口饥饿点数", def: 2, min: 0, max: 100, step: 1, unit: "point", help: "sip_hunger" },
+      { path: ["drink", "sip", "saturation"], name: "每口饱和系数", def: 0.3, min: 0, max: 10, step: 0.05, unit: "", help: "sip_saturation" },
+    ].concat(CF_DRINKS.flatMap(([id, name, dur, amp]) => [
+      { path: ["drink", id, "duration"], name: name + " · 效果时长", def: dur, min: 0, max: 100000, step: 20, unit: "tick", help: "duration" },
+      { path: ["drink", id, "amplifier"], name: name + " · 效果等级", def: amp, min: 0, max: 9, step: 1, unit: "level", help: "amplifier" },
+    ])) },
+    { id: "food", title: "食物营养", fields: CF_FOODS.flatMap(([id, hunger, sat]) => [
+      { path: ["food", id, "hunger"], name: id + " · 饥饿点数", def: hunger, min: 0, max: 100, step: 1, unit: "point", item: NS + ":" + id, help: "hunger" },
+      { path: ["food", id, "saturation"], name: id + " · 饱和系数", def: sat, min: 0, max: 10, step: 0.05, unit: "", item: NS + ":" + id, help: "saturation" },
+    ]) },
+  ];
+}
+const cfFieldKey = (f) => f.path.join(".");
+// Java formatValue：整数项不留小数，小数项去掉尾零
+function cfFormat(f, v) {
+  let s = (Math.round(v * 100) / 100).toFixed(f.step < 1 ? 2 : 0);
+  if (s.indexOf(".") >= 0) s = s.replace(/0+$/, "").replace(/[.]$/, "");
+  return s;
+}
+// Java parse()：不是数字 / 不是整数 / 超范围都不合法
+function cfParse(f, text) {
+  const t = String(text == null ? "" : text).trim();
+  if (!t || !/^-?[0-9]+([.][0-9]+)?$/.test(t)) return null;
+  const v = Number(t);
+  if (!isFinite(v)) return null;
+  if (f.step >= 1 && Math.abs(v - Math.round(v)) > 1e-6) return null;
+  return v < f.min - 1e-6 || v > f.max + 1e-6 ? null : v;
+}
+function cfState(s) {
+  if (!s.values) s.values = {};
+  if (!s.bad) s.bad = {};
+  if (!s.expanded) s.expanded = [];
+  if (!s.tab) s.tab = "common";
+  if (s.particles == null) s.particles = 100;
+  return s;
+}
+function cfValue(s, f) {
+  const key = cfFieldKey(f);
+  return key in s.values ? s.values[key] : f.def;
+}
+// 单位字：语言文件里还没有这个键时不显示（网页先看得懂就行，游戏里是翻译好的）
+function cfUnit(g, f) {
+  const key = CF_UNIT[f.unit];
+  if (!key) return "";
+  const text = g.tr(CF_KEY(key));
+  return text === CF_KEY(key) ? "" : text;
+}
+function cfValueText(g, s, f, width) {
+  const v = cfValue(s, f);
+  const num = cfFormat(f, v);
+  const unit = cfUnit(g, f);
+  const base = unit ? num + " " + unit : num;
+  if (f.unit === "tick" && v >= 20) {
+    const both = base + " (" + (v / 20).toFixed(1) + " 秒)";
+    if (g.width(both) <= width - 6) return both;
+  }
+  return base;
+}
+// 一行的名字：和 Java 完全一致，只画名字（不追加配置键——追加会撑爆行宽、和 Java 也对不上）；
+// 配置键放在悬停提示里，照样能回配置文件对位置。
+function cfLabel(f) {
+  return f.name;
+}
+// 数值框宽度：画布很窄时先压缩它（= Java valueWidth()）
+function cfValueWidth(w) {
+  const listW = w - 20 - CF.SCROLL_W - 4;
+  const fixed = 2 * CF.BTN + 3 * CF.CTRL_GAP + CF.RESET_W;
+  // = Java valueWidth()：名字区至少留 96 像素（2026-11-09 r146a 修）
+  return Math.max(56, Math.min(CF.VALUE_W, listW - 10 - 96 - fixed));
+}
+function cfLabelWidth(w) {
+  const controls = CF.BTN + CF.CTRL_GAP + cfValueWidth(w) + CF.CTRL_GAP + CF.BTN + CF.CTRL_GAP + CF.RESET_W;
+  return Math.max(60, w - 20 - CF.SCROLL_W - 4 - 10 - controls);
+}
+function cfLayout(g, s, w) {
+  const labelW = cfLabelWidth(w);
+  const out = [];
+  const push = (f) => {
+    if (!s._fields) s._fields = {};
+    s._fields[cfFieldKey(f)] = f;
+    const name = cfLabel(f);
+    const lines = g.width(name) <= labelW ? [name] : g.wrap(name, labelW);
+    out.push({ kind: "row", f, lines, h: Math.max(CF.ROW_MIN_H, lines.length * 10 + 10) });
+  };
+  s._fields = {};
+  if (s.tab === "common") CF_COMMON.forEach(push);
+  else {
+    if (!s._groups) s._groups = cfGroupDefs();
+    s._groups.forEach((grp) => {
+      out.push({ kind: "header", grp, h: CF.HEADER_H });
+      if (s.expanded.indexOf(grp.id) >= 0) grp.fields.forEach(push);
+    });
+  }
+  return out;
+}
+// 列表上边界跟着页签走（= Java applyTab() 里的 listTop）：
+// 常用页上面有粒子滑块（48..68）+ 提示（70）+ 快捷档（68..80），列表从 88 起；高级页直接从 48 起。
+// 2026-11-09 r146a 修：以前写死 CF.LIST_TOP=60，常用页第一行会压在快捷档上。
+function cfListArea(s) {
+  // 常用页：滑块 48..68 + 提示 70 + 快捷档 83..95，列表从 100 起（= Java listTop = contentTop + 52）
+  const top = s && s.tab === "advanced" ? 48 : 100;
+  const bottom = CF.H - CF.BOTTOM_H - 10;
+  return { top, bottom, view: Math.max(1, bottom - top) };
+}
+function cfIn(mouse, x, y, w, h) {
+  return !!mouse && mouse[0] >= x && mouse[0] < x + w && mouse[1] >= y && mouse[1] < y + h;
+}
+function cfCentre(g, text, cx, y, color, shadow) {
+  g.text(text, cx - g.width(text) / 2, y, color, shadow !== false);
+}
+// 超宽就等比缩小（= Java drawFitted）
+function cfFit(g, text, cx, y, max, color) {
+  if (g.width(text) <= max) { cfCentre(g, text, cx, y, color); return; }
+  const k = Math.max(0.6, max / g.width(text));
+  g.textScaled(text, cx - (g.width(text) * k) / 2, y + (1 - k) * 4, k, color, true);
+}
+function cfHeaderRow(g, s, el, lx, y, lw, mouse) {
+  const open = s.expanded.indexOf(el.grp.id) >= 0;
+  const hover = cfIn(mouse, lx, y, lw, el.h);
+  g.fill(lx, y, lx + lw, y + el.h - 1, hover ? 0x30b47a1c : 0x204a2e12);
+  g.fill(lx, y + el.h - 1, lx + lw, y + el.h, BRASS_DARK);
+  g.text((open ? "\u25BE " : "\u25B8 ") + el.grp.title + "  (" + el.grp.fields.length + ")", lx + 6,
+    y + (el.h - 8) / 2, TITLE, true);
+  s._acts.push({ x: lx, y, w: lw, h: el.h, run: () => {
+    if (open) s.expanded = s.expanded.filter((id) => id !== el.grp.id);
+    else s.expanded = s.expanded.concat([el.grp.id]);
+    s._tip = (open ? "收起 " : "展开 ") + el.grp.title;
+  } });
+}
+function cfFieldRow(g, s, el, lx, y, lw, mouse) {
+  const f = el.f, key = cfFieldKey(f);
+  const area = cfListArea(s);
+  const hover = cfIn(mouse, lx, y, lw, el.h);
+  g.fill(lx, y, lx + lw, y + el.h - 1, hover ? 0x30ffffff : CF_COL.stripe);
+  let labelX = lx + 6;
+  const icon = f.item ? g.icons.get(f.item) : null;
+  if (icon) {
+    g.g.drawImage(icon, (g.ox + lx + 3) * g.s, (g.oy + y + (el.h - 16) / 2) * g.s, 16 * g.s, 16 * g.s);
+    labelX = lx + 24;
+  }
+  let textY = y + Math.floor((el.h - el.lines.length * 10) / 2);
+  for (const line of el.lines) { g.text(line, labelX, textY, CF_COL.text); textY += 10; }
+  const vw = cfValueWidth(CF.W);
+  const resetX = lx + lw - 6 - CF.RESET_W;
+  const plusX = resetX - CF.CTRL_GAP - CF.BTN;
+  const valueX = plusX - CF.CTRL_GAP - vw;
+  const minusX = valueX - CF.CTRL_GAP - CF.BTN;
+  const by = y + Math.floor((el.h - CF.BTN) / 2);
+  const visible = (yy, hh) => yy >= area.top && yy + hh <= area.bottom;
+  [[minusX, "-", -1], [plusX, "+", 1]].forEach(([bx, mark, dir]) => {
+    const hot = cfIn(mouse, bx, by, CF.BTN, CF.BTN);
+    g.fill(bx, by, bx + CF.BTN, by + CF.BTN, hot ? CF_COL.hover : CF_COL.panel);
+    g.fill(bx, by, bx + CF.BTN, by + 1, BRASS);
+    cfCentre(g, mark, bx + CF.BTN / 2, by + 4, hot ? TITLE : CF_COL.text);
+    if (!visible(by, CF.BTN)) return;
+    s._acts.push({ x: bx, y: by, w: CF.BTN, h: CF.BTN, run: () => {
+      const step = f.step * (s.shift === "on" ? 10 : 1) * dir;
+      s.values[key] = Math.round(Math.max(f.min, Math.min(f.max, cfValue(s, f) + step)) * 100) / 100;
+      delete s.bad[key];
+      s.editing = null;
+      s._tip = f.name + "：" + cfFormat(f, s.values[key]) + (s.shift === "on" ? "（Shift 按着，一次 10 步）" : "");
+    } });
+  });
+  const valueY = y + Math.floor((el.h - 16) / 2);
+  const vHover = cfIn(mouse, valueX, valueY, vw, 16);
+  const editing = s.editing === key;
+  g.fill(valueX, valueY, valueX + vw, valueY + 16,
+    editing ? CF_COL.typedBg : (vHover ? CF_COL.valueBgHover : CF_COL.valueBg));
+  g.fill(valueX, valueY, valueX + vw, valueY + 1, vHover || editing ? BRASS_HI : BRASS_DARK);
+  if (editing) {
+    // 正在键入：把玩家敲的原文画在框里，不合法的标红（Java 里是 EditBox 的文字色）
+    const typed = String(s.typed == null ? "" : s.typed);
+    const ok = cfParse(f, typed) != null;
+    cfCentre(g, typed + "|", valueX + vw / 2, valueY + 4, ok ? TITLE : CF_COL.bad);
+  } else if (s.bad[key] != null) {
+    cfCentre(g, s.bad[key], valueX + vw / 2, valueY + 4, CF_COL.bad);
+  } else {
+    cfCentre(g, cfValueText(g, s, f, vw), valueX + vw / 2, valueY + 4, RIVET);
+  }
+  if (visible(valueY, 16)) {
+    s._acts.push({ x: valueX, y: valueY, w: vw, h: 16, run: () => {
+      s.editing = key;
+      s.typed = key in s.bad ? s.bad[key] : cfFormat(f, cfValue(s, f));
+    } });
+  }
+  // ↺：只在当前值 ≠ 默认值（或输错了）时出现（= Java drawFieldControls）
+  if (Math.abs(cfValue(s, f) - f.def) >= 5e-4 || s.bad[key] != null) {
+    const hot = cfIn(mouse, resetX, by, CF.RESET_W, CF.BTN);
+    g.fill(resetX, by, resetX + CF.RESET_W, by + CF.BTN, hot ? CF_COL.hover : CF_COL.panel);
+    g.fill(resetX, by, resetX + CF.RESET_W, by + 1, BRASS);
+    cfCentre(g, "\u21BA", resetX + CF.RESET_W / 2, by + 3, hot ? TITLE : CF_COL.muted);
+    if (visible(by, CF.BTN)) {
+      s._acts.push({ x: resetX, y: by, w: CF.RESET_W, h: CF.BTN, run: () => {
+        s.values[key] = f.def;
+        delete s.bad[key];
+        s.editing = null;
+        s._tip = "只恢复这一项：" + f.name + " = " + cfFormat(f, f.def);
+      } });
+    }
+  }
+  if (hover && !editing) {
+    // 悬停说明 = 一句白话（管什么）+ 范围 / 默认值（= Java tooltipFor 的两行）
+    const help = CF_HELP[f.help] || "";
+    s._tips = [help, f.name + "｜范围 " + cfFormat(f, f.min) + "～" + cfFormat(f, f.max) + "，默认 " + cfFormat(f, f.def),
+      "配置键：" + cfFieldKey(f)]
+      .filter(Boolean);
+  }
+}
+
+const configScreen = {
+  id: "config",
+  name: "设置界面",
+  blocks: [],
+  open: "主菜单 Mods → 选中本模组 → 「Config」按钮（Fabric 装 Mod Menu 后同样从这里进）。打开默认在「常用」页；"
+    + "点上方「高级」切页，点分组标题展开 / 收起；每行 [- 数值 +]，把「按住 Shift」选项切到「按着」再点 ± 就是一次 10 步；"
+    + "点数值框可以直接键入（输错标红、保存被拦，Esc 撤掉），行尾 ↺ 只在该项不是默认值时出现；"
+    + "底部「恢复默认」点一次变确认态、再点一次才生效。滚轮可以滚列表。预览里改的值只存在这个界面里，不写配置文件。",
+  size: [CF.W, CF.H],
+  textures: [],
+  params: [
+    { key: "tab", label: "页签", options: [["common", "常用"], ["advanced", "高级"]], default: "common" },
+    { key: "particles", label: "粒子强度", range: [0, 100, 5], default: 100 },
+    { key: "shift", label: "按住 Shift（± 一次 10 步）", options: [["off", "没按"], ["on", "按着"]], default: "off" },
+  ],
+  icons() {
+    const ids = new Set();
+    for (const [id] of CF_FOODS) ids.add(NS + ":" + id);
+    for (const [id] of CF_ITEMS) ids.add(NS + ":" + id);
+    return [...ids];
+  },
+  slots() { return []; },
+  background(g, s, w, h) {
+    cfState(s);
+    s._acts = [];
+    s._tips = null;
+    const tab = s.tab === "advanced" ? "advanced" : "common";
+    s.tab = tab;
+    frame(g, w, h, 1, true);
+    g.text(g.tr(CF_KEY("title")), 12, 7, TITLE, true);
+    g.fill(12, 19, w - 12, 20, BRASS_DARK);
+    // 页签：常用 / 高级
+    const startX = Math.floor((w - (CF.TAB_W * 2 + CF.TAB_GAP)) / 2);
+    [["common", "常用"], ["advanced", "高级"]].forEach(([id, label], i) => {
+      const x = startX + i * (CF.TAB_W + CF.TAB_GAP), y = 24;
+      const active = tab === id, hover = cfIn(s._mouse, x, y, CF.TAB_W, CF.TAB_H);
+      g.fill(x, y, x + CF.TAB_W, y + CF.TAB_H, active ? CF_COL.hover : (hover ? 0xff4a2e12 : CF_COL.panel));
+      g.fill(x, y, x + CF.TAB_W, y + 1, active ? BRASS_HI : BRASS);
+      if (active) g.fill(x, y + CF.TAB_H - 2, x + CF.TAB_W, y + CF.TAB_H, BRASS_HI);
+      const key = CF_KEY("tab." + id);
+      cfFit(g, g.tr(key) === key ? label : g.tr(key), x + CF.TAB_W / 2, y + 6, CF.TAB_W - 8,
+        active ? TITLE : CF_COL.text);
+      s._acts.push({ x, y, w: CF.TAB_W, h: CF.TAB_H, run: () => { s.tab = id; s._scroll = 0; s.editing = null; } });
+    });
+    s._slider = null;
+    if (tab === "common") {
+      // 粒子强度滑块 + 一行提示 + 右侧三个快捷档（= Java drawParticleBlock）
+      const sy = 48, hintY = sy + 22;
+      g.fill(10, sy, w - 10, sy + 20, BRASS_DARK);
+      g.fill(11, sy + 1, w - 11, sy + 19, CF_COL.panel);
+      const knobW = 10;
+      const ratio = Math.max(0, Math.min(1, Number(s.particles) / 100));
+      const knobX = 11 + Math.round(ratio * (w - 22 - knobW));
+      g.fill(knobX, sy + 2, knobX + knobW, sy + 18, BRASS);
+      g.fill(knobX, sy + 2, knobX + knobW, sy + 3, BRASS_HI);
+      const offKey = CF_KEY("particles.off");
+      const offText = g.tr(offKey);
+      cfCentre(g, Number(s.particles) <= 0
+        ? (offText === offKey ? "火锅粒子效果：已关闭 (0%)" : offText)
+        : "火锅粒子效果：" + s.particles + "%", w / 2, sy + 6, TITLE);
+      s._slider = { x: 11, w: w - 22, y: sy };
+      const hintKey = CF_KEY("common.hint");
+      const hintText = g.tr(hintKey);
+      // 提示独占一行、给满宽度；快捷档挪到下面一行右对齐（= Java drawParticleBlock，2026-11-09 r146a 修）
+      g.text(hintText === hintKey ? "控制灶口火苗、火星与汤面热气浓淡（仅本机生效）" : hintText,
+        12, hintY, CF_COL.muted, true);
+      const qw = Math.max(36, Math.min(64, Math.floor((w - 24) / 6)));
+      const percents = [0, 50, 100];
+      const quickTotal = percents.length * qw + (percents.length - 1) * 4;
+      const x0 = w - 10 - quickTotal;
+      percents.forEach((percent, i) => {
+        const x = x0 + i * (qw + 4), y = hintY + 13;
+        const chosen = Number(s.particles) === percent;
+        const hover = cfIn(s._mouse, x, y, qw, 12);
+        g.fill(x, y, x + qw, y + 12, chosen ? CF_COL.hover : (hover ? 0xff4a2e12 : CF_COL.panel));
+        g.fill(x, y, x + qw, y + 1, BRASS);
+        cfCentre(g, percent + "%", x + qw / 2, y + 2, chosen ? TITLE : CF_COL.text);
+        s._acts.push({ x, y, w: qw, h: 12, run: () => {
+          s.particles = percent;
+          s._tip = "粒子强度 " + percent + "%（仅本机生效）";
+        } });
+        if (hover) s._tip = "点一下直接切到 " + percent + "%（＝ Java 里的快捷档）";
+      });
+    }
+    // 列表（= Java drawList）
+    const area = cfListArea(s);
+    const elements = cfLayout(g, s, w);
+    const total = elements.reduce((n, e) => n + e.h, 4);
+    s._scroll = Math.max(0, Math.min(s._scroll || 0, total - area.view));
+    const lx = 10, lw = w - 20 - CF.SCROLL_W - 4;
+    g.enableScissor(lx, area.top, lx + lw + CF.SCROLL_W + 4, area.bottom);
+    let y = area.top - (s._scroll || 0);
+    for (const el of elements) {
+      if (y + el.h > area.top && y < area.bottom) {
+        if (el.kind === "header") cfHeaderRow(g, s, el, lx, y, lw, s._mouse);
+        else cfFieldRow(g, s, el, lx, y, lw, s._mouse);
+      }
+      y += el.h;
+      if (y > area.bottom) break;
+    }
+    g.disableScissor();
+    if (total > area.view) {
+      const thumbH = Math.max(12, Math.floor((area.view * area.view) / Math.max(1, total)));
+      const maxScroll = Math.max(1, total - area.view);
+      const thumbY = area.top + Math.floor(((area.view - thumbH) * (s._scroll || 0)) / maxScroll);
+      g.fill(lx + lw + 3, area.top, lx + lw + 3 + CF.SCROLL_W, area.top + area.view, 0x40ffffff);
+      g.fill(lx + lw + 3, thumbY, lx + lw + 3 + CF.SCROLL_W, thumbY + thumbH, BRASS);
+    }
+    // 底部三个按钮（= Java drawBottomBar；「恢复默认」点一次变确认态）
+    const gap = 6, btnW = Math.max(70, Math.min(150, Math.floor((w - 24 - gap * 2) / 3)));
+    const bx0 = Math.floor((w - (btnW * 3 + gap * 2)) / 2), by = h - CF.BOTTOM_H - 8;
+    s._resetAct = null;
+    [["save", "保存并生效"], ["reset", "恢复默认"], ["cancel", "取消"]].forEach(([id, label], i) => {
+      const x = bx0 + i * (btnW + gap);
+      const confirming = i === 1 && s._confirm === true;
+      const hover = cfIn(s._mouse, x, by, btnW, CF.BOTTOM_H);
+      g.fill(x, by, x + btnW, by + CF.BOTTOM_H, confirming ? 0x60b47a1c : (hover ? 0xff4a2e12 : CF_COL.panel));
+      g.fill(x, by, x + btnW, by + 1, confirming ? CF_COL.confirm : BRASS);
+      const key = CF_KEY(id);
+      const text = confirming ? "再点一次确认" : (g.tr(key) === key ? label : g.tr(key));
+      cfFit(g, text, x + btnW / 2, by + 6, btnW - 6, confirming ? CF_COL.confirm : CF_COL.text);
+      const act = { x, y: by, w: btnW, h: CF.BOTTOM_H, run: () => {
+        if (i === 0) {
+          if (Object.keys(s.bad).length) {
+            s._tip = "有 " + Object.keys(s.bad).length + " 项输错了（标红），改对之前不让保存";
+            return;
+          }
+          s._tip = "保存并生效：写回 config/orients_hotpot_chronicles.json 并热重载（预览里只演示，不写文件）";
+        } else if (i === 1) {
+          if (s._confirm === true) {
+            s._confirm = false;
+            s.values = {};
+            s.bad = {};
+            s.editing = null;
+            s.particles = 100;
+            s._tip = "已恢复全部默认值";
+          } else {
+            s._confirm = true;
+            s._tip = "再点一次「恢复默认」才会真的恢复";
+          }
+        } else {
+          s.values = {};
+          s.bad = {};
+          s.editing = null;
+          s._confirm = false;
+          s._tip = "取消：丢掉这次的改动，粒子强度退回进界面前的值";
+        }
+      } };
+      if (i === 1) s._resetAct = act;
+      s._acts.push(act);
+    });
+  },
+  foreground(g, s, w, h, slots, time, mouse) {
+    if (mouse) s._mouse = [mouse[0], mouse[1]];
+    const lines = s._tips || (s._tip ? [s._tip] : null);
+    if (lines && mouse) g.tooltip(lines, mouse[0], mouse[1], w, h);
+    s._tip = null;
+    s._tips = null;
+  },
+  // 点：先判滑块，再走这一帧画出来的命中表（Java 是同一套自绘命中表）
+  click(s, mx, my) {
+    cfState(s);
+    if (s._slider && my >= s._slider.y && my <= s._slider.y + 20
+      && mx >= s._slider.x && mx <= s._slider.x + s._slider.w) {
+      s.particles = Math.max(0, Math.min(100, Math.round(((mx - s._slider.x) / s._slider.w) * 100)));
+      s._tip = "粒子强度 " + s.particles + "%（仅本机生效）";
+      return true;
+    }
+    for (const act of s._acts || []) {
+      if (!cfIn([mx, my], act.x, act.y, act.w, act.h)) continue;
+      if (s.editing) {
+        // 点别处：先把这一项的输入结算掉（合法写进副本；不合法标红留着）
+        const f = s._fields ? s._fields[s.editing] : null;
+        if (f) {
+          const value = cfParse(f, s.typed);
+          if (value == null) s.bad[s.editing] = String(s.typed == null ? "" : s.typed);
+          else { s.values[s.editing] = value; delete s.bad[s.editing]; }
+        }
+        s.editing = null;
+      }
+      if (s._confirm && act !== s._resetAct) s._confirm = false;
+      act.run();
+      return true;
+    }
+    return false;
+  },
+  wheel(s, mx, my, dx, dy) {
+    const area = cfListArea(s);
+    if (my < area.top || my > area.bottom) return false;
+    s._scroll = Math.max(0, (s._scroll || 0) + Math.sign(dy || dx) * CF.SCROLL_STEP);
+    return true;
+  },
+  // 键入：数字、小数点、退格、回车确认、Esc 撤销（Java 走 EditBox，这里走 canvas 的 key 事件）
+  key(s, event) {
+    if (!s.editing) return false;
+    const f = s._fields ? s._fields[s.editing] : null;
+    if (!f) { s.editing = null; return true; }
+    const typed = String(s.typed == null ? "" : s.typed);
+    if (event.key === "Enter") {
+      const value = cfParse(f, typed);
+      if (value == null) s.bad[s.editing] = typed;
+      else { s.values[s.editing] = value; delete s.bad[s.editing]; }
+      s.editing = null;
+      s._tip = value == null ? "这一项输错了（要 " + cfFormat(f, f.min) + "～" + cfFormat(f, f.max) + "），改对之前不让保存"
+        : f.name + "：" + cfFormat(f, value);
+      return true;
+    }
+    if (event.key === "Escape") {
+      delete s.bad[s.editing];
+      s.editing = null;
+      s._tip = "撤销这一项的输入";
+      return true;
+    }
+    if (event.key === "Backspace") {
+      s.typed = typed.slice(0, -1);
+      return true;
+    }
+    if (/^[0-9.]$/.test(event.key) && !event.ctrlKey && !event.metaKey) {
+      s.typed = typed + event.key;
+      return true;
+    }
+    return true;   // 编辑中吞掉其余按键
+  },
+};
+
+export default [hotpot, stove, sauceOverview, sauceStation, guideBook, configScreen];

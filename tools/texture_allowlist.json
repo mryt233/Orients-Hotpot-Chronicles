@@ -89,5 +89,14 @@
   },
   "models/item/tomato_soup_bowl": {
     "gui_center": "待用户决定是否调整（2026-11-01 自检首次发现，未改动游戏内容）"
+  },
+  "models/armor/cloth_apron_layer_1": {
+    "unused": "布围裙三款的胸甲护甲层。贴图名由 ClothApronItem.Style.id() + HotPot.id(...) 在运行时拼给 ArmorMaterial.Layer，静态扫描读不到；款式枚举、材质注册、贴图文件三处一一对应，改款时三处一起改（r146b，mryt233 改）"
+  },
+  "models/armor/blue_print_cloth_apron_layer_1": {
+    "unused": "布围裙三款的胸甲护甲层。贴图名由 ClothApronItem.Style.id() + HotPot.id(...) 在运行时拼给 ArmorMaterial.Layer，静态扫描读不到；款式枚举、材质注册、贴图文件三处一一对应，改款时三处一起改（r146b，mryt233 改）"
+  },
+  "models/armor/brown_trim_cloth_apron_layer_1": {
+    "unused": "布围裙三款的胸甲护甲层。贴图名由 ClothApronItem.Style.id() + HotPot.id(...) 在运行时拼给 ArmorMaterial.Layer，静态扫描读不到；款式枚举、材质注册、贴图文件三处一一对应，改款时三处一起改（r146b，mryt233 改）"
   }
 }

@@ -37,6 +37,9 @@ public class PlateHolderBlockEntity extends BlockEntity {
         public double x;
         public double z;
         public Direction.Axis axis;
+        // mryt233 改（r146e）：筷尖四向与碗沿角度分别存档，角度遵循玩家 yaw（0=南）。
+        public Direction facing;
+        public float chopsticksYaw;
         public final NonNullList<ItemStack> items;
         /** 整件摆上来的东西（汤碗、橙子饮料、空瓶；r99）：拿起来原样还回去；空 = 盘子 / 装菜的碗。 */
         public ItemStack self = ItemStack.EMPTY;
@@ -48,8 +51,9 @@ public class PlateHolderBlockEntity extends BlockEntity {
          * 已经摆在桌上的筷子本身（{@link ChopstickRestBlock}）也不能再叠架第二双（r136b，2026-11-05 用户）。
          */
         public boolean restsChopsticks() {
+            // mryt233 改（r146a，2026-11-08）：芝麻酱 / 蚝油瓶和饮料瓶、杯子一样，瓶口太小，架不了筷子
             return !(plate instanceof DrinkBlock) && !(plate instanceof CupBlock)
-                && !(plate instanceof ChopstickRestBlock);
+                && !(plate instanceof ChopstickRestBlock) && !(plate instanceof SauceBottleBlock);
         }
 
         Placed(PlateBlock plate, double x, double z, Direction.Axis axis) {
@@ -57,15 +61,17 @@ public class PlateHolderBlockEntity extends BlockEntity {
             this.x = x;
             this.z = z;
             this.axis = axis;
+            this.facing = axis == Direction.Axis.Z ? Direction.SOUTH : Direction.EAST;
+            this.chopsticksYaw = axis == Direction.Axis.Z ? 135F : 45F;
             this.items = NonNullList.withSize(plate.size().capacity(), ItemStack.EMPTY);
         }
 
         public double halfX() {
-            return (axis == Direction.Axis.Z ? plate.size().width() : plate.size().length()) / 2;
+            return (axis == Direction.Axis.Z ? plate.footprintWidth() : plate.footprintLength()) / 2;
         }
 
         public double halfZ() {
-            return (axis == Direction.Axis.Z ? plate.size().length() : plate.size().width()) / 2;
+            return (axis == Direction.Axis.Z ? plate.footprintLength() : plate.footprintWidth()) / 2;
         }
 
         boolean overlaps(double ox, double oz, double hx, double hz) {
@@ -148,7 +154,17 @@ public class PlateHolderBlockEntity extends BlockEntity {
     /** keepSelf：整件摆上来（汤碗、橙子饮料），记着原来那件物品。 */
     public boolean tryAdd(PlateBlock plate, Direction.Axis axis, double hitX, double hitZ, ItemStack fromItem,
                           boolean keepSelf) {
+        return tryAdd(plate, axis, hitX, hitZ, fromItem, keepSelf,
+            axis == Direction.Axis.Z ? Direction.SOUTH : Direction.EAST);
+    }
+
+    /** mryt233 改：只有桌面竹筷的占地跟随筷尖朝向，普通餐具保持旧 axis。 */
+    public boolean tryAdd(PlateBlock plate, Direction.Axis axis, double hitX, double hitZ, ItemStack fromItem,
+                          boolean keepSelf, Direction facing) {
+        if (facing == null || !facing.getAxis().isHorizontal()) facing = Direction.EAST;
+        if (plate instanceof ChopstickRestBlock) axis = facing.getAxis();
         Placed p = new Placed(plate, 8, 8, axis);
+        p.facing = facing;
         double hx = p.halfX(), hz = p.halfZ();
         List<double[]> spots = new ArrayList<>();
         for (double x = hx; x <= 16 - hx + 1e-6; x += 0.5) {
@@ -205,12 +221,8 @@ public class PlateHolderBlockEntity extends BlockEntity {
         }
     }
 
-    /** 一个盘子（连盘里的菜）的形状，选中框只框准星对着的那个时用。 */
-    /**
-     * 摆在桌上的那双竹筷（连迷你筷架）占多高：迷你筷架 1.5 像素，筷子搁在上面再抬一点，
-     * 选中框和碰撞按 3.0 像素算，正好把筷架和筷子一起框住（r136b，2026-11-05 用户）。
-     */
-    public static final double TABLE_CHOPSTICKS_H = 3.0;
+    /** mryt233 改（r146e）：筷架最高 1.6，竹条最高约 1.74 像素；夹菜另计高度。 */
+    public static final double TABLE_CHOPSTICKS_H = 2.0; // mryt233 改：最高竹条约 1.74 像素，留到 2。
 
     /**
      * 摆着的这件有多高（像素）：一般按盘子大小；之晗可乐（原名 之晗可乐，2026-10-26 用户改名）的玻璃汽水瓶只有 11.75（2026-10-26）；
@@ -218,7 +230,12 @@ public class PlateHolderBlockEntity extends BlockEntity {
      */
     public static double heightOf(Placed p) {
         if (p.plate instanceof ChopstickRestBlock) {
-            return TABLE_CHOPSTICKS_H;
+            return TABLE_CHOPSTICKS_H + (Chopsticks.held(p.self).isEmpty() ? 0 : FOOD_H);
+        }
+        // mryt233 改（r146a，2026-11-08）：摆在桌上的芝麻酱 / 蚝油瓶按自己那种瓶子的高度算
+        // （芝麻酱矮罐 6 像素、蚝油细高瓶 8 像素，见 SauceBottleKind#bottleHeight）。
+        if (p.plate instanceof SauceBottleBlock) {
+            return SauceBottleBlock.heightOf(SauceBottleItem.kindOf(p.self));
         }
         DrinkKind kind = p.self.getItem() instanceof DrinkItem d ? d.kind()
             : p.self.getItem() instanceof EmptyBottleItem e ? e.kind() : null;
@@ -260,6 +277,8 @@ public class PlateHolderBlockEntity extends BlockEntity {
             c.putDouble("X", p.x);
             c.putDouble("Z", p.z);
             c.putString("Axis", p.axis.getSerializedName());
+            c.putString("Facing", p.facing.getSerializedName());
+            c.putFloat("ChopsticksYaw", p.chopsticksYaw);
             ContainerHelper.saveAllItems(c, p.items, registries);
             if (!p.self.isEmpty()) {
                 c.put("Self", p.self.save(registries));
@@ -285,6 +304,14 @@ public class PlateHolderBlockEntity extends BlockEntity {
             }
             Direction.Axis axis = "z".equals(c.getString("Axis")) ? Direction.Axis.Z : Direction.Axis.X;
             Placed p = new Placed(plate, c.getDouble("X"), c.getDouble("Z"), axis);
+            // mryt233 改：旧档缺字段或字段损坏，使用构造时按 axis 得到的默认值。
+            Direction facing = Direction.byName(c.getString("Facing"));
+            if (facing != null && facing.getAxis().isHorizontal()) p.facing = facing;
+            if (plate instanceof ChopstickRestBlock) p.axis = p.facing.getAxis();
+            if (c.contains("ChopsticksYaw", Tag.TAG_ANY_NUMERIC)) {
+                float yaw = c.getFloat("ChopsticksYaw");
+                if (Float.isFinite(yaw)) p.chopsticksYaw = ((yaw % 360F) + 360F) % 360F;
+            }
             ContainerHelper.loadAllItems(c, p.items, registries);
             if (c.contains("Self")) {
                 ItemStack parsed = ItemStack.parseOptional(registries, c.getCompound("Self"));

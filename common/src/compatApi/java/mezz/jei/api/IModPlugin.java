@@ -13,6 +13,9 @@ import net.minecraft.resources.ResourceLocation;
  * 作者：mryt233 */
 
 public interface IModPlugin {
+    // mryt233 改（r146f）：原料表占用区域注册签名。
+    default void registerGuiHandlers(mezz.jei.api.registration.IGuiHandlerRegistration registration) { }
+
     /** 插件唯一标识，必须全模组唯一。 */
     ResourceLocation getPluginUid();
 

@@ -151,6 +151,32 @@ What people fear most at a hotpot is hot oil and boiling broth splashing up — 
 
 {{recipe:cloth_apron}}
 
+### Three styles and recolouring {#apron_styles}{{since:0.2.2-alpha}}
+
+{{icons:cloth_apron,blue_print_cloth_apron,brown_trim_cloth_apron}}
+
+There are **three styles** of cloth apron. Their effect, durability, enchantability and repair materials are **identical** — only the fabric pattern differs:
+
+|| Style | Look |
+|| --- | --- |
+|| {{i:cloth_apron}} Linen Cloth Apron | **Plain linen**, the default |
+|| {{i:blue_print_cloth_apron}} Blue Print Cloth Apron | Indigo with tiny single-pixel white flowers |
+|| {{i:brown_trim_cloth_apron}} Brown Trim Cloth Apron | Linen with dark brown trim all round and a small pocket on the hem |
+
+**Recolouring**: in a crafting grid, **any style + a dye** (shapeless) turns it into another style —
+
+- any style + **white dye** → **linen**
+- any style + **blue dye** → **blue print**
+- any style + **brown dye** → **brown trim**
+
+Recolouring is the **same apron with a new look**: **durability, enchantments and any custom name are all kept**, and it only costs one dye. Adding the dye of the style it already is changes nothing (you get the apron back).
+
+{{recipe:cloth_apron,blue_print_cloth_apron,brown_trim_cloth_apron}}
+
+:::tip
+**How it looks when worn**: the apron sits close to the body and hangs from your chest **down to just above the knees**, one piece of cloth in front of both legs; when you walk, the hem swings forward with whichever leg steps out, and it lies flat on your lap when you sit. It only wraps a little around the sides; the **sleeves and back are transparent**, with just the neck strap showing behind your neck.
+:::
+
 Once you wear it:
 
 1. **Level 3 Extreme Spicy does not faze you**: eating a dish cooked in Level 3 (Extreme) spicy red broth, or drinking such a soup bowl, **no longer sets those 2 seconds of flame on your lips** (without the apron you still get them — they are pure spectacle and deal no damage).
@@ -166,15 +192,16 @@ Once you wear it:
 
 Chopsticks are the most commonly used tool in this mod:
 
+<!-- mryt233 改（r146e）：立体竹条、四向、沿口点击与中心放菜。清单#139 -->
 - **Open the hotpot screen:** hold bamboo chopsticks and **Shift + right-click the pot**.
 - **Pick up cooked food from the pot:** **right-click the pot directly** to pick up a cooked portion from the targeted cell (it will notify you if there is no cooked food in that cell).
-- **Pick up food from bowls and plates:** right-click a bowl or plate to pick up the last-added portion (you can see it at the chopstick tips while held).
-- **Add food to the pot:** right-click the pot while holding a **raw** ingredient to place it in the targeted large cell (into the pot).
-- **Eat:** while holding cooked food, **hold right-click** to eat it (aiming at the air, the pot, a bowl, or a plate all work). **You can eat even when full** (the hunger bar stays put, saturation is still added). Any dipping-sauce effects apply too.
-- **Put food back:** **sneak + right-click** a bowl or plate while holding food; the food goes back and the chopsticks stay in your hand.
+- **Pick up food from bowls and plates:** right-click a bowl or plate to pick up the last-added portion.
+- **Add food to the pot:** right-click the pot while holding a **raw** ingredient to place it in the pot.
+- **Eat:** while holding cooked food, **hold right-click** to eat it. **You can eat even when full** (the hunger bar stays put, saturation is still added). Any dipping-sauce effects apply too.
+- **Put food back:** **sneak + right-click the center of a bowl or plate** while holding food; the food goes back and the chopsticks stay in your hand.
 - **Dip:** right-click a sauce bowl on the table while holding food with chopsticks to take a dip; see [Dipping Sauces](sauce.html).
-- **Rest chopsticks on bowls and plates:** **Shift + right-click** a placed bowl or plate with **empty chopsticks** (if they hold food, the first press puts the food back and the next one rests them). The chopsticks rest across its rim. **Right-click with an empty hand** to retrieve them. Breaking the bowl drops the chopsticks too.
-- **Lay them straight on the tabletop**{{since:0.2.2-alpha}}: aim at an **empty spot on a hotpot table or tall hotpot table** and hold **Shift + right-click**. The chopsticks (and whatever they are holding) are placed on the table, and a dainty **white porcelain mini chopstick rest** appears under the tips — a small base with two slightly upturned ends and a shallow groove in the middle that keeps the tips off the tabletop. **Right-click** again or **break** the rest to take the chopsticks back; no extra rest item is dropped.
+- **Rest on bowl or plate rims (Development Preview):** **Shift + right-click the rim**; chopsticks rest pointing toward the center from whichever side you click, and chopsticks holding food will rest along with the food. When clicking the center of a bowl or plate, empty chopsticks rest on the side closest to the player based on player facing (chopsticks holding food will still place the food or dip first). The resting angle snaps to steps of 22.5°; **right-click with an empty hand** to retrieve the chopsticks, and breaking the bowl or plate drops the chopsticks too.
+- **Lay them straight on the tabletop**{{since:0.2.2-alpha}}: aim at an **empty spot on a hotpot table or tall hotpot table** and hold **Shift + right-click**; any held food is kept, and a white porcelain mini chopstick rest is added automatically. **Development Preview**: two straight bamboo sticks about 8.5 pixels long lie parallel with their tips resting across the white porcelain saddle and ends resting on the table; **tips point where you face, ends point toward you**, placeable in all four cardinal directions. They land on the nearest empty spot near the clicked position, occupying 9.5×4.5 pixels; a prompt appears if they don't fit without consuming items. **Right-click with an empty hand** or **mine** them to retrieve both the chopsticks and held food as they were, without dropping a separate chopstick rest.
 
 {{icons:bamboo_chopsticks,chopstick_rest}}
 

@@ -1,6 +1,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.client.compat.rei;
 
 import cn.blockforge.generated.orientshotpotchronicles.compat.HotPotRecipeViewerData;
+import cn.blockforge.generated.orientshotpotchronicles.compat.HotPotCompat;
+import cn.blockforge.generated.orientshotpotchronicles.client.SauceStationScreen;
+import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import me.shedaniel.math.Point;
@@ -34,6 +37,14 @@ import java.util.Locale;
  * 作者：mryt233 */
 @REIPluginClient
 public final class HotPotReiClientPlugin implements REIClientPlugin {
+    // mryt233 改（r146f）：已有配方插件同时登记动态原料表占用区。
+    @Override
+    public void registerScreens(ScreenRegistry registry) {
+        if (!HotPotCompat.isModLoaded("roughlyenoughitems")) return;
+        registry.exclusionZones().register(SauceStationScreen.class, screen -> screen.guideAreas().stream()
+            .map(area -> new Rectangle(area.getX(), area.getY(), area.getWidth(), area.getHeight())).toList());
+    }
+
     /** 火锅涮煮类别。 */
     public static final CategoryIdentifier<CookingDisplay> COOKING = CategoryIdentifier.of(HotPot.id("hotpot_cooking"));
     /** 砧板切配类别。 */

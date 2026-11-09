@@ -26,8 +26,11 @@ import net.minecraft.world.phys.Vec3;
  * /hpt aim &lt;方块&gt; &lt;小格&gt;             模拟客户端报「这格浮着的是第几小格」（筷子夹菜用）
  * /hpt use &lt;方块&gt; &lt;点击坐标&gt; &lt;潜行&gt;   假玩家主手右键（走原版 interactBlock，和真人一样先方块后物品）
  * /hpt eat                              假玩家把主手的东西「吃完」（筷子夹着菜时 = 按住右键吃完）
+ * /hpt sounds [clear]                   查看 / 清空实际下发给假玩家的声音包（mryt233 改 r146d）
+ * /hpt authorspick                      直接读取假玩家「作者推荐」的真实进度（mryt233 改 r146d）
  * /hpt show                             打印两只手的物品和组件、饥饿值、状态效果
  * /hpt join                             把假玩家真正挂进玩家列表（list / @a 能看到），之后 /recipe give、/give、/advancement 才测得了
+ * /hpt join progress                    使用普通服务端玩家配合空连接模拟，避开加载器禁止内置假玩家获得成就的限制（mryt233 改 r146d）
  * /hpt leave                            把假玩家从玩家列表里移除
  * /hpt recipe &lt;配方 ID&gt;              查一条配方在不在、产物是什么（不用玩家也能测）
  * </pre>
@@ -37,7 +40,10 @@ public final class DevTestCommands {
     }
 
     private static java.util.function.BiFunction<ServerLevel, com.mojang.authlib.GameProfile, ServerPlayer> playerFactory;
+    private static ServerPlayer progressPlayer;
     public static java.util.function.Supplier<net.minecraft.network.Connection> connectionFactory = DevFakeConnection::new;
+    // mryt233 改（r146e）：以四向真实交互取证，不直接往 NBT 填新字段冒充摆放。
+    private static float testYaw;
 
     public static void register(com.mojang.brigadier.CommandDispatcher<CommandSourceStack> dispatcher,
                                 net.minecraft.commands.CommandBuildContext registryAccess,
@@ -45,6 +51,28 @@ public final class DevTestCommands {
         playerFactory = factory;
         dispatcher.register(
             Commands.literal("hpt").requires(src -> src.hasPermission(2))
+                .then(Commands.literal("facing")
+                    .then(Commands.argument("yaw", com.mojang.brigadier.arguments.FloatArgumentType.floatArg())
+                        .executes(ctx -> {
+                            testYaw = com.mojang.brigadier.arguments.FloatArgumentType.getFloat(ctx, "yaw");
+                            return report(ctx, "facing=" + testYaw);
+                        })))
+                .then(Commands.literal("break")
+                    .then(Commands.argument("pos", BlockPosArgument.blockPos()).executes(ctx -> {
+                        var pos = BlockPosArgument.getBlockPos(ctx, "pos");
+                        var p = player(ctx);
+                        if (p.serverLevel().getBlockEntity(pos) instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlockEntity be) {
+                            cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlock.breakOne(p.serverLevel(), pos, be, p);
+                            return report(ctx, "remaining=" + be.plates().size());
+                        }
+                        return report(ctx, "no holder");
+                    })))
+                .then(Commands.literal("shape")
+                    .then(Commands.argument("pos", BlockPosArgument.blockPos()).executes(ctx -> {
+                        var pos = BlockPosArgument.getBlockPos(ctx, "pos");
+                        var world = ctx.getSource().getLevel();
+                        return report(ctx, "shape=" + world.getBlockState(pos).getCollisionShape(world, pos).bounds());
+                    })))
                 .then(Commands.literal("hold")
                     .then(Commands.argument("main", ItemArgument.item(registryAccess))
                         .executes(ctx -> hold(ctx, false))
@@ -60,12 +88,34 @@ public final class DevTestCommands {
                         .then(Commands.argument("slot", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 80))
                             .executes(DevTestCommands::aim))))
                 .then(Commands.literal("eat").executes(DevTestCommands::eat))
-                .then(Commands.literal("join").executes(DevTestCommands::join))
+                .then(Commands.literal("authorspick").executes(ctx -> {
+                    var advancement = ctx.getSource().getServer().getAdvancements().get(
+                        net.minecraft.resources.ResourceLocation.parse("orients_hotpot_chronicles:authors_pick"));
+                    return report(ctx, "authors_pick=" + (advancement != null
+                        && player(ctx).getAdvancements().getOrStartProgress(advancement).isDone()));
+                }))
+                .then(Commands.literal("sounds")
+                    .executes(ctx -> report(ctx, "sounds=" + DevFakeConnection.sounds()))
+                    .then(Commands.literal("clear").executes(ctx -> {
+                        DevFakeConnection.clearSounds();
+                        return report(ctx, "sounds cleared");
+                    })))
+                .then(Commands.literal("join").executes(DevTestCommands::join)
+                    .then(Commands.literal("progress").executes(DevTestCommands::joinProgress)))
                 .then(Commands.literal("leave").executes(DevTestCommands::leave))
                 .then(Commands.literal("recipe")
                     .then(Commands.argument("id", net.minecraft.commands.arguments.ResourceLocationArgument.id())
                         .executes(DevTestCommands::recipe)))
                 .then(Commands.literal("show").executes(DevTestCommands::show))
+                // mryt233 改（2026-11-09，r146b）：打印胸甲槽那件的「算不算布围裙」，
+                // 三款防烫 / 特辣不冒火都走 ClothApronItem.wornBy，这个答案就是判定结果。
+                .then(Commands.literal("apron").executes(DevTestCommands::apron))
+                // mryt233 改（2026-11-09，r146b）：照真实工作台构造输入、找配方、出产物——
+                // 用来验「布围裙换款保留耐久 / 附魔 / 自定义名字」。
+                .then(Commands.literal("craftwear")
+                    .then(Commands.argument("apron", ItemArgument.item(registryAccess))
+                        .then(Commands.argument("dye", ItemArgument.item(registryAccess))
+                            .executes(DevTestCommands::craftWear))))
                 .then(Commands.literal("modules").executes(ctx -> {
                     var host = cn.blockforge.generated.orientshotpotchronicles.HotpotContentModule.HOST;
                     return report(ctx, "modules order=" + host.order() + " declarations=" + host.declarations().size()
@@ -106,6 +156,9 @@ public final class DevTestCommands {
 
     private static ServerPlayer player(CommandContext<CommandSourceStack> ctx) {
         ServerLevel world = ctx.getSource().getServer().overworld();
+        if (progressPlayer != null && progressPlayer.serverLevel() == world) {
+            return progressPlayer;
+        }
         return playerFactory.apply(world, PROFILE);
     }
 
@@ -123,7 +176,9 @@ public final class DevTestCommands {
         BlockPos pos = BlockPosArgument.getBlockPos(ctx, "pos");
         Vec3 hit = Vec3Argument.getVec3(ctx, "hit");
         p.setShiftKeyDown(BoolArgumentType.getBool(ctx, "sneak"));
-        p.moveTo(hit.x, hit.y + 1.0, hit.z - 1.5, 0F, 30F);
+        double yaw = Math.toRadians(testYaw);
+        p.moveTo(hit.x + Math.sin(yaw) * 1.5, hit.y + 1.0 - p.getEyeHeight(), hit.z - Math.cos(yaw) * 1.5,
+            testYaw, (float)Math.toDegrees(Math.atan2(1, 1.5)));
         InteractionResult r = p.gameMode.useItemOn(p, p.serverLevel(), p.getMainHandItem(), InteractionHand.MAIN_HAND,
             new BlockHitResult(hit, Direction.UP, pos, false));
         String text = "use -> " + r;
@@ -142,6 +197,53 @@ public final class DevTestCommands {
         cn.blockforge.generated.orientshotpotchronicles.hotpot.ChopsticksAim.remember(player(ctx),
             BlockPosArgument.getBlockPos(ctx, "pos"), com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "slot"));
         return report(ctx, "aim ok");
+    }
+
+    /**
+     * /hpt apron：打印假玩家胸甲槽里的东西，以及「算不算布围裙」（= {@code ClothApronItem.wornBy}）。
+     * 三款防烫、变态辣不冒火，最终都落在这一个判断上。
+     */
+    private static int apron(CommandContext<CommandSourceStack> ctx) {
+        ServerPlayer p = player(ctx);
+        var chest = p.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST);
+        var hotpot = cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronItem.class;
+        boolean apron = cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronItem.isApron(chest);
+        boolean worn = cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronItem.wornBy(p);
+        return report(ctx, "apron | chest=" + net.minecraft.core.registries.BuiltInRegistries.ITEM
+            .getKey(chest.getItem()) + " | isApron=" + apron + " | wornBy=" + worn);
+    }
+
+    /**
+     * /hpt craftwear &lt;围裙物品&gt; &lt;染料物品&gt;：把这两样摆成 3×3 工作台的输入，按真实配方找一遍、
+     * 调 assemble 出产物，放进假玩家主手。用来验换款（耐久 / 附魔 / 自定义名字要保留）。
+     */
+    private static int craftWear(CommandContext<CommandSourceStack> ctx)
+            throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        ServerPlayer p = player(ctx);
+        // 用**手里真正拿着的那件**当围裙（带耐久 / 附魔 / 自定义名字），
+        // 只有手里不是对应物品时才照参数新建一件——这样测的就是真实换款路径
+        ItemStack wanted = ItemArgument.getItem(ctx, "apron").createItemStack(1, false);
+        ItemStack held = p.getItemInHand(InteractionHand.MAIN_HAND);
+        ItemStack apron = held.getItem() == wanted.getItem() ? held.copy() : wanted;
+        ItemStack dye = ItemArgument.getItem(ctx, "dye").createItemStack(1, false);
+        // 3×3 工作台必须给满 9 个格子（空位给空栈），只给 2 个会抛异常
+        java.util.List<ItemStack> slots = new java.util.ArrayList<>(9);
+        for (int i = 0; i < 9; i++) {
+            slots.add(ItemStack.EMPTY);
+        }
+        slots.set(0, apron);
+        slots.set(1, dye);
+        net.minecraft.world.item.crafting.CraftingInput input =
+            net.minecraft.world.item.crafting.CraftingInput.of(3, 3, slots);
+        var level = ctx.getSource().getServer().overworld();
+        var recipe = level.getRecipeManager()
+            .getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, input, level);
+        if (recipe.isEmpty()) {
+            return report(ctx, "craftwear 没有配得上这种组合的配方");
+        }
+        ItemStack out = recipe.get().value().assemble(input, level.registryAccess());
+        p.setItemInHand(InteractionHand.MAIN_HAND, out);
+        return report(ctx, "craftwear ok via " + recipe.get().id());
     }
 
     private static int eat(CommandContext<CommandSourceStack> ctx) {
@@ -211,6 +313,24 @@ public final class DevTestCommands {
         manager.placeNewPlayer(connectionFactory.get(), p,
             net.minecraft.server.network.CommonListenerCookie.createInitial(p.getGameProfile(), false));
         return report(ctx, "join ok");
+    }
+
+    /** mryt233 改（r146d）：成就测试走真正的进度监听；不手动授予成就，也不改加载器的假玩家策略。 */
+    private static int joinProgress(CommandContext<CommandSourceStack> ctx) {
+        var server = ctx.getSource().getServer();
+        if (progressPlayer == null || progressPlayer.serverLevel() != server.overworld()) {
+            if (server.getPlayerList().getPlayer(PROFILE.getId()) != null) {
+                return report(ctx, "join progress: 请先 hpt leave");
+            }
+            progressPlayer = new ServerPlayer(server, server.overworld(), PROFILE,
+                net.minecraft.server.level.ClientInformation.createDefault()) {
+                @Override
+                public void tick() {
+                    // 无真实客户端驱动移动，和开发假玩家一样保持静止。
+                }
+            };
+        }
+        return join(ctx);
     }
 
     private static int leave(CommandContext<CommandSourceStack> ctx) {

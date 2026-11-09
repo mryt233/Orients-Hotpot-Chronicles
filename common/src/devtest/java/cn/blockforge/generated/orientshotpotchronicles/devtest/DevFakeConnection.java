@@ -26,6 +26,23 @@ import java.net.SocketAddress;
  * 作者：mryt233 */
 class DevFakeConnection extends Connection {
     private static final SocketAddress ADDRESS = new InetSocketAddress("127.0.0.1", 0);
+    // mryt233 改（r146d）：开发服记录实际下发的声音包；限制条数，不进入发布包。
+    private static final java.util.List<String> SOUNDS = new java.util.ArrayList<>();
+
+    static void clearSounds() {
+        SOUNDS.clear();
+    }
+
+    static String sounds() {
+        return SOUNDS.toString();
+    }
+
+    private static void recordSound(Packet<?> packet) {
+        if (packet instanceof net.minecraft.network.protocol.game.ClientboundSoundPacket sound && SOUNDS.size() < 256) {
+            SOUNDS.add(sound.getSound().value().getLocation() + ":" + sound.getSource()
+                + ":" + sound.getVolume() + ":" + sound.getPitch());
+        }
+    }
 
     DevFakeConnection() {
         super(PacketFlow.SERVERBOUND);
@@ -33,15 +50,17 @@ class DevFakeConnection extends Connection {
 
     @Override
     public void send(Packet<?> packet) {
-        // 假玩家不需要收包
+        recordSound(packet);
     }
 
     @Override
     public void send(Packet<?> packet, @Nullable PacketSendListener callbacks) {
+        recordSound(packet);
     }
 
     @Override
     public void send(Packet<?> packet, @Nullable PacketSendListener callbacks, boolean flush) {
+        recordSound(packet);
     }
 
     @Override

@@ -124,6 +124,16 @@ public final class NeoForgeClient {
                 return custom;
             }
         }, item));
+        // mryt233 改（2026-11-09，r146g）：布围裙用自己的穿戴模型（垂到膝盖、贴身），见 ApronModel；
+        // 姿势和显示哪些部位由 NeoForge 从原版护甲模型拷过来，贴图仍是护甲材质那一层
+        event.registerItem(new IClientItemExtensions() {
+            @Override
+            public net.minecraft.client.model.HumanoidModel<?> getHumanoidArmorModel(
+                    net.minecraft.world.entity.LivingEntity entity, ItemStack stack,
+                    net.minecraft.world.entity.EquipmentSlot slot, net.minecraft.client.model.HumanoidModel<?> original) {
+                return ApronModel.get();
+            }
+        }, HotPotContent.CLOTH_APRONS.toArray(new net.minecraft.world.item.Item[0]));
         SharedClientSetup.registerItems();
     }
 

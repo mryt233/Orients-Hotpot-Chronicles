@@ -1,6 +1,10 @@
 package cn.blockforge.generated.orientshotpotchronicles.client.compat.jei;
 
 import cn.blockforge.generated.orientshotpotchronicles.compat.HotPotRecipeViewerData;
+import cn.blockforge.generated.orientshotpotchronicles.compat.HotPotCompat;
+import cn.blockforge.generated.orientshotpotchronicles.client.SauceStationScreen;
+import mezz.jei.api.registration.IGuiHandlerRegistration;
+import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import mezz.jei.api.IModPlugin;
@@ -83,6 +87,18 @@ public final class HotPotJeiPlugin implements IModPlugin {
         for (ItemStack catalyst : HotPotRecipeViewerData.poundingCatalysts()) {
             registration.addRecipeCatalyst(catalyst, POUNDING);
         }
+    }
+
+    // mryt233 改（r146f）：实时读取面板边界，关闭原料表后返回空区域。
+    @Override
+    public void registerGuiHandlers(IGuiHandlerRegistration registration) {
+        if (!HotPotCompat.isModLoaded("jei")) return;
+        registration.addGuiContainerHandler(SauceStationScreen.class, new IGuiContainerHandler<SauceStationScreen>() {
+            @Override
+            public java.util.List<net.minecraft.client.renderer.Rect2i> getGuiExtraAreas(SauceStationScreen screen) {
+                return screen.guideAreas();
+            }
+        });
     }
 
     /** 把刻数换算成「秒」的显示文本（一位小数，固定用点号）。 */

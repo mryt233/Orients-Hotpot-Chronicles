@@ -1443,6 +1443,14 @@
        "t": "方头中式菜刀，耐久 250，也能当武器（伤害 4）。"
       },
       {
+       "k": "note",
+       "t": "小提示",
+       "b": [
+        "朝向固定在贴图里：刀柄在左下↙、刀尖朝右上↗、锋刃朝右下↘，物品栏、拿在手里、火锅指南、网页教程和查看器四处完全一样，不再靠模型翻转；重跑贴图生成脚本也不会翻回去。拿在手里时刀刃会换到另一侧，和物品栏里看到的一致，属于预期效果。"
+       ],
+       "s": "tip"
+      },
+      {
        "k": "sub",
        "t": "◆ 擀面杖",
        "l": 3
@@ -2313,8 +2321,8 @@
       },
       {
        "k": "tr",
-       "icon": "minecraft:bowl",
-       "t": "打蘸料　拿一只碗（碗）右键台上有货的小碗，碗里就盛进一份调料，变成「蘸料」。",
+       "icon": "orients_hotpot_chronicles:sesame_paste",
+       "t": "芝麻酱、蚝油摆上桌　芝麻酱和蚝油除了拿来在蘸料台打蘸料，也能整瓶摆到桌上当摆设。",
        "go": [
         3,
         3
@@ -2323,10 +2331,19 @@
       {
        "k": "tr",
        "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
-       "t": "怎么蘸　有三种蘸法：",
+       "t": "打蘸料　拿一只碗（碗）右键台上有货的小碗，碗里就盛进一份调料，变成「蘸料」。",
        "go": [
         3,
         4
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:oak_sauce_station",
+       "t": "怎么蘸　有三种蘸法：",
+       "go": [
+        3,
+        5
        ]
       }
      ]
@@ -2409,7 +2426,7 @@
        "k": "note",
        "t": "小提示",
        "b": [
-        "小料变多了，帮助面板会自动分两列。 调料种类超过 10 种（现在一共 15 种）时，按「?」弹出的调料效果说明会从长长的一竖条改成整整齐齐的双列面板，左列放前 8 种、右列放后 7 种，一眼扫完不用往下滚。桌上只摆了 9 种以内的老存档还是原来的单列样子。"
+        "开发版预览：原料表改成单列翻页。 点「?」打开与主界面等宽的窄面板，名字和效果完整显示，放不下会换行；底部箭头或面板上的鼠标滚轮都能翻页，关闭再开仍记住上次页码。主界面与原料表整体居中，已安装的 JEI / REI 会避让这块区域。"
        ],
        "s": "tip"
       }
@@ -2556,7 +2573,56 @@
      ]
     },
     {
-     "icon": "minecraft:bowl",
+     "icon": "orients_hotpot_chronicles:sesame_paste",
+     "title": "芝麻酱、蚝油摆上桌",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:sesame_paste",
+        "orients_hotpot_chronicles:oyster_sauce"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "芝麻酱和蚝油除了拿来在蘸料台打蘸料，也能整瓶摆到桌上当摆设。"
+      },
+      {
+       "k": "num",
+       "t": "摆上桌：手持芝麻酱或蚝油，潜行 + 右键火锅桌 / 高火锅桌顶面的空位就放下——和竹筷、蘸料碗一样占一个盘子格，一格能混着摆。桌上会显示成对应的小立体瓶子：芝麻酱是带白标签的矮玻璃罐，蚝油是细高的深色瓶子。",
+       "n": 1,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "拿回来：空手右键桌上的瓶子就收回背包；对着瓶子挖也只挖这一瓶。挖掉桌子时，整格的餐具会一起掉出来。",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "只是摆设：摆在桌上的瓶子不能蘸酱、不能给菜加料。想给菜加上这一味，仍然和以前一样——去蘸料台打一碗蘸料（或者筷子夹着菜蘸桌上的蘸料碗）。",
+       "n": 3,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "瓶子本身还是能吃（饥饿值照旧），摆桌上只是好看。",
+       "n": 4,
+       "d": 0
+      },
+      {
+       "k": "note",
+       "t": "小提示",
+       "b": [
+        "一格里摆得下就挨着摆：芝麻酱、蚝油、蘸料碗、盘子可以混在一格里，桌上摆一排很有火锅店的样子。"
+       ],
+       "s": "tip"
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
      "title": "打蘸料",
      "blocks": [
       {
@@ -2615,7 +2681,7 @@
      ]
     },
     {
-     "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
+     "icon": "orients_hotpot_chronicles:oak_sauce_station",
      "title": "怎么蘸",
      "blocks": [
       {
@@ -3197,6 +3263,81 @@
        ]
       },
       {
+       "k": "sub",
+       "t": "◆ 三款花色与换款",
+       "l": 3
+      },
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:cloth_apron",
+        "orients_hotpot_chronicles:blue_print_cloth_apron",
+        "orients_hotpot_chronicles:brown_trim_cloth_apron"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "布围裙有三款，效果、耐久、附魔、修理材料完全一样，只是花布样子不同："
+      },
+      {
+       "k": "th",
+       "t": "款式　样子"
+      },
+      {
+       "k": "tr",
+       "t": "米白布围裙 布围裙　米白粗布，默认款",
+       "icon": "orients_hotpot_chronicles:cloth_apron"
+      },
+      {
+       "k": "tr",
+       "t": "蓝印花布围裙 蓝印花布围裙　靛蓝底、单像素的白色小碎花",
+       "icon": "orients_hotpot_chronicles:blue_print_cloth_apron"
+      },
+      {
+       "k": "tr",
+       "t": "棕边布围裙 棕边布围裙　米白底、整片深棕滚边，下摆上一个小口袋",
+       "icon": "orients_hotpot_chronicles:brown_trim_cloth_apron"
+      },
+      {
+       "k": "p",
+       "t": "换款：工作台里任意一款 + 染料（无序合成）就能换成另一款——"
+      },
+      {
+       "k": "bul",
+       "t": "「任意一款 + 白色染料」→ 米白款",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "「任意一款 + 蓝色染料」→ 蓝印花款",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "「任意一款 + 棕色染料」→ 棕边款",
+       "d": 0
+      },
+      {
+       "k": "p",
+       "t": "换款是同一件换个样子：耐久、附魔、自己改的名字全部保留，只花掉一份染料；同一款再加同色染料也不会浪费（原样还给你）。"
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:cloth_apron",
+        "orients_hotpot_chronicles:blue_print_cloth_apron",
+        "orients_hotpot_chronicles:brown_trim_cloth_apron"
+       ]
+      },
+      {
+       "k": "note",
+       "t": "小提示",
+       "b": [
+        "穿在身上的样子：围裙贴身，从胸口一直垂到膝盖上面，整片布挡在两条腿前面；走路时哪条腿往前迈，下摆就跟着往前摆，坐下时平铺在腿上。侧面只包住一点边，袖子和后背是透明的，背后只有后颈下面一圈挂脖带。"
+       ],
+       "s": "tip"
+      },
+      {
        "k": "p",
        "t": "穿上它以后："
       },
@@ -3259,7 +3400,7 @@
       },
       {
        "k": "bul",
-       "t": "放回碗盘：夹着菜潜行右键碗或盘子，菜放回去，筷子留在手上。",
+       "t": "放回碗盘：夹着菜潜行右键碗心、盘心，菜放回去，筷子留在手上。",
        "d": 0
       },
       {
@@ -3269,12 +3410,12 @@
       },
       {
        "k": "bul",
-       "t": "架在碗沿、盘沿上：拿空竹筷 Shift + 右键桌上的碗或盘子（夹着菜时先放菜，再按一次才架），筷子就横躺在碗口上；空手右键把筷子拿回来。挖掉碗时筷子一起掉。",
+       "t": "架在碗沿、盘沿上（开发版预览）：Shift + 右键沿口，点哪侧就从哪侧架向中间，夹着菜也能连菜一起架。点在碗心、盘心时，空筷子按玩家朝向架在靠近自己的一侧（夹菜筷子仍先放菜 / 蘸料）。角度按 22.5° 一档对齐；空手右键拿回筷子，挖掉碗盘时筷子一起掉。",
        "d": 0
       },
       {
        "k": "bul",
-       "t": "直接摆在桌面上：对着火锅桌 / 高火锅桌顶面的空位按住 Shift + 右键，筷子和夹着的菜一起摆到桌上，而且筷尖下面会自动垫起一只精致的白瓷迷你筷架——下面一小块底座，两头微微翘起挡住筷子，中间一道浅凹槽刚好把筷尖搁住，不会被桌面蹭脏。右键或挖掉就把竹筷原样收回来，不会额外掉出筷架物品。",
+       "t": "直接摆在桌面上：拿竹筷对火锅桌 / 高火锅桌顶面空位 Shift + 右键，夹着的菜一起保留，自动带一只白瓷迷你筷架。开发版预览：两根约 8.5 像素的笔直竹条平行摆放，筷尖横搭白瓷鞍谷，尾端落桌；筷尖朝自己面朝的方向，尾端靠自己，东南西北四向可摆。以点击位置附近最近空位落下，占地 9.5×4.5 像素；放不下会提示，不扣物品。空手右键或挖掉原样取回竹筷与夹菜，不单独掉筷架。",
        "d": 0
       },
       {
@@ -4090,6 +4231,28 @@
      "blocks": [
       {
        "k": "sub",
+       "t": "蓝印花布围裙",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:blue_print_cloth_apron"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "棕边布围裙",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:brown_trim_cloth_apron"
+       ]
+      },
+      {
+       "k": "sub",
        "t": "香菜丸子（4 种）",
        "l": 3
       },
@@ -4104,12 +4267,13 @@
       },
       {
        "k": "sub",
-       "t": "布围裙",
+       "t": "米白布围裙（2 种）",
        "l": 3
       },
       {
        "k": "recipes",
        "ids": [
+        "orients_hotpot_chronicles:cloth_apron",
         "orients_hotpot_chronicles:cloth_apron"
        ]
       },
@@ -5234,7 +5398,7 @@
       },
       {
        "k": "sub",
-       "t": "食材（98 种）",
+       "t": "食材（100 种）",
        "l": 2
       },
       {
@@ -5254,8 +5418,18 @@
       },
       {
        "k": "tr",
+       "icon": "orients_hotpot_chronicles:blue_print_cloth_apron",
+       "t": "蓝印花布围裙　blue_print_cloth_apron"
+      },
+      {
+       "k": "tr",
        "icon": "orients_hotpot_chronicles:boiled_crispy_pork",
        "t": "煮酥肉　boiled_crispy_pork"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:brown_trim_cloth_apron",
+       "t": "棕边布围裙　brown_trim_cloth_apron"
       },
       {
        "k": "tr",
@@ -5295,7 +5469,7 @@
       {
        "k": "tr",
        "icon": "orients_hotpot_chronicles:cloth_apron",
-       "t": "布围裙　cloth_apron"
+       "t": "米白布围裙　cloth_apron"
       },
       {
        "k": "tr",

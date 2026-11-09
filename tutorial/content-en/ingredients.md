@@ -54,6 +54,10 @@ Craft these three tools before preparing ingredients:
 
 A square-tipped Chinese cleaver with 250 durability. **It also works as a weapon**, dealing four damage.
 
+:::tip
+**The orientation is baked into the texture**{{since:0.2.2-alpha}}: handle at the lower left, tip at the upper right, edge facing lower right. The inventory, the held item, the in-game Hotpot Guide, the web tutorial and the viewer all look **exactly the same**, because nothing flips the model any more — re-running the texture generator cannot flip it back either. When held in hand the blade ends up on the other side, matching the inventory icon; that is expected.
+:::
+
 ### Rolling Pin
 
 {{recipe:rolling_pin}}

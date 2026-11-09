@@ -281,6 +281,10 @@ def icon_path(i):
     p = os.path.join(bt.ICONS, fid.replace(":", "__") + ".png")
     if os.path.exists(p):
         return p
+    # mryt233 改（2026-11-09，r146b）：标签名（不一定是 «ns:name» 形式）找不到平面贴图，
+    # 直接返回 None，交给调用方报「缺图标」，别在这里 split 崩掉。
+    if fid.count(":") != 1:
+        return None
     ns, name = fid.split(":")
     for d in ([os.path.join(TEX, "item")] if ns == bt.MOD else [VANILLA_ITEM_TEX]):
         q = os.path.join(d, name + ".png")
@@ -481,6 +485,14 @@ def recipe_book_entries():
             src = ref_key(bt.ing_ref(r["ingredient"]))
             cutting.append({"cells": [src], "out": ikey(rid) + [bt.result_count(r)], "dev": dev, "mat": src})
             continue
+        # mryt233 改（2026-11-09，r146b）：布围裙换款配方（apron_recolor）字段是 apron / dye，
+        # 当成「两格无序」进合成表大全的「厨具与食材」段。
+        if t == "apron_recolor":
+            # cells 存的是 ing_ref 结果（(图标 id, 名字)），渲染时统一经 ref_key 转换一次
+            cells = [bt.ing_ref(r["apron"]), bt.ing_ref(r["dye"])]
+            groups.setdefault(base_of(rid.split(":")[1]), []).append(
+                {"rid": rid, "cells": cells, "count": bt.result_count(r), "dev": dev})
+            continue
         if not ("pattern" in r or "ingredients" in r):
             bt.warnings.append("看不懂的配方类型：%s" % k)
             continue
@@ -499,7 +511,10 @@ def recipe_book_entries():
             vs = groups[b]
             # 已发布的排前面（橡木打头），开发版的排后面
             vs.sort(key=lambda v: (v["dev"], 0 if v["rid"].split(":")[1].startswith("oak_") else 1, v["rid"]))
-            vary = [i for i in range(9) if len({(v["cells"][i] or (None,))[0] for v in vs}) > 1]
+            # mryt233 改（2026-11-09，r146b）：换款配方只有 2 格（围裙 + 染料），
+            # 轮换格数按各卡片实际格子数取最小值，免得越界。
+            n_cells = min(len(v["cells"]) for v in vs)
+            vary = [i for i in range(n_cells) if len({(v["cells"][i] or (None,))[0] for v in vs}) > 1]
             vj = []
             for v in vs:
                 mat = None if b in CHIP_BY_RESULT else next((v["cells"][i] for i in vary if v["cells"][i]), None)

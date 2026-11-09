@@ -12,7 +12,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run-dir", required=True, type=Path)
     parser.add_argument("id")
-    parser.add_argument("action", choices=("snapshot", "guide", "overview", "restock", "inventory", "creative", "aim", "close", "disconnect", "stop"))
+    parser.add_argument("action", choices=("snapshot", "world", "language", "resize", "sauce", "sauceinput", "guide", "overview", "restock", "inventory", "creative", "aim",
+                                           "config", "configset", "wear", "view", "camera", "observe", "walk", "pose", "input", "useblock", "close", "disconnect", "stop"))
     parser.add_argument("extra", nargs="*")
     args = parser.parse_args()
     folder = (ROOT / args.run_dir).resolve()
@@ -33,6 +34,10 @@ def main():
         except ValueError:
             parser.error("aim 参数必须是整数")
         payload.update(x=x, y=y, z=z, cell=cell)
+    # mryt233 改（2026-11-09，r146a）：configset 的参数（advanced / common / expand:N）走 extra 数组
+    # mryt233 改：合并实测增加真实按键与独立侧面跟拍输入。
+    if args.action in ("configset", "wear", "view", "camera", "resize", "sauceinput", "language", "observe", "walk", "pose", "input", "useblock"):
+        payload["extra"] = list(args.extra)
     request = folder / "hotpot-probe-request.json"
     temp = request.with_suffix(".tmp")
     temp.write_bytes(json.dumps(payload).encode())

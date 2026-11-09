@@ -119,6 +119,12 @@ public final class HotPotContent {
     /** 摆在桌上的玻璃杯（只带模型，2026-10-25）。 */
     public static final CupBlock CUP_BLOCK = reg().blocks().register(
         HotPot.id("cup"), new CupBlock());
+    // mryt233 改（r146a，2026-11-08）：芝麻酱 / 蚝油瓶也能摆上桌（用户第三项）。和饮料瓶、玻璃杯一样
+    // 只带模型、借「盘子格」摆，摆法见 SauceBottleBlock 与 SauceBottleItem。
+    // mryt233 改（r146c，2026-11-09）：瓶子只做摆设，桌上加料与每瓶次数已去掉。
+    /** 摆在桌上的芝麻酱 / 蚝油瓶（只带模型，r146a）。方块状态 kind 决定画哪种瓶子。 */
+    public static final SauceBottleBlock SAUCE_BOTTLE_BLOCK = reg().blocks().register(
+        HotPot.id("sauce_bottle"), new SauceBottleBlock());
     // mryt233 改（2026-11-05）：给并行任务 r136b 预留的方块引用——直接摆在桌上的竹筷（带迷你筷架，
     // 借用 PlateHolderBlock 摆放，方块类见 ChopstickRestBlock）。
     /** 直接摆在桌上的竹筷（带迷你筷架，借用 PlateHolderBlock 摆放，见 ChopstickRestBlock）。 */
@@ -299,9 +305,15 @@ public final class HotPotContent {
     /** 熟火腿肠片：火腿肠片再加热一次（2026-10-29 用户）。 */
     public static final Item COOKED_HAM_SAUSAGE_SLICE = foodItem("cooked_ham_sausage_slice", 2, 0.5F);
     // ---- mryt233 改（2026-11-06）：r137 新增 4 种蘸料原料与 10 组第二梯队火锅食材 ----
-    /** 蚝油、芝麻酱、花生、花生碎、小米辣（辣椒在砧板上切 1 刀出 2 份小米辣；花生用擀面杖敲 3 下出 2 份花生碎）。 */
-    public static final Item OYSTER_SAUCE = foodItem("oyster_sauce", 1, 0.2F);
-    public static final Item SESAME_PASTE = foodItem("sesame_paste", 2, 0.3F);
+    /**
+     * 蚝油、芝麻酱、花生、花生碎、小米辣（辣椒在砧板上切 1 刀出 2 份小米辣；花生用擀面杖敲 3 下出 2 份花生碎）。
+     * <p>mryt233 改（r146a，2026-11-08）：蚝油、芝麻酱改成 {@link SauceBottleItem}——ID、贴图、配方、
+     * 饥饿值都不变，多出「摆上桌」的玩法（用户第三项）。</p>
+     * <p>mryt233 改（r146c，2026-11-09）：摆上桌只是摆设，不能给菜加料（加这一味仍去蘸料台），也没有次数；
+     * 物品恢复成可正常堆叠。</p>
+     */
+    public static final SauceBottleItem OYSTER_SAUCE = sauceBottle(SauceBottleKind.OYSTER_SAUCE, 1, 0.2F);
+    public static final SauceBottleItem SESAME_PASTE = sauceBottle(SauceBottleKind.SESAME_PASTE, 2, 0.3F);
     public static final Item PEANUT = foodItem("peanut", 1, 0.2F);
     public static final Item CRUSHED_PEANUTS = foodItem("crushed_peanuts", 1, 0.2F);
     public static final Item MILLET_CHILI = foodItem("millet_chili", 1, 0.1F);
@@ -358,7 +370,19 @@ public final class HotPotContent {
      * ② 站在烧着的火锅 / 灶台旁不再被热油沸水溅到（热的灶台边不受伤、不点着）。</p>
      */
     public static final Item CLOTH_APRON = reg().items().register( HotPot.id("cloth_apron"),
-        new ClothApronItem());
+        new ClothApronItem(ClothApronItem.Style.LINEN));
+    // mryt233 改（2026-11-09，r146b）：另外两款布围裙（蓝印花 / 棕边带兜），数值与米白款完全一样，
+    // 只有护甲层贴图和名字不同；三款之间用工作台加染料互相换款（配方见 recipe/ 下的 apron_*_recolor.json）。
+    /** 蓝印花布围裙：靛蓝底 + 白色十字小花。 */
+    public static final Item BLUE_PRINT_CLOTH_APRON = reg().items().register(
+        HotPot.id("blue_print_cloth_apron"), new ClothApronItem(ClothApronItem.Style.BLUE_PRINT));
+    /** 棕边布围裙：米白底 + 深棕滚边 + 方框口袋。 */
+    public static final Item BROWN_TRIM_CLOTH_APRON = reg().items().register(
+        HotPot.id("brown_trim_cloth_apron"), new ClothApronItem(ClothApronItem.Style.BROWN_TRIM));
+
+    /** 三款布围裙（创造栏 / 换款配方 / 成就共用）。 */
+    public static final java.util.List<Item> CLOTH_APRONS = java.util.List.of(
+        CLOTH_APRON, BLUE_PRINT_CLOTH_APRON, BROWN_TRIM_CLOTH_APRON);
 
     // ==== tools/new_item.py：新物品的注册插在这行上面（mryt233 2026-11-01，别删这行）====
     /** 番茄（2026-10-25）：打草掉（GarnishLoot，同大蒜 15%），能吃；做番茄锅底料。 */
@@ -426,6 +450,16 @@ public final class HotPotContent {
         return reg().items().register( HotPot.id(id),
             new ConfiguredFoodItem(id, new Item.Properties().food(new net.minecraft.world.food.FoodProperties.Builder()
                 .nutrition(nutrition).saturationModifier(saturation).alwaysEdible().build())));
+    }
+
+    /**
+     * mryt233 改（r146a，2026-11-08）：能摆上桌的蘸料瓶（芝麻酱 / 蚝油）。
+     * 营养值和别的食物一样记进 {@code food.<id>.hunger / .saturation}，吃的时候现读配置。
+     * mryt233 改（r146c，2026-11-09）：只做摆设，没有次数配置项（见 {@link SauceBottleKind}）。
+     */
+    private static SauceBottleItem sauceBottle(SauceBottleKind kind, int nutrition, float saturation) {
+        return reg().items().register( HotPot.id(kind.id()),
+            new SauceBottleItem(kind, kind.id(), nutrition, saturation));
     }
 
     /** 一碗汤（r99）：顺序同 SoupBase（清汤、高汤、菌汤、红汤）。 */
@@ -641,7 +675,10 @@ public final class HotPotContent {
                     entries.accept(zheErGen);
                 }
                 // 布围裙：防溅油装备，排在厨具（菜刀 / 擀面杖 / 砧板）后面
-                entries.accept(CLOTH_APRON);
+                // mryt233 改（2026-11-09，r146b）：三款布围裙都进创造栏
+                for (Item apron : CLOTH_APRONS) {
+                    entries.accept(apron);
+                }
                 // ==== tools/new_item.py：新物品进创造栏插在这行上面（别删这行）====
                 entries.accept(HOTPOT_GUIDE);
                 entries.accept(KITCHEN_KNIFE);
@@ -737,6 +774,8 @@ public final class HotPotContent {
         HotPotCooking.potResult(ZHE_ER_GEN_SLICE, COOKED_ZHE_ER_GEN_SLICE);
         HotPotCriterion.register();
         SoupBucketRecipe.register();
+        // mryt233 改（2026-11-09，r146b）：布围裙换款配方（任意一款 + 染料 → 指定款，保留耐久 / 附魔 / 名字）
+        ApronRecolorRecipe.register();
         HotPot.LOGGER.info("[Orient的火锅物语] 内容已注册（组合灶台 + 铜锅 + 铁锅 + 独立分类）");
     }
 

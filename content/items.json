@@ -1,5 +1,5 @@
 {
-  "_说明": "内容清单（mryt233 建，gen_content_manifest.py 生成）：115 个物品。每条记录描述一个物品，check_content.py 用它核对贴图 / 模型 / 配方 / 语言 / 指南是否齐全，并核对 hunger / saturation 与代码是否一致。改数值可以直接改这里的 hunger / saturation，再跑 gen_food_numbers.py --apply 写回代码。",
+  "_说明": "内容清单（mryt233 建，gen_content_manifest.py 生成）：117 个物品。每条记录描述一个物品，check_content.py 用它核对贴图 / 模型 / 配方 / 语言 / 指南是否齐全，并核对 hunger / saturation 与代码是否一致。改数值可以直接改这里的 hunger / saturation，再跑 gen_food_numbers.py --apply 写回代码。",
   "_字段": {
     "id": "物品 ID（不含命名空间）",
     "block": "是不是方块物品（有 block 模型）",
@@ -50,6 +50,15 @@
       "guide": true
     },
     {
+      "id": "blue_print_cloth_apron",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "apron_blue_print_cloth_apron_recolor"
+      ],
+      "guide": false
+    },
+    {
       "id": "boiled_crispy_pork",
       "block": true,
       "food": true,
@@ -66,6 +75,15 @@
         "brick_stove"
       ],
       "guide": true
+    },
+    {
+      "id": "brown_trim_cloth_apron",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "apron_brown_trim_cloth_apron_recolor"
+      ],
+      "guide": false
     },
     {
       "id": "chili_pepper",
@@ -141,6 +159,7 @@
       "block": false,
       "food": false,
       "recipes": [
+        "apron_cloth_apron_recolor",
         "cloth_apron"
       ],
       "guide": false
@@ -901,13 +920,13 @@
     {
       "id": "oyster_sauce",
       "block": true,
-      "food": true,
-      "hunger": 1,
-      "saturation": 0.2,
+      "food": false,
       "recipes": [
         "oyster_sauce"
       ],
-      "guide": false
+      "guide": false,
+      "hunger": 1,
+      "saturation": 0.2
     },
     {
       "id": "peanut",
@@ -1034,13 +1053,13 @@
     {
       "id": "sesame_paste",
       "block": true,
-      "food": true,
-      "hunger": 2,
-      "saturation": 0.3,
+      "food": false,
       "recipes": [
         "sesame_paste"
       ],
-      "guide": false
+      "guide": false,
+      "hunger": 2,
+      "saturation": 0.3
     },
     {
       "id": "shrimp",

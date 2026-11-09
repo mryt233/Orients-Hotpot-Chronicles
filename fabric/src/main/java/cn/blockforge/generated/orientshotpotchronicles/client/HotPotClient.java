@@ -39,6 +39,14 @@ public final class HotPotClient implements ClientModInitializer {
         BlockEntityRendererRegistry.register(HotPotContent.PLATE_HOLDER_BE, PlateHolderRenderer::new);
         BlockEntityRendererRegistry.register(HotPotContent.BENCH_BE, BenchLegsRenderer::new);
         EntityRendererRegistry.register(HotPotContent.SEAT, net.minecraft.client.renderer.entity.NoopRenderer::new);
+        // mryt233 改（2026-11-09，r146g）：布围裙用自己的穿戴模型（垂到膝盖、贴身），见 ApronModel
+        net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer.register((pose, buffers, stack, entity, slot, light, parent) -> {
+            net.minecraft.resources.ResourceLocation texture = ApronModel.texture(stack);
+            if (texture != null) {
+                net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer.renderPart(
+                    pose, buffers, light, stack, ApronModel.posedFrom(parent), texture);
+            }
+        }, HotPotContent.CLOTH_APRONS.toArray(new net.minecraft.world.level.ItemLike[0]));
         ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> ClientTooltips.append(stack, lines));
         net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlocks(
             net.minecraft.client.renderer.RenderType.cutout(),

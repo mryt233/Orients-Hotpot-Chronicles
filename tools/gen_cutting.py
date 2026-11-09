@@ -184,68 +184,49 @@ def outline(im, color):
 
 
 # ---------------------------------------------------------------- 铁菜刀
-# 用户 2026-10-23：长方形中式菜刀，柄和刀背在一条线上、从刀身后端直着伸出去，整把刀斜 45 度
-# （柄在左下、刀头在右上，同原版工具）。按刀的坐标画：u 沿刀（柄尾 → 刀头），v 垂直（0 = 刀背线，正向 = 刃口一侧）。
-KNIFE_ORIGIN = (1.6, 14.4)
-BLADE_U, BLADE_V = (5.6, 14.8), (-5.2, 0.6)    # 刀身（用户：拿在手里方向反了 → 刃口改到左上一侧，同原版斧头的刃朝向）
-HANDLE_U, HANDLE_V = (-1.4, 5.0), (-1.3, 0.6)   # 木柄（贴着刀背那一侧；用户：再长一个像素）
+# mryt233 改（2026-11-09，用户定）：菜刀贴图写成固定像素，不再用几何现算、也不做任何翻转 / 旋转 / 镜像。
+# 朝向就是这张图本身：刀柄在左下、刀头在右上，锋刃（最亮那条边）朝右下。物品模型是原版 item/handheld，
+# 不带 display 变换；物品栏、手持、指南、网页教程、查看器全都直接用这张图。要改样子就直接改下面的像素。
+KNIFE_PALETTE = {
+    "a": (59, 61, 64),     # 刀背描边（深）
+    "b": (85, 87, 90),     # 刀身描边
+    "c": (190, 194, 200),  # 刀身
+    "d": (70, 72, 78),     # 挂孔
+    "e": (238, 242, 246),  # 锋刃亮边
+    "f": (107, 108, 110),  # 锋刃描边
+    "g": (214, 218, 224),  # 斜反光
+    "h": (54, 54, 57),     # 刀箍
+    "i": (74, 50, 28),     # 木柄亮面
+    "j": (55, 37, 20),     # 木柄
+    "k": (34, 22, 11),     # 木柄暗面
+}
+KNIFE_PIXELS = [
+    "................",
+    "................",
+    "...........ab...",
+    "..........accb..",
+    ".........acdccb.",
+    "........acccccef",
+    ".......acccccef.",
+    "......agggggef..",
+    ".....hcccccef...",
+    "....iihbccef....",
+    "...ijk..bef.....",
+    "..ijk....f......",
+    ".ijk............",
+    ".jk.............",
+    "................",
+    "................",
+]
 
 
 def knife_texture():
     im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    px = im.load()
-    s2 = math.sqrt(0.5)
-    for y in range(16):
-        for x in range(16):
-            cx, cy = x + 0.5 - KNIFE_ORIGIN[0], y + 0.5 - KNIFE_ORIGIN[1]
-            u = (cx - cy) * s2
-            v = (cx + cy) * s2
-            c = None
-            if BLADE_U[0] <= u <= BLADE_U[1] and BLADE_V[0] <= v <= BLADE_V[1]:
-                if v > -0.4:
-                    c = (132, 136, 144)                    # 刀背（贴着柄那条线）
-                elif v < BLADE_V[0] + 1.1:
-                    c = (238, 242, 246)                    # 刃口亮边
-                else:
-                    c = (214, 218, 224) if abs(u + v - 6.5) < 0.9 else (190, 194, 200)   # 一道斜反光
-            elif HANDLE_U[1] <= u < BLADE_U[0] and -1.6 <= v <= 0.9:
-                c = (120, 122, 128)                        # 刀箍
-            elif HANDLE_U[0] <= u < HANDLE_U[1] and HANDLE_V[0] <= v <= HANDLE_V[1]:
-                c = (124, 84, 46) if v < -0.5 else (92, 60, 32)   # 木柄（上亮下暗）
-            if c:
-                px[x, y] = c + (255,)
-    solid = {(x, y) for y in range(16) for x in range(16) if px[x, y][3]}
-    for (x, y) in solid:
-        if any((x + dx, y + dy) not in solid for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
-            r, g, b, _ = px[x, y]
-            px[x, y] = shade((r, g, b), 0.45) + (255,)
-    # 挂孔：刀头靠刀背处只点一个深色像素（用户：那里只留一个点，像中式菜刀的洞）
-    hu, hv = BLADE_U[1] - 2.4, -1.6
-    hx = int(KNIFE_ORIGIN[0] + (hu + hv) * s2)
-    hy = int(KNIFE_ORIGIN[1] + (hv - hu) * s2)
-    px[hx, hy] = (70, 72, 78, 255)
-    return knife_user_edit(centered(im))
-
-
-def knife_user_edit(im):
-    """2026-10-26 用户逐像素调的刀把（看预览定的，调整）：刀把加粗一排（亮 / 原色 / 暗三排，暗的那排在新加的一侧），
-    末端收平。用户看的预览是物品栏里的样子：物品模型的 gui 显示本来就沿对角线翻一面（见下面 iron_kitchen_knife.json），
-    所以贴图本身不再翻（r120 开发中翻过一次，物品栏 / 指南里就反了，用户报，已改回）。"""
-    HI, LO = (74, 50, 28, 255), (34, 22, 11, 255)
-    for p in [(6, 10), (6, 11), (5, 12), (4, 13), (3, 14)]:
-        im.putpixel(p, HI)
-    for p in [(5, 10), (4, 11), (3, 12), (2, 13)]:
-        im.putpixel(p, LO)
+    for y, row in enumerate(KNIFE_PIXELS):
+        for x, ch in enumerate(row):
+            if ch != ".":
+                im.putpixel((x, y), KNIFE_PALETTE[ch] + (255,))
     return im
-
-
-def centered(im):
-    """整把刀挪到格子正中（用户：物品栏里没在正中心）。"""
-    box = im.getbbox()
-    w, h = box[2] - box[0], box[3] - box[1]
-    out = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    out.paste(im.crop(box), ((16 - w) // 2, (16 - h) // 2))
-    return out
 
 
 # ---------------------------------------------------------------- 砧板
@@ -321,10 +302,10 @@ def main():
         for name in ("beef_loin", "cooked_beef_loin", "beef_loin_slice", "cooked_beef_loin_slice"):
             write(root / f"models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{MODID}:item/{name}"}})
         knife_texture().save(tex / "item/iron_kitchen_knife.png")
-        # 物品栏里（gui）沿对角线翻一面，看着和最早那版一样（刃口在右下）；拿在手里仍是改过的方向（用户 2026-10-23）
+        # mryt233 改（2026-11-08）：模型不再带 display.gui 的旋转 / 翻转，朝向全在贴图里定死；
+        # 物品栏、手持、指南、网页教程、查看器都用同一张图，不需要任何特殊处理。
         write(root / "models/item/iron_kitchen_knife.json",
-              {"parent": "minecraft:item/handheld", "textures": {"layer0": f"{MODID}:item/iron_kitchen_knife"},
-               "display": {"gui": {"rotation": [180, 0, -90], "translation": [0, 0, 0], "scale": [1, 1, 1]}}})
+              {"parent": "minecraft:item/handheld", "textures": {"layer0": f"{MODID}:item/iron_kitchen_knife"}})
         board_top().save(tex / "block/cutting_board_top.png")
         board_side().save(tex / "block/cutting_board_side.png")
         write(root / "models/block/cutting_board.json", board_model())
@@ -391,9 +372,9 @@ def data_files():
     # 合并写、不覆盖：土豆 / 豆腐由 gen_ingredients.py 加。r106～r110 这里整份覆盖，跑完把土豆、豆腐挤掉了，
     # 砧板切不了土豆片、豆腐块（用户报，调整）；这里也列上，两个脚本谁后跑都齐全
     # mryt233 改（2026-11-04）：豆腐改名分冷热（cold_tofu / hot_tofu），两种都能上砧板，旧 ID 不再写。
-    for v in ["minecraft:beef", "minecraft:mutton", "minecraft:porkchop", "minecraft:potato", f"{MODID}:cold_tofu", f"{MODID}:hot_tofu", f"{MODID}:beef_loin", f"{MODID}:shrimp"]:   # 虾、猪排由各自加工方案共用此标签
     if f"{MODID}:tofu" in tag["values"]:
         tag["values"].remove(f"{MODID}:tofu")   # mryt233 改（2026-11-04）：清掉改名前的旧条目
+    for v in ["minecraft:beef", "minecraft:mutton", "minecraft:porkchop", "minecraft:potato", f"{MODID}:cold_tofu", f"{MODID}:hot_tofu", f"{MODID}:beef_loin", f"{MODID}:shrimp"]:   # 虾、猪排由各自加工方案共用此标签
         if v not in tag["values"]:
             tag["values"].append(v)
     write(f, tag)

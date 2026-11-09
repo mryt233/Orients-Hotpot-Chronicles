@@ -128,9 +128,15 @@ def check_item(item: dict, code: str, langs: dict[str, dict], guide: str) -> tup
             problems.append(f"{item_id}: 缺配方 recipe/{recipe}.json")
 
     if "hunger" in item:
+        # mryt233 改（2026-11-08，r146a）：蚝油 / 芝麻酱改成 sauceBottle(SauceBottleKind.OYSTER_SAUCE, 饥饿, 饱和) 注册，
+        # 数值检查要同时认 foodItem("id", 饥饿, 饱和) 和 sauceBottle(SauceBottleKind.<枚举>, 饥饿, 饱和) 两种写法。
         m = re.search(rf'foodItem\("{re.escape(item_id)}",\s*(\d+),\s*([0-9.]+)', code)
         if not m:
-            problems.append(f"{item_id}: 清单写了数值，但代码里没有 foodItem(\"{item_id}\", …) 注册")
+            # 枚举常量是 item_id 全大写（oyster_sauce → OYSTER_SAUCE，和 Seasoning 的写法一致）
+            m = re.search(rf'sauceBottle\(SauceBottleKind\.{re.escape(item_id.upper())},\s*(\d+),\s*([0-9.]+)', code)
+        if not m:
+            problems.append(f"{item_id}: 清单写了数值，但代码里没有 foodItem(\"{item_id}\", …) / "
+                            f"sauceBottle(SauceBottleKind.{item_id.upper()}, …) 注册")
         else:
             have = (int(m.group(1)), float(m.group(2)))
             want = (int(item["hunger"]), float(item.get("saturation", m.group(2))))

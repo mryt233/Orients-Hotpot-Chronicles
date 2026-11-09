@@ -57,9 +57,8 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
                 // 迷你筷架 + 垫在上面的一双筷子全由代码画
                 matrices.pushPose();
                 matrices.translate(0.5, 0, 0.5);
-                if (p.axis == Direction.Axis.Z) {
-                    matrices.mulPose(Axis.YP.rotationDegrees(90F));   // 和盘子 blockstate 的 y: 90 一致
-                }
+                // mryt233 改：局部 +x 是筷尖，依照完整四向旋转。
+                matrices.mulPose(Axis.YP.rotationDegrees(-90F - p.facing.toYRot()));
                 matrices.translate(-0.5, 0, -0.5);
                 renderMiniChopstickRest(matrices, vertexConsumers, light);
                 renderTableChopsticks(p, matrices, vertexConsumers, light);
@@ -80,104 +79,93 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
         }
     }
 
-    /** 筷子架在碗沿上占多大：物品贴图 16 像素 × 这个比例，斜着的两根筷子约 12 像素长，比碗宽一截（2026-10-27）。 */
-    private static final float CHOPSTICKS_SCALE = 0.6F;
-    // ---------------------------------------------------------------- 桌上的迷你筷架与竹筷
+    // mryt233 改（r146e）：与 viewer/animations.js 共用同一套像素尺寸和变换顺序。
+    private static final double LENGTH = 8.5, THICK = 0.55, TIP_THICK = 0.38, GAP = 1.0;
+    private static final double HANDLE = LENGTH * 0.45;
+    private static final double REST_LEN = 3.8, REST_DEPTH = 1.2, REST_H = 1.2, REST_LIP = 1.6;
+    // 支点在全长 88%；鞍谷靠尾端的边缘接触竹条下表面，向前的部分不会穿入竹条。
+    private static final double TILT = Math.atan(REST_H / (LENGTH * 0.88));
+    private static final double TAIL_X = 8 - LENGTH * Math.cos(TILT) / 2;
+    private static final double REST_X = TAIL_X + REST_H / Math.tan(TILT) + 0.55;
+    private static final net.minecraft.resources.ResourceLocation BAMBOO =
+        net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("orients_hotpot_chronicles", "textures/block/resting_bamboo.png");
 
-    /**
-     * 迷你筷架（像素）：长边横跨在一双筷子下面，两端微翘，中间是搁筷尖的鞍谷（2026-11-05 用户：
-     * 长约 2.5 像素、宽约 1.2 像素、高约 1.2 像素、两端微翘约 1.5 像素）。
-     * 筷子经下面的变换后沿方块的 x 轴铺开，所以架子长边沿 z（横着托住两根筷子）。
-     */
-    private static final double REST_LEN = 2.5;     // 长（沿 z）：横跨一双筷子
-    private static final double REST_DEPTH = 1.2;   // 宽（沿 x）：沿筷子方向
-    private static final double REST_H = 1.2;       // 鞍谷高度，筷尖就搁在这上面
-    private static final double REST_LIP = 1.5;     // 两端微翘的翘唇高度
-    /** 垫底用的深色木料（白瓷鞍身坐在深色木托上，像宋式漆器筷架）。 */
-    private static final net.minecraft.world.level.block.Block REST_BASE = net.minecraft.world.level.block.Blocks.DARK_OAK_PLANKS;
-
-    /**
-     * 桌上那双竹筷的大小：整张贴图 16 像素 × 0.34 ≈ 5.4 像素，一双筷子（贴图上沿对角线铺开）
-     * 平躺下来约 5 像素长，正好落在借来的 5×5 像素小碟格子里（尾端允许略微探出一点，像真把筷子搁在筷架上）。
-     */
-    private static final float TABLE_CHOPSTICKS_SCALE = 0.34F;
-    /** 尾端贴桌面、尖端架在迷你筷架上微翘的斜度（2026-11-05 用户：约 6°）。 */
-    private static final float TABLE_CHOPSTICKS_TILT = 6F;
-
-    /**
-     * 架在碗沿 / 盘沿上的筷子（2026-10-27 用户，新增）：平躺在碗口上方一点，筷子尖在碗正中上方、另一头搭出碗沿；
-     * 夹着菜时 HeldFoodItemRenderer 把菜画在筷子尖上，跟着一起躺平。
-     */
     private void renderChopsticks(PlateHolderBlockEntity.Placed p, PoseStack matrices,
-                                  MultiBufferSource vertexConsumers, int light) {
+                                  MultiBufferSource buffers, int light) {
         matrices.pushPose();
-        matrices.translate(0.5, (PlateHolderBlockEntity.heightOf(p) + 0.3) / 16.0, 0.5);
-        matrices.mulPose(Axis.YP.rotationDegrees((p.axis == Direction.Axis.X ? 0 : 90) + 45));
-        matrices.mulPose(Axis.XP.rotationDegrees(90));
-        matrices.scale(CHOPSTICKS_SCALE, CHOPSTICKS_SCALE, CHOPSTICKS_SCALE);
-        // 筷子尖（夹着的菜在这儿）挪到碗正中上方，另一头搭在碗沿外（物品显示 fixed 转了 180°，尖在 +x、-y）
-        matrices.translate(-0.26F, 0.3F, 0F);
-        itemRenderer.renderStatic(p.chopsticks, ItemDisplayContext.FIXED, light, OverlayTexture.NO_OVERLAY,
-            matrices, vertexConsumers, null, 0);
+        matrices.translate(0.5, PlateHolderBlockEntity.heightOf(p) / 16, 0.5);
+        matrices.mulPose(Axis.YP.rotationDegrees(-90F - p.chopsticksYaw));
+        // 尖端位于碗心；后段横搭近侧碗沿，尾端自然探出。
+        matrices.translate(-LENGTH / 16, 0, 0);
+        renderBamboo(matrices, buffers, light, p.chopsticks);
         matrices.popPose();
     }
 
-
-    /**
-     * 迷你筷架（r136b，2026-11-05 用户，新增）：一只白瓷质感的小鞍形架子——
-     * 平滑石英做鞍身与两端微翘的翘唇，深色橡木做垫底。筷尖就搁在中间那道鞍谷上，两根筷子都垫离桌面。
-     * 用 {@code renderSingleBlock} 配合缩放矩阵画出各个小方块（和 BenchLegsRenderer 画条凳腿同样的做法）。
-     */
-    private void renderMiniChopstickRest(PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
+    private void renderMiniChopstickRest(PoseStack matrices, MultiBufferSource buffers, int light) {
         BlockState porcelain = net.minecraft.world.level.block.Blocks.SMOOTH_QUARTZ.defaultBlockState();
-        BlockState wood = REST_BASE.defaultBlockState();
-        double cx = 8;   // 方块正中；筷子也摆在这一列上
-        double cz = 8;
-        double halfL = REST_LEN / 2;     // 沿 z：横跨一双筷子
-        double halfD = REST_DEPTH / 2;   // 沿 x：沿筷子方向
-        // 木托：比鞍身略宽一圈的深色木底座
-        miniBox(matrices, vertexConsumers, light, wood,
-            cx - halfD - 0.1, cx + halfD + 0.1, 0, 0.35, cz - halfL - 0.1, cz + halfL + 0.1);
-        // 鞍身：中间那道让筷尖落进去的谷
-        miniBox(matrices, vertexConsumers, light, porcelain,
-            cx - halfD + 0.05, cx + halfD - 0.05, 0.35, REST_H, cz - halfL + 0.15, cz + halfL - 0.15);
-        // 两端微翘的两片翘唇
-        miniBox(matrices, vertexConsumers, light, porcelain,
-            cx - halfD + 0.05, cx + halfD - 0.05, 0.35, REST_LIP, cz - halfL, cz - halfL + 0.4);
-        miniBox(matrices, vertexConsumers, light, porcelain,
-            cx - halfD + 0.05, cx + halfD - 0.05, 0.35, REST_LIP, cz + halfL - 0.4, cz + halfL);
+        BlockState wood = net.minecraft.world.level.block.Blocks.DARK_OAK_PLANKS.defaultBlockState();
+        double halfL = REST_LEN / 2, halfD = REST_DEPTH / 2;
+        miniBox(matrices, buffers, light, wood, REST_X-halfD-0.1, REST_X+halfD+0.1, 0, 0.35, 8-halfL-0.1, 8+halfL+0.1);
+        miniBox(matrices, buffers, light, porcelain, REST_X-halfD+0.05, REST_X+halfD-0.05, 0.35, REST_H, 8-halfL+0.15, 8+halfL-0.15);
+        miniBox(matrices, buffers, light, porcelain, REST_X-halfD+0.05, REST_X+halfD-0.05, 0.35, REST_LIP, 8-halfL, 8-halfL+0.4);
+        miniBox(matrices, buffers, light, porcelain, REST_X-halfD+0.05, REST_X+halfD-0.05, 0.35, REST_LIP, 8+halfL-0.4, 8+halfL);
     }
 
-    /** 用原版方块模型画一个小方盒（像素坐标）——整块立方体按 (x1-x0, y1-y0, z1-z0) 缩放。 */
-    private void miniBox(PoseStack matrices, MultiBufferSource vertexConsumers, int light, BlockState state,
+    private void miniBox(PoseStack matrices, MultiBufferSource buffers, int light, BlockState state,
                          double x0, double x1, double y0, double y1, double z0, double z1) {
         matrices.pushPose();
-        matrices.translate(x0 / 16.0, y0 / 16.0, z0 / 16.0);
-        matrices.scale((float) ((x1 - x0) / 16.0), (float) ((y1 - y0) / 16.0), (float) ((z1 - z0) / 16.0));
-        blocks.renderSingleBlock(state, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
+        matrices.translate(x0 / 16, y0 / 16, z0 / 16);
+        matrices.scale((float)((x1-x0)/16), (float)((y1-y0)/16), (float)((z1-z0)/16));
+        blocks.renderSingleBlock(state, matrices, buffers, light, OverlayTexture.NO_OVERLAY);
         matrices.popPose();
     }
 
-    /**
-     * 垫在迷你筷架上的这双竹筷（r136b，2026-11-05 用户，新增）：平躺在桌面上方约 1.2 像素处，
-     * 绕垂直于筷子的水平轴微倾约 6°——筷尖落在鞍谷上、尾端贴向桌面。
-     * 夹着菜时 HeldFoodItemRenderer 会把菜画在筷尖上（尖在迷你筷架这一头）。
-     */
     private void renderTableChopsticks(PlateHolderBlockEntity.Placed p, PoseStack matrices,
-                                       MultiBufferSource vertexConsumers, int light) {
+                                       MultiBufferSource buffers, int light) {
         matrices.pushPose();
-        // 原点放在迷你筷架的鞍心：筷尖就搁在这儿，另一头朝 -x 铺开、落到桌面上
-        matrices.translate(0.5, REST_H / 16.0, 0.5);
-        // 绕横跨方块的 z 轴微倾：尾端（-x 那头）落到桌面，尖端（原点这头）被迷你筷架垫起
-        matrices.mulPose(Axis.ZP.rotationDegrees(TABLE_CHOPSTICKS_TILT));
-        // 压平这双筷子（立着的贴图躺下来），再转成沿方块的 x 轴铺开
-        matrices.mulPose(Axis.YP.rotationDegrees(-45F));
-        matrices.mulPose(Axis.XP.rotationDegrees(90F));
-        matrices.scale(TABLE_CHOPSTICKS_SCALE, TABLE_CHOPSTICKS_SCALE, TABLE_CHOPSTICKS_SCALE);
-        // 与架在碗沿上同一套算法：贴图里的筷子尖（夹着的菜画在这一头）挪到变换原点上，正落在迷你筷架
-        matrices.translate(-0.26F, 0.3F, 0F);
-        itemRenderer.renderStatic(p.self, ItemDisplayContext.FIXED, light, OverlayTexture.NO_OVERLAY,
-            matrices, vertexConsumers, null, 0);
+        matrices.translate(TAIL_X / 16, 0, 0.5);
+        matrices.mulPose(Axis.ZP.rotation((float)TILT));
+        renderBamboo(matrices, buffers, light, p.self);
         matrices.popPose();
+    }
+
+    private void renderBamboo(PoseStack matrices, MultiBufferSource buffers, int light, ItemStack stack) {
+        var vc = buffers.getBuffer(net.minecraft.client.renderer.RenderType.entityCutoutNoCull(BAMBOO));
+        for (int side : new int[]{-1, 1}) {
+            double z = side * (GAP + THICK) / 2;
+            bambooBox(matrices, vc, light, 0, HANDLE, THICK, z, 0.25F);
+            bambooBox(matrices, vc, light, HANDLE, LENGTH, TIP_THICK, z, 0.75F);
+        }
+        ItemStack food = cn.blockforge.generated.orientshotpotchronicles.hotpot.Chopsticks.held(stack);
+        if (!food.isEmpty()) {
+            matrices.pushPose();
+            // 菜的厚度垂直，两根筷尖插到菜的近侧边缘；整段跟随桌面竹筷的倾斜。
+            matrices.translate(LENGTH / 16, (TIP_THICK / 2 + 1.4) / 16, 0);
+            matrices.scale(0.175F, 0.175F, 0.175F);
+            itemRenderer.renderStatic(food, ItemDisplayContext.FIXED, light, OverlayTexture.NO_OVERLAY,
+                matrices, buffers, null, 0);
+            matrices.popPose();
+        }
+    }
+
+    private static void bambooBox(PoseStack matrices, com.mojang.blaze3d.vertex.VertexConsumer vc, int light,
+                                   double x0, double x1, double thick, double z, float u) {
+        float a=(float)(x0/16), d=(float)(x1/16), b=0, f=(float)(thick/16);
+        float c=(float)((z-thick/2)/16), g=(float)((z+thick/2)/16);
+        var pose=matrices.last();
+        bambooQuad(vc,pose,light,u,0,0,-1, d,f,c, a,f,c, a,b,c, d,b,c);
+        bambooQuad(vc,pose,light,u,0,0,1, a,f,g, d,f,g, d,b,g, a,b,g);
+        bambooQuad(vc,pose,light,u,-1,0,0, a,f,c, a,f,g, a,b,g, a,b,c);
+        bambooQuad(vc,pose,light,u,1,0,0, d,f,g, d,f,c, d,b,c, d,b,g);
+        bambooQuad(vc,pose,light,u,0,1,0, a,f,c, d,f,c, d,f,g, a,f,g);
+        bambooQuad(vc,pose,light,u,0,-1,0, a,b,g, d,b,g, d,b,c, a,b,c);
+    }
+
+    private static void bambooQuad(com.mojang.blaze3d.vertex.VertexConsumer vc, PoseStack.Pose pose, int light,
+                                    float u, float nx, float ny, float nz, float... xyz) {
+        for (int i=0; i<12; i+=3) {
+            vc.addVertex(pose,xyz[i],xyz[i+1],xyz[i+2]).setColor(255,255,255,255).setUv(u,0.5F)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose,nx,ny,nz);
+        }
     }
 }

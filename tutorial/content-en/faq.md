@@ -76,12 +76,25 @@ Visit the GitHub repository: <https://github.com/mryt233/Orients-Hotpot-Chronicl
 ## Configurable values {#config}{{since:0.2.0-alpha}}
 
 **Q: Can I change how much hunger food restores, or how fast broths cook?**
-Yes. Starting in 0.2.2-alpha, you can select this mod in the **Mods menu** (install Mod Menu on Fabric; built-in on NeoForge / Forge) and click **Config** to adjust categorized sliders and save immediately. You can also edit `config/orients_hotpot_chronicles.json` directly (adjusting food nutrition, per-sip drink nutrition, broth speed, fuel, dipping sauces, and more, with each entry's meaning, range, and unit documented). After editing the JSON file, an administrator runs **`/orientshotpot reload`** to apply changes without restarting; the reply reports how many warnings there were.
+Yes. Starting in 0.2.2-alpha, you can select this mod in the **Mods menu** (install Mod Menu on Fabric; built-in on NeoForge / Forge) and click **Config** to adjust the values and save immediately. You can also edit `config/orients_hotpot_chronicles.json` directly (adjusting food nutrition, per-sip drink nutrition, broth speed, fuel, dipping sauces, and more, with each entry's meaning, range, and unit documented). After editing the JSON file, an administrator runs **`/orientshotpot reload`** to apply changes without restarting; the reply reports how many warnings there were.
 
 - On **multiplayer servers**, edit only the server file; players receive it when joining and after each reload.
 - A bad entry (not a number, out of range, or a misspelled key) falls back to its default with a warning; if the whole file is broken, all defaults are used and **the broken file is kept as-is** so you can fix it.
 - Change recipes with a data pack, then run vanilla `/reload`.
 - Numbers in this guide are defaults; if a server changed its config, the server's values apply.
+
+### Using the settings screen {#screen}
+
+{{since:0.2.2-alpha}}The screen has two tabs, **Common** and **Advanced**, and opens on **Common**:
+
+- **Common** holds only the few things players change most — the **particle intensity** slider at the top (plus 0% / 50% / 100% shortcuts), then **coal-grade stove heat** (the master knob for how fast everything cooks), **fallback cook time**, and the **heat multiplier of spicy / clear / rich-stock broth**.
+- **Advanced** moves everything else into collapsible groups by category: cooking times, per-ingredient cooking times, broth heat speed, fuel grades, soup bowls, seasonings, drinks, and food nutrition. Groups start collapsed; click a group title to expand it.
+- **Changing values**: each row is `- value unit +`. One click steps once; **hold Shift to step by 10**. **Click the value box to type a number directly**; typing something that is not a number or out of range turns it **red and blocks saving**.
+- **Units**: time is shown in ticks (20 ticks = 1 second, with the seconds also shown when there is room), multipliers as ×, hunger and XP as points, effect levels as levels.
+- **Per-row reset**: a **↺** appears on rows you changed, and resets only that entry. Unchanged rows do not show it.
+- **Reset everything**: the bottom Reset button turns into **click again to confirm**; a second click within 4 seconds really resets everything (and sets particle intensity back to 100%).
+- **Hints**: hover any row to see a plain-language explanation plus “range x–y, default z”.
+- Scroll with the **mouse wheel** or the scrollbar when the list is long. **Save & Apply** writes the config file and hot-reloads; ESC or Cancel discards every change (particle intensity goes back to its pre-screen value).
 
 ## Useful commands
 

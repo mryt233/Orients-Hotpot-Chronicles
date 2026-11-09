@@ -37,7 +37,9 @@
     "on_table=true": "是",
     "on_table=false": "否",
     "kind=orange_drink": "橙子饮料",
-    "kind=plant_protein_drink": "植物蛋白饮料"
+    "kind=plant_protein_drink": "植物蛋白饮料",
+    "kind=sesame_paste": "芝麻酱",
+    "kind=oyster_sauce": "蚝油"
   },
   "blocks": {
     "oak_stool": {
@@ -462,6 +464,11 @@
         "facing": "坐着面朝",
         "left": "左手边相连",
         "right": "右手边相连"
+      }
+    },
+    "sauce_bottle": {
+      "props": {
+        "kind": "瓶里是"
       }
     }
   }

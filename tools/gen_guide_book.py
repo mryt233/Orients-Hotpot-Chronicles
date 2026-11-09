@@ -415,6 +415,10 @@ def recipe_sections():
         if t == "stonecutting":
             cutting.append(rid)
             continue
+        # mryt233 改（2026-11-09，r146b）：布围裙换款配方（apron_recolor）也进合成表大全
+        if t == "apron_recolor":
+            groups.setdefault(btb.base_of(rid.split(":")[1]), []).append((rid, dev))
+            continue
         if not ("pattern" in r or "ingredients" in r):
             warnings.append("看不懂的配方类型：%s" % k)
             continue
@@ -476,7 +480,7 @@ def items_blocks():
     ]
     all_ids = sorted({k.split(":")[1] for k in bt.NAMES} - {"plates"})
     # mryt233 改：饮料炼药锅只有方块状态，没有可列入图鉴的独立物品。
-    hide = {"plates", "sauce_station_top", "tall_brick_stove_top", "bowl", "drink", "drink_cauldron"}
+    hide = {"plates", "sauce_station_top", "tall_brick_stove_top", "bowl", "drink", "drink_cauldron", "sauce_bottle"}
     all_ids = [i for i in all_ids if i not in hide]
     ex = "/give @s %s:brick_stove" % MODID
     blocks = [{"k": "p", "t": inline(L("模组里所有物品和方块（自动生成）。<code>ID</code> 是指令里用的名字，例如 ")

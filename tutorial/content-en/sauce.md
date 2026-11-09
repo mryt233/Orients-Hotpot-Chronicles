@@ -30,7 +30,7 @@ Each recipe makes one station. Replace planks with iron ingots for iron, or use 
 - Stocked bowls visibly show their seasoning on the station.
 
 :::tip
-**With more seasonings, the help panel splits into two columns.** When the number of seasonings goes over **10** (there are 15 now), the effect reference opened by **?** changes from one long strip into a **tidy two-column panel** — eight seasonings on the left, seven on the right, all readable at a glance without having to scroll. Older saves with nine kinds or fewer on the station keep the original single column.
+**Development preview: the ingredient list now uses a single paginated column.** Clicking **?** opens a narrow panel matching the main interface width, displaying names and effects in full with text wrapping; turn pages using the bottom arrows or the mouse wheel over the panel, and reopening it remembers your last page. The main interface and ingredient list are centered together, and installed JEI / REI will avoid this area.<!--清单#140-->
 :::
 
 ## 15 seasonings {#seasoning}
@@ -68,6 +68,22 @@ Each of the new ingredients has its own little story:
 {{recipe:oyster_sauce,sesame_paste}}
 
 “Cooling the spice” means clearing the Hunger effect from Spicy Red Broth. **Every seasoning in your bowl contributes its effect when you eat dipped food.**
+
+## Placing sesame paste and oyster sauce {#bottle}
+
+{{icons:sesame_paste,oyster_sauce}}
+
+Besides being used to mix sauces at the station, sesame paste and oyster sauce can also be **placed on the table as a decoration**.
+
+1. **Place it**: hold sesame paste or oyster sauce and **Shift + right-click** an empty spot on a hotpot table or tall hotpot table. Like chopsticks and sauce bowls it takes one plate slot, and several things can share that slot. It appears as a small 3D bottle matching its icon: **sesame paste** is a short labelled glass jar, **oyster sauce** a slim dark bottle.
+2. **Pick it back up**: **right-click it empty-handed** to put it back in your inventory; mining the bottle takes only that bottle. Mining the table drops every piece of tableware in that slot.
+3. **Decoration only**: a bottle on the table **cannot be dipped into and cannot season food**. To add this seasoning to a dish, go to the [sauce station](sauce.html#make) and mix a bowl as before (or dip at a sauce bowl on the table with chopsticks).
+4. The bottle can still be eaten as before (same hunger value); placing it is just for looks.
+
+:::tip
+Fill a slot if it fits: sesame paste, oyster sauce, sauce bowls and plates can share one slot — a row of bottles makes the table look like a real hotpot restaurant.
+:::
+
 
 ## Mixing a sauce {#make}
 

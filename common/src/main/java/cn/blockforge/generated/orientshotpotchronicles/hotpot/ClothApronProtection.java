@@ -185,7 +185,8 @@ public final class ClothApronProtection {
     /** 护甲槽里的布围裙掉一点耐久（穿久了总会沾油；挡下烫伤、灭火苗时都会磨损）。 */
     public static void wear(Player player, int amount) {
         ItemStack chest = player.getItemBySlot(EquipmentSlot.CHEST);
-        if (chest.getItem() instanceof ClothApronItem) {
+        // mryt233 改（2026-11-09，r146b）：三款都认（标签判断）
+        if (ClothApronItem.isApron(chest)) {
             chest.hurtAndBreak(amount, player, EquipmentSlot.CHEST);
         }
     }

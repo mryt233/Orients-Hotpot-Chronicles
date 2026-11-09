@@ -97,7 +97,8 @@ public final class HotPotCooking {
             || stack.is(HotPotContent.CRUSHED_PEANUTS) || stack.is(HotPotContent.LOTUS_ROOT)
             || stack.is(HotPotContent.RAW_SQUID) || stack.is(HotPotContent.EGG_FRIED_RICE)
             || stack.is(HotPotContent.ZHE_ER_GEN) || stack.is(HotPotContent.MINCED_ZHE_ER_GEN)
-            || stack.is(HotPotContent.CLOTH_APRON)) {
+            // mryt233 改（2026-11-09，r146b）：布围裙有三款，认标签而不是单个常量
+            || ClothApronItem.isApron(stack)) {
             return false;
         }
         if (SoupBase.fromStack(stack) != null || PlateItem.placedFor(stack) != null) {

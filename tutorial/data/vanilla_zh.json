@@ -7,10 +7,12 @@
  "minecraft:beetroot": "甜菜根",
  "minecraft:birch_planks": "白桦木板",
  "minecraft:blaze_powder": "烈焰粉",
+ "minecraft:blue_dye": "蓝色染料",
  "minecraft:book": "书",
  "minecraft:bowl": "碗",
  "minecraft:brick": "红砖",
  "minecraft:bricks": "红砖块",
+ "minecraft:brown_dye": "棕色染料",
  "minecraft:brown_mushroom": "棕色蘑菇",
  "minecraft:carrot": "胡萝卜",
  "minecraft:cauldron": "炼药锅",
@@ -58,5 +60,6 @@
  "minecraft:water_bucket": "水桶",
  "minecraft:wheat": "小麦",
  "minecraft:wheat_seeds": "小麦种子",
+ "minecraft:white_dye": "白色染料",
  "minecraft:white_wool": "白色羊毛"
 }

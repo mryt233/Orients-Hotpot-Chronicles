@@ -1,0 +1,11 @@
+{
+  "type": "orients_hotpot_chronicles:apron_recolor",
+  "category": "equipment",
+  "apron": {
+    "tag": "orients_hotpot_chronicles:cloth_aprons"
+  },
+  "dye": {
+    "item": "minecraft:brown_dye"
+  },
+  "result": "orients_hotpot_chronicles:brown_trim_cloth_apron"
+}

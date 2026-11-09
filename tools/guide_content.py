@@ -141,13 +141,14 @@ ZH = [
         {"icon": "cooked_kelp",
          "text": "海带下锅煮成熟海带（熔炉里还是干海带）。"},
     ]},
+    # mryt233 改（r146f）：指南同步原料表翻页。
     {"id": "sauce", "icon": "oak_sauce_station", "title": "蘸料", "entries": [
         {"icon": "oak_sauce_station",
          "text": "台上 9 个小碗。11 种木头加铁的，占两格高。",
          "recipes": ["oak_sauce_station", "iron_sauce_station"],
          "steps": ["空手右键蘸料台：打开补货界面",
                    "每格放一种原料，1 个原料 = 4 份调料",
-                   "右上角的「?」是原料对照表"]},
+                   "右上角的「?」打开单列原料表，底部箭头或滚轮翻页，关闭重开记住页码"]},
         {"icon": "garlic_paste", "title": "十种小料",
          "text": "一碗里加几种，吃下去就有几种效果。",
          "rows": [["minecraft:wheat", "味精：多回 2 饥饿"],
