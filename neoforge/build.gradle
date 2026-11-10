@@ -43,6 +43,10 @@ neoForge {
             if (project.hasProperty('hotpotClientProbe')) {
                 systemProperty 'hotpot.clientProbe', 'true'
             }
+            // mryt233 改（2026-11-10）：只在显式开发验证中启用 3C 假内容。
+            if (project.hasProperty('hotpotOpt3c')) {
+                systemProperty 'hotpot.opt3c', 'true'
+            }
             if (project.hasProperty('hotpotExpreg')) {
                 systemProperty 'hotpot.expreg', 'true'
             }
@@ -51,6 +55,10 @@ neoForge {
             server()
             gameDirectory = project.file('run-server')
             programArgument '--nogui'
+            // mryt233 改（2026-11-10）：只在显式开发验证中启用 3C 假内容。
+            if (project.hasProperty('hotpotOpt3c')) {
+                systemProperty 'hotpot.opt3c', 'true'
+            }
             if (project.hasProperty('hotpotExpreg')) {
                 systemProperty 'hotpot.expreg', 'true'
             }
@@ -64,6 +72,8 @@ neoForge {
 // 2) 把 common 的资源目录并进本工程的资源集：assets/ 和 data/（贴图、模型、配方、
 //    战利品表、语言文件）只有在同一个 jar 里，NeoForge 才会当成这个模组的资源扫。
 sourceSets.main.resources.srcDirs += project(':common').file('src/main/resources')
+// mryt233 改（2026-11-10）：开发与生产均加载前置自带语言。
+sourceSets.main.resources.srcDirs += project(':framework:loader').file('src/main/resources')
 // mryt233 改：共享原版客户端源码只在平台模块编译，专用服不初始化客户端入口。
 sourceSets.main.java.srcDir project(':common').file('src/client/java')
 sourceSets.main.java.srcDir project(':common').file('src/mixin/java')

@@ -1,5 +1,7 @@
 package cn.blockforge.orient.framework.platform.fabric;
 
+// mryt233 改（2026-11-10）：第三批 3C 平台接线。
+
 import cn.blockforge.orient.framework.loader.Framework;
 import cn.blockforge.orient.framework.loader.LootEventBridge;
 import cn.blockforge.orient.framework.loader.MenuOpener;
@@ -32,6 +34,8 @@ public final class FabricFrameworkPlatform implements Platform {
     private static final Logger LOGGER = LoggerFactory.getLogger("orient-framework");
     private static FabricFrameworkPlatform installed;
 
+    private final FabricRuntimeEvents events = new FabricRuntimeEvents();
+
     private final FabricRegistrationApi registration = new FabricRegistrationApi();
     private final FabricNetworkApi network = new FabricNetworkApi();
 
@@ -52,6 +56,8 @@ public final class FabricFrameworkPlatform implements Platform {
                 Framework.install(platform);
             }
             installed = platform;
+            FabricLootEvents.install();
+            ServerLifecycleEvents.SERVER_STARTING.register(server -> platform.registration.closeRegistration());
             RuntimeStats.get().runtimeInit();
             if (isClient) {
                 FabricClientNetworkHandlers.installLifecycle();
@@ -62,6 +68,11 @@ public final class FabricFrameworkPlatform implements Platform {
             ServerLifecycleEvents.SERVER_STARTED.register(server -> RuntimeStats.get().logSummary("server-started"));
             ServerLifecycleEvents.SERVER_STOPPED.register(server -> RuntimeStats.get().logSummary("server-stopped"));
         }
+    }
+
+    @Override
+    public cn.blockforge.orient.framework.loader.RuntimeEvents events() {
+        return events;
     }
 
     @Override

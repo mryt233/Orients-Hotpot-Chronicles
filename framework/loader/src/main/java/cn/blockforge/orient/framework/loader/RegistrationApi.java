@@ -1,5 +1,7 @@
 package cn.blockforge.orient.framework.loader;
 
+// mryt233 改（2026-11-10）：第三批 3C 补充平台能力。
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
@@ -84,4 +86,53 @@ public interface RegistrationApi {
     interface EntityRegistrar {
         <T extends Entity> EntityType<T> register(ResourceLocation id, EntityType<T> type);
     }
+    // 新方法保留默认实现，旧平台实现的二进制契约保持不变。
+    default RecipeSerializerRegistrar recipeSerializers() {
+        throw new UnsupportedOperationException("recipeSerializers requires Runtime 0.1.5");
+    }
+
+    interface RecipeSerializerRegistrar {
+        <T extends net.minecraft.world.item.crafting.RecipeSerializer<?>> T register(ResourceLocation id, T value);
+    }
+
+    default RecipeTypeRegistrar recipeTypes() {
+        throw new UnsupportedOperationException("recipeTypes requires Runtime 0.1.5");
+    }
+
+    interface RecipeTypeRegistrar {
+        <T extends net.minecraft.world.item.crafting.RecipeType<?>> T register(ResourceLocation id, T value);
+    }
+
+    default CriterionRegistrar criteria() {
+        throw new UnsupportedOperationException("criteria requires Runtime 0.1.5");
+    }
+
+    interface CriterionRegistrar {
+        <T extends net.minecraft.advancements.CriterionTrigger<?>> T register(ResourceLocation id, T value);
+    }
+
+    default ArmorMaterialRegistrar armorMaterials() {
+        throw new UnsupportedOperationException("armorMaterials requires Runtime 0.1.5");
+    }
+
+    interface ArmorMaterialRegistrar {
+        net.minecraft.core.Holder<net.minecraft.world.item.ArmorMaterial> register(ResourceLocation id, net.minecraft.world.item.ArmorMaterial value);
+    }
+
+    default SoundRegistrar sounds() {
+        throw new UnsupportedOperationException("sounds requires Runtime 0.1.5");
+    }
+
+    interface SoundRegistrar {
+        net.minecraft.sounds.SoundEvent register(ResourceLocation id, net.minecraft.sounds.SoundEvent value);
+    }
+
+    default ParticleRegistrar particles() {
+        throw new UnsupportedOperationException("particles requires Runtime 0.1.5");
+    }
+
+    interface ParticleRegistrar {
+        <T extends net.minecraft.core.particles.ParticleType<?>> T register(ResourceLocation id, T value);
+    }
+
 }

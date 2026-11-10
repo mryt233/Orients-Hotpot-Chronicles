@@ -1,5 +1,7 @@
 package cn.blockforge.generated.orientshotpotchronicles.platform;
 
+// mryt233 改（2026-11-10）：第三批 3C 平台接线。
+
 import cn.blockforge.orient.framework.loader.Framework;
 import cn.blockforge.orient.framework.loader.LootEventBridge;
 
@@ -28,6 +30,9 @@ public final class LootListeners {
             return;
         }
         installed = true;
+        if (Framework.lootEvents().isPlatformManaged()) {
+            return;
+        }
         LootTableEvents.MODIFY.register((key, builder, source, registries) -> {
             boolean builtin = source.isBuiltin();
             for (LootEventBridge.Modification modification : Framework.lootEvents().all()) {

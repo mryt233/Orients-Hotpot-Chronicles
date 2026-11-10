@@ -42,6 +42,16 @@ public final class GeneratedMod implements ModInitializer {
         // 先装平台实现，核心注册时才知道创造栏和界面类型怎么建
         cn.blockforge.generated.orientshotpotchronicles.platform.FabricPlatform.install();
         MODULES.registerAll();
+        // mryt233 改（2026-11-10）：独立探针只在显式开发参数下加载。
+        if (net.fabricmc.loader.api.FabricLoader.getInstance().isDevelopmentEnvironment() && Boolean.getBoolean("hotpot.opt3c")) {
+            try {
+                Class.forName("cn.blockforge.generated.orientshotpotchronicles.devtest.Opt3cFabricProbe")
+                    .getMethod("install").invoke(null);
+            } catch (ReflectiveOperationException error) {
+                throw new IllegalStateException("3C development probe failed", error);
+            }
+        }
+
         MODULES.runtime(new cn.blockforge.orient.framework.loader.RuntimeHooks() {
             @Override
             public void onServerStarted(Runnable callback) {

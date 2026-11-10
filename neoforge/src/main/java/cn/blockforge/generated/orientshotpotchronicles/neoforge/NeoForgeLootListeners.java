@@ -1,5 +1,7 @@
 package cn.blockforge.generated.orientshotpotchronicles.neoforge;
 
+// mryt233 改（2026-11-10）：第三批 3C 平台接线。
+
 import cn.blockforge.orient.framework.loader.Framework;
 import cn.blockforge.orient.framework.loader.LootEventBridge;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -76,6 +78,9 @@ public final class NeoForgeLootListeners {
                     .setWeight(SHRIMP_WEIGHT).build());
                 pool.hotpot$setEntries(entries);
             }
+        }
+        if (Framework.lootEvents().isPlatformManaged()) {
+            return;
         }
         List<LootEventBridge.Modification> modifications = Framework.lootEvents().all();
         if (modifications.isEmpty()) {

@@ -1,5 +1,7 @@
 package cn.blockforge.orient.framework.loader;
 
+// mryt233 改（2026-11-10）：第三批 3C 补充平台能力。
+
 /**
  * 框架版本号的唯一来源（预发布；1.0.0 只在 P3 打包实验通过后发布）。作者：mryt233
  * mryt233 改（2026-11-01，前置检查 W4）：删掉没人用的 COMPAT_RANGE；加 {@link #RUNTIME}，
@@ -13,7 +15,7 @@ public final class ApiVersion {
      * 破坏性变更进 0.2.0。内容包要求的范围由打包脚本按此算出：[本版本, 下一个次版本)。
      */
     // mryt233 改（2026-11-10）：ConfigStore 新增保存回执接口，本体依赖的 Runtime 下限同步提升。
-    public static final String RUNTIME = "0.1.4";
+    public static final String RUNTIME = "0.1.5";
 
     private ApiVersion() {
     }

@@ -1,5 +1,7 @@
 package cn.blockforge.orient.framework.loader;
 
+// mryt233 改（2026-11-10）：第三批 3C 补充平台能力。
+
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
@@ -109,7 +111,9 @@ public final class ModuleHost {
     public void registerAll() {
         for (ContentModule module : ordered) {
             RuntimeStats.get().modulePhase(declarationByModule.get(module).modId(), "register");
-            module.register(Framework.platform().registration());
+            cn.blockforge.orient.framework.pure.RegistrationGuard.withOwner(
+                declarationByModule.get(module).modId(),
+                () -> module.register(Framework.platform().registration()));
         }
     }
 

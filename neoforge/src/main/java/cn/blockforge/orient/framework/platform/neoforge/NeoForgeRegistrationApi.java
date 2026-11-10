@@ -1,5 +1,16 @@
 package cn.blockforge.orient.framework.platform.neoforge;
 
+// mryt233 改（2026-11-10）：第三批 3C 补充平台能力。
+
+import net.minecraft.advancements.CriterionTrigger;
+import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import cn.blockforge.orient.framework.pure.RegistrationWindow;
+
 import cn.blockforge.orient.framework.loader.RegistrationApi;
 import cn.blockforge.orient.framework.pure.RegistrationGuard;
 import net.minecraft.core.Registry;
@@ -35,22 +46,28 @@ import java.util.function.Supplier;
  * 也不报错；现在每个注册表落地后关窗，之后再登记直接抛出带 id 的异常（与「注册失败即停」一致）。</p>
  */
 public final class NeoForgeRegistrationApi implements RegistrationApi {
-    private record Entry<T>(ResourceLocation id, T value) {
+    private record Entry<T>(ResourceLocation id, T value, String owner) {
     }
 
-    /** 已经落地（关窗）的注册表。 */
-    private final java.util.Set<ResourceKey<?>> closed = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private final RegistrationWindow window = new RegistrationWindow();
 
     private void requireOpen(ResourceKey<?> registry, ResourceLocation id) {
-        if (closed.contains(registry)) {
-            throw new IllegalStateException("registration window already closed: registry="
-                + registry.location() + ", id=" + id + "（请在模组构造 / 注册阶段登记）");
+        Registry<?> target = BuiltInRegistries.REGISTRY.get(registry.location());
+        window.claim(registry.location().toString(), id.toString(),
+            RegistrationGuard.owner(id.getNamespace()), target != null && target.containsKey(id));
+    }
+
+    private static <T> T requireValue(ResourceKey<?> registry, ResourceLocation id, T value) {
+        if (value == null) {
+            throw RegistrationGuard.failure(registry.location().toString(), id.toString(),
+                RegistrationGuard.owner(id.getNamespace()), "declare", new NullPointerException("null entry"));
         }
+        return value;
     }
 
     private <T> void flushAndClose(ResourceKey<?> key, Registry<T> registry, List<Entry<T>> queue) {
         flush(registry, queue);
-        closed.add(key);
+        window.close(key.location().toString());
     }
 
     private final List<Entry<Item>> items = new ArrayList<>();
@@ -61,11 +78,23 @@ public final class NeoForgeRegistrationApi implements RegistrationApi {
     private final List<Entry<CreativeModeTab>> tabs = new ArrayList<>();
     private final List<Entry<EntityType<?>>> entities = new ArrayList<>();
 
+    private final List<Entry<RecipeSerializer<?>>> recipeSerializers = new ArrayList<>();
+    private final List<Entry<RecipeType<?>>> recipeTypes = new ArrayList<>();
+    private final List<Entry<CriterionTrigger<?>>> criteria = new ArrayList<>();
+    private final List<Entry<ArmorMaterial>> armorMaterials = new ArrayList<>();
+    private final List<Entry<SoundEvent>> sounds = new ArrayList<>();
+    private final List<Entry<ParticleType<?>>> particles = new ArrayList<>();
+
     private static <T> void flush(Registry<T> registry, List<Entry<T>> queue) {
         for (Entry<T> entry : queue) {
-            RegistrationGuard.requireAbsent(registry.containsKey(entry.id()),
-                registry.key().location().toString(), entry.id().toString(), entry.id().getNamespace());
-            Registry.register(registry, entry.id(), entry.value());
+            try {
+                RegistrationGuard.requireAbsent(registry.containsKey(entry.id()),
+                    registry.key().location().toString(), entry.id().toString(), entry.owner());
+                Registry.register(registry, entry.id(), entry.value());
+            } catch (RuntimeException error) {
+                throw RegistrationGuard.failure(registry.key().location().toString(),
+                    entry.id().toString(), entry.owner(), "register", error);
+            }
         }
         queue.clear();
     }
@@ -86,6 +115,18 @@ public final class NeoForgeRegistrationApi implements RegistrationApi {
             flushAndClose(key, BuiltInRegistries.CREATIVE_MODE_TAB, tabs);
         } else if (key.equals(Registries.ENTITY_TYPE)) {
             flushAndClose(key, BuiltInRegistries.ENTITY_TYPE, entities);
+        } else if (key.equals(Registries.RECIPE_SERIALIZER)) {
+            flushAndClose(key, BuiltInRegistries.RECIPE_SERIALIZER, recipeSerializers);
+        } else if (key.equals(Registries.RECIPE_TYPE)) {
+            flushAndClose(key, BuiltInRegistries.RECIPE_TYPE, recipeTypes);
+        } else if (key.equals(Registries.TRIGGER_TYPE)) {
+            flushAndClose(key, BuiltInRegistries.TRIGGER_TYPES, criteria);
+        } else if (key.equals(Registries.ARMOR_MATERIAL)) {
+            flushAndClose(key, BuiltInRegistries.ARMOR_MATERIAL, armorMaterials);
+        } else if (key.equals(Registries.SOUND_EVENT)) {
+            flushAndClose(key, BuiltInRegistries.SOUND_EVENT, sounds);
+        } else if (key.equals(Registries.PARTICLE_TYPE)) {
+            flushAndClose(key, BuiltInRegistries.PARTICLE_TYPE, particles);
         }
     }
 
@@ -95,7 +136,7 @@ public final class NeoForgeRegistrationApi implements RegistrationApi {
             @Override
             public <T extends Item> T register(ResourceLocation id, T item) {
                 requireOpen(Registries.ITEM, id);
-                items.add(new Entry<Item>(id, item));
+                items.add(new Entry<Item>(id, item, RegistrationGuard.owner(id.getNamespace())));
                 return item;
             }
         };
@@ -107,7 +148,7 @@ public final class NeoForgeRegistrationApi implements RegistrationApi {
             @Override
             public <T extends Block> T register(ResourceLocation id, T block) {
                 requireOpen(Registries.BLOCK, id);
-                blocks.add(new Entry<Block>(id, block));
+                blocks.add(new Entry<Block>(id, block, RegistrationGuard.owner(id.getNamespace())));
                 return block;
             }
         };
@@ -122,7 +163,7 @@ public final class NeoForgeRegistrationApi implements RegistrationApi {
                                                                        Block... blockArray) {
                 requireOpen(Registries.BLOCK_ENTITY_TYPE, id);
                 BlockEntityType<T> type = BlockEntityType.Builder.of(factory::create, blockArray).build(null);
-                blockEntities.add(new Entry<BlockEntityType<?>>(id, type));
+                blockEntities.add(new Entry<BlockEntityType<?>>(id, type, RegistrationGuard.owner(id.getNamespace())));
                 return type;
             }
         };
@@ -136,7 +177,7 @@ public final class NeoForgeRegistrationApi implements RegistrationApi {
                 requireOpen(Registries.MENU, id);
                 MenuType<T> type = IMenuTypeExtension.create((IContainerFactory<T>)
                     (syncId, inventory, data) -> factory.create(syncId, inventory, data.readBlockPos()));
-                menus.add(new Entry<>(id, type));
+                menus.add(new Entry<>(id, type, RegistrationGuard.owner(id.getNamespace())));
                 return type;
             }
         };
@@ -148,7 +189,7 @@ public final class NeoForgeRegistrationApi implements RegistrationApi {
             @Override
             public <T> DataComponentType<T> register(ResourceLocation id, DataComponentType<T> type) {
                 requireOpen(Registries.DATA_COMPONENT_TYPE, id);
-                components.add(new Entry<>(id, type));
+                components.add(new Entry<>(id, type, RegistrationGuard.owner(id.getNamespace())));
                 return type;
             }
         };
@@ -161,7 +202,7 @@ public final class NeoForgeRegistrationApi implements RegistrationApi {
             CreativeModeTab tab = CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
                 .title(title).icon(icon)
                 .displayItems((params, output) -> content.fill(params, output)).build();
-            tabs.add(new Entry<>(id, tab));
+            tabs.add(new Entry<>(id, tab, RegistrationGuard.owner(id.getNamespace())));
             return tab;
         };
     }
@@ -172,8 +213,85 @@ public final class NeoForgeRegistrationApi implements RegistrationApi {
             @Override
             public <T extends Entity> EntityType<T> register(ResourceLocation id, EntityType<T> type) {
                 requireOpen(Registries.ENTITY_TYPE, id);
-                entities.add(new Entry<EntityType<?>>(id, type));
+                entities.add(new Entry<EntityType<?>>(id, type, RegistrationGuard.owner(id.getNamespace())));
                 return type;
+            }
+        };
+    }
+    @Override
+    public RecipeSerializerRegistrar recipeSerializers() {
+        return new RecipeSerializerRegistrar() {
+            @Override
+            public <T extends net.minecraft.world.item.crafting.RecipeSerializer<?>> T register(ResourceLocation id, T value) {
+                requireOpen(Registries.RECIPE_SERIALIZER, id);
+                recipeSerializers.add(new Entry<RecipeSerializer<?>>(id, requireValue(Registries.RECIPE_SERIALIZER, id, value),
+                    RegistrationGuard.owner(id.getNamespace())));
+                return value;
+            }
+        };
+    }
+
+    @Override
+    public RecipeTypeRegistrar recipeTypes() {
+        return new RecipeTypeRegistrar() {
+            @Override
+            public <T extends net.minecraft.world.item.crafting.RecipeType<?>> T register(ResourceLocation id, T value) {
+                requireOpen(Registries.RECIPE_TYPE, id);
+                recipeTypes.add(new Entry<RecipeType<?>>(id, requireValue(Registries.RECIPE_TYPE, id, value),
+                    RegistrationGuard.owner(id.getNamespace())));
+                return value;
+            }
+        };
+    }
+
+    @Override
+    public CriterionRegistrar criteria() {
+        return new CriterionRegistrar() {
+            @Override
+            public <T extends net.minecraft.advancements.CriterionTrigger<?>> T register(ResourceLocation id, T value) {
+                requireOpen(Registries.TRIGGER_TYPE, id);
+                criteria.add(new Entry<CriterionTrigger<?>>(id, requireValue(Registries.TRIGGER_TYPE, id, value),
+                    RegistrationGuard.owner(id.getNamespace())));
+                return value;
+            }
+        };
+    }
+
+    @Override
+    public ArmorMaterialRegistrar armorMaterials() {
+        return new ArmorMaterialRegistrar() {
+            @Override
+            public net.minecraft.core.Holder<net.minecraft.world.item.ArmorMaterial> register(ResourceLocation id, net.minecraft.world.item.ArmorMaterial value) {
+                requireOpen(Registries.ARMOR_MATERIAL, id);
+                armorMaterials.add(new Entry<ArmorMaterial>(id, requireValue(Registries.ARMOR_MATERIAL, id, value),
+                    RegistrationGuard.owner(id.getNamespace())));
+                return net.neoforged.neoforge.registries.DeferredHolder.create(Registries.ARMOR_MATERIAL, id);
+            }
+        };
+    }
+
+    @Override
+    public SoundRegistrar sounds() {
+        return new SoundRegistrar() {
+            @Override
+            public net.minecraft.sounds.SoundEvent register(ResourceLocation id, net.minecraft.sounds.SoundEvent value) {
+                requireOpen(Registries.SOUND_EVENT, id);
+                sounds.add(new Entry<SoundEvent>(id, requireValue(Registries.SOUND_EVENT, id, value),
+                    RegistrationGuard.owner(id.getNamespace())));
+                return value;
+            }
+        };
+    }
+
+    @Override
+    public ParticleRegistrar particles() {
+        return new ParticleRegistrar() {
+            @Override
+            public <T extends net.minecraft.core.particles.ParticleType<?>> T register(ResourceLocation id, T value) {
+                requireOpen(Registries.PARTICLE_TYPE, id);
+                particles.add(new Entry<ParticleType<?>>(id, requireValue(Registries.PARTICLE_TYPE, id, value),
+                    RegistrationGuard.owner(id.getNamespace())));
+                return value;
             }
         };
     }

@@ -52,7 +52,7 @@ public final class ClientProbe {
             pending = null;
         }
         // mryt233 改（r146f）：等资源加载遮罩退出后再读档，避免启动阶段嵌套加载。
-        if (mc.getOverlay() != null || ticks % 10 != 0) {
+        if (ticks % 10 != 0) {
             return;
         }
         var file = mc.gameDirectory.toPath().resolve("hotpot-probe-request.json");
@@ -65,9 +65,13 @@ public final class ClientProbe {
             if (id.equals(lastId) || !id.matches("[a-zA-Z0-9_-]{1,64}")) {
                 return;
             }
-            lastId = id;
             String action = request.get("action").getAsString();
+            // mryt233 改（2026-11-10）：加载中也可截图和关本实例；进世界仍等遮罩退出。
+            if (mc.getOverlay() != null && !action.equals("snapshot") && !action.equals("stop")) return;
+            lastId = id;
             switch (action) {
+                // mryt233 改（2026-11-10）：3C 客户端能力取证。
+                case "opt3c" -> Opt3cClientProbe.action(request);
                 case "snapshot" -> { }
                 case "observe" -> {
                     if (mc.player == null) throw new IllegalStateException("Observer requires player");
@@ -267,7 +271,7 @@ public final class ClientProbe {
                 default -> throw new IllegalArgumentException("Unsupported probe action");
             }
             pending = id;
-            if (!action.equals("walk")) readyAt = ticks + 40;
+            if (!action.equals("walk")) readyAt = ticks + (Boolean.getBoolean("hotpot.opt3c") ? 6 : 40);
         } catch (Exception e) {
             HotPot.LOGGER.error("[hotpot-probe] 请求处理失败", e);
         }
@@ -276,6 +280,11 @@ public final class ClientProbe {
     private static void snapshot(Minecraft mc, String id) {
         var report = new com.google.gson.JsonObject();
         report.addProperty("id", id);
+        report.addProperty("overlay", mc.getOverlay() == null ? "none" : mc.getOverlay().getClass().getName());
+        report.addProperty("window_focused", org.lwjgl.glfw.GLFW.glfwGetWindowAttrib(mc.getWindow().getWindow(),
+            org.lwjgl.glfw.GLFW.GLFW_FOCUSED) != 0);
+        report.addProperty("pause_on_lost_focus", mc.options.pauseOnLostFocus);
+        if (Boolean.getBoolean("hotpot.opt3c")) report.add("opt3c", Opt3cClientProbe.status());
         report.addProperty("screen", mc.screen == null ? "none" : mc.screen.getClass().getName());
         report.addProperty("window_width", mc.getWindow().getWidth());
         report.addProperty("window_height", mc.getWindow().getHeight());

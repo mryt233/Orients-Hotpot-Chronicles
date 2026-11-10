@@ -1,5 +1,7 @@
 package cn.blockforge.orient.framework.platform.fabric;
 
+// mryt233 改（2026-11-10）：第三批 3C 补充平台能力。
+
 import cn.blockforge.orient.framework.loader.NetworkApi;
 import cn.blockforge.orient.framework.loader.PayloadHandler;
 import cn.blockforge.orient.framework.loader.ProtocolPolicy;
@@ -31,7 +33,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class FabricNetworkApi implements NetworkApi {
     private static final Logger LOGGER = LoggerFactory.getLogger("orient-framework");
-    private static final int PROTOCOL_VERSION = 1;
 
     private final Set<String> registered = ConcurrentHashMap.newKeySet();
     /** 必需通道 id（两个方向都算），握手时发给客户端核对。 */

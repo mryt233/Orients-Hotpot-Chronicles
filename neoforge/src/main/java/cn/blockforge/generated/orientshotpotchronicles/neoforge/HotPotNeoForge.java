@@ -49,6 +49,16 @@ public final class HotPotNeoForge {
         // 注册表解冻窗口：核心的物品 / 方块 / 方块实体 / 菜单 / 创造栏都在这里落地
         NeoForgePlatform.install(modBus);
         modBus.addListener(this::onRegisterEvent);
+        // mryt233 改（2026-11-10）：独立探针只在显式开发参数下加载。
+        if (!FMLEnvironment.production && Boolean.getBoolean("hotpot.opt3c")) {
+            try {
+                Class.forName("cn.blockforge.generated.orientshotpotchronicles.devtest.Opt3cNeoForgeProbe")
+                    .getMethod("install", IEventBus.class).invoke(null, modBus);
+            } catch (ReflectiveOperationException error) {
+                throw new IllegalStateException("3C development probe failed", error);
+            }
+        }
+
         // mryt233 改（2026-11-10）：生产环境跳过；开发探针通过反射接线。
         if (!FMLEnvironment.production && Boolean.getBoolean("hotpot.expreg")) {
             try {
