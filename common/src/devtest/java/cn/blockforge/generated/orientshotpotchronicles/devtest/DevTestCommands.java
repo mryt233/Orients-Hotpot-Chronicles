@@ -41,6 +41,8 @@ public final class DevTestCommands {
 
     private static java.util.function.BiFunction<ServerLevel, com.mojang.authlib.GameProfile, ServerPlayer> playerFactory;
     private static ServerPlayer progressPlayer;
+    // mryt233 改（2026-11-10）：空连接没有底层 channel，加载器开发适配补发其断线生命周期。
+    public static java.util.function.Consumer<ServerPlayer> fakeDisconnect = player -> { };
     public static java.util.function.Supplier<net.minecraft.network.Connection> connectionFactory = DevFakeConnection::new;
     // mryt233 改（r146e）：以四向真实交互取证，不直接往 NBT 填新字段冒充摆放。
     private static float testYaw;
@@ -49,8 +51,13 @@ public final class DevTestCommands {
                                 net.minecraft.commands.CommandBuildContext registryAccess,
                                 java.util.function.BiFunction<ServerLevel, com.mojang.authlib.GameProfile, ServerPlayer> factory) {
         playerFactory = factory;
+        // mryt233 改（2026-11-10）：实际运行事件与缓存释放的开发取证。
+        Opt3dRuntimeProbe.install();
         dispatcher.register(
             Commands.literal("hpt").requires(src -> src.hasPermission(2))
+                .then(Commands.literal("opt3d").then(Commands.argument("action", com.mojang.brigadier.arguments.StringArgumentType.word())
+                    .executes(ctx -> report(ctx, Opt3dRuntimeProbe.run(ctx.getSource(),
+                        com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "action"))))))
                 .then(Commands.literal("facing")
                     .then(Commands.argument("yaw", com.mojang.brigadier.arguments.FloatArgumentType.floatArg())
                         .executes(ctx -> {
@@ -392,7 +399,10 @@ public final class DevTestCommands {
         if (manager.getPlayer(p.getUUID()) == null) {
             return report(ctx, "leave: 不在玩家列表里");
         }
-        manager.remove(p);
+        // mryt233 改（2026-11-10）：走真实断线处理，覆盖加载器的玩家下线事件与清理回调。
+        fakeDisconnect.accept(p);
+        p.connection.onDisconnect(new net.minecraft.network.DisconnectionDetails(Component.literal("development logout")));
+        if (manager.getPlayer(p.getUUID()) != null) manager.remove(p);
         return report(ctx, "leave ok");
     }
 

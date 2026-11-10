@@ -1,3 +1,4 @@
+# mryt233 改（2026-11-10）：同时识别旧字段写法与传入 registration 的生命周期注册。
 """把内容清单里的食物数值写回代码。
 
 用途：`content/items.json` 是食物数值的唯一出处，改完清单跑一次这个脚本，
@@ -28,7 +29,7 @@ MOD = Path(__file__).resolve().parent.parent
 MANIFEST = MOD / "content/items.json"
 CONTENT_JAVA = MOD / "common/src/main/java/cn/blockforge/generated/orientshotpotchronicles/hotpot/HotPotContent.java"
 
-CALL = re.compile(r'(foodItem\("(?P<id>[a-z0-9_]+)",\s*)(?P<hunger>\d+)(,\s*)(?P<sat>[0-9.]+)(F?\))')
+CALL = re.compile(r'(foodItem\(\s*(?:registration\s*,\s*)?"(?P<id>[a-z0-9_]+)",\s*)(?P<hunger>\d+)(,\s*)(?P<sat>[0-9.]+)(F?\))')
 
 
 def fmt_float(value: float, original: str) -> str:

@@ -8,8 +8,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.Registry;
 import net.minecraft.core.NonNullList;
 
 /**
@@ -24,8 +22,13 @@ public class SoupBucketRecipe extends ShapelessRecipe {
         super(base.getGroup(), base.category(), base.getResultItem(null), base.getIngredients());
     }
 
+    // mryt233 改（2026-11-10）：登记由内容模块传入的注册能力完成，保留旧入口。
     public static void register() {
-        Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, HotPot.id("soup_bucket"), SERIALIZER);
+        register(cn.blockforge.orient.framework.loader.Framework.platform().registration());
+    }
+
+    public static void register(cn.blockforge.orient.framework.loader.RegistrationApi registration) {
+        registration.recipeSerializers().register( HotPot.id("soup_bucket"), SERIALIZER);
     }
 
     @Override

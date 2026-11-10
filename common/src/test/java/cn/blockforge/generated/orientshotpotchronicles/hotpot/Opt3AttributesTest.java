@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * 3A：属性收拢后的默认值回归。作者：mryt233
  *
  * <p>这里只测<b>不依赖注册平台</b>的属性（汤底 / 饮料 / 锅材质的枚举本身）。
- * {@link HotPotContent} 的静态初始化需要框架平台先装好（真正注册方块和物品），单元测试环境里跑不起来；
+ * {@link HotPotContent} 的真实登记需要平台；提前类初始化已由生命周期回归覆盖；
  * 蘸料 {@link Seasoning} 的静态块要取 {@link HotPotContent} 的物品字段，同样跑不起来。
  * 所以「注册 ID 列表、创造栏顺序、方块 / 物品切实注册出来的属性、调料属性」用开发命令
  * {@code /hpt dumpattrs} 在改动前后各导出一份 JSON 逐项比对（tools/out/opt3_compare.py，结果在报告里）。</p>
@@ -244,4 +244,17 @@ class Opt3AttributesTest {
         assertEquals("copper", HotPotMaterial.COPPER_S.textureKey());
         assertEquals("iron", HotPotMaterial.IRON_O.textureKey());
     }
+    // mryt233 改（2026-11-10）：提前加载只产生元数据，不依赖平台也不提前登记。
+    @Test
+    void touchingContentBeforeRegistrationDoesNotUseAPlatform() {
+        assertFalse(cn.blockforge.orient.framework.loader.Framework.isInstalled());
+        assertEquals(12, HotPotContent.POT_ORDER.size());
+        assertNull(HotPotContent.STOVE);
+        assertNull(HotPotContent.CLOTH_APRON);
+        assertNull(HotPotContent.POT_CONTENTS);
+        assertTrue(HotPotContent.POT_BLOCKS.isEmpty());
+        assertTrue(HotPotContent.PLATES.isEmpty());
+        assertFalse(cn.blockforge.orient.framework.loader.Framework.isInstalled());
+    }
+
 }

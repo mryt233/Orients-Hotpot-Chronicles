@@ -9,6 +9,12 @@ public final class FabricDevTests {
     }
 
     public static void register() {
+        // mryt233 改（2026-11-10）：空连接无 Netty channelInactive，显式结束同一 networking addon 会话。
+        DevTestCommands.fakeDisconnect = player -> {
+            if (player.connection instanceof net.fabricmc.fabric.impl.networking.NetworkHandlerExtensions extension) {
+                extension.getAddon().handleDisconnect();
+            }
+        };
         CommandRegistrationCallback.EVENT.register((dispatcher, access, environment) ->
             DevTestCommands.register(dispatcher, access, FakePlayer::get));
     }

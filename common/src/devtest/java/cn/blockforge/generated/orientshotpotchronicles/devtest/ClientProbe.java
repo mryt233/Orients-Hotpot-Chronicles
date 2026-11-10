@@ -72,6 +72,8 @@ public final class ClientProbe {
             switch (action) {
                 // mryt233 改（2026-11-10）：3C 客户端能力取证。
                 case "opt3c" -> Opt3cClientProbe.action(request);
+                // mryt233 改（2026-11-10）：3D 只取证真实火锅内容，不登记假物品。
+                case "opt3d" -> Opt3dClientProbe.action(request);
                 case "snapshot" -> { }
                 case "observe" -> {
                     if (mc.player == null) throw new IllegalStateException("Observer requires player");
@@ -286,6 +288,7 @@ public final class ClientProbe {
         report.addProperty("pause_on_lost_focus", mc.options.pauseOnLostFocus);
         if (Boolean.getBoolean("hotpot.opt3c")) report.add("opt3c", Opt3cClientProbe.status());
         report.addProperty("screen", mc.screen == null ? "none" : mc.screen.getClass().getName());
+        report.add("opt3d", Opt3dClientProbe.status());
         report.addProperty("window_width", mc.getWindow().getWidth());
         report.addProperty("window_height", mc.getWindow().getHeight());
         report.addProperty("gui_width", mc.getWindow().getGuiScaledWidth());

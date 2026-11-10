@@ -18,6 +18,24 @@ public interface RuntimeEvents {
                       Commands.CommandSelection selection);
     }
 
+    // mryt233 改（2026-11-10）：保留默认方法，已有平台实现仍可加载。
+    default void onServerStarting(Consumer<MinecraftServer> callback) {
+        throw new UnsupportedOperationException("server starting requires Runtime 0.1.6");
+    }
+    default void onServerStopped(Consumer<MinecraftServer> callback) {
+        throw new UnsupportedOperationException("server stopped requires Runtime 0.1.6");
+    }
+    @FunctionalInterface
+    interface BlockBreak {
+        /** 返回 true 取消原版破坏；回调在方块移除之前执行。 */
+        boolean cancel(net.minecraft.world.level.Level level, net.minecraft.world.entity.player.Player player,
+                       net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state,
+                       net.minecraft.world.level.block.entity.BlockEntity entity);
+    }
+    default void beforeBlockBreak(BlockBreak callback) {
+        throw new UnsupportedOperationException("block breaking requires Runtime 0.1.6");
+    }
+
     void onCommands(CommandRegistration callback);
     void onPlayerJoin(Consumer<ServerPlayer> callback);
     void onPlayerLeave(Consumer<ServerPlayer> callback);

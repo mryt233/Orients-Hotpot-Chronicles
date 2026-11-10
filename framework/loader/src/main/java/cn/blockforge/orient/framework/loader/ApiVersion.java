@@ -15,7 +15,7 @@ public final class ApiVersion {
      * 破坏性变更进 0.2.0。内容包要求的范围由打包脚本按此算出：[本版本, 下一个次版本)。
      */
     // mryt233 改（2026-11-10）：ConfigStore 新增保存回执接口，本体依赖的 Runtime 下限同步提升。
-    public static final String RUNTIME = "0.1.5";
+    public static final String RUNTIME = "0.1.6";
 
     private ApiVersion() {
     }

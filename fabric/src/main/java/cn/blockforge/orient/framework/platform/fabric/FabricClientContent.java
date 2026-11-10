@@ -28,6 +28,9 @@ import java.util.Objects;
 final class FabricClientContent implements ClientContent {
     static void install() {
         ClientContent.install(new FabricClientContent());
+        // mryt233 改（2026-11-10）：动态物品平台适配由框架安装，内容只登记绘制回调。
+        cn.blockforge.orient.framework.client.ClientItemRenderers.install((item, renderer) ->
+            net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.INSTANCE.register(item, renderer::render));
     }
 
     @Override
@@ -81,5 +84,30 @@ final class FabricClientContent implements ClientContent {
     public void onDisconnect(Runnable callback) {
         Objects.requireNonNull(callback);
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> callback.run());
+    }
+    // mryt233 改（2026-11-10）：只把客户端原生事件转换为公共回调。
+    @Override
+    public void cutout(net.minecraft.world.level.block.Block... blocks) {
+        net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlocks(
+            net.minecraft.client.renderer.RenderType.cutout(), blocks);
+    }
+
+    @Override
+    public void screens(ScreenInit initializer) {
+        Objects.requireNonNull(initializer);
+        net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
+            ScreenHooks hooks = initializer.init(screen, widget ->
+                net.fabricmc.fabric.api.client.screen.v1.Screens.getButtons(screen).add(widget));
+            if (hooks == null) return;
+            net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.beforeRender(screen).register((s, graphics, x, y, delta) -> hooks.beforeRender().run());
+            net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.allowMouseScroll(screen).register((s, x, y, horizontal, vertical) -> hooks.scroll().allow(x, y, vertical));
+        });
+    }
+
+    @Override
+    public void blockOutline(BlockOutline callback) {
+        Objects.requireNonNull(callback);
+        net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.BLOCK_OUTLINE.register((context, outline) ->
+            !callback.render(outline.blockState(), outline.blockPos(), outline.cameraX(), outline.cameraY(), outline.cameraZ(), context.matrixStack(), outline.vertexConsumer()));
     }
 }

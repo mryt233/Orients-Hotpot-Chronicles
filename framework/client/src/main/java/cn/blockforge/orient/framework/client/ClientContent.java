@@ -15,6 +15,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -62,6 +63,30 @@ public interface ClientContent {
     /** 模型使用物品原有 ArmorMaterial 的贴图层；平台负责复制原版姿势与槽位可见性。 */
     void armorModels(ArmorModel factory, Item... items);
     void onDisconnect(Runnable callback);
+
+    // mryt233 改（2026-11-10）：客户端公共接线所需的窄事件能力，旧平台保留二进制兼容。
+    default void cutout(Block... blocks) {
+        throw new UnsupportedOperationException("cutout requires Runtime 0.1.6");
+    }
+    @FunctionalInterface
+    interface Scroll { boolean allow(double x, double y, double delta); }
+    record ScreenHooks(Runnable beforeRender, Scroll scroll) { }
+    @FunctionalInterface
+    interface ScreenInit {
+        ScreenHooks init(Screen screen, java.util.function.Consumer<net.minecraft.client.gui.components.AbstractWidget> add);
+    }
+    default void screens(ScreenInit initializer) {
+        throw new UnsupportedOperationException("screen events require Runtime 0.1.6");
+    }
+    @FunctionalInterface
+    interface BlockOutline {
+        boolean render(net.minecraft.world.level.block.state.BlockState state, net.minecraft.core.BlockPos pos,
+                       double cameraX, double cameraY, double cameraZ,
+                       com.mojang.blaze3d.vertex.PoseStack pose, com.mojang.blaze3d.vertex.VertexConsumer vertices);
+    }
+    default void blockOutline(BlockOutline callback) {
+        throw new UnsupportedOperationException("block outline requires Runtime 0.1.6");
+    }
 
     final class Installed {
         private static volatile ClientContent instance;

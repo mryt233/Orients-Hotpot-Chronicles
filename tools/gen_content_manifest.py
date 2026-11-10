@@ -1,3 +1,4 @@
+# mryt233 改（2026-11-10）：同时识别旧字段写法与传入 registration 的生命周期注册。
 """从代码和资源生成内容清单 mod/content/items.json。
 
 用途：内容清单是「一条内容应该有哪些文件」的唯一记录。手工维护 60 多个物品必然漏，
@@ -55,7 +56,7 @@ def registered_items(src: str) -> list[str]:
     ids = set(re.findall(r"Registries\.ITEM,\s*HotPot\.id\(\"([a-z0-9_]+)\"\)", src))
     # P1 第三批起走分域 Registrar：reg().items().register(HotPot.id("x"), ...)
     ids |= set(re.findall(r'\.items\(\)\.register\(\s*HotPot\.id\("([a-z0-9_]+)"\)', src))
-    ids |= set(re.findall(r'foodItem\("([a-z0-9_]+)"', src))
+    ids |= set(re.findall(r'foodItem\(\s*(?:registration\s*,\s*)?"([a-z0-9_]+)"', src))
     soup = (MOD / "common/src/main/java/cn/blockforge/generated/orientshotpotchronicles/hotpot/SoupBase.java")
     if soup.is_file():
         text = soup.read_text(encoding="utf-8")
@@ -69,7 +70,7 @@ def registered_items(src: str) -> list[str]:
 
 
 def food_items(src: str) -> set[str]:
-    return set(re.findall(r'foodItem\("([a-z0-9_]+)"', src))
+    return set(re.findall(r'foodItem\(\s*(?:registration\s*,\s*)?"([a-z0-9_]+)"', src))
 
 
 def recipe_results() -> dict[str, list[str]]:
@@ -94,7 +95,7 @@ def recipe_results() -> dict[str, list[str]]:
 def food_numbers(src: str) -> dict[str, tuple[int, float]]:
     """`foodItem("id", 饥饿, 饱和度系数)` → {id: (饥饿, 饱和度系数)}。"""
     out = {}
-    for m in re.finditer(r'foodItem\("([a-z0-9_]+)",\s*(\d+),\s*([0-9.]+)F?\)', src):
+    for m in re.finditer(r'foodItem\(\s*(?:registration\s*,\s*)?"([a-z0-9_]+)",\s*(\d+),\s*([0-9.]+)F?\)', src):
         out[m.group(1)] = (int(m.group(2)), float(m.group(3)))
     return out
 

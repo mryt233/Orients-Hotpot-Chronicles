@@ -14,6 +14,26 @@ import java.util.function.Consumer;
 
 /** Fabric 游戏事件适配。 */
 final class FabricRuntimeEvents implements RuntimeEvents {
+    // mryt233 改（2026-11-10）：仅适配原生事件，不承载内容业务。
+    @Override
+    public void onServerStarting(Consumer<MinecraftServer> callback) {
+        Objects.requireNonNull(callback);
+        ServerLifecycleEvents.SERVER_STARTING.register(callback::accept);
+    }
+
+    @Override
+    public void onServerStopped(Consumer<MinecraftServer> callback) {
+        Objects.requireNonNull(callback);
+        ServerLifecycleEvents.SERVER_STOPPED.register(callback::accept);
+    }
+
+    @Override
+    public void beforeBlockBreak(BlockBreak callback) {
+        Objects.requireNonNull(callback);
+        net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, entity) ->
+            !callback.cancel(world, player, pos, state, entity));
+    }
+
     @Override
     public void onCommands(CommandRegistration callback) {
         Objects.requireNonNull(callback);

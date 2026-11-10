@@ -24,4 +24,7 @@ public interface Platform {
     boolean isModLoaded(String modId);
 
     boolean isDevelopmentEnvironment();
+
+    /** mryt233 改（2026-11-10）：区分专用服与客户端进程，供初始化配置使用。 */
+    default boolean isDedicatedServer() { return false; }
 }

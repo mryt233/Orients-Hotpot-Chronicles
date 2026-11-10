@@ -1,7 +1,6 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -41,7 +40,7 @@ import java.util.Map;
  * 耐久 80、附魔性 15、皮革装备音，但护甲层贴图指向本模组的
  * {@code textures/models/armor/cloth_apron_layer_1.png}（浅亚麻布 + 白色挂脖绳），穿起来是布围裙的样子。</p>
  *
- * <p>材质在代码里用 {@link Registry#register} 直接注册进 {@code Registries.ARMOR_MATERIAL}
+ * <p>材质通过框架登记到 {@code Registries.ARMOR_MATERIAL}
  * （1.21.1 的护甲材质是数据驱动的静态注册表，代码里能直接注册，不依赖数据包）。</p>
  *
  * <p>防护特性（用户要的两条）：</p>
@@ -111,7 +110,12 @@ public class ClothApronItem extends ArmorItem {
     }
 
     public ClothApronItem(Style style) {
-        super(material(style), ArmorItem.Type.CHESTPLATE, new Item.Properties()
+        this(cn.blockforge.orient.framework.loader.Framework.platform().registration(), style);
+    }
+
+    // mryt233 改（2026-11-10）：保存登记器返回的 Holder，延迟注册落地前不读取 value()。
+    public ClothApronItem(cn.blockforge.orient.framework.loader.RegistrationApi registration, Style style) {
+        super(material(registration, style), ArmorItem.Type.CHESTPLATE, new Item.Properties()
             .durability(DURABILITY)
             .component(DataComponents.ATTRIBUTE_MODIFIERS, modifiers()));
         this.style = style;
@@ -130,7 +134,7 @@ public class ClothApronItem extends ArmorItem {
      * 取材质 Holder：第一次用到时把材质注册进静态注册表。材质里的护甲层贴图在本模组命名空间下，
      * 修复材料是白色羊毛或线（和配方一致）。
      */
-    private static synchronized net.minecraft.core.Holder<ArmorMaterial> material(Style style) {
+    private static synchronized net.minecraft.core.Holder<ArmorMaterial> material(cn.blockforge.orient.framework.loader.RegistrationApi registration, Style style) {
         net.minecraft.core.Holder<ArmorMaterial> cached = MATERIALS.get(style);
         if (cached == null) {
             ArmorMaterial value = new ArmorMaterial(
@@ -144,7 +148,7 @@ public class ClothApronItem extends ArmorItem {
                 0.0F,   // 韧性：布做的没有
                 0.0F);  // 击退抗性：同上
             // 注册进静态注册表并直接拿到 Holder（ArmorItem 的构造要的是 Holder，不是材质本体）
-            cached = Registry.registerForHolder(BuiltInRegistries.ARMOR_MATERIAL, HotPot.id(style.id()), value);
+            cached = registration.armorMaterials().register( HotPot.id(style.id()), value);
             MATERIALS.put(style, cached);
         }
         return cached;

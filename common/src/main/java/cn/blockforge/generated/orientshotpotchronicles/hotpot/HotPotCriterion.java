@@ -6,8 +6,6 @@ import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.ContextAwarePredicate;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Optional;
@@ -25,8 +23,13 @@ import java.util.Optional;
 public class HotPotCriterion extends SimpleCriterionTrigger<HotPotCriterion.Conditions> {
     public static final HotPotCriterion INSTANCE = new HotPotCriterion();
 
+    // mryt233 改（2026-11-10）：登记由内容模块传入的注册能力完成，保留旧入口。
     public static void register() {
-        Registry.register(BuiltInRegistries.TRIGGER_TYPES, HotPot.id("hotpot"), INSTANCE);
+        register(cn.blockforge.orient.framework.loader.Framework.platform().registration());
+    }
+
+    public static void register(cn.blockforge.orient.framework.loader.RegistrationApi registration) {
+        registration.criteria().register( HotPot.id("hotpot"), INSTANCE);
     }
 
     /** 只在服务端、真玩家身上触发；别处随便调。 */

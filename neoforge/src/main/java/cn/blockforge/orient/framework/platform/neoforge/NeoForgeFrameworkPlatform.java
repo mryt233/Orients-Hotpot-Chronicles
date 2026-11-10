@@ -124,4 +124,8 @@ public final class NeoForgeFrameworkPlatform implements Platform {
             return menu.title();
         }
     }
+    // mryt233 改（2026-11-10）：配置初始化需要的环境信息。
+    @Override
+    public boolean isDedicatedServer() { return net.neoforged.fml.loading.FMLEnvironment.dist.isDedicatedServer(); }
+
 }

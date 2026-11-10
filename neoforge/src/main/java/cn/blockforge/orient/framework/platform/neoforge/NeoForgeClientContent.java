@@ -41,6 +41,25 @@ final class NeoForgeClientContent implements ClientContent {
         bus.addListener((EntityRenderersEvent.RegisterRenderers e) -> content.renderers.bind(e));
         bus.addListener((RegisterClientExtensionsEvent e) -> content.extensions.bind(e));
         ClientContent.install(content);
+        // mryt233 改（2026-11-10）：复用扩展事件队列，公共登记不依赖原生事件先后。
+        cn.blockforge.orient.framework.client.ClientItemRenderers.install((item, renderer) ->
+            content.extensions.add(e -> e.registerItem(new IClientItemExtensions() {
+                private net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer custom;
+                @Override
+                public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                    if (custom == null) {
+                        var mc = net.minecraft.client.Minecraft.getInstance();
+                        custom = new net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer(mc.getBlockEntityRenderDispatcher(), mc.getEntityModels()) {
+                            @Override
+                            public void renderByItem(ItemStack stack, net.minecraft.world.item.ItemDisplayContext context,
+                                    com.mojang.blaze3d.vertex.PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buffers, int light, int overlay) {
+                                renderer.render(stack, context, pose, buffers, light, overlay);
+                            }
+                        };
+                    }
+                    return custom;
+                }
+            }, item)));
     }
 
     @Override
@@ -94,6 +113,43 @@ final class NeoForgeClientContent implements ClientContent {
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> {
             // 原生事件在进入世界前也会用空连接触发，只转发真正的玩家断开。
             if (e.getPlayer() != null && e.getConnection() != null) callback.run();
+        });
+    }
+    // mryt233 改（2026-11-10）：子标签和选中框的原生差异统一在平台转换。
+    @Override
+    public void cutout(net.minecraft.world.level.block.Block... blocks) {
+        for (var block : blocks) net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(block, net.minecraft.client.renderer.RenderType.cutout());
+    }
+
+    @Override
+    public void screens(ScreenInit initializer) {
+        Objects.requireNonNull(initializer);
+        java.util.Map<Screen, ScreenHooks> hooks = new java.util.IdentityHashMap<>();
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ScreenEvent.Init.Post e) -> {
+            ScreenHooks value = initializer.init(e.getScreen(), e::addListener);
+            if (value == null) hooks.remove(e.getScreen()); else hooks.put(e.getScreen(), value);
+        });
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ScreenEvent.Render.Pre e) -> {
+            ScreenHooks value = hooks.get(e.getScreen());
+            if (value != null) value.beforeRender().run();
+        });
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ScreenEvent.MouseScrolled.Pre e) -> {
+            ScreenHooks value = hooks.get(e.getScreen());
+            if (value != null && !value.scroll().allow(e.getMouseX(), e.getMouseY(), e.getScrollDeltaY())) e.setCanceled(true);
+        });
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ScreenEvent.Closing e) -> hooks.remove(e.getScreen()));
+    }
+
+    @Override
+    public void blockOutline(BlockOutline callback) {
+        Objects.requireNonNull(callback);
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.RenderHighlightEvent.Block e) -> {
+            var mc = net.minecraft.client.Minecraft.getInstance();
+            if (mc.level == null) return;
+            var pos = e.getTarget().getBlockPos();
+            var camera = e.getCamera().getPosition();
+            if (callback.render(mc.level.getBlockState(pos), pos, camera.x, camera.y, camera.z, e.getPoseStack(),
+                    e.getMultiBufferSource().getBuffer(net.minecraft.client.renderer.RenderType.lines()))) e.setCanceled(true);
         });
     }
 }

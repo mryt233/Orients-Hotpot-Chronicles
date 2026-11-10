@@ -188,7 +188,7 @@ def plan_item(plan, spec, label, cooked_from=None, base_like=None, base_color=No
         return None
     src = plan.java[CONTENT]
     names = names_ok(plan, spec, label)
-    exists = f'HotPot.id("{iid}")' in src or f'foodItem("{iid}"' in src
+    exists = f'HotPot.id("{iid}")' in src or f'foodItem("{iid}"' in src or f'foodItem(registration, "{iid}"' in src
     if exists:
         plan.todo.append(f"{iid} 已经注册过，跳过注册代码（只补缺的文件）")
     elif re.search(rf"\b{const(iid)}\b", src):
@@ -196,13 +196,17 @@ def plan_item(plan, spec, label, cooked_from=None, base_like=None, base_color=No
     else:
         doc = spec.get("comment") or (f"{names.get('zh_cn', iid)}：{cooked_from} 煮 / 烤熟（tools/new_item.py 生成）"
                                       if cooked_from else f"{names.get('zh_cn', iid)}（tools/new_item.py 生成，记得补说明）")
+        # mryt233 改（2026-11-10）：字段只声明，登记赋值写进 register(registration)。
+        line = f'    /** {doc} */\n    public static Item {const(iid)};\n'
         if "hunger" in spec:
-            line = (f'    /** {doc} */\n    public static final Item {const(iid)} = '
-                    f'foodItem("{iid}", {int(spec["hunger"])}, {float(spec.get("saturation", 0.3))}F);\n')
+            assignment = (f'        {const(iid)} = foodItem(registration, "{iid}", '
+                          f'{int(spec["hunger"])}, {float(spec.get("saturation", 0.3))}F);\n')
         else:
-            line = (f'    /** {doc} */\n    public static final Item {const(iid)} = reg().items().register( HotPot.id("{iid}"),\n'
-                    f'        new Item(new Item.Properties()));\n')
+            assignment = (f'        {const(iid)} = registration.items().register(HotPot.id("{iid}"),\n'
+                          f'            new Item(new Item.Properties()));\n')
         plan.java[CONTENT] = insert_before(plan.java[CONTENT], MARK_REG, line)
+        plan.java[CONTENT] = insert_before(plan.java[CONTENT],
+            "        // ==== tools/new_item.py：新物品的登记赋值插在这行上面", assignment)
         plan.java[CONTENT] = insert_before(plan.java[CONTENT], MARK_TAB, f"                entries.accept({const(iid)});\n")
         plan.step(CONTENT, f"注册 {const(iid)}" + (f"（食物：回 {spec['hunger']}，饱和 {spec.get('saturation', 0.3)}）"
                                                      if "hunger" in spec else "（普通物品）") + "，并加进创造栏")
