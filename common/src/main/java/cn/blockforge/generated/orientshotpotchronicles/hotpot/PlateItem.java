@@ -1,5 +1,15 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+// mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.BlockItem;
@@ -36,7 +46,7 @@ public class PlateItem extends BlockItem {
      */
     public static void syncFoodModel(ItemStack stack, boolean hasFood) {
         if (hasFood) {
-            stack.set(DataComponents.CUSTOM_MODEL_DATA, new net.minecraft.world.item.component.CustomModelData(1));
+            stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(1));
         } else {
             stack.remove(DataComponents.CUSTOM_MODEL_DATA);
         }
@@ -45,7 +55,7 @@ public class PlateItem extends BlockItem {
     /** 盘子物品按 container 组件里有没有菜同步模型。 */
     public static void syncPlateModel(ItemStack stack) {
         syncFoodModel(stack, stack.getOrDefault(DataComponents.CONTAINER,
-            net.minecraft.world.item.component.ItemContainerContents.EMPTY).nonEmptyStream().findAny().isPresent());
+            ItemContainerContents.EMPTY).nonEmptyStream().findAny().isPresent());
     }
 
     /** 能不能装进盘子：能下锅的生食材，或者本身能吃的东西（熟食也能装）；汤碗、橙子饮料这种整件摆的不算。 */
@@ -66,12 +76,12 @@ public class PlateItem extends BlockItem {
      * 若这里返回筷架方块，点盘子就会被当成「再摆一个盘子」。竹筷上桌由
      * {@link ChopsticksItem#useOn} 自己调 {@link #placeOn} 摆 {@link HotPotContent#CHOPSTICK_REST_BLOCK}。
      */
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     public static PlateBlock placedFor(ItemStack stack) {
         if (stack.getItem() instanceof PlateItem item) {
             return item.plate();
         }
-        if (stack.is(net.minecraft.world.item.Items.BOWL) || stack.getItem() instanceof SoupBowlItem
+        if (stack.is(Items.BOWL) || stack.getItem() instanceof SoupBowlItem
             || stack.getItem() instanceof DippingSauceItem) {
             return HotPotContent.BOWL_BLOCK;
         }
@@ -109,12 +119,12 @@ public class PlateItem extends BlockItem {
     public static InteractionResult placeOn(UseOnContext context, PlateBlock plate, boolean keepSelf) {
         Level world = context.getLevel();
         if (context.getClickedFace() != Direction.UP || context.getPlayer() == null) {
-            return InteractionResult.PASS;
+            return Use.item(UseOutcome.PASS, world.isClientSide);
         }
         BlockState clicked = world.getBlockState(context.getClickedPos());
         if (clicked.getBlock() instanceof HotPotBlock || StoveBlock.isStove(clicked)
             || clicked.getBlock() instanceof StoveTopBlock) {
-            return InteractionResult.PASS;
+            return Use.item(UseOutcome.PASS, world.isClientSide);
         }
         BlockPos target = context.getClickedPos().above();
         // 桌面在方块中间（11/16），点在桌面上时目标是桌子上面那一格
@@ -122,18 +132,18 @@ public class PlateItem extends BlockItem {
         if (!existing.is(HotPotContent.PLATE_HOLDER)) {
             BlockPlaceContext placement = new BlockPlaceContext(context);
             if (!existing.canBeReplaced(placement) || !PlateHolderBlock.supported(world, target)) {
-                return InteractionResult.PASS;
+                return Use.item(UseOutcome.PASS, world.isClientSide);
             }
         }
         if (world.isClientSide) {
-            return InteractionResult.SUCCESS;
+            return Use.item(UseOutcome.SUCCESS, world.isClientSide);
         }
         if (!existing.is(HotPotContent.PLATE_HOLDER)) {
             world.setBlock(target, PlateHolderBlock.withSurface(HotPotContent.PLATE_HOLDER.defaultBlockState(), world, target),
-                net.minecraft.world.level.block.Block.UPDATE_ALL);
+                Block.UPDATE_ALL);
         }
         if (!(world.getBlockEntity(target) instanceof PlateHolderBlockEntity be)) {
-            return InteractionResult.FAIL;
+            return Use.item(UseOutcome.FAIL, world.isClientSide);
         }
         double hx = (context.getClickLocation().x - target.getX()) * 16;
         double hz = (context.getClickLocation().z - target.getZ()) * 16;
@@ -145,7 +155,7 @@ public class PlateItem extends BlockItem {
             if (be.plates().isEmpty()) {
                 world.removeBlock(target, false);
             }
-            return InteractionResult.FAIL;
+            return Use.item(UseOutcome.FAIL, world.isClientSide);
         }
         // mryt233 改（r146d）：只替换饮料瓶上桌的声音，杯子和其他餐具沿用原声。
         if (plate instanceof DrinkBlock) {
@@ -154,6 +164,6 @@ public class PlateItem extends BlockItem {
             world.playSound(null, target, plate.defaultBlockState().getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
         }
         stack.consume(1, context.getPlayer());
-        return InteractionResult.SUCCESS;
+        return Use.item(UseOutcome.SUCCESS, world.isClientSide);
     }
 }

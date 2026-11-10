@@ -47,6 +47,10 @@ class EnvironmentTests(unittest.TestCase):
         code = 'TABLE_WOODS = java.util.List.of(' + ','.join(json.dumps(w) for w in ids("woods")) + ')'
         self.assertEqual(check_content.check_materials(code), [])
         self.assertTrue(check_content.check_materials(code.replace('"oak"', '"absent"')))
+        # mryt233 改（2026-11-11）：机械 import 清理不能使内容检查误报。
+        imported = code.replace('java.util.List', 'List')
+        self.assertEqual(check_content.check_materials(imported), [])
+        self.assertTrue(check_content.check_materials(imported.replace('"oak"', '"absent"')))
 
     def test_legacy_writer_preserves_bytes_and_newline(self):
         with tempfile.TemporaryDirectory() as folder:

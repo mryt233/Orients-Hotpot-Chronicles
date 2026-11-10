@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.world.effect.MobEffectInstance;
+
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.effect.MobEffects;
@@ -83,7 +86,7 @@ public class SoupBowlItem extends Item {
             }
             // mryt233 改（2026-11-05，r136a）：六种汤碗统一按 SoupBase.dishBonusEffects(辣度) 结算，
             // 红汤碗的辣度是盛出来时装在 SPICY_LEVEL 组件里的（0 档 = 微辣，和以前一样）。
-            for (net.minecraft.world.effect.MobEffectInstance effect : soup.dishBonusEffects(spicy)) {
+            for (MobEffectInstance effect : soup.dishBonusEffects(spicy)) {
                 user.addEffect(effect);
             }
             // 3 级特辣：嘴上冒 2 秒火苗，纯节目效果（前面刚加的抗火罩着，不会扣血）

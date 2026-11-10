@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
@@ -18,8 +21,8 @@ import net.minecraft.world.level.Level;
  * 作者：mryt233 */
 public class DrinkBlock extends PlateBlock {
     public static final BooleanProperty EMPTY = BooleanProperty.create("empty");
-    public static final net.minecraft.world.level.block.state.properties.EnumProperty<DrinkKind> KIND =
-        net.minecraft.world.level.block.state.properties.EnumProperty.create("kind", DrinkKind.class, DrinkKind::hasBottle);   // 水、牛奶没有瓶装（2026-10-27）
+    public static final EnumProperty<DrinkKind> KIND =
+        EnumProperty.create("kind", DrinkKind.class, DrinkKind::hasBottle);   // 水、牛奶没有瓶装（2026-10-27）
 
     public DrinkBlock() {
         super("drink", PlateSize.DRINK, MapColor.COLOR_ORANGE, SoundType.DECORATED_POT);

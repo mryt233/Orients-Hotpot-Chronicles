@@ -1,5 +1,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.Locale;
+import net.minecraft.client.resources.language.I18n;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -107,7 +111,7 @@ public final class ClientTooltips {
             return "∞";
         }
         int seconds = (ticks + 19) / 20;
-        return (seconds / 60) + ":" + String.format(java.util.Locale.ROOT, "%02d", seconds % 60);
+        return (seconds / 60) + ":" + String.format(Locale.ROOT, "%02d", seconds % 60);
     }
 
     /**
@@ -129,7 +133,7 @@ public final class ClientTooltips {
         var id = BuiltInRegistries.ITEM.getKey(stack.getItem());
         if (HotPot.MOD_ID.equals(id.getNamespace())) {
             String key = "tooltip." + HotPot.MOD_ID + ".flavor." + id.getPath();
-            if (net.minecraft.client.resources.language.I18n.exists(key)) {
+            if (I18n.exists(key)) {
                 lines.add(Component.translatable(key).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
             }
         }

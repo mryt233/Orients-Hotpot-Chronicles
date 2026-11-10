@@ -1,5 +1,8 @@
 package mezz.jei.api;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import mezz.jei.api.registration.IGuiHandlerRegistration;
+
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -14,7 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public interface IModPlugin {
     // mryt233 改（r146f）：原料表占用区域注册签名。
-    default void registerGuiHandlers(mezz.jei.api.registration.IGuiHandlerRegistration registration) { }
+    default void registerGuiHandlers(IGuiHandlerRegistration registration) { }
 
     /** 插件唯一标识，必须全模组唯一。 */
     ResourceLocation getPluginUid();

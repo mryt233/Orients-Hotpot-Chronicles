@@ -1,5 +1,16 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+// mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -55,8 +66,8 @@ public class CupItem extends Item {
     /** 手里的是水桶 / 奶桶：能倒出哪种；别的东西是 null。 */
     @Nullable
     public static DrinkKind bucketKind(ItemStack stack) {
-        return stack.is(net.minecraft.world.item.Items.WATER_BUCKET) ? DrinkKind.WATER
-            : stack.is(net.minecraft.world.item.Items.MILK_BUCKET) ? DrinkKind.MILK : null;
+        return stack.is(Items.WATER_BUCKET) ? DrinkKind.WATER
+            : stack.is(Items.MILK_BUCKET) ? DrinkKind.MILK : null;
     }
 
     public static boolean isEmptyCup(ItemStack stack) {
@@ -112,22 +123,23 @@ public class CupItem extends Item {
                     cheers(world, user, stack, null, null, user.getEyePosition().add(user.getLookAngle().scale(0.4)));
                 }
             }
-            return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
+            return Use.itemUse(UseOutcome.SUCCESS_SOFT, stack, world.isClientSide());
         }
         if (kind != null) {
             return ItemUtils.startUsingInstantly(world, user, hand);
         }
         // 空杯对着水源：舀一杯水（同原版玻璃瓶）
-        net.minecraft.world.phys.BlockHitResult hit = getPlayerPOVHitResult(world, user, net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY);
-        if (hit.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK
+        BlockHitResult hit = getPlayerPOVHitResult(world, user, ClipContext.Fluid.SOURCE_ONLY);
+        if (hit.getType() == HitResult.Type.BLOCK
             && world.mayInteract(user, hit.getBlockPos())
-            && world.getFluidState(hit.getBlockPos()).is(net.minecraft.tags.FluidTags.WATER)) {
+            && world.getFluidState(hit.getBlockPos()).is(FluidTags.WATER)) {
             world.playSound(user, user.getX(), user.getY(), user.getZ(), SoundEvents.BOTTLE_FILL, SoundSource.NEUTRAL, 1.0F, 1.0F);
-            world.gameEvent(user, net.minecraft.world.level.gameevent.GameEvent.FLUID_PICKUP, hit.getBlockPos());
+            world.gameEvent(user, GameEvent.FLUID_PICKUP, hit.getBlockPos());
             user.awardStat(Stats.ITEM_USED.get(this));
-            return InteractionResultHolder.sidedSuccess(ItemUtils.createFilledResult(stack, user, new ItemStack(HotPotContent.WATER_CUP)), world.isClientSide());
+            return Use.itemUse(UseOutcome.SUCCESS_SOFT,
+            ItemUtils.createFilledResult(stack, user, new ItemStack(HotPotContent.WATER_CUP)), world.isClientSide());
         }
-        return InteractionResultHolder.pass(stack);
+        return Use.itemUse(UseOutcome.PASS, stack, world.isClientSide());
     }
 
     /**
@@ -137,16 +149,16 @@ public class CupItem extends Item {
     @Override
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity target, InteractionHand hand) {
         if (kind == null || !(target instanceof Player other) || other == player) {
-            return InteractionResult.PASS;
+            return Use.item(UseOutcome.PASS, player.level().isClientSide);
         }
         ItemStack otherCup = heldCup(other);
         if (otherCup.isEmpty()) {
-            return InteractionResult.PASS;
+            return Use.item(UseOutcome.PASS, player.level().isClientSide);
         }
         if (!player.level().isClientSide) {
             cheers(player.level(), player, stack, other, otherCup, midPoint(player, other));
         }
-        return InteractionResult.sidedSuccess(player.level().isClientSide);
+        return Use.item(UseOutcome.SUCCESS_SOFT, player.level().isClientSide);
     }
 
     /** 这位玩家主手或副手里端着的满杯；没有返回空。 */

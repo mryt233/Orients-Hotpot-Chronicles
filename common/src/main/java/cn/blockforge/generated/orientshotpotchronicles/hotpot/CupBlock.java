@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
@@ -11,8 +14,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
  * 方块状态借用 DrinkBlock 的 empty；kind 用自己的（杯子还能装水、牛奶，2026-10-27）。作者：mryt233 * 2026-10-30 Mojang 映射迁移。
  */
 public class CupBlock extends PlateBlock {
-    public static final net.minecraft.world.level.block.state.properties.EnumProperty<DrinkKind> KIND =
-        net.minecraft.world.level.block.state.properties.EnumProperty.create("kind", DrinkKind.class);
+    public static final EnumProperty<DrinkKind> KIND =
+        EnumProperty.create("kind", DrinkKind.class);
 
     public CupBlock() {
         super("cup", PlateSize.CUP, MapColor.NONE, SoundType.GLASS);

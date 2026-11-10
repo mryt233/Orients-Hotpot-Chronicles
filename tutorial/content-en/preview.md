@@ -17,6 +17,8 @@ Development Preview (not released yet; names and values may change). Everything 
 <!-- mryt233 改（2026-11-11，r147 第三批 3E）。 -->
 - **Modpacks can change pot cooking and rolling-pin pounding with data packs**: Pot-only cooking (kelp, whole tofu, crispy pork, zhe'ergen slices) and rolling-pin pounding (meatballs, fish balls, minced garlic, shrimp paste, crushed peanuts, minced zhe'ergen) are now data-pack recipes of type `orients_hotpot_chronicles:pot_boiling` and `orients_hotpot_chronicles:pounding`; they can be added, changed or removed and take effect after `/reload`. Items added to the item tag `orients_hotpot_chronicles:not_pot_ingredient` can no longer go into the pot. Default gameplay is unchanged, and cooking times for this mod's own ingredients still follow the config.<!--清单#148-->
 - **Recipe viewer cooking list completed and corrected**: The JEI / REI cooking list now includes the previously missing kelp, raw ham sausage, ham sausage slices, and vanilla raw meat, raw fish, potatoes and chorus fruit that can go straight into the pot; whole tofu now shows the actual 1 piece when overcooked, and re-boiling crispy pork shows the actual 0.15 XP. Only the display was corrected; actual cooking is unchanged.<!--清单#149-->
+<!-- mryt233 改（2026-11-11，r147 第三批 3G）。 -->
+- **Internal cleanup (no visible change)**: Right-click results and block save/load code now go through a small version-adapter module, making future ports to other Minecraft versions easier; gameplay and the save format are unchanged.<!--清单#150-->
 
 <!-- mryt233 改（r146f） -->
 ## Sauce station ingredient list: narrowed with pagination {#r146f}

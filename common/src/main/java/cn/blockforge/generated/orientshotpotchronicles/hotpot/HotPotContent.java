@@ -1,5 +1,36 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.mojang.serialization.Codec;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
+
 import cn.blockforge.orient.framework.loader.Framework;
 import cn.blockforge.orient.framework.loader.RegistrationApi;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -36,7 +67,7 @@ public final class HotPotContent {
      *
      * <p>旧字段名（COPPER_HOT_POT 等）保留成指向同一对象的别名，子模组和旧调用方不受影响。</p>
      */
-    public static final java.util.List<HotPotMaterial> POT_ORDER = java.util.List.of(
+    public static final List<HotPotMaterial> POT_ORDER = List.of(
         HotPotMaterial.COPPER, HotPotMaterial.IRON,
         HotPotMaterial.COPPER_S, HotPotMaterial.COPPER_O,
         HotPotMaterial.IRON_S, HotPotMaterial.IRON_O,
@@ -45,16 +76,16 @@ public final class HotPotContent {
         HotPotMaterial.COPPER_FOUR, HotPotMaterial.IRON_FOUR);
 
     /** 锅方块：材质 → 方块（顺序同 {@link #POT_ORDER}）。 */
-    public static final java.util.Map<HotPotMaterial, HotPotBlock> POT_BLOCKS =
-        new java.util.EnumMap<>(HotPotMaterial.class);
+    public static final Map<HotPotMaterial, HotPotBlock> POT_BLOCKS =
+        new EnumMap<>(HotPotMaterial.class);
     /** 锅物品：材质 → 物品（同一顺序）。 */
-    public static final java.util.Map<HotPotMaterial, BlockItem> POT_ITEMS =
-        new java.util.EnumMap<>(HotPotMaterial.class);
+    public static final Map<HotPotMaterial, BlockItem> POT_ITEMS =
+        new EnumMap<>(HotPotMaterial.class);
 
 
 
     /** 每种原版木板一种火锅桌（顺序同原版木板），围着灶台拼成 3x3 的大桌，顶面和灶台台面齐平。 */
-    public static final java.util.List<String> TABLE_WOODS = java.util.List.of(
+    public static final List<String> TABLE_WOODS = List.of(
         "oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped");
     /** 石料 / 金属桌面的桌子：{材质（ID 用）, 取声音和颜色的原版方块}，和 tools/gen_stone_tables.py 的 MATERIALS 同序（2026-10-26）。 */
     static final String[][] STONE_TABLES = {
@@ -62,16 +93,16 @@ public final class HotPotContent {
         {"polished_granite", "polished_granite"}, {"polished_deepslate", "polished_deepslate"},
         {"polished_blackstone", "polished_blackstone"}, {"quartz", "quartz_block"}, {"cut_copper", "cut_copper"},
         {"iron", "iron_block"}};
-    public static final java.util.List<HotPotTableBlock> HOTPOT_TABLES = new java.util.ArrayList<>();
-    public static final java.util.List<BlockItem> HOTPOT_TABLE_ITEMS = new java.util.ArrayList<>();
+    public static final List<HotPotTableBlock> HOTPOT_TABLES = new ArrayList<>();
+    public static final List<BlockItem> HOTPOT_TABLE_ITEMS = new ArrayList<>();
     /** 板凳（矮）：同样每种原版木板一种，能坐。 */
-    public static final java.util.List<BenchBlock> BENCHES = new java.util.ArrayList<>();
-    public static final java.util.List<BlockItem> BENCH_ITEMS = new java.util.ArrayList<>();
+    public static final List<BenchBlock> BENCHES = new ArrayList<>();
+    public static final List<BlockItem> BENCH_ITEMS = new ArrayList<>();
     /** 1.5 格高的火锅桌和一格高的条凳（配高灶台），同样每种原版木板一种。 */
-    public static final java.util.List<TallHotPotTableBlock> TALL_TABLES = new java.util.ArrayList<>();
-    public static final java.util.List<BlockItem> TALL_TABLE_ITEMS = new java.util.ArrayList<>();
-    public static final java.util.List<BenchBlock> TALL_BENCHES = new java.util.ArrayList<>();
-    public static final java.util.List<BlockItem> TALL_BENCH_ITEMS = new java.util.ArrayList<>();
+    public static final List<TallHotPotTableBlock> TALL_TABLES = new ArrayList<>();
+    public static final List<BlockItem> TALL_TABLE_ITEMS = new ArrayList<>();
+    public static final List<BenchBlock> TALL_BENCHES = new ArrayList<>();
+    public static final List<BlockItem> TALL_BENCH_ITEMS = new ArrayList<>();
 
     /**
      * 盘子材质（顺序：材质在外层；打乱会让注册顺序和创造栏顺序变化）。
@@ -81,25 +112,25 @@ public final class HotPotContent {
      * 见 {@link #verifyPlateMaterials()}）。
      */
     public record PlateMaterial(String id,
-                                net.minecraft.world.level.material.MapColor mapColor,
-                                net.minecraft.world.level.block.SoundType sounds) {
+                                MapColor mapColor,
+                                SoundType sounds) {
     }
 
-    public static final java.util.List<PlateMaterial> PLATE_MATERIALS = java.util.List.of(
-        new PlateMaterial("quartz", net.minecraft.world.level.material.MapColor.QUARTZ,
-            net.minecraft.world.level.block.SoundType.DECORATED_POT),
-        new PlateMaterial("bamboo", net.minecraft.world.level.material.MapColor.SAND,
-            net.minecraft.world.level.block.SoundType.BAMBOO_WOOD),
-        new PlateMaterial("terracotta", net.minecraft.world.level.material.MapColor.COLOR_ORANGE,
-            net.minecraft.world.level.block.SoundType.DECORATED_POT),
-        new PlateMaterial("copper", net.minecraft.world.level.material.MapColor.COLOR_ORANGE,
-            net.minecraft.world.level.block.SoundType.COPPER),
-        new PlateMaterial("iron", net.minecraft.world.level.material.MapColor.METAL,
-            net.minecraft.world.level.block.SoundType.METAL));
-    public static final java.util.List<PlateBlock> PLATES = new java.util.ArrayList<>();
-    public static final java.util.List<PlateItem> PLATE_ITEMS = new java.util.ArrayList<>();
+    public static final List<PlateMaterial> PLATE_MATERIALS = List.of(
+        new PlateMaterial("quartz", MapColor.QUARTZ,
+            SoundType.DECORATED_POT),
+        new PlateMaterial("bamboo", MapColor.SAND,
+            SoundType.BAMBOO_WOOD),
+        new PlateMaterial("terracotta", MapColor.COLOR_ORANGE,
+            SoundType.DECORATED_POT),
+        new PlateMaterial("copper", MapColor.COLOR_ORANGE,
+            SoundType.COPPER),
+        new PlateMaterial("iron", MapColor.METAL,
+            SoundType.METAL));
+    public static final List<PlateBlock> PLATES = new ArrayList<>();
+    public static final List<PlateItem> PLATE_ITEMS = new ArrayList<>();
     /** 筷子上夹着的那一样食物（组件值包在 HeldFood 里，NeoForge 要求组件值实现 equals/hashCode）。 */
-    public static net.minecraft.core.component.DataComponentType<HeldFood> HELD_FOOD;
+    public static DataComponentType<HeldFood> HELD_FOOD;
 
 
 
@@ -127,7 +158,7 @@ public final class HotPotContent {
     public static BlockEntityType<PlateHolderBlockEntity> PLATE_HOLDER_BE;
 
     /** 坐条凳时骑的看不见的座位实体。 */
-    public static net.minecraft.world.entity.EntityType<SeatEntity> SEAT;
+    public static EntityType<SeatEntity> SEAT;
 
 
 
@@ -320,7 +351,7 @@ public final class HotPotContent {
     public static Item BROWN_TRIM_CLOTH_APRON;
 
     /** 三款布围裙（创造栏 / 换款配方 / 成就共用）。 */
-    public static java.util.List<Item> CLOTH_APRONS;
+    public static List<Item> CLOTH_APRONS;
 
     // ==== tools/new_item.py：新物品的注册插在这行上面（mryt233 2026-11-01，别删这行）====
     /** 番茄（2026-10-25）：打草掉（GarnishLoot，同大蒜 15%），能吃；做番茄锅底料。 */
@@ -380,7 +411,7 @@ public final class HotPotContent {
     private static Item foodItem(RegistrationApi registration, String id, int nutrition, float saturation) {
         Config.rememberFood(id, nutrition, saturation);
         return registration.items().register( HotPot.id(id),
-            new ConfiguredFoodItem(id, new Item.Properties().food(new net.minecraft.world.food.FoodProperties.Builder()
+            new ConfiguredFoodItem(id, new Item.Properties().food(new FoodProperties.Builder()
                 .nutrition(nutrition).saturationModifier(saturation).alwaysEdible().build())));
     }
 
@@ -395,7 +426,7 @@ public final class HotPotContent {
     }
 
     /** 一碗汤（r99）：顺序同 SoupBase（清汤、高汤、菌汤、红汤）。 */
-    public static java.util.List<SoupBowlItem> SOUP_BOWLS;
+    public static List<SoupBowlItem> SOUP_BOWLS;
 
     /** 饮料（r99 橙子饮料，r101 维二）和喝完的空瓶。 */
     public static DrinkItem ORANGE_DRINK;
@@ -456,8 +487,8 @@ public final class HotPotContent {
     public static DataComponentType<Boolean> CHEERED;
     public static DippingSauceItem DIPPING_SAUCE;
     /** 蘸料台：11 种原版木头各一个 + 铁的（用户定）；ID = <木头>_sauce_station / iron_sauce_station。 */
-    public static final java.util.List<SauceStationBlock> SAUCE_STATIONS = new java.util.ArrayList<>();
-    public static final java.util.List<BlockItem> SAUCE_STATION_ITEMS = new java.util.ArrayList<>();
+    public static final List<SauceStationBlock> SAUCE_STATIONS = new ArrayList<>();
+    public static final List<BlockItem> SAUCE_STATION_ITEMS = new ArrayList<>();
 
 
 
@@ -466,7 +497,7 @@ public final class HotPotContent {
 
     public static BlockEntityType<SauceStationBlockEntity> SAUCE_STATION_BE;
     /** 由平台在 {@link #register} 里注册并赋值。 */
-    public static net.minecraft.world.inventory.MenuType<SauceStationScreenHandler> SAUCE_STATION_SCREEN;
+    public static MenuType<SauceStationScreenHandler> SAUCE_STATION_SCREEN;
 
     /** 装着东西的锅物品：汤底、食材、熟度原样打包（格式同锅方块实体存档）。 */
     public static DataComponentType<CustomData> POT_CONTENTS;
@@ -480,10 +511,10 @@ public final class HotPotContent {
     /** 条凳的方块实体（只用来画斜腿）。 */
     public static BlockEntityType<BenchBlockEntity> BENCH_BE;
 
-    public static net.minecraft.world.inventory.MenuType<HotPotScreenHandler> HOT_POT_SCREEN;
+    public static MenuType<HotPotScreenHandler> HOT_POT_SCREEN;
 
     /** 灶台底座的灶膛燃料界面。 */
-    public static net.minecraft.world.inventory.MenuType<StoveScreenHandler> STOVE_SCREEN;
+    public static MenuType<StoveScreenHandler> STOVE_SCREEN;
 
     /** 本模组专属分类：使用 Fabric 的追加式标签页，自动排在原版标签页之后并进入后续页面。 */
     public static final ResourceKey<CreativeModeTab> ITEM_GROUP_KEY = ResourceKey.create(
@@ -497,7 +528,7 @@ public final class HotPotContent {
      * 九宫格 / S / O / 方心 / 直隔 / 田字。和注册用的 {@link #POT_ORDER} 刻意不同，所以单独排一份，
      * 别把注册顺序也一起改了（mryt233 改 2026-11-10）。
      */
-    static final java.util.List<HotPotMaterial> CREATIVE_POT_ORDER = java.util.List.of(
+    static final List<HotPotMaterial> CREATIVE_POT_ORDER = List.of(
         HotPotMaterial.IRON, HotPotMaterial.IRON_S, HotPotMaterial.IRON_O,
         HotPotMaterial.IRON_SQUARE, HotPotMaterial.IRON_SPLIT, HotPotMaterial.IRON_FOUR,
         HotPotMaterial.COPPER, HotPotMaterial.COPPER_S, HotPotMaterial.COPPER_O,
@@ -618,14 +649,14 @@ public final class HotPotContent {
      * 开发环境能读到就核对，正式包里读不到就跳过。</p>
      */
     public static void verifyPlateMaterials() {
-        java.nio.file.Path json = java.nio.file.Path.of("content", "materials.json");
-        if (!java.nio.file.Files.isRegularFile(json)) {
+        Path json = Path.of("content", "materials.json");
+        if (!Files.isRegularFile(json)) {
             return;   // 正式包 / 工作目录不同：没有源数据可核，跳过
         }
         try {
-            String text = java.nio.file.Files.readString(json, java.nio.charset.StandardCharsets.UTF_8);
-            com.google.gson.JsonObject root = com.google.gson.JsonParser.parseString(text).getAsJsonObject();
-            com.google.gson.JsonArray plates = root.getAsJsonArray("plates");
+            String text = Files.readString(json, StandardCharsets.UTF_8);
+            JsonObject root = JsonParser.parseString(text).getAsJsonObject();
+            JsonArray plates = root.getAsJsonArray("plates");
             if (plates == null) {
                 throw new IllegalStateException("content/materials.json 缺少 plates 段");
             }
@@ -634,7 +665,7 @@ public final class HotPotContent {
                     + " 种，materials.json " + plates.size() + " 种");
             }
             for (int i = 0; i < plates.size(); i++) {
-                com.google.gson.JsonObject entry = plates.get(i).getAsJsonObject();
+                JsonObject entry = plates.get(i).getAsJsonObject();
                 PlateMaterial material = PLATE_MATERIALS.get(i);
                 String jsonId = entry.get("id").getAsString();
                 if (!jsonId.equals(material.id())) {
@@ -647,16 +678,16 @@ public final class HotPotContent {
                         + soundName(material.sounds()) + "，materials.json " + jsonSound);
                 }
             }
-        } catch (java.io.IOException error) {
+        } catch (IOException error) {
             HotPot.LOGGER.warn("[hotpot] 读取 content/materials.json 失败，跳过盘子材质一致性核对", error);
         }
     }
 
     /** 声音类型的名字（和 materials.json 里的写法一致，见 tools/pixkit/materials.py）。 */
-    private static String soundName(net.minecraft.world.level.block.SoundType sounds) {
-        for (java.lang.reflect.Field field : net.minecraft.world.level.block.SoundType.class.getFields()) {
+    private static String soundName(SoundType sounds) {
+        for (Field field : SoundType.class.getFields()) {
             try {
-                if (field.getType() == net.minecraft.world.level.block.SoundType.class && field.get(null) == sounds) {
+                if (field.getType() == SoundType.class && field.get(null) == sounds) {
                     return field.getName();
                 }
             } catch (IllegalAccessException ignored) {
@@ -676,7 +707,7 @@ public final class HotPotContent {
 
     // mryt233 改（2026-11-10）：按原字段和静态块的顺序登记，静态字段保留原类型供外部直接读取。
     public static synchronized void register(RegistrationApi registration) {
-        java.util.Objects.requireNonNull(registration);
+        Objects.requireNonNull(registration);
         if (registered) throw new IllegalStateException("hotpot content already registered");
         registered = true;
         STOVE = registration.blocks().register(
@@ -691,7 +722,7 @@ public final class HotPotContent {
                 HotPot.id(material.idPath()), new HotPotBlock(material)));
         }
         HELD_FOOD = registration.components().register( HotPot.id("held_food"),
-            net.minecraft.core.component.DataComponentType.<HeldFood>builder()
+            DataComponentType.<HeldFood>builder()
                 .persistent(HeldFood.CODEC)
                 .networkSynchronized(HeldFood.STREAM_CODEC)
                 .build());
@@ -725,7 +756,7 @@ public final class HotPotContent {
         PLATE_HOLDER = registration.blocks().register(
             HotPot.id("plates"), new PlateHolderBlock());
         SEAT = registration.entityTypes().register( HotPot.id("seat"),
-            net.minecraft.world.entity.EntityType.Builder.<SeatEntity>of(SeatEntity::new, net.minecraft.world.entity.MobCategory.MISC)
+            EntityType.Builder.<SeatEntity>of(SeatEntity::new, MobCategory.MISC)
                 .sized(0.25F, 0.01F)
                 .noSave()
                 .noSummon()
@@ -733,7 +764,7 @@ public final class HotPotContent {
                 .build(HotPot.id("seat").toString()));
 
         for (String wood : TABLE_WOODS) {
-            net.minecraft.world.level.block.Block planks = BuiltInRegistries.BLOCK.get(ResourceLocation.withDefaultNamespace(wood + "_planks"));
+            Block planks = BuiltInRegistries.BLOCK.get(ResourceLocation.withDefaultNamespace(wood + "_planks"));
             HotPotTableBlock table = registration.blocks().register(
                 HotPot.id(wood + "_hotpot_table"), new HotPotTableBlock(planks));
             HOTPOT_TABLES.add(table);
@@ -741,7 +772,7 @@ public final class HotPotContent {
                 HotPot.id(wood + "_hotpot_table"), new BlockItem(table, new Item.Properties())));
         }
         for (String wood : TABLE_WOODS) {
-            net.minecraft.world.level.block.Block planks = BuiltInRegistries.BLOCK.get(ResourceLocation.withDefaultNamespace(wood + "_planks"));
+            Block planks = BuiltInRegistries.BLOCK.get(ResourceLocation.withDefaultNamespace(wood + "_planks"));
             BenchBlock bench = registration.blocks().register(
                 HotPot.id(wood + "_stool"), new BenchBlock(planks));   // 板凳 = Stool（r102 改 ID）
             BENCHES.add(bench);
@@ -749,7 +780,7 @@ public final class HotPotContent {
                 HotPot.id(wood + "_stool"), new BlockItem(bench, new Item.Properties())));
         }
         for (String wood : TABLE_WOODS) {
-            net.minecraft.world.level.block.Block planks = BuiltInRegistries.BLOCK.get(ResourceLocation.withDefaultNamespace(wood + "_planks"));
+            Block planks = BuiltInRegistries.BLOCK.get(ResourceLocation.withDefaultNamespace(wood + "_planks"));
             TallHotPotTableBlock table = registration.blocks().register(
                 HotPot.id(wood + "_tall_hotpot_table"), new TallHotPotTableBlock(planks));
             TALL_TABLES.add(table);
@@ -766,7 +797,7 @@ public final class HotPotContent {
         // 声音、地图颜色取那种原版方块；不会着火。新增
         // mryt233 改（2026-11-05）：石料 / 金属桌面传 true，硬度 2.0、抗性 6.0，空手也能挖（以前照铁块 5.0 太慢）。
         for (String[] m : STONE_TABLES) {
-            net.minecraft.world.level.block.Block material = BuiltInRegistries.BLOCK.get(ResourceLocation.withDefaultNamespace(m[1]));
+            Block material = BuiltInRegistries.BLOCK.get(ResourceLocation.withDefaultNamespace(m[1]));
             HotPotTableBlock table = registration.blocks().register(
                 HotPot.id(m[0] + "_hotpot_table"), new HotPotTableBlock(material, true));
             HOTPOT_TABLES.add(table);
@@ -824,9 +855,9 @@ public final class HotPotContent {
         COOKED_BEEF_LOIN_SLICE = foodItem(registration, "cooked_beef_loin_slice", 3, 0.6F);
         KITCHEN_KNIFE = registration.items().register( HotPot.id("iron_kitchen_knife"),
             new Item(new Item.Properties().durability(250).attributes(
-                net.minecraft.world.item.SwordItem.createAttributes(net.minecraft.world.item.Tiers.IRON, 1, -2.2F))));
+                SwordItem.createAttributes(Tiers.IRON, 1, -2.2F))));
         CUTTING_BOARD = registration.blocks().register( HotPot.id("cutting_board"),
-            new CuttingBoardBlock(net.minecraft.world.level.block.state.BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.OAK_PLANKS).noOcclusion()
+            new CuttingBoardBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS).noOcclusion()
                 .dynamicShape()));
         CUTTING_BOARD_ITEM = registration.items().register( HotPot.id("cutting_board"),
             new BlockItem(CUTTING_BOARD, new Item.Properties()));
@@ -888,7 +919,7 @@ public final class HotPotContent {
             HotPot.id("blue_print_cloth_apron"), new ClothApronItem(registration, ClothApronItem.Style.BLUE_PRINT));
         BROWN_TRIM_CLOTH_APRON = registration.items().register(
             HotPot.id("brown_trim_cloth_apron"), new ClothApronItem(registration, ClothApronItem.Style.BROWN_TRIM));
-        CLOTH_APRONS = java.util.List.of(
+        CLOTH_APRONS = List.of(
             CLOTH_APRON, BLUE_PRINT_CLOTH_APRON, BROWN_TRIM_CLOTH_APRON);
         // ==== tools/new_item.py：新物品的登记赋值插在这行上面（mryt233 2026-11-10）====
         TOMATO = foodItem(registration, "tomato", 2, 0.3F);
@@ -924,7 +955,7 @@ public final class HotPotContent {
         COOKED_CILANTRO_FISH_BALL = foodItem(registration, "cooked_cilantro_fish_ball", 4, 0.6F);
         POUNDED_MEAT = registration.items().register( HotPot.id("pounded_meat"),
             new Item(new Item.Properties()));
-        SOUP_BOWLS = java.util.Arrays.stream(SoupBase.values())
+        SOUP_BOWLS = Arrays.stream(SoupBase.values())
             .map(soup -> registration.items().register( HotPot.id(soup.bowlId()),
                 new SoupBowlItem(soup)))
             .toList();
@@ -958,26 +989,26 @@ public final class HotPotContent {
         SAUCE = registration.components().register( HotPot.id("sauce"),
             DataComponentType.<SauceContents>builder().persistent(SauceContents.CODEC).networkSynchronized(SauceContents.PACKET_CODEC).build());
         DIPPED = registration.components().register( HotPot.id("dipped"),
-            DataComponentType.<Integer>builder().persistent(com.mojang.serialization.Codec.INT)
-                .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
+            DataComponentType.<Integer>builder().persistent(Codec.INT)
+                .networkSynchronized(ByteBufCodecs.VAR_INT).build());
         COOKED_IN_SOUP = registration.components().register(HotPot.id("cooked_in_soup"),
-            DataComponentType.<String>builder().persistent(com.mojang.serialization.Codec.STRING)
-                .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.STRING_UTF8).build());
+            DataComponentType.<String>builder().persistent(Codec.STRING)
+                .networkSynchronized(ByteBufCodecs.STRING_UTF8).build());
         SPICY_LEVEL = registration.components().register(HotPot.id("spicy_level"),
-            DataComponentType.<Integer>builder().persistent(com.mojang.serialization.Codec.INT)
-                .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
+            DataComponentType.<Integer>builder().persistent(Codec.INT)
+                .networkSynchronized(ByteBufCodecs.VAR_INT).build());
         CHEERED = registration.components().register(HotPot.id("cheered"),
-            DataComponentType.<Boolean>builder().persistent(com.mojang.serialization.Codec.BOOL)
-                .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.BOOL).build());
+            DataComponentType.<Boolean>builder().persistent(Codec.BOOL)
+                .networkSynchronized(ByteBufCodecs.BOOL).build());
         DIPPING_SAUCE = registration.items().register(
             HotPot.id("dipping_sauce"), new DippingSauceItem());
 
-        java.util.List<String> bodies = new java.util.ArrayList<>(TABLE_WOODS);
+        List<String> bodies = new ArrayList<>(TABLE_WOODS);
         bodies.add("iron");
         for (String body : bodies) {
             boolean iron = body.equals("iron");
-            net.minecraft.world.level.block.Block like = iron ? net.minecraft.world.level.block.Blocks.IRON_BLOCK
-                : BuiltInRegistries.BLOCK.get(net.minecraft.resources.ResourceLocation.withDefaultNamespace(body + "_planks"));
+            Block like = iron ? Blocks.IRON_BLOCK
+                : BuiltInRegistries.BLOCK.get(ResourceLocation.withDefaultNamespace(body + "_planks"));
             // mryt233 改（2026-11-05）：属性统一由 SauceStationBlock.settingsFor 给，木头 2.0/3.0、铁 2.0/6.0，都不强制工具。
             SauceStationBlock station = registration.blocks().register( HotPot.id(body + "_sauce_station"),
                 new SauceStationBlock(SauceStationBlock.settingsFor(like, iron)));
@@ -994,7 +1025,7 @@ public final class HotPotContent {
                 .build());
         // 创造栏 / 菜单 / 方块实体类型统一走分域 Registrar（P1 第三批）
         ITEM_GROUP = registration.creativeTabs().register(ITEM_GROUP_KEY.location(),
-            net.minecraft.network.chat.Component.translatable("itemGroup." + HotPot.MOD_ID),
+            Component.translatable("itemGroup." + HotPot.MOD_ID),
             HotPotContent::tabIcon, HotPotContent::fillCreativeTab);
         HOT_POT_SCREEN = registration.menus().register(HotPot.id("hot_pot"),
             (syncId, inventory, pos) -> new HotPotScreenHandler(syncId, inventory, pos));
@@ -1005,13 +1036,13 @@ public final class HotPotContent {
         PLATE_HOLDER_BE = registration.blockEntities().register(HotPot.id("plates"), PlateHolderBlockEntity::new, PLATE_HOLDER);
         CUTTING_BOARD_BE = registration.blockEntities().register(HotPot.id("cutting_board"), CuttingBoardBlockEntity::new, CUTTING_BOARD);
         SAUCE_STATION_BE = registration.blockEntities().register(HotPot.id("sauce_station"), SauceStationBlockEntity::new,
-            SAUCE_STATIONS.toArray(new net.minecraft.world.level.block.Block[0]));
+            SAUCE_STATIONS.toArray(new Block[0]));
         // mryt233 改（2026-11-10，r147）：方块实体类型挂哪些锅也从 POT_ORDER 来（顺序照旧）
         HOT_POT_BE = registration.blockEntities().register(HotPot.id("hot_pot"), HotPotBlockEntity::new,
-            POT_ORDER.stream().map(m -> POT_BLOCKS.get(m)).toArray(net.minecraft.world.level.block.Block[]::new));
+            POT_ORDER.stream().map(m -> POT_BLOCKS.get(m)).toArray(Block[]::new));
         STOVE_BE = registration.blockEntities().register(HotPot.id("stove"), StoveBlockEntity::new, STOVE, TALL_STOVE);
         BENCH_BE = registration.blockEntities().register(HotPot.id("bench"), BenchBlockEntity::new,
-            TALL_BENCHES.toArray(new net.minecraft.world.level.block.Block[0]));
+            TALL_BENCHES.toArray(new Block[0]));
         // 触碰静态字段，明确让物品组在客户端和服务端都完成初始化。
         ITEM_GROUP.getDisplayName();
         // mryt233 改（2026-11-10，r147）：核对盘子材质和生成脚本源数据一致（漏写 / 写岔直接报错）
@@ -1036,8 +1067,8 @@ public final class HotPotContent {
      */
     public static ItemStack tabIcon() {
         ItemStack icon = new ItemStack(IRON_HOT_POT_ITEM);
-        icon.set(net.minecraft.core.component.DataComponents.CUSTOM_MODEL_DATA,
-            new net.minecraft.world.item.component.CustomModelData(1));
+        icon.set(DataComponents.CUSTOM_MODEL_DATA,
+            new CustomModelData(1));
         return icon;
     }
 

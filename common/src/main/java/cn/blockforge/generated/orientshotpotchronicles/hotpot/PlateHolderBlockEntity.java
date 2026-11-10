@@ -1,16 +1,22 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.world.item.Items;
+
+// mryt233 改（2026-11-11）：第三批 3G 存读档改走适配小包，键名与结构不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.BeIo;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.StoreChildList;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.StoreReader;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.StoreWriter;
+
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.ItemContainerContents;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
@@ -120,7 +126,7 @@ public class PlateHolderBlockEntity extends SyncedBlockEntity {
             if (!self.isEmpty()) {
                 return self.copy();
             }
-            ItemStack stack = plate instanceof BowlBlock ? new ItemStack(net.minecraft.world.item.Items.BOWL) : new ItemStack(plate);
+            ItemStack stack = plate instanceof BowlBlock ? new ItemStack(Items.BOWL) : new ItemStack(plate);
             if (items.stream().anyMatch(s -> !s.isEmpty())) {
                 stack.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(items));
             }
@@ -266,62 +272,54 @@ public class PlateHolderBlockEntity extends SyncedBlockEntity {
         return shape;
     }
 
+    // mryt233 改（2026-11-11）：第三批 3G 存读档改走适配小包，键名、结构与兜底值不变。
     @Override
     protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
         super.saveAdditional(nbt, registries);
-        ListTag list = new ListTag();
-        for (Placed p : plates) {
-            CompoundTag c = new CompoundTag();
-            c.putString("Plate", BuiltInRegistries.BLOCK.getKey(p.plate).toString());
-            c.putDouble("X", p.x);
-            c.putDouble("Z", p.z);
-            c.putString("Axis", p.axis.getSerializedName());
-            c.putString("Facing", p.facing.getSerializedName());
-            c.putFloat("ChopsticksYaw", p.chopsticksYaw);
-            ContainerHelper.saveAllItems(c, p.items, registries);
-            if (!p.self.isEmpty()) {
-                c.put("Self", p.self.save(registries));
+        BeIo.write(nbt, registries, w -> {
+            StoreChildList list = w.childList("Plates");
+            for (Placed p : plates) {
+                StoreWriter c = list.addChild();
+                c.putString("Plate", BuiltInRegistries.BLOCK.getKey(p.plate).toString());
+                c.putDouble("X", p.x);
+                c.putDouble("Z", p.z);
+                c.putString("Axis", p.axis.getSerializedName());
+                c.putString("Facing", p.facing.getSerializedName());
+                c.putFloat("ChopsticksYaw", p.chopsticksYaw);
+                c.putItems(p.items);
+                c.putItem("Self", p.self);
+                c.putItem("Chopsticks", p.chopsticks);
             }
-            if (!p.chopsticks.isEmpty()) {
-                c.put("Chopsticks", p.chopsticks.save(registries));
-            }
-            list.add(c);
-        }
-        nbt.put("Plates", list);
+        });
     }
 
     @Override
     protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
         super.loadAdditional(nbt, registries);
-        plates.clear();
-        shape = null;
-        ListTag list = nbt.getList("Plates", Tag.TAG_COMPOUND);
-        for (int i = 0; i < list.size(); i++) {
-            CompoundTag c = list.getCompound(i);
-            if (!(BuiltInRegistries.BLOCK.get(ResourceLocation.parse(c.getString("Plate"))) instanceof PlateBlock plate)) {
-                continue;
+        BeIo.read(nbt, registries, r -> {
+            plates.clear();
+            shape = null;
+            for (StoreReader c : r.children("Plates")) {
+                if (!(BuiltInRegistries.BLOCK.get(ResourceLocation.parse(c.getString("Plate", "")))
+                        instanceof PlateBlock plate)) {
+                    continue;
+                }
+                Direction.Axis axis = "z".equals(c.getString("Axis", "")) ? Direction.Axis.Z : Direction.Axis.X;
+                Placed p = new Placed(plate, c.getDouble("X", 0.0), c.getDouble("Z", 0.0), axis);
+                // mryt233 改：旧档缺字段或字段损坏，使用构造时按 axis 得到的默认值。
+                Direction facing = Direction.byName(c.getString("Facing", ""));
+                if (facing != null && facing.getAxis().isHorizontal()) p.facing = facing;
+                if (plate instanceof ChopstickRestBlock) p.axis = p.facing.getAxis();
+                if (c.hasNumber("ChopsticksYaw")) {
+                    float yaw = c.getFloat("ChopsticksYaw", 0F);
+                    if (Float.isFinite(yaw)) p.chopsticksYaw = ((yaw % 360F) + 360F) % 360F;
+                }
+                c.loadItems(p.items);
+                p.self = c.getItem("Self");
+                p.chopsticks = c.getItem("Chopsticks");
+                plates.add(p);
             }
-            Direction.Axis axis = "z".equals(c.getString("Axis")) ? Direction.Axis.Z : Direction.Axis.X;
-            Placed p = new Placed(plate, c.getDouble("X"), c.getDouble("Z"), axis);
-            // mryt233 改：旧档缺字段或字段损坏，使用构造时按 axis 得到的默认值。
-            Direction facing = Direction.byName(c.getString("Facing"));
-            if (facing != null && facing.getAxis().isHorizontal()) p.facing = facing;
-            if (plate instanceof ChopstickRestBlock) p.axis = p.facing.getAxis();
-            if (c.contains("ChopsticksYaw", Tag.TAG_ANY_NUMERIC)) {
-                float yaw = c.getFloat("ChopsticksYaw");
-                if (Float.isFinite(yaw)) p.chopsticksYaw = ((yaw % 360F) + 360F) % 360F;
-            }
-            ContainerHelper.loadAllItems(c, p.items, registries);
-            if (c.contains("Self")) {
-                ItemStack parsed = ItemStack.parseOptional(registries, c.getCompound("Self"));
-                p.self = parsed == null ? ItemStack.EMPTY : parsed;
-            }
-            if (c.contains("Chopsticks")) {
-                ItemStack parsed = ItemStack.parseOptional(registries, c.getCompound("Chopsticks"));
-                p.chopsticks = parsed == null ? ItemStack.EMPTY : parsed;
-            }
-            plates.add(p);
-        }
+        });
     }
 
 

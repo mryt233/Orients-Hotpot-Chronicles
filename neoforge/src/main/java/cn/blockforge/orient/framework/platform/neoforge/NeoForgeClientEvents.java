@@ -1,5 +1,10 @@
 package cn.blockforge.orient.framework.platform.neoforge;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.orient.framework.game.ConfigBase;
+import net.minecraft.client.Minecraft;
+import net.neoforged.bus.api.IEventBus;
+
 // mryt233 改（2026-11-10）：第三批 3C 平台接线。
 
 import cn.blockforge.orient.framework.loader.RuntimeStats;
@@ -14,15 +19,15 @@ public final class NeoForgeClientEvents {
     private NeoForgeClientEvents() {
     }
 
-    public static void installLifecycle(net.neoforged.bus.api.IEventBus modBus) {
+    public static void installLifecycle(IEventBus modBus) {
         NeoForgeClientContent.install(modBus);
         installLifecycle();
     }
 
     public static void installLifecycle() {
         // 配置门面：只有客户端主线程读客户端那份配置（前置检查 F3，mryt233 改 2026-11-01）
-        cn.blockforge.orient.framework.game.ConfigBase.setClientThreadCheck(
-            () -> net.minecraft.client.Minecraft.getInstance().isSameThread());
+        ConfigBase.setClientThreadCheck(
+            () -> Minecraft.getInstance().isSameThread());
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) ->
             RuntimeStats.get().logSummary("client-disconnect"));
     }

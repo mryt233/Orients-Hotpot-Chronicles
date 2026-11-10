@@ -1,5 +1,9 @@
 package cn.blockforge.orient.framework.platform.fabric;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.fabricmc.api.EnvType;
+import net.minecraft.network.chat.Component;
+
 // mryt233 改（2026-11-10）：第三批 3C 补充平台能力。
 
 import cn.blockforge.orient.framework.loader.NetworkApi;
@@ -62,7 +66,7 @@ public final class FabricNetworkApi implements NetworkApi {
     }
 
     /** 客户端：核对握手，返回断开原因；全部满足返回 null。 */
-    net.minecraft.network.chat.Component verify(FrameworkHello hello) {
+    Component verify(FrameworkHello hello) {
         if (hello.version() != PROTOCOL_VERSION) {
             return FrameworkHello.protocolMismatch(hello.version(), PROTOCOL_VERSION);
         }
@@ -76,7 +80,7 @@ public final class FabricNetworkApi implements NetworkApi {
     }
 
     private static boolean isClient() {
-        return FabricLoader.getInstance().getEnvironmentType() == net.fabricmc.api.EnvType.CLIENT;
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     }
 
     @Override

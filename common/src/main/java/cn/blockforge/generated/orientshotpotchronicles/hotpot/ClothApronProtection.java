@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.resources.ResourceKey;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -49,7 +52,7 @@ public final class ClothApronProtection {
     private static final long HEAT_CACHE_TICKS = 2L;
 
     /** 一次热源判定的结果（哪一刻、哪个方块位置、热不热）。 */
-    private record HeatStamp(long gameTime, net.minecraft.resources.ResourceKey<Level> dimension, BlockPos pos, boolean hot) {
+    private record HeatStamp(long gameTime, ResourceKey<Level> dimension, BlockPos pos, boolean hot) {
     }
 
     private static final Map<UUID, HeatStamp> HEAT_CACHE = new ConcurrentHashMap<>();

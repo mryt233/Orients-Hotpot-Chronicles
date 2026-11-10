@@ -1,5 +1,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.food.FoodProperties;
+
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.InteractionResult;
@@ -64,7 +68,7 @@ public final class HotPotHooks {
      */
     @FunctionalInterface
     public interface OffhandFood {
-        net.minecraft.world.food.FoodProperties foodIn(ItemStack offhand, net.minecraft.world.entity.LivingEntity user);
+        FoodProperties foodIn(ItemStack offhand, LivingEntity user);
     }
 
     /**
@@ -73,12 +77,12 @@ public final class HotPotHooks {
      */
     public interface EatListener {
         /** 即将吃掉这一份，此时物品栈还没变；返回 true 表示这次由它接管，火锅不再继续。 */
-        default boolean beforeEating(ItemStack chopsticks, net.minecraft.world.entity.LivingEntity user) {
+        default boolean beforeEating(ItemStack chopsticks, LivingEntity user) {
             return false;
         }
 
         /** 已经决定吃掉这一份食物，**在真正结算之前**调用。 */
-        default void onEating(Level world, net.minecraft.world.entity.LivingEntity user, ItemStack food) {
+        default void onEating(Level world, LivingEntity user, ItemStack food) {
         }
     }
 
@@ -221,11 +225,11 @@ public final class HotPotHooks {
     }
 
     /** 筷子里没夹菜时，问一问副手有没有能吃的东西；没有返回 null。 */
-    public static net.minecraft.world.food.FoodProperties offhandFood(ItemStack chopsticks,
-                                                                         net.minecraft.world.entity.LivingEntity user) {
+    public static FoodProperties offhandFood(ItemStack chopsticks,
+                                                                         LivingEntity user) {
         for (OffhandFood source : OFFHAND_FOODS.all()) {
             try {
-                net.minecraft.world.food.FoodProperties food = source.foodIn(chopsticks, user);
+                FoodProperties food = source.foodIn(chopsticks, user);
                 if (food != null) {
                     return food;
                 }
@@ -237,7 +241,7 @@ public final class HotPotHooks {
     }
 
     /** 吃东西之前；返回 true 表示这次由外部接管，火锅不再继续。 */
-    public static boolean beforeEating(ItemStack chopsticks, net.minecraft.world.entity.LivingEntity user) {
+    public static boolean beforeEating(ItemStack chopsticks, LivingEntity user) {
         for (EatListener listener : EAT_LISTENERS.all()) {
             try {
                 if (listener.beforeEating(chopsticks, user)) {
@@ -251,7 +255,7 @@ public final class HotPotHooks {
     }
 
     /** 即将吃掉这份食物（真正结算之前，物品栈还没变）。 */
-    public static void onEating(Level world, net.minecraft.world.entity.LivingEntity user, ItemStack food) {
+    public static void onEating(Level world, LivingEntity user, ItemStack food) {
         EAT_LISTENERS.forEach(listener -> listener.onEating(world, user, food),
             (listener, error) -> HotPot.LOGGER.warn("[hotpot] 进食结算钩子执行失败，已跳过", error));
     }

@@ -1,5 +1,13 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Chopsticks;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Blocks;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.ChopstickRestBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlock;
@@ -37,7 +45,7 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
 
     /** 画哪个模型：见 {@link cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlock#modelState}（挖掉时的碎屑也用它）。 */
     public static BlockState modelState(PlateHolderBlockEntity.Placed p) {
-        return cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlock.modelState(p);
+        return PlateHolderBlock.modelState(p);
     }
 
     @Override
@@ -67,8 +75,8 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
                 continue;
             }
             blocks.renderSingleBlock(modelState(p), matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
-            if (p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem) {
-                SauceRender.surface(cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem.contents(p.self).mask(), matrices, vertexConsumers, light);
+            if (p.self.getItem() instanceof DippingSauceItem) {
+                SauceRender.surface(DippingSauceItem.contents(p.self).mask(), matrices, vertexConsumers, light);
             }
             PlateFoodRenderer.render(p.plate.size(), p.axis, p.items, matrices, vertexConsumers, light,
                 be.getLevel(), seed, itemRenderer);
@@ -87,8 +95,8 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
     private static final double TILT = Math.atan(REST_H / (LENGTH * 0.88));
     private static final double TAIL_X = 8 - LENGTH * Math.cos(TILT) / 2;
     private static final double REST_X = TAIL_X + REST_H / Math.tan(TILT) + 0.55;
-    private static final net.minecraft.resources.ResourceLocation BAMBOO =
-        net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("orients_hotpot_chronicles", "textures/block/resting_bamboo.png");
+    private static final ResourceLocation BAMBOO =
+        ResourceLocation.fromNamespaceAndPath("orients_hotpot_chronicles", "textures/block/resting_bamboo.png");
 
     private void renderChopsticks(PlateHolderBlockEntity.Placed p, PoseStack matrices,
                                   MultiBufferSource buffers, int light) {
@@ -102,8 +110,8 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
     }
 
     private void renderMiniChopstickRest(PoseStack matrices, MultiBufferSource buffers, int light) {
-        BlockState porcelain = net.minecraft.world.level.block.Blocks.SMOOTH_QUARTZ.defaultBlockState();
-        BlockState wood = net.minecraft.world.level.block.Blocks.DARK_OAK_PLANKS.defaultBlockState();
+        BlockState porcelain = Blocks.SMOOTH_QUARTZ.defaultBlockState();
+        BlockState wood = Blocks.DARK_OAK_PLANKS.defaultBlockState();
         double halfL = REST_LEN / 2, halfD = REST_DEPTH / 2;
         miniBox(matrices, buffers, light, wood, REST_X-halfD-0.1, REST_X+halfD+0.1, 0, 0.35, 8-halfL-0.1, 8+halfL+0.1);
         miniBox(matrices, buffers, light, porcelain, REST_X-halfD+0.05, REST_X+halfD-0.05, 0.35, REST_H, 8-halfL+0.15, 8+halfL-0.15);
@@ -130,13 +138,13 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
     }
 
     private void renderBamboo(PoseStack matrices, MultiBufferSource buffers, int light, ItemStack stack) {
-        var vc = buffers.getBuffer(net.minecraft.client.renderer.RenderType.entityCutoutNoCull(BAMBOO));
+        var vc = buffers.getBuffer(RenderType.entityCutoutNoCull(BAMBOO));
         for (int side : new int[]{-1, 1}) {
             double z = side * (GAP + THICK) / 2;
             bambooBox(matrices, vc, light, 0, HANDLE, THICK, z, 0.25F);
             bambooBox(matrices, vc, light, HANDLE, LENGTH, TIP_THICK, z, 0.75F);
         }
-        ItemStack food = cn.blockforge.generated.orientshotpotchronicles.hotpot.Chopsticks.held(stack);
+        ItemStack food = Chopsticks.held(stack);
         if (!food.isEmpty()) {
             matrices.pushPose();
             // 菜的厚度垂直，两根筷尖插到菜的近侧边缘；整段跟随桌面竹筷的倾斜。
@@ -148,7 +156,7 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
         }
     }
 
-    private static void bambooBox(PoseStack matrices, com.mojang.blaze3d.vertex.VertexConsumer vc, int light,
+    private static void bambooBox(PoseStack matrices, VertexConsumer vc, int light,
                                    double x0, double x1, double thick, double z, float u) {
         float a=(float)(x0/16), d=(float)(x1/16), b=0, f=(float)(thick/16);
         float c=(float)((z-thick/2)/16), g=(float)((z+thick/2)/16);
@@ -161,7 +169,7 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
         bambooQuad(vc,pose,light,u,0,-1,0, a,b,g, d,b,g, d,b,c, a,b,c);
     }
 
-    private static void bambooQuad(com.mojang.blaze3d.vertex.VertexConsumer vc, PoseStack.Pose pose, int light,
+    private static void bambooQuad(VertexConsumer vc, PoseStack.Pose pose, int light,
                                     float u, float nx, float ny, float nz, float... xyz) {
         for (int i=0; i<12; i+=3) {
             vc.addVertex(pose,xyz[i],xyz[i+1],xyz[i+2]).setColor(255,255,255,255).setUv(u,0.5F)

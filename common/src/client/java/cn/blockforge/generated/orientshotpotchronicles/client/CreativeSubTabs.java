@@ -1,5 +1,13 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.CupItem;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkItem;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.EmptyBottleItem;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlock;
+import java.util.function.Consumer;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.BenchBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
@@ -70,7 +78,7 @@ public final class CreativeSubTabs {
 
     public static Sub categoryOf(ItemStack stack) {
         if (stack.is(HotPotContent.CHOPSTICKS) || stack.getItem() instanceof PlateItem
-            || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.CupItem) {
+            || stack.getItem() instanceof CupItem) {
             return Sub.TABLEWARE;   // 玻璃杯（空的、装满的）算餐具（2026-10-26 用户报有的没分类，新增）
         }
         if (stack.is(HotPotContent.KITCHEN_KNIFE) || stack.is(HotPotContent.CUTTING_BOARD_ITEM)
@@ -85,15 +93,15 @@ public final class CreativeSubTabs {
         // 都带 DataComponents.FOOD 且不是 BlockItem，下面的条件会把它们自动归进「食物」子类，不用逐个列名字。
         if (stack.is(HotPotContent.RAW_TRIPE) || stack.is(HotPotContent.COOKED_TRIPE)
             || stack.is(HotPotContent.MINCED_PORK)
-            || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkItem
-            || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.EmptyBottleItem
-            || stack.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem
+            || stack.getItem() instanceof DrinkItem
+            || stack.getItem() instanceof EmptyBottleItem
+            || stack.getItem() instanceof DippingSauceItem
             || (!(stack.getItem() instanceof BlockItem) && stack.has(DataComponents.FOOD))) {
             return Sub.FOOD;
         }
         if (stack.getItem() instanceof BlockItem item) {
             if (item.getBlock() instanceof StoveBlock || item.getBlock() instanceof HotPotBlock
-                || item.getBlock() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlock) {   // 蘸料台算厨具（r103）
+                || item.getBlock() instanceof SauceStationBlock) {   // 蘸料台算厨具（r103）
                 return Sub.COOKWARE;
             }
             if (item.getBlock() instanceof HotPotTableBlock) {
@@ -177,7 +185,7 @@ public final class CreativeSubTabs {
     public record Hooks(Runnable beforeRender, ScrollHandler scroll) {}
 
     public static Hooks init(CreativeModeInventoryScreen creative, int width, int height,
-                             java.util.function.Consumer<AbstractWidget> addWidget) {
+                             Consumer<AbstractWidget> addWidget) {
             // 物品栏背景左上角（原版 HandledScreen 也是这样居中算的），标签开口贴着它的左边
             int left = (width - BG_W) / 2;
             int top = (height - BG_H) / 2;

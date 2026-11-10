@@ -1,5 +1,18 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+// mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
+import java.util.HashMap;
+import java.util.Map;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+
 import cn.blockforge.orient.framework.game.PartOutline;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.Block;
@@ -47,25 +60,25 @@ import net.minecraft.network.chat.Component;
  * 标签 {@code cut_piece_by_piece} 里的（土豆）一刀只掉 1 份，切满配方的份数才切完（用户：一个土豆切三下）；其他一刀切完。
  * 作者：mryt233 */
 public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline {
-    public static final TagKey<net.minecraft.world.item.Item> CUTTABLE =
-        TagKey.create(Registries.ITEM, cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot.id("cuttable"));
+    public static final TagKey<Item> CUTTABLE =
+        TagKey.create(Registries.ITEM, HotPot.id("cuttable"));
     /** 一刀一刀切的东西（用户：土豆切三下，每下掉一份）；不在这个标签里的一刀切完（肉卷）。 */
-    public static final TagKey<net.minecraft.world.item.Item> CUT_PIECE_BY_PIECE =
-        TagKey.create(Registries.ITEM, cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot.id("cut_piece_by_piece"));
+    public static final TagKey<Item> CUT_PIECE_BY_PIECE =
+        TagKey.create(Registries.ITEM, HotPot.id("cut_piece_by_piece"));
     /** 圆木墩：直径 12、高 3 像素（同 tools/gen_cutting.py 的模型）。 */
     private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 3, 14);
     public static final float TOP = 3F / 16F;
 
     /** 朝向 = 放的人站的那一边（2026-10-23 用户：砧板要有朝向，板上的东西朝着玩家）。 */
-    public static final net.minecraft.world.level.block.state.properties.DirectionProperty FACING = net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public CuttingBoardBlock(BlockBehaviour.Properties settings) {
         super(settings);
-        registerDefaultState(defaultBlockState().setValue(FACING, net.minecraft.core.Direction.SOUTH));
+        registerDefaultState(defaultBlockState().setValue(FACING, Direction.SOUTH));
     }
 
     @Override
-    protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
 
@@ -128,7 +141,7 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
 
     /** mryt233 改：板上食材与木墩分别显示各自名称。 */
     @Override
-    public net.minecraft.network.chat.MutableComponent getName() {
+    public MutableComponent getName() {
         Player player = PlateHolderBlock.pickPlayer.get();
         if (player != null && player.level() != null) {
             HitResult hit = player.pick(player.blockInteractionRange(), 1.0F, false);
@@ -160,24 +173,24 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
      */
     private static final class BuiltinCuts {
         // Map.of 最多 10 对，改用 ofEntries（mryt233 2026-11-01，内容不变）
-        static final java.util.Map<Item, ItemStack> TABLE = java.util.Map.ofEntries(
-            java.util.Map.entry(Items.BEEF, new ItemStack(HotPotContent.FATTY_BEEF_ROLL, 3)),
-            java.util.Map.entry(Items.MUTTON, new ItemStack(HotPotContent.MUTTON_ROLL, 3)),
-            java.util.Map.entry(Items.POTATO, new ItemStack(HotPotContent.POTATO_SLICE, 3)),
-            java.util.Map.entry(Items.PORKCHOP, new ItemStack(HotPotContent.MINCED_PORK, 1)),
-            java.util.Map.entry(HotPotContent.BEEF_LOIN, new ItemStack(HotPotContent.BEEF_LOIN_SLICE, 3)),
+        static final Map<Item, ItemStack> TABLE = Map.ofEntries(
+            Map.entry(Items.BEEF, new ItemStack(HotPotContent.FATTY_BEEF_ROLL, 3)),
+            Map.entry(Items.MUTTON, new ItemStack(HotPotContent.MUTTON_ROLL, 3)),
+            Map.entry(Items.POTATO, new ItemStack(HotPotContent.POTATO_SLICE, 3)),
+            Map.entry(Items.PORKCHOP, new ItemStack(HotPotContent.MINCED_PORK, 1)),
+            Map.entry(HotPotContent.BEEF_LOIN, new ItemStack(HotPotContent.BEEF_LOIN_SLICE, 3)),
             // mryt233 改（2026-11-04）：冷 / 热豆腐都能切，各出对应的豆腐块（热豆腐切热豆腐块，和冷豆腐切冷豆腐块一样）。
-            java.util.Map.entry(HotPotContent.COLD_TOFU, new ItemStack(HotPotContent.COLD_TOFU_CUBE, 3)),
-            java.util.Map.entry(HotPotContent.HOT_TOFU, new ItemStack(HotPotContent.HOT_TOFU_CUBE, 3)),
-            java.util.Map.entry(HotPotContent.SHRIMP, new ItemStack(HotPotContent.PEELED_SHRIMP, 1)),
-            java.util.Map.entry(HotPotContent.HAM_SAUSAGE, new ItemStack(HotPotContent.HAM_SAUSAGE_SLICE, 3)),
+            Map.entry(HotPotContent.COLD_TOFU, new ItemStack(HotPotContent.COLD_TOFU_CUBE, 3)),
+            Map.entry(HotPotContent.HOT_TOFU, new ItemStack(HotPotContent.HOT_TOFU_CUBE, 3)),
+            Map.entry(HotPotContent.SHRIMP, new ItemStack(HotPotContent.PEELED_SHRIMP, 1)),
+            Map.entry(HotPotContent.HAM_SAUSAGE, new ItemStack(HotPotContent.HAM_SAUSAGE_SLICE, 3)),
             // mryt233 改（2026-11-06，r137）：辣椒一刀切成 2 份小米辣；莲藕切 3 刀、每刀 1 片藕片（和土豆一样
             // 记在 cut_piece_by_piece 标签里）；生鱿鱼一刀切成 3 份鱿鱼卷。
-            java.util.Map.entry(HotPotContent.CHILI_PEPPER, new ItemStack(HotPotContent.MILLET_CHILI, 2)),
-            java.util.Map.entry(HotPotContent.LOTUS_ROOT, new ItemStack(HotPotContent.LOTUS_ROOT_SLICE, 3)),
-            java.util.Map.entry(HotPotContent.RAW_SQUID, new ItemStack(HotPotContent.SQUID_ROLL, 3)),
+            Map.entry(HotPotContent.CHILI_PEPPER, new ItemStack(HotPotContent.MILLET_CHILI, 2)),
+            Map.entry(HotPotContent.LOTUS_ROOT, new ItemStack(HotPotContent.LOTUS_ROOT_SLICE, 3)),
+            Map.entry(HotPotContent.RAW_SQUID, new ItemStack(HotPotContent.SQUID_ROLL, 3)),
             // mryt233 改（2026-11-06，r139）：折耳根一刀切成 3 段（整根 → 折耳根段，下锅涮的食材）。
-            java.util.Map.entry(HotPotContent.ZHE_ER_GEN, new ItemStack(HotPotContent.ZHE_ER_GEN_SLICE, 3))
+            Map.entry(HotPotContent.ZHE_ER_GEN, new ItemStack(HotPotContent.ZHE_ER_GEN_SLICE, 3))
             // ==== tools/new_item.py：新的砧板切配插在这行上面（别删这行）====
         );
 
@@ -191,8 +204,8 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
     }
 
     // mryt233 改（2026-11-10）：只保留当前配方管理器的切配结果，换世界 / 重载不累积旧表。
-    private static net.minecraft.world.item.crafting.RecipeManager cachedManager;
-    private static final java.util.Map<Item, ItemStack> CUT_CACHE = new java.util.HashMap<>();
+    private static RecipeManager cachedManager;
+    private static final Map<Item, ItemStack> CUT_CACHE = new HashMap<>();
 
     public static synchronized void clearCache() {
         cachedManager = null;
@@ -225,7 +238,7 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
                                               Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(world.getBlockEntity(pos) instanceof CuttingBoardBlockEntity board)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
         }
         if (stack.is(HotPotContent.ROLLING_PIN)) {
             return pound(stack, world, pos, player, hand, board);
@@ -241,7 +254,7 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
                         Component.translatableWithFallback(HotPotBlockEntity.key("msg.board_pounded"),
                             "这摊东西已经捶成浆了，切不动，换擀面杖把它捶成丸子吧"), true);
                 }
-                return ItemInteractionResult.SUCCESS;
+                return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
             }
             ItemStack result = cutResult(world, board.item());
             if (result.isEmpty()) {
@@ -252,9 +265,9 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
                         Component.translatableWithFallback(HotPotBlockEntity.key("msg.board_not_cuttable"),
                             "这样东西在砧板上切不出东西"), true);
                 }
-                return board.item().isEmpty()
-                    ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
-                    : ItemInteractionResult.SUCCESS;
+                return Use.blockItem(board.item().isEmpty()
+                    ? UseOutcome.PASS_TO_EMPTY
+                    : UseOutcome.SUCCESS, world.isClientSide);
             }
             if (!world.isClientSide) {
                 ItemStack cut = board.item();
@@ -276,7 +289,7 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
                 ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, cut),
                     pos.getX() + 0.5, pos.getY() + TOP + 0.05, pos.getZ() + 0.5, 8, 0.15, 0.05, 0.15, 0.05);
             }
-            return ItemInteractionResult.SUCCESS;
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
         }
         if (board.item().isEmpty() && (stack.is(CUTTABLE) || Pounding.poundable(world, stack))) {
             if (!world.isClientSide) {
@@ -285,9 +298,9 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
                 stack.consume(1, player);
                 world.playSound((Player) null, pos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS, 0.6F, 1.2F);
             }
-            return ItemInteractionResult.SUCCESS;
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
         }
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
     }
 
     /** 擀面杖捣一下（Pounding）：前两下砧板上的肉变样（捶碎 → 肉浆），第三下掉出 3 个生丸子；擀面杖掉 1 点耐久。 */
@@ -297,7 +310,7 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
         // mryt233 改（2026-11-11）：数量、次数及组件均由配方给出。
         PoundingRecipe recipe = Pounding.recipe(world, meat);
         if (recipe == null) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
         }
         if (!world.isClientSide) {
             // mryt233 改（2026-11-07）：捣的进度用 pounds 单独记，不再借用 cuts（切 / 捣分开记账）
@@ -315,7 +328,7 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
             ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, meat),
                 pos.getX() + 0.5, pos.getY() + TOP + 0.05, pos.getZ() + 0.5, 6, 0.15, 0.05, 0.15, 0.04);
         }
-        return ItemInteractionResult.SUCCESS;
+        return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
     }
 
     /** 对着板上的东西挖：一下就挖掉（只挖东西，砧板留着，见 HotPotContent 的破坏事件）；否则按砧板自己的硬度。 */
@@ -344,13 +357,13 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         if (!(world.getBlockEntity(pos) instanceof CuttingBoardBlockEntity board) || board.item().isEmpty()) {
-            return InteractionResult.PASS;
+            return Use.blockEmpty(UseOutcome.PASS, world.isClientSide);
         }
         if (!world.isClientSide) {
             player.getInventory().placeItemBackInInventory(board.item());
             board.setItem(ItemStack.EMPTY);
         }
-        return InteractionResult.SUCCESS;
+        return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide);
     }
 
     /** 挖掉时板上的东西掉出来。 */

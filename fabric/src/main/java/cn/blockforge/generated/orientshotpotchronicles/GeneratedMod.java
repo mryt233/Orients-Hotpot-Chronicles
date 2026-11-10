@@ -1,6 +1,10 @@
 // 作者：mryt233；mryt233 改（2026-11-10）
 package cn.blockforge.generated.orientshotpotchronicles;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.orient.framework.loader.ClientHooks;
+import org.slf4j.Logger;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.platform.FabricPlatform;
 import net.fabricmc.api.ModInitializer;
@@ -14,9 +18,9 @@ import net.minecraft.server.packs.resources.ResourceManager;
 /** Fabric 只负责加载阶段与原生资源重载事件。 */
 public final class GeneratedMod implements ModInitializer {
     public static final String MOD_ID = HotPot.MOD_ID;
-    public static final org.slf4j.Logger LOGGER = HotPot.LOGGER;
+    public static final Logger LOGGER = HotPot.LOGGER;
     public static ResourceLocation id(String path) { return HotPot.id(path); }
-    public static void clientHooks(cn.blockforge.orient.framework.loader.ClientHooks hooks) { HotpotContentModule.HOST.client(hooks); }
+    public static void clientHooks(ClientHooks hooks) { HotpotContentModule.HOST.client(hooks); }
     @Override
     public void onInitialize() {
         FabricPlatform.install();

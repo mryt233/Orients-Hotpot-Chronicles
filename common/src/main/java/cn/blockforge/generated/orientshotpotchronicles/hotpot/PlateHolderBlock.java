@@ -1,5 +1,18 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+// mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
+import java.util.function.Supplier;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LevelEvent;
+import net.minecraft.world.level.material.PushReaction;
+import org.jetbrains.annotations.Nullable;
+
 import cn.blockforge.orient.framework.game.PartOutline;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.Block;
@@ -59,7 +72,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
             // 形状随方块实体（摆了哪些盘子）变、矮桌上还伸出本格：不让原版提前缓存形状（同潜影盒），
             // 否则缓存的是空世界里的默认小方块，和真实碰撞对不上，站上去会抽搐
             .dynamicShape()
-            .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY));
+            .pushReaction(PushReaction.DESTROY));
         registerDefaultState(defaultBlockState().setValue(ON_TABLE, false).setValue(ON_TALL_TABLE, false));
     }
 
@@ -88,7 +101,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
 
     /** 按下面的方块定好 ON_TABLE / ON_TALL_TABLE。 */
     public static BlockState withSurface(BlockState state, BlockGetter world, BlockPos pos) {
-        net.minecraft.world.level.block.Block below = world.getBlockState(pos.below()).getBlock();
+        Block below = world.getBlockState(pos.below()).getBlock();
         boolean tall = below instanceof TallHotPotTableBlock;
         return state.setValue(ON_TALL_TABLE, tall).setValue(ON_TABLE, !tall && below instanceof HotPotTableBlock);
     }
@@ -110,7 +123,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
                                      LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
         if (direction == Direction.DOWN) {
             if (!supported(world, pos)) {
-                return net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+                return Blocks.AIR.defaultBlockState();
             }
             return withSurface(state, world, pos);
         }
@@ -150,11 +163,11 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
     }
 
     /** 客户端填：当前玩家（鼠标中键选方块时用来找准星对着哪个盘子）；服务端一直是 null。 */
-    public static java.util.function.Supplier<Player> pickPlayer = () -> null;
+    public static Supplier<Player> pickPlayer = () -> null;
 
     /** mryt233 改：指示器名称与选中框、复制物品共用餐具命中判定。 */
     @Override
-    public net.minecraft.network.chat.MutableComponent getName() {
+    public MutableComponent getName() {
         Player player = pickPlayer.get();
         if (player != null && player.level() != null) {
             HitResult hit = player.pick(player.blockInteractionRange(), 1.0F, false);
@@ -194,7 +207,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
     }
 
     /** mryt233 改：名称、复制物品与 Jade 共用当前准星命中的餐具。 */
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     public static PlateHolderBlockEntity.Placed aimedAt(BlockPos pos, BlockHitResult hit, PlateHolderBlockEntity be) {
         double[] at = local(pos, hit);
         PlateHolderBlockEntity.Placed plate = be.at(at[0], at[1]);
@@ -206,7 +219,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
 
     /** 选中框只框准星对着的那个盘子（连盘里的菜 / 那瓶饮料 / 那只碗）。 */
     @Override
-    public net.minecraft.world.phys.shapes.VoxelShape aimedPart(BlockState state, BlockGetter world, BlockPos pos, Player player) {
+    public VoxelShape aimedPart(BlockState state, BlockGetter world, BlockPos pos, Player player) {
         if (!(world.getBlockEntity(pos) instanceof PlateHolderBlockEntity be) || be.plates().size() < 2) {
             return null;
         }
@@ -219,17 +232,17 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
      * （：以前碎屑用默认状态，植物蛋白饮料挖掉飞出的是橙子饮料的碎屑，用户报）。
      */
     public static BlockState modelState(PlateHolderBlockEntity.Placed p) {
-        BlockState state = p.plate.defaultBlockState().setValue(cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateBlock.AXIS, p.axis);
-        if (p.plate instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.BowlBlock
-            && p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBowlItem bowl) {
-            state = state.setValue(cn.blockforge.generated.orientshotpotchronicles.hotpot.BowlBlock.SOUP,
-                cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual.fromBase(bowl.soup()));
+        BlockState state = p.plate.defaultBlockState().setValue(PlateBlock.AXIS, p.axis);
+        if (p.plate instanceof BowlBlock
+            && p.self.getItem() instanceof SoupBowlItem bowl) {
+            state = state.setValue(BowlBlock.SOUP,
+                SoupVisual.fromBase(bowl.soup()));
         }
-        if (p.plate instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock) {
-            boolean empty = p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.EmptyBottleItem;
-            cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkKind kind = p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.EmptyBottleItem e ? e.kind()
-                : p.self.getItem() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkItem d ? d.kind() : cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkKind.ORANGE_DRINK;
-            state = state.setValue(cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock.EMPTY, empty).setValue(cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock.KIND, kind);
+        if (p.plate instanceof DrinkBlock) {
+            boolean empty = p.self.getItem() instanceof EmptyBottleItem;
+            DrinkKind kind = p.self.getItem() instanceof EmptyBottleItem e ? e.kind()
+                : p.self.getItem() instanceof DrinkItem d ? d.kind() : DrinkKind.ORANGE_DRINK;
+            state = state.setValue(DrinkBlock.EMPTY, empty).setValue(DrinkBlock.KIND, kind);
         }
         if (p.plate instanceof CupBlock) {
             DrinkKind kind = p.self.getItem() instanceof CupItem cup ? cup.kind() : null;
@@ -244,7 +257,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
     }
 
     /** 准星对着的是这一格里的哪个盘子（服务端和客户端同一套射线）。 */
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     public static PlateHolderBlockEntity.Placed aimed(Player player, BlockPos pos, PlateHolderBlockEntity be) {
         HitResult hit = player.pick(player.blockInteractionRange(), 1.0F, false);
         if (!(hit instanceof BlockHitResult blockHit) || hit.getType() != HitResult.Type.BLOCK) {
@@ -267,9 +280,9 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
         if (plate.plate instanceof ChopstickRestBlock) {
             // 迷你筷架没有单独的方块模型 json（由渲染器按代码画），挖掉时的碎屑改用竹板，
             // 免得拿一个查不到模型的方块状态去生成粒子（r136b，2026-11-05 用户）
-            plateState = net.minecraft.world.level.block.Blocks.BAMBOO_PLANKS.defaultBlockState();
+            plateState = Blocks.BAMBOO_PLANKS.defaultBlockState();
         }
-        world.levelEvent(null, net.minecraft.world.level.block.LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(plateState));
+        world.levelEvent(null, LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(plateState));
         if (!player.isCreative()) {
             Block.popResource(world, pos, plate.toItem());
         }
@@ -295,7 +308,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
                                               Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(world.getBlockEntity(pos) instanceof PlateHolderBlockEntity be)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
         }
         double[] at = local(pos, hit);
         // 拿饮料瓶右键桌上的空杯 = 倒一杯（2026-10-25，新增）；要在「再摆一个」之前判断，不然瓶子会被摆上去
@@ -307,7 +320,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
                 be.changed();
                 world.playSound(null, pos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 0.8F, 1.1F);
             }
-            return ItemInteractionResult.SUCCESS;
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
         }
         // 拿水桶 / 奶桶右键桌上的空杯 = 倒一杯，桶不会空（2026-10-27 用户：原版的桶就无限倒）
         DrinkKind fromBucket = CupItem.bucketKind(stack);
@@ -317,7 +330,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
                 be.changed();
                 world.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 0.6F, 1.2F);
             }
-            return ItemInteractionResult.SUCCESS;
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
         }
         // 拿着装满饮品的玻璃杯右键桌上摆着的满杯：跟桌上这杯碰一下（r136b，2026-11-05 用户，新增）
         if (stack.getItem() instanceof CupItem handCup && handCup.kind() != null
@@ -328,7 +341,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
                 CupItem.cheers(world, player, stack, null, target.self, at3);
                 be.changed();   // 桌上的杯子也带上 CHEERED，客户端拿到的物品栈才是新的
             }
-            return ItemInteractionResult.SUCCESS;
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
         }
         PlateBlock placing = PlateItem.placedFor(stack);
         if (placing != null) {
@@ -348,18 +361,18 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
                     player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.plate_no_room")), true);
                 }
             }
-            return ItemInteractionResult.SUCCESS;
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
         }
         PlateHolderBlockEntity.Placed plate = be.at(at[0], at[1]);
         if (plate == null) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
         }
         // 筷子夹着菜点桌上的蘸料碗 = 蘸一口，配料记在菜上，吃的时候生效
         // （r103 有过，2026-10-23 去掉；2026-10-25 用户在开发计划「筷子新交互」里要回来。调整）
         if (stack.is(HotPotContent.CHOPSTICKS) && plate.self.getItem() instanceof DippingSauceItem) {
             if (!world.isClientSide) {
                 ItemStack held = Chopsticks.held(stack);
-                if (held.isEmpty() || !held.has(net.minecraft.core.component.DataComponents.FOOD)) {
+                if (held.isEmpty() || !held.has(DataComponents.FOOD)) {
                     player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.dip_need_food")), true);
                 } else {
                     ItemStack dipped = held.copy();
@@ -371,24 +384,24 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
                     world.playSound(null, pos, SoundEvents.HONEY_BLOCK_STEP, SoundSource.BLOCKS, 0.4F, 1.4F);
                 }
             }
-            return ItemInteractionResult.SUCCESS;
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
         }
         if (!plate.holdsFood() && (stack.is(HotPotContent.CHOPSTICKS) || PlateItem.holdsFood(world, stack))) {
             // 汤碗、橙子饮料里放不了菜，也夹不出菜
             if (!world.isClientSide) {
                 player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.cannot_hold_food")), true);
             }
-            return ItemInteractionResult.SUCCESS;
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
         }
         if (stack.is(HotPotContent.CHOPSTICKS)) {
             // 夹着菜、肚子还吃得下：不放回去，交给筷子吃。以前夹起来以后按住右键会被当成连点，
             // 菜在碗和筷子之间来回放、夹，看着像夹不起来（用户报，2026-10-25 调整）；吃饱了才放回碗盘里
             ItemStack inHand = Chopsticks.held(stack);
-            net.minecraft.world.food.FoodProperties food = inHand.get(net.minecraft.core.component.DataComponents.FOOD);
+            FoodProperties food = inHand.get(DataComponents.FOOD);
             // 饱食度满了也让他吃（玩家反馈：装了 Always Eat 就吃不了筷子夹的菜）。
             // 想放回碗里就潜行右键——以前是「吃饱了自动放回」，改成随时能吃以后用潜行保留这个功能。
             if (food != null && !player.isShiftKeyDown() && player.canEat(true)) {
-                return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+                return Use.blockItem(UseOutcome.SKIPPED, world.isClientSide);
             }
             if (!world.isClientSide) {
                 ItemStack held = Chopsticks.held(stack);
@@ -409,7 +422,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
                     player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.plate_full")), true);
                 }
             }
-            return ItemInteractionResult.SUCCESS;
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
         }
         if (PlateItem.holdsFood(world, stack)) {
             if (!world.isClientSide) {
@@ -421,21 +434,21 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
                     player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.plate_full")), true);
                 }
             }
-            return ItemInteractionResult.SUCCESS;
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
         }
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
     }
 
     /** 空手右键：把点到的那个盘子连菜拿起来；潜行时改成取出最后放的那样菜。 */
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         if (!player.getMainHandItem().isEmpty() || !(world.getBlockEntity(pos) instanceof PlateHolderBlockEntity be)) {
-            return InteractionResult.PASS;
+            return Use.blockEmpty(UseOutcome.PASS, world.isClientSide);
         }
         double[] at = local(pos, hit);
         PlateHolderBlockEntity.Placed plate = be.at(at[0], at[1]);
         if (plate == null) {
-            return InteractionResult.PASS;
+            return Use.blockEmpty(UseOutcome.PASS, world.isClientSide);
         }
         // 空手右键架着筷子的碗 / 盘子：先把筷子（连夹着的菜）拿回来（2026-10-27）
         if (!plate.chopsticks.isEmpty() && !player.isShiftKeyDown()) {
@@ -445,7 +458,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
                 be.changed();
                 world.playSound(null, pos, SoundEvents.BAMBOO_HIT, SoundSource.BLOCKS, 0.6F, 1.4F);
             }
-            return InteractionResult.SUCCESS;
+            return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide);
         }
         // 潜行 + 空手右键：按「最后放进去的先出来」取一样菜进背包，按一下取一个（r96）
         if (player.isShiftKeyDown()) {
@@ -459,7 +472,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
                     world.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.35F, 1.5F);
                 }
             }
-            return InteractionResult.SUCCESS;
+            return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide);
         }
         if (!world.isClientSide) {
             be.remove(plate);
@@ -470,6 +483,6 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
                 world.removeBlock(pos, false);
             }
         }
-        return InteractionResult.SUCCESS;
+        return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide);
     }
 }

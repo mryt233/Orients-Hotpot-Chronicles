@@ -1,5 +1,11 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.core.Holder;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -62,14 +68,14 @@ public enum DrinkKind implements StringRepresentable {
     private final double bottleHeight;
     /** 满瓶 / 空瓶 / 满杯的物品，用 Supplier 延迟到真正要用的时候再读 HotPotContent 的字段。 */
     private final Supplier<DrinkItem> bottle;
-    private final Supplier<net.minecraft.world.item.Item> emptyBottle;
+    private final Supplier<Item> emptyBottle;
     private final Supplier<CupItem> cup;
-    private final net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect> effect;
+    private final Holder<MobEffect> effect;
 
     DrinkKind(String id, boolean hasBottle, double bottleHeight,
-              Supplier<DrinkItem> bottle, Supplier<net.minecraft.world.item.Item> emptyBottle,
+              Supplier<DrinkItem> bottle, Supplier<Item> emptyBottle,
               Supplier<CupItem> cup,
-              net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect> effect) {
+              Holder<MobEffect> effect) {
         this.id = id;
         this.hasBottle = hasBottle;
         this.bottleHeight = bottleHeight;
@@ -110,8 +116,8 @@ public enum DrinkKind implements StringRepresentable {
     }
 
     /** 喝完剩的空瓶物品；水和牛奶没有瓶装，返回原版玻璃瓶（用不到，只是给调用方一个安全的兜底）。 */
-    public net.minecraft.world.item.Item emptyBottle() {
-        return hasBottle ? emptyBottle.get() : net.minecraft.world.item.Items.GLASS_BOTTLE;
+    public Item emptyBottle() {
+        return hasBottle ? emptyBottle.get() : Items.GLASS_BOTTLE;
     }
 
     /** 满杯物品（每种饮料都有杯子，包括水和牛奶）。 */
@@ -154,7 +160,7 @@ public enum DrinkKind implements StringRepresentable {
     }
 
     /** mryt233 改（2026-11-05）：时长 &lt;= 0 表示这条效果在配置里关掉了。 */
-    private static void addEffect(LivingEntity user, net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect> effect,
+    private static void addEffect(LivingEntity user, Holder<MobEffect> effect,
                                   int ticks, int amplifier) {
         if (effect == null || ticks <= 0) {
             return;

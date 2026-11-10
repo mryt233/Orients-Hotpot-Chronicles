@@ -1,5 +1,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.Locale;
+import java.util.function.Supplier;
+
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -129,10 +133,10 @@ public enum SoupBase {
     private final String nameKey;
     private final String bowlId;
     private final float speedMul;
-    private final java.util.function.Supplier<Item> sourceItem;
+    private final Supplier<Item> sourceItem;
     private final Item remainderItem;
     /** 锅底料：加进清汤里把它变成这种汤（只有番茄 / 三鲜有）；没有就是 null。 */
-    private final java.util.function.Supplier<Item> additive;
+    private final Supplier<Item> additive;
     private final int defaultBowlHunger;
     private final float defaultBowlSaturation;
     private final Holder<MobEffect> mainEffect;
@@ -156,8 +160,8 @@ public enum SoupBase {
 
     // 原料用 Supplier：新汤底的原料是本模组物品，枚举初始化时 HotPotContent 可能还没注册好（2026-10-25）
     SoupBase(String nameKey, String bowlId, float speedMul,
-             java.util.function.Supplier<Item> sourceItem, Item remainderItem,
-             java.util.function.Supplier<Item> additive,
+             Supplier<Item> sourceItem, Item remainderItem,
+             Supplier<Item> additive,
              int bowlHunger, float bowlSaturation,
              Holder<MobEffect> mainEffect, int duration,
              Holder<MobEffect> secondEffect, int secondDuration,
@@ -195,7 +199,7 @@ public enum SoupBase {
     }
 
     public String nameKey() {
-        return "text." + cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot.MOD_ID + "." + nameKey;
+        return "text." + HotPot.MOD_ID + "." + nameKey;
     }
 
     /**
@@ -203,7 +207,7 @@ public enum SoupBase {
      * 鸳鸯 / 田字锅的汤面由渲染器按这个名字取贴图画，所以以后加新汤底只要加枚举值 + 这两张贴图，任何一边都能用。
      */
     public String textureKey() {
-        return name().toLowerCase(java.util.Locale.ROOT);
+        return name().toLowerCase(Locale.ROOT);
     }
 
     /**

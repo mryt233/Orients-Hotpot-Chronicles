@@ -1,5 +1,13 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.orient.framework.loader.Framework;
+import cn.blockforge.orient.framework.loader.RegistrationApi;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Items;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -57,8 +65,8 @@ public class ClothApronItem extends ArmorItem {
     /** 米白款材质的注册 ID（其余两款的 ID 是 {@code <款式 ID>}，见 {@link Style}）。 */
     public static final ResourceLocation MATERIAL_ID = HotPot.id("cloth_apron");
     /** 三款布围裙共用的物品标签：所有「穿没穿围裙」的判断都认它（r146b）。 */
-    public static final net.minecraft.tags.TagKey<Item> APRON_TAG =
-        net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM,
+    public static final TagKey<Item> APRON_TAG =
+        TagKey.create(Registries.ITEM,
             HotPot.id("cloth_aprons"));
     /** 胸部防御点数（和原版皮革胸甲一致：3 点）。 */
     public static final int DEFENSE = 3;
@@ -72,7 +80,7 @@ public class ClothApronItem extends ArmorItem {
      * {@code textures/models/armor/cloth_apron_layer_1.png}（{@link ArmorMaterial.Layer} 会用
      * {@code textures/models/armor/<路径>_layer_<1|2>.png} 去找）。null 表示还没注册（注册顺序兜底）。
      */
-    private static final Map<Style, net.minecraft.core.Holder<ArmorMaterial>> MATERIALS =
+    private static final Map<Style, Holder<ArmorMaterial>> MATERIALS =
         new EnumMap<>(Style.class);
 
     /**
@@ -110,11 +118,11 @@ public class ClothApronItem extends ArmorItem {
     }
 
     public ClothApronItem(Style style) {
-        this(cn.blockforge.orient.framework.loader.Framework.platform().registration(), style);
+        this(Framework.platform().registration(), style);
     }
 
     // mryt233 改（2026-11-10）：保存登记器返回的 Holder，延迟注册落地前不读取 value()。
-    public ClothApronItem(cn.blockforge.orient.framework.loader.RegistrationApi registration, Style style) {
+    public ClothApronItem(RegistrationApi registration, Style style) {
         super(material(registration, style), ArmorItem.Type.CHESTPLATE, new Item.Properties()
             .durability(DURABILITY)
             .component(DataComponents.ATTRIBUTE_MODIFIERS, modifiers()));
@@ -134,8 +142,8 @@ public class ClothApronItem extends ArmorItem {
      * 取材质 Holder：第一次用到时把材质注册进静态注册表。材质里的护甲层贴图在本模组命名空间下，
      * 修复材料是白色羊毛或线（和配方一致）。
      */
-    private static synchronized net.minecraft.core.Holder<ArmorMaterial> material(cn.blockforge.orient.framework.loader.RegistrationApi registration, Style style) {
-        net.minecraft.core.Holder<ArmorMaterial> cached = MATERIALS.get(style);
+    private static synchronized Holder<ArmorMaterial> material(RegistrationApi registration, Style style) {
+        Holder<ArmorMaterial> cached = MATERIALS.get(style);
         if (cached == null) {
             ArmorMaterial value = new ArmorMaterial(
                 new EnumMap<>(Map.of(
@@ -163,12 +171,12 @@ public class ClothApronItem extends ArmorItem {
     @Override
     public boolean isValidRepairItem(ItemStack stack, ItemStack repair) {
         // 用户定：白色羊毛或线都能修（和工作台配方一致）
-        return repair.is(ItemTags.WOOL) || repair.is(net.minecraft.world.item.Items.STRING)
+        return repair.is(ItemTags.WOOL) || repair.is(Items.STRING)
             || super.isValidRepairItem(stack, repair);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context,
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context,
                                 List<Component> lines, TooltipFlag flag) {
         super.appendHoverText(stack, context, lines, flag);
         lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.cloth_apron"))

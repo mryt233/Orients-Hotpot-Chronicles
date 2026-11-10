@@ -1,6 +1,13 @@
 // 作者：mryt233；mryt233 改（2026-11-10）
 package cn.blockforge.generated.orientshotpotchronicles.neoforge;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
+
 import cn.blockforge.generated.orientshotpotchronicles.HotpotContentModule;
 import cn.blockforge.orient.framework.loader.ClientHooks;
 import net.neoforged.bus.api.IEventBus;
@@ -22,7 +29,7 @@ public final class HotPotNeoForge {
             contentRegistered = true;
             HotpotContentModule.HOST.registerAll();
             HotpotContentModule.HOST.runtime(callback -> NeoForge.EVENT_BUS.addListener(
-                (net.neoforged.neoforge.event.server.ServerStartedEvent e) -> callback.run()));
+                (ServerStartedEvent e) -> callback.run()));
             NeoForgePlatform.afterContentRegistration();
         });
         // 开发命令依赖原生事件参数，正式包不携带实现。
@@ -31,12 +38,12 @@ public final class HotPotNeoForge {
         if (Boolean.getBoolean("hotpot.expreg")) HotpotContentModule.development("NeoForgeRegProbe", "register", new Class<?>[]{IEventBus.class}, modBus);
         if (Boolean.getBoolean("hotpot.opt3c")) HotpotContentModule.development("Opt3cNeoForgeProbe", "install", new Class<?>[]{IEventBus.class}, modBus);
         // 两端原生资源重载 API 不同，统一通知公共宿主。
-        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.AddReloadListenerEvent event) ->
-            event.addListener(new net.minecraft.server.packs.resources.SimplePreparableReloadListener<Void>() {
-                @Override protected Void prepare(net.minecraft.server.packs.resources.ResourceManager manager,
-                    net.minecraft.util.profiling.ProfilerFiller profiler) { return null; }
-                @Override protected void apply(Void unused, net.minecraft.server.packs.resources.ResourceManager manager,
-                    net.minecraft.util.profiling.ProfilerFiller profiler) { HotpotContentModule.HOST.reload(); }
+        NeoForge.EVENT_BUS.addListener((AddReloadListenerEvent event) ->
+            event.addListener(new SimplePreparableReloadListener<Void>() {
+                @Override protected Void prepare(ResourceManager manager,
+                    ProfilerFiller profiler) { return null; }
+                @Override protected void apply(Void unused, ResourceManager manager,
+                    ProfilerFiller profiler) { HotpotContentModule.HOST.reload(); }
             }));
     }
     static void clientHooks(ClientHooks hooks) { HotpotContentModule.HOST.client(hooks); }

@@ -1,6 +1,11 @@
 // 作者：mryt233；mryt233 改（2026-11-11）
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.HashMap;
+import java.util.Map;
+import java.util.WeakHashMap;
+
 import cn.blockforge.orient.framework.loader.RegistrationApi;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.crafting.*;
@@ -15,8 +20,8 @@ public final class HotPotRecipes {
     private static volatile MinecraftServer server;
     private static volatile Supplier<Level> clientLevel = () -> null;
     // 只缓存当前配方代次的排序结果；弱键不阻止旧世界与旧 manager 回收。
-    private record Snapshot(Object generation, java.util.Map<RecipeType<?>, List<?>> types) { }
-    private static final java.util.Map<RecipeManager, Snapshot> SNAPSHOTS = new java.util.WeakHashMap<>();
+    private record Snapshot(Object generation, Map<RecipeType<?>, List<?>> types) { }
+    private static final Map<RecipeManager, Snapshot> SNAPSHOTS = new WeakHashMap<>();
     private HotPotRecipes() { }
     public static void register(RegistrationApi registration) {
         registration.recipeTypes().register(HotPot.id("pot_boiling"), PotBoilingRecipe.TYPE);
@@ -45,7 +50,7 @@ public final class HotPotRecipes {
             // 客户端 replaceRecipes 会原地换表，不能只检查 manager 身份。
             Object generation = manager.getRecipes();
             if (snapshot == null || snapshot.generation != generation) {
-                snapshot = new Snapshot(generation, new java.util.HashMap<>());
+                snapshot = new Snapshot(generation, new HashMap<>());
                 SNAPSHOTS.put(manager, snapshot);
             }
             return (List<RecipeHolder<T>>) snapshot.types.computeIfAbsent(type, ignored ->

@@ -1,5 +1,8 @@
 package cn.blockforge.orient.framework.platform.fabric;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.orient.framework.loader.RuntimeEvents;
+
 // mryt233 改（2026-11-10）：第三批 3C 平台接线。
 
 import cn.blockforge.orient.framework.loader.Framework;
@@ -71,7 +74,7 @@ public final class FabricFrameworkPlatform implements Platform {
     }
 
     @Override
-    public cn.blockforge.orient.framework.loader.RuntimeEvents events() {
+    public RuntimeEvents events() {
         return events;
     }
 
@@ -128,6 +131,6 @@ public final class FabricFrameworkPlatform implements Platform {
     }
     // mryt233 改（2026-11-10）：配置初始化需要的环境信息。
     @Override
-    public boolean isDedicatedServer() { return net.fabricmc.loader.api.FabricLoader.getInstance().getEnvironmentType() == net.fabricmc.api.EnvType.SERVER; }
+    public boolean isDedicatedServer() { return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER; }
 
 }

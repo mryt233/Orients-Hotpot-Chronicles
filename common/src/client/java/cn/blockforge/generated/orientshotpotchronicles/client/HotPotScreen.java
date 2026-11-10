@@ -1,5 +1,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.ArrayList;
+import java.util.function.BiPredicate;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCooking;
@@ -44,7 +48,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
     public HotPotScreen(HotPotScreenHandler handler, Inventory inventory, Component title) {
         // 鸳鸯 / 田字锅标题用锅自己的名字，九宫格锅照旧「九宫格火锅」
         super(handler, inventory, handler.layout().multiSoup()
-            ? cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.blockFor(handler.potMaterial()).getName()
+            ? HotPotContent.blockFor(handler.potMaterial()).getName()
             : Component.translatable(HotPotBlockEntity.key("screen.title")));
         this.imageWidth = W;
         this.imageHeight = H;
@@ -190,7 +194,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
 
     /** @param keep 鸳鸯 / 田字锅：只画落在这一边的高光、配料、气泡（界面坐标）；null = 整锅（同时铺底色）。 */
     private void drawSoup(GuiGraphics c, int gx, int gy, double t, int soupId,
-                          java.util.function.BiPredicate<Double, Double> keep) {
+                          BiPredicate<Double, Double> keep) {
         Soup soup = soup(soupId);
         if (keep == null) {
             c.fill(gx, gy, gx + GW, gy + GW, soup.base());
@@ -598,7 +602,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
                     String.format(Locale.ROOT, "%.1f", seconds)).withStyle(ChatFormatting.YELLOW);
             }
         }
-        List<Component> lines = new java.util.ArrayList<>(List.of(
+        List<Component> lines = new ArrayList<>(List.of(
             stack.getItem().getName(stack).copy().withStyle(ChatFormatting.WHITE),
             location.copy().withStyle(ChatFormatting.GRAY),
             status));

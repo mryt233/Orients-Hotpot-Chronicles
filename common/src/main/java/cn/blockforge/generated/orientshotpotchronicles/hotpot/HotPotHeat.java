@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.world.level.block.Block;
+
 import cn.blockforge.orient.framework.game.Hooks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.registries.Registries;
@@ -27,7 +30,7 @@ import net.minecraft.world.level.Level;
  * 作者：mryt233
  */
 public final class HotPotHeat {
-    public static final TagKey<net.minecraft.world.level.block.Block> HEAT_SOURCES =
+    public static final TagKey<Block> HEAT_SOURCES =
         TagKey.create(Registries.BLOCK, HotPot.id("heat_sources"));
 
     /** 判断某个位置的方块此刻能不能给上面的锅加热。 */

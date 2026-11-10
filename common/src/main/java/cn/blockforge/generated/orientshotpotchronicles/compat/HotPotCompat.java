@@ -1,5 +1,10 @@
 package cn.blockforge.generated.orientshotpotchronicles.compat;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotHeat;
+import java.util.Objects;
+import java.util.function.Predicate;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotFuel;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
 import net.minecraft.world.item.Item;
@@ -38,8 +43,8 @@ public final class HotPotCompat {
     }
 
     /** 注册第三方热源：返回 true 时，摆在这个方块上的锅算热锅（例如农夫乐事的炉灶）。 */
-    public static void registerHeatSource(cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotHeat.HeatSource source) {
-        cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotHeat.register(source);
+    public static void registerHeatSource(HotPotHeat.HeatSource source) {
+        HotPotHeat.register(source);
     }
 
     // ------- 查询接口（由火锅/灶台逻辑调用） -------
@@ -63,10 +68,10 @@ public final class HotPotCompat {
     }
 
     // 调整：由平台注册加载器检测，兼容模块本身保持加载器无关。
-    private static java.util.function.Predicate<String> modLoaded = id -> false;
+    private static Predicate<String> modLoaded = id -> false;
 
-    public static void install(java.util.function.Predicate<String> detector) {
-        modLoaded = java.util.Objects.requireNonNull(detector);
+    public static void install(Predicate<String> detector) {
+        modLoaded = Objects.requireNonNull(detector);
     }
 
     public static boolean isModLoaded(String modId) {

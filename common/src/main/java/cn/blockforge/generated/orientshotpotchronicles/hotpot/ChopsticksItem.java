@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.food.FoodProperties;
@@ -51,7 +54,7 @@ public class ChopsticksItem extends Item {
     public InteractionResult useOn(UseOnContext context) {
         Player player = context.getPlayer();
         if (player == null) {
-            return InteractionResult.PASS;
+            return Use.item(UseOutcome.PASS, context.getLevel().isClientSide);
         }
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
@@ -63,7 +66,7 @@ public class ChopsticksItem extends Item {
             return hooked;
         }
         if (!player.isShiftKeyDown()) {
-            return InteractionResult.PASS;
+            return Use.item(UseOutcome.PASS, world.isClientSide);
         }
         if (world.getBlockState(pos).is(HotPotContent.STOVE_TOP)) {
             // 高灶台的上半截：当成点在下面的灶台上
@@ -90,7 +93,7 @@ public class ChopsticksItem extends Item {
                     pos, player, context.getHand(), hit).result();
             }
             if (!plate.restsChopsticks() || !plate.chopsticks.isEmpty()) {
-                return InteractionResult.PASS;
+                return Use.item(UseOutcome.PASS, world.isClientSide);
             }
             if (!world.isClientSide) {
                 plate.chopsticks = context.getItemInHand().copy();
@@ -101,7 +104,7 @@ public class ChopsticksItem extends Item {
                 world.playSound(null, pos, SoundEvents.BAMBOO_PLACE,
                     SoundSource.BLOCKS, 0.6F, 1.4F);
             }
-            return InteractionResult.sidedSuccess(world.isClientSide);
+            return Use.item(UseOutcome.SUCCESS_SOFT, world.isClientSide);
         }
         boolean pot = state.getBlock() instanceof HotPotBlock
             || (StoveBlock.isStove(state) && StoveBlock.isPotHit(state, pos, hit));
@@ -109,11 +112,11 @@ public class ChopsticksItem extends Item {
             if (!world.isClientSide) {
                 be.useWithChopsticks(player);
             }
-            return InteractionResult.sidedSuccess(world.isClientSide);
+            return Use.item(UseOutcome.SUCCESS_SOFT, world.isClientSide);
         }
         // 锅、灶台（含没架锅的灶台、高灶台的上半截）上不摆筷子
         if (state.getBlock() instanceof HotPotBlock || StoveBlock.isStove(state) || state.getBlock() instanceof StoveTopBlock) {
-            return InteractionResult.PASS;
+            return Use.item(UseOutcome.PASS, world.isClientSide);
         }
         // 桌面 / 地面等方块的顶面：Shift+右键把这双筷子直接摆在上面（r136b，2026-11-05 用户，新增）
         return placeTableChopsticks(context);
@@ -134,7 +137,7 @@ public class ChopsticksItem extends Item {
         if (context.getClickedFace() == Direction.UP && world.getBlockState(pos).is(HotPotContent.PLATE_HOLDER)
             && world.getBlockEntity(pos) instanceof PlateHolderBlockEntity holder) {
             if (world.isClientSide) {
-                return InteractionResult.SUCCESS;
+                return Use.item(UseOutcome.SUCCESS, world.isClientSide);
             }
             double hx = (context.getClickLocation().x - pos.getX()) * 16;
             double hz = (context.getClickLocation().z - pos.getZ()) * 16;
@@ -143,12 +146,12 @@ public class ChopsticksItem extends Item {
                 context.getHorizontalDirection())) {
                 world.playSound(null, pos, SoundEvents.BAMBOO_PLACE, SoundSource.BLOCKS, 0.6F, 1.4F);
                 context.getItemInHand().consume(1, player);
-                return InteractionResult.SUCCESS;
+                return Use.item(UseOutcome.SUCCESS, world.isClientSide);
             }
             if (player != null) {
                 player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.plate_no_room")), true);
             }
-            return InteractionResult.FAIL;
+            return Use.item(UseOutcome.FAIL, world.isClientSide);
         }
         return PlateItem.placeOn(context, HotPotContent.CHOPSTICK_REST_BLOCK, true);
     }
@@ -165,10 +168,10 @@ public class ChopsticksItem extends Item {
         // 饱食度满时饥饿条不再涨，饱和度照常加（原版规则：最多加到当前饥饿值，即 20）。
         // 装了 Always Eat 也不冲突：它只让带食物组件的物品随时能吃，筷子本身不带食物组件（mryt233 改，2026-11-01）。
         if (food == null || !user.canEat(true)) {
-            return InteractionResultHolder.pass(stack);
+            return Use.itemUse(UseOutcome.PASS, stack, world.isClientSide);
         }
         user.startUsingItem(hand);
-        return InteractionResultHolder.consume(stack);
+        return Use.itemUse(UseOutcome.CONSUME, stack, world.isClientSide);
     }
 
     @Override

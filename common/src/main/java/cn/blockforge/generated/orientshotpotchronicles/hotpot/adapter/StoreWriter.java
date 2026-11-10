@@ -1,0 +1,44 @@
+// 作者：mryt233
+package cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter;
+
+import java.util.List;
+import net.minecraft.world.item.ItemStack;
+
+/**
+ * 存档写侧的「无版本读写原语」。业务方块实体只描述「写什么」，不直接摸 {@code CompoundTag}。
+ *
+ * <p>mryt233 改（2026-11-11）：第三批 3G 版本适配层。1.21.1 的实现是 {@link CompoundWriter}；
+ * 26.x 要落到 {@code ValueOutput} 上（{@code output.child(key)}、{@code output.childrenList(key)}、
+ * {@code output.store(key, ItemStack.CODEC, stack)}）；1.20.1 只要去掉 {@code HolderLookup.Provider}。</p>
+ *
+ * <p>原语只收主工程实际用到的键（逐项对照见 {@code docs/版本适配小包说明.md}）。
+ * 子节点用 {@link #child(String)}；子节点列表用 {@link #childList(String)} 拿到 {@link StoreChildList}
+ * 再 {@code addChild()} 一条一条写，不另造「列表 API」。</p>
+ */
+public interface StoreWriter {
+    void putInt(String key, int value);
+
+    void putFloat(String key, float value);
+
+    void putDouble(String key, double value);
+
+    void putBoolean(String key, boolean value);
+
+    void putString(String key, String value);
+
+    void putIntArray(String key, int[] value);
+
+    void putByteArray(String key, byte[] value);
+
+    /** 单个物品；空栈跳过（1.21.1 的写法本来就是「非空才写」）。 */
+    void putItem(String key, ItemStack stack);
+
+    /** 当前节点的物品列表（键名固定 {@code Items}、每条带 {@code Slot}、空表也写）。 */
+    void putItems(List<ItemStack> items);
+
+    /** 开一个子节点（例如灶台的 {@code Fuel}）。 */
+    StoreWriter child(String key);
+
+    /** 开一个子节点列表（例如桌面的 {@code Plates}）。 */
+    StoreChildList childList(String key);
+}

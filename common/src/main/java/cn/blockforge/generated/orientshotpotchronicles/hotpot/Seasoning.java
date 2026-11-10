@@ -1,5 +1,10 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
+import net.minecraft.world.effect.MobEffect;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,39 +47,39 @@ public enum Seasoning {
      *   raws      能补这种调料的原料
      */
 
-    MSG("msg", 0xFFECECF0, null, 0, 0, 2, new net.minecraft.core.Holder[0], () -> Items.WHEAT),
-    CHILI_OIL("chili_oil", 0xFFC42816, MobEffects.FIRE_RESISTANCE, 200, 0, 0, new net.minecraft.core.Holder[0],
+    MSG("msg", 0xFFECECF0, null, 0, 0, 2, new Holder[0], () -> Items.WHEAT),
+    CHILI_OIL("chili_oil", 0xFFC42816, MobEffects.FIRE_RESISTANCE, 200, 0, 0, new Holder[0],
         () -> Items.BLAZE_POWDER),
     SWEET_SOUR_SAUCE("sweet_sour_sauce", 0xFFC85A3C, MobEffects.MOVEMENT_SPEED, 200, 0, 0,
-        new net.minecraft.core.Holder[0], () -> Items.SWEET_BERRIES),
+        new Holder[0], () -> Items.SWEET_BERRIES),
     HONEY("honey", 0xFFECA826, null, 0, 0, 0,
-        new net.minecraft.core.Holder[]{MobEffects.HUNGER, MobEffects.POISON}, () -> Items.HONEY_BOTTLE),
-    SESAME_OIL("sesame_oil", 0xFFCC8A28, MobEffects.REGENERATION, 100, 0, 0, new net.minecraft.core.Holder[0],
+        new Holder[]{MobEffects.HUNGER, MobEffects.POISON}, () -> Items.HONEY_BOTTLE),
+    SESAME_OIL("sesame_oil", 0xFFCC8A28, MobEffects.REGENERATION, 100, 0, 0, new Holder[0],
         () -> Items.SUNFLOWER, () -> Items.PUMPKIN_SEEDS),   // 用户 2026-10-23：向日葵或南瓜种子
     VINEGAR("vinegar", 0xFF462418, null, 0, 0, 0,
-        new net.minecraft.core.Holder[]{MobEffects.CONFUSION, MobEffects.HUNGER}, () -> Items.APPLE, () -> Items.BEETROOT),
-    SUGAR("sugar", 0xFFF0EEE8, MobEffects.DIG_SPEED, 200, 0, 0, new net.minecraft.core.Holder[0], () -> Items.SUGAR),
-    CHOPPED_SCALLION("chopped_scallion", 0xFF6CB03A, null, 0, 0, 0, new net.minecraft.core.Holder[0],
+        new Holder[]{MobEffects.CONFUSION, MobEffects.HUNGER}, () -> Items.APPLE, () -> Items.BEETROOT),
+    SUGAR("sugar", 0xFFF0EEE8, MobEffects.DIG_SPEED, 200, 0, 0, new Holder[0], () -> Items.SUGAR),
+    CHOPPED_SCALLION("chopped_scallion", 0xFF6CB03A, null, 0, 0, 0, new Holder[0],
         () -> HotPotContent.SCALLION),
-    MINCED_CILANTRO("minced_cilantro", 0xFF4E9A2C, null, 0, 0, 0, new net.minecraft.core.Holder[0],
+    MINCED_CILANTRO("minced_cilantro", 0xFF4E9A2C, null, 0, 0, 0, new Holder[0],
         () -> HotPotContent.CILANTRO),
     GARLIC_PASTE("garlic_paste", 0xFFE8D696, MobEffects.DAMAGE_RESISTANCE, 160, 0, 0,
-        new net.minecraft.core.Holder[0], () -> HotPotContent.GARLIC_PASTE),   // 蒜泥（2026-10-25 用户加，第 10 种）
+        new Holder[0], () -> HotPotContent.GARLIC_PASTE),   // 蒜泥（2026-10-25 用户加，第 10 种）
     // mryt233 改（2026-11-06）：r137 新增 4 种蘸料，共 14 种。蚝油（水下呼吸）、芝麻酱（伤害吸收）、
     // 花生碎（跳跃提升）、小米辣（力量）；原料都是 r137 新加的蘸料原料，1 个原料照旧 4 份。
     OYSTER_SAUCE("oyster_sauce", 0xFF5A321E, MobEffects.WATER_BREATHING, 200, 0, 0,
-        new net.minecraft.core.Holder[0], () -> HotPotContent.OYSTER_SAUCE),
+        new Holder[0], () -> HotPotContent.OYSTER_SAUCE),
     SESAME_PASTE("sesame_paste", 0xFFC89E64, MobEffects.ABSORPTION, 200, 0, 0,
-        new net.minecraft.core.Holder[0], () -> HotPotContent.SESAME_PASTE),
+        new Holder[0], () -> HotPotContent.SESAME_PASTE),
     CRUSHED_PEANUTS("crushed_peanuts", 0xFFDAB46E, MobEffects.JUMP, 200, 0, 0,
-        new net.minecraft.core.Holder[0], () -> HotPotContent.CRUSHED_PEANUTS),
+        new Holder[0], () -> HotPotContent.CRUSHED_PEANUTS),
     MILLET_CHILI("millet_chili", 0xFFE2281C, MobEffects.DAMAGE_BOOST, 160, 0, 0,
-        new net.minecraft.core.Holder[0], () -> HotPotContent.MILLET_CHILI),
+        new Holder[0], () -> HotPotContent.MILLET_CHILI),
     // mryt233 改（2026-11-06，r139）：第 15 种调料——折耳根碎（西南吃法：折耳根剁碎拌进蘸水）。
     // 象征折耳根清热解毒：给 10 秒抗性提升 I（和蒜泥同一档，但时间更长），原料是折耳根碾成的碎末；
     // 顺手解掉中毒（毒也是「热毒」）。
     MINCED_ZHE_ER_GEN("minced_zhe_er_gen", 0xFFD8D2BC, MobEffects.DAMAGE_RESISTANCE, 200, 0, 0,
-        new net.minecraft.core.Holder[]{MobEffects.POISON}, () -> HotPotContent.MINCED_ZHE_ER_GEN);
+        new Holder[]{MobEffects.POISON}, () -> HotPotContent.MINCED_ZHE_ER_GEN);
 
     public static final Seasoning[] ALL = values();
 
@@ -106,20 +111,20 @@ public enum Seasoning {
     private final Supplier<Item>[] raws;
     private final int color;
     /** 主效果（null = 这种调料没有正面效果）。 */
-    private final net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect> effect;
+    private final Holder<MobEffect> effect;
     /** 主效果的默认时长 / 等级（配成 0 就不加）。 */
     private final int defaultTicks;
     private final int defaultAmplifier;
     /** 多回的饥饿值（只有味精用）。 */
     private final int defaultHunger;
     /** 吃下时解除的状态效果。 */
-    private final net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect>[] removes;
+    private final Holder<MobEffect>[] removes;
 
     @SafeVarargs
     Seasoning(String id, int color,
-              net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect> effect,
+              Holder<MobEffect> effect,
               int defaultTicks, int defaultAmplifier, int defaultHunger,
-              net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect>[] removes,
+              Holder<MobEffect>[] removes,
               Supplier<Item>... raws) {
         this.id = id;
         this.raws = raws;
@@ -181,12 +186,12 @@ public enum Seasoning {
     }
 
     /** 「 辣油：抗火 10 秒」这样一行灰字：蘸料碗、蘸过的菜的提示共用。 */
-    public static void appendEffects(int mask, java.util.List<Component> lines) {
+    public static void appendEffects(int mask, List<Component> lines) {
         for (Seasoning s : ALL) {
             if ((mask & s.bit()) != 0) {
                 lines.add(Component.literal(" ").append(Component.translatable(HotPotBlockEntity.key("tooltip.sauce.line"),
                     Component.translatable(s.nameKey()), Component.translatable(s.effectKey())))
-                    .withStyle(net.minecraft.ChatFormatting.GRAY));
+                    .withStyle(ChatFormatting.GRAY));
             }
         }
     }
@@ -205,7 +210,7 @@ public enum Seasoning {
      */
     public void apply(LivingEntity user) {
         // 先解除（蜂蜜解毒解辣、醋解反胃解辣、折耳根碎解毒）
-        for (net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect> removed : removes) {
+        for (Holder<MobEffect> removed : removes) {
             user.removeEffect(removed);
         }
         // 味精：提鲜，多回 2 点饥饿值（用户 2026-10-23 选的）
@@ -221,7 +226,7 @@ public enum Seasoning {
 
     /** 按配置给状态效果；时长配成 0 或这条效果不存在就不加。 */
     private void addEffect(LivingEntity user,
-                           net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect> effect,
+                           Holder<MobEffect> effect,
                            int defaultTicks, int defaultAmplifier) {
         if (effect == null) {
             return;

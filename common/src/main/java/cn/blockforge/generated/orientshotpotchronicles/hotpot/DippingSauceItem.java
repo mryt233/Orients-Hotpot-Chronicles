@@ -1,5 +1,15 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+// mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -38,7 +48,7 @@ public class DippingSauceItem extends Item {
     public static ItemStack bite(ItemStack stack) {
         SauceContents left = contents(stack).bitten();
         if (left.bites() <= 0) {
-            return new ItemStack(net.minecraft.world.item.Items.BOWL);
+            return new ItemStack(Items.BOWL);
         }
         stack.set(HotPotContent.SAUCE, left);
         return stack;
@@ -57,8 +67,8 @@ public class DippingSauceItem extends Item {
     }
 
     /** 吃之前：主手或副手拿着蘸料就自动蘸一口（先看副手；用户 2026-10-25：另一只手主副都行）。 */
-    public static void dipFromHands(net.minecraft.world.entity.LivingEntity user, ItemStack food) {
-        for (net.minecraft.world.InteractionHand hand : new net.minecraft.world.InteractionHand[]{net.minecraft.world.InteractionHand.OFF_HAND, net.minecraft.world.InteractionHand.MAIN_HAND}) {
+    public static void dipFromHands(LivingEntity user, ItemStack food) {
+        for (InteractionHand hand : new InteractionHand[]{InteractionHand.OFF_HAND, InteractionHand.MAIN_HAND}) {
             ItemStack sauce = user.getItemInHand(hand);
             if (sauce.getItem() instanceof DippingSauceItem && contents(sauce).bites() > 0) {
                 user.setItemInHand(hand, dipInto(sauce, food));
@@ -91,13 +101,13 @@ public class DippingSauceItem extends Item {
      * 只清数量、不补碗，等于把碗一起吞掉。
      */
     @Override
-    public void inventoryTick(ItemStack stack, net.minecraft.world.level.Level world,
-                              net.minecraft.world.entity.Entity entity, int slot, boolean selected) {
+    public void inventoryTick(ItemStack stack, Level world,
+                              Entity entity, int slot, boolean selected) {
         // 只在服务端换（客户端也跑 inventoryTick，两边各塞一只碗会多出一只假碗；mryt233 改）
         if (world.isClientSide() || contents(stack).bites() > 0) {
             return;
         }
-        if (!(entity instanceof net.minecraft.world.entity.player.Player player)) {
+        if (!(entity instanceof Player player)) {
             // mryt233 改（2026-11-07）：非玩家容器不处理，避免吞物品
             return;
         }
@@ -109,13 +119,13 @@ public class DippingSauceItem extends Item {
 
     /** mryt233 改（2026-11-04）：手里这碗要是空的（非法状态）就换成空碗。inventoryTick 只在东西进背包时才跑，
      *  拿在手里、一开始就是空的那种靠这里兜住。 */
-    private static boolean emptyBowlIfInvalid(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
+    private static boolean emptyBowlIfInvalid(Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (contents(stack).bites() > 0) {
             return false;
         }
         if (!player.level().isClientSide()) {   // 换碗只在服务端做，客户端等同步（mryt233 改）
-            player.setItemInHand(hand, new ItemStack(net.minecraft.world.item.Items.BOWL));
+            player.setItemInHand(hand, new ItemStack(Items.BOWL));
         }
         return true;
     }
@@ -123,7 +133,7 @@ public class DippingSauceItem extends Item {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         if (context.getPlayer() != null && emptyBowlIfInvalid(context.getPlayer(), context.getHand())) {
-            return InteractionResult.SUCCESS;
+            return Use.item(UseOutcome.SUCCESS, context.getLevel().isClientSide);
         }
         return PlateItem.placeOn(context, HotPotContent.BOWL_BLOCK, true);
     }

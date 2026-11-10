@@ -1,5 +1,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.level.Level;
+
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.food.FoodProperties;
@@ -36,7 +40,7 @@ public class HotPotScreenHandler extends PlayerInventoryMenu {
     public static final int HOTBAR_Y = 186;
 
     private final Container pot;
-    private final net.minecraft.world.level.Level world;
+    private final Level world;
     private final HotPotBlockEntity serverBe;
     private final DataSlot[] properties;
     private final int[] clientData = new int[HotPotBlockEntity.PROP_COUNT];
@@ -81,11 +85,11 @@ public class HotPotScreenHandler extends PlayerInventoryMenu {
     }
 
     private static Container clientInventory(Inventory playerInventory, BlockPos pos) {
-        net.minecraft.world.level.Level world = playerInventory.player.level();
+        Level world = playerInventory.player.level();
         if (world.getBlockEntity(pos) instanceof HotPotBlockEntity be) {
             return be;
         }
-        return new net.minecraft.world.SimpleContainer(HotPotBlockEntity.SLOTS);
+        return new SimpleContainer(HotPotBlockEntity.SLOTS);
     }
 
     // ------------------------------------------------------------------ UI 数据

@@ -1,6 +1,9 @@
 // 作者：mryt233
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.client.renderer.entity.NoopRenderer;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.*;
 import cn.blockforge.orient.framework.client.ClientContent;
 import cn.blockforge.orient.framework.client.ClientNetwork;
@@ -32,7 +35,7 @@ public final class HotPotClientContent {
         client.blockEntityRenderer(HotPotContent.CUTTING_BOARD_BE, CuttingBoardRenderer::new);
         client.blockEntityRenderer(HotPotContent.PLATE_HOLDER_BE, PlateHolderRenderer::new);
         client.blockEntityRenderer(HotPotContent.BENCH_BE, BenchLegsRenderer::new);
-        client.entityRenderer(HotPotContent.SEAT, net.minecraft.client.renderer.entity.NoopRenderer::new);
+        client.entityRenderer(HotPotContent.SEAT, NoopRenderer::new);
         client.armorModels((entity, stack, slot, original) -> ApronModel.get(), HotPotContent.CLOTH_APRONS.toArray(Item[]::new));
         client.tooltip((stack, context, flag, lines) -> ClientTooltips.append(stack, lines));
         client.cutout(HotPotContent.SAUCE_STATIONS.toArray(Block[]::new));

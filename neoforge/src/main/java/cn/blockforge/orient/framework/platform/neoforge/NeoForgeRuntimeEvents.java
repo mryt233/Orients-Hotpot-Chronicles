@@ -1,6 +1,12 @@
 // 作者：mryt233
 package cn.blockforge.orient.framework.platform.neoforge;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+
 import cn.blockforge.orient.framework.loader.RuntimeEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,20 +26,20 @@ final class NeoForgeRuntimeEvents implements RuntimeEvents {
     @Override
     public void onServerStarting(Consumer<MinecraftServer> callback) {
         Objects.requireNonNull(callback);
-        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.server.ServerStartingEvent e) -> callback.accept(e.getServer()));
+        NeoForge.EVENT_BUS.addListener((ServerStartingEvent e) -> callback.accept(e.getServer()));
     }
 
     @Override
     public void onServerStopped(Consumer<MinecraftServer> callback) {
         Objects.requireNonNull(callback);
-        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.server.ServerStoppedEvent e) -> callback.accept(e.getServer()));
+        NeoForge.EVENT_BUS.addListener((ServerStoppedEvent e) -> callback.accept(e.getServer()));
     }
 
     @Override
     public void beforeBlockBreak(BlockBreak callback) {
         Objects.requireNonNull(callback);
-        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.level.BlockEvent.BreakEvent e) -> {
-            if (e.getLevel() instanceof net.minecraft.world.level.Level world
+        NeoForge.EVENT_BUS.addListener((BlockEvent.BreakEvent e) -> {
+            if (e.getLevel() instanceof Level world
                 && callback.cancel(world, e.getPlayer(), e.getPos(), e.getState(), world.getBlockEntity(e.getPos()))) {
                 e.setCanceled(true);
             }

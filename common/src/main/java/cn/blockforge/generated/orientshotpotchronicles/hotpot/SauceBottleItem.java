@@ -1,5 +1,14 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+// mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.food.FoodProperties;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
@@ -37,7 +46,7 @@ public class SauceBottleItem extends ConfiguredFoodItem {
      * @param saturation 默认饱和度系数
      */
     public SauceBottleItem(SauceBottleKind kind, String foodId, int nutrition, float saturation) {
-        super(foodId, new Item.Properties().food(new net.minecraft.world.food.FoodProperties.Builder()
+        super(foodId, new Item.Properties().food(new FoodProperties.Builder()
             .nutrition(nutrition).saturationModifier(saturation).alwaysEdible().build()));
         this.kind = kind;
         Config.rememberFood(foodId, nutrition, saturation);
@@ -56,7 +65,7 @@ public class SauceBottleItem extends ConfiguredFoodItem {
     public InteractionResult useOn(UseOnContext context) {
         // 拿瓶子上桌只认 Shift+右键（竹筷也是这个规矩）：不潜行时把这次点击让给方块
         if (context.getPlayer() == null || !context.getPlayer().isShiftKeyDown()) {
-            return InteractionResult.PASS;
+            return Use.item(UseOutcome.PASS, context.getLevel().isClientSide);
         }
         return placeBottle(context);
     }
@@ -69,26 +78,26 @@ public class SauceBottleItem extends ConfiguredFoodItem {
     private InteractionResult placeBottle(UseOnContext context) {
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
-        if (context.getClickedFace() == net.minecraft.core.Direction.UP
+        if (context.getClickedFace() == Direction.UP
             && world.getBlockState(pos).is(HotPotContent.PLATE_HOLDER)
             && world.getBlockEntity(pos) instanceof PlateHolderBlockEntity holder) {
             if (world.isClientSide) {
-                return InteractionResult.SUCCESS;
+                return Use.item(UseOutcome.SUCCESS, world.isClientSide);
             }
             double hx = (context.getClickLocation().x - pos.getX()) * 16;
             double hz = (context.getClickLocation().z - pos.getZ()) * 16;
-            net.minecraft.core.Direction.Axis axis = HotPotBlock.handleAxisFor(context.getHorizontalDirection());
+            Direction.Axis axis = HotPotBlock.handleAxisFor(context.getHorizontalDirection());
             if (holder.tryAdd(HotPotContent.SAUCE_BOTTLE_BLOCK, axis, hx, hz, context.getItemInHand(), true)) {
-                world.playSound(null, pos, net.minecraft.sounds.SoundEvents.GLASS_PLACE,
-                    net.minecraft.sounds.SoundSource.BLOCKS, 0.6F, 1.4F);
+                world.playSound(null, pos, SoundEvents.GLASS_PLACE,
+                    SoundSource.BLOCKS, 0.6F, 1.4F);
                 context.getItemInHand().consume(1, context.getPlayer());
-                return InteractionResult.SUCCESS;
+                return Use.item(UseOutcome.SUCCESS, world.isClientSide);
             }
             if (context.getPlayer() != null) {
                 context.getPlayer().displayClientMessage(
                     Component.translatable(HotPotBlockEntity.key("msg.plate_no_room")), true);
             }
-            return InteractionResult.FAIL;
+            return Use.item(UseOutcome.FAIL, world.isClientSide);
         }
         return PlateItem.placeOn(context, HotPotContent.SAUCE_BOTTLE_BLOCK, true);
     }

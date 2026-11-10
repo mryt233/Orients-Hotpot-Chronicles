@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -24,6 +27,6 @@ public class GuideBookItem extends Item {
         if (world.isClientSide) {
             clientOpen.run();
         }
-        return InteractionResultHolder.sidedSuccess(user.getItemInHand(hand), world.isClientSide);
+        return Use.itemUse(UseOutcome.SUCCESS_SOFT, user.getItemInHand(hand), world.isClientSide);
     }
 }

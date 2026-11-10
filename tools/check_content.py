@@ -154,7 +154,8 @@ def check_item(item: dict, code: str, langs: dict[str, dict], guide: str) -> tup
 # mryt233 改（2026-11-10）：不改 Java 注册顺序，只检查有序名单是否漂移。
 def check_materials(code: str) -> list[str]:
     from pixkit.materials import ids
-    match = re.search(r'TABLE_WOODS\s*=\s*java\.util\.List\.of\((.*?)\)', code, re.S)
+    # mryt233 改（2026-11-11）：全名清理后同时识别导入的 List 和原有全名写法。
+    match = re.search(r'TABLE_WOODS\s*=\s*(?:java\.util\.)?List\.of\((.*?)\)', code, re.S)
     woods = re.findall(r'"([^"\n]+)"', match.group(1)) if match else []
     return [] if woods == ids("woods") else ["Java TABLE_WOODS 与 content/materials.json 的木头名单或顺序不一致"]
 

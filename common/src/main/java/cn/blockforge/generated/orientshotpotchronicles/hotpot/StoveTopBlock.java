@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.network.chat.MutableComponent;
+
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
@@ -108,8 +111,8 @@ public class StoveTopBlock extends TopProxyBlock<StoveTopBlock.Below> {
 
     /** mryt233 改：上半截也显示准星所指的锅名或下方高灶台本名。 */
     @Override
-    public net.minecraft.network.chat.MutableComponent getName() {
-        net.minecraft.network.chat.MutableComponent name = StoveBlock.aimedName(PlateHolderBlock.pickPlayer.get());
+    public MutableComponent getName() {
+        MutableComponent name = StoveBlock.aimedName(PlateHolderBlock.pickPlayer.get());
         return name == null ? super.getName() : name;
     }
 
@@ -120,7 +123,7 @@ public class StoveTopBlock extends TopProxyBlock<StoveTopBlock.Below> {
     }
 
     @Override
-    protected net.minecraft.world.level.block.state.properties.EnumProperty<Below> belowProperty() { return BELOW; }
+    protected EnumProperty<Below> belowProperty() { return BELOW; }
 
     @Override
     protected Below belowOf(BlockState state) { return Below.of(state); }

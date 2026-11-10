@@ -1,6 +1,9 @@
 // 作者：mryt233
 package cn.blockforge.orient.framework.platform.fabric;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+
 import cn.blockforge.orient.framework.loader.RuntimeEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -30,7 +33,7 @@ final class FabricRuntimeEvents implements RuntimeEvents {
     @Override
     public void beforeBlockBreak(BlockBreak callback) {
         Objects.requireNonNull(callback);
-        net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, entity) ->
+        PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, entity) ->
             !callback.cancel(world, player, pos, state, entity));
     }
 

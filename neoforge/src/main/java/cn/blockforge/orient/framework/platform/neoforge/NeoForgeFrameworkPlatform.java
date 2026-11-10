@@ -1,5 +1,8 @@
 package cn.blockforge.orient.framework.platform.neoforge;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.orient.framework.loader.RuntimeEvents;
+
 // mryt233 改（2026-11-10）：第三批 3C 平台接线。
 
 import cn.blockforge.orient.framework.loader.Framework;
@@ -74,7 +77,7 @@ public final class NeoForgeFrameworkPlatform implements Platform {
     }
 
     @Override
-    public cn.blockforge.orient.framework.loader.RuntimeEvents events() {
+    public RuntimeEvents events() {
         return events;
     }
 
@@ -126,6 +129,6 @@ public final class NeoForgeFrameworkPlatform implements Platform {
     }
     // mryt233 改（2026-11-10）：配置初始化需要的环境信息。
     @Override
-    public boolean isDedicatedServer() { return net.neoforged.fml.loading.FMLEnvironment.dist.isDedicatedServer(); }
+    public boolean isDedicatedServer() { return FMLEnvironment.dist.isDedicatedServer(); }
 
 }

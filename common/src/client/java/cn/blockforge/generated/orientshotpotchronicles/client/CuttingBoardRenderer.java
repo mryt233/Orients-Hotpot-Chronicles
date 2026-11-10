@@ -1,5 +1,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Pounding;
+import net.minecraft.core.Direction;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.CuttingBoardBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.CuttingBoardBlockEntity;
 import net.minecraft.client.Minecraft;
@@ -29,11 +33,11 @@ public class CuttingBoardRenderer implements BlockEntityRenderer<CuttingBoardBlo
             return;
         }
         // mryt233 改（2026-11-11）：中间物品栈从当前世界配方读取，原有立体绘制保持。
-        stack = cn.blockforge.generated.orientshotpotchronicles.hotpot.Pounding.display(be.getLevel(), stack, be.cuts());
+        stack = Pounding.display(be.getLevel(), stack, be.cuts());
         matrices.pushPose();
         matrices.translate(0.5, CuttingBoardBlock.TOP + 0.02, 0.5);
         // 物品的「上方」朝远离放砧板的人那边，站在放的位置看是正的（2026-10-23 用户：板上的东西要朝着玩家）
-        net.minecraft.core.Direction away = be.itemFacing().getOpposite();   // 食物自己的朝向，和砧板分开
+        Direction away = be.itemFacing().getOpposite();   // 食物自己的朝向，和砧板分开
         matrices.mulPose(Axis.YP.rotationDegrees(-away.toYRot()));
         matrices.mulPose(Axis.XP.rotationDegrees(90));
         matrices.scale(0.5F, 0.5F, 0.5F);

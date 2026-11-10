@@ -1,5 +1,12 @@
 package cn.blockforge.generated.orientshotpotchronicles;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCooking;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotRuntime;
+import cn.blockforge.orient.framework.loader.ClientHooks;
+import cn.blockforge.orient.framework.loader.Framework;
+import cn.blockforge.orient.framework.loader.RuntimeHooks;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import cn.blockforge.orient.framework.loader.ContentModule;
@@ -34,14 +41,14 @@ public final class HotpotContentModule implements ContentModule {
     }
 
     @Override
-    public void runtime(cn.blockforge.orient.framework.loader.RuntimeHooks hooks) {
+    public void runtime(RuntimeHooks hooks) {
         runtimeCalls++;
         // mryt233 改（2026-11-10）：公共业务实际接入框架生命周期。
-        cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotRuntime.install(hooks);
+        HotPotRuntime.install(hooks);
     }
 
     @Override
-    public void client(cn.blockforge.orient.framework.loader.ClientHooks hooks) {
+    public void client(ClientHooks hooks) {
         clientCalls++;
         // mryt233 改（2026-11-10）：客户端类独立在 client 源集，服务端不链接客户端类型。
         hooks.onClientSetup(() -> {
@@ -57,7 +64,7 @@ public final class HotpotContentModule implements ContentModule {
     /** mryt233 改（2026-11-10）：数据包重载使已下锅的食材时长失效。 */
     @Override
     public void onReload() {
-        cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCooking.reviseCookTimes();
+        HotPotCooking.reviseCookTimes();
     }
 
     public static int declarationCalls() {
@@ -73,7 +80,7 @@ public final class HotpotContentModule implements ContentModule {
     }
     /** mryt233 改（2026-11-10）：开发探针统一按需反射，分发包缺类时安静跳过。 */
     public static void development(String name, String method, Class<?>[] types, Object... arguments) {
-        if (!cn.blockforge.orient.framework.loader.Framework.platform().isDevelopmentEnvironment()) return;
+        if (!Framework.platform().isDevelopmentEnvironment()) return;
         try {
             Class.forName("cn.blockforge.generated.orientshotpotchronicles.devtest." + name)
                 .getMethod(method, types).invoke(null, arguments);

@@ -1,6 +1,9 @@
 /** 作者：mryt233。灶台、锅与桌面餐具按准星部位提供 Jade 视图。 */
 package cn.blockforge.generated.orientshotpotchronicles.compat.jade;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceBottleItem;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
@@ -303,7 +306,7 @@ public final class HotPotJadePlugin implements IWailaPlugin {
                         .withStyle(ChatFormatting.GRAY));
                 }
             } else if (plate.self.getItem()
-                instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceBottleItem) {
+                instanceof SauceBottleItem) {
                 // mryt233 改（2026-11-09，r146c）：桌上的芝麻酱 / 蚝油瓶现在只是摆设——Jade 只显示名称
                 //（Jade 默认取方块名，PlateHolderBlock#getName 返回的就是这瓶的名字）+ 一行「怎么摆、怎么拿」；
                 // 效果说明和剩余次数两行随「桌上加料 / 每瓶次数」一起去掉了。

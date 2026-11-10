@@ -1,5 +1,11 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+// mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
+import net.minecraft.tags.BlockTags;
+
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -67,7 +73,7 @@ public class HotPotBlock extends Block implements EntityBlock {
     private static final VoxelShape POT_SHAPE_LOW = POT_SHAPE.move(0, -CAMPFIRE_DROP / 16.0, 0);
 
     public static boolean campfireBelow(BlockGetter world, BlockPos pos) {
-        return world.getBlockState(pos.below()).is(net.minecraft.tags.BlockTags.CAMPFIRES);
+        return world.getBlockState(pos.below()).is(BlockTags.CAMPFIRES);
     }
 
     private static VoxelShape shapeOf(BlockState state) {
@@ -158,7 +164,7 @@ public class HotPotBlock extends Block implements EntityBlock {
     protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
                                      LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
         if (direction == Direction.DOWN) {
-            return state.setValue(ON_CAMPFIRE, neighborState.is(net.minecraft.tags.BlockTags.CAMPFIRES));
+            return state.setValue(ON_CAMPFIRE, neighborState.is(BlockTags.CAMPFIRES));
         }
         return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
     }
@@ -172,7 +178,7 @@ public class HotPotBlock extends Block implements EntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player,
                                                BlockHitResult hit) {
         if (!(world.getBlockEntity(pos) instanceof HotPotBlockEntity be)) {
-            return InteractionResult.PASS;
+            return Use.blockEmpty(UseOutcome.PASS, world.isClientSide);
         }
         // 空手潜行右键 = 把锅连汤带食材拿进背包，和灶台上拆锅一样（用户报：篝火上的锅 Shift+右键拿不下来；新增）
         if (player.isShiftKeyDown()) {
@@ -186,7 +192,7 @@ public class HotPotBlock extends Block implements EntityBlock {
                 world.playSound((Player) null, pos, SoundEvents.ANVIL_LAND,
                     SoundSource.BLOCKS, 0.25F, 0.75F);
             }
-            return InteractionResult.SUCCESS;
+            return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide);
         }
         int bigCell = HotPotInteraction.cellFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE);
         if (world.isClientSide) {
@@ -195,14 +201,14 @@ public class HotPotBlock extends Block implements EntityBlock {
         if (!world.isClientSide && !be.collectShown(player, bigCell)) {
             player.displayClientMessage(be.statusText(), true);
         }
-        return InteractionResult.SUCCESS;
+        return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide);
     }
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
                                               Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(world.getBlockEntity(pos) instanceof HotPotBlockEntity be)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
         }
         // 其他模组的东西先处理，比如空碗要先盛汤（见 HotPotHooks）
         ItemInteractionResult hooked = HotPotHooks.blockUse(world, player, hand, stack, pos, state, hit);

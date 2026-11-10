@@ -1,5 +1,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.List;
+import net.minecraft.world.level.Level;
+
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -23,7 +27,7 @@ public final class Pounding {
     private Pounding() { }
 
     /** mryt233 改（2026-11-11）：原料、产物、数量和中间样子统一读当前世界配方。 */
-    public static PoundingRecipe recipe(net.minecraft.world.level.Level level, ItemStack stack) {
+    public static PoundingRecipe recipe(Level level, ItemStack stack) {
         return HotPotRecipes.pounding(level, stack);
     }
 
@@ -33,7 +37,7 @@ public final class Pounding {
         PoundingRecipe recipe = recipe(HotPotRecipes.currentLevel(), stack);
         if (recipe == null) return null;
         int model = recipe.stage1().getOrDefault(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(0)).value();
-        return model >= 1 && model <= 8 ? java.util.List.of("beef", "pork", "mutton", "fish").get((model - 1) / 2) : null;
+        return model >= 1 && model <= 8 ? List.of("beef", "pork", "mutton", "fish").get((model - 1) / 2) : null;
     }
 
     /** 大蒜也能敲：敲三下出 2 份蒜泥（用户 2026-10-25：大蒜 + 蒜泥，用擀面杖敲）。 */
@@ -66,7 +70,7 @@ public final class Pounding {
 
     /** 兼容旧无世界参数入口，当前环境配方为空时返回不能捣。 */
     public static boolean poundable(ItemStack stack) { return poundable(HotPotRecipes.currentLevel(), stack); }
-    public static boolean poundable(net.minecraft.world.level.Level level, ItemStack stack) {
+    public static boolean poundable(Level level, ItemStack stack) {
         return recipe(level, stack) != null;
     }
     public static int resultCount(ItemStack stack) {
@@ -80,7 +84,7 @@ public final class Pounding {
     public static ItemStack display(ItemStack stack, int hits) {
         return display(HotPotRecipes.currentLevel(), stack, hits);
     }
-    public static ItemStack display(net.minecraft.world.level.Level level, ItemStack stack, int hits) {
+    public static ItemStack display(Level level, ItemStack stack, int hits) {
         PoundingRecipe recipe = recipe(level, stack);
         return recipe == null ? stack : recipe.display(stack, hits);
     }

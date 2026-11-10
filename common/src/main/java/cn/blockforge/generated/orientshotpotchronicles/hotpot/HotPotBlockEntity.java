@@ -1,5 +1,19 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.IntPredicate;
+import java.util.function.IntUnaryOperator;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.ItemUtils;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.ItemContainerContents;
+
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.Packet;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.api.HotpotScreens;
@@ -112,7 +126,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
     /** 供组合灶台子类使用的构造器。 */
     protected HotPotBlockEntity(BlockEntityType<?> type, BlockPos blockPos, BlockState state) {
         super(type, blockPos, state);
-        java.util.Arrays.fill(tracked, ItemStack.EMPTY);
+        Arrays.fill(tracked, ItemStack.EMPTY);
     }
 
     // ------------------------------------------------------------------ tick
@@ -263,8 +277,8 @@ public class HotPotBlockEntity extends SyncedBlockEntity
 
     /** 清空汤底并同步空锅外观，拆锅或重新安装时使用。 */
     protected void clearSoupState() {
-        java.util.Arrays.fill(bases, -1);
-        java.util.Arrays.fill(spicyLevels, 0);   // mryt233 改（2026-11-05）：汤底没了，辣度一起归零（r136a）
+        Arrays.fill(bases, -1);
+        Arrays.fill(spicyLevels, 0);   // mryt233 改（2026-11-05）：汤底没了，辣度一起归零（r136a）
         updateSoupVisual();
         markDirtyAndSync();
     }
@@ -311,7 +325,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
      * 每边一种汤（九宫格锅一边；鸳鸯 / 田字锅按准星那边，见 scoopSoup），食材可以先放，汤底只决定那边煮不煮。
      */
     public boolean canScoopWith(ItemStack stack) {
-        return stack.is(net.minecraft.world.item.Items.BUCKET);
+        return stack.is(Items.BUCKET);
     }
 
     /**
@@ -350,10 +364,10 @@ public class HotPotBlockEntity extends SyncedBlockEntity
         setBaseOfSide(side, -1);
         setSpicyOfSide(side, 0);   // mryt233 改（2026-11-05）：舀走汤底，辣度归零（r136a）
         updateSoupVisual();
-        player.setItemInHand(hand, net.minecraft.world.item.ItemUtils.createFilledResult(stack, player, new ItemStack(soup.source())));
+        player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, new ItemStack(soup.source())));
         // mryt233 改（2026-11-10，r147）：红汤用岩浆灌桶声，改成读 isSpicy() 属性
-        net.minecraft.sounds.SoundEvent sound = soup.isSpicy() ? SoundEvents.BUCKET_FILL_LAVA
-            : soup.remainder() == net.minecraft.world.item.Items.BOWL ? SoundEvents.BOTTLE_FILL : SoundEvents.BUCKET_FILL;
+        SoundEvent sound = soup.isSpicy() ? SoundEvents.BUCKET_FILL_LAVA
+            : soup.remainder() == Items.BOWL ? SoundEvents.BOTTLE_FILL : SoundEvents.BUCKET_FILL;
         level.playSound(null, worldPosition, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
         markDirtyAndSync();
         return true;
@@ -368,9 +382,9 @@ public class HotPotBlockEntity extends SyncedBlockEntity
             return false;
         }
         ItemStack held = player.getItemInHand(hand);
-        java.util.List<ItemStack> scooped = new java.util.ArrayList<>();
+        List<ItemStack> scooped = new ArrayList<>();
         float xp = 0;
-        java.util.List<Integer> order = new java.util.ArrayList<>();
+        List<Integer> order = new ArrayList<>();
         // 鸳鸯 / 田字锅只盛和准星那一边同一种汤底里的菜（两边汤底一样就都能盛；用户定）
         int soup = baseOfSide(layout().sideOfCell(Math.max(0, bigCell)));
         for (int i = 0; i < 9; i++) {
@@ -420,12 +434,12 @@ public class HotPotBlockEntity extends SyncedBlockEntity
                     HotPotCriterion.fire(player, "cook_shrimp");
                 }
             }
-            result = new ItemStack(net.minecraft.world.item.Items.BOWL);
-            result.set(net.minecraft.core.component.DataComponents.CONTAINER,
-                net.minecraft.world.item.component.ItemContainerContents.fromItems(scooped));
+            result = new ItemStack(Items.BOWL);
+            result.set(DataComponents.CONTAINER,
+                ItemContainerContents.fromItems(scooped));
             PlateItem.syncPlateModel(result);
             if (xp > 0) {
-                net.minecraft.world.entity.ExperienceOrb.award((net.minecraft.server.level.ServerLevel) level,
+                ExperienceOrb.award((ServerLevel) level,
                     Vec3.atCenterOf(worldPosition).add(0, 0.6, 0), Math.max(1, Math.round(xp)));
             }
             level.playSound(null, worldPosition, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.35F, 1.2F);
@@ -445,7 +459,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
             player.displayClientMessage(Component.translatable(key("msg.bowl_nothing")), true);
             return false;
         }
-        player.setItemInHand(hand, net.minecraft.world.item.ItemUtils.createFilledResult(held, player, result));
+        player.setItemInHand(hand, ItemUtils.createFilledResult(held, player, result));
         markDirtyAndSync();
         return true;
     }
@@ -481,7 +495,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
             }
             setBaseOfSide(side, soup.ordinal());
             setSpicyOfSide(side, 0);   // mryt233 改（2026-11-05）：换汤底，辣度回到 0 档（r136a）
-            consumeHand(player, hand, net.minecraft.world.item.Items.AIR);
+            consumeHand(player, hand, Items.AIR);
             updateSoupVisual();
             level.playSound(null, worldPosition, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.5F, 1.3F);
             markDirtyAndSync();
@@ -528,16 +542,16 @@ public class HotPotBlockEntity extends SyncedBlockEntity
      * HotPotBlock / StoveBlock 用它决定要不要先试调辣度，再考虑下锅当食材。
      */
     public static boolean isSpicyModifier(ItemStack stack) {
-        return stack.is(HotPotContent.CHILI_PEPPER) || stack.is(net.minecraft.world.item.Items.ICE)
-            || stack.is(net.minecraft.world.item.Items.PACKED_ICE) || stack.is(net.minecraft.world.item.Items.BLUE_ICE);
+        return stack.is(HotPotContent.CHILI_PEPPER) || stack.is(Items.ICE)
+            || stack.is(Items.PACKED_ICE) || stack.is(Items.BLUE_ICE);
     }
 
     /** 冰块降辣几档：普通冰 1 档、浮冰 2 档、蓝冰直接压到 0 档（用户定的，见任务单）。 */
     private static int iceDrop(ItemStack stack) {
-        if (stack.is(net.minecraft.world.item.Items.BLUE_ICE)) {
+        if (stack.is(Items.BLUE_ICE)) {
             return SPICY_MAX;
         }
-        if (stack.is(net.minecraft.world.item.Items.PACKED_ICE)) {
+        if (stack.is(Items.PACKED_ICE)) {
             return 2;
         }
         return 1;
@@ -557,9 +571,9 @@ public class HotPotBlockEntity extends SyncedBlockEntity
         }
         ItemStack stack = player.getItemInHand(hand);
         boolean chili = stack.is(HotPotContent.CHILI_PEPPER);
-        boolean ice = stack.is(net.minecraft.world.item.Items.ICE)
-            || stack.is(net.minecraft.world.item.Items.PACKED_ICE)
-            || stack.is(net.minecraft.world.item.Items.BLUE_ICE);
+        boolean ice = stack.is(Items.ICE)
+            || stack.is(Items.PACKED_ICE)
+            || stack.is(Items.BLUE_ICE);
         if (!chili && !ice) {
             return false;
         }
@@ -577,7 +591,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
                 return true;
             }
             setSpicyOfSide(side, spicy + 1);
-            consumeHand(player, hand, net.minecraft.world.item.Items.AIR);
+            consumeHand(player, hand, Items.AIR);
             level.playSound(null, worldPosition, SoundEvents.BLAZE_SHOOT, SoundSource.BLOCKS, 0.5F, 1.2F);
             spawnSpicyParticles(true);
             player.displayClientMessage(Component.translatable(key("msg.spicy_up"), spicyLevelText(spicy + 1)), true);
@@ -591,7 +605,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
             }
             int next = Math.max(0, spicy - iceDrop(stack));
             setSpicyOfSide(side, next);
-            consumeHand(player, hand, net.minecraft.world.item.Items.AIR);
+            consumeHand(player, hand, Items.AIR);
             level.playSound(null, worldPosition, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 1.3F);
             spawnSpicyParticles(false);
             player.displayClientMessage(Component.translatable(key("msg.spicy_down"), spicyLevelText(next)), true);
@@ -607,14 +621,14 @@ public class HotPotBlockEntity extends SyncedBlockEntity
         }
         Vec3 at = Vec3.atCenterOf(worldPosition).add(0, 0.95, 0);
         if (up) {
-            server.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME,
+            server.sendParticles(ParticleTypes.FLAME,
                 at.x, at.y, at.z, 14, 0.38, 0.12, 0.38, 0.02);
-            server.sendParticles(net.minecraft.core.particles.ParticleTypes.LAVA,
+            server.sendParticles(ParticleTypes.LAVA,
                 at.x, at.y, at.z, 3, 0.3, 0.1, 0.3, 0.0);
         } else {
-            server.sendParticles(net.minecraft.core.particles.ParticleTypes.CLOUD,
+            server.sendParticles(ParticleTypes.CLOUD,
                 at.x, at.y, at.z, 14, 0.38, 0.12, 0.38, 0.02);
-            server.sendParticles(net.minecraft.core.particles.ParticleTypes.SPLASH,
+            server.sendParticles(ParticleTypes.SPLASH,
                 at.x, at.y, at.z, 8, 0.3, 0.1, 0.3, 0.0);
         }
     }
@@ -681,8 +695,8 @@ public class HotPotBlockEntity extends SyncedBlockEntity
         if (plateBlock == null || PlateItem.keepsSelf(held)) {
             return false;
         }
-        net.minecraft.world.item.component.ItemContainerContents contents = held.getOrDefault(
-            net.minecraft.core.component.DataComponents.CONTAINER, net.minecraft.world.item.component.ItemContainerContents.EMPTY);
+        ItemContainerContents contents = held.getOrDefault(
+            DataComponents.CONTAINER, ItemContainerContents.EMPTY);
         NonNullList<ItemStack> foods = NonNullList.withSize(plateBlock.size().capacity(), ItemStack.EMPTY);
         contents.copyInto(foods);
         if (foods.stream().allMatch(ItemStack::isEmpty)) {
@@ -709,8 +723,8 @@ public class HotPotBlockEntity extends SyncedBlockEntity
             return false;
         }
         ItemStack plate = held.getCount() > 1 ? held.split(1) : held;
-        plate.set(net.minecraft.core.component.DataComponents.CONTAINER,
-            net.minecraft.world.item.component.ItemContainerContents.fromItems(foods));
+        plate.set(DataComponents.CONTAINER,
+            ItemContainerContents.fromItems(foods));
         PlateItem.syncPlateModel(plate);
         if (plate != held && !player.getInventory().add(plate)) {
             player.drop(plate, false);
@@ -746,7 +760,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
             return false;
         }
         ingredients.setItem(slot, handStack.copyWithCount(1));
-        consumeHand(player, hand, net.minecraft.world.item.Items.AIR);
+        consumeHand(player, hand, Items.AIR);
         onSlotStackChanged(slot);
         level.playSound(null, worldPosition, SoundEvents.ITEM_PICKUP,
             SoundSource.BLOCKS, 0.35F, 1.35F);
@@ -1058,7 +1072,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
         return firstSlotInCell(bigCell, slot -> cooked[slot] && !ingredients.getItem(slot).isEmpty());
     }
 
-    private int firstSlotInCell(int bigCell, java.util.function.IntPredicate matches) {
+    private int firstSlotInCell(int bigCell, IntPredicate matches) {
         PotLayout layout = layout();
         if (bigCell < 0 || bigCell > 8 || !layout.usesCell(bigCell)) {
             return -1;
@@ -1157,14 +1171,14 @@ public class HotPotBlockEntity extends SyncedBlockEntity
      * mryt233 改（2026-11-05）：多了辣度版重载 {@link #soupText(PotLayout, java.util.function.IntUnaryOperator, java.util.function.IntUnaryOperator)}，
      * 红汤边会在名字后面带档位；不知道辣度的地方（旧的两参版本）照旧只写汤底名。
      */
-    public static Component soupText(PotLayout layout, java.util.function.IntUnaryOperator baseOfSide) {
+    public static Component soupText(PotLayout layout, IntUnaryOperator baseOfSide) {
         return soupText(layout, baseOfSide, side -> -1);
     }
 
     /** 带辣度档位的汤底那一栏（见 {@link #soupNameWithSpicy}）。 */
-    public static Component soupText(PotLayout layout, java.util.function.IntUnaryOperator baseOfSide,
-                                     java.util.function.IntUnaryOperator spicyOfSide) {
-        net.minecraft.network.chat.MutableComponent text = Component.empty();
+    public static Component soupText(PotLayout layout, IntUnaryOperator baseOfSide,
+                                     IntUnaryOperator spicyOfSide) {
+        MutableComponent text = Component.empty();
         for (int side = 0; side < layout.sides(); side++) {
             if (side > 0) {
                 text.append(Component.literal(" / "));
@@ -1273,8 +1287,8 @@ public class HotPotBlockEntity extends SyncedBlockEntity
             resetSlot(i, ItemStack.EMPTY);
         }
         pendingXp = 0F;
-        java.util.Arrays.fill(bases, -1);
-        java.util.Arrays.fill(spicyLevels, 0);   // mryt233 改（2026-11-05）：整锅打包后清空，辣度也清掉（r136a）
+        Arrays.fill(bases, -1);
+        Arrays.fill(spicyLevels, 0);   // mryt233 改（2026-11-05）：整锅打包后清空，辣度也清掉（r136a）
         setChanged();
     }
 
@@ -1331,7 +1345,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
         }
         if (stack.getCount() > 1) {
             stack.shrink(1);
-            if (remainder != net.minecraft.world.item.Items.AIR) {
+            if (remainder != Items.AIR) {
                 ItemStack back = new ItemStack(remainder);
                 if (!player.getInventory().add(back)) {
                     player.drop(back, false);
@@ -1339,7 +1353,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
             }
         } else {
             player.setItemInHand(hand,
-                remainder == net.minecraft.world.item.Items.AIR ? ItemStack.EMPTY : new ItemStack(remainder));
+                remainder == Items.AIR ? ItemStack.EMPTY : new ItemStack(remainder));
         }
     }
 

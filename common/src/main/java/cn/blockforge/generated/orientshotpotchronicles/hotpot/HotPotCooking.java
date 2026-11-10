@@ -1,5 +1,13 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.IntSupplier;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
+
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -81,7 +89,7 @@ public final class HotPotCooking {
     }
 
     // mryt233 改（2026-11-10）：配置和数据包重载共用修订号，避免每刻逐槽查配方。
-    private static final java.util.concurrent.atomic.AtomicLong COOK_REVISION = new java.util.concurrent.atomic.AtomicLong();
+    private static final AtomicLong COOK_REVISION = new AtomicLong();
 
     public static long cookRevision() {
         return COOK_REVISION.get();
@@ -93,8 +101,8 @@ public final class HotPotCooking {
     }
 
     /** 数据包可追加或替换不许下锅的名单。mryt233 改（2026-11-11）。 */
-    public static final net.minecraft.tags.TagKey<Item> NOT_POT_INGREDIENT =
-        net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, HotPot.id("not_pot_ingredient"));
+    public static final TagKey<Item> NOT_POT_INGREDIENT =
+        TagKey.create(Registries.ITEM, HotPot.id("not_pot_ingredient"));
 
     private HotPotCooking() {
     }
@@ -166,9 +174,9 @@ public final class HotPotCooking {
      * 这里按 RecipeManager 实例缓存成集合：/reload 会换一个新 manager，缓存自动作废。</p>
      */
     private static volatile RecipeManager cachedOutputsManager;
-    private static volatile java.util.Set<Item> cachedOutputs = java.util.Set.of();
+    private static volatile Set<Item> cachedOutputs = Set.of();
 
-    private static java.util.Set<Item> cookedOutputs(RecipeManager manager, Level world) {
+    private static Set<Item> cookedOutputs(RecipeManager manager, Level world) {
         if (cachedOutputsManager == manager) {
             return cachedOutputs;
         }
@@ -176,18 +184,18 @@ public final class HotPotCooking {
             if (cachedOutputsManager == manager) {
                 return cachedOutputs;
             }
-            java.util.Set<Item> out = new java.util.HashSet<>();
+            Set<Item> out = new HashSet<>();
             collectOutputs(out, manager, RecipeType.SMELTING, world);
             collectOutputs(out, manager, RecipeType.SMOKING, world);
             collectOutputs(out, manager, RecipeType.CAMPFIRE_COOKING, world);
-            cachedOutputs = java.util.Set.copyOf(out);
+            cachedOutputs = Set.copyOf(out);
             cachedOutputsManager = manager;
             return cachedOutputs;
         }
     }
 
     private static <T extends AbstractCookingRecipe> void collectOutputs(
-            java.util.Set<Item> out, RecipeManager manager, RecipeType<T> type, Level world) {
+            Set<Item> out, RecipeManager manager, RecipeType<T> type, Level world) {
         for (RecipeHolder<T> entry : manager.getAllRecipesFor(type)) {
             out.add(entry.value().getResultItem(world.registryAccess()).getItem());
         }
@@ -302,7 +310,7 @@ public final class HotPotCooking {
     }
 
     /** 时间优先级与惰性兜底；单测也使用实际查询的选择函数。mryt233 改（2026-11-11）。 */
-    static int cookingTime(Integer configured, PotBoilingRecipe recipe, java.util.function.IntSupplier vanilla) {
+    static int cookingTime(Integer configured, PotBoilingRecipe recipe, IntSupplier vanilla) {
         if (configured != null) return configured;
         return recipe != null && recipe.cookTicks().isPresent() ? recipe.cookTicks().get() : vanilla.getAsInt();
     }

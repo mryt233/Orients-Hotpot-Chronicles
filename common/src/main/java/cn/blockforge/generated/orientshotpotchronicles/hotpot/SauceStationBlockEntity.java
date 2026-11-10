@@ -1,11 +1,15 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.Arrays;
+// mryt233 改（2026-11-11）：第三批 3G 存读档改走适配小包，键名与结构不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.BeIo;
+
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
@@ -50,7 +54,7 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
 
     public SauceStationBlockEntity(BlockPos worldPosition, BlockState state) {
         super(HotPotContent.SAUCE_STATION_BE, worldPosition, state);
-        java.util.Arrays.fill(kinds, -1);
+        Arrays.fill(kinds, -1);
         raw.addListener(inv -> {
             if (!loading) {
                 changed();
@@ -150,35 +154,40 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
         }
     }
 
+    // mryt233 改（2026-11-11）：第三批 3G 存读档改走适配小包，键名、结构与兜底值不变。
     @Override
     protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
         super.saveAdditional(nbt, registries);
-        NonNullList<ItemStack> list = NonNullList.withSize(raw.getContainerSize(), ItemStack.EMPTY);
-        for (int i = 0; i < raw.getContainerSize(); i++) {
-            list.set(i, raw.getItem(i));
-        }
-        ContainerHelper.saveAllItems(nbt, list, registries);
-        nbt.putIntArray("Portions", portions);
-        nbt.putIntArray("Kinds", kinds);
+        BeIo.write(nbt, registries, w -> {
+            NonNullList<ItemStack> list = NonNullList.withSize(raw.getContainerSize(), ItemStack.EMPTY);
+            for (int i = 0; i < raw.getContainerSize(); i++) {
+                list.set(i, raw.getItem(i));
+            }
+            w.putItems(list);
+            w.putIntArray("Portions", portions);
+            w.putIntArray("Kinds", kinds);
+        });
     }
 
     @Override
     protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
         super.loadAdditional(nbt, registries);
-        NonNullList<ItemStack> list = NonNullList.withSize(raw.getContainerSize(), ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(nbt, list, registries);
-        loading = true;
-        for (int i = 0; i < raw.getContainerSize(); i++) {
-            raw.setItem(i, list.get(i));
-        }
-        loading = false;
-        int[] p = nbt.getIntArray("Portions");
-        int[] k = nbt.getIntArray("Kinds");
-        for (int i = 0; i < BOWLS; i++) {
-            portions[i] = i < p.length ? p[i] : 0;
-            // 老存档（碗固定位置时）没有 Kinds：第 i 格原来就是第 i 种调料
-            kinds[i] = i < k.length ? k[i] : (portions[i] > 0 ? i : -1);
-        }
+        BeIo.read(nbt, registries, r -> {
+            NonNullList<ItemStack> list = NonNullList.withSize(raw.getContainerSize(), ItemStack.EMPTY);
+            r.loadItems(list);
+            loading = true;
+            for (int i = 0; i < raw.getContainerSize(); i++) {
+                raw.setItem(i, list.get(i));
+            }
+            loading = false;
+            int[] p = r.getIntArray("Portions");
+            int[] k = r.getIntArray("Kinds");
+            for (int i = 0; i < BOWLS; i++) {
+                portions[i] = i < p.length ? p[i] : 0;
+                // 老存档（碗固定位置时）没有 Kinds：第 i 格原来就是第 i 种调料
+                kinds[i] = i < k.length ? k[i] : (portions[i] > 0 ? i : -1);
+            }
+        });
     }
 
 

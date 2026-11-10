@@ -1,5 +1,8 @@
 package cn.blockforge.orient.framework.platform.fabric;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.Objects;
+
 // mryt233 改（2026-11-10）：第三批 3C 补充平台能力。
 
 import net.minecraft.advancements.CriterionTrigger;
@@ -49,7 +52,7 @@ public final class FabricRegistrationApi implements RegistrationApi {
         String key = registry.key().location().toString();
         window.claim(key, id.toString(), owner, registry.containsKey(id));
         try {
-            return (T) Registry.register(registry, id, java.util.Objects.requireNonNull(value));
+            return (T) Registry.register(registry, id, Objects.requireNonNull(value));
         } catch (RuntimeException error) {
             throw RegistrationGuard.failure(key, id.toString(), owner, "register", error);
         }
@@ -131,7 +134,7 @@ public final class FabricRegistrationApi implements RegistrationApi {
     public RecipeSerializerRegistrar recipeSerializers() {
         return new RecipeSerializerRegistrar() {
             @Override
-            public <T extends net.minecraft.world.item.crafting.RecipeSerializer<?>> T register(ResourceLocation id, T value) {
+            public <T extends RecipeSerializer<?>> T register(ResourceLocation id, T value) {
                 return put(BuiltInRegistries.RECIPE_SERIALIZER, id, value);
             }
         };
@@ -141,7 +144,7 @@ public final class FabricRegistrationApi implements RegistrationApi {
     public RecipeTypeRegistrar recipeTypes() {
         return new RecipeTypeRegistrar() {
             @Override
-            public <T extends net.minecraft.world.item.crafting.RecipeType<?>> T register(ResourceLocation id, T value) {
+            public <T extends RecipeType<?>> T register(ResourceLocation id, T value) {
                 return put(BuiltInRegistries.RECIPE_TYPE, id, value);
             }
         };
@@ -151,7 +154,7 @@ public final class FabricRegistrationApi implements RegistrationApi {
     public CriterionRegistrar criteria() {
         return new CriterionRegistrar() {
             @Override
-            public <T extends net.minecraft.advancements.CriterionTrigger<?>> T register(ResourceLocation id, T value) {
+            public <T extends CriterionTrigger<?>> T register(ResourceLocation id, T value) {
                 return put(BuiltInRegistries.TRIGGER_TYPES, id, value);
             }
         };
@@ -161,7 +164,7 @@ public final class FabricRegistrationApi implements RegistrationApi {
     public ArmorMaterialRegistrar armorMaterials() {
         return new ArmorMaterialRegistrar() {
             @Override
-            public net.minecraft.core.Holder<net.minecraft.world.item.ArmorMaterial> register(ResourceLocation id, net.minecraft.world.item.ArmorMaterial value) {
+            public Holder<ArmorMaterial> register(ResourceLocation id, ArmorMaterial value) {
                 String owner = RegistrationGuard.owner(id.getNamespace());
                 String key = BuiltInRegistries.ARMOR_MATERIAL.key().location().toString();
                 window.claim(key, id.toString(), owner, BuiltInRegistries.ARMOR_MATERIAL.containsKey(id));
@@ -178,7 +181,7 @@ public final class FabricRegistrationApi implements RegistrationApi {
     public SoundRegistrar sounds() {
         return new SoundRegistrar() {
             @Override
-            public net.minecraft.sounds.SoundEvent register(ResourceLocation id, net.minecraft.sounds.SoundEvent value) {
+            public SoundEvent register(ResourceLocation id, SoundEvent value) {
                 return put(BuiltInRegistries.SOUND_EVENT, id, value);
             }
         };
@@ -188,7 +191,7 @@ public final class FabricRegistrationApi implements RegistrationApi {
     public ParticleRegistrar particles() {
         return new ParticleRegistrar() {
             @Override
-            public <T extends net.minecraft.core.particles.ParticleType<?>> T register(ResourceLocation id, T value) {
+            public <T extends ParticleType<?>> T register(ResourceLocation id, T value) {
                 return put(BuiltInRegistries.PARTICLE_TYPE, id, value);
             }
         };

@@ -1,5 +1,23 @@
 package cn.blockforge.generated.orientshotpotchronicles.mixin;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.BenchBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Chopsticks;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronItem;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronProtection;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCriterion;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SeatEntity;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning;
 import net.minecraft.world.food.FoodProperties;
@@ -20,8 +38,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * 作者：mryt233 */
 @Mixin(LivingEntity.class)
 abstract class LivingEntityEatMixin {
-    @org.spongepowered.asm.mixin.Shadow
-    private java.util.Optional<net.minecraft.core.BlockPos> lastClimbablePos;
+    @Shadow
+    private Optional<BlockPos> lastClimbablePos;
 
     /**
      * 一格高的条凳（<wood>_bench）上下搭了至少 2 层时，贴着凳塔侧面即可像爬梯子一样上下攀爬；
@@ -38,11 +56,11 @@ abstract class LivingEntityEatMixin {
         if (self.isSpectator() || self.isPassenger() || !self.isAlive()) {
             return;
         }
-        net.minecraft.core.BlockPos pos =
-            cn.blockforge.generated.orientshotpotchronicles.hotpot.BenchBlock.findClimbableStackedBench(self);
+        BlockPos pos =
+            BenchBlock.findClimbableStackedBench(self);
         if (pos != null) {
             // 真的贴着可爬的叠层条凳才记录；两端都返回 true（否则客户端 travel 不走攀爬分支，就爬不上去）
-            this.lastClimbablePos = java.util.Optional.of(pos);
+            this.lastClimbablePos = Optional.of(pos);
             cir.setReturnValue(true);
         }
     }
@@ -55,10 +73,10 @@ abstract class LivingEntityEatMixin {
      * 判定逻辑在 {@link ClothApronProtection#blocksBurn}（核心层，加载器无关）。</p>
      */
     @Inject(method = "hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z", at = @At("HEAD"), cancellable = true)
-    private void orientsHotpot$apronBlocksScald(net.minecraft.world.damagesource.DamageSource source, float amount,
+    private void orientsHotpot$apronBlocksScald(DamageSource source, float amount,
                                                  CallbackInfoReturnable<Boolean> cir) {
         if ((Object) this instanceof Player player
-            && cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronProtection
+            && ClothApronProtection
                 .blocksBurn(player, source)) {
             cir.setReturnValue(false);
         }
@@ -69,9 +87,9 @@ abstract class LivingEntityEatMixin {
      * 站在热源边把溅到身上的火苗灭掉（见 {@link ClothApronProtection#tickOne}）。
      */
     @Inject(method = "baseTick", at = @At("TAIL"))
-    private void orientsHotpot$apronTick(org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
+    private void orientsHotpot$apronTick(CallbackInfo ci) {
         if ((Object) this instanceof Player player) {
-            cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronProtection.tickOne(player);
+            ClothApronProtection.tickOne(player);
         }
     }
 
@@ -86,8 +104,8 @@ abstract class LivingEntityEatMixin {
         // 状态效果；红汤再按它带来的辣度档位加强（0 微辣 ~ 3 变态辣）。
         String soupKey = stack.get(HotPotContent.COOKED_IN_SOUP);
         if (!world.isClientSide && soupKey != null) {
-            cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase soup =
-                cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase.byTextureKey(soupKey);
+            SoupBase soup =
+                SoupBase.byTextureKey(soupKey);
             if (soup != null) {
                 LivingEntity self = (LivingEntity) (Object) this;
                 int spicy = stack.getOrDefault(HotPotContent.SPICY_LEVEL, 0);
@@ -97,10 +115,10 @@ abstract class LivingEntityEatMixin {
                 // 清汤、番茄汤本来就解冷锅反胃
                 // mryt233 改（2026-11-10，r147）：「是不是清汤 / 番茄」改成汤底自己的属性 clearsNausea()
                 if (soup.clearsNausea()) {
-                    self.removeEffect(net.minecraft.world.effect.MobEffects.CONFUSION);
+                    self.removeEffect(MobEffects.CONFUSION);
                 }
-                for (net.minecraft.world.effect.MobEffectInstance effect : soup.dishBonusEffects(spicy)) {
-                    if (calmSpicy && effect.getEffect().is(net.minecraft.world.effect.MobEffects.HUNGER)) {
+                for (MobEffectInstance effect : soup.dishBonusEffects(spicy)) {
+                    if (calmSpicy && effect.getEffect().is(MobEffects.HUNGER)) {
                         continue;   // 蘸了蜂蜜 / 醋，红汤的饥饿不再往上叠
                     }
                     self.addEffect(effect);
@@ -110,33 +128,33 @@ abstract class LivingEntityEatMixin {
                 // mryt233 改（2026-11-10）：红汤判断改成 isSpicy() 属性
                 if (soup.isSpicy()
                     && spicy >= 3 && !calmSpicy
-                    && !cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronItem.wornBy(self)) {
+                    && !ClothApronItem.wornBy(self)) {
                     self.setRemainingFireTicks(Math.max(self.getRemainingFireTicks(), 40));
                 }
             }
         }
         // 成就（2026-10-25）：吃了什么、蘸没蘸、是不是坐在凳子上吃的
-        if (!world.isClientSide && (Object) this instanceof net.minecraft.world.entity.player.Player player) {
-            cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCriterion.fire(player,
-                "eat:" + net.minecraft.core.registries.BuiltInRegistries.ITEM.getId(stack.getItem()));
+        if (!world.isClientSide && (Object) this instanceof Player player) {
+            HotPotCriterion.fire(player,
+                "eat:" + BuiltInRegistries.ITEM.getId(stack.getItem()));
             // mryt233 改（2026-11-06，r139「西南之魂」）：吃下折耳根（整根、段、熟段都算）就解锁。
-            if (stack.is(cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.ZHE_ER_GEN)
-                || stack.is(cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.ZHE_ER_GEN_SLICE)
-                || stack.is(cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.COOKED_ZHE_ER_GEN_SLICE)) {
-                cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCriterion.fire(player, "eat_zhe_er_gen");
+            if (stack.is(HotPotContent.ZHE_ER_GEN)
+                || stack.is(HotPotContent.ZHE_ER_GEN_SLICE)
+                || stack.is(HotPotContent.COOKED_ZHE_ER_GEN_SLICE)) {
+                HotPotCriterion.fire(player, "eat_zhe_er_gen");
             }
             if (mask != null && mask != 0) {
-                cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCriterion.fire(player, "eat_dipped");
+                HotPotCriterion.fire(player, "eat_dipped");
                 // mryt233 改（2026-11-06，r139「调味宗师」）：这一口蘸到了 5 种以上调料才算。
                 if (Integer.bitCount(mask) >= 5) {
-                    cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCriterion.fire(player, "sauce_master_5");
+                    HotPotCriterion.fire(player, "sauce_master_5");
                 }
             }
             // 座位只取一次：getVehicle() 每帧都可能变，同一段判定里必须用同一个对象
-            if (player.getVehicle() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.SeatEntity seat) {
+            if (player.getVehicle() instanceof SeatEntity seat) {
                 // mryt233 改（2026-11-10）：运行时仅保留条凳座位，高凳已归档。
-                cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCriterion.fire(player, "eat_seated");
-                cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCriterion.fire(player, "eat_seated_bench");
+                HotPotCriterion.fire(player, "eat_seated");
+                HotPotCriterion.fire(player, "eat_seated_bench");
             }
         }
     }
@@ -145,10 +163,10 @@ abstract class LivingEntityEatMixin {
      * 用筷子吃东西时，吃的碎屑按筷子上那样菜来画（2026-10-23 用户报：吃丸子碎屑是紫黑的「未知方块」——
      * 筷子夹着菜的物品模型是代码画的 builtin/entity，没有碎屑贴图）。新增。
      */
-    @org.spongepowered.asm.mixin.injection.ModifyVariable(method = "spawnItemParticles", at = @At("HEAD"), argsOnly = true)
+    @ModifyVariable(method = "spawnItemParticles", at = @At("HEAD"), argsOnly = true)
     private ItemStack orientsHotpot$chopsticksCrumbs(ItemStack stack) {
         if (stack.is(HotPotContent.CHOPSTICKS)) {
-            ItemStack held = cn.blockforge.generated.orientshotpotchronicles.hotpot.Chopsticks.held(stack);
+            ItemStack held = Chopsticks.held(stack);
             if (!held.isEmpty()) {
                 return held;
             }

@@ -1,5 +1,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.orient.framework.pure.ConfigStore;
+import net.minecraft.Util;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Config;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkKind;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
@@ -531,7 +535,7 @@ public class HotPotConfigScreen extends Screen {
         resetRectIndex = -1;
         hoverField = null;
         hoverTip = null;
-        if (confirmReset && net.minecraft.Util.getMillis() > confirmUntil) {
+        if (confirmReset && Util.getMillis() > confirmUntil) {
             confirmReset = false;
         }
         // GuiKit.frame 以 (0,0) 为左上角，这里靠 pose 平移到面板位置
@@ -938,7 +942,7 @@ public class HotPotConfigScreen extends Screen {
 
     /** 「恢复全部默认」点一次变确认态，再点一次才真的恢复（4 秒内有效）。 */
     private void resetAllClicked() {
-        long now = net.minecraft.Util.getMillis();
+        long now = Util.getMillis();
         if (confirmReset && now <= confirmUntil) {
             confirmReset = false;
             resetAll();
@@ -968,12 +972,12 @@ public class HotPotConfigScreen extends Screen {
             return;
         }
         Config.Loaded loaded = Config.saveAndReload(edited);
-        if (loaded.saveStatus() == cn.blockforge.orient.framework.pure.ConfigStore.SaveStatus.FAILED) {
+        if (loaded.saveStatus() == ConfigStore.SaveStatus.FAILED) {
             saveNotice = Component.translatable(k("msg.save_failed"), loaded.reason());
             return;
         }
         entryParticle = Config.particleIntensity();
-        if (loaded.saveStatus() == cn.blockforge.orient.framework.pure.ConfigStore.SaveStatus.MEMORY_ONLY) {
+        if (loaded.saveStatus() == ConfigStore.SaveStatus.MEMORY_ONLY) {
             saveNotice = Component.translatable(k("msg.memory_only"), loaded.reason());
             if (loaded.backup() != null) {
                 saveNotice = saveNotice.copy().append(" ").append(Component.translatable(k("msg.broken_backup"), loaded.backup().getFileName().toString()));

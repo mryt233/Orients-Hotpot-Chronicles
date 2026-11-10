@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.network.chat.Component;
+
 import cn.blockforge.orient.framework.game.ConfigBase;
 import cn.blockforge.orient.framework.pure.ConfigStore;
 import cn.blockforge.orient.framework.pure.ConfigWarning;
@@ -39,8 +42,8 @@ public final class Config {
     }
 
     /** 一条配置警告按玩家语言显示；没有翻译时显示英文。 */
-    public static net.minecraft.network.chat.Component describe(ConfigWarning warning) {
-        return net.minecraft.network.chat.Component.translatableWithFallback(
+    public static Component describe(ConfigWarning warning) {
+        return Component.translatableWithFallback(
             warning.key(), warning.fallback(), warning.args().toArray());
     }
 

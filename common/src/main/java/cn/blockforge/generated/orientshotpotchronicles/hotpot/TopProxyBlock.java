@@ -1,6 +1,9 @@
 // 作者：mryt233
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
 import cn.blockforge.orient.framework.game.PartOutline;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -84,13 +87,14 @@ public abstract class TopProxyBlock<T extends Enum<T> & StringRepresentable> ext
                                               Player player, InteractionHand hand, BlockHitResult hit) {
         BlockState below = world.getBlockState(pos.below());
         return accepts(below) ? below.useItemOn(stack, world, player, hand, toBelow(pos, hit))
-            : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            : Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         BlockState below = world.getBlockState(pos.below());
-        return accepts(below) ? below.useWithoutItem(world, player, toBelow(pos, hit)) : InteractionResult.PASS;
+        return accepts(below) ? below.useWithoutItem(world, player, toBelow(pos, hit))
+            : Use.blockEmpty(UseOutcome.PASS, world.isClientSide);
     }
 
     @Override

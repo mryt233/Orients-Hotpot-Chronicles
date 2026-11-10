@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.client.compat.rei;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.client.Minecraft;
+
 import static cn.blockforge.generated.orientshotpotchronicles.compat.HotPotRecipeViewerData.*;
 
 import cn.blockforge.generated.orientshotpotchronicles.compat.HotPotRecipeViewerData;
@@ -76,13 +79,13 @@ public final class HotPotReiClientPlugin implements REIClientPlugin {
     @Override
     public void registerDisplays(DisplayRegistry registry) {
         // mryt233 改（2026-11-11）：枚举当前客户端配方与配置，实际界面重建由查看器生命周期负责。
-        for (HotPotRecipeViewerData.CookingEntry recipe : HotPotRecipeViewerData.cookingRecipes(net.minecraft.client.Minecraft.getInstance().level)) {
+        for (HotPotRecipeViewerData.CookingEntry recipe : HotPotRecipeViewerData.cookingRecipes(Minecraft.getInstance().level)) {
             registry.add(new CookingDisplay(recipe));
         }
         for (HotPotRecipeViewerData.CuttingEntry recipe : HotPotRecipeViewerData.cuttingRecipes()) {
             registry.add(new CuttingDisplay(recipe));
         }
-        for (HotPotRecipeViewerData.PoundingEntry recipe : HotPotRecipeViewerData.poundingRecipes(net.minecraft.client.Minecraft.getInstance().level)) {
+        for (HotPotRecipeViewerData.PoundingEntry recipe : HotPotRecipeViewerData.poundingRecipes(Minecraft.getInstance().level)) {
             registry.add(new PoundingDisplay(recipe));
         }
     }

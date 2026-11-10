@@ -1,5 +1,10 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.player.Player;
@@ -42,7 +47,7 @@ public class SauceStationTopBlock extends TopProxyBlock<SauceStationTopBlock.Bel
      * 下面蘸料台的朝向，记在自己的方块状态里（mryt233 2026-11-01）。以前形状现读下面方块、还开了 dynamicShape，
      * 光照线程调 getShape 读世界会和主线程互等，整服卡死（同 {@link StoveTopBlock.Below}）。
      */
-    public enum Below implements net.minecraft.util.StringRepresentable {
+    public enum Below implements StringRepresentable {
         NONE("none", null), NORTH("north", Direction.NORTH), EAST("east", Direction.EAST),
         SOUTH("south", Direction.SOUTH), WEST("west", Direction.WEST);
 
@@ -72,8 +77,8 @@ public class SauceStationTopBlock extends TopProxyBlock<SauceStationTopBlock.Bel
         }
     }
 
-    public static final net.minecraft.world.level.block.state.properties.EnumProperty<Below> BELOW =
-        net.minecraft.world.level.block.state.properties.EnumProperty.create("below", Below.class);
+    public static final EnumProperty<Below> BELOW =
+        EnumProperty.create("below", Below.class);
 
     /** 给这个蘸料台配的上半截状态。 */
     public static BlockState mirroring(BlockState station) {
@@ -93,14 +98,14 @@ public class SauceStationTopBlock extends TopProxyBlock<SauceStationTopBlock.Bel
 
     /** mryt233 改：沿用下方材质名称与同一小碗的调料判定。 */
     @Override
-    public net.minecraft.network.chat.MutableComponent getName() {
-        net.minecraft.network.chat.MutableComponent name = SauceStationBlock.aimedName(PlateHolderBlock.pickPlayer.get());
+    public MutableComponent getName() {
+        MutableComponent name = SauceStationBlock.aimedName(PlateHolderBlock.pickPlayer.get());
         return name == null ? super.getName() : name;
     }
 
 
     @Override
-    protected net.minecraft.world.level.block.state.properties.EnumProperty<Below> belowProperty() { return BELOW; }
+    protected EnumProperty<Below> belowProperty() { return BELOW; }
 
     @Override
     protected Below belowOf(BlockState state) { return Below.of(state); }

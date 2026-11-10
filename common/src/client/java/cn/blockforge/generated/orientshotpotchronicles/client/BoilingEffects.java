@@ -1,5 +1,11 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.function.BiPredicate;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual;
@@ -41,14 +47,14 @@ public final class BoilingEffects {
      * 以前这里写 {@code default -> PAL_SPICY}，加汤底漏写会悄悄用红汤的颜色；现在颜色是枚举构造参数的一部分，
      * 漏写编译就过不去。
      */
-    private static final java.util.Map<SoupVisual, Palette> PALETTES = buildPalettes();
+    private static final Map<SoupVisual, Palette> PALETTES = buildPalettes();
 
-    private static java.util.Map<SoupVisual, Palette> buildPalettes() {
-        java.util.EnumMap<SoupVisual, Palette> map = new java.util.EnumMap<>(SoupVisual.class);
+    private static Map<SoupVisual, Palette> buildPalettes() {
+        EnumMap<SoupVisual, Palette> map = new EnumMap<>(SoupVisual.class);
         for (SoupBase base : SoupBase.values()) {
             map.put(base.visual(), new Palette(base.bubbleBody(), base.bubbleHi()));
         }
-        return java.util.Collections.unmodifiableMap(map);
+        return Collections.unmodifiableMap(map);
     }
 
     private static Palette palette(SoupVisual soup) {
@@ -79,7 +85,7 @@ public final class BoilingEffects {
      */
     static void render(SoupVisual soup, float surfaceY, float innerMin, float innerSize, float heat,
                        double seconds, int salt, PoseStack matrices, MultiBufferSource consumers, int light,
-                       java.util.function.BiPredicate<Double, Double> keepAt) {
+                       BiPredicate<Double, Double> keepAt) {
         if (!soup.hasSoup()) {
             return;
         }
@@ -102,7 +108,7 @@ public final class BoilingEffects {
     private static void renderWithPalette(Palette pal, float surfaceY, float innerMin, float innerSize, float heat,
                                           double seconds, int salt, PoseStack matrices,
                                           MultiBufferSource consumers, int light,
-                                          java.util.function.BiPredicate<Double, Double> keepAt) {
+                                          BiPredicate<Double, Double> keepAt) {
         if (heat < 0.05F) {
             return;
         }

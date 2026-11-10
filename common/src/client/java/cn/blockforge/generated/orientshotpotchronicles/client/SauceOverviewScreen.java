@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.ChatFormatting;
+
 import cn.blockforge.orient.framework.client.ClientNetwork;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.network.OpenSauceRestockPayload;
@@ -98,9 +101,9 @@ public class SauceOverviewScreen extends Screen {
                     hoverLines.add(Component.translatable(HotPotBlockEntity.key("screen.sauce.empty")));
                 } else {
                     hoverLines.add(Component.translatable(s.nameKey()));
-                    hoverLines.add(Component.translatable(HotPotBlockEntity.key("seasoning." + s.id() + ".effect")).withStyle(net.minecraft.ChatFormatting.GRAY));
+                    hoverLines.add(Component.translatable(HotPotBlockEntity.key("seasoning." + s.id() + ".effect")).withStyle(ChatFormatting.GRAY));
                 }
-                hoverLines.add(Component.translatable(HotPotBlockEntity.key("screen.sauce.left"), left, MAX).withStyle(net.minecraft.ChatFormatting.GRAY));
+                hoverLines.add(Component.translatable(HotPotBlockEntity.key("screen.sauce.left"), left, MAX).withStyle(ChatFormatting.GRAY));
             }
         }
         if (hoverLines != null) {

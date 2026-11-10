@@ -1,5 +1,17 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import net.minecraft.Util;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.CustomModelData;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -202,7 +214,7 @@ public class GuideBookScreen extends Screen {
         cat = Math.min(lastCat, Math.max(0, cats.size() - 1));
         open(cat, lastEntry);
         entryScroll = targetEntryScroll;
-        lastScrollFrame = net.minecraft.Util.getMillis();
+        lastScrollFrame = Util.getMillis();
         buildSearchIndex();
         searchBox = new EditBox(font, searchX() + 29, searchY() + 11, SEARCH_W - 54, 12,
             Component.literal(ui("搜索", "搜尋", "Search")));
@@ -220,21 +232,21 @@ public class GuideBookScreen extends Screen {
         runSearch();
         if (!opened) {   // init 在改窗口大小时也会再跑，只在第一次打开时响
             opened = true;
-            sound(net.minecraft.sounds.SoundEvents.BOOK_PAGE_TURN, 0.8F);
+            sound(SoundEvents.BOOK_PAGE_TURN, 0.8F);
         }
     }
 
     /** 合上书（关界面、换成别的界面都算）：原版把书放上讲台那声「啪」。 */
     @Override
     public void removed() {
-        sound(net.minecraft.sounds.SoundEvents.BOOK_PUT, 1.0F);
+        sound(SoundEvents.BOOK_PUT, 1.0F);
         super.removed();
     }
 
     /** 翻开 / 合上书的音效（2026-10-26 用户：指南加打开、关闭的音效）。 */
-    private void sound(net.minecraft.sounds.SoundEvent event, float pitch) {
+    private void sound(SoundEvent event, float pitch) {
         if (minecraft != null) {
-            minecraft.getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(event, pitch));
+            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(event, pitch));
         }
     }
 
@@ -277,15 +289,15 @@ public class GuideBookScreen extends Screen {
         Item item = ident == null ? Items.BARRIER : BuiltInRegistries.ITEM.getOptional(ident).orElse(Items.BARRIER);
         ItemStack stack = new ItemStack(item);
         if (parts.length > 1 && parts[1].equals("lit")) {
-            stack.set(net.minecraft.core.component.DataComponents.CUSTOM_MODEL_DATA,
-                new net.minecraft.world.item.component.CustomModelData(1));
+            stack.set(DataComponents.CUSTOM_MODEL_DATA,
+                new CustomModelData(1));
         } else if (parts.length > 1) {
             try {
-                net.minecraft.nbt.CompoundTag nbt = new net.minecraft.nbt.CompoundTag();
-                nbt.putInt("Base", cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase.valueOf(
-                    parts[1].toUpperCase(java.util.Locale.ROOT)).ordinal());
-                stack.set(cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.POT_CONTENTS,
-                    net.minecraft.world.item.component.CustomData.of(nbt));
+                CompoundTag nbt = new CompoundTag();
+                nbt.putInt("Base", SoupBase.valueOf(
+                    parts[1].toUpperCase(Locale.ROOT)).ordinal());
+                stack.set(HotPotContent.POT_CONTENTS,
+                    CustomData.of(nbt));
             } catch (IllegalArgumentException e) {
                 HotPot.LOGGER.warn("guide book: unknown soup in {}", id);
             }
@@ -603,7 +615,7 @@ public class GuideBookScreen extends Screen {
         hoverStacks.clear();
         linkRects.clear();
         linkTargets.clear();
-        long now = net.minecraft.Util.getMillis();
+        long now = Util.getMillis();
         float amount = 1 - (float) Math.exp(-Math.min(100, Math.max(0, now - lastScrollFrame)) / 65F);
         entryScroll += (targetEntryScroll - entryScroll) * amount;
         entryScroll = clampEntryScroll(entryScroll);
@@ -1309,8 +1321,8 @@ public class GuideBookScreen extends Screen {
 
     private void click() {
         if (minecraft != null) {
-            minecraft.getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(
-                net.minecraft.sounds.SoundEvents.BOOK_PAGE_TURN, 1.0F));
+            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(
+                SoundEvents.BOOK_PAGE_TURN, 1.0F));
         }
     }
 

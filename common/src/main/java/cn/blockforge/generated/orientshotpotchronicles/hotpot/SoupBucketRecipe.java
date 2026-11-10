@@ -1,5 +1,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.orient.framework.loader.Framework;
+import cn.blockforge.orient.framework.loader.RegistrationApi;
+
 import com.mojang.serialization.MapCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -24,10 +28,10 @@ public class SoupBucketRecipe extends ShapelessRecipe {
 
     // mryt233 改（2026-11-10）：登记由内容模块传入的注册能力完成，保留旧入口。
     public static void register() {
-        register(cn.blockforge.orient.framework.loader.Framework.platform().registration());
+        register(Framework.platform().registration());
     }
 
-    public static void register(cn.blockforge.orient.framework.loader.RegistrationApi registration) {
+    public static void register(RegistrationApi registration) {
         registration.recipeSerializers().register( HotPot.id("soup_bucket"), SERIALIZER);
     }
 

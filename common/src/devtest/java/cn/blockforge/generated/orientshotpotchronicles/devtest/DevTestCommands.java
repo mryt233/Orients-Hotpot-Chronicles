@@ -62,6 +62,13 @@ public final class DevTestCommands {
                             report(ctx, Opt3fProbe.run(player(ctx),
                                 com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "action"),
                                 BlockPosArgument.getBlockPos(ctx, "pos")))))))
+                // mryt233 改（2026-11-11）：3G 打包 / 凳子 / 砧板 / 饮料锅的真实入口取证。
+                .then(Commands.literal("opt3g")
+                    .then(Commands.argument("action", com.mojang.brigadier.arguments.StringArgumentType.word())
+                        .then(Commands.argument("pos", BlockPosArgument.blockPos()).executes(ctx ->
+                            report(ctx, Opt3gProbe.run(player(ctx),
+                                com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "action"),
+                                BlockPosArgument.getBlockPos(ctx, "pos")))))))
                 .then(Commands.literal("opt3d").then(Commands.argument("action", com.mojang.brigadier.arguments.StringArgumentType.word())
                     .executes(ctx -> report(ctx, Opt3dRuntimeProbe.run(ctx.getSource(),
                         com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "action"))))))

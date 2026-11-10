@@ -1,5 +1,10 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.orient.framework.loader.Framework;
+import cn.blockforge.orient.framework.loader.RegistrationApi;
+import net.minecraft.network.codec.ByteBufCodecs;
+
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.registries.BuiltInRegistries;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -55,10 +60,10 @@ public class ApronRecolorRecipe implements CraftingRecipe {
 
     // mryt233 改（2026-11-10）：登记由内容模块传入的注册能力完成，保留旧入口。
     public static void register() {
-        register(cn.blockforge.orient.framework.loader.Framework.platform().registration());
+        register(Framework.platform().registration());
     }
 
-    public static void register(cn.blockforge.orient.framework.loader.RegistrationApi registration) {
+    public static void register(RegistrationApi registration) {
         registration.recipeSerializers().register( HotPot.id("apron_recolor"), SERIALIZER);
     }
 
@@ -161,7 +166,7 @@ public class ApronRecolorRecipe implements CraftingRecipe {
                 Ingredient.CONTENTS_STREAM_CODEC, r -> r.apron,
                 Ingredient.CONTENTS_STREAM_CODEC, r -> r.dye,
                 // 物品用注册表的流编解码：网络同步时两端都按注册名找同一个物品
-                net.minecraft.network.codec.ByteBufCodecs.VAR_INT.map(
+                ByteBufCodecs.VAR_INT.map(
                     i -> Item.byId(i), Item::getId),
                 r -> r.result,
                 ApronRecolorRecipe::new);

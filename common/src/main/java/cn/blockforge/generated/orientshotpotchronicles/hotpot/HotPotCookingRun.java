@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.world.phys.AABB;
+
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -186,7 +189,7 @@ final class HotPotCookingRun {
         if (world.isClientSide || !stack.is(HotPotContent.HOT_TOFU_CUBE)) {
             return;
         }
-        net.minecraft.world.phys.AABB box = net.minecraft.world.phys.AABB.encapsulatingFullBlocks(
+        AABB box = AABB.encapsulatingFullBlocks(
             be.getBlockPos().offset(-8, -8, -8), be.getBlockPos().offset(8, 8, 8));
         for (Player nearby : world.getEntitiesOfClass(Player.class, box)) {
             HotPotCriterion.fire(nearby, "tofu_overcook");

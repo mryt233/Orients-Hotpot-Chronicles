@@ -1,5 +1,11 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlock;
+import java.util.Arrays;
+import net.minecraft.nbt.CompoundTag;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotInteraction;
@@ -37,14 +43,10 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
     // 水面/内底高度与锅腔范围都跟着模型走：独立锅腔 1.5..14.5、汤面 y=5.6、内底 y=1.25；
     // 灶上锅坐进 7.6/16 深的锅槽，锅腔 1.837..14.163，汤面 y=14.32、内底 y=9.1。
     // mryt233 改（2026-11-04）：汤面高度改用 HotPotInteraction 里那份（服务端算准星格子也用同一个值，别各写一个数）。
-    private static final float STANDALONE_SURFACE = (float) cn.blockforge.generated.orientshotpotchronicles
-        .hotpot.HotPotInteraction.STANDALONE_SURFACE;
-    private static final float STANDALONE_FLOOR = (float) cn.blockforge.generated.orientshotpotchronicles
-        .hotpot.HotPotInteraction.STANDALONE_FLOOR;
-    private static final float STOVE_SURFACE = (float) cn.blockforge.generated.orientshotpotchronicles
-        .hotpot.HotPotInteraction.STOVE_SURFACE;
-    private static final float STOVE_FLOOR = (float) cn.blockforge.generated.orientshotpotchronicles
-        .hotpot.HotPotInteraction.STOVE_FLOOR;
+    private static final float STANDALONE_SURFACE = (float) HotPotInteraction.STANDALONE_SURFACE;
+    private static final float STANDALONE_FLOOR = (float) HotPotInteraction.STANDALONE_FLOOR;
+    private static final float STOVE_SURFACE = (float) HotPotInteraction.STOVE_SURFACE;
+    private static final float STOVE_FLOOR = (float) HotPotInteraction.STOVE_FLOOR;
 
     /** 漂在汤面上的食材大小（物品模型的倍率）。 */
     private static final float FOOD_SCALE = 0.24F;
@@ -84,9 +86,9 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
             return;
         }
 
-        boolean onStove = cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlock.isStove(be.getBlockState());
+        boolean onStove = StoveBlock.isStove(be.getBlockState());
         // 高灶台：锅、汤面整体抬高
-        float lift = cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlock.liftOf(be.getBlockState());
+        float lift = StoveBlock.liftOf(be.getBlockState());
         float innerMin = (float) (onStove
             ? HotPotInteraction.STOVE_INNER_MIN : HotPotInteraction.STANDALONE_INNER_MIN);
         float innerSize = (float) (onStove
@@ -209,8 +211,8 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
      * 和摆在地上时同一套画法，所以任意汤底组合、以后新加的汤底都对（用户 2026-10-24 报：收起来的新锅图标没汤）。
      * 坐标是方块坐标 0..1（独立锅：汤面 5.6 像素高、锅腔 1.5..14.5）。
      */
-    public static void renderItemSoups(cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial material,
-                                       net.minecraft.nbt.CompoundTag data, PoseStack matrices,
+    public static void renderItemSoups(HotPotMaterial material,
+                                       CompoundTag data, PoseStack matrices,
                                        MultiBufferSource consumers, int light) {
         PotLayout layout = material.layout();
         String[] keys = {"Base", "BaseB", "BaseC", "BaseD"};
@@ -291,7 +293,7 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
      * mryt233 改：以前按大格各扫一遍（多汤锅 9 × 81 次 getItem），现在只扫一遍。
      */
     private static void collectSlots(HotPotBlockEntity be, PotLayout layout, int[][] slots, int[] counts) {
-        java.util.Arrays.fill(counts, 0);
+        Arrays.fill(counts, 0);
         boolean multi = layout.multiSoup();
         for (int slot = 0; slot < HotPotBlockEntity.SLOTS; slot++) {
             if (be.getItem(slot).isEmpty()) {

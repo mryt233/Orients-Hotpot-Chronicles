@@ -1,5 +1,14 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.core.Direction;
+
+// mryt233 改（2026-11-11）：第三批 3G 存读档改走适配小包，键名与结构不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.BeIo;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.level.block.LevelEvent;
+import org.jetbrains.annotations.Nullable;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.api.HotpotScreens;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -8,14 +17,12 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.server.level.ServerPlayer;
@@ -124,7 +131,7 @@ public class StoveBlockEntity extends HotPotBlockEntity {
     }
 
     /** 被这台灶台加热的锅：坐在灶里的锅就是自己，否则是正上方的旧式独立锅。 */
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     private HotPotBlockEntity heatedPot() {
         if (hasPot()) {
             return this;
@@ -173,7 +180,7 @@ public class StoveBlockEntity extends HotPotBlockEntity {
      * mryt233 改（2026-11-07）：返回是否真的装上。调用方要据此决定要不要读锅内容、扣锅物品；
      * 以前是 void，装不上也照扣，等于把玩家一整锅东西吞掉。
      */
-    public boolean attachPot(HotPotMaterial material, net.minecraft.core.Direction.Axis handleAxis) {
+    public boolean attachPot(HotPotMaterial material, Direction.Axis handleAxis) {
         if (level == null || level.isClientSide || material == null) {
             return false;
         }
@@ -234,7 +241,7 @@ public class StoveBlockEntity extends HotPotBlockEntity {
         }
         HotPotBlock potBlock = HotPotContent.blockFor(material);
         BlockState potState = potBlock.defaultBlockState();
-        level.levelEvent(null, net.minecraft.world.level.block.LevelEvent.PARTICLES_DESTROY_BLOCK, worldPosition, Block.getId(potState));
+        level.levelEvent(null, LevelEvent.PARTICLES_DESTROY_BLOCK, worldPosition, Block.getId(potState));
         if (!player.isCreative()) {
             if (player.hasCorrectToolForDrops(potState)) {
                 Block.popResource(level, worldPosition, toPotItem(material));
@@ -242,7 +249,7 @@ public class StoveBlockEntity extends HotPotBlockEntity {
                 dropContents();
             }
             player.getMainHandItem().mineBlock(level, potState, worldPosition, player);
-            player.awardStat(net.minecraft.stats.Stats.BLOCK_MINED.get(potBlock));
+            player.awardStat(Stats.BLOCK_MINED.get(potBlock));
             player.causeFoodExhaustion(0.005F);
         }
         removePot();
@@ -336,33 +343,36 @@ public class StoveBlockEntity extends HotPotBlockEntity {
 
     // ------------------------------------------------------------------ NBT
 
+    // mryt233 改（2026-11-11）：第三批 3G 存读档改走适配小包，键名、结构与兜底值不变。
     @Override
     protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
         super.saveAdditional(nbt, registries);
-        nbt.putInt("BurnTicks", burnTicks);
-        nbt.putInt("BurnTotal", burnTotal);
-        nbt.putInt("FuelType", fuelType);
-        nbt.putBoolean("IdleFlame", idleFlame);
-        // 灶膛燃料单独存进 "Fuel" 子标签，避开父类 81 格用的 "Items" 键。
-        NonNullList<ItemStack> list = NonNullList.withSize(FUEL_SLOTS, ItemStack.EMPTY);
-        list.set(0, fuel.getItem(0));
-        CompoundTag fuelNbt = new CompoundTag();
-        ContainerHelper.saveAllItems(fuelNbt, list, registries);
-        nbt.put("Fuel", fuelNbt);
+        BeIo.write(nbt, registries, w -> {
+            w.putInt("BurnTicks", burnTicks);
+            w.putInt("BurnTotal", burnTotal);
+            w.putInt("FuelType", fuelType);
+            w.putBoolean("IdleFlame", idleFlame);
+            // 灶膛燃料单独存进 "Fuel" 子标签，避开父类 81 格用的 "Items" 键。
+            NonNullList<ItemStack> list = NonNullList.withSize(FUEL_SLOTS, ItemStack.EMPTY);
+            list.set(0, fuel.getItem(0));
+            w.child("Fuel").putItems(list);
+        });
     }
 
     @Override
     protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
         super.loadAdditional(nbt, registries);
-        burnTicks = nbt.contains("BurnTicks") ? nbt.getInt("BurnTicks") : 0;
-        burnTotal = nbt.contains("BurnTotal") ? nbt.getInt("BurnTotal") : 0;
-        fuelType = nbt.contains("FuelType") ? nbt.getInt("FuelType") : -1;
-        idleFlame = nbt.getBoolean("IdleFlame");
-        fuel.clearContent();
-        if (nbt.contains("Fuel", Tag.TAG_COMPOUND)) {
-            NonNullList<ItemStack> list = NonNullList.withSize(FUEL_SLOTS, ItemStack.EMPTY);
-            ContainerHelper.loadAllItems(nbt.getCompound("Fuel"), list, registries);
-            fuel.setItem(0, list.get(0));
-        }
+        BeIo.read(nbt, registries, r -> {
+            burnTicks = r.getInt("BurnTicks", 0);
+            burnTotal = r.getInt("BurnTotal", 0);
+            fuelType = r.getInt("FuelType", -1);
+            idleFlame = r.getBoolean("IdleFlame", false);
+            fuel.clearContent();
+            if (r.hasCompound("Fuel")) {
+                NonNullList<ItemStack> list = NonNullList.withSize(FUEL_SLOTS, ItemStack.EMPTY);
+                r.child("Fuel").loadItems(list);
+                fuel.setItem(0, list.get(0));
+            }
+        });
     }
 }

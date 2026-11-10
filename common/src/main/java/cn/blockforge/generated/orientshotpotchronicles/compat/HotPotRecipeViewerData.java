@@ -1,5 +1,14 @@
 package cn.blockforge.generated.orientshotpotchronicles.compat;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import java.util.Comparator;
+import java.util.Locale;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.Level;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Config;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
@@ -99,25 +108,25 @@ public final class HotPotRecipeViewerData {
     public static List<CookingEntry> cookingRecipes() { return cookingRecipes(HotPotRecipes.currentLevel()); }
 
     /** mryt233 改（2026-11-11）：展示与实际下锅查询共用配置、产物与经验规则，不再手抄食材表。 */
-    public static List<CookingEntry> cookingRecipes(net.minecraft.world.level.Level level) {
+    public static List<CookingEntry> cookingRecipes(Level level) {
         if (level == null) return List.of();
         List<CookingEntry> entries = new ArrayList<>();
-        for (Item item : net.minecraft.core.registries.BuiltInRegistries.ITEM) {
+        for (Item item : BuiltInRegistries.ITEM) {
             ItemStack input = new ItemStack(item);
             if (!HotPotCooking.acceptable(level, input)) continue;
             boolean custom = HotPotRecipes.boiling(level, input) != null;
             boolean vanilla = HotPotCooking.smeltingRecipe(level, input).isPresent();
             if (!custom && !vanilla) continue;
-            ItemStack output = HotPotCooking.finish(level, input, cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase.CLEAR);
+            ItemStack output = HotPotCooking.finish(level, input, SoupBase.CLEAR);
             ItemStack over = HotPotCooking.overcookResult(level, output.getItem());
-            var key = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item);
+            var key = BuiltInRegistries.ITEM.getKey(item);
             ResourceLocation id = HotPot.id("hotpot_cooking/" + (key.getNamespace().equals(HotPot.MOD_ID)
                 || key.getNamespace().equals("minecraft") ? key.getPath() : key.getNamespace() + "/" + key.getPath()));
             entries.add(new CookingEntry(id, input, output, HotPotCooking.cookTicks(level, input),
                 HotPotCooking.xpFor(level, input), over.copy(),
                 over.isEmpty() ? 0 : HotPotCooking.overcookTicks(level, output.getItem())));
         }
-        entries.sort(java.util.Comparator.comparing(e -> e.id().toString()));
+        entries.sort(Comparator.comparing(e -> e.id().toString()));
         return List.copyOf(entries);
     }
 
@@ -159,13 +168,13 @@ public final class HotPotRecipeViewerData {
     public static List<PoundingEntry> poundingRecipes() { return poundingRecipes(HotPotRecipes.currentLevel()); }
 
     /** mryt233 改（2026-11-11）：按同步到客户端的捣制配方枚举，标签原料逐个展开。 */
-    public static List<PoundingEntry> poundingRecipes(net.minecraft.world.level.Level level) {
+    public static List<PoundingEntry> poundingRecipes(Level level) {
         List<PoundingEntry> entries = new ArrayList<>();
         for (var holder : HotPotRecipes.all(level, PoundingRecipe.TYPE)) {
             var recipe = holder.value();
             for (ItemStack input : recipe.ingredient().getItems()) {
                 if (HotPotRecipes.pounding(level, input) != recipe) continue;
-                var key = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(input.getItem());
+                var key = BuiltInRegistries.ITEM.getKey(input.getItem());
                 ResourceLocation id = recipe.ingredient().getItems().length == 1 ? holder.id()
                     : ResourceLocation.fromNamespaceAndPath(holder.id().getNamespace(), holder.id().getPath()
                         + "/" + key.getNamespace() + "/" + key.getPath());
@@ -209,28 +218,28 @@ public final class HotPotRecipeViewerData {
     public static final int WARN_DARK = 0xFF7C2A1C;
 
     public static String seconds(int ticks) {
-        return String.format(java.util.Locale.ROOT, "%.1f", ticks / 20F);
+        return String.format(Locale.ROOT, "%.1f", ticks / 20F);
     }
 
-    public static net.minecraft.network.chat.MutableComponent recipeText(String suffix, Object... args) {
-        return net.minecraft.network.chat.Component.translatable("text.orients_hotpot_chronicles.recipe." + suffix, args);
+    public static MutableComponent recipeText(String suffix, Object... args) {
+        return Component.translatable("text.orients_hotpot_chronicles.recipe." + suffix, args);
     }
 
-    public static net.minecraft.network.chat.Component cookingTime(CookingEntry recipe) {
+    public static Component cookingTime(CookingEntry recipe) {
         return recipeText("cooking.time", seconds(recipe.cookTicks()), String.valueOf(recipe.cookTicks()));
     }
 
-    public static net.minecraft.network.chat.Component overcookHint(CookingEntry recipe) {
+    public static Component overcookHint(CookingEntry recipe) {
         int extra = Math.max(0, recipe.overcookTotalTicks() - recipe.cookTicks());
         return recipeText("cooking.overcook", seconds(extra), recipe.overcookOutput().getHoverName());
     }
 
-    public static net.minecraft.network.chat.Component cuttingHint(CuttingEntry recipe) {
+    public static Component cuttingHint(CuttingEntry recipe) {
         return recipe.pieceByPiece() ? recipeText("cutting.multi", String.valueOf(recipe.output().getCount()))
             : recipeText("cutting.single");
     }
 
-    public static net.minecraft.network.chat.Component poundingHint(PoundingEntry recipe) {
+    public static Component poundingHint(PoundingEntry recipe) {
         return recipeText("pounding.hits", String.valueOf(recipe.hits()));
     }
 }

@@ -1,5 +1,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.client.compat.jei;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.List;
+import net.minecraft.client.renderer.Rect2i;
+
 import static cn.blockforge.generated.orientshotpotchronicles.compat.HotPotRecipeViewerData.*;
 
 import cn.blockforge.generated.orientshotpotchronicles.compat.HotPotRecipeViewerData;
@@ -67,9 +71,9 @@ public final class HotPotJeiPlugin implements IModPlugin {
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         // mryt233 改（2026-11-11）：枚举当前客户端配方与配置，实际界面重建由查看器生命周期负责。
-        registration.addRecipes(COOKING, HotPotRecipeViewerData.cookingRecipes(net.minecraft.client.Minecraft.getInstance().level));
+        registration.addRecipes(COOKING, HotPotRecipeViewerData.cookingRecipes(Minecraft.getInstance().level));
         registration.addRecipes(CUTTING, HotPotRecipeViewerData.cuttingRecipes());
-        registration.addRecipes(POUNDING, HotPotRecipeViewerData.poundingRecipes(net.minecraft.client.Minecraft.getInstance().level));
+        registration.addRecipes(POUNDING, HotPotRecipeViewerData.poundingRecipes(Minecraft.getInstance().level));
     }
 
     @Override
@@ -91,7 +95,7 @@ public final class HotPotJeiPlugin implements IModPlugin {
         if (!HotPotCompat.isModLoaded("jei")) return;
         registration.addGuiContainerHandler(SauceStationScreen.class, new IGuiContainerHandler<SauceStationScreen>() {
             @Override
-            public java.util.List<net.minecraft.client.renderer.Rect2i> getGuiExtraAreas(SauceStationScreen screen) {
+            public List<Rect2i> getGuiExtraAreas(SauceStationScreen screen) {
                 return screen.guideAreas();
             }
         });
