@@ -5,15 +5,12 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoublePlantBlock;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
-import net.minecraft.world.level.storage.loot.predicates.MatchTool;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
-import net.minecraft.advancements.critereon.ItemPredicate;
 
 /**
  * 打草掉小葱、香菜（r103，用户：打草掉落，概率「多一点」= 各 25%）。和原版打草掉小麦种子一样：用剪刀剪下来的是草本身，
@@ -22,6 +19,7 @@ import net.minecraft.advancements.critereon.ItemPredicate;
  * mryt233 改（2026-11-05）：辣椒（r136a）也打草掉，概率同大蒜 15%。
  * mryt233 改（2026-11-06）：花生、青菜（r137）也打草掉，同样 15%。
  * 作者：mryt233 */
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
 public final class GarnishLoot {
     public static final float CHANCE = 0.25F;
     public static final float SOYBEAN_CHANCE = 0.15F;
@@ -56,7 +54,7 @@ public final class GarnishLoot {
                 HotPotContent.ZHE_ER_GEN}) {
                 LootPool.Builder pool = LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1))
-                    .when(MatchTool.toolMatches(ItemPredicate.Builder.item().of(Items.SHEARS)).invert())
+                    .when(HotPotLoot.withoutShears())
                     .when(LootItemRandomChanceCondition.randomChance(item == HotPotContent.SOYBEAN ? SOYBEAN_CHANCE
                         : item == HotPotContent.GARLIC || item == HotPotContent.TOMATO ? GARLIC_CHANCE
                         : item == HotPotContent.CHILI_PEPPER ? CHILI_CHANCE

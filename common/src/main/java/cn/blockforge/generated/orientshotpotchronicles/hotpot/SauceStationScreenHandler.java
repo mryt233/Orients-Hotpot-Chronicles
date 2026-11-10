@@ -7,7 +7,6 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.core.BlockPos;
 
@@ -17,7 +16,8 @@ import net.minecraft.core.BlockPos;
  * 下面玩家背包。同步给客户端的数：前 9 个是每个碗已化开的份数，后 9 个是每个碗装的调料（序号 + 1，0 = 空碗）。
  * 网页预览 viewer/screens.js 的 sauceStation 与 client/SauceStationScreen 一一对应。
  * 作者：mryt233 */
-public class SauceStationScreenHandler extends AbstractContainerMenu {
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+public class SauceStationScreenHandler extends PlayerInventoryMenu {
     /** 9 个原料格排成 3×3，和台上的碗一一对应（第一行 = 最上层，从左到右；2026-10-23 用户要求）。 */
     public static final int GRID_X = 44;
     public static final int GRID_Y = 18;
@@ -82,14 +82,7 @@ public class SauceStationScreenHandler extends AbstractContainerMenu {
         for (int i = 0; i < N; i++) {
             addSlot(new RawSlot(raw, i, slotX(i), slotY(i)));
         }
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(playerInventory, col + row * 9 + 9, 8 + col * 18, INV_Y + row * 18));
-            }
-        }
-        for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(playerInventory, col, 8 + col * 18, HOTBAR_Y));
-        }
+        addPlayerInventory(playerInventory, 8, INV_Y, HOTBAR_Y);
         addDataSlots(data);
     }
 
@@ -116,28 +109,7 @@ public class SauceStationScreenHandler extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int slotId) {
-        Slot slot = slots.get(slotId);
-        if (!slot.hasItem()) {
-            return ItemStack.EMPTY;
-        }
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        if (slotId < N) {
-            if (!moveItemStackTo(stack, N, slots.size(), true)) {
-                return ItemStack.EMPTY;
-            }
-        } else {
-            // 先补装着同一种的碗，再放进空碗（insertItem 第二轮只放 canInsert 的格子）
-            if (Seasoning.ofRaw(stack) == null || !moveItemStackTo(stack, 0, N, false)) {
-                return ItemStack.EMPTY;
-            }
-        }
-        if (stack.isEmpty()) {
-            slot.set(ItemStack.EMPTY);
-        } else {
-            slot.setChanged();
-        }
-        return original;
+        return super.quickMoveStack(player, slotId);
     }
 
     @Override
@@ -164,4 +136,10 @@ public class SauceStationScreenHandler extends AbstractContainerMenu {
             return SauceStationBlockEntity.MAX_RAW;
         }
     }
+
+    @Override
+    protected int containerSlots() { return N; }
+
+    @Override
+    protected boolean acceptsQuickMove(ItemStack stack) { return Seasoning.ofRaw(stack) != null; }
 }

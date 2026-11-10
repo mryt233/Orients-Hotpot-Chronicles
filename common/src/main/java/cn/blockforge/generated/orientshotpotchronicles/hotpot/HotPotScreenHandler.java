@@ -1,6 +1,5 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.food.FoodProperties;
@@ -24,7 +23,8 @@ import net.minecraft.util.Mth;
  * 摆放为 9x9 的锅面，大格之间留分界。用法像熔炉：
  * 生的放进去，熟的直接取出来（取出时结算经验）。
  */
-public class HotPotScreenHandler extends AbstractContainerMenu {
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+public class HotPotScreenHandler extends PlayerInventoryMenu {
     /** 大格间缝隙（像素）。 */
     public static final int GAP = 4;
     /** 锅面网格左上角（界面坐标）；每格 18 像素，物品画在格内向右下偏 1 像素处。 */
@@ -75,43 +75,9 @@ public class HotPotScreenHandler extends AbstractContainerMenu {
             addSlot(new PotSlot(pot, i, x, y));
         }
         // 玩家背包
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(playerInventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18));
-            }
-        }
-        for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(playerInventory, col, INV_X + col * 18, HOTBAR_Y));
-        }
+        addPlayerInventory(playerInventory, INV_X, INV_Y, HOTBAR_Y);
 
-        properties = new DataSlot[HotPotBlockEntity.PROP_COUNT];
-        for (int i = 0; i < properties.length; i++) {
-            final int index = i;
-            if (be != null) {
-                properties[i] = addDataSlot(new DataSlot() {
-                    @Override
-                    public int get() {
-                        return be.propertyAt(index);
-                    }
-
-                    @Override
-                    public void set(int value) {
-                    }
-                });
-            } else {
-                properties[i] = addDataSlot(new DataSlot() {
-                    @Override
-                    public int get() {
-                        return clientData[index];
-                    }
-
-                    @Override
-                    public void set(int value) {
-                        clientData[index] = value;
-                    }
-                });
-            }
-        }
+        properties = bindData(clientData, be == null ? null : be::propertyAt);
     }
 
     private static Container clientInventory(Inventory playerInventory, BlockPos pos) {
@@ -344,44 +310,7 @@ public class HotPotScreenHandler extends AbstractContainerMenu {
     /** shift 键：背包 → 锅里空格；锅里 → 背包，并按实际移动数量结算经验。 */
     @Override
     public ItemStack quickMoveStack(Player player, int slotId) {
-        if (slotId < 0 || slotId >= slots.size()) {
-            return ItemStack.EMPTY;
-        }
-        Slot slot = slots.get(slotId);
-        if (!slot.hasItem()) {
-            return ItemStack.EMPTY;
-        }
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        int before = stack.getCount();
-        boolean fromPot = slot instanceof PotSlot;
-        boolean cookedOutput = fromPot && isCooked(slot.getContainerSlot());
-
-        if (fromPot) {
-            if (!moveItemStackTo(stack, HotPotBlockEntity.SLOTS, slots.size(), true)) {
-                return ItemStack.EMPTY;
-            }
-        } else if (!moveItemStackTo(stack, 0, HotPotBlockEntity.SLOTS, false)) {
-            return ItemStack.EMPTY;
-        }
-
-        int moved = before - stack.getCount();
-        if (moved <= 0) {
-            return ItemStack.EMPTY;
-        }
-        if (cookedOutput && serverBe != null) {
-            serverBe.grantTakeXp(player, slot.getContainerSlot(), moved);
-        }
-        if (stack.isEmpty()) {
-            slot.set(ItemStack.EMPTY);
-            if (fromPot && serverBe != null) {
-                serverBe.onSlotEmptied(slot.getContainerSlot());
-            }
-        } else {
-            slot.setChanged();
-        }
-        broadcastChanges();
-        return original;
+        return super.quickMoveStack(player, slotId);
     }
 
     @Override
@@ -449,4 +378,31 @@ public class HotPotScreenHandler extends AbstractContainerMenu {
         }
 
     }
+
+    @Override
+    protected int containerSlots() { return HotPotBlockEntity.SLOTS; }
+
+    @Override
+    protected boolean fromContainer(Slot slot, int slotId) { return slot instanceof PotSlot; }
+
+    @Override
+    protected boolean requireMovedCount() { return true; }
+
+    @Override
+    protected boolean quickMoveOutput(Slot slot, boolean fromContainer) {
+        return fromContainer && isCooked(slot.getContainerSlot());
+    }
+
+    @Override
+    protected void onQuickMoved(Player player, Slot slot, boolean fromContainer, int moved, boolean cookedOutput) {
+        if (cookedOutput && serverBe != null) serverBe.grantTakeXp(player, slot.getContainerSlot(), moved);
+    }
+
+    @Override
+    protected void onQuickEmptied(Slot slot, boolean fromContainer) {
+        if (fromContainer && serverBe != null) serverBe.onSlotEmptied(slot.getContainerSlot());
+    }
+
+    @Override
+    protected void afterQuickMove() { broadcastChanges(); }
 }

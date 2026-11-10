@@ -199,4 +199,38 @@ public final class HotPotRecipeViewerData {
     public static List<ItemStack> poundingCatalysts() {
         return List.of(new ItemStack(HotPotContent.CUTTING_BOARD_ITEM), new ItemStack(HotPotContent.ROLLING_PIN));
     }
+
+    // mryt233 改（2026-11-11）：两种查看器只共享文案与配色，布局仍各自负责。
+    public static final int TEXT = 0xFF404040;
+    public static final int TEXT_DARK = 0xFF303030;
+    public static final int HINT = 0xFF8A5524;
+    public static final int HINT_DARK = 0xFF6E421B;
+    public static final int WARN = 0xFFA63D2A;
+    public static final int WARN_DARK = 0xFF7C2A1C;
+
+    public static String seconds(int ticks) {
+        return String.format(java.util.Locale.ROOT, "%.1f", ticks / 20F);
+    }
+
+    public static net.minecraft.network.chat.MutableComponent recipeText(String suffix, Object... args) {
+        return net.minecraft.network.chat.Component.translatable("text.orients_hotpot_chronicles.recipe." + suffix, args);
+    }
+
+    public static net.minecraft.network.chat.Component cookingTime(CookingEntry recipe) {
+        return recipeText("cooking.time", seconds(recipe.cookTicks()), String.valueOf(recipe.cookTicks()));
+    }
+
+    public static net.minecraft.network.chat.Component overcookHint(CookingEntry recipe) {
+        int extra = Math.max(0, recipe.overcookTotalTicks() - recipe.cookTicks());
+        return recipeText("cooking.overcook", seconds(extra), recipe.overcookOutput().getHoverName());
+    }
+
+    public static net.minecraft.network.chat.Component cuttingHint(CuttingEntry recipe) {
+        return recipe.pieceByPiece() ? recipeText("cutting.multi", String.valueOf(recipe.output().getCount()))
+            : recipeText("cutting.single");
+    }
+
+    public static net.minecraft.network.chat.Component poundingHint(PoundingEntry recipe) {
+        return recipeText("pounding.hits", String.valueOf(recipe.hits()));
+    }
 }

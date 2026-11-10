@@ -1,5 +1,7 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.Packet;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.api.HotpotScreens;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -20,9 +22,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.server.level.ServerPlayer;
@@ -44,7 +43,8 @@ import net.minecraft.world.level.Level;
  * 食材、汤底、烹饪进度和经验逻辑。81 格怎么分边、每边一种汤由锅的 {@link PotLayout} 决定
  * （九宫格锅一边；鸳鸯锅两边；田字锅四边，2026-10-23 起）。</p>
  */
-public class HotPotBlockEntity extends BlockEntity
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+public class HotPotBlockEntity extends SyncedBlockEntity
     implements Container {
     /** 9x9 = 81 个食材槽，每 3x3 为一个大格。 */
     public static final int SLOTS = 81;
@@ -1448,16 +1448,6 @@ public class HotPotBlockEntity extends BlockEntity
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveWithoutMetadata(registries);
-    }
-
-    @Override
     protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
         super.saveAdditional(nbt, registries);
         HotPotStorage.write(this, nbt, registries);
@@ -1470,4 +1460,11 @@ public class HotPotBlockEntity extends BlockEntity
         HotPotStorage.read(this, nbt, registries);
     }
 
+
+    /** 保留公开入口，实际更新格式由公共基类提供。 */
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() { return super.getUpdatePacket(); }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) { return super.getUpdateTag(registries); }
 }

@@ -6,7 +6,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.inventory.DataSlot;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.core.BlockPos;
 
@@ -14,7 +13,8 @@ import net.minecraft.core.BlockPos;
  * 灶膛界面：像熔炉一样只有一个燃料槽，可放入任何原版熔炉燃料。
  * 燃烧进度通过两个同步属性（余燃 / 总燃）送到客户端画火苗。
  */
-public class StoveScreenHandler extends AbstractContainerMenu {
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+public class StoveScreenHandler extends PlayerInventoryMenu {
     /** 燃料槽相对屏幕的位置。 */
     public static final int FUEL_X = 112;
     public static final int FUEL_Y = 35;
@@ -22,7 +22,7 @@ public class StoveScreenHandler extends AbstractContainerMenu {
     private final Container fuel;
     /** 服务端的灶台（客户端为 null）：判断界面是否还有效用。 */
     private final StoveBlockEntity stove;
-    private final DataSlot[] properties = new DataSlot[2];
+    private final DataSlot[] properties;
     private final int[] clientData = new int[2];
 
     // 服务端构造
@@ -43,42 +43,9 @@ public class StoveScreenHandler extends AbstractContainerMenu {
         fuel.startOpen(playerInventory.player);
 
         addSlot(new FuelSlot(fuel, 0, FUEL_X, FUEL_Y));
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(playerInventory, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
-            }
-        }
-        for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(playerInventory, col, 8 + col * 18, 142));
-        }
+        addPlayerInventory(playerInventory, 8, 84, 142);
 
-        for (int i = 0; i < properties.length; i++) {
-            final int index = i;
-            if (be != null) {
-                properties[i] = addDataSlot(new DataSlot() {
-                    @Override
-                    public int get() {
-                        return index == 0 ? be.displayBurnTicks() : be.displayBurnTotal();
-                    }
-
-                    @Override
-                    public void set(int value) {
-                    }
-                });
-            } else {
-                properties[i] = addDataSlot(new DataSlot() {
-                    @Override
-                    public int get() {
-                        return clientData[index];
-                    }
-
-                    @Override
-                    public void set(int value) {
-                        clientData[index] = value;
-                    }
-                });
-            }
-        }
+        properties = bindData(clientData, be == null ? null : index -> index == 0 ? be.displayBurnTicks() : be.displayBurnTotal());
     }
 
     private static Container clientFuel(Inventory playerInventory, BlockPos pos) {
@@ -119,28 +86,7 @@ public class StoveScreenHandler extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int slotId) {
-        if (slotId < 0 || slotId >= slots.size()) {
-            return ItemStack.EMPTY;
-        }
-        Slot slot = slots.get(slotId);
-        if (!slot.hasItem()) {
-            return ItemStack.EMPTY;
-        }
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        if (slotId == 0) {
-            if (!moveItemStackTo(stack, 1, slots.size(), true)) {
-                return ItemStack.EMPTY;
-            }
-        } else if (!moveItemStackTo(stack, 0, 1, false)) {
-            return ItemStack.EMPTY;
-        }
-        if (stack.isEmpty()) {
-            slot.set(ItemStack.EMPTY);
-        } else {
-            slot.setChanged();
-        }
-        return original;
+        return super.quickMoveStack(player, slotId);
     }
 
     @Override
@@ -165,4 +111,7 @@ public class StoveScreenHandler extends AbstractContainerMenu {
             return 64;
         }
     }
+
+    @Override
+    protected int containerSlots() { return 1; }
 }

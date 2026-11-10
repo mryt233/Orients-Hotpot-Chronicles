@@ -1,20 +1,19 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.BlockPos;
 
 /**
  * 砧板上放着的那一件东西（2026-10-23）。变了就存档并同步给客户端，CuttingBoardRenderer 画在板面上。
  * 作者：mryt233 */
-public class CuttingBoardBlockEntity extends BlockEntity {
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+public class CuttingBoardBlockEntity extends SyncedBlockEntity {
     private ItemStack item = ItemStack.EMPTY;
     /**
      * 一刀一刀切的东西已经切了几刀。
@@ -116,13 +115,11 @@ public class CuttingBoardBlockEntity extends BlockEntity {
         itemFacing = f != null && f.getAxis().isHorizontal() ? f : net.minecraft.core.Direction.SOUTH;
     }
 
+
+    /** 保留公开入口，实际更新格式由公共基类提供。 */
     @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
+    public Packet<ClientGamePacketListener> getUpdatePacket() { return super.getUpdatePacket(); }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveWithoutMetadata(registries);
-    }
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) { return super.getUpdateTag(registries); }
 }

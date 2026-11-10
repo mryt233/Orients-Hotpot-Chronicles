@@ -107,3 +107,11 @@ loom {
         }
     }
 }
+
+// mryt233 改（2026-11-11）：仅测试网络平台实现，不改变前置运行代码。
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+tasks.named('test') { useJUnitPlatform() }

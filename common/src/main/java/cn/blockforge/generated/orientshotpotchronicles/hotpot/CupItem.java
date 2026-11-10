@@ -243,34 +243,8 @@ public class CupItem extends Item {
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity user) {
-        if (kind == null) {
-            return stack;
-        }
-        world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.GENERIC_DRINK,
-            SoundSource.PLAYERS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
-        if (world.isClientSide) {
-            return stack;
-        }
-        kind.applySip(user);
-        // 碰过杯的杯子（r136b，2026-11-05 用户）：在原来那一口之外再多回 1 饥饿值、0.4 饱和度
-        boolean cheered = Boolean.TRUE.equals(stack.get(HotPotContent.CHEERED));
-        if (user instanceof Player player) {
-            if (kind.hasBottle()) {
-                player.getFoodData().eat(DrinkItem.sipFood());   // 水、牛奶不回饥饿值（同原版）；数值同饮料瓶，读配置（W7）
-                // mryt233 改（r146d）：杯装也只认植物蛋白饮料；其他饮料仍照常结算营养。
-                if (kind == DrinkKind.PLANT_PROTEIN_DRINK) {
-                    HotPotCriterion.fire(player, "drink_author");
-                }
-            }
-            if (cheered) {
-                player.getFoodData().eat(1, 0.4F);
-            }
-            player.awardStat(Stats.ITEM_USED.get(this));
-            if (player.getAbilities().instabuild) {
-                return stack;
-            }
-        }
-        return new ItemStack(HotPotContent.GLASS_CUP);
+        // mryt233 改（2026-11-11）：共用一口结算，保留瓶杯差异。
+        return DrinkSip.finish(stack, world, user, kind, this, false);
     }
 
     /** 碰过杯的杯子上挂一行金色说明（r136b，2026-11-05 用户，新增）。 */

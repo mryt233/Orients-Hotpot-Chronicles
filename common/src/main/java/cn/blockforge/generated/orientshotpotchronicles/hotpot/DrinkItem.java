@@ -8,9 +8,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.stats.Stats;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.ChatFormatting;
@@ -79,29 +76,8 @@ public class DrinkItem extends Item {
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity user) {
-        world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.GENERIC_DRINK,
-            SoundSource.PLAYERS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
-        if (world.isClientSide) {
-            return stack;
-        }
-        if (user instanceof Player player) {
-            player.getFoodData().eat(sipFood());
-            player.awardStat(Stats.ITEM_USED.get(this));
-            // mryt233 改（r146d）：作者只推荐植物蛋白饮料，其他瓶装饮料不触发。
-            // 这里走模组自己的 HotPotCriterion，不依赖原版 consume_item 判定（自定义结算不一定会触发它）。
-            if (kind == DrinkKind.PLANT_PROTEIN_DRINK) {
-                HotPotCriterion.fire(player, "drink_author");
-            }
-        }
-        kind.applySip(user);
-        if (user instanceof Player player && player.getAbilities().instabuild) {
-            return stack;
-        }
-        if (stack.getDamageValue() + 1 >= SIPS) {
-            return new ItemStack(HotPotContent.emptyBottle(kind));
-        }
-        stack.setDamageValue(stack.getDamageValue() + 1);
-        return stack;
+        // mryt233 改（2026-11-11）：共用一口结算，保留瓶杯差异。
+        return DrinkSip.finish(stack, world, user, kind, this, true);
     }
 
     /** 倒出一口（倒进杯子，2026-10-25）：返回倒完剩下的瓶子，最后一口倒完是空瓶。创造模式也照样少一口。 */

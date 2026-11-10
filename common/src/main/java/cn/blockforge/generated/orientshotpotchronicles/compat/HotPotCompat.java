@@ -74,8 +74,9 @@ public final class HotPotCompat {
     }
 
     public static Item itemOf(String namespace, String path) {
-        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(namespace, path));
-        return item == net.minecraft.world.item.Items.AIR ? null : item;
+        // mryt233 改（2026-11-11）：先查 ID 是否存在，不能用默认物品判断注册状态。
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(namespace, path);
+        return BuiltInRegistries.ITEM.containsKey(id) ? BuiltInRegistries.ITEM.get(id) : null;
     }
 
     static void log(String message) {

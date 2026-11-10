@@ -1,8 +1,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.ContainerHelper;
@@ -10,9 +11,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
@@ -30,7 +28,8 @@ import java.util.List;
  * 一格里摆着的若干个盘子：每个盘子记它是哪种（材质 + 大小）、中心位置（像素）、长边方向和里面的菜。
  * 盘子之间不能重叠，所以一格能摆几个由盘子大小自然决定（小碟 5 个、长盘 2 个、方盘 1 个，也能混着摆）。
  */
-public class PlateHolderBlockEntity extends BlockEntity {
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+public class PlateHolderBlockEntity extends SyncedBlockEntity {
     /** 摆着的一个盘子。 */
     public static final class Placed {
         public final PlateBlock plate;
@@ -325,13 +324,11 @@ public class PlateHolderBlockEntity extends BlockEntity {
         }
     }
 
+
+    /** 保留公开入口，实际更新格式由公共基类提供。 */
     @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
+    public Packet<ClientGamePacketListener> getUpdatePacket() { return super.getUpdatePacket(); }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveWithoutMetadata(registries);
-    }
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) { return super.getUpdateTag(registries); }
 }

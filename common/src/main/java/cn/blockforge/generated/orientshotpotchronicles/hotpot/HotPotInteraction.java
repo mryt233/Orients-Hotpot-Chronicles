@@ -1,6 +1,11 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -10,6 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 
 /** 准星与 3x3 九宫格之间的共享空间映射。 */
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
 public final class HotPotInteraction {
     /** 独立摆放的锅：锅腔 1.5..14.5（对应 iron/copper_hot_pot_shell 模型）。 */
     public static final double STANDALONE_INNER_MIN = 1.5 / 16.0;
@@ -168,5 +174,93 @@ public final class HotPotInteraction {
     /** 筷子用于开面板，碗用于直接捞取；空手由方块的 onUse 路径处理。 */
     public static boolean isServingTool(ItemStack stack) {
         return stack.is(HotPotContent.CHOPSTICKS) || stack.is(Items.BOWL);
+    }
+
+    /** 已通过入口筛选后的锅操作；钩子只由方块入口调用一次。 */
+    public static ItemInteractionResult useItem(HotPotBlockEntity be, ItemStack stack,
+            Level world, BlockPos pos, Player player,
+            InteractionHand hand, BlockHitResult hit, double innerMin, double innerSize) {
+        return useItem(be, stack, world, pos, player, hand, hit, innerMin, innerSize, null);
+    }
+
+    static ItemInteractionResult useItem(HotPotBlockEntity be, ItemStack stack,
+            Level world, BlockPos pos, Player player,
+            InteractionHand hand, BlockHitResult hit, double innerMin, double innerSize,
+            boolean[] checks) {
+        int bigCell = HotPotInteraction.cellFromHit(be, player, pos, hit, innerMin, innerSize);
+        int cookedSlot = be.firstCookedSlotInCell(bigCell);
+
+        if (checks == null ? HotPotBlock.isPlate(stack) : checks[0]) {
+            if (!world.isClientSide) {
+                be.pourPlate(player, hand);
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
+        if (checks == null ? be.canScoopWith(stack) : checks[1]) {
+            if (!world.isClientSide) {
+                be.scoopSoup(player, hand, HotPotInteraction.sideFromHit(be, player, pos, hit, innerMin, innerSize));
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
+        if (stack.is(Items.BOWL)) {
+            if (world.isClientSide) {
+                HotPotInteraction.clientChopsticksAim.accept(be, bigCell);   // 碗先盛看到的那样（2026-10-26）
+            }
+            if (!world.isClientSide) {
+                be.serveWithBowl(player, hand, bigCell);
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
+        if (checks == null ? isServingTool(stack) : checks[2]) {
+            if (stack.is(HotPotContent.CHOPSTICKS)) {
+                // 夹着的是熟菜（下不了锅）：不管锅，交给筷子吃（按住右键吃）。以前会提示「煮不了」，
+                // 刚从锅里夹起来、右键还按着时就吃不上（用户报：筷子夹起来的菜吃不了。调整）
+                ItemStack held = Chopsticks.held(stack);
+                if (!held.isEmpty() && !HotPotCooking.acceptable(world, held)) {
+                    return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+                }
+                // 筷子上夹着菜：放进准星对着的那一格；空筷子：夹起这一格的一样熟食
+                // （2026-10-25 用户定的新交互；开锅界面改成拿筷子 Shift+右键，见 ChopsticksItem.useOnBlock。调整）
+                if (world.isClientSide && Chopsticks.held(stack).isEmpty()) {
+                    // 告诉服务端这一刻浮在这格上的是哪样，夹的就是看到的那样（用户 2026-10-25）
+                    HotPotInteraction.clientChopsticksAim.accept(be, bigCell);
+                }
+                if (!world.isClientSide) {
+                    if (!Chopsticks.held(stack).isEmpty()) {
+                        be.insertHeld(player, stack, be.firstEmptySlotInCell(bigCell));
+                    } else if (!be.pickShown(player, stack, bigCell)) {
+                        player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.no_cooked_here")), true);
+                    }
+                }
+                return ItemInteractionResult.SUCCESS;
+            }
+            if (!world.isClientSide && !be.collectCookedSlot(player, cookedSlot)) {
+                player.displayClientMessage(Component.translatable(
+                    HotPotBlockEntity.key("msg.no_cooked_here")), true);
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
+        if (checks == null ? SoupBase.fromStack(stack) != null : checks[3]) {
+            if (!world.isClientSide && !be.pourSoup(player, hand, HotPotInteraction.sideFromHit(be, player, pos, hit, innerMin, innerSize))) {
+                return ItemInteractionResult.FAIL;
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
+        // mryt233 改（2026-11-05，r136a）：辣椒加辣、冰块降辣——排在倒汤底之后、下锅食材之前，
+        // 免得辣椒被当成生食材塞进锅槽里（HotPotCooking.acceptable 里也明确拒收辣椒）。
+        if (checks == null ? HotPotBlockEntity.isSpicyModifier(stack) : checks[4]) {
+            if (!world.isClientSide) {
+                be.adjustSpiciness(player, hand,
+                    HotPotInteraction.sideFromHit(be, player, pos, hit, innerMin, innerSize));
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
+        if (checks == null ? HotPotCooking.acceptable(world, stack) : checks[5]) {
+            if (!world.isClientSide && !be.insertIngredient(player, hand, be.firstEmptySlotInCell(bigCell))) {
+                return ItemInteractionResult.FAIL;
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 }

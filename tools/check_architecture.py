@@ -25,10 +25,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
+# mryt233 改（2026-11-11）：移除重复键，规则不变。
 ALLOWED = {
     "framework:pure": set(),
     "framework:loader": {"framework:pure"},
-    "framework:game": {"framework:pure", "framework:loader"},
     "framework:game": {"framework:pure", "framework:loader"},
     "framework:client": {"framework:pure", "framework:loader", "framework:game"},
     "common": {"framework:pure", "framework:loader", "framework:game", "framework:client"},      # 过渡：content/hotpot

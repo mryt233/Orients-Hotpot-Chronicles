@@ -1,5 +1,7 @@
 package cn.blockforge.generated.orientshotpotchronicles.client.compat.rei;
 
+import static cn.blockforge.generated.orientshotpotchronicles.compat.HotPotRecipeViewerData.*;
+
 import cn.blockforge.generated.orientshotpotchronicles.compat.HotPotRecipeViewerData;
 import cn.blockforge.generated.orientshotpotchronicles.compat.HotPotCompat;
 import cn.blockforge.generated.orientshotpotchronicles.client.SauceStationScreen;
@@ -26,7 +28,6 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * REI 客户端插件：把火锅涮煮、砧板切配、擀面杖拍打三类玩法配方交给 REI 展示。
@@ -36,6 +37,7 @@ import java.util.Locale;
  * 注解扫描发现），模组照常运行、也不会因为缺少 REI 报错。
  * 作者：mryt233 */
 @REIPluginClient
+// mryt233 改（2026-11-11）：共享配方文字和颜色。
 public final class HotPotReiClientPlugin implements REIClientPlugin {
     // mryt233 改（r146f）：已有配方插件同时登记动态原料表占用区。
     @Override
@@ -52,23 +54,8 @@ public final class HotPotReiClientPlugin implements REIClientPlugin {
     /** 擀面杖拍打类别。 */
     public static final CategoryIdentifier<PoundingDisplay> POUNDING = CategoryIdentifier.of(HotPot.id("pounding"));
 
-    /** 正文颜色（深灰）。 */
-    private static final int TEXT = 0xFF404040;
-    /** 正文颜色的暗色版本（REI 的 shadow 参数）。 */
-    private static final int TEXT_DARK = 0xFF303030;
-    /** 提示颜色（偏暖的深棕）。 */
-    private static final int HINT = 0xFF8A5524;
-    /** 「久煮会煮老」提示色。 */
-    private static final int HINT_DARK = 0xFF6E421B;
-    /** 警告颜色。 */
-    private static final int WARN = 0xFFA63D2A;
-    /** 警告颜色的暗色版本。 */
-    private static final int WARN_DARK = 0xFF7C2A1C;
 
-    /** 把刻数换算成「秒」的显示文本（一位小数，固定用点号）。 */
-    private static String seconds(int ticks) {
-        return String.format(Locale.ROOT, "%.1f", ticks / 20F);
-    }
+
 
     // ------------------------------------------------------------------ 注册
 
@@ -134,7 +121,7 @@ public final class HotPotReiClientPlugin implements REIClientPlugin {
 
         @Override
         public Component getTitle() {
-            return Component.translatable("text.orients_hotpot_chronicles.recipe.cooking");
+            return recipeText("cooking");
         }
 
         @Override
@@ -159,18 +146,15 @@ public final class HotPotReiClientPlugin implements REIClientPlugin {
             widgets.add(Widgets.createSlot(new Point(bounds.getX() + 61, bounds.getY() + 20))
                 .entries(EntryIngredients.of(recipe.output()))
                 .markOutput());
-            Component time = Component.translatable("text.orients_hotpot_chronicles.recipe.cooking.time",
-                seconds(recipe.cookTicks()), String.valueOf(recipe.cookTicks()));
+            Component time = cookingTime(recipe);
             widgets.add(Widgets.createLabel(new Point(bounds.getX() + 8, bounds.getY() + 5), time)
                 .leftAligned().noShadow().color(TEXT, TEXT_DARK));
             if (!recipe.overcookOutput().isEmpty()) {
                 // 「久煮」指煮熟之后再继续煮的时间：总刻数减去煮熟那一段
-                int extra = Math.max(0, recipe.overcookTotalTicks() - recipe.cookTicks());
-                widgets.add(Widgets.createSlot(new Point(bounds.getX() + 91, bounds.getY() + 20))
+                    widgets.add(Widgets.createSlot(new Point(bounds.getX() + 91, bounds.getY() + 20))
                     .entries(EntryIngredients.of(recipe.overcookOutput()))
                     .markOutput());
-                Component overcook = Component.translatable("text.orients_hotpot_chronicles.recipe.cooking.overcook",
-                    seconds(extra), recipe.overcookOutput().getHoverName());
+                Component overcook = overcookHint(recipe);
                 widgets.add(Widgets.createLabel(new Point(bounds.getX() + 8, bounds.getY() + 48), overcook)
                     .leftAligned().noShadow().color(WARN, WARN_DARK));
             }
@@ -207,7 +191,7 @@ public final class HotPotReiClientPlugin implements REIClientPlugin {
 
         @Override
         public Component getTitle() {
-            return Component.translatable("text.orients_hotpot_chronicles.recipe.cutting");
+            return recipeText("cutting");
         }
 
         @Override
@@ -230,10 +214,7 @@ public final class HotPotReiClientPlugin implements REIClientPlugin {
             widgets.add(Widgets.createSlot(new Point(bounds.getX() + 85, bounds.getY() + 22))
                 .entries(EntryIngredients.of(recipe.output()))
                 .markOutput());
-            Component hint = recipe.pieceByPiece()
-                ? Component.translatable("text.orients_hotpot_chronicles.recipe.cutting.multi",
-                    String.valueOf(recipe.output().getCount()))
-                : Component.translatable("text.orients_hotpot_chronicles.recipe.cutting.single");
+            Component hint = cuttingHint(recipe);
             widgets.add(Widgets.createLabel(new Point(bounds.getX() + 8, bounds.getY() + 5), hint)
                 .leftAligned().noShadow().color(HINT, HINT_DARK));
             return widgets;
@@ -269,7 +250,7 @@ public final class HotPotReiClientPlugin implements REIClientPlugin {
 
         @Override
         public Component getTitle() {
-            return Component.translatable("text.orients_hotpot_chronicles.recipe.pounding");
+            return recipeText("pounding");
         }
 
         @Override
@@ -304,8 +285,7 @@ public final class HotPotReiClientPlugin implements REIClientPlugin {
             widgets.add(Widgets.createSlot(new Point(bounds.getX() + 8, bounds.getY() + 44))
                 .entries(EntryIngredients.of(recipe.tool()))
                 .markInput());
-            Component hits = Component.translatable("text.orients_hotpot_chronicles.recipe.pounding.hits",
-                String.valueOf(recipe.hits()));
+            Component hits = poundingHint(recipe);
             widgets.add(Widgets.createLabel(new Point(bounds.getX() + 32, bounds.getY() + 48), hits)
                 .leftAligned().noShadow().color(HINT, HINT_DARK));
             return widgets;

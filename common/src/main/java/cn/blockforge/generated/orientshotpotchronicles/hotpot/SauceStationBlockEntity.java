@@ -1,17 +1,15 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
@@ -27,7 +25,8 @@ import net.minecraft.core.BlockPos;
  * 每个碗装的什么、有没有货同步给客户端，由 client/SauceStationRenderer 画碗里的调料面。
  * 碗的编号 = 阶梯上的位置：从最上层到最下层、每层从左到右（见 SauceStationBlock.aimed）。
  * 作者：mryt233 */
-public class SauceStationBlockEntity extends BlockEntity {
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+public class SauceStationBlockEntity extends SyncedBlockEntity {
     public static final int BOWLS = 9;
     public static final int PORTIONS_PER_RAW = 4;
     public static final int MAX_RAW = 16;
@@ -182,14 +181,11 @@ public class SauceStationBlockEntity extends BlockEntity {
         }
     }
 
+
+    /** 保留公开入口，实际更新格式由公共基类提供。 */
     @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
+    public Packet<ClientGamePacketListener> getUpdatePacket() { return super.getUpdatePacket(); }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveWithoutMetadata(registries);
-    }
-
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) { return super.getUpdateTag(registries); }
 }

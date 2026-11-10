@@ -55,6 +55,13 @@ public final class DevTestCommands {
         Opt3dRuntimeProbe.install();
         dispatcher.register(
             Commands.literal("hpt").requires(src -> src.hasPermission(2))
+                // mryt233 改（2026-11-11）：3F 服务端菜单、同步与真实交互取证。
+                .then(Commands.literal("opt3f")
+                    .then(Commands.argument("action", com.mojang.brigadier.arguments.StringArgumentType.word())
+                        .then(Commands.argument("pos", BlockPosArgument.blockPos()).executes(ctx ->
+                            report(ctx, Opt3fProbe.run(player(ctx),
+                                com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "action"),
+                                BlockPosArgument.getBlockPos(ctx, "pos")))))))
                 .then(Commands.literal("opt3d").then(Commands.argument("action", com.mojang.brigadier.arguments.StringArgumentType.word())
                     .executes(ctx -> report(ctx, Opt3dRuntimeProbe.run(ctx.getSource(),
                         com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "action"))))))

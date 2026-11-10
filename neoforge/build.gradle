@@ -124,3 +124,17 @@ tasks.named('jar') {
 tasks.named('sourcesJar') { from(project(':common').sourceSets.main.allJava) }
 
 // mryt233 改：客户端/服务端独立目录，由运行配置创建，不再共用 run/。
+
+// mryt233 改（2026-11-11）：仅测试网络平台实现，不改变前置运行代码。
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+tasks.named('test') { useJUnitPlatform() }
+
+// 测试复用已有开发映射与库，不启动加载器或下载依赖。
+sourceSets.test {
+    compileClasspath += sourceSets.main.compileClasspath
+    runtimeClasspath += sourceSets.main.runtimeClasspath
+}

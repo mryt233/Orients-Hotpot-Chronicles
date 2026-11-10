@@ -39,6 +39,7 @@ import net.minecraft.world.level.LevelReader;
 import org.jetbrains.annotations.Nullable;
 
 /** 同一方块状态中保存彼此独立的灶台底座与可拆锅体。 */
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
 public class StoveBlock extends Block implements PartOutline, EntityBlock {
     public static final BooleanProperty LIT = BooleanProperty.create("lit");
     public static final EnumProperty<StovePot> POT = EnumProperty.create("pot", StovePot.class);
@@ -348,76 +349,9 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
-        int bigCell = HotPotInteraction.cellFromHit(stove, player, pos, hit,
-                    HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE);
-        int cookedSlot = stove.firstCookedSlotInCell(bigCell);
-        if (plate) {
-            if (!world.isClientSide) {
-                stove.pourPlate(player, hand);
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
-        if (scoop) {
-            if (!world.isClientSide) {
-                stove.scoopSoup(player, hand, HotPotInteraction.sideFromHit(stove, player, pos, hit, HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE));
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
-        if (stack.is(net.minecraft.world.item.Items.BOWL)) {
-            if (world.isClientSide) {
-                HotPotInteraction.clientChopsticksAim.accept(stove, bigCell);   // 碗先盛看到的那样（2026-10-26）
-            }
-            if (!world.isClientSide) {
-                stove.serveWithBowl(player, hand, bigCell);
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
-        if (servingTool) {
-            if (stack.is(HotPotContent.CHOPSTICKS)) {
-                // 夹着的是熟菜（下不了锅）：不管锅，交给筷子吃（按住右键吃）。以前会提示「煮不了」，
-                // 刚从锅里夹起来、右键还按着时就吃不上（用户报：筷子夹起来的菜吃不了。调整）
-                ItemStack held = Chopsticks.held(stack);
-                if (!held.isEmpty() && !HotPotCooking.acceptable(world, held)) {
-                    return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
-                }
-                // 筷子上夹着菜：放进准星对着的那一格；空筷子：夹起这一格的一样熟食
-                // （2026-10-25 用户定的新交互；开锅界面改成拿筷子 Shift+右键，见 ChopsticksItem.useOnBlock。调整）
-                if (world.isClientSide && Chopsticks.held(stack).isEmpty()) {
-                    // 告诉服务端这一刻浮在这格上的是哪样，夹的就是看到的那样（用户 2026-10-25）
-                    HotPotInteraction.clientChopsticksAim.accept(stove, bigCell);
-                }
-                if (!world.isClientSide) {
-                    if (!Chopsticks.held(stack).isEmpty()) {
-                        stove.insertHeld(player, stack, stove.firstEmptySlotInCell(bigCell));
-                    } else if (!stove.pickShown(player, stack, bigCell)) {
-                        player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.no_cooked_here")), true);
-                    }
-                }
-                return ItemInteractionResult.SUCCESS;
-            }
-            if (!world.isClientSide && !stove.collectCookedSlot(player, cookedSlot)) {
-                player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.no_cooked_here")), true);
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
-        if (soupSource) {
-            if (!world.isClientSide && !stove.pourSoup(player, hand, HotPotInteraction.sideFromHit(stove, player, pos, hit, HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE))) {
-                return ItemInteractionResult.FAIL;
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
-        // mryt233 改（2026-11-05，r136a）：辣椒加辣、冰块降辣，排在倒汤底之后、下锅食材之前
-        if (spicyModifier) {
-            if (!world.isClientSide) {
-                stove.adjustSpiciness(player, hand,
-                    HotPotInteraction.sideFromHit(stove, player, pos, hit, HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE));
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
-        if (!world.isClientSide && !stove.insertIngredient(player, hand, stove.firstEmptySlotInCell(bigCell))) {
-            return ItemInteractionResult.FAIL;
-        }
-        return ItemInteractionResult.SUCCESS;
+        return HotPotInteraction.useItem(stove, stack, world, pos, player, hand, hit,
+            HotPotInteraction.STOVE_INNER_MIN, HotPotInteraction.STOVE_INNER_SIZE,
+            new boolean[]{plate, scoop, servingTool, soupSource, spicyModifier, ingredient});
     }
 
     /** 手里这件东西是不是冲着锅去的（捞取工具、汤底、食材、调辣度的辣椒 / 冰块）。 */
