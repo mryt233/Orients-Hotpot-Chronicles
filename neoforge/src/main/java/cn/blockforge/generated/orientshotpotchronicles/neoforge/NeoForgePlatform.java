@@ -69,8 +69,5 @@ public final class NeoForgePlatform {
             }
         });
 
-        // 旧版「hotpot_table」→「oak_hotpot_table」的 id 迁移：Fabric 版用 Registry.addAlias，
-        // 但 Minecraft 1.21.1 的注册表**没有** addAlias（1.21.2 才加），NeoForge 21.1 也没有替代品，
-        // 所以第一版先跳过。老存档里的 hotpot_table 会变成缺失方块——这是 1.21.1 的硬限制
     }
 }

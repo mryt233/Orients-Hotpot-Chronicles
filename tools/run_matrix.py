@@ -19,10 +19,13 @@ import sys
 import time
 from pathlib import Path
 
+# mryt233 改（2026-11-10）：版本与 JDK 读取唯一配置源。
+from project_env import jdk21, mod_version, runtime_version
+
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "build/exp-pkg"
 LOGS = OUT / "logs"
-JAVA_HOME = "C:/Users/10536/.jdks/jdk-21.0.12.1+1"
+JAVA_HOME = str(jdk21())
 
 SERVERS = {
     "fabric": (ROOT / "experiments/server-fabric", ":experiments:server-fabric:runServer",
@@ -44,7 +47,7 @@ SCENARIOS = [
     ("missing-framework", ["beta-{l}-B.jar"], "reject", "缺框架前置", False),
     ("api-major-conflict", ["framework-{l}-0.1.0.jar", "beta-conflict-{l}-B.jar"], "reject",
      "API 主版本冲突", False),
-    ("candidate-B", ["candidate/orient_framework-{l}-0.1.1.jar",
+    ("candidate-B", ["candidate/orient_framework-{l}-{r}.jar",
                      "candidate/orients_hotpot_chronicles-{l}-{v}.jar"], "success",
      "B 候选：框架 Runtime + 火锅内容", True),
     ("candidate-missing-runtime", ["candidate/orients_hotpot_chronicles-{l}-{v}.jar"], "reject",
@@ -54,13 +57,6 @@ REJECT_MARKERS = ("Incompatible mods", "Mod loading has failed", "Missing or uns
                   "ModResolutionException", "requires orient_framework", "缺少", "incompatible",
                   "failed to resolve")
 
-
-def mod_version() -> str:
-    text = (ROOT / "gradle.properties").read_text(encoding="utf-8")
-    match = re.search(r"^mod_version\s*=\s*(\S+)", text, re.MULTILINE)
-    if not match:
-        raise SystemExit("gradle.properties 里找不到 mod_version")
-    return match.group(1)
 
 
 def rcon(loader: str, *commands: str):
@@ -161,7 +157,7 @@ def run_scenario(loader: str, name: str, jars: list[str], expect: str, note: str
         shutil.rmtree(mods)
     mods.mkdir(parents=True)
     for pattern in jars:
-        file = OUT / pattern.format(l=loader, v=version)
+        file = OUT / pattern.format(l=loader, v=version, r=runtime_version())
         if not file.is_file():
             return {"loader": loader, "scenario": name, "expect": expect, "note": note,
                     "status": "fail", "ready": False, "reason": f"缺少 {file.name}", "log": ""}

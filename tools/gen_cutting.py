@@ -12,13 +12,15 @@
 import json
 import math
 import random
-from pathlib import Path
+
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.io import write_legacy_json as write
+
 
 from PIL import Image
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
 ROOTS = [RES / "assets" / MODID]
 
 
@@ -281,10 +283,6 @@ def board_model():
                          "particle": f"{MODID}:block/cutting_board_top"},
             "elements": els}
 
-
-def write(p, obj):
-    p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_bytes((json.dumps(obj, indent=2) + "\n").encode("utf-8"))  # 调整：保持 LF
 
 
 def main():

@@ -51,7 +51,10 @@ public final class HotPotHooks {
         net.minecraft.world.food.FoodProperties foodIn(ItemStack offhand, net.minecraft.world.entity.LivingEntity user);
     }
 
-    /** 筷子吃东西前后给外部的通知（面条碗要在结算前认出口、吃完刷红汤）。 */
+    /**
+     * mryt233 改（2026-11-10）：手持筷子物品进食、锅界面用筷子点熟食两条路径都会触发。
+     * 每口各通知一次；beforeEating 接管后不扣食物，也不触发 onEating。
+     */
     public interface EatListener {
         /** 即将吃掉这一份，此时物品栈还没变；返回 true 表示这次由它接管，火锅不再继续。 */
         default boolean beforeEating(ItemStack chopsticks, net.minecraft.world.entity.LivingEntity user) {

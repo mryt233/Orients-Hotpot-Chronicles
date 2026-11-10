@@ -11,13 +11,15 @@
 """
 import copy
 import json
-from pathlib import Path
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.templates import write_shared_model as write
+from pixkit.materials import ids
+
 ASSET_ROOTS = [RES / "assets" / MODID]
-WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped"]
+WOODS = ids("woods")
 # 高火锅桌桌面板 y TOP0..TOP1：r82 定 20..24（1.5 格），r84 用户说桌子和灶台都再低一点 → 19..23
 TOP0, TOP1 = 19.0, 23.0
 # r82：先按砖面与 1.5 格桌面齐平上移 13（砖面 24、锅沿 29）；用户看了说高了，降 3 像素 → 上移 10；又说再高一点 → 上移 11（砖面 22、锅沿 27，露出桌面 3 像素）；r84 和桌子一起降 1 → 上移 10（砖面 21、锅沿 26，桌面 23）
@@ -31,12 +33,10 @@ BLOCK_DISPLAY = {
     "firstperson_lefthand": {"rotation": [0, 225, 0], "translation": [0, 0, 0], "scale": [0.4, 0.4, 0.4]},
 }
 # 条凳腿到地面各往外岔开的像素（上端在凳面下 y=14）
-LEG_SPREAD = 2.0
+# mryt233 改（2026-11-10）：横撑与预览腿共用 Java 参数，现有几何不变。
+from bench_preview import java_parameters
+LEG_SPREAD = java_parameters()["LEG_SPREAD"]
 
-
-def write(path, obj):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(obj, indent=2) + "\n", encoding="utf-8")
 
 
 def faces(skip=(), cull_down=False):
@@ -281,7 +281,10 @@ def main():
             if f"{MODID}:{i}" not in tag["values"]:
                 tag["values"].append(f"{MODID}:{i}")
         write(f, tag)
-    print("已生成：高灶台、11 种高火锅桌、11 种条凳")
+    # mryt233 改（2026-11-10）：更新条凳时同次刷新预览和说明，防止旧入口覆盖说明。
+    from gen_benches import generate_previews
+    generate_previews()
+    print("已生成：高灶台、11 种高火锅桌、11 种条凳及完整预览")
 
 
 if __name__ == "__main__":

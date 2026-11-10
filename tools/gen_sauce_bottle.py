@@ -11,12 +11,14 @@
 作者：mryt233
 """
 import json
-from pathlib import Path
+
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.io import write_legacy_json as write
+
 from PIL import Image
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
 ASSET_ROOTS = [RES / "assets" / MODID]
 
 FACES = ["north", "east", "south", "west", "up", "down"]
@@ -106,8 +108,7 @@ def game_files():
         for kind in BOTTLES:
             texture().save(root / f"textures/block/sauce_bottle_{kind}.png")
             (root / "models/block").mkdir(parents=True, exist_ok=True)
-            (root / f"models/block/sauce_bottle_{kind}.json").write_bytes(
-                (json.dumps(model(kind), indent=2) + "\n").encode("utf-8"))
+            write(root / f"models/block/sauce_bottle_{kind}.json", model(kind), ensure_ascii=True)
         variants = {}
         for kind in BOTTLES:
             for axis in ("x", "z"):
@@ -116,8 +117,7 @@ def game_files():
                     v["y"] = 90
                 variants[f"axis={axis},kind={kind}"] = v
         (root / "blockstates").mkdir(parents=True, exist_ok=True)
-        (root / "blockstates/sauce_bottle.json").write_bytes(
-            (json.dumps({"variants": variants}, indent=2) + "\n").encode("utf-8"))
+        write(root / "blockstates/sauce_bottle.json", {"variants": variants}, ensure_ascii=True)
     print("ok")
 
 

@@ -8,12 +8,14 @@
 作者：mryt233
 """
 import json
-from pathlib import Path
+
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.io import write_legacy_json as write
+
 from PIL import Image
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
 ASSET_ROOTS = [RES / "assets" / MODID]
 
 WH, WH_HI, WH_LO = (238, 234, 226, 255), (250, 248, 242, 255), (214, 208, 200, 255)   # 瓶身奶白
@@ -122,10 +124,10 @@ def main():
     for root in ASSET_ROOTS:
         tex.save(root / "textures/block/plant_protein_drink.png")
         texture_empty(tex).save(root / "textures/block/plant_protein_drink_empty.png")
-        (root / "models/block/plant_protein_drink.json").write_text(json.dumps(model(), indent=2) + "\n", encoding="utf-8")
+        write(root / "models/block/plant_protein_drink.json", model(), ensure_ascii=True)
         empty = model()
         empty["textures"] = {"d": f"{MODID}:block/plant_protein_drink_empty", "particle": f"{MODID}:block/plant_protein_drink_empty"}
-        (root / "models/block/plant_protein_drink_empty.json").write_text(json.dumps(empty, indent=2) + "\n", encoding="utf-8")
+        write(root / "models/block/plant_protein_drink_empty.json", empty, ensure_ascii=True)
     print("ok")
 
 

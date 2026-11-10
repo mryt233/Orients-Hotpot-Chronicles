@@ -43,6 +43,12 @@ public final class HotpotContentModule implements ContentModule {
         clientCalls++;
     }
 
+    /** mryt233 改（2026-11-10）：数据包重载使已下锅的食材时长失效。 */
+    @Override
+    public void onReload() {
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCooking.reviseCookTimes();
+    }
+
     public static int declarationCalls() {
         return declarationCalls;
     }

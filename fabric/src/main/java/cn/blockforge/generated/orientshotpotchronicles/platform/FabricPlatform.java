@@ -10,7 +10,7 @@ import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 
 /**
- * Fabric 内容侧平台接线：可燃表 / 别名 / 方块破坏拦截等火锅业务。
+ * Fabric 内容侧平台接线：可燃表 / 方块破坏拦截等火锅业务。
  *
  * <p>通用平台能力（注册 / 网络 / 菜单 / 战利品 / 配置目录）由框架 Runtime
  * {@link FabricFrameworkPlatform} 提供；这里只在没有 Runtime 的开发环境回退安装，
@@ -32,14 +32,12 @@ public final class FabricPlatform {
         FabricFrameworkPlatform.install();
     }
 
-    /** 内容注册完成后的平台侧接线（loot/别名/可燃表/破坏拦截）。作者：mryt233 */
+    /** 内容注册完成后的平台侧接线（loot/可燃表/破坏拦截）。作者：mryt233 */
     public static void afterContentRegistration() {
         // 平台侧的收尾接线（从核心移过来）
         LootListeners.install();
         ShrimpLoot.register();   // 钓鱼出虾用 Fabric 注入的 modifyPools，放在平台
-        // 旧版只有一种火锅桌（hotpot_table），老存档里的桌子和物品变成橡木火锅桌
-        BuiltInRegistries.BLOCK.addAlias(GeneratedMod.id("hotpot_table"), GeneratedMod.id("oak_hotpot_table"));
-        BuiltInRegistries.ITEM.addAlias(GeneratedMod.id("hotpot_table"), GeneratedMod.id("oak_hotpot_table"));
+        // mryt233 改（2026-11-10）：旧桌子 ID 不再设置加载器专属别名。
         // 调整：三个包统一由入口的 FabricNetwork 注册。
         // 下界木（绯红、诡异）不可燃，其余和原版木板一样会着火
         for (int i = 0; i < HotPotContent.TABLE_WOODS.size(); i++) {

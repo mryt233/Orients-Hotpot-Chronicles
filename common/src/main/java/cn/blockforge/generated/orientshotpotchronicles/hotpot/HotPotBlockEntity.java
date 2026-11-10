@@ -58,6 +58,8 @@ public class HotPotBlockEntity extends BlockEntity
     final SimpleContainer ingredients = new SimpleContainer(SLOTS);
     final int[] doneness = new int[SLOTS];
     final int[] cookDur = new int[SLOTS];
+    // mryt233 改（2026-11-10）：只在修订号变化时重算，doneness 始终保留千分比。
+    long cookRevision = -1;
     final float[] xpValue = new float[SLOTS];
     final boolean[] cooked = new boolean[SLOTS];
     /**
@@ -906,6 +908,7 @@ public class HotPotBlockEntity extends BlockEntity
 
     /** 读档时 level 还没设好，查不到配方，烹饪时间只能用兜底值：第一次服务端 tick 时按配方重算（代码检查 B3）。 */
     void recomputeCookTimes() {
+        cookRevision = HotPotCooking.cookRevision();
         for (int i = 0; i < SLOTS; i++) {
             ItemStack stack = ingredients.getItem(i);
             if (!stack.isEmpty() && !cooked[i]) {

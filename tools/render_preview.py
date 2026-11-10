@@ -1,7 +1,7 @@
 """把方块 / 物品模型（JSON，长方块拼的）画成一张斜视预览图，不用开游戏、不用 WebGL（2026-10-25）。
 
     python tools/render_preview.py 输出.png 模型1 模型2 ...      模型写 orients_hotpot_chronicles:block/orient_cola 或 minecraft:block/xxx
-只画 elements 里的长方块（不支持 rotation 字段的斜面）；从右前上方看（看得见 上 / 南 / 东 三面），三面各一个亮度。
+画 elements 里的长方块（支持元素旋转）；从右前上方看（看得见 上 / 南 / 东 三面），三面各一个亮度。
 贴图按像素画，放大 SCALE 倍。原版模型 / 贴图从查看器缓存 viewer/cache/1.21.1 读。
 作者：mryt233
 """
@@ -24,6 +24,10 @@ PREVIEW = Path(os.environ["PREVIEW_ROOT"]) if os.environ.get("PREVIEW_ROOT") els
 def asset(ns, sub):
     if PREVIEW is not None and ns == MODID and (PREVIEW / sub).exists():
         return PREVIEW / sub
+    # mryt233 改（2026-11-10）：正式出图也优先读取独立的完整模型覆盖层。
+    overlay = MOD / "preview_models/assets" / ns / sub
+    if sub.startswith("models/") and overlay.is_file():
+        return overlay
     return ROOTS[ns] / sub
 SHADE = {"up": 1.0, "south": 0.82, "east": 0.64}
 
@@ -77,7 +81,7 @@ def project(p, ox, oy):
     return (ox + (x - z) * COS * SCALE, oy + ((x + z) * SIN - y) * SCALE)
 
 
-def face_points(el, face):
+def _face_points(el, face):
     (x0, y0, z0), (x1, y1, z1) = el["from"], el["to"]
     # 每个面四个角：左上、右上、右下、左下（和贴图 uv 的方向对应）
     if face == "up":
@@ -87,6 +91,30 @@ def face_points(el, face):
     if face == "east":
         return [(x1, y1, z1), (x1, y1, z0), (x1, y0, z0), (x1, y0, z1)]
     raise ValueError(face)
+
+
+def face_points(el, face):
+    """mryt233 改（2026-11-10）：和模型查看器相同的元素旋转。"""
+    points = _face_points(el, face)
+    rot = el.get("rotation")
+    if not rot or not rot.get("angle"):
+        return points
+    origin = rot.get("origin", [8, 8, 8])
+    angle = math.radians(rot["angle"])
+    c, s = math.cos(angle), math.sin(angle)
+    out = []
+    for point in points:
+        x, y, z = (v - o for v, o in zip(point, origin))
+        if rot.get("rescale"):
+            k = 1 / math.cos(min(abs(angle), math.pi / 2 - abs(angle)))
+            if rot["axis"] == "x": y, z = y * k, z * k
+            elif rot["axis"] == "y": x, z = x * k, z * k
+            else: x, y = x * k, y * k
+        if rot["axis"] == "x": y, z = y * c - z * s, y * s + z * c
+        elif rot["axis"] == "y": x, z = x * c + z * s, -x * s + z * c
+        else: x, y = x * c - y * s, x * s + y * c
+        out.append(tuple(v + o for v, o in zip((x, y, z), origin)))
+    return out
 
 
 def lerp(a, b, t):

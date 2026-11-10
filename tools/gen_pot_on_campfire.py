@@ -16,11 +16,13 @@
 """
 import copy
 import json
-from pathlib import Path
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.io import write_legacy_json as write
+
+
 ROOTS = [RES / "assets" / MODID]
 POTS = ["copper_nine_grid_hotpot", "iron_nine_grid_hotpot"] + [   # 鸳鸯锅 / 田字锅（gen_yuanyang.py，新增）
     f"{m}_{k}" for m in ("copper", "iron")
@@ -79,11 +81,11 @@ def main():
                 low = lowered(json.loads(src.read_text(encoding="utf-8")))
                 if name.endswith("_shell"):
                     low["elements"] = low["elements"] + legs()
-                (root / f"models/block/{name}{SUFFIX}.json").write_text(json.dumps(low, indent=2) + "\n", encoding="utf-8")
+                write(root / f"models/block/{name}{SUFFIX}.json", low, ensure_ascii=True)
                 out.append({"when": {**when, "on_campfire": "false"}, "apply": apply})
                 out.append({"when": {**when, "on_campfire": "true"},
                             "apply": {**apply, "model": apply["model"] + SUFFIX}})
-            path.write_text(json.dumps({"multipart": out}, indent=2) + "\n", encoding="utf-8")
+            write(path, {"multipart": out}, ensure_ascii=True)
     print("ok")
 
 

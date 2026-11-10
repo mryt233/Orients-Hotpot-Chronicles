@@ -16,11 +16,14 @@ import sys
 import time
 from pathlib import Path
 
+# mryt233 改（2026-11-10）：版本与 JDK 读取唯一配置源。
+from project_env import jdk21
+
 import rcon_lib
 
 ROOT = Path(__file__).resolve().parent.parent
 LOGS = ROOT / "build/exp-pkg/logs"
-JAVA = "C:/Users/10536/.jdks/jdk-21.0.12.1+1/bin/java.exe"
+JAVA = str(jdk21() / "bin/java.exe")
 
 CONFIG = {
     "fabric": {

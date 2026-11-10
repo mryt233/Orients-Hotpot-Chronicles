@@ -10,22 +10,20 @@
 """
 import json
 import random
-from pathlib import Path
+
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MOD, MODID, RES
+from pixkit.io import write_legacy_json as write
+from pixkit.materials import materials
 from PIL import Image
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
 ASSETS = RES / "assets" / MODID
 DATA = RES / "data" / MODID
 WATER = MOD.parent / "viewer/cache/1.21.1/assets/minecraft/textures/block/water_still.png"
 
 # 饮料颜色：暗、基色、亮（和 gen_cup.py 杯子里的一致）
-COLORS = {
-    "orange_drink": ((212, 118, 12), (247, 160, 20), (255, 196, 70)),
-    "plant_protein_drink": ((212, 204, 190), (238, 232, 220), (250, 248, 240)),
-    "orient_cola": ((52, 26, 16), (78, 40, 24), (112, 62, 36)),
-}
+COLORS = {e["id"]: e["cauldron_colors"] for e in materials()["drinks"] if "cauldron_colors" in e}
 SIPS = 12
 PER_LEVEL = 4
 LEVELS = {1: "level1", 2: "level2", 3: "full"}
@@ -75,10 +73,6 @@ def fizz(sheet, seed=5, count=14):
                     px[x + dx, oy + y + dy] = GLINT
     return sheet
 
-
-def write(path, obj):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes((json.dumps(obj, indent=2, ensure_ascii=False) + "\n").encode())
 
 
 def level_of(sips):

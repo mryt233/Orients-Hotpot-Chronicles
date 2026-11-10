@@ -8,12 +8,14 @@
 """
 import json
 import random
-from pathlib import Path
+
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.templates import write_shared_model as write
+from pixkit.materials import ids
 from PIL import Image
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
 ROOTS = [RES / "assets" / MODID]
 
 # 调料 ID（英文名）→ 颜色（基色）；葱花 / 香菜碎末用画好的贴图
@@ -38,7 +40,7 @@ SAUCES = [
     ("minced_zhe_er_gen", (216, 210, 188)),  # 折耳根碎（r139）
 ]
 # 用户 2026-10-23 定：每种原版木头一个（台身该木头的木板、台面白色石英）+ 一个铁的（原版铁块）。ID = <木头>_sauce_station / iron_sauce_station
-WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped"]
+WOODS = ids("woods")
 BODIES = {w: {"side": f"minecraft:block/{w}_planks", "top": "minecraft:block/quartz_block_top"} for w in WOODS}
 BODIES["iron"] = {"side": "minecraft:block/iron_block", "top": "minecraft:block/iron_block"}
 # 2026-10-23 用户改成阶梯式（照自助调料台照片）：1.5 格高，三层台阶从前往后一层比一层高，每层一横排 3 个小碗。
@@ -252,15 +254,12 @@ def main():
         for old in ("sauce_station_wood", "sauce_station_steel", "sauce_station_wood_empty", "sauce_station_steel_empty"):
             (root / f"models/block/{old}.json").unlink(missing_ok=True)   # 第一版预览（wood / steel）；只删这几个，别误删 sauce_station_top
         # 看不见的上半截 sauce_station_top：方块状态 + 只有粒子贴图的空模型（以前手写，被上面的清理误删过，改由这里生成）
-        (root / "models/block/sauce_station_top.json").write_text(json.dumps(
-            {"textures": {"particle": "minecraft:block/oak_planks"}}, indent=2) + "\n", encoding="utf-8")
-        (root / "blockstates/sauce_station_top.json").write_text(json.dumps(
-            {"variants": {"": {"model": f"{MODID}:block/sauce_station_top"}}}, indent=2) + "\n", encoding="utf-8")
+        write(root / "models/block/sauce_station_top.json", {"textures": {"particle": "minecraft:block/oak_planks"}}, ensure_ascii=True)
+        write(root / "blockstates/sauce_station_top.json", {"variants": {"": {"model": f"{MODID}:block/sauce_station_top"}}}, ensure_ascii=True)
         for body in BODIES:
             for filled in (True, False):
                 name = f"{body}_sauce_station" + ("" if filled else "_empty")
-                (root / f"models/block/{name}.json").write_text(json.dumps(model(body, filled), indent=2) + "\n",
-                                                                encoding="utf-8")
+                write(root / f"models/block/{name}.json", model(body, filled), ensure_ascii=True)
     print("ok")
 
 
@@ -293,9 +292,8 @@ def game_files():
             ident = f"{body}_sauce_station"
             variants = {f"facing={facing}": {"model": f"{MODID}:block/{ident}_empty", **({"y": y} if y else {})}
                         for facing, y in ROT.items()}
-            (root / f"blockstates/{ident}.json").write_text(json.dumps({"variants": variants}, indent=2) + "\n", encoding="utf-8")
-            (root / f"models/item/{ident}.json").write_text(json.dumps(
-                {"parent": f"{MODID}:block/{ident}", "display": BLOCK_DISPLAY}, indent=2) + "\n", encoding="utf-8")
+            write(root / f"blockstates/{ident}.json", {"variants": variants}, ensure_ascii=True)
+            write(root / f"models/item/{ident}.json", {"parent": f"{MODID}:block/{ident}", "display": BLOCK_DISPLAY}, ensure_ascii=True)
     for body in BODIES:
         ident = f"{body}_sauce_station"
         loot = {"type": "minecraft:block", "pools": [{"rolls": 1.0, "bonus_rolls": 0.0,
@@ -303,7 +301,7 @@ def game_files():
                 "entries": [{"type": "minecraft:item", "name": f"{MODID}:{ident}"}]}]}
         f = data / MODID / f"loot_table/blocks/{ident}.json"
         f.parent.mkdir(parents=True, exist_ok=True)
-        f.write_text(json.dumps(loot, indent=2) + "\n", encoding="utf-8")
+        write(f, loot, ensure_ascii=True)
     # mryt233 改（2026-11-05）：蘸料台的「上半截」sauce_station_top 两种都要 —— 木头蘸料台的上半截跟木头走斧，
     # 铁蘸料台的上半截跟铁走镐（挖上半截时挖掘速度按上半截自己所在的标签算）。
     for tag_file, ids in [("mineable/axe.json", [f"{w}_sauce_station" for w in WOODS] + ["sauce_station_top"]),
@@ -313,7 +311,7 @@ def game_files():
         for i in ids:
             if f"{MODID}:{i}" not in tag["values"]:
                 tag["values"].append(f"{MODID}:{i}")
-        f.write_text(json.dumps(tag, indent=2) + "\n", encoding="utf-8")
+        write(f, tag, ensure_ascii=True)
 
 
 game_files()
@@ -330,7 +328,7 @@ def recipes():
                   "pattern": ["  B", " BP", "BPP"],   # 用户 2026-10-23 改成台阶样式（原：碗 / 台阶 / 木板三排）
                   "key": {"B": {"item": "minecraft:bowl"}, "P": {"item": leg}},
                   "result": {"id": f"{MODID}:{ident}", "count": 1}}
-        (RES / "data" / MODID / f"recipe/{ident}.json").write_text(json.dumps(recipe, indent=2) + "\n", encoding="utf-8")
+        write(RES / "data" / MODID / f"recipe/{ident}.json", recipe, ensure_ascii=True)
 
 
 recipes()

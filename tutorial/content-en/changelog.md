@@ -11,6 +11,13 @@ This page is updated with each release, **newest first**. The Development Previe
 <!-- mryt233 改，2026-11-08：0.2.2-alpha 发布，开发版预览改名为版本号，再开一段空的预览。 -->
 ## Development Preview {{dev}} {#unreleased}
 
+<!-- mryt233 改（2026-11-10，r146 优化第一批）。 -->
+- **Food already in the pot follows new cooking times after a reload**: After changing a cooking time and running `/orientshotpot reload` (or changing a cooking recipe in a data pack and running `/reload`), ingredients already in the pot **keep their cooking progress** and the remaining time is recalculated from the new value.<!--清单#142-->
+- **Settings save failures are reported honestly**: If the config file cannot be written, the screen **stays open** and says why (the changes only apply to this session, or were not applied). If the original config file is broken, it is first backed up as `orients_hotpot_chronicles.json.broken-<time>` and the backup name is shown.<!--清单#143-->
+- **Same-named ingredients from other mods no longer use this mod's cooking times**: `cooking.items.<item>` in the config only applies to this mod's own ingredients; vanilla and other mods' ingredients cook by their own recipes. The config format is unchanged.<!--清单#144-->
+- **Add-on eating hooks also fire in the pot screen**: Eating cooked food with chopsticks inside the pot screen now notifies add-on mods just like eating with held chopsticks; if an add-on cancels the bite, the food stays in the pot.<!--清单#145-->
+- **NeoForge mod description corrected**: The mod list no longer says the client is still being ported, and the issue link now points to the project's Issues page.<!--清单#146-->
+- **The old hotpot table ID is no longer converted (very early Fabric worlds only)**: The Fabric build no longer converts the earliest `hotpot_table` into the oak hotpot table, matching NeoForge; current hotpot tables are unaffected.<!--清单#147-->
 <!-- mryt233 改：r146d。 -->
 - **Bottle placement sounds**: full and partly drunk bottles play a bottle placement sound together with a gentle liquid sound. Orient Cola uses a clearer glass sound; empty bottles only play the bottle sound. This applies to both empty and occupied table surfaces.<!--清单#137-->
 - **Author's Pick fixed**: only plant protein drink unlocks this advancement, whether you take a sip from a bottle or drink a cup. Orange drink, Orient Cola, water and milk do not count.<!--清单#138-->

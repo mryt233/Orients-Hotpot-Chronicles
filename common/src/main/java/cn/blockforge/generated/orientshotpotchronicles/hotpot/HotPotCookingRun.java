@@ -24,6 +24,11 @@ final class HotPotCookingRun {
             be.repairVisualState();
             be.recomputeCookTimes();   // 读档时查不到配方，这里补算（代码检查 B3）
         }
+        // mryt233 改（2026-11-10）：重载后先刷新耗时，熟度不回退；区块更新也通知客户端刷新。
+        if (be.cookRevision != HotPotCooking.cookRevision()) {
+            be.recomputeCookTimes();
+            be.syncPending = true;
+        }
         be.trackSlotChanges();
         cook(be, world);
         if (be.syncPending) {

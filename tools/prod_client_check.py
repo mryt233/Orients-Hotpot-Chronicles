@@ -23,11 +23,14 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
+# mryt233 改（2026-11-10）：版本与 JDK 读取唯一配置源。
+from project_env import jdk21, mod_version, runtime_version
+
 import rcon_lib
 
 ROOT = Path(__file__).resolve().parent.parent
 LOGS = ROOT / "build/exp-pkg/logs"
-JAVA = "C:/Users/10536/.jdks/jdk-21.0.12.1+1/bin/java.exe"
+JAVA = str(jdk21() / "bin/java.exe")
 SERVER_DIR = ROOT / "experiments/prod-fabric-server"
 CLIENT_DIR = ROOT / "experiments/prod-fabric-client"
 LOOM = Path.home() / ".gradle/caches/fabric-loom"
@@ -148,8 +151,8 @@ def prepare_mods() -> list[Path]:
         shutil.rmtree(mods)
     mods.mkdir(parents=True)
     jars = [
-        CANDIDATES / "orient_framework-fabric-0.1.1.jar",
-        CANDIDATES / "orients_hotpot_chronicles-fabric-1.0.0-r130.jar",
+        CANDIDATES / f"orient_framework-fabric-{runtime_version()}.jar",
+        CANDIDATES / f"orients_hotpot_chronicles-fabric-{mod_version()}.jar",
         HARNESS_JAR,
         Path.home() / ".gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-api/0.116.14+1.21.1/1bc9caf399a9eadddaec3215e31594ca40fc9485/fabric-api-0.116.14+1.21.1.jar",
     ]
@@ -210,8 +213,8 @@ def main() -> int:
     server_log = LOGS / "prod-client-server.log"
     if "--from-logs" in sys.argv:
         return analyze(server_log, LOGS / "prod-client-client.log",
-                       [CANDIDATES / "orient_framework-fabric-0.1.1.jar",
-                        CANDIDATES / "orients_hotpot_chronicles-fabric-1.0.0-r130.jar", HARNESS_JAR])
+                       [CANDIDATES / f"orient_framework-fabric-{runtime_version()}.jar",
+                        CANDIDATES / f"orients_hotpot_chronicles-fabric-{mod_version()}.jar", HARNESS_JAR])
     client_log = LOGS / "prod-client-client.log"
     jars = prepare_mods()
     classpath, natives = prepare_client()

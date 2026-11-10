@@ -29,6 +29,11 @@ JSON 结构（GuideBookScreen 读取；旧版的 text / rows / recipes / steps �
 """
 import html
 import json
+
+# mryt233 改（2026-11-10）：材质名单与输出目录统一。
+from pixkit.materials import ids
+from pixkit.paths import RES
+from pixkit.io import write_text
 import os
 import re
 import sys
@@ -39,7 +44,7 @@ import build_tutorial as bt          # noqa: E402  正文、物品名、配方�
 import build_tutorial_book as btb    # noqa: E402  网页书本教程的分类 / 条目划分
 
 MODID = bt.MOD
-ROOTS = [os.path.join(bt.RES, "assets", MODID)]
+ROOTS = [str(RES / "assets" / MODID)]
 LANGS = [("zh_cn", "zh_cn"), ("zh_tw", "zh_tw"), ("en_us", "en")]
 
 warnings = []
@@ -55,7 +60,7 @@ ALIAS = {
     "cup": "glass_cup",             # 玻璃杯
 }
 # 汤底名（GuideBookScreen 里按 SoupBase 枚举查，写错了锅图标是空的）
-SOUP_NAMES = {"clear", "rich_stock", "mushroom", "spicy", "tomato", "three_fresh"}
+SOUP_NAMES = set(ids("soups"))
 # {{potviewer}}（网页上的三维锅形展示）在游戏里换成六个锅的物品图标
 POT_IDS = ["copper_nine_grid_hotpot", "copper_taiji_yuanyang_hotpot", "copper_round_yuanyang_hotpot",
            "copper_split_yuanyang_hotpot", "copper_four_grid_hotpot", "copper_square_yuanyang_hotpot"]
@@ -716,8 +721,7 @@ def main():
         book = books[lang_json]
         out = os.path.join(ROOTS[0], "guide", lang_json + ".json")
         os.makedirs(os.path.dirname(out), exist_ok=True)
-        with open(out, "w", encoding="utf-8") as f:   # 和原来的生成脚本一样：Windows 下就是 CRLF
-            f.write(json.dumps(book, ensure_ascii=False, indent=1) + "\n")
+        write_text(out, json.dumps(book, ensure_ascii=False, indent=1) + "\n")
         cats = book["categories"]
         entries = sum(len(c["entries"]) for c in cats)
         blocks = sum(len(e["blocks"]) for c in cats for e in c["entries"])

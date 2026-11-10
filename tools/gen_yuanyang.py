@@ -19,11 +19,13 @@
 """
 import json
 import math
-from pathlib import Path
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.io import write_legacy_json as write
+from pixkit.materials import ids
+
 ROOTS = [RES / "assets" / MODID]
 DATA = RES / "data"
 METALS = ["copper", "iron"]
@@ -108,10 +110,6 @@ def walls(shape, body):
                     "to": [round(x0 + i1 * s, 4), y1, round(x0 + (j + 1) * s, 4)], "faces": faces})
     return els
 
-
-def write(path, obj):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(obj, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
 def assets():

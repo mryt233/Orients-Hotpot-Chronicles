@@ -15,10 +15,13 @@ import tempfile
 import zipfile
 from pathlib import Path
 
+# mryt233 改（2026-11-10）：版本与 JDK 读取唯一配置源。
+from project_env import jdk21
+
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "build/exp-pkg"
-JAVA = Path("C:/Users/10536/.jdks/jdk-21.0.12.1+1/bin/javac.exe")
-JAVA_HOME = Path("C:/Users/10536/.jdks/jdk-21.0.12.1+1")
+JAVA = jdk21() / "bin/javac.exe"
+JAVA_HOME = jdk21()
 FRAMEWORK_CLASSES = [
     ROOT / "framework/pure/build/classes/java/main",
     ROOT / "framework/loader/build/classes/java/main",

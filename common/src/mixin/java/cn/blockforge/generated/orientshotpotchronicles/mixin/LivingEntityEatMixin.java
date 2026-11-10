@@ -133,16 +133,9 @@ abstract class LivingEntityEatMixin {
             }
             // 座位只取一次：getVehicle() 每帧都可能变，同一段判定里必须用同一个对象
             if (player.getVehicle() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.SeatEntity seat) {
-                // 所有座位（一格高条凳 <wood>_bench、高脚凳 <wood>_high_stool）都给「坐着吃」
+                // mryt233 改（2026-11-10）：运行时仅保留条凳座位，高凳已归档。
                 cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCriterion.fire(player, "eat_seated");
-                // mryt233 改（2026-11-07）：「围炉而坐 / eat_seated_bench」只认一格高条凳的座位。
-                // 以前用 getClass() == SeatEntity.class 反推「恰好是条凳座位」——一旦 SeatEntity 被改成 abstract，
-                // 或条凳座位换了子类，这里就静默失效 / 静默归错，且没有任何报错。
-                // 现在反着写：只要不是高脚凳的座位（HighStoolBlock.Seat）就算条凳座位，
-                // 高脚凳以后再加子类也仍然被排除在外。（让座位自己声明 isBenchSeat() 更彻底，留到下次动 SeatEntity 时做）
-                if (!(seat instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.HighStoolBlock.Seat)) {
-                    cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCriterion.fire(player, "eat_seated_bench");
-                }
+                cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCriterion.fire(player, "eat_seated_bench");
             }
         }
     }

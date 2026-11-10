@@ -150,6 +150,14 @@ def check_item(item: dict, code: str, langs: dict[str, dict], guide: str) -> tup
     return problems, notes
 
 
+# mryt233 改（2026-11-10）：不改 Java 注册顺序，只检查有序名单是否漂移。
+def check_materials(code: str) -> list[str]:
+    from pixkit.materials import ids
+    match = re.search(r'TABLE_WOODS\s*=\s*java\.util\.List\.of\((.*?)\)', code, re.S)
+    woods = re.findall(r'"([^"\n]+)"', match.group(1)) if match else []
+    return [] if woods == ids("woods") else ["Java TABLE_WOODS 与 content/materials.json 的木头名单或顺序不一致"]
+
+
 def main() -> int:
     strict = "--strict" in sys.argv
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
@@ -162,7 +170,7 @@ def main() -> int:
     lang_files = sorted(LANGS.glob("*.json"))
     langs = {p.stem: json.loads(p.read_text(encoding="utf-8")) for p in lang_files}
 
-    problems: list[str] = []
+    problems: list[str] = check_materials(code)
     notes: list[str] = []
     for item in items:
         p, n = check_item(item, code, langs, guide)

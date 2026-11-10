@@ -311,6 +311,10 @@ public class HotPotScreenHandler extends AbstractContainerMenu {
             player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.too_full")), true);
             return;
         }
+        // mryt233 改（2026-11-10）：与筷子物品一致，接管时保留锅槽与经验。
+        if (HotPotHooks.beforeEating(getCarried(), player)) {
+            return;
+        }
         int index = slot.getContainerSlot();
         ItemStack eaten = slot.remove(1);
         serverBe.grantTakeXp(player, index, 1);
@@ -319,6 +323,7 @@ public class HotPotScreenHandler extends AbstractContainerMenu {
         }
         // 主手或副手拿着蘸料：吃之前自动蘸一口（r103，用户：两种都要；2026-10-25 主手也算，调整）
         DippingSauceItem.dipFromHands(player, eaten);
+        HotPotHooks.onEating(world, player, eaten);
         player.eat(world, eaten.copy(), ConfiguredFoodItem.food(eaten));
         // 冷锅：没坐在烧着的灶台（或其他热源）上，吃了有概率反胃
         if (!serverBe.isHeated() && world.random.nextFloat() < COLD_NAUSEA_CHANCE) {

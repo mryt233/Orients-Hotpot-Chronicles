@@ -8,15 +8,17 @@
 作者：mryt233
 """
 import json
-from pathlib import Path
+
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.io import write_legacy_json as write
+
 from PIL import Image
 
 import fizz
 import gen_plant_protein_drink as ppd
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
 ASSET_ROOTS = [RES / "assets" / MODID]
 
 CO, CO_HI, CO_LO = (78, 40, 24, 255), (112, 62, 36, 255), (52, 26, 16, 255)       # 可乐深棕
@@ -116,9 +118,8 @@ def main():
         sheet, meta = fizzing(tex)
         fizz.save(sheet, meta, root / "textures/block/orient_cola.png")
         texture_empty(tex).save(root / "textures/block/orient_cola_empty.png")
-        (root / "models/block/orient_cola.json").write_text(json.dumps(model("orient_cola"), indent=2) + "\n", encoding="utf-8")
-        (root / "models/block/orient_cola_empty.json").write_text(json.dumps(model("orient_cola_empty", cap=False), indent=2) + "\n",
-                                                                encoding="utf-8")
+        write(root / "models/block/orient_cola.json", model("orient_cola"), ensure_ascii=True)
+        write(root / "models/block/orient_cola_empty.json", model("orient_cola_empty", cap=False), ensure_ascii=True)
     print("ok")
 
 

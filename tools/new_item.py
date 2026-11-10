@@ -33,6 +33,9 @@ import sys
 from collections import OrderedDict
 from pathlib import Path
 
+# mryt233 改（2026-11-10）：版本与 JDK 读取唯一配置源。
+from project_env import jdk21
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from PIL import Image  # noqa: E402
 
@@ -365,7 +368,7 @@ def apply(plan):
         print(f"  {script}: {'通过' if r.returncode == 0 else '失败'}  {' / '.join(tail)}")
     if "--compile" in sys.argv:
         import os
-        env = dict(os.environ, JAVA_HOME="C:/Users/10536/.jdks/jdk-21.0.12.1+1")
+        env = dict(os.environ, JAVA_HOME=str(jdk21()))
         gw = str(MOD / ("gradlew.bat" if os.name == "nt" else "gradlew"))
         r = subprocess.run([gw, ":common:compileJava", ":fabric:compileJava", ":neoforge:compileJava", "-q"], cwd=MOD,
                            env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")

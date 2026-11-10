@@ -7,23 +7,19 @@
 合成：2 份材料横排 → 2 个小碟（1x1，石英用下界石英）；大盘用同材质小碟拼，几格用几个。
 """
 import json
-from pathlib import Path
 
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.templates import write_shared_model as write
+from pixkit.materials import columns
+
+
 ASSET_ROOTS = [RES / "assets" / MODID]
 DATA = RES / "data" / MODID
 
 # id: (盘面贴图, 盘沿贴图, 合成材料)
-MATERIALS = {
-    "quartz": ("minecraft:block/quartz_block_top", "minecraft:block/quartz_block_side", "minecraft:quartz"),
-    "bamboo": ("minecraft:block/bamboo_mosaic", "minecraft:block/bamboo_mosaic", "minecraft:bamboo"),
-    "terracotta": ("minecraft:block/terracotta", "minecraft:block/terracotta", "minecraft:brick"),
-    "copper": ("minecraft:block/copper_block", "minecraft:block/copper_block", "minecraft:copper_ingot"),
-    "iron": ("minecraft:block/iron_block", "minecraft:block/iron_block", "minecraft:iron_ingot"),
-}
+MATERIALS = columns("plates", "floor", "rim", "ingredient")
 # id: (列, 行, 长 px, 宽 px, 合成形状)
 SIZES = {
     "1x1": (1, 1, 5, 5, None),
@@ -69,10 +65,6 @@ def model(size, floor_tex, rim_tex, drop):
             "textures": {"plate": floor_tex, "rim": rim_tex, "particle": floor_tex},
             "elements": els}
 
-
-def write(path, obj):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(obj, indent=2) + "\n", encoding="utf-8")
 
 
 def main():

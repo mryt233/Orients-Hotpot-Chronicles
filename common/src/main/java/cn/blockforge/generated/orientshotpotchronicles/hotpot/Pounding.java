@@ -84,27 +84,37 @@ public final class Pounding {
     }
 
     /** 生肉 → 阶段贴图用的名字（beef / pork / mutton / fish）；不是生肉返回 null。 */
+    // mryt233 改（2026-11-10）：内部已无调用，公开入口保留兼容。
+    @Deprecated
     public static String meatOf(ItemStack stack) {
         Spec spec = specOf(stack);
         return spec == null ? null : spec.meatName();
     }
 
     /** 大蒜也能敲：敲三下出 2 份蒜泥（用户 2026-10-25：大蒜 + 蒜泥，用擀面杖敲）。 */
+    // mryt233 改（2026-11-10）：内部已无调用，公开入口保留兼容。
+    @Deprecated
     public static boolean isGarlic(ItemStack stack) {
         return stack.is(HotPotContent.GARLIC);
     }
 
     /** 虾仁拍三下成一颗虾滑（用户 2026-10-26：虾滑用擀面杖拍出来）。 */
+    // mryt233 改（2026-11-10）：内部已无调用，公开入口保留兼容。
+    @Deprecated
     public static boolean isPeeledShrimp(ItemStack stack) {
         return stack.is(HotPotContent.PEELED_SHRIMP);
     }
 
     /** mryt233 改（2026-11-06，r137）：花生也能敲，敲三下出 2 份花生碎（蘸料台「花生碎」的原料）。 */
+    // mryt233 改（2026-11-10）：内部已无调用，公开入口保留兼容。
+    @Deprecated
     public static boolean isPeanut(ItemStack stack) {
         return stack.is(HotPotContent.PEANUT);
     }
 
     /** mryt233 改（2026-11-06，r139）：折耳根也能敲，敲三下出 2 份折耳根碎（蘸料台第 15 种调料的原料）。 */
+    // mryt233 改（2026-11-10）：内部已无调用，公开入口保留兼容。
+    @Deprecated
     public static boolean isZheErGen(ItemStack stack) {
         return stack.is(HotPotContent.ZHE_ER_GEN);
     }

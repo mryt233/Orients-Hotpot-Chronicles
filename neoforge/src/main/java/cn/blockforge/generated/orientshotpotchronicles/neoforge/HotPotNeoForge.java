@@ -49,9 +49,14 @@ public final class HotPotNeoForge {
         // 注册表解冻窗口：核心的物品 / 方块 / 方块实体 / 菜单 / 创造栏都在这里落地
         NeoForgePlatform.install(modBus);
         modBus.addListener(this::onRegisterEvent);
-        if (Boolean.getBoolean("hotpot.expreg")) {
-            cn.blockforge.generated.orientshotpotchronicles.devtest.NeoForgeRegProbe.constructorProbe();
-            modBus.addListener(cn.blockforge.generated.orientshotpotchronicles.devtest.NeoForgeRegProbe::onRegisterEvent);
+        // mryt233 改（2026-11-10）：生产环境跳过；开发探针通过反射接线。
+        if (!FMLEnvironment.production && Boolean.getBoolean("hotpot.expreg")) {
+            try {
+                Class.forName("cn.blockforge.generated.orientshotpotchronicles.devtest.NeoForgeRegProbe")
+                    .getMethod("register", IEventBus.class).invoke(null, modBus);
+            } catch (ReflectiveOperationException | LinkageError error) {
+                HotPot.LOGGER.warn("registration probe unavailable: {}", error.toString());
+            }
         }
         // 通道登记走框架 NetworkApi，Runtime 的 RegisterPayloadHandlersEvent 窗口统一落地
         NeoForgeNetwork.register();
@@ -65,6 +70,9 @@ public final class HotPotNeoForge {
         // 以下都是「游戏事件」，挂在 NeoForge 的游戏总线上，和注册无关
         NeoForge.EVENT_BUS.addListener(this::onServerStarting);
         NeoForge.EVENT_BUS.addListener(this::onServerStopped);
+        // mryt233 改（2026-11-10）：玩家下线释放围裙热源缓存。
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent event) ->
+            cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronProtection.removePlayer(event.getEntity().getUUID()));
         NeoForge.EVENT_BUS.addListener(this::onRegisterCommands);
         // 数据重载：每次 /reload 都通知内容模块（可重复）
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.AddReloadListenerEvent event) ->

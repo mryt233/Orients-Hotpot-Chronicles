@@ -1,20 +1,22 @@
-"""碗的模型（r99，用户要原版碗能放桌上装菜、盛汤）：先出两种形状给用户在查看器里挑。
+"""碗的模型（r99，用户要原版碗能放桌上装菜、盛汤）：只生成已选定的 b 形碗。mryt233 改（2026-11-10）。
 
     python tools/gen_bowls.py
 生成 models/block/bowl_<形状>.json（空碗）和 bowl_<形状>_soup_<汤底>.json（盛着汤）。中心在方块中央、底在 y=0，
 和盘子一样由盘子格的渲染器平移、贴着桌面画。贴图 bowl_wood / bowl_wood_inner 是按原版碗物品的颜色给橡木木板重新上色的。
-  a：直壁碗——4×4 碗底脚，6×6 碗身，壁厚 1，高 3
+  a 形试作已移至 archive/bowl_a/，不进运行资源。
   b：敞口碗——4×4 碗脚，下圈 6×6、上圈 7×7 往外张半像素，高 3（8×8 的话一格并排两只会连成一条槽）
 作者：mryt233
 """
 import json
-from pathlib import Path
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.io import write_legacy_json as write
+from pixkit.materials import ids
+
 ASSET_ROOTS = [RES / "assets" / MODID]
-SOUPS = ["clear", "rich_stock", "mushroom", "spicy", "tomato", "three_fresh"]
+SOUPS = ids("soups")
 FACES = ["north", "east", "south", "west", "up", "down"]
 
 
@@ -35,8 +37,6 @@ def ring(half_out, y0, y1, tex="#wood"):
 
 SHAPES = {
     # 形状: (元素, 汤面高度, 汤面半宽)
-    "a": ([box([6, 0, 6], [10, 0.5, 10], "#wood"), box([5, 0.5, 5], [11, 1, 11], "#inner")] + ring(3, 1, 3),
-          2.5, 2),
     "b": ([box([6, 0, 6], [10, 1, 10], "#wood")] + ring(3, 1, 2) + ring(3.5, 2, 3), 2.5, 2.5),
 }
 
@@ -46,10 +46,6 @@ def surface(y, half):
     return {"from": [a, y, a], "to": [b, y + 0.01, b],
             "faces": {"up": {"texture": "#soup", "uv": [a, a, b, b]}}}
 
-
-def write(path, obj):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(obj, indent=2) + "\n", encoding="utf-8")
 
 
 def main():
@@ -76,7 +72,7 @@ if __name__ == "__main__":
     main()
 
 
-# ---------------------------------------------------------------- r99 定稿：游戏里用 b（a 的模型留在仓库，用户要求）
+# ---------------------------------------------------------------- r99 定稿：游戏里用 b（a 的模型归档，不进运行资源）
 GAME_SHAPE = "b"
 BOWL_DISPLAY = {
     "gui": {"rotation": [30, 225, 0], "translation": [0, 6, 0], "scale": [1.3, 1.3, 1.3]},

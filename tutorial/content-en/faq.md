@@ -81,6 +81,8 @@ Yes. Starting in 0.2.2-alpha, you can select this mod in the **Mods menu** (inst
 - On **multiplayer servers**, edit only the server file; players receive it when joining and after each reload.
 - A bad entry (not a number, out of range, or a misspelled key) falls back to its default with a warning; if the whole file is broken, all defaults are used and **the broken file is kept as-is** so you can fix it.
 - Change recipes with a data pack, then run vanilla `/reload`.
+- {{dev}}After a reload, **ingredients already in the pot keep their cooking progress** and the remaining time is recalculated.
+- {{dev}}`cooking.items.<item>` only applies to this mod's own ingredients; vanilla and other mods' ingredients cook by their own recipes.
 - Numbers in this guide are defaults; if a server changed its config, the server's values apply.
 
 ### Using the settings screen {#screen}
@@ -95,6 +97,7 @@ Yes. Starting in 0.2.2-alpha, you can select this mod in the **Mods menu** (inst
 - **Reset everything**: the bottom Reset button turns into **click again to confirm**; a second click within 4 seconds really resets everything (and sets particle intensity back to 100%).
 - **Hints**: hover any row to see a plain-language explanation plus “range x–y, default z”.
 - Scroll with the **mouse wheel** or the scrollbar when the list is long. **Save & Apply** writes the config file and hot-reloads; ESC or Cancel discards every change (particle intensity goes back to its pre-screen value).
+- {{dev}}**Save failures**: if the config file cannot be written, the screen stays open and explains why — the changes apply only to this session, or were not applied and the original file was kept. If the original file is broken, it is backed up as `orients_hotpot_chronicles.json.broken-<time>` before saving and the backup name is shown; review it before closing.
 
 ## Useful commands
 

@@ -75,7 +75,19 @@ public final class HotPotCooking {
      */
     private static String itemPath(ItemStack stack) {
         ResourceLocation key = BuiltInRegistries.ITEM.getKey(stack.getItem());
-        return key == null ? null : key.getPath();
+        // mryt233 改（2026-11-10）：短键只属于本模组，第三方同名物品按自身配方煮。
+        return key != null && HotPot.MOD_ID.equals(key.getNamespace()) ? key.getPath() : null;
+    }
+
+    // mryt233 改（2026-11-10）：配置和数据包重载共用修订号，避免每刻逐槽查配方。
+    private static final java.util.concurrent.atomic.AtomicLong COOK_REVISION = new java.util.concurrent.atomic.AtomicLong();
+
+    public static long cookRevision() {
+        return COOK_REVISION.get();
+    }
+
+    public static void reviseCookTimes() {
+        COOK_REVISION.incrementAndGet();
     }
 
     private HotPotCooking() {

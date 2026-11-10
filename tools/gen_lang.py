@@ -9,11 +9,14 @@ import json
 import re
 import sys
 from collections import OrderedDict
-from pathlib import Path
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-ROOTS = [MOD / "common/src/main/resources/assets"]
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MOD, MODID, RES
+from pixkit.io import write_legacy_json as write
+from pixkit.materials import ids
+
+ROOTS = [RES / "assets"]
 # 之晗 / Orient 是同一个人的中文名和英文名（像 陶喆 / David Tao）：中日韩用之晗，其他语言用 Orient，都当人名处理、不意译
 NAME_EN = "Orient's Hotpot Chronicles"
 NAME_JA = "之晗の火鍋物語"  # 日文里中国人名照写汉字（如 陶喆）
@@ -26,8 +29,6 @@ def full_key(short):
         return f"{head}.{MODID}.{rest}"
     if short == "itemGroup":
         return f"itemGroup.{MODID}"
-    if short == "resourcePack":
-        return f"resourcePack.{MODID}.hotpot_assets"
     if head == "mm":
         return f"modmenu.{rest}Translation.{MODID}"
     return f"text.{MODID}.{short}"
@@ -37,14 +38,14 @@ L = {}
 
 L["zh_tw"] = {
     "block.brick_stove": "灶台", "block.copper_nine_grid_hotpot": "銅製九宮格火鍋", "block.iron_nine_grid_hotpot": "鐵製九宮格火鍋",
-    "item.bamboo_chopsticks": "竹筷", "itemGroup": "之晗的火鍋物語", "resourcePack": "之晗的火鍋物語內建材質",
+    "item.bamboo_chopsticks": "竹筷", "itemGroup": "之晗的火鍋物語",
     "soup.clear": "清湯鍋底", "soup.rich_stock": "高湯鍋底", "soup.mushroom": "菌湯鍋底", "soup.spicy": "紅湯鍋底",
     "soup.name.clear": "清湯", "soup.name.rich_stock": "高湯", "soup.name.mushroom": "菌湯", "soup.name.spicy": "紅湯",
     "soup.none": "空鍋", "fuel.wood": "柴火", "fuel.coal": "煤炭", "fuel.lava": "岩漿", "fuel.none": "灶膛無火",
-    "stove.none": "沒坐在灶台上", "screen.title": "九宮格火鍋", "screen.base": "湯底：", "screen.temp": "%s°C",
+    "stove.none": "沒坐在灶台上", "screen.title": "九宮格火鍋",
     "screen.filled": "食材 %s", "screen.stove": "灶台", "screen.stove.fuel": "燃料：",
-    "screen.stove.hint": "可放入煤炭、木柴等原版熔爐燃料", "screen.stove.seconds": "還能燒 %s 秒",
-    "screen.stove.waiting": "有燃料，等鍋需要加熱時自動點燃", "screen.stove.waiting.short": "待點燃",
+    "screen.stove.hint": "可放入煤炭、木柴等原版熔爐燃料",
+    "screen.stove.waiting": "有燃料，等鍋需要加熱時自動點燃",
     "ui.cooked": "已煮熟，取出即食（附經驗）", "ui.wait": "還需約 %s 秒",
     "ui.no_fire": "灶火熄了，右鍵灶台打開灶膛添燃料！", "ui.need_soup": "先把湯底倒進鍋裡，才能開始加熱",
     "ui.no_soup_yet": "尚未加入湯底，可先放食材", "ui.cell": "九宮格 第%1$s行·第%2$s列",
@@ -52,7 +53,7 @@ L["zh_tw"] = {
     "msg.stove_has_pot": "灶台上已經坐著一口鍋了", "msg.no_pot": "先手持銅鍋或鐵鍋右鍵灶台",
     "msg.pot_full": "鍋裡的 81 個小格已經放滿了", "msg.cell_full": "準星所指的九宮格大格已經放滿了",
     "msg.slot_occupied": "準星所指的小格已有食材", "msg.no_cooked_here": "準星所指的小格還沒有熟食",
-    "msg.aim_at_pot": "請把準星對準上半部鍋體", "msg.detach_hint": "潛行右鍵鍋體可以把鍋從灶台上取下",
+
     "msg.status": "[%1$s] · 食材 %2$s/81 · %3$s", "screen.inventory": "背包", "screen.fire": "灶火",
     "screen.cooked": "已熟 %s", "screen.hint.collect": "空手或拿碗點鍋，就能撈出熟食",
     "screen.hint.cooking": "食材正在鍋裡慢慢煮熟…", "screen.hint.add": "把食材放進格子裡就會開始煮",
@@ -62,20 +63,20 @@ L["zh_tw"] = {
     "mm.name": "之晗的火鍋物語", "mm.summary": "灶台上咕嘟作響的重慶九宮格火鍋，全程只用一雙筷子。",
     "mm.description": "灶台上咕嘟作響的重慶九宮格：往灶膛添燃料，把銅鍋或鐵鍋坐上灶，倒湯底，在 9x9 小格裡下菜，像熔爐一樣煮熟後直接取菜（帶經驗）。用筷子在鍋裡一口吃掉熟食；圍著燒火的鍋還能慢慢回血。鍋連湯帶菜整鍋收走，冷鍋吃了可能反胃。",
     "fuel.idle": "空燒（不耗燃料）",
-    "msg.no_soup_to_scoop": "鍋裡沒有湯底可以舀", "msg.scoop_need_bowl": "菌湯要用碗舀（先把鍋裡的食物取完）",
+    "msg.no_soup_to_scoop": "鍋裡沒有湯底可以舀",
     "msg.seat_taken": "這個位置已經有人坐了"
 }
 
 L["ja_jp"] = {
     "block.brick_stove": "レンガのかまど", "block.copper_nine_grid_hotpot": "銅の九宮格火鍋", "block.iron_nine_grid_hotpot": "鉄の九宮格火鍋",
-    "item.bamboo_chopsticks": "竹の箸", "itemGroup": NAME_JA, "resourcePack": NAME_JA + " 内蔵テクスチャ",
+    "item.bamboo_chopsticks": "竹の箸", "itemGroup": NAME_JA,
     "soup.clear": "清湯スープ", "soup.rich_stock": "上湯スープ", "soup.mushroom": "きのこスープ", "soup.spicy": "麻辣スープ",
     "soup.name.clear": "清湯", "soup.name.rich_stock": "上湯", "soup.name.mushroom": "きのこ", "soup.name.spicy": "麻辣",
     "soup.none": "空", "fuel.wood": "薪", "fuel.coal": "石炭", "fuel.lava": "溶岩", "fuel.none": "火が消えている",
-    "stove.none": "かまどの上にない", "screen.title": "九宮格火鍋", "screen.base": "スープ：", "screen.temp": "%s°C",
+    "stove.none": "かまどの上にない", "screen.title": "九宮格火鍋",
     "screen.filled": "具材 %s", "screen.stove": "かまど", "screen.stove.fuel": "燃料：",
-    "screen.stove.hint": "石炭や木材などバニラのかまど燃料が使えます", "screen.stove.seconds": "残り %s 秒燃焼",
-    "screen.stove.waiting": "燃料あり - 鍋に熱が必要になると点火します", "screen.stove.waiting.short": "待機中",
+    "screen.stove.hint": "石炭や木材などバニラのかまど燃料が使えます",
+    "screen.stove.waiting": "燃料あり - 鍋に熱が必要になると点火します",
     "ui.cooked": "煮えました - 取り出せます（経験値つき）", "ui.wait": "あと約 %s 秒",
     "ui.no_fire": "かまどの火が消えています - かまどを開いて燃料を足しましょう！",
     "ui.need_soup": "加熱するには先にスープを入れてください", "ui.no_soup_yet": "スープはまだ - 具材は先に入れられます",
@@ -84,7 +85,7 @@ L["ja_jp"] = {
     "msg.stove_has_pot": "このかまどにはもう鍋が乗っています", "msg.no_pot": "まず銅か鉄の鍋を持ってかまどを右クリックしてください",
     "msg.pot_full": "81 マスすべて埋まっています", "msg.cell_full": "狙っている大きなマスはいっぱいです",
     "msg.slot_occupied": "狙っているマスにはもう具材があります", "msg.no_cooked_here": "狙っているマスに煮えた料理はありません",
-    "msg.aim_at_pot": "鍋の上の部分を狙ってください", "msg.detach_hint": "スニークしながら鍋を右クリックするとかまどから外せます",
+
     "msg.status": "[%1$s] · 具材 %2$s/81 · %3$s", "screen.inventory": "インベントリ", "screen.fire": "火",
     "screen.cooked": "%s 個煮えた", "screen.hint.collect": "素手かボウルで鍋を使うと煮えた料理を取り出せます",
     "screen.hint.cooking": "具材がぐつぐつ煮えています…", "screen.hint.add": "具材をマスに入れると煮始めます",
@@ -94,20 +95,20 @@ L["ja_jp"] = {
     "mm.name": NAME_JA, "mm.summary": "レンガのかまどでぐつぐつ煮える重慶の九宮格火鍋。箸一膳ですべて楽しめます。",
     "mm.description": "レンガのかまどでぐつぐつ煮える重慶の九宮格火鍋：かまどに燃料をくべ、銅か鉄の鍋を乗せ、スープを注ぎ、9x9 のマスに具材を入れて、かまどのように煮えたら取り出せます（経験値つき）。すべて箸一膳で。燃えている鍋のそばにいるとゆっくり回復し、鍋はスープと具材ごと持ち運べますが、冷めた鍋から食べると気分が悪くなることがあります。",
     "fuel.idle": "空焚き中（燃料を使わない）",
-    "msg.no_soup_to_scoop": "鍋にすくえるスープがありません", "msg.scoop_need_bowl": "きのこスープはボウルですくいます（先に具材を取り出してください）",
+    "msg.no_soup_to_scoop": "鍋にすくえるスープがありません",
     "msg.seat_taken": "そこにはもう誰かが座っています"
 }
 
 L["ko_kr"] = {
     "block.brick_stove": "벽돌 화덕", "block.copper_nine_grid_hotpot": "구리 구궁격 훠궈", "block.iron_nine_grid_hotpot": "철 구궁격 훠궈",
-    "item.bamboo_chopsticks": "대나무 젓가락", "itemGroup": NAME_KO, "resourcePack": NAME_KO + " 내장 텍스처",
+    "item.bamboo_chopsticks": "대나무 젓가락", "itemGroup": NAME_KO,
     "soup.clear": "맑은 육수", "soup.rich_stock": "진한 육수", "soup.mushroom": "버섯 육수", "soup.spicy": "마라 홍탕",
     "soup.name.clear": "맑은 탕", "soup.name.rich_stock": "육수", "soup.name.mushroom": "버섯 탕", "soup.name.spicy": "홍탕",
     "soup.none": "비어 있음", "fuel.wood": "장작", "fuel.coal": "석탄", "fuel.lava": "용암", "fuel.none": "불 꺼짐",
-    "stove.none": "화덕 위에 없음", "screen.title": "구궁격 훠궈", "screen.base": "육수: ", "screen.temp": "%s°C",
+    "stove.none": "화덕 위에 없음", "screen.title": "구궁격 훠궈",
     "screen.filled": "재료 %s", "screen.stove": "화덕", "screen.stove.fuel": "연료:",
-    "screen.stove.hint": "석탄, 나무 등 바닐라 화로 연료를 넣을 수 있습니다", "screen.stove.seconds": "%s초 동안 더 탐",
-    "screen.stove.waiting": "연료 준비됨 - 냄비에 열이 필요하면 불이 붙습니다", "screen.stove.waiting.short": "대기",
+    "screen.stove.hint": "석탄, 나무 등 바닐라 화로 연료를 넣을 수 있습니다",
+    "screen.stove.waiting": "연료 준비됨 - 냄비에 열이 필요하면 불이 붙습니다",
     "ui.cooked": "익었습니다 - 꺼내세요 (경험치 지급)", "ui.wait": "약 %s초 남음",
     "ui.no_fire": "화덕 불이 꺼졌습니다 - 화덕을 열고 연료를 넣으세요!",
     "ui.need_soup": "가열하려면 먼저 육수를 부으세요", "ui.no_soup_yet": "아직 육수가 없습니다 - 재료는 먼저 넣을 수 있습니다",
@@ -116,7 +117,7 @@ L["ko_kr"] = {
     "msg.stove_has_pot": "이 화덕에는 이미 냄비가 있습니다", "msg.no_pot": "먼저 구리나 철 냄비를 들고 화덕을 우클릭하세요",
     "msg.pot_full": "81칸이 모두 찼습니다", "msg.cell_full": "조준한 큰 칸이 가득 찼습니다",
     "msg.slot_occupied": "조준한 칸에 이미 재료가 있습니다", "msg.no_cooked_here": "조준한 칸에 익은 음식이 없습니다",
-    "msg.aim_at_pot": "냄비 윗부분을 조준하세요", "msg.detach_hint": "웅크린 채 냄비를 우클릭하면 화덕에서 뗄 수 있습니다",
+
     "msg.status": "[%1$s] · 재료 %2$s/81 · %3$s", "screen.inventory": "인벤토리", "screen.fire": "불",
     "screen.cooked": "%s개 익음", "screen.hint.collect": "빈손이나 그릇으로 냄비를 사용하면 익은 음식을 꺼냅니다",
     "screen.hint.cooking": "재료가 보글보글 익고 있습니다…", "screen.hint.add": "재료를 칸에 넣으면 익기 시작합니다",
@@ -126,20 +127,20 @@ L["ko_kr"] = {
     "mm.name": NAME_KO, "mm.summary": "벽돌 화덕 위에서 보글보글 끓는 충칭식 구궁격 훠궈, 젓가락 한 벌이면 충분합니다.",
     "mm.description": "벽돌 화덕 위에서 보글보글 끓는 충칭식 구궁격 훠궈: 화덕에 연료를 넣고, 구리나 철 냄비를 올리고, 육수를 붓고, 9x9 칸에 재료를 넣으면 화로처럼 익어서 바로 꺼낼 수 있습니다 (경험치 지급). 모두 젓가락 한 벌로. 불이 붙은 냄비 곁에 있으면 천천히 회복되고, 냄비는 육수와 재료째 들고 다닐 수 있지만, 식은 냄비에서 먹으면 속이 울렁거릴 수 있습니다.",
     "fuel.idle": "빈불 (연료 소모 없음)",
-    "msg.no_soup_to_scoop": "냄비에 퍼낼 육수가 없습니다", "msg.scoop_need_bowl": "버섯 육수는 그릇으로 퍼야 합니다 (먼저 음식을 꺼내세요)",
+    "msg.no_soup_to_scoop": "냄비에 퍼낼 육수가 없습니다",
     "msg.seat_taken": "이미 누가 앉아 있습니다"
 }
 
 L["ru_ru"] = {
     "block.brick_stove": "Кирпичная печь", "block.copper_nine_grid_hotpot": "Медный хого на девять ячеек", "block.iron_nine_grid_hotpot": "Железный хого на девять ячеек",
-    "item.bamboo_chopsticks": "Бамбуковые палочки", "itemGroup": 'Хроники хого Ориента', "resourcePack": 'Хроники хого Ориента' + ": встроенные текстуры",
+    "item.bamboo_chopsticks": "Бамбуковые палочки", "itemGroup": 'Хроники хого Ориента',
     "soup.clear": "Прозрачный бульон", "soup.rich_stock": "Наваристый бульон", "soup.mushroom": "Грибной бульон", "soup.spicy": "Острый красный бульон",
     "soup.name.clear": "Прозрачный", "soup.name.rich_stock": "Наваристый", "soup.name.mushroom": "Грибной", "soup.name.spicy": "Красный острый",
     "soup.none": "Пусто", "fuel.wood": "Дрова", "fuel.coal": "Уголь", "fuel.lava": "Лава", "fuel.none": "Огонь погас",
-    "stove.none": "Не на печи", "screen.title": "Хого на девять ячеек", "screen.base": "Бульон: ", "screen.temp": "%s°C",
+    "stove.none": "Не на печи", "screen.title": "Хого на девять ячеек",
     "screen.filled": "продуктов %s", "screen.stove": "Печь", "screen.stove.fuel": "Топливо:",
-    "screen.stove.hint": "Подходит обычное печное топливо: уголь, дерево и т. п.", "screen.stove.seconds": "Гореть ещё %s с",
-    "screen.stove.waiting": "Топливо есть - загорится, когда котлу понадобится жар", "screen.stove.waiting.short": "Готово",
+    "screen.stove.hint": "Подходит обычное печное топливо: уголь, дерево и т. п.",
+    "screen.stove.waiting": "Топливо есть - загорится, когда котлу понадобится жар",
     "ui.cooked": "Сварено - можно достать (даёт опыт)", "ui.wait": "Осталось около %s с",
     "ui.no_fire": "Огонь в печи погас - откройте печь и добавьте топливо!",
     "ui.need_soup": "Сначала налейте бульон, чтобы начать нагрев", "ui.no_soup_yet": "Бульона ещё нет - продукты можно положить заранее",
@@ -148,7 +149,7 @@ L["ru_ru"] = {
     "msg.stove_has_pot": "На этой печи уже стоит котёл", "msg.no_pot": "Сначала возьмите медный или железный котёл и нажмите ПКМ по печи",
     "msg.pot_full": "Все 81 ячейка заняты", "msg.cell_full": "Выбранная большая ячейка заполнена",
     "msg.slot_occupied": "В выбранной ячейке уже есть продукт", "msg.no_cooked_here": "В выбранной ячейке нет готовой еды",
-    "msg.aim_at_pot": "Наведитесь на верхнюю часть котла", "msg.detach_hint": "Присядьте и нажмите ПКМ по котлу, чтобы снять его с печи",
+
     "msg.status": "[%1$s] · продуктов %2$s/81 · %3$s", "screen.inventory": "Инвентарь", "screen.fire": "Огонь",
     "screen.cooked": "Готово: %s", "screen.hint.collect": "Используйте котёл пустой рукой или миской, чтобы достать готовое",
     "screen.hint.cooking": "Продукты тихо кипят…", "screen.hint.add": "Положите продукты в ячейки, чтобы начать варку",
@@ -158,20 +159,20 @@ L["ru_ru"] = {
     "mm.name": 'Хроники хого Ориента', "mm.summary": "Кипящий чунцинский хого на девять ячеек на кирпичной печи - и всё одной парой палочек.",
     "mm.description": "Кипящий чунцинский хого на девять ячеек на кирпичной печи: подбросьте топлива, поставьте медный или железный котёл, налейте бульон, положите продукты в сетку 9x9 и доставайте их готовыми (с опытом, как из печи) - всё одной парой палочек. Рядом с горящим котлом здоровье медленно восстанавливается; котёл можно забрать целиком с бульоном и едой, но еда из холодного котла может вызвать тошноту.",
     "fuel.idle": "Томится (без расхода топлива)",
-    "msg.no_soup_to_scoop": "В котле нет бульона, который можно зачерпнуть", "msg.scoop_need_bowl": "Грибной бульон черпают миской (сначала достаньте еду)",
+    "msg.no_soup_to_scoop": "В котле нет бульона, который можно зачерпнуть",
     "msg.seat_taken": "Здесь уже кто-то сидит"
 }
 
 L["de_de"] = {
     "block.brick_stove": "Ziegelherd", "block.copper_nine_grid_hotpot": "Kupferner Neun-Felder-Hotpot", "block.iron_nine_grid_hotpot": "Eiserner Neun-Felder-Hotpot",
-    "item.bamboo_chopsticks": "Bambus-Essstäbchen", "itemGroup": 'Orients Hotpot-Chroniken', "resourcePack": 'Orients Hotpot-Chroniken' + " - Eingebaute Texturen",
+    "item.bamboo_chopsticks": "Bambus-Essstäbchen", "itemGroup": 'Orients Hotpot-Chroniken',
     "soup.clear": "Klare Brühe", "soup.rich_stock": "Kräftige Brühe", "soup.mushroom": "Pilzbrühe", "soup.spicy": "Scharfe rote Brühe",
     "soup.name.clear": "Klar", "soup.name.rich_stock": "Kräftig", "soup.name.mushroom": "Pilz", "soup.name.spicy": "Rotes Öl",
     "soup.none": "Leer", "fuel.wood": "Brennholz", "fuel.coal": "Kohle", "fuel.lava": "Lava", "fuel.none": "Feuer aus",
-    "stove.none": "Nicht auf einem Herd", "screen.title": "Neun-Felder-Hotpot", "screen.base": "Brühe: ", "screen.temp": "%s°C",
+    "stove.none": "Nicht auf einem Herd", "screen.title": "Neun-Felder-Hotpot",
     "screen.filled": "Zutaten %s", "screen.stove": "Herd", "screen.stove.fuel": "Brennstoff:",
-    "screen.stove.hint": "Nimmt normale Ofenbrennstoffe wie Kohle oder Holz", "screen.stove.seconds": "Brennt noch %s s",
-    "screen.stove.waiting": "Brennstoff bereit - zündet, sobald der Topf Hitze braucht", "screen.stove.waiting.short": "Bereit",
+    "screen.stove.hint": "Nimmt normale Ofenbrennstoffe wie Kohle oder Holz",
+    "screen.stove.waiting": "Brennstoff bereit - zündet, sobald der Topf Hitze braucht",
     "ui.cooked": "Gar - herausnehmen (gibt EP)", "ui.wait": "Noch etwa %s s",
     "ui.no_fire": "Das Herdfeuer ist aus - öffne den Herd und lege Brennstoff nach!",
     "ui.need_soup": "Gieße zuerst eine Brühe ein, um mit dem Erhitzen zu beginnen", "ui.no_soup_yet": "Noch keine Brühe - Zutaten können schon hinein",
@@ -180,7 +181,7 @@ L["de_de"] = {
     "msg.stove_has_pot": "Auf diesem Herd steht schon ein Topf", "msg.no_pot": "Halte zuerst einen Kupfer- oder Eisentopf und klicke den Herd mit Rechtsklick an",
     "msg.pot_full": "Alle 81 Felder sind belegt", "msg.cell_full": "Das anvisierte große Feld ist voll",
     "msg.slot_occupied": "Im anvisierten Feld liegt schon eine Zutat", "msg.no_cooked_here": "Im anvisierten Feld ist nichts Gares",
-    "msg.aim_at_pot": "Ziele auf den oberen Teil des Topfes", "msg.detach_hint": "Schleichen + Rechtsklick auf den Topf nimmt ihn vom Herd",
+
     "msg.status": "[%1$s] · Zutaten %2$s/81 · %3$s", "screen.inventory": "Inventar", "screen.fire": "Feuer",
     "screen.cooked": "%s gar", "screen.hint.collect": "Benutze den Topf mit leerer Hand oder einer Schüssel, um Gares herauszunehmen",
     "screen.hint.cooking": "Die Zutaten köcheln…", "screen.hint.add": "Lege Zutaten in die Felder, um mit dem Kochen zu beginnen",
@@ -190,20 +191,20 @@ L["de_de"] = {
     "mm.name": 'Orients Hotpot-Chroniken', "mm.summary": "Ein brodelnder Chongqing-Neun-Felder-Hotpot auf einem Ziegelherd, gegessen mit nur einem Paar Stäbchen.",
     "mm.description": "Ein brodelnder Chongqing-Neun-Felder-Hotpot auf einem Ziegelherd: Herd befeuern, einen Kupfer- oder Eisentopf aufsetzen, Brühe eingießen, Zutaten in das 9x9-Raster legen und gar wieder herausnehmen (mit Ofen-EP) - alles mit einem Paar Stäbchen. Neben einem brennenden Topf regenerierst du langsam; den ganzen Topf kannst du samt Brühe und Essen mitnehmen, aber Essen aus einem kalten Topf kann dir übel machen.",
     "fuel.idle": "Köchelt (kein Brennstoffverbrauch)",
-    "msg.no_soup_to_scoop": "Im Topf ist keine Brühe zum Schöpfen", "msg.scoop_need_bowl": "Pilzbrühe braucht eine Schüssel (nimm zuerst das Essen heraus)",
+    "msg.no_soup_to_scoop": "Im Topf ist keine Brühe zum Schöpfen",
     "msg.seat_taken": "Dort sitzt schon jemand"
 }
 
 L["fr_fr"] = {
     "block.brick_stove": "Fourneau en briques", "block.copper_nine_grid_hotpot": "Fondue chinoise à neuf cases en cuivre", "block.iron_nine_grid_hotpot": "Fondue chinoise à neuf cases en fer",
-    "item.bamboo_chopsticks": "Baguettes en bambou", "itemGroup": "Les Chroniques du hotpot, par Orient", "resourcePack": "Les Chroniques du hotpot, par Orient" + " - Textures intégrées",
+    "item.bamboo_chopsticks": "Baguettes en bambou", "itemGroup": "Les Chroniques du hotpot, par Orient",
     "soup.clear": "Bouillon clair", "soup.rich_stock": "Bouillon riche", "soup.mushroom": "Bouillon aux champignons", "soup.spicy": "Bouillon rouge épicé",
     "soup.name.clear": "Clair", "soup.name.rich_stock": "Riche", "soup.name.mushroom": "Champignons", "soup.name.spicy": "Huile rouge",
     "soup.none": "Vide", "fuel.wood": "Bois", "fuel.coal": "Charbon", "fuel.lava": "Lave", "fuel.none": "Feu éteint",
-    "stove.none": "Pas sur un fourneau", "screen.title": "Fondue chinoise à neuf cases", "screen.base": "Bouillon : ", "screen.temp": "%s°C",
+    "stove.none": "Pas sur un fourneau", "screen.title": "Fondue chinoise à neuf cases",
     "screen.filled": "ingrédients %s", "screen.stove": "Fourneau", "screen.stove.fuel": "Combustible :",
-    "screen.stove.hint": "Accepte les combustibles de four habituels comme le charbon ou le bois", "screen.stove.seconds": "Encore %s s de combustion",
-    "screen.stove.waiting": "Combustible prêt - s'allume quand la marmite a besoin de chaleur", "screen.stove.waiting.short": "Prêt",
+    "screen.stove.hint": "Accepte les combustibles de four habituels comme le charbon ou le bois",
+    "screen.stove.waiting": "Combustible prêt - s'allume quand la marmite a besoin de chaleur",
     "ui.cooked": "Cuit - à sortir (donne de l'XP)", "ui.wait": "Encore environ %s s",
     "ui.no_fire": "Le feu du fourneau est éteint - ouvrez-le et ajoutez du combustible !",
     "ui.need_soup": "Versez d'abord un bouillon pour commencer à chauffer", "ui.no_soup_yet": "Pas encore de bouillon - vous pouvez déjà mettre les ingrédients",
@@ -212,7 +213,7 @@ L["fr_fr"] = {
     "msg.stove_has_pot": "Une marmite est déjà posée sur ce fourneau", "msg.no_pot": "Tenez d'abord une marmite en cuivre ou en fer et faites un clic droit sur le fourneau",
     "msg.pot_full": "Les 81 cases sont pleines", "msg.cell_full": "La grande case visée est pleine",
     "msg.slot_occupied": "La case visée contient déjà un ingrédient", "msg.no_cooked_here": "Rien de cuit dans la case visée",
-    "msg.aim_at_pot": "Visez la partie haute de la marmite", "msg.detach_hint": "Accroupi + clic droit sur la marmite pour la retirer du fourneau",
+
     "msg.status": "[%1$s] · ingrédients %2$s/81 · %3$s", "screen.inventory": "Inventaire", "screen.fire": "Feu",
     "screen.cooked": "%s cuits", "screen.hint.collect": "Utilisez la marmite à main nue ou avec un bol pour sortir ce qui est cuit",
     "screen.hint.cooking": "Les ingrédients mijotent…", "screen.hint.add": "Placez des ingrédients dans les cases pour lancer la cuisson",
@@ -222,20 +223,20 @@ L["fr_fr"] = {
     "mm.name": "Les Chroniques du hotpot, par Orient", "mm.summary": "Une fondue chinoise de Chongqing à neuf cases qui bouillonne sur un fourneau en briques, avec une seule paire de baguettes.",
     "mm.description": "Une fondue chinoise de Chongqing à neuf cases qui bouillonne sur un fourneau en briques : alimentez le fourneau, posez une marmite en cuivre ou en fer, versez un bouillon, placez les ingrédients dans la grille 9x9 et sortez-les cuits (avec l'XP du four) - le tout avec une seule paire de baguettes. Près d'une marmite qui chauffe, vous régénérez lentement ; la marmite s'emporte entière avec bouillon et nourriture, mais manger dans une marmite froide peut vous donner la nausée.",
     "fuel.idle": "Mijote (sans combustible)",
-    "msg.no_soup_to_scoop": "Il n'y a pas de bouillon à puiser dans la marmite", "msg.scoop_need_bowl": "Le bouillon aux champignons se puise avec un bol (retirez d'abord la nourriture)",
+    "msg.no_soup_to_scoop": "Il n'y a pas de bouillon à puiser dans la marmite",
     "msg.seat_taken": "Quelqu'un est déjà assis là"
 }
 
 L["es_es"] = {
     "block.brick_stove": "Fogón de ladrillo", "block.copper_nine_grid_hotpot": "Hotpot de nueve casillas de cobre", "block.iron_nine_grid_hotpot": "Hotpot de nueve casillas de hierro",
-    "item.bamboo_chopsticks": "Palillos de bambú", "itemGroup": 'Crónicas del hotpot de Orient', "resourcePack": 'Crónicas del hotpot de Orient' + ": texturas integradas",
+    "item.bamboo_chopsticks": "Palillos de bambú", "itemGroup": 'Crónicas del hotpot de Orient',
     "soup.clear": "Caldo claro", "soup.rich_stock": "Caldo concentrado", "soup.mushroom": "Caldo de setas", "soup.spicy": "Caldo rojo picante",
     "soup.name.clear": "Claro", "soup.name.rich_stock": "Concentrado", "soup.name.mushroom": "Setas", "soup.name.spicy": "Aceite rojo",
     "soup.none": "Vacía", "fuel.wood": "Leña", "fuel.coal": "Carbón", "fuel.lava": "Lava", "fuel.none": "Fuego apagado",
-    "stove.none": "No está sobre un fogón", "screen.title": "Hotpot de nueve casillas", "screen.base": "Caldo: ", "screen.temp": "%s°C",
+    "stove.none": "No está sobre un fogón", "screen.title": "Hotpot de nueve casillas",
     "screen.filled": "ingredientes %s", "screen.stove": "Fogón", "screen.stove.fuel": "Combustible:",
-    "screen.stove.hint": "Acepta combustibles de horno normales, como carbón o madera", "screen.stove.seconds": "Quedan %s s de fuego",
-    "screen.stove.waiting": "Combustible listo: se enciende cuando la olla necesita calor", "screen.stove.waiting.short": "Listo",
+    "screen.stove.hint": "Acepta combustibles de horno normales, como carbón o madera",
+    "screen.stove.waiting": "Combustible listo: se enciende cuando la olla necesita calor",
     "ui.cooked": "Cocinado: sácalo (da experiencia)", "ui.wait": "Faltan unos %s s",
     "ui.no_fire": "El fuego del fogón se ha apagado: ¡ábrelo y añade combustible!",
     "ui.need_soup": "Echa primero un caldo para empezar a calentar", "ui.no_soup_yet": "Aún no hay caldo: ya puedes poner ingredientes",
@@ -244,7 +245,7 @@ L["es_es"] = {
     "msg.stove_has_pot": "Ya hay una olla sobre este fogón", "msg.no_pot": "Primero sostén una olla de cobre o hierro y haz clic derecho en el fogón",
     "msg.pot_full": "Las 81 casillas están llenas", "msg.cell_full": "La casilla grande que miras está llena",
     "msg.slot_occupied": "La casilla que miras ya tiene un ingrediente", "msg.no_cooked_here": "No hay comida cocinada en la casilla que miras",
-    "msg.aim_at_pot": "Apunta a la parte superior de la olla", "msg.detach_hint": "Agáchate y haz clic derecho en la olla para quitarla del fogón",
+
     "msg.status": "[%1$s] · ingredientes %2$s/81 · %3$s", "screen.inventory": "Inventario", "screen.fire": "Fuego",
     "screen.cooked": "%s cocinados", "screen.hint.collect": "Usa la olla con la mano vacía o con un cuenco para sacar lo cocinado",
     "screen.hint.cooking": "Los ingredientes se están cocinando a fuego lento…", "screen.hint.add": "Pon ingredientes en las casillas para empezar a cocinar",
@@ -254,20 +255,20 @@ L["es_es"] = {
     "mm.name": 'Crónicas del hotpot de Orient', "mm.summary": "Un hotpot de Chongqing de nueve casillas burbujeando sobre un fogón de ladrillo, con un solo par de palillos.",
     "mm.description": "Un hotpot de Chongqing de nueve casillas burbujeando sobre un fogón de ladrillo: alimenta el fogón, coloca una olla de cobre o hierro, echa un caldo, pon los ingredientes en la cuadrícula de 9x9 y sácalos cocinados (con la experiencia del horno), todo con un solo par de palillos. Junto a una olla encendida te regeneras poco a poco; puedes llevarte la olla entera con caldo y comida, pero comer de una olla fría puede darte náuseas.",
     "fuel.idle": "A fuego lento (sin gastar combustible)",
-    "msg.no_soup_to_scoop": "No hay caldo en la olla que recoger", "msg.scoop_need_bowl": "El caldo de setas se recoge con un cuenco (saca antes la comida)",
+    "msg.no_soup_to_scoop": "No hay caldo en la olla que recoger",
     "msg.seat_taken": "Ya hay alguien sentado ahí"
 }
 
 L["pt_br"] = {
     "block.brick_stove": "Fogão de tijolos", "block.copper_nine_grid_hotpot": "Hotpot de nove casas de cobre", "block.iron_nine_grid_hotpot": "Hotpot de nove casas de ferro",
-    "item.bamboo_chopsticks": "Hashis de bambu", "itemGroup": 'Crônicas do hotpot de Orient', "resourcePack": 'Crônicas do hotpot de Orient' + ": texturas embutidas",
+    "item.bamboo_chopsticks": "Hashis de bambu", "itemGroup": 'Crônicas do hotpot de Orient',
     "soup.clear": "Caldo claro", "soup.rich_stock": "Caldo encorpado", "soup.mushroom": "Caldo de cogumelos", "soup.spicy": "Caldo vermelho apimentado",
     "soup.name.clear": "Claro", "soup.name.rich_stock": "Encorpado", "soup.name.mushroom": "Cogumelos", "soup.name.spicy": "Óleo vermelho",
     "soup.none": "Vazia", "fuel.wood": "Lenha", "fuel.coal": "Carvão", "fuel.lava": "Lava", "fuel.none": "Fogo apagado",
-    "stove.none": "Não está em um fogão", "screen.title": "Hotpot de nove casas", "screen.base": "Caldo: ", "screen.temp": "%s°C",
+    "stove.none": "Não está em um fogão", "screen.title": "Hotpot de nove casas",
     "screen.filled": "ingredientes %s", "screen.stove": "Fogão", "screen.stove.fuel": "Combustível:",
-    "screen.stove.hint": "Aceita combustíveis comuns de fornalha, como carvão ou madeira", "screen.stove.seconds": "Ainda queima por %s s",
-    "screen.stove.waiting": "Combustível pronto - acende quando a panela precisar de calor", "screen.stove.waiting.short": "Pronto",
+    "screen.stove.hint": "Aceita combustíveis comuns de fornalha, como carvão ou madeira",
+    "screen.stove.waiting": "Combustível pronto - acende quando a panela precisar de calor",
     "ui.cooked": "Cozido - pode tirar (dá experiência)", "ui.wait": "Faltam cerca de %s s",
     "ui.no_fire": "O fogo do fogão apagou - abra o fogão e coloque combustível!",
     "ui.need_soup": "Coloque um caldo primeiro para começar a aquecer", "ui.no_soup_yet": "Ainda sem caldo - os ingredientes já podem entrar",
@@ -276,7 +277,7 @@ L["pt_br"] = {
     "msg.stove_has_pot": "Já há uma panela neste fogão", "msg.no_pot": "Primeiro segure uma panela de cobre ou ferro e clique com o botão direito no fogão",
     "msg.pot_full": "As 81 casas estão cheias", "msg.cell_full": "A casa grande que você mira está cheia",
     "msg.slot_occupied": "A casa que você mira já tem um ingrediente", "msg.no_cooked_here": "Não há comida cozida na casa que você mira",
-    "msg.aim_at_pot": "Mire na parte de cima da panela", "msg.detach_hint": "Agache e clique com o botão direito na panela para tirá-la do fogão",
+
     "msg.status": "[%1$s] · ingredientes %2$s/81 · %3$s", "screen.inventory": "Inventário", "screen.fire": "Fogo",
     "screen.cooked": "%s cozidos", "screen.hint.collect": "Use a panela com a mão vazia ou uma tigela para tirar o que está cozido",
     "screen.hint.cooking": "Os ingredientes estão cozinhando em fogo baixo…", "screen.hint.add": "Coloque ingredientes nas casas para começar a cozinhar",
@@ -286,12 +287,12 @@ L["pt_br"] = {
     "mm.name": 'Crônicas do hotpot de Orient', "mm.summary": "Um hotpot de Chongqing de nove casas borbulhando num fogão de tijolos, com um único par de hashis.",
     "mm.description": "Um hotpot de Chongqing de nove casas borbulhando num fogão de tijolos: alimente o fogão, coloque uma panela de cobre ou ferro, despeje um caldo, ponha os ingredientes na grade 9x9 e tire-os cozidos (com a experiência da fornalha) - tudo com um único par de hashis. Perto de uma panela acesa você regenera devagar; dá para levar a panela inteira com caldo e comida, mas comer de uma panela fria pode dar enjoo.",
     "fuel.idle": "Fervendo (sem gastar combustível)",
-    "msg.no_soup_to_scoop": "Não há caldo na panela para pegar", "msg.scoop_need_bowl": "O caldo de cogumelos precisa de uma tigela (tire a comida primeiro)",
+    "msg.no_soup_to_scoop": "Não há caldo na panela para pegar",
     "msg.seat_taken": "Já tem alguém sentado aí"
 }
 
 # 每种木头的火锅桌名字（顺序同 TABLE_WOODS），按各语言原版木板的叫法
-TABLE_WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped"]
+TABLE_WOODS = ids("woods")
 TABLE_NAMES = {
     "zh_tw": [
         "橡木火鍋桌",
@@ -1867,10 +1868,10 @@ SAUCE_TEXT = {
         "text.orients_hotpot_chronicles.tooltip.sauce.sep": "、",
         "text.orients_hotpot_chronicles.tooltip.sauce.bites": "還能蘸 %s 口",
         "text.orients_hotpot_chronicles.tooltip.dipped": "蘸了：%s",
-        "text.orients_hotpot_chronicles.msg.station_out": "%s 沒貨了，空手右鍵蘸料台補貨",
+
         "text.orients_hotpot_chronicles.msg.sauce_has": "碗裡已經有%s了",
         "text.orients_hotpot_chronicles.msg.dip_need_food": "先用筷子夾一樣菜再來蘸",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "放原料補貨：1 個 = 4 份",
+
         "text.orients_hotpot_chronicles.screen.sauce.slot": "放 %s：1 個 = 4 份",
         "text.orients_hotpot_chronicles.screen.sauce.left": "台上還有 %s 份（最多 %s）",
         "block.orients_hotpot_chronicles.oak_sauce_station": "橡木蘸料台",
@@ -1902,10 +1903,10 @@ SAUCE_TEXT = {
         "text.orients_hotpot_chronicles.tooltip.sauce.sep": "、",
         "text.orients_hotpot_chronicles.tooltip.sauce.bites": "あと %s 回つけられる",
         "text.orients_hotpot_chronicles.tooltip.dipped": "つけた：%s",
-        "text.orients_hotpot_chronicles.msg.station_out": "%s が切れています - 素手で右クリックして補充",
+
         "text.orients_hotpot_chronicles.msg.sauce_has": "この器にはもう%sが入っています",
         "text.orients_hotpot_chronicles.msg.dip_need_food": "先に箸で具をつまんでください",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "材料で補充：1 個 = 4 回分",
+
         "text.orients_hotpot_chronicles.screen.sauce.slot": "%s を入れる：1 個 = 4 回分",
         "text.orients_hotpot_chronicles.screen.sauce.left": "残り %s 回分（最大 %s）",
         "block.orients_hotpot_chronicles.oak_sauce_station": "オークのつけだれ台",
@@ -1937,10 +1938,10 @@ SAUCE_TEXT = {
         "text.orients_hotpot_chronicles.tooltip.sauce.sep": ", ",
         "text.orients_hotpot_chronicles.tooltip.sauce.bites": "%s번 더 찍을 수 있음",
         "text.orients_hotpot_chronicles.tooltip.dipped": "찍은 소스: %s",
-        "text.orients_hotpot_chronicles.msg.station_out": "%s이(가) 떨어졌습니다 - 빈손으로 우클릭해 채우세요",
+
         "text.orients_hotpot_chronicles.msg.sauce_has": "이 그릇에는 이미 %s이(가) 있습니다",
         "text.orients_hotpot_chronicles.msg.dip_need_food": "먼저 젓가락으로 음식을 집으세요",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "재료로 채우기: 1개 = 4회분",
+
         "text.orients_hotpot_chronicles.screen.sauce.slot": "%s 넣기: 1개 = 4회분",
         "text.orients_hotpot_chronicles.screen.sauce.left": "%s회분 남음 (최대 %s)",
         "block.orients_hotpot_chronicles.oak_sauce_station": "참나무 양념 테이블",
@@ -1972,10 +1973,10 @@ SAUCE_TEXT = {
         "text.orients_hotpot_chronicles.tooltip.sauce.sep": ", ",
         "text.orients_hotpot_chronicles.tooltip.sauce.bites": "Осталось макнуть: %s",
         "text.orients_hotpot_chronicles.tooltip.dipped": "Обмакнуто в: %s",
-        "text.orients_hotpot_chronicles.msg.station_out": "Закончилось: %s - нажмите ПКМ пустой рукой, чтобы пополнить",
+
         "text.orients_hotpot_chronicles.msg.sauce_has": "В миске уже есть %s",
         "text.orients_hotpot_chronicles.msg.dip_need_food": "Сначала возьмите еду палочками",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "Пополнение: 1 предмет = 4 порции",
+
         "text.orients_hotpot_chronicles.screen.sauce.slot": "Принимает %s: 1 = 4 порции",
         "text.orients_hotpot_chronicles.screen.sauce.left": "Осталось порций: %s (макс. %s)",
         "block.orients_hotpot_chronicles.oak_sauce_station": "Дубовый стол для соусов",
@@ -2007,10 +2008,10 @@ SAUCE_TEXT = {
         "text.orients_hotpot_chronicles.tooltip.sauce.sep": ", ",
         "text.orients_hotpot_chronicles.tooltip.sauce.bites": "Noch %s Mal dippen",
         "text.orients_hotpot_chronicles.tooltip.dipped": "Gedippt in: %s",
-        "text.orients_hotpot_chronicles.msg.station_out": "%s ist alle - mit leerer Hand rechtsklicken zum Auffüllen",
+
         "text.orients_hotpot_chronicles.msg.sauce_has": "In dieser Schüssel ist schon %s",
         "text.orients_hotpot_chronicles.msg.dip_need_food": "Nimm zuerst etwas Essen mit den Stäbchen",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "Mit Zutaten auffüllen: 1 = 4 Portionen",
+
         "text.orients_hotpot_chronicles.screen.sauce.slot": "Nimmt %s: 1 = 4 Portionen",
         "text.orients_hotpot_chronicles.screen.sauce.left": "Noch %s Portionen (max. %s)",
         "block.orients_hotpot_chronicles.oak_sauce_station": "Eichen-Soßentheke",
@@ -2042,10 +2043,10 @@ SAUCE_TEXT = {
         "text.orients_hotpot_chronicles.tooltip.sauce.sep": ", ",
         "text.orients_hotpot_chronicles.tooltip.sauce.bites": "Encore %s trempages",
         "text.orients_hotpot_chronicles.tooltip.dipped": "Trempé dans : %s",
-        "text.orients_hotpot_chronicles.msg.station_out": "Plus de %s - clic droit à main vide pour réapprovisionner",
+
         "text.orients_hotpot_chronicles.msg.sauce_has": "Ce bol contient déjà %s",
         "text.orients_hotpot_chronicles.msg.dip_need_food": "Prenez d'abord un aliment avec les baguettes",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "Réapprovisionner : 1 = 4 portions",
+
         "text.orients_hotpot_chronicles.screen.sauce.slot": "Accepte %s : 1 = 4 portions",
         "text.orients_hotpot_chronicles.screen.sauce.left": "Encore %s portions (max %s)",
         "block.orients_hotpot_chronicles.oak_sauce_station": "Table à sauces en chêne",
@@ -2077,10 +2078,10 @@ SAUCE_TEXT = {
         "text.orients_hotpot_chronicles.tooltip.sauce.sep": ", ",
         "text.orients_hotpot_chronicles.tooltip.sauce.bites": "Quedan %s mojadas",
         "text.orients_hotpot_chronicles.tooltip.dipped": "Mojado en: %s",
-        "text.orients_hotpot_chronicles.msg.station_out": "Se acabó %s - clic derecho con la mano vacía para reponer",
+
         "text.orients_hotpot_chronicles.msg.sauce_has": "Este cuenco ya tiene %s",
         "text.orients_hotpot_chronicles.msg.dip_need_food": "Primero coge comida con los palillos",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "Reponer con ingredientes: 1 = 4 raciones",
+
         "text.orients_hotpot_chronicles.screen.sauce.slot": "Admite %s: 1 = 4 raciones",
         "text.orients_hotpot_chronicles.screen.sauce.left": "Quedan %s raciones (máx. %s)",
         "block.orients_hotpot_chronicles.oak_sauce_station": "Mesa de salsas de roble",
@@ -2112,10 +2113,10 @@ SAUCE_TEXT = {
         "text.orients_hotpot_chronicles.tooltip.sauce.sep": ", ",
         "text.orients_hotpot_chronicles.tooltip.sauce.bites": "Restam %s mergulhos",
         "text.orients_hotpot_chronicles.tooltip.dipped": "Mergulhado em: %s",
-        "text.orients_hotpot_chronicles.msg.station_out": "Acabou %s - clique direito com a mão vazia para repor",
+
         "text.orients_hotpot_chronicles.msg.sauce_has": "Esta tigela já tem %s",
         "text.orients_hotpot_chronicles.msg.dip_need_food": "Primeiro pegue comida com os hashis",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "Repor com ingredientes: 1 = 4 porções",
+
         "text.orients_hotpot_chronicles.screen.sauce.slot": "Aceita %s: 1 = 4 porções",
         "text.orients_hotpot_chronicles.screen.sauce.left": "Restam %s porções (máx. %s)",
         "block.orients_hotpot_chronicles.oak_sauce_station": "Mesa de molhos de carvalho",
@@ -2149,7 +2150,7 @@ SAUCE_GUIDE_TEXT = {
         "text.orients_hotpot_chronicles.msg.bowl_empty": "這個小碗是空的：空手右鍵蘸料台放原料",
         "text.orients_hotpot_chronicles.screen.sauce.empty": "空碗：放任意原料",
         "text.orients_hotpot_chronicles.screen.sauce.guide": "原料表",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "原料放哪格都行：1 個 = 4 份"
+
     },
     "ja_jp": {
         "block.orients_hotpot_chronicles.sauce_station_top": "つけだれ台",
@@ -2165,7 +2166,7 @@ SAUCE_GUIDE_TEXT = {
         "text.orients_hotpot_chronicles.msg.bowl_empty": "この小鉢は空です - 素手で右クリックして材料を入れる",
         "text.orients_hotpot_chronicles.screen.sauce.empty": "空の小鉢：どの材料でも入る",
         "text.orients_hotpot_chronicles.screen.sauce.guide": "材料一覧",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "どの枠にも入れられる：1 個 = 4 回分"
+
     },
     "ko_kr": {
         "block.orients_hotpot_chronicles.sauce_station_top": "양념 테이블",
@@ -2181,7 +2182,7 @@ SAUCE_GUIDE_TEXT = {
         "text.orients_hotpot_chronicles.msg.bowl_empty": "이 작은 그릇은 비어 있습니다 - 빈손으로 우클릭해 재료를 넣으세요",
         "text.orients_hotpot_chronicles.screen.sauce.empty": "빈 그릇: 아무 재료나 가능",
         "text.orients_hotpot_chronicles.screen.sauce.guide": "재료 표",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "아무 칸에나 재료: 1개 = 4회분"
+
     },
     "ru_ru": {
         "block.orients_hotpot_chronicles.sauce_station_top": "Стол для соусов",
@@ -2197,7 +2198,7 @@ SAUCE_GUIDE_TEXT = {
         "text.orients_hotpot_chronicles.msg.bowl_empty": "Эта мисочка пуста - нажмите ПКМ пустой рукой, чтобы положить продукты",
         "text.orients_hotpot_chronicles.screen.sauce.empty": "Пустая мисочка: любой продукт",
         "text.orients_hotpot_chronicles.screen.sauce.guide": "Ингредиенты",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "Любой продукт в любую ячейку: 1 = 4 порции"
+
     },
     "de_de": {
         "block.orients_hotpot_chronicles.sauce_station_top": "Soßentheke",
@@ -2213,7 +2214,7 @@ SAUCE_GUIDE_TEXT = {
         "text.orients_hotpot_chronicles.msg.bowl_empty": "Diese kleine Schüssel ist leer - mit leerer Hand rechtsklicken zum Befüllen",
         "text.orients_hotpot_chronicles.screen.sauce.empty": "Leere Schüssel: nimmt jede Zutat",
         "text.orients_hotpot_chronicles.screen.sauce.guide": "Zutaten",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "Jede Zutat, jeder Platz: 1 = 4 Portionen"
+
     },
     "fr_fr": {
         "block.orients_hotpot_chronicles.sauce_station_top": "Table à sauces",
@@ -2229,7 +2230,7 @@ SAUCE_GUIDE_TEXT = {
         "text.orients_hotpot_chronicles.msg.bowl_empty": "Ce petit bol est vide - clic droit à main vide pour le remplir",
         "text.orients_hotpot_chronicles.screen.sauce.empty": "Bol vide : accepte tout ingrédient",
         "text.orients_hotpot_chronicles.screen.sauce.guide": "Ingrédients",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "N'importe quel ingrédient, n'importe où : 1 = 4 portions"
+
     },
     "es_es": {
         "block.orients_hotpot_chronicles.sauce_station_top": "Mesa de salsas",
@@ -2245,7 +2246,7 @@ SAUCE_GUIDE_TEXT = {
         "text.orients_hotpot_chronicles.msg.bowl_empty": "Este cuenquito está vacío - clic derecho con la mano vacía para llenarlo",
         "text.orients_hotpot_chronicles.screen.sauce.empty": "Cuenco vacío: admite cualquier ingrediente",
         "text.orients_hotpot_chronicles.screen.sauce.guide": "Ingredientes",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "Cualquier ingrediente, cualquier hueco: 1 = 4 raciones"
+
     },
     "pt_br": {
         "block.orients_hotpot_chronicles.sauce_station_top": "Mesa de molhos",
@@ -2261,7 +2262,7 @@ SAUCE_GUIDE_TEXT = {
         "text.orients_hotpot_chronicles.msg.bowl_empty": "Esta tigelinha está vazia - clique direito com a mão vazia para abastecer",
         "text.orients_hotpot_chronicles.screen.sauce.empty": "Tigela vazia: aceita qualquer ingrediente",
         "text.orients_hotpot_chronicles.screen.sauce.guide": "Ingredientes",
-        "text.orients_hotpot_chronicles.screen.sauce.hint": "Qualquer ingrediente, qualquer espaço: 1 = 4 porções"
+
     }
 }
 
@@ -4524,13 +4525,35 @@ R146B_APRON_TEXT = {
 }
 
 
+# mryt233 改（2026-11-10）：保存回执只写简体 / 英文，其余语言用英文占位。
+SAVE_RESULT_TEXT = {
+    "zh_cn": {
+        "text.orients_hotpot_chronicles.config.msg.memory_only": "没能写入配置文件，改动只在本次游戏有效：%s",
+        "text.orients_hotpot_chronicles.config.msg.save_failed": "没能应用改动，原配置文件已保留：%s",
+        "text.orients_hotpot_chronicles.config.msg.broken_backup": "原配置无效，已备份为 %s。请核对后再关闭此页。",
+    },
+    "en_us": {
+        "text.orients_hotpot_chronicles.config.msg.memory_only": "Could not write the config file. Changes apply only to this session: %s",
+        "text.orients_hotpot_chronicles.config.msg.save_failed": "Changes were not applied. The original config was kept: %s",
+        "text.orients_hotpot_chronicles.config.msg.broken_backup": "The invalid original config was backed up as %s. Review it before closing this page.",
+    },
+}
+RETIRED_KEYS = ['resourcePack.orients_hotpot_chronicles.hotpot_assets', 'text.orients_hotpot_chronicles.screen.base', 'text.orients_hotpot_chronicles.screen.temp', 'text.orients_hotpot_chronicles.screen.stove.seconds', 'text.orients_hotpot_chronicles.screen.stove.waiting.short', 'text.orients_hotpot_chronicles.msg.aim_at_pot', 'text.orients_hotpot_chronicles.msg.detach_hint', 'text.orients_hotpot_chronicles.msg.scoop_need_bowl', 'text.orients_hotpot_chronicles.msg.station_out', 'text.orients_hotpot_chronicles.screen.sauce.hint']
+
+
 def main():
     cauldron_key = full_key("block.drink_cauldron")
     for code in ("zh_cn", "en_us"):
         source = ROOTS[0] / MODID / f"lang/{code}.json"
         text = source.read_text(encoding="utf-8")
         values = json.loads(text)
-        changed = False
+        changed = any(key in values for key in RETIRED_KEYS)
+        for key in RETIRED_KEYS:
+            values.pop(key, None)
+        for key, value in SAVE_RESULT_TEXT[code].items():
+            if values.get(key) != value:
+                values[key] = value
+                changed = True
         if values.get(cauldron_key) != DRINK_CAULDRON_TEXT[code]:
             values[cauldron_key] = DRINK_CAULDRON_TEXT[code]
             changed = True
@@ -4539,11 +4562,12 @@ def main():
                 values[k] = v
                 changed = True
         if changed:
-            source.write_text(json.dumps(values, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            write(source, values, ensure_ascii=False)
     en = json.loads((ROOTS[0] / MODID / "lang/en_us.json").read_text(encoding="utf-8"))
     problems = []
     for code, table in L.items():
         by_full = {full_key(k): v for k, v in table.items()}
+        by_full.update(SAVE_RESULT_TEXT["en_us"])
         for wood, name in zip(TABLE_WOODS, TABLE_NAMES[code]):
             by_full[full_key(f"block.{wood}_hotpot_table")] = name
         for wood, name in zip(TABLE_WOODS, BENCH_NAMES[code]):
@@ -4610,7 +4634,7 @@ def main():
         problems += [f"{code}: 英文里没有 {k}" for k in sorted(extra)]
         for root in ROOTS:
             f = root / MODID / f"lang/{code}.json"
-            f.write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            write(f, out, ensure_ascii=False)
     if problems:
         print("\n".join(problems))
         sys.exit(1)
@@ -4653,4 +4677,6 @@ def sync_r146e_tutorial_placeholders():
 
 if __name__ == "__main__":
     main()
-    sync_r146e_tutorial_placeholders()
+    # mryt233 改（2026-11-10）：默认同步教程占位；只读教程任务可显式跳过。
+    if "--no-tutorial" not in sys.argv and "--out" not in sys.argv:
+        sync_r146e_tutorial_placeholders()

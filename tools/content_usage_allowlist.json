@@ -1,0 +1,50 @@
+{
+  "_说明": "作者：mryt233；逐项保留动态引用原因，不作为错误豁免。",
+  "models": {
+    "block/oyster_sauce": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/sesame_paste": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/peanut": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/crushed_peanuts": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/millet_chili": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/enoki_mushroom": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/cooked_enoki_mushroom": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/greens": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/cooked_greens": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/lotus_root": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/lotus_root_slice": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/cooked_lotus_root_slice": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/raw_squid": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/squid_roll": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/cooked_squid_roll": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/egg_fried_rice": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/raw_crispy_pork": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/crispy_pork": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/boiled_crispy_pork": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/dried_tofu": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/cooked_dried_tofu": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/tofu_skin": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/cooked_tofu_skin": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/wide_noodles": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/cooked_wide_noodles": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/sweet_potato_skin": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。",
+    "block/cooked_sweet_potato_skin": "第一批核实：查看器模型文件页直接索引并渲染的立体食物模型，保留。"
+  },
+  "model_prefixes": {
+    "block/sauce_": "调料表面由运行时按 Seasoning.id 拼接。",
+    "block/standalone_soup_": "SoupBase 动态汤面。",
+    "block/stove_soup_": "灶台的 SoupBase 动态汤面。",
+    "block/tall_stove_soup_": "高灶台的 SoupBase 动态汤面。"
+  },
+  "language_prefixes": {
+    "soup_": "SoupBase / 汤碗动态名称。",
+    "sauce_": "Seasoning 动态名称。",
+    "soup.": "SoupBase 动态说明。",
+    "seasoning.": "调料动态说明。",
+    "itemGroup.": "创造栏自动翻译入口。",
+    "modmenu.": "模组菜单约定的 nameTranslation / summaryTranslation / descriptionTranslation 自动入口。",
+    "entity.orients_hotpot_chronicles.": "实体注册表自动生成的名称键。",
+    "tag.item.orients_hotpot_chronicles.": "物品标签名称由配方查看器按标签 ID 动态读取。",
+    "tag.block.orients_hotpot_chronicles.": "方块标签名称由兼容界面按标签 ID 动态读取。",
+    "orient_framework.config.": "ConfigWarning.of 通过名称动态拼接前缀；由框架警告翻译入口读取。"
+  }
+}

@@ -1,0 +1,364 @@
+{
+  "credit": "作者：mryt233；mryt233 改（2026-11-10）；仅供预览，不可装进资源包",
+  "textures": {
+    "planks": "minecraft:block/cherry_planks",
+    "particle": "minecraft:block/cherry_planks"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        14,
+        5
+      ],
+      "to": [
+        15.5,
+        16,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#planks"
+        },
+        "east": {
+          "texture": "#planks"
+        },
+        "south": {
+          "texture": "#planks"
+        },
+        "up": {
+          "texture": "#planks"
+        },
+        "down": {
+          "texture": "#planks"
+        }
+      }
+    },
+    {
+      "from": [
+        10.0,
+        2.5,
+        4.928571428571429
+      ],
+      "to": [
+        11.0,
+        3.5,
+        11.071428571428571
+      ],
+      "faces": {
+        "north": {
+          "texture": "#planks"
+        },
+        "east": {
+          "texture": "#planks"
+        },
+        "south": {
+          "texture": "#planks"
+        },
+        "west": {
+          "texture": "#planks"
+        },
+        "up": {
+          "texture": "#planks"
+        },
+        "down": {
+          "texture": "#planks"
+        }
+      }
+    },
+    {
+      "from": [
+        10.0,
+        7.0,
+        5.571428571428571
+      ],
+      "to": [
+        11.0,
+        8.0,
+        10.428571428571429
+      ],
+      "faces": {
+        "north": {
+          "texture": "#planks"
+        },
+        "east": {
+          "texture": "#planks"
+        },
+        "south": {
+          "texture": "#planks"
+        },
+        "west": {
+          "texture": "#planks"
+        },
+        "up": {
+          "texture": "#planks"
+        },
+        "down": {
+          "texture": "#planks"
+        }
+      }
+    },
+    {
+      "name": "斜腿",
+      "from": [
+        9.5,
+        -0.142135623730951,
+        5.75
+      ],
+      "to": [
+        11.5,
+        14.0,
+        7.25
+      ],
+      "rotation": {
+        "origin": [
+          9.5,
+          14.0,
+          6.5
+        ],
+        "axis": "x",
+        "angle": 8.13010235415598
+      },
+      "faces": {
+        "north": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            2.0,
+            14.142135623730951
+          ]
+        },
+        "south": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            2.0,
+            14.142135623730951
+          ]
+        },
+        "west": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            1.5,
+            14.142135623730951
+          ]
+        },
+        "east": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            1.5,
+            14.142135623730951
+          ]
+        },
+        "up": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            2.0,
+            1.5
+          ]
+        },
+        "down": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            2.0,
+            1.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "斜腿",
+      "from": [
+        9.5,
+        -0.142135623730951,
+        8.75
+      ],
+      "to": [
+        11.5,
+        14.0,
+        10.25
+      ],
+      "rotation": {
+        "origin": [
+          9.5,
+          14.0,
+          9.5
+        ],
+        "axis": "x",
+        "angle": -8.13010235415598
+      },
+      "faces": {
+        "north": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            2.0,
+            14.142135623730951
+          ]
+        },
+        "south": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            2.0,
+            14.142135623730951
+          ]
+        },
+        "west": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            1.5,
+            14.142135623730951
+          ]
+        },
+        "east": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            1.5,
+            14.142135623730951
+          ]
+        },
+        "up": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            2.0,
+            1.5
+          ]
+        },
+        "down": {
+          "texture": "#planks",
+          "uv": [
+            0,
+            0,
+            2.0,
+            1.5
+          ]
+        }
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        225,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.625,
+        0.625,
+        0.625
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        3,
+        0
+      ],
+      "scale": [
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        75,
+        45,
+        0
+      ],
+      "translation": [
+        0,
+        2.5,
+        0
+      ],
+      "scale": [
+        0.375,
+        0.375,
+        0.375
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        45,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.4,
+        0.4,
+        0.4
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        225,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.4,
+        0.4,
+        0.4
+      ]
+    }
+  },
+  "ambientocclusion": true,
+  "gui_light": "side"
+}

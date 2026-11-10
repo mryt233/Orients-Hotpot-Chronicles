@@ -111,6 +111,8 @@ public class HotPotConfigScreen extends Screen {
     /** 这一帧要显示的悬停提示（已经排好版）；普通按钮 / 快捷档用它直接出提示。 */
     private List<FormattedCharSequence> hoverTip;
 
+    // mryt233 改（2026-11-10）：保存失败提示留在当前页，主菜单无玩家时也能读到原因。
+    private Component saveNotice;
     private boolean confirmReset;
     private long confirmUntil;
     /** 这一帧「恢复全部默认」按钮在命中表里的下标（-1 = 没画）。 */
@@ -543,7 +545,12 @@ public class HotPotConfigScreen extends Screen {
         if (tab == 0) {
             drawParticleBlock(g, mouseX, mouseY);
         }
+        List<FormattedCharSequence> noticeLines = saveNotice == null ? List.of() : font.split(saveNotice, panelW - 24);
+        listBottom = py + panelH - BOTTOM_H - 16 - noticeLines.size() * 10;
         drawList(g, mouseX, mouseY);
+        for (int i = 0; i < noticeLines.size(); i++) {
+            g.drawString(font, noticeLines.get(i), px + 12, listBottom + 3 + i * 10, BAD, true);
+        }
         drawBottomBar(g, mouseX, mouseY);
     }
 
@@ -961,6 +968,23 @@ public class HotPotConfigScreen extends Screen {
             return;
         }
         Config.Loaded loaded = Config.saveAndReload(edited);
+        if (loaded.saveStatus() == cn.blockforge.orient.framework.pure.ConfigStore.SaveStatus.FAILED) {
+            saveNotice = Component.translatable(k("msg.save_failed"), loaded.reason());
+            return;
+        }
+        entryParticle = Config.particleIntensity();
+        if (loaded.saveStatus() == cn.blockforge.orient.framework.pure.ConfigStore.SaveStatus.MEMORY_ONLY) {
+            saveNotice = Component.translatable(k("msg.memory_only"), loaded.reason());
+            if (loaded.backup() != null) {
+                saveNotice = saveNotice.copy().append(" ").append(Component.translatable(k("msg.broken_backup"), loaded.backup().getFileName().toString()));
+            }
+            return;
+        }
+        if (loaded.backup() != null) {
+            saveNotice = Component.translatable(k("msg.broken_backup"), loaded.backup().getFileName().toString());
+            return;
+        }
+        saveNotice = null;
         message(Component.translatable("text." + HotPot.MOD_ID + ".msg.config_reloaded", loaded.warnings().size()));
         if (minecraft != null) {
             minecraft.setScreen(parent);

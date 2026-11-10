@@ -7,12 +7,13 @@
 作者：mryt233
 """
 import shutil
-from pathlib import Path
+
+
+# mryt233 改（2026-11-10）：沿用调用方的隔离输出目录。
+from pixkit.paths import MOD, RES
 
 from PIL import Image
 
-MOD = Path(__file__).resolve().parent.parent
-RES = MOD / "common/src/main/resources"
 DIRS = [RES / "assets/orients_hotpot_chronicles/textures/block"]
 BACKUP = MOD / "archive/clear_soup_old"
 FILES = ["hot_pot_top_clear.png", "hot_pot_top_clear_boiling.png"]

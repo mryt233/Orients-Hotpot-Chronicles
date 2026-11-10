@@ -1,4 +1,7 @@
-"""把放进 Releases 文件夹的开发版 jar 整理成正式发布编号（现阶段用 alpha）。
+"""【已停用】仅保留历史记录。请改用 tools/build_candidates.py 生成双端内嵌前置单 JAR。
+作者：mryt233；mryt233 改（2026-11-10）。
+
+把放进 Releases 文件夹的开发版 jar 整理成正式发布编号（现阶段用 alpha）。
 
 用法：双击 Releases/整理发布版.bat，或在 mod/ 目录运行
     python tools/make_release.py
@@ -12,6 +15,8 @@
   5. docs/移植同步清单.md 的「未发布」一段改名为这个发布版，上面再开一段空的（移植那边按段同步，新增）。
 jar 里的其他内容一个字节都不动，所以发布版和当时测的开发版完全一样。
 """
+raise SystemExit("已停用：请运行 python tools/build_candidates.py；本工具不会修改任何发布文件。")
+
 import datetime
 import json
 import re

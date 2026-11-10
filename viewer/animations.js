@@ -348,11 +348,19 @@ async function benchLegs(ctx, wood, state) {
   const angle = Math.atan(LEG_SPREAD / LEG_TOP), len = Math.hypot(LEG_SPREAD, LEG_TOP);
   for (const x0 of ends) {
     for (const [zc, sign] of [[6.5, 1], [9.5, -1]]) {
-      const leg = new TexBoxBatch(tex.texture || tex, 1);
+      const leg = new TexBoxBatch(tex.texture || tex, 2);
       const p = (v) => v / 16;
       // leg hangs down from its pivot at the top centre, then tilts outwards
-      leg.box(p(0), p(-len), p(-LEG_T / 2), p(LEG_W), p(0), p(LEG_T / 2),
-        [0, 1, LEG_W / 16, 1 - LEG_T / 16], [0, 1, LEG_W / 16, 1 - len / 16]);
+      // mryt233 改（2026-11-10）：照 BenchLegsRenderer.box()：每个面取木板贴图左上角「面宽 × 面高」像素
+      // （东西两面宽 LEG_T 而不是 LEG_W），并补上底面；以前四个侧面都按 LEG_W 取图、也不画底面，和游戏差一点。
+      const a = p(0), b = p(LEG_W), y0 = p(-len), y1 = p(0), z0 = p(-LEG_T / 2), z1 = p(LEG_T / 2);
+      const uv = (w, h) => [0, 1, w / 16, 1 - h / 16];
+      leg._quad([[a, y1, z0], [b, y1, z0], [b, y1, z1], [a, y1, z1]], uv(LEG_W, LEG_T), 1.0); // up
+      leg._quad([[a, y0, z1], [b, y0, z1], [b, y0, z0], [a, y0, z0]], uv(LEG_W, LEG_T), 0.5); // down
+      leg._quad([[b, y1, z0], [a, y1, z0], [a, y0, z0], [b, y0, z0]], uv(LEG_W, len), 0.8); // north
+      leg._quad([[a, y1, z1], [b, y1, z1], [b, y0, z1], [a, y0, z1]], uv(LEG_W, len), 0.8); // south
+      leg._quad([[a, y1, z0], [a, y1, z1], [a, y0, z1], [a, y0, z0]], uv(LEG_T, len), 0.6); // west
+      leg._quad([[b, y1, z1], [b, y1, z0], [b, y0, z0], [b, y0, z1]], uv(LEG_T, len), 0.6); // east
       leg.end();
       const pivot = new THREE.Group();
       pivot.position.set(mc(p(x0)), mc(p(LEG_TOP)), mc(p(zc)));

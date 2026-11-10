@@ -1811,7 +1811,8 @@ function cfLayout(g, s, w) {
 function cfListArea(s) {
   // 常用页：滑块 48..68 + 提示 70 + 快捷档 83..95，列表从 100 起（= Java listTop = contentTop + 52）
   const top = s && s.tab === "advanced" ? 48 : 100;
-  const bottom = CF.H - CF.BOTTOM_H - 10;
+  // mryt233 改（2026-11-10）：保存失败回执持续显示，列表为回执让出位置。
+  const bottom = CF.H - CF.BOTTOM_H - 16 - (s._noticeHeight || 0);
   return { top, bottom, view: Math.max(1, bottom - top) };
 }
 function cfIn(mouse, x, y, w, h) {
@@ -1932,6 +1933,7 @@ const configScreen = {
   params: [
     { key: "tab", label: "页签", options: [["common", "常用"], ["advanced", "高级"]], default: "common" },
     { key: "particles", label: "粒子强度", range: [0, 100, 5], default: 100 },
+    { key: "saveResult", label: "保存回执演示", options: [["written", "已写盘"], ["memory", "仅内存"], ["failed", "失败"], ["backup", "坏文件备份"]], default: "written" },
     { key: "shift", label: "按住 Shift（± 一次 10 步）", options: [["off", "没按"], ["on", "按着"]], default: "off" },
   ],
   icons() {
@@ -1945,6 +1947,11 @@ const configScreen = {
     cfState(s);
     s._acts = [];
     s._tips = null;
+    s._saveMessages = {
+      memory: g.tr(CF_KEY("msg.memory_only"), "Permission denied"),
+      failed: g.tr(CF_KEY("msg.save_failed"), "Permission denied"),
+      backup: g.tr(CF_KEY("msg.broken_backup"), "orients_hotpot_chronicles.json.broken-20261110-120000"),
+    };
     const tab = s.tab === "advanced" ? "advanced" : "common";
     s.tab = tab;
     frame(g, w, h, 1, true);
@@ -2003,6 +2010,8 @@ const configScreen = {
         if (hover) s._tip = "点一下直接切到 " + percent + "%（＝ Java 里的快捷档）";
       });
     }
+    const notice = s._saveNotice ? g.wrap(s._saveNotice, w - 24) : [];
+    s._noticeHeight = notice.length * 10;
     // 列表（= Java drawList）
     const area = cfListArea(s);
     const elements = cfLayout(g, s, w);
@@ -2027,6 +2036,7 @@ const configScreen = {
       g.fill(lx + lw + 3, area.top, lx + lw + 3 + CF.SCROLL_W, area.top + area.view, 0x40ffffff);
       g.fill(lx + lw + 3, thumbY, lx + lw + 3 + CF.SCROLL_W, thumbY + thumbH, BRASS);
     }
+    notice.forEach((line, i) => g.text(line, 12, area.bottom + 3 + i * 10, CF_COL.bad, true));
     // 底部三个按钮（= Java drawBottomBar；「恢复默认」点一次变确认态）
     const gap = 6, btnW = Math.max(70, Math.min(150, Math.floor((w - 24 - gap * 2) / 3)));
     const bx0 = Math.floor((w - (btnW * 3 + gap * 2)) / 2), by = h - CF.BOTTOM_H - 8;
@@ -2046,7 +2056,8 @@ const configScreen = {
             s._tip = "有 " + Object.keys(s.bad).length + " 项输错了（标红），改对之前不让保存";
             return;
           }
-          s._tip = "保存并生效：写回 config/orients_hotpot_chronicles.json 并热重载（预览里只演示，不写文件）";
+          s._saveNotice = s._saveMessages[s.saveResult] || null;
+          if (!s._saveNotice) s._tip = "已保存并生效（预览演示）";
         } else if (i === 1) {
           if (s._confirm === true) {
             s._confirm = false;

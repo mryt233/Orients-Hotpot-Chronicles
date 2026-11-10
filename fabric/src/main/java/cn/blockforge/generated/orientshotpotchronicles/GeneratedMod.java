@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  *
  * 核心玩法：砌一座灶台，往灶膛里添柴生火，把铜锅/铁锅坐上灶，
  * 倒汤底后用筷子打开 9x9 的九宫格面板下菜，像熔炉一样等它煮熟，
- * 直接取走带经验收益的熟食；汤底效果接口为后续扩展预留——全程只有气泡与蒸汽在变。
+ * 直接取走带经验收益与汤底风味的熟食。mryt233 改（2026-11-10）。
  */
 public final class GeneratedMod implements ModInitializer {
     private static final cn.blockforge.orient.framework.loader.ModuleHost MODULES = HotpotContentModule.HOST;
@@ -28,8 +28,15 @@ public final class GeneratedMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        if (Boolean.getBoolean("hotpot.expreg")) {
-            cn.blockforge.generated.orientshotpotchronicles.devtest.FabricRegProbe.run();
+        // mryt233 改（2026-11-10）：正式包不加载开发探针，缺类也只记录一行。
+        if (net.fabricmc.loader.api.FabricLoader.getInstance().isDevelopmentEnvironment()
+            && Boolean.getBoolean("hotpot.expreg")) {
+            try {
+                Class.forName("cn.blockforge.generated.orientshotpotchronicles.devtest.FabricRegProbe")
+                    .getMethod("run").invoke(null);
+            } catch (ReflectiveOperationException | LinkageError error) {
+                LOGGER.warn("registration probe unavailable: {}", error.toString());
+            }
         }
         // 修复：先完整登记默认值，再校验配置；物品注册只使用默认组件。
         // 先装平台实现，核心注册时才知道创造栏和界面类型怎么建
@@ -76,6 +83,9 @@ public final class GeneratedMod implements ModInitializer {
             cn.blockforge.generated.orientshotpotchronicles.hotpot.Config::setServer);
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(
             s -> cn.blockforge.generated.orientshotpotchronicles.hotpot.Config.setServer(null));
+        // mryt233 改（2026-11-10）：玩家下线释放围裙热源缓存。
+        net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents.DISCONNECT.register((handler, server) ->
+            cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronProtection.removePlayer(handler.player.getUUID()));
         // 数值热重载命令：食物营养、汤底、燃料、蘸料、烹饪兜底都立即生效（食物走 ConfiguredFoodItem，吃的时候读配置）
         net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback.EVENT.register((dispatcher, access, env) ->
             dispatcher.register(net.minecraft.commands.Commands.literal("orientshotpot")

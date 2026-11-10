@@ -190,32 +190,34 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
         }
     }
 
-    /**
-     * 数据包里的切石机配方查一次就记住了（按物品缓存）：同一样东西永远切出同样的产物，
-     * 但以前每右键一次、客户端和服务端各扫一遍整张 STONECUTTING 配方表（整合包里几十上百条）。
-     * 注意：整合包跑 /reload 换了配方后，缓存要跟着清，所以缓存键里带上配方管理器的身份。
-     * 作者：mryt233
-     */
-    private record CutKey(Object recipeManager, Item item) {
+    // mryt233 改（2026-11-10）：只保留当前配方管理器的切配结果，换世界 / 重载不累积旧表。
+    private static net.minecraft.world.item.crafting.RecipeManager cachedManager;
+    private static final java.util.Map<Item, ItemStack> CUT_CACHE = new java.util.HashMap<>();
+
+    public static synchronized void clearCache() {
+        cachedManager = null;
+        CUT_CACHE.clear();
     }
 
-    private static final java.util.Map<CutKey, ItemStack> CUT_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
-
-    /** 这件东西在砧板上切出什么（照切石机配方，数据包里没有就用内置表）；不能切返回空。 */
-    public static ItemStack cutResult(Level world, ItemStack stack) {
+    /** 切配结果始终返回独立拷贝；客户端与集成服共用时整次查询持锁。 */
+    public static synchronized ItemStack cutResult(Level world, ItemStack stack) {
         if (stack.isEmpty() || !stack.is(CUTTABLE)) {
             return ItemStack.EMPTY;
         }
-        CutKey key = new CutKey(world.getRecipeManager(), stack.getItem());
-        ItemStack cached = CUT_CACHE.get(key);
-        if (cached != null) {
-            return cached.copy();          // 调用方会改数量，给的必须是拷贝
+        var manager = world.getRecipeManager();
+        if (cachedManager != manager) {
+            CUT_CACHE.clear();
+            cachedManager = manager;
         }
-        ItemStack result = world.getRecipeManager()
+        ItemStack cached = CUT_CACHE.get(stack.getItem());
+        if (cached != null) {
+            return cached.copy();
+        }
+        ItemStack result = manager
             .getRecipeFor(RecipeType.STONECUTTING, new SingleRecipeInput(stack), world)
             .map(entry -> entry.value().getResultItem(world.registryAccess()).copy())
             .orElseGet(() -> BuiltinCuts.of(stack.getItem()));
-        CUT_CACHE.put(key, result.copy());
+        CUT_CACHE.put(stack.getItem(), result.copy());
         return result;
     }
 

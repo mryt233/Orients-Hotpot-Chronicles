@@ -12,10 +12,13 @@ import sys
 import time
 from pathlib import Path
 
+# mryt233 改（2026-11-10）：版本与 JDK 读取唯一配置源。
+from project_env import jdk21
+
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "build/exp-pkg"
 LOGS = OUT / "logs"
-JAVA_HOME = "C:/Users/10536/.jdks/jdk-21.0.12.1+1"
+JAVA_HOME = str(jdk21())
 
 SERVERS = {
     "fabric": ROOT / "experiments/server-fabric",

@@ -185,6 +185,8 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
      * 这格条凳是不是「已经上下搭起来了」（至少 2 层条凳叠在一起）：
      * 单张放在火锅桌边的条凳不触发爬梯子，免得围桌走动时不小心蹭上去；一旦上下搭了 2 层及以上，就能当梯子攀爬。
      */
+    // mryt233 改（2026-11-10）：内部已无调用，公开入口保留兼容。
+    @Deprecated
     public static boolean isStackedTallBench(BlockGetter world, BlockPos pos) {
         if (!isTallBench(world.getBlockState(pos))) {
             return false;

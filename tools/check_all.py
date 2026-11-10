@@ -1,7 +1,8 @@
 """多加载器工程自检。
 
-七项：分层 / 架构 / 内容（模型父链、贴图、语言、配方、指南）/ 清单 / 数值 / 贴图（尺寸、动画、半透明、居中、原版风格；mryt233 2026-11-01 加）/ 产物。
-产物缺失或早于源码时标为「未验证」，不自动打包，也不声称五项全绿。
+十项（mryt233 改（2026-11-10））：未引用模型/语言键警告、生成物哈希/合并关系、条凳预览与 Java 参数、显式 --jar 最终单包验收；原有六项源码检查与产物检查。
+原有：分层 / 架构 / 内容（模型父链、贴图、语言、配方、指南）/ 清单 / 数值 / 贴图（尺寸、动画、半透明、居中、原版风格；mryt233 2026-11-01 加）/ 产物。
+产物缺失或早于源码时标为「未验证」，不自动打包，也不声称十项全绿（--source-only 为九项；mryt233 改，2026-11-10）。
 --strict：有失败或未验证返回 1。--source-only：显式只验源码，不做产物验收。
 
 用法（mod 目录下）：
@@ -11,6 +12,7 @@
 """
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import re
@@ -120,8 +122,20 @@ def run_script(script: str, *args: str) -> tuple[bool, list[str]]:
 
 
 def main() -> int:
-    strict = "--strict" in sys.argv
-    source_only = "--source-only" in sys.argv
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--strict", action="store_true")
+    parser.add_argument("--source-only", action="store_true")
+    parser.add_argument("--jar", action="append", nargs="+", type=Path, default=[], help="指定一个或多个最终单 JAR")
+    args = parser.parse_args()
+    jars = [path for group in args.jar for path in group]
+    if args.source_only and jars:
+        parser.error("--source-only 与 --jar 不能一起使用")
+    strict = args.strict or bool(jars)
+    source_only = args.source_only
+    from check_unused import check_unused
+    from check_generated import check_manifest
+    from check_final_jar import check_final_jar
+    from check_bench_preview import check_bench_preview
     failed, unverified = [], []
     checks = [
         ("分层", check_layering),
@@ -130,9 +144,15 @@ def main() -> int:
         ("清单", lambda: run_script("gen_content_manifest.py", "--check")),
         ("数值", lambda: run_script("gen_food_numbers.py", "--strict")),
         ("贴图", lambda: run_script("check_textures.py", "--strict")),
+        ("未引用模型/语言键", check_unused),
+        ("生成物哈希/合并关系", check_manifest),
+        ("条凳预览/Java 参数", check_bench_preview),
     ]
-    if not source_only:
-        checks.append(("产物", check_jars))
+    if jars:
+        for jar in jars:
+            checks.append(("最终单 JAR：" + jar.name, lambda jar=jar: check_final_jar(jar)))
+    elif not source_only:
+        checks.append(("中间产物（最终包请指定 --jar）", check_jars))
     for name, fn in checks:
         try:
             ok, lines = fn()

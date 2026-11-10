@@ -9,15 +9,17 @@
 连接位掩码：北 1 / 东 2 / 南 4 / 西 8，模型后缀按 n e s w 顺序拼字母（全没接 = 无后缀）。
 """
 import json
-from pathlib import Path
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.templates import write_shared_model as write
+from pixkit.materials import ids
+
 ASSET_ROOTS = [RES / "assets" / MODID]
 DATA = RES / "data"
 
-WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped"]
+WOODS = ids("woods")
 
 TOP_Y0, TOP_Y1 = 7, 11
 BASE_Y1 = TOP_Y0
@@ -62,10 +64,6 @@ def model(mask, planks):
         ],
     }
 
-
-def write(path, obj):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(obj, indent=2) + "\n", encoding="utf-8")
 
 
 def main():

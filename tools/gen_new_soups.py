@@ -11,21 +11,18 @@
 """
 import json
 import random
-from pathlib import Path
+
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.io import write_legacy_json as write, write_text
+from pixkit.materials import materials, tuples
 from PIL import Image
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
 ROOTS = [RES / "assets" / MODID]
 
 # 新汤：(照哪锅汤的明暗, 汤色 暗 → 亮, 撒的料 [(颜色, 个数)])
-NEW = {
-    "tomato": ("spicy", ((150, 34, 18), (226, 84, 46), (255, 150, 96)),
-               [((242, 196, 74), 7), ((190, 40, 24), 6), ((104, 170, 58), 3)]),          # 蛋花、番茄块、葱
-    "three_fresh": ("rich_stock", ((178, 150, 96), (222, 204, 156), (248, 238, 206)),
-                    [((138, 90, 52), 5), ((236, 136, 48), 5), ((62, 122, 58), 5)]),       # 蘑菇、胡萝卜、海带
-}
+NEW = {e["id"]: tuples(e["new_texture"]) for e in materials()["soups"] if "new_texture" in e}
 BLOCKSTATES = ["bowl", "brick_stove", "tall_brick_stove", "iron_nine_grid_hotpot", "copper_nine_grid_hotpot"]
 
 
@@ -56,10 +53,6 @@ def soup_texture(name, src_name, ramp, bits):
     return out
 
 
-def write(path, obj):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(obj, indent=2) + "\n", encoding="utf-8")
-
 
 def main():
     for root in ROOTS:
@@ -67,7 +60,7 @@ def main():
             soup_texture(name, src_name, ramp, bits).save(root / f"textures/block/hot_pot_top_{name}.png")
             for f in sorted((root / "models/block").glob("*spicy*.json")):
                 text = f.read_text(encoding="utf-8").replace("spicy", name)
-                (f.parent / f.name.replace("spicy", name)).write_text(text, encoding="utf-8")
+                write_text(f.parent / f.name.replace("spicy", name), text)
         for bs in BLOCKSTATES:
             f = root / "blockstates" / f"{bs}.json"
             d = json.loads(f.read_text(encoding="utf-8"))

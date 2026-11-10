@@ -19,6 +19,9 @@ import subprocess
 import sys
 from PIL import Image
 
+# mryt233 改（2026-11-10）：材质名单与输出目录统一。
+from pixkit.materials import materials, tuples
+
 from pixkit import anim, io, model as pm
 from pixkit.color import lerp, rgba
 from pixkit.paths import MOD, MODID, RES, ROOTS as ASSET_ROOTS
@@ -32,14 +35,7 @@ RIM_MAIN = (196, 216, 226, 255)
 RIM_HI = (232, 246, 252, 255)
 
 # 饮料颜色：基色、亮、暗（通透鲜亮）
-LIQUID = {
-    "orange_drink": ((248, 158, 22, 255), (255, 208, 92, 255), (212, 116, 10, 255)),
-    "plant_protein_drink": ((240, 234, 222, 255), (252, 249, 242, 255), (212, 202, 186, 255)),
-    "orient_cola": ((88, 42, 24, 255), (138, 78, 46, 255), (54, 24, 14, 255)),
-    # 一杯水 / 一杯牛奶（2026-10-27 用户，新增）
-    "water": ((68, 138, 242, 255), (132, 190, 255, 255), (44, 98, 206, 255)),
-    "milk": ((246, 246, 240, 255), (255, 255, 255, 255), (220, 222, 216, 255)),
-}
+LIQUID = {e["id"]: tuples(e["cup_colors"]) for e in materials()["drinks"]}
 KINDS = list(LIQUID)
 LEVEL = 5.35       # 饮料面高度（模型像素，杯高 6）
 WALL_T = 0.25      # 纤薄杯壁厚度

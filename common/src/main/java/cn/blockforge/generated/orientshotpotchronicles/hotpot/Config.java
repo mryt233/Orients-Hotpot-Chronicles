@@ -4,19 +4,11 @@ import cn.blockforge.orient.framework.game.ConfigBase;
 import cn.blockforge.orient.framework.pure.ConfigStore;
 import cn.blockforge.orient.framework.pure.ConfigWarning;
 import cn.blockforge.orient.framework.pure.NumericConfig;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import net.minecraft.server.MinecraftServer;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 /**
@@ -34,7 +26,13 @@ public final class Config {
         缺项使用默认值；写错一项仅回退该项并警告；坏文件原样保留。联机只改服务端，数值自动同步。""";
 
     /** 一次重载的结果；警告带语言键（前置检查 W5，mryt233 改 2026-11-01），用 {@link #describe} 显示。 */
-    public record Loaded(JsonObject data, List<ConfigWarning> warnings) {
+    // mryt233 改（2026-11-10）：保留原有构造入口，同时携带保存回执。
+    public record Loaded(JsonObject data, List<ConfigWarning> warnings,
+                         ConfigStore.SaveStatus saveStatus, String reason, Path backup) {
+        public Loaded(JsonObject data, List<ConfigWarning> warnings) {
+            this(data, warnings, null, "", null);
+        }
+
         public Loaded {
             warnings = List.copyOf(warnings);
         }
@@ -53,9 +51,6 @@ public final class Config {
         FILE_NAME, 1, MAX_BYTES, NOTE, Config::rule, Config::fieldHelp,
         message -> HotPot.LOGGER.warn("[hotpot] {}", message));
     private static final ConfigBase BASE = new ConfigBase(STORE);
-
-    /** mryt233 改（2026-11-05，r135e）：写回配置文件的 JSON 格式，与 {@link ConfigStore} 里那份一致。 */
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     static {
         // mryt233 改（2026-11-05，r135e）：客户端项必须在 load() 之前登记进模板，
@@ -102,6 +97,7 @@ public final class Config {
         ConfigStore.Loaded loaded = BASE.reload();
         // mryt233 改（2026-11-05，r135e）：热重载也要刷新本地粒子强度
         readLocalParticleIntensity();
+        HotPotCooking.reviseCookTimes(); // mryt233 改（2026-11-10）：已下锅食材保留熟度并刷新时长。
         return new Loaded(loaded.data(), loaded.details());
     }
 
@@ -113,6 +109,11 @@ public final class Config {
         // mryt233 改（2026-11-05，r135e）：记住服务端实例，单人集成服存盘后要就地重载
         activeServer = value;
         BASE.setServer(value);
+        if (value == null) {
+            // mryt233 改（2026-11-10）：关服后不再持有玩家或配方管理器。
+            CuttingBoardBlock.clearCache();
+            ClothApronProtection.clearCache();
+        }
         if (value != null) {
             // 断线（value == null）时快照会退回默认值，此时不要去覆盖玩家本机的粒子强度
             readLocalParticleIntensity();
@@ -144,6 +145,9 @@ public final class Config {
     }
 
     public static void clearClient() {
+        // mryt233 改（2026-11-10）：退服释放客户端缓存。
+        CuttingBoardBlock.clearCache();
+        ClothApronProtection.clearCache();
         BASE.clearClient();
     }
 
@@ -208,108 +212,19 @@ public final class Config {
         return STORE.defaults().deepCopy();
     }
 
-    /**
-     * mryt233 改（2026-11-05，r135e）：设置界面保存。
-     * <p>流程：读回 particle_intensity → 与默认值合并（保留 _format / _说明 / _字段说明）→ 临时文件原子替换写入
-     * 配置目录 → {@link #reload()} 重新加载本地配置 → 单人集成服在服务端线程再重载一次并补全文件，
-     * 让食物营养、涮煮时间、汤底速度等不必敲命令就立即在世界里生效。
-     * <p>配置目录还没初始化时（单元测试 / 极早期）只更新内存快照，不碰文件。
-     */
+    /** mryt233 改（2026-11-10）：保存结果如实回传；文件备份和安全写入统一交给 ConfigStore。 */
     public static synchronized Loaded saveAndReload(JsonObject edited) {
-        // mryt233 改（2026-11-06，r139b）：先清一遍旧键，免得把已经作废的 slow_* 又从旧文件合并回新文件
         migrateLegacyKeys();
-        JsonObject source = edited == null ? new JsonObject() : edited;
-        JsonObject client = ConfigStore.read(source, "client");
-        if (client != null && client.has("particle_intensity")) {
-            JsonElement value = client.get("particle_intensity");
-            if (value != null && value.isJsonPrimitive() && value.getAsJsonPrimitive().isNumber()) {
-                try {
-                    setParticleIntensity(value.getAsInt());
-                } catch (RuntimeException ignored) {
-                    // 界面写坏的数字忽略，继续用当前本地值
-                }
+        ConfigStore.Saved saved = STORE.saveEdited(edited);
+        if (saved.status() != ConfigStore.SaveStatus.FAILED) {
+            readLocalParticleIntensity();
+            HotPotCooking.reviseCookTimes();
+            if (activeServer != null && !activeServer.isDedicatedServer()) {
+                BASE.acceptServer(saved.loaded().data());
             }
         }
-
-        // 以「默认值 + 现有文件」为底，再盖上界面改过的值：这样文件里玩家手写的未知键不会被界面保存冲掉
-        // （ConfigStore 的解析快照只保留认识的键，所以得从文件再读一遍原始内容）。
-        JsonObject base = ConfigStore.merge(STORE.defaults(), existingDocument());
-        JsonObject out = ConfigStore.merge(base, source);
-        ConfigStore.make(out, "client").addProperty("particle_intensity", localParticleIntensity);
-        out.addProperty("_format", 1);
-        out.addProperty("_说明", NOTE);
-        out.add("_字段说明", fieldHelp());
-
-        Path file = directory == null ? null : directory.resolve(FILE_NAME);
-        if (file == null) {
-            STORE.replaceServer(out);
-            return new Loaded(out.deepCopy(), List.of());
-        }
-
-        Path temp = null;
-        boolean written = false;
-        try {
-            Files.createDirectories(file.getParent());
-            temp = Files.createTempFile(file.getParent(), "config-", ".tmp");
-            Files.writeString(temp, GSON.toJson(out) + "\n", StandardCharsets.UTF_8);
-            try {
-                Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException unsupported) {
-                Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING);
-            }
-            written = true;
-        } catch (IOException error) {
-            // mryt233 改（2026-11-05，r135e）：写盘失败不动旧文件，界面改动只留在内存快照里
-            HotPot.LOGGER.warn("[hotpot] Could not write config ({}); original file kept", error.getMessage());
-        } finally {
-            if (temp != null) {
-                try {
-                    Files.deleteIfExists(temp);
-                } catch (IOException ignored) {
-                    // 临时文件删不掉不影响结果
-                }
-            }
-        }
-        if (!written) {
-            // 写盘失败时至少让内存快照跟上，界面上的改动不白填
-            STORE.replaceServer(out);
-            return new Loaded(out.deepCopy(), List.of());
-        }
-
-        Loaded result = reload();
-        MinecraftServer server = activeServer;
-        if (server != null && !server.isDedicatedServer()) {
-            // 单人集成服：客户端和服务端在同一个进程里，服务端线程重载一次并补全文件即可，
-            // 不用额外发网络包（客户端粒子强度读的是本机那份配置）。
-            server.execute(Config::reload);
-            server.execute(STORE::saveDefaultsIfNeeded);
-        }
-        return result;
-    }
-
-    /**
-     * mryt233 改（2026-11-05，r135e）：读现有配置文件的原始内容，给 {@link #saveAndReload} 当合并底稿。
-     * 文件不存在、太大或写坏时返回空对象——写坏的文件交给调用方照常覆盖，反正原文件已经解析不出来。
-     */
-    private static JsonObject existingDocument() {
-        Path dir = directory;
-        if (dir == null) {
-            return new JsonObject();
-        }
-        Path file = dir.resolve(FILE_NAME);
-        try {
-            if (!Files.exists(file) || Files.size(file) > MAX_BYTES) {
-                return new JsonObject();
-            }
-            String text = Files.readString(file, StandardCharsets.UTF_8);
-            if (!STORE.isValidDocument(text)) {
-                return new JsonObject();
-            }
-            JsonElement parsed = JsonParser.parseString(text);
-            return parsed != null && parsed.isJsonObject() ? parsed.getAsJsonObject() : new JsonObject();
-        } catch (IOException | RuntimeException error) {
-            return new JsonObject();
-        }
+        return new Loaded(saved.loaded().data(), saved.loaded().details(),
+            saved.status(), saved.reason(), saved.backup());
     }
 
     // ------------------------------------------------------------------ 取值（mryt233 改 2026-11-07：全部走扁平快照）

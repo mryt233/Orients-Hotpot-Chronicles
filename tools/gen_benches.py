@@ -1,4 +1,4 @@
-"""生成每种原版木板的条凳：方块状态、4 个连接模型、物品模型、配方、战利品表、斧头挖掘标签。
+"""生成每种原版木板的板凳与高条凳预览。作者：mryt233
 
 用法（在 mod/ 目录）：
     python tools/gen_benches.py
@@ -8,14 +8,44 @@
   - left / right：站在凳子后面面朝 facing 时的左手边 / 右手边（朝北时 = 西 / 东）。
 """
 import json
-from pathlib import Path
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.io import write_legacy_json
+from pixkit.templates import write_shared_model as write
+from pixkit.materials import ids
+
 ASSET_ROOTS = [RES / "assets" / MODID]
 DATA = RES / "data"
-WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped"]
+WOODS = ids("woods")
+
+
+def generate_previews():
+    """mryt233 改（2026-11-10）：高条凳额外生成完整预览，游戏模型只加说明。"""
+    from bench_preview import VARIANTS, complete_model, explanation, java_parameters, preview_root
+    from model_bake import ModelResolver
+    from pixkit.manifest import declare_merge
+    resolver = ModelResolver(RES)
+    parameters = java_parameters()
+    for wood in WOODS:
+        for (left, right), tail in VARIANTS.items():
+            name = f"{wood}_bench{tail}"
+            relative = f"assets/{MODID}/models/block/{name}.json"
+            file = RES / relative
+            source = json.loads(file.read_text(encoding="utf-8"))
+            source["_说明"] = explanation(name)
+            write_legacy_json(file, source, ensure_ascii=False)
+            declare_merge(file, ["tools/gen_tall.py", "tools/gen_benches.py"],
+                          "先生成游戏凳面和横撑，再补预览说明；不改变游戏烘焙结果")
+            base = resolver.merged(f"{MODID}:block/{name}")
+            write_legacy_json(preview_root() / relative,
+                              complete_model(base, left, right, parameters), ensure_ascii=False)
+        item = resolver.merged(f"{MODID}:item/{wood}_bench")
+        base = resolver.merged(f"{MODID}:block/{wood}_bench")
+        base["display"] = item["display"]
+        write_legacy_json(preview_root() / f"assets/{MODID}/models/item/{wood}_bench.json",
+                          complete_model(base, False, False, parameters), ensure_ascii=False)
 
 SEAT_Y0, SEAT_Y1 = 5, 7
 SEAT_Z0, SEAT_Z1 = 4, 12
@@ -60,10 +90,6 @@ def suffix(left, right):
     return {(False, False): "", (True, False): "_left", (False, True): "_right", (True, True): "_middle"}[(left, right)]
 
 
-def write(path, obj):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(obj, indent=2) + "\n", encoding="utf-8")
-
 
 def main():
     for root in ASSET_ROOTS:
@@ -107,7 +133,8 @@ def main():
         if ident not in tag["values"]:
             tag["values"].append(ident)
     write(axe, tag)
-    print(f"已生成 {len(WOODS)} 种条凳（每种 4 个连接模型）")
+    generate_previews()
+    print(f"已生成 {len(WOODS)} 种板凳，以及条凳 44 个方块 / 11 个物品预览")
 
 
 if __name__ == "__main__":

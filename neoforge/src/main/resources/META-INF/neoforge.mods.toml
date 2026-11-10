@@ -1,11 +1,9 @@
 # 之晗的火锅物语 · NeoForge 元数据（mryt233 2026-10-30）
-#
-# 第一版只接服务端内容：物品 / 方块 / 方块实体 / 创造栏 / 菜单类型 / 战利品 / 可燃表。
-# 客户端界面与渲染还没搬，见 mod-multiloader/neoforge 下各类的注释。
+# mryt233 改（2026-11-10）：介绍与 Fabric 保持一致。
 modLoader="javafml"
 loaderVersion="[4,)"
 license="MIT AND CC-BY-NC-SA-4.0"
-issueTrackerURL="https://github.com/"
+issueTrackerURL="https://github.com/mryt233/Orients-Hotpot-Chronicles/issues"
 
 [[mods]]
 modId="orients_hotpot_chronicles"
@@ -13,9 +11,7 @@ version="${version}"
 displayName="Orient's Hotpot Chronicles"
 authors="mryt233"
 description='''
-A bubbling Chongqing nine-grid hotpot on a brick stove: fuel the stove, seat a copper or iron pot,
-pour in a broth, drop ingredients into the 9x9 grid and pick them out cooked (with furnace XP).
-This is the NeoForge build of the Fabric mod; the client-side screens and renderers are still being ported.
+A bubbling Chongqing nine-grid hotpot on a brick stove: fuel the stove, seat a copper or iron pot, pour in a broth, drop ingredients into the 9x9 grid and pick them out cooked (with furnace XP) - all with one pair of chopsticks.
 '''
 
 [[mixins]]

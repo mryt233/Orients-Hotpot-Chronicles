@@ -12,13 +12,15 @@
 import json
 import math
 import random
-from pathlib import Path
+
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.io import write_legacy_json as write
+
 
 from PIL import Image
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
 ROOTS = [RES / "assets" / MODID]
 
 
@@ -196,10 +198,6 @@ def ball_model(name):
     return {"parent": "minecraft:block/block", "textures": {"ball": f"{MODID}:item/{name}", "particle": f"{MODID}:item/{name}"},
             "elements": els, "display": BALL_DISPLAY}
 
-
-def write(p, obj):
-    p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(obj, indent=2) + "\n", encoding="utf-8")
 
 
 def ball_id(meat, cilantro, cooked):

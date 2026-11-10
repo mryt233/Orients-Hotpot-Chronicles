@@ -136,6 +136,9 @@ def gui_centers():
         parent = m.get("parent", "")
         if not parent.startswith(f"{MODID}:block/"):
             continue
+        # mryt233 改（2026-11-10）：*_item 模板是原先直接写几何的物品；保持原有检查范围。
+        if parent.startswith(f"{MODID}:block/template/") and parent.endswith("_item"):
+            continue
         try:
             x0, x1, y0, y1, _ = gui_center.bbox(p.stem)
         except (KeyError, ValueError, OSError, TypeError):

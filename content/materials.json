@@ -1,0 +1,481 @@
+{
+  "_说明": "作者：mryt233；有序材质唯一名单，顺序保持现有注册与生成器约定。",
+  "woods": [
+    {
+      "id": "oak"
+    },
+    {
+      "id": "spruce"
+    },
+    {
+      "id": "birch"
+    },
+    {
+      "id": "jungle"
+    },
+    {
+      "id": "acacia"
+    },
+    {
+      "id": "dark_oak"
+    },
+    {
+      "id": "mangrove"
+    },
+    {
+      "id": "cherry"
+    },
+    {
+      "id": "bamboo"
+    },
+    {
+      "id": "crimson"
+    },
+    {
+      "id": "warped"
+    }
+  ],
+  "stone_tables": [
+    {
+      "id": "smooth_stone",
+      "ingredient": "minecraft:smooth_stone",
+      "top": "smooth_stone",
+      "side": "smooth_stone_slab_side"
+    },
+    {
+      "id": "polished_andesite",
+      "ingredient": "minecraft:polished_andesite",
+      "top": "polished_andesite",
+      "side": "polished_andesite"
+    },
+    {
+      "id": "polished_diorite",
+      "ingredient": "minecraft:polished_diorite",
+      "top": "polished_diorite",
+      "side": "polished_diorite"
+    },
+    {
+      "id": "polished_granite",
+      "ingredient": "minecraft:polished_granite",
+      "top": "polished_granite",
+      "side": "polished_granite"
+    },
+    {
+      "id": "polished_deepslate",
+      "ingredient": "minecraft:polished_deepslate",
+      "top": "polished_deepslate",
+      "side": "polished_deepslate"
+    },
+    {
+      "id": "polished_blackstone",
+      "ingredient": "minecraft:polished_blackstone",
+      "top": "polished_blackstone",
+      "side": "polished_blackstone"
+    },
+    {
+      "id": "quartz",
+      "ingredient": "minecraft:quartz_block",
+      "top": "quartz_block_top",
+      "side": "quartz_block_side"
+    },
+    {
+      "id": "cut_copper",
+      "ingredient": "minecraft:cut_copper",
+      "top": "cut_copper",
+      "side": "cut_copper"
+    },
+    {
+      "id": "iron",
+      "ingredient": "minecraft:iron_ingot",
+      "top": "iron_block",
+      "side": "iron_block"
+    }
+  ],
+  "plates": [
+    {
+      "id": "quartz",
+      "floor": "minecraft:block/quartz_block_top",
+      "rim": "minecraft:block/quartz_block_side",
+      "ingredient": "minecraft:quartz",
+      "map_color": "QUARTZ",
+      "sound": "DECORATED_POT"
+    },
+    {
+      "id": "bamboo",
+      "floor": "minecraft:block/bamboo_mosaic",
+      "rim": "minecraft:block/bamboo_mosaic",
+      "ingredient": "minecraft:bamboo",
+      "map_color": "SAND",
+      "sound": "BAMBOO_WOOD"
+    },
+    {
+      "id": "terracotta",
+      "floor": "minecraft:block/terracotta",
+      "rim": "minecraft:block/terracotta",
+      "ingredient": "minecraft:brick",
+      "map_color": "COLOR_ORANGE",
+      "sound": "DECORATED_POT"
+    },
+    {
+      "id": "copper",
+      "floor": "minecraft:block/copper_block",
+      "rim": "minecraft:block/copper_block",
+      "ingredient": "minecraft:copper_ingot",
+      "map_color": "COLOR_ORANGE",
+      "sound": "COPPER"
+    },
+    {
+      "id": "iron",
+      "floor": "minecraft:block/iron_block",
+      "rim": "minecraft:block/iron_block",
+      "ingredient": "minecraft:iron_ingot",
+      "map_color": "METAL",
+      "sound": "METAL"
+    }
+  ],
+  "soups": [
+    {
+      "id": "clear",
+      "bubble_body": [
+        218,
+        203,
+        158
+      ],
+      "bubble_highlight": [
+        255,
+        248,
+        228
+      ]
+    },
+    {
+      "id": "rich_stock",
+      "bubble_body": [
+        245,
+        236,
+        218
+      ],
+      "bubble_highlight": [
+        255,
+        255,
+        255
+      ]
+    },
+    {
+      "id": "mushroom",
+      "bubble_body": [
+        176,
+        132,
+        86
+      ],
+      "bubble_highlight": [
+        236,
+        206,
+        146
+      ]
+    },
+    {
+      "id": "spicy",
+      "bubble_body": [
+        224,
+        88,
+        48
+      ],
+      "bubble_highlight": [
+        255,
+        184,
+        120
+      ]
+    },
+    {
+      "id": "tomato",
+      "bubble_body": [
+        232,
+        96,
+        56
+      ],
+      "bubble_highlight": [
+        255,
+        192,
+        144
+      ],
+      "new_texture": [
+        "spicy",
+        [
+          [
+            150,
+            34,
+            18
+          ],
+          [
+            226,
+            84,
+            46
+          ],
+          [
+            255,
+            150,
+            96
+          ]
+        ],
+        [
+          [
+            [
+              242,
+              196,
+              74
+            ],
+            7
+          ],
+          [
+            [
+              190,
+              40,
+              24
+            ],
+            6
+          ],
+          [
+            [
+              104,
+              170,
+              58
+            ],
+            3
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "three_fresh",
+      "bubble_body": [
+        224,
+        204,
+        152
+      ],
+      "bubble_highlight": [
+        255,
+        246,
+        220
+      ],
+      "new_texture": [
+        "rich_stock",
+        [
+          [
+            178,
+            150,
+            96
+          ],
+          [
+            222,
+            204,
+            156
+          ],
+          [
+            248,
+            238,
+            206
+          ]
+        ],
+        [
+          [
+            [
+              138,
+              90,
+              52
+            ],
+            5
+          ],
+          [
+            [
+              236,
+              136,
+              48
+            ],
+            5
+          ],
+          [
+            [
+              62,
+              122,
+              58
+            ],
+            5
+          ]
+        ]
+      ]
+    }
+  ],
+  "drinks": [
+    {
+      "id": "orange_drink",
+      "cup_colors": [
+        [
+          248,
+          158,
+          22,
+          255
+        ],
+        [
+          255,
+          208,
+          92,
+          255
+        ],
+        [
+          212,
+          116,
+          10,
+          255
+        ]
+      ],
+      "cauldron_colors": [
+        [
+          212,
+          118,
+          12
+        ],
+        [
+          247,
+          160,
+          20
+        ],
+        [
+          255,
+          196,
+          70
+        ]
+      ],
+      "bottle": true
+    },
+    {
+      "id": "plant_protein_drink",
+      "cup_colors": [
+        [
+          240,
+          234,
+          222,
+          255
+        ],
+        [
+          252,
+          249,
+          242,
+          255
+        ],
+        [
+          212,
+          202,
+          186,
+          255
+        ]
+      ],
+      "cauldron_colors": [
+        [
+          212,
+          204,
+          190
+        ],
+        [
+          238,
+          232,
+          220
+        ],
+        [
+          250,
+          248,
+          240
+        ]
+      ],
+      "bottle": true
+    },
+    {
+      "id": "orient_cola",
+      "cup_colors": [
+        [
+          88,
+          42,
+          24,
+          255
+        ],
+        [
+          138,
+          78,
+          46,
+          255
+        ],
+        [
+          54,
+          24,
+          14,
+          255
+        ]
+      ],
+      "cauldron_colors": [
+        [
+          52,
+          26,
+          16
+        ],
+        [
+          78,
+          40,
+          24
+        ],
+        [
+          112,
+          62,
+          36
+        ]
+      ],
+      "bottle": true
+    },
+    {
+      "id": "water",
+      "cup_colors": [
+        [
+          68,
+          138,
+          242,
+          255
+        ],
+        [
+          132,
+          190,
+          255,
+          255
+        ],
+        [
+          44,
+          98,
+          206,
+          255
+        ]
+      ],
+      "bottle": false
+    },
+    {
+      "id": "milk",
+      "cup_colors": [
+        [
+          246,
+          246,
+          240,
+          255
+        ],
+        [
+          255,
+          255,
+          255,
+          255
+        ],
+        [
+          220,
+          222,
+          216,
+          255
+        ]
+      ],
+      "bottle": false
+    }
+  ]
+}

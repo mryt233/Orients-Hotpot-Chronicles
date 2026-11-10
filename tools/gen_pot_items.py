@@ -6,12 +6,17 @@
 作者：mryt233
 """
 import json
+
+# mryt233 改（2026-11-10）：材质名单与输出目录统一。
+from pixkit.materials import ids
+from pixkit.paths import RES
+from pixkit.io import write_legacy_json
 import os
 
-ROOT = os.path.join(os.path.dirname(__file__), '..', 'src', 'main', 'resources')
+ROOT = str(RES)
 COPIES = [os.path.join(ROOT, 'assets', 'orients_hotpot_chronicles')]
 NS = 'orients_hotpot_chronicles'
-SOUPS = ['clear', 'rich_stock', 'mushroom', 'spicy', 'tomato', 'three_fresh']   # 顺序 = SoupBase 编号
+SOUPS = ids("soups")   # 顺序 = SoupBase 编号
 METALS = ['iron', 'copper']
 
 
@@ -21,8 +26,7 @@ def load(base, rel):
 
 
 def save(base, rel, data):
-    with open(os.path.join(base, rel), 'w', encoding='utf-8', newline='\n') as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    write_legacy_json(os.path.join(base, rel), data, ensure_ascii=False, trailing=False)
 
 
 for base in COPIES:

@@ -10,29 +10,21 @@
 作者：mryt233
 """
 import json
-from pathlib import Path
+
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.templates import write_shared_model as write
+from pixkit.materials import ids, columns
 
 import gen_tables as low
 import gen_tall as tall
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
 ASSET_ROOTS = [RES / "assets" / MODID]
 DATA = RES / "data"
 
 # 材质 → (配方里用的物品, 顶面贴图, 侧面贴图)；和 HotPotContent.STONE_TABLES 同序
-MATERIALS = {
-    "smooth_stone": ("minecraft:smooth_stone", "smooth_stone", "smooth_stone_slab_side"),
-    "polished_andesite": ("minecraft:polished_andesite", "polished_andesite", "polished_andesite"),
-    "polished_diorite": ("minecraft:polished_diorite", "polished_diorite", "polished_diorite"),
-    "polished_granite": ("minecraft:polished_granite", "polished_granite", "polished_granite"),
-    "polished_deepslate": ("minecraft:polished_deepslate", "polished_deepslate", "polished_deepslate"),
-    "polished_blackstone": ("minecraft:polished_blackstone", "polished_blackstone", "polished_blackstone"),
-    "quartz": ("minecraft:quartz_block", "quartz_block_top", "quartz_block_side"),
-    "cut_copper": ("minecraft:cut_copper", "cut_copper", "cut_copper"),
-    "iron": ("minecraft:iron_ingot", "iron_block", "iron_block"),
-}
+MATERIALS = columns("stone_tables", "ingredient", "top", "side")
 BRICKS = "minecraft:block/bricks"
 DIRS = ["north", "east", "south", "west"]
 
@@ -58,10 +50,6 @@ def tall_model(mask, top, side, open_=False):
     m["textures"].update({"top": f"minecraft:block/{top}", "bricks": BRICKS, "particle": f"minecraft:block/{side}"})
     return m
 
-
-def write(path, obj):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(obj, indent=2) + "\n", encoding="utf-8")
 
 
 def key_of(mask):

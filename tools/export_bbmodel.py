@@ -37,6 +37,10 @@ def split_id(i, kind):
 
 
 def find(ns, sub):
+    # mryt233 改（2026-11-10）：代码绘制部件优先取完整预览，贴图继续使用原资源。
+    preview = MOD / "preview_models/assets" / ns / sub
+    if sub.startswith("models/") and preview.is_file():
+        return preview
     for r in ROOTS:
         f = r / ns / sub
         if f.exists():

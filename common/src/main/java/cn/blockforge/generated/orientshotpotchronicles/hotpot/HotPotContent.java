@@ -125,7 +125,7 @@ public final class HotPotContent {
     /** 摆在桌上的芝麻酱 / 蚝油瓶（只带模型，r146a）。方块状态 kind 决定画哪种瓶子。 */
     public static final SauceBottleBlock SAUCE_BOTTLE_BLOCK = reg().blocks().register(
         HotPot.id("sauce_bottle"), new SauceBottleBlock());
-    // mryt233 改（2026-11-05）：给并行任务 r136b 预留的方块引用——直接摆在桌上的竹筷（带迷你筷架，
+    // mryt233 改（2026-11-10）：桌面竹筷方块引用——直接摆在桌上的竹筷（带迷你筷架，
     // 借用 PlateHolderBlock 摆放，方块类见 ChopstickRestBlock）。
     /** 直接摆在桌上的竹筷（带迷你筷架，借用 PlateHolderBlock 摆放，见 ChopstickRestBlock）。 */
     public static final ChopstickRestBlock CHOPSTICK_REST_BLOCK = reg().blocks().register(
@@ -552,7 +552,7 @@ public final class HotPotContent {
     public static final DataComponentType<Integer> SPICY_LEVEL = reg().components().register(HotPot.id("spicy_level"),
         DataComponentType.<Integer>builder().persistent(com.mojang.serialization.Codec.INT)
             .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
-    // mryt233 改（2026-11-05）：给并行任务 r136b 预留的组件与方块引用（干杯标记、桌面迷你筷架）。
+    // mryt233 改（2026-11-10）：干杯与桌面筷架使用的组件和方块引用（干杯标记、桌面迷你筷架）。
     /** 玻璃杯是否已经碰过杯（干杯标记，喝下时多回 1 饥饿值）。 */
     public static final DataComponentType<Boolean> CHEERED = reg().components().register(HotPot.id("cheered"),
         DataComponentType.<Boolean>builder().persistent(com.mojang.serialization.Codec.BOOL)

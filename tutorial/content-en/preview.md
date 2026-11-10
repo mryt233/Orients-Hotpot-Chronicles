@@ -5,6 +5,16 @@
 Development Preview (not released yet; names and values may change). Everything added after 0.2.2-alpha is listed here.
 :::
 
+<!-- mryt233 改（2026-11-10，r146 优化第一批） -->
+## Optimization pass 1: more reliable reloads and settings saves {#r146opt1}
+
+- **Food already in the pot follows new cooking times after a reload**: After changing a cooking time and running `/orientshotpot reload` (or changing a cooking recipe in a data pack and running `/reload`), ingredients already in the pot **keep their cooking progress** and the remaining time is recalculated from the new value.<!--清单#142-->
+- **Settings save failures are reported honestly**: If the config file cannot be written, the screen **stays open** and says why (the changes only apply to this session, or were not applied). If the original config file is broken, it is first backed up as `orients_hotpot_chronicles.json.broken-<time>` and the backup name is shown.<!--清单#143-->
+- **Same-named ingredients from other mods no longer use this mod's cooking times**: `cooking.items.<item>` in the config only applies to this mod's own ingredients; vanilla and other mods' ingredients cook by their own recipes. The config format is unchanged.<!--清单#144-->
+- **Add-on eating hooks also fire in the pot screen**: Eating cooked food with chopsticks inside the pot screen now notifies add-on mods just like eating with held chopsticks; if an add-on cancels the bite, the food stays in the pot.<!--清单#145-->
+- **NeoForge mod description corrected**: The mod list no longer says the client is still being ported, and the issue link now points to the project's Issues page.<!--清单#146-->
+- **The old hotpot table ID is no longer converted (very early Fabric worlds only)**: The Fabric build no longer converts the earliest `hotpot_table` into the oak hotpot table, matching NeoForge; current hotpot tables are unaffected.<!--清单#147-->
+
 <!-- mryt233 改（r146f） -->
 ## Sauce station ingredient list: narrowed with pagination {#r146f}
 

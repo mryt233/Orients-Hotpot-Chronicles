@@ -6,12 +6,14 @@ b 是按照片里瓶子的比例（细高）做的：第一版 3×2、6 像素�
 作者：mryt233
 """
 import json
-from pathlib import Path
+
+
+# mryt233 改（2026-11-10）：共用路径、保留原资源格式。
+from pixkit.paths import MODID, RES
+from pixkit.io import write_legacy_json as write
+from pixkit.materials import materials
 from PIL import Image
 
-MOD = Path(__file__).resolve().parent.parent
-MODID = "orients_hotpot_chronicles"
-RES = MOD / "common/src/main/resources"
 ASSET_ROOTS = [RES / "assets" / MODID]
 
 O, OL, OD = (247, 160, 20, 255), (255, 200, 70, 255), (212, 118, 12, 255)
@@ -198,10 +200,10 @@ def main():
         texture_empty(tex).save(root / "textures/block/orange_drink_empty.png")
         empty = bottle_b()
         empty["textures"] = {"d": f"{MODID}:block/orange_drink_empty", "particle": f"{MODID}:block/orange_drink_empty"}
-        (root / "models/block/orange_drink_empty.json").write_text(json.dumps(empty, indent=2) + "\n", encoding="utf-8")
+        write(root / "models/block/orange_drink_empty.json", empty, ensure_ascii=True)
         (root / "models/block/orange_drink_a.json").unlink(missing_ok=True)   # 第一版（按错的尺寸），已淘汰
         (root / "models/block/orange_drink_b.json").unlink(missing_ok=True)   # 定稿后改名为 orange_drink
-        (root / "models/block/orange_drink.json").write_text(json.dumps(bottle_b(), indent=2) + "\n", encoding="utf-8")
+        write(root / "models/block/orange_drink.json", bottle_b(), ensure_ascii=True)
     print("ok")
 
 
@@ -224,7 +226,7 @@ DRINK_DISPLAY = {
 def game_files():
     """摆在桌上的瓶子（方块状态 drink：种类 × 满 / 空 × 方向）和每种饮料的满瓶 / 空瓶物品模型。
     r101 加了维二（模型和贴图在 tools/gen_plant_protein_drink.py，物品显示参数共用这里的 DRINK_DISPLAY）。"""
-    kinds = ("orange_drink", "plant_protein_drink", "orient_cola")   # 之晗可乐（原名 之晗可乐，2026-10-26 用户改名） 2026-10-25 加（模型贴图在 tools/gen_orient_cola.py）
+    kinds = [e["id"] for e in materials()["drinks"] if e["bottle"]]   # 之晗可乐（原名 之晗可乐，2026-10-26 用户改名） 2026-10-25 加（模型贴图在 tools/gen_orient_cola.py）
     for root in ASSET_ROOTS:
         variants = {}
         for kind in kinds:
@@ -234,7 +236,7 @@ def game_files():
                     if axis == "z":
                         v["y"] = 90
                     variants[f"axis={axis},empty={empty},kind={kind}"] = v
-        (root / "blockstates/drink.json").write_text(json.dumps({"variants": variants}, indent=2) + "\n", encoding="utf-8")
+        write(root / "blockstates/drink.json", {"variants": variants}, ensure_ascii=True)
         for kind in kinds:
             full, empty = {"orange_drink": ("orange_drink", "empty_orange_drink_bottle"),
                            "plant_protein_drink": ("plant_protein_drink", "empty_plant_protein_drink_bottle"),
@@ -245,8 +247,7 @@ def game_files():
                     # 可乐瓶比另外两种矮，共用的 gui 平移让它偏下 1.5～1.8 像素；单独往上挪到格子正中（2026-10-26 用户；调整）
                     lift = 1.95 if item == full else 2.3
                     display = dict(DRINK_DISPLAY, gui=dict(DRINK_DISPLAY["gui"], translation=[0, lift, 0]))
-                (root / f"models/item/{item}.json").write_bytes((json.dumps(
-                    {"parent": f"{MODID}:block/{model}", "display": display}, indent=2) + "\n").encode("utf-8"))
+                write(root / f"models/item/{item}.json", {"parent": f"{MODID}:block/{model}", "display": display}, ensure_ascii=True)
 
 
 game_files()

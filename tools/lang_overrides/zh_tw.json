@@ -36,7 +36,6 @@
   "item.orients_hotpot_chronicles.dipping_sauce": "沾醬",
   "text.orients_hotpot_chronicles.tooltip.sauce.bites": "還能沾 %s 口",
   "text.orients_hotpot_chronicles.tooltip.dipped": "沾了：%s",
-  "text.orients_hotpot_chronicles.msg.station_out": "%s 沒貨了，空手右鍵沾醬台補貨",
   "text.orients_hotpot_chronicles.msg.dip_need_food": "先用筷子夾一樣菜再來沾",
   "text.orients_hotpot_chronicles.screen.sauce.left": "檯上還有 %s 份（最多 %s）",
   "block.orients_hotpot_chronicles.oak_sauce_station": "橡木沾醬台",

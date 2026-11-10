@@ -20,8 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class SeatEntity extends Entity {
     private BlockPos a = BlockPos.ZERO;
     private BlockPos b = BlockPos.ZERO;
-    /** 座位朝向。mryt233 改（2026-11-07）：升为 protected，子类直接复用这一份，不要再存第二份
-     *  （以前子类 HighStoolBlock.Seat 自己存了一份，父类这份恒为 NORTH，是个埋着的坑）。 */
+    /** 座位朝向。mryt233 改（2026-11-10）：供条凳座位及后续子类共用。 */
     protected Direction facing = Direction.NORTH;
     /** 凳面离地多高（方块单位）：起身时站回地面用。mryt233 改（2026-11-07）：升为 protected，供子类赋值。 */
     protected double seatY = BenchBlock.SEAT_Y;

@@ -13,6 +13,24 @@ def write_json(path, obj, ensure_ascii=True):
     path.write_bytes((json.dumps(obj, indent=2, ensure_ascii=ensure_ascii) + "\n").encode("utf-8"))
 
 
+# mryt233 改（2026-11-10）：迁移旧生成器时保留资源的换行、末尾换行和转义约定。
+def write_legacy_json(path, obj, ensure_ascii=True, newline=None, trailing=True):
+    path = Path(path)
+    if newline is None:
+        newline = "\r\n" if path.exists() and b"\r\n" in path.read_bytes() else "\n"
+    text = json.dumps(obj, indent=2, ensure_ascii=ensure_ascii) + ("\n" if trailing else "")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(text.replace("\n", newline).encode("utf-8"))
+
+
+def write_text(path, text):
+    """复制文本时保留目标资源已有换行，新文件使用 LF。"""
+    path = Path(path)
+    newline = "\r\n" if path.exists() and b"\r\n" in path.read_bytes() else "\n"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(text.replace("\r\n", "\n").replace("\n", newline).encode("utf-8"))
+
+
 def save_png(im, path):
     """保存 PNG，自动建目录。"""
     path = Path(path)
