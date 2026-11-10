@@ -32,7 +32,8 @@ public class SoupBowlItem extends Item {
     private static FoodProperties foodOf(SoupBase soup) {
         return new FoodProperties.Builder()
             .nutrition(SoupBase.DEFAULT_BOWL_HUNGER)
-            .saturationModifier(soup == SoupBase.RICH_STOCK || soup == SoupBase.THREE_FRESH ? 0.9F : 0.6F)
+            // mryt233 改（2026-11-10，r147）：饱和度系数改读汤底定义上的属性（以前是按具体汤底写的判断）
+            .saturationModifier(soup.defaultBowlSaturation())
             .usingConvertsTo(Items.BOWL)
             .alwaysEdible()   // 饱了也能喝（同本模组其他食物，mryt233 改 2026-11-01）
             .build();
@@ -76,7 +77,8 @@ public class SoupBowlItem extends Item {
         // mryt233 改（2026-11-05）：营养按配置现算再吃；和 ConfiguredFoodItem 一样用 user.eat 结算
         ItemStack result = user.eat(world, stack, eating());
         if (!world.isClientSide) {
-            if (soup == SoupBase.CLEAR || soup == SoupBase.TOMATO) {
+            // mryt233 改（2026-11-10，r147）：「喝下解反胃」改成汤底自己的属性（清汤、番茄汤为 true）
+            if (soup.clearsNausea()) {
                 user.removeEffect(MobEffects.CONFUSION);
             }
             // mryt233 改（2026-11-05，r136a）：六种汤碗统一按 SoupBase.dishBonusEffects(辣度) 结算，
@@ -86,7 +88,8 @@ public class SoupBowlItem extends Item {
             }
             // 3 级特辣：嘴上冒 2 秒火苗，纯节目效果（前面刚加的抗火罩着，不会扣血）
             // mryt233 改（2026-11-06，r139）：穿着布围裙时不再点火苗（防溅油装备挡滚油与明火）。
-            if (soup == SoupBase.SPICY && spicy >= 3 && !ClothApronItem.wornBy(user)) {
+            // mryt233 改（2026-11-10）：红汤判断改成 isSpicy() 属性；特辣冒火苗属于红汤独有的玩法，保留特判
+            if (soup.isSpicy() && spicy >= 3 && !ClothApronItem.wornBy(user)) {
                 user.setRemainingFireTicks(Math.max(user.getRemainingFireTicks(), 40));
             }
         }

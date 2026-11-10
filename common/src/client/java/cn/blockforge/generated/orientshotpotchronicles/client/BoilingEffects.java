@@ -1,6 +1,7 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.RenderType;
@@ -33,23 +34,29 @@ public final class BoilingEffects {
     /** 清水锅的气泡配色（子模组画水锅时用）。 */
     private static final Palette WATER = new Palette(0x5A8FD8, 0xC8E2FF);
 
-    // 配色做成常量，不再每帧 new（代码检查 W5，mryt233 2026-11-01）
-    private static final Palette PAL_CLEAR = new Palette(0xC6CCCA, 0xF4F4EC);   // 2026-10-23 清汤换成清亮的银灰（用户参考图），调整
-    private static final Palette PAL_RICH_STOCK = new Palette(0xF2E7D2, 0xFFFFFF);
-    private static final Palette PAL_MUSHROOM = new Palette(0x9A7048, 0xE8C88A);
-    private static final Palette PAL_TOMATO = new Palette(0xE2563A, 0xFF9A6A);       // 2026-10-25 番茄锅底
-    private static final Palette PAL_THREE_FRESH = new Palette(0xE6D8B0, 0xFFF6DC);  // 2026-10-25 三鲜锅底
-    private static final Palette PAL_SPICY = new Palette(0xBE3325, 0xD8553A); // 红汤：比汤底 #B82F23 稍亮，顶面带红油光泽
+    /**
+     * mryt233 改（2026-11-10，r147）：气泡配色不再是一个按汤底写的 switch，直接从汤底定义上读
+     * （{@link SoupBase#bubbleBody()} / {@link SoupBase#bubbleHi()}）。
+     * 配色做成常量，读一次不再每帧 new（代码检查 W5，mryt233 2026-11-01）。
+     * 以前这里写 {@code default -> PAL_SPICY}，加汤底漏写会悄悄用红汤的颜色；现在颜色是枚举构造参数的一部分，
+     * 漏写编译就过不去。
+     */
+    private static final java.util.Map<SoupVisual, Palette> PALETTES = buildPalettes();
+
+    private static java.util.Map<SoupVisual, Palette> buildPalettes() {
+        java.util.EnumMap<SoupVisual, Palette> map = new java.util.EnumMap<>(SoupVisual.class);
+        for (SoupBase base : SoupBase.values()) {
+            map.put(base.visual(), new Palette(base.bubbleBody(), base.bubbleHi()));
+        }
+        return java.util.Collections.unmodifiableMap(map);
+    }
 
     private static Palette palette(SoupVisual soup) {
-        return switch (soup) {
-            case CLEAR -> PAL_CLEAR;
-            case RICH_STOCK -> PAL_RICH_STOCK;
-            case MUSHROOM -> PAL_MUSHROOM;
-            case TOMATO -> PAL_TOMATO;
-            case THREE_FRESH -> PAL_THREE_FRESH;
-            default -> PAL_SPICY;
-        };
+        Palette palette = PALETTES.get(soup);
+        if (palette == null) {
+            throw new IllegalStateException("汤面 " + soup + " 没有气泡配色；加汤底时要在 SoupBase 上补气泡配色。");
+        }
+        return palette;
     }
 
     private BoilingEffects() {

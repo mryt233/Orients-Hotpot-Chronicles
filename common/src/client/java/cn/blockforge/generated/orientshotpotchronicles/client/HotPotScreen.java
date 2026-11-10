@@ -57,21 +57,17 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
 
     private static final Soup NO_SOUP = new Soup(0xFF1B1C20, 0xFFFFFFFF, 0xFF808080, new int[]{0xFF808080});
 
+    /**
+     * mryt233 改（2026-11-10，r147）：配色不再是一个按汤底写的 switch，直接读汤底定义上的颜色
+     * （{@link SoupBase#screenBase()} 等）。加汤底时颜色写在 {@code SoupBase} 的构造参数里，
+     * 枚举构造漏写就编译不过，不会悄悄退化成红汤的配色。
+     */
     private static Soup soup(int baseId) {
         SoupBase soup = SoupBase.byId(baseId);
         if (soup == null) {
             return NO_SOUP;
         }
-        return switch (soup) {
-            case CLEAR -> new Soup(0xFFB4BCBC, 0xFFF4F4EC, 0xFFC6CCCA,   // 清汤配色同锅里的新贴图（2026-10-23，调整）
-                new int[]{0xFF6FAF3A, 0xFF8FCF52, 0xFFD04A2A});
-            case RICH_STOCK -> new Soup(0xFFE3D7BF, 0xFFFFFFFF, 0xFFF2E7D2, new int[]{0xFFFFF8EA, 0xFF6FAF3A, 0xFFD9C9A8});
-            case MUSHROOM -> new Soup(0xFF7C5836, 0xFFE8C88A, 0xFF9A7048, new int[]{0xFF4A3220, 0xFFC9A16A, 0xFF5E4026});
-            case SPICY -> new Soup(0xFFB32A1E, 0xFFFFB070, 0xFFD94A2E, new int[]{0xFFE8862A, 0xFF7A1408, 0xFF3A1208});
-            // 2026-10-25 新汤底：番茄 = 橙红汤面 + 蛋花黄 / 番茄块 / 葱绿；三鲜 = 淡金汤面 + 蘑菇 / 胡萝卜 / 海带
-            case TOMATO -> new Soup(0xFFD8482A, 0xFFFF9A6A, 0xFFE86040, new int[]{0xFFF2C14A, 0xFFB82818, 0xFF6FAF3A});
-            case THREE_FRESH -> new Soup(0xFFD8C79A, 0xFFFFF6DC, 0xFFE6D8B0, new int[]{0xFF8A5A34, 0xFFF08A30, 0xFF3E7A3A});
-        };
+        return new Soup(soup.screenBase(), soup.screenHi(), soup.screenLo(), soup.screenBits());
     }
 
     /** 锅身金属配色：取自锅贴图（铜锅 = 原版铜块色系，铁锅 = 铁灰），锅沿、隔条、铆钉都用它，不再是金色。 */

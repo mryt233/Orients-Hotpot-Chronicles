@@ -31,23 +31,35 @@ public final class HotPotContent {
     public static final StoveTopBlock STOVE_TOP = reg().blocks().register(
         HotPot.id("tall_brick_stove_top"), new StoveTopBlock());
 
-    public static final HotPotBlock COPPER_HOT_POT = reg().blocks().register(
-        HotPot.id(HotPotMaterial.COPPER.idPath()), new HotPotBlock(HotPotMaterial.COPPER));
+    /**
+     * mryt233 改（2026-11-10，r147）：12 种锅的方块 / 物品改成 {@link java.util.EnumMap} + 循环注册。
+     * 以前是 12 个字段 + 两个 12 路的 switch（blockFor / itemFor）共 26 处手写；现在只在
+     * {@link #POT_ORDER} 里排一次序。注册顺序严格照旧（先铜后铁里也照旧：九宫格、S、O、方心、直隔、田字），
+     * ID 与创造栏顺序都由同一份表决定，不会漂移。
+     *
+     * <p>旧字段名（COPPER_HOT_POT 等）保留成指向同一对象的别名，子模组和旧调用方不受影响。</p>
+     */
+    public static final java.util.List<HotPotMaterial> POT_ORDER = java.util.List.of(
+        HotPotMaterial.COPPER, HotPotMaterial.IRON,
+        HotPotMaterial.COPPER_S, HotPotMaterial.COPPER_O,
+        HotPotMaterial.IRON_S, HotPotMaterial.IRON_O,
+        HotPotMaterial.COPPER_SQUARE, HotPotMaterial.IRON_SQUARE,
+        HotPotMaterial.COPPER_SPLIT, HotPotMaterial.IRON_SPLIT,
+        HotPotMaterial.COPPER_FOUR, HotPotMaterial.IRON_FOUR);
 
-    public static final HotPotBlock IRON_HOT_POT = reg().blocks().register(
-        HotPot.id(HotPotMaterial.IRON.idPath()), new HotPotBlock(HotPotMaterial.IRON));
-    /** 鸳鸯锅（2026-10-23，新增）：S 形 / O 形隔板，两边各一种汤；铜、铁各两种。 */
-    public static final HotPotBlock COPPER_S_POT = potBlock(HotPotMaterial.COPPER_S);
-    public static final HotPotBlock COPPER_O_POT = potBlock(HotPotMaterial.COPPER_O);
-    public static final HotPotBlock IRON_S_POT = potBlock(HotPotMaterial.IRON_S);
-    public static final HotPotBlock IRON_O_POT = potBlock(HotPotMaterial.IRON_O);
-    public static final HotPotBlock COPPER_SQUARE_POT = potBlock(HotPotMaterial.COPPER_SQUARE);
-    public static final HotPotBlock IRON_SQUARE_POT = potBlock(HotPotMaterial.IRON_SQUARE);
-    public static final HotPotBlock COPPER_SPLIT_POT = potBlock(HotPotMaterial.COPPER_SPLIT);
-    public static final HotPotBlock IRON_SPLIT_POT = potBlock(HotPotMaterial.IRON_SPLIT);
-    /** 田字四宫格锅：四块各一种汤。 */
-    public static final HotPotBlock COPPER_FOUR_POT = potBlock(HotPotMaterial.COPPER_FOUR);
-    public static final HotPotBlock IRON_FOUR_POT = potBlock(HotPotMaterial.IRON_FOUR);
+    /** 锅方块：材质 → 方块（顺序同 {@link #POT_ORDER}）。 */
+    public static final java.util.Map<HotPotMaterial, HotPotBlock> POT_BLOCKS =
+        new java.util.EnumMap<>(HotPotMaterial.class);
+    /** 锅物品：材质 → 物品（同一顺序）。 */
+    public static final java.util.Map<HotPotMaterial, BlockItem> POT_ITEMS =
+        new java.util.EnumMap<>(HotPotMaterial.class);
+
+    static {
+        for (HotPotMaterial material : POT_ORDER) {
+            POT_BLOCKS.put(material, reg().blocks().register(
+                HotPot.id(material.idPath()), new HotPotBlock(material)));
+        }
+    }
 
     /** 每种原版木板一种火锅桌（顺序同原版木板），围着灶台拼成 3x3 的大桌，顶面和灶台台面齐平。 */
     public static final java.util.List<String> TABLE_WOODS = java.util.List.of(
@@ -69,9 +81,29 @@ public final class HotPotContent {
     public static final java.util.List<BenchBlock> TALL_BENCHES = new java.util.ArrayList<>();
     public static final java.util.List<BlockItem> TALL_BENCH_ITEMS = new java.util.ArrayList<>();
 
-    /** 盘子：5 种材质 × 6 种大小（顺序：材质在外层）。 */
-    public static final java.util.List<String> PLATE_MATERIALS = java.util.List.of(
-        "quartz", "bamboo", "terracotta", "copper", "iron");
+    /**
+     * 盘子材质（顺序：材质在外层；打乱会让注册顺序和创造栏顺序变化）。
+     * mryt233 改（2026-11-10，r147）：材质做成一条记录（名字、地图颜色、声音），
+     * 以前这里只有名字，颜色和声音在两个按名字写的 switch 里——加一种材质要改三处。
+     * 这条记录和 {@code content/materials.json} 的 {@code plates} 段一一对应（启动时核对，
+     * 见 {@link #verifyPlateMaterials()}）。
+     */
+    public record PlateMaterial(String id,
+                                net.minecraft.world.level.material.MapColor mapColor,
+                                net.minecraft.world.level.block.SoundType sounds) {
+    }
+
+    public static final java.util.List<PlateMaterial> PLATE_MATERIALS = java.util.List.of(
+        new PlateMaterial("quartz", net.minecraft.world.level.material.MapColor.QUARTZ,
+            net.minecraft.world.level.block.SoundType.DECORATED_POT),
+        new PlateMaterial("bamboo", net.minecraft.world.level.material.MapColor.SAND,
+            net.minecraft.world.level.block.SoundType.BAMBOO_WOOD),
+        new PlateMaterial("terracotta", net.minecraft.world.level.material.MapColor.COLOR_ORANGE,
+            net.minecraft.world.level.block.SoundType.DECORATED_POT),
+        new PlateMaterial("copper", net.minecraft.world.level.material.MapColor.COLOR_ORANGE,
+            net.minecraft.world.level.block.SoundType.COPPER),
+        new PlateMaterial("iron", net.minecraft.world.level.material.MapColor.METAL,
+            net.minecraft.world.level.block.SoundType.METAL));
     public static final java.util.List<PlateBlock> PLATES = new java.util.ArrayList<>();
     public static final java.util.List<PlateItem> PLATE_ITEMS = new java.util.ArrayList<>();
     /** 筷子上夹着的那一样食物（组件值包在 HeldFood 里，NeoForge 要求组件值实现 equals/hashCode）。 */
@@ -82,27 +114,15 @@ public final class HotPotContent {
             .build());
 
     static {
-        for (String material : PLATE_MATERIALS) {
-            net.minecraft.world.level.material.MapColor color = switch (material) {
-                case "quartz" -> net.minecraft.world.level.material.MapColor.QUARTZ;
-                case "bamboo" -> net.minecraft.world.level.material.MapColor.SAND;
-                case "terracotta" -> net.minecraft.world.level.material.MapColor.COLOR_ORANGE;
-                case "copper" -> net.minecraft.world.level.material.MapColor.COLOR_ORANGE;
-                default -> net.minecraft.world.level.material.MapColor.METAL;
-            };
-            net.minecraft.world.level.block.SoundType sounds = switch (material) {
-                case "quartz", "terracotta" -> net.minecraft.world.level.block.SoundType.DECORATED_POT;
-                case "bamboo" -> net.minecraft.world.level.block.SoundType.BAMBOO_WOOD;
-                case "copper" -> net.minecraft.world.level.block.SoundType.COPPER;
-                default -> net.minecraft.world.level.block.SoundType.METAL;
-            };
+        // mryt233 改（2026-11-10）：颜色和声音直接从材质记录上取，不再按名字写两个 switch
+        for (PlateMaterial material : PLATE_MATERIALS) {
             for (PlateSize size : PlateSize.values()) {
                 if (size == PlateSize.BOWL || size == PlateSize.DRINK || size == PlateSize.CUP) {
                     continue;   // 碗、橙子饮料不是盘子（只借用盘子格摆放）
                 }
-                String id = material + "_" + size.itemId();   // ID 和显示名对得上（r102）：quartz_small_dish 等
+                String id = material.id() + "_" + size.itemId();   // ID 和显示名对得上（r102）：quartz_small_dish 等
                 PlateBlock plate = reg().blocks().register( HotPot.id(id),
-                    new PlateBlock(material, size, color, sounds));
+                    new PlateBlock(material.id(), size, material.mapColor(), material.sounds()));
                 PLATES.add(plate);
                 PLATE_ITEMS.add(reg().items().register( HotPot.id(id),
                     new PlateItem(plate, new Item.Properties().stacksTo(16))));
@@ -204,23 +224,46 @@ public final class HotPotContent {
     public static final BlockItem TALL_STOVE_ITEM = reg().items().register(
         HotPot.id("tall_brick_stove"), new BlockItem(TALL_STOVE, new Item.Properties()));
 
-    public static final BlockItem COPPER_HOT_POT_ITEM = reg().items().register(
-        HotPot.id(HotPotMaterial.COPPER.idPath()),
-        new BlockItem(COPPER_HOT_POT, new Item.Properties()));
+    /**
+     * mryt233 改（2026-11-10，r147）：12 种锅物品也改成循环注册，顺序同 {@link #POT_ORDER}。
+     * 旧字段名保留成别名。
+     */
+    static {
+        for (HotPotMaterial material : POT_ORDER) {
+            POT_ITEMS.put(material, reg().items().register(
+                HotPot.id(material.idPath()),
+                new BlockItem(POT_BLOCKS.get(material), new Item.Properties())));
+        }
+    }
 
-    public static final BlockItem IRON_HOT_POT_ITEM = reg().items().register(
-        HotPot.id(HotPotMaterial.IRON.idPath()),
-        new BlockItem(IRON_HOT_POT, new Item.Properties()));
-    public static final BlockItem COPPER_S_POT_ITEM = potItem(COPPER_S_POT);
-    public static final BlockItem COPPER_O_POT_ITEM = potItem(COPPER_O_POT);
-    public static final BlockItem IRON_S_POT_ITEM = potItem(IRON_S_POT);
-    public static final BlockItem IRON_O_POT_ITEM = potItem(IRON_O_POT);
-    public static final BlockItem COPPER_SQUARE_POT_ITEM = potItem(COPPER_SQUARE_POT);
-    public static final BlockItem IRON_SQUARE_POT_ITEM = potItem(IRON_SQUARE_POT);
-    public static final BlockItem COPPER_SPLIT_POT_ITEM = potItem(COPPER_SPLIT_POT);
-    public static final BlockItem IRON_SPLIT_POT_ITEM = potItem(IRON_SPLIT_POT);
-    public static final BlockItem COPPER_FOUR_POT_ITEM = potItem(COPPER_FOUR_POT);
-    public static final BlockItem IRON_FOUR_POT_ITEM = potItem(IRON_FOUR_POT);
+    // ---- 旧字段名：都指向 EnumMap 里同一个对象，子模组 / 旧调用方不用改（mryt233 2026-11-10） ----
+    public static final HotPotBlock COPPER_HOT_POT = POT_BLOCKS.get(HotPotMaterial.COPPER);
+    public static final HotPotBlock IRON_HOT_POT = POT_BLOCKS.get(HotPotMaterial.IRON);
+    /** 鸳鸯锅（2026-10-23，新增）：S 形 / O 形隔板，两边各一种汤；铜、铁各两种。 */
+    public static final HotPotBlock COPPER_S_POT = POT_BLOCKS.get(HotPotMaterial.COPPER_S);
+    public static final HotPotBlock COPPER_O_POT = POT_BLOCKS.get(HotPotMaterial.COPPER_O);
+    public static final HotPotBlock IRON_S_POT = POT_BLOCKS.get(HotPotMaterial.IRON_S);
+    public static final HotPotBlock IRON_O_POT = POT_BLOCKS.get(HotPotMaterial.IRON_O);
+    public static final HotPotBlock COPPER_SQUARE_POT = POT_BLOCKS.get(HotPotMaterial.COPPER_SQUARE);
+    public static final HotPotBlock IRON_SQUARE_POT = POT_BLOCKS.get(HotPotMaterial.IRON_SQUARE);
+    public static final HotPotBlock COPPER_SPLIT_POT = POT_BLOCKS.get(HotPotMaterial.COPPER_SPLIT);
+    public static final HotPotBlock IRON_SPLIT_POT = POT_BLOCKS.get(HotPotMaterial.IRON_SPLIT);
+    /** 田字四宫格锅：四块各一种汤。 */
+    public static final HotPotBlock COPPER_FOUR_POT = POT_BLOCKS.get(HotPotMaterial.COPPER_FOUR);
+    public static final HotPotBlock IRON_FOUR_POT = POT_BLOCKS.get(HotPotMaterial.IRON_FOUR);
+
+    public static final BlockItem COPPER_HOT_POT_ITEM = POT_ITEMS.get(HotPotMaterial.COPPER);
+    public static final BlockItem IRON_HOT_POT_ITEM = POT_ITEMS.get(HotPotMaterial.IRON);
+    public static final BlockItem COPPER_S_POT_ITEM = POT_ITEMS.get(HotPotMaterial.COPPER_S);
+    public static final BlockItem COPPER_O_POT_ITEM = POT_ITEMS.get(HotPotMaterial.COPPER_O);
+    public static final BlockItem IRON_S_POT_ITEM = POT_ITEMS.get(HotPotMaterial.IRON_S);
+    public static final BlockItem IRON_O_POT_ITEM = POT_ITEMS.get(HotPotMaterial.IRON_O);
+    public static final BlockItem COPPER_SQUARE_POT_ITEM = POT_ITEMS.get(HotPotMaterial.COPPER_SQUARE);
+    public static final BlockItem IRON_SQUARE_POT_ITEM = POT_ITEMS.get(HotPotMaterial.IRON_SQUARE);
+    public static final BlockItem COPPER_SPLIT_POT_ITEM = POT_ITEMS.get(HotPotMaterial.COPPER_SPLIT);
+    public static final BlockItem IRON_SPLIT_POT_ITEM = POT_ITEMS.get(HotPotMaterial.IRON_SPLIT);
+    public static final BlockItem COPPER_FOUR_POT_ITEM = POT_ITEMS.get(HotPotMaterial.COPPER_FOUR);
+    public static final BlockItem IRON_FOUR_POT_ITEM = POT_ITEMS.get(HotPotMaterial.IRON_FOUR);
 
     /**
      * 毛肚（牛掉落，r93）：生的回 2 点饥饿；熟的回 5 点。熔炉 / 烟熏炉 / 营火都能烤，锅里涮得比牛肉快一半（熔炉配方 100 tick）。
@@ -496,32 +539,21 @@ public final class HotPotContent {
     public static final CupItem MILK_CUP = reg().items().register( HotPot.id("milk_cup"),
         new CupItem(DrinkKind.MILK));
 
+    /**
+     * mryt233 改（2026-11-10，r147）：这三个把饮料种类翻成物品的 switch 删掉了——
+     * 瓶子 / 空瓶 / 杯子都挂在 {@link DrinkKind} 自己身上（按 ID 查注册表，不受类初始化顺序影响）。
+     * 保留这三个公开方法是为了子模组和旧调用方还能按原名字拿到东西。
+     */
     public static CupItem cupFor(DrinkKind kind) {
-        return switch (kind) {
-            case ORANGE_DRINK -> ORANGE_DRINK_CUP;
-            case PLANT_PROTEIN_DRINK -> PLANT_PROTEIN_DRINK_CUP;
-            case ORIENT_COLA -> ORIENT_COLA_CUP;
-            case WATER -> WATER_CUP;
-            case MILK -> MILK_CUP;
-        };
+        return kind.cup();
     }
 
     public static DrinkItem drinkFor(DrinkKind kind) {
-        return switch (kind) {
-            case ORANGE_DRINK -> ORANGE_DRINK;
-            case PLANT_PROTEIN_DRINK -> PLANT_PROTEIN_DRINK;
-            case ORIENT_COLA -> ORIENT_COLA;
-            case WATER, MILK -> throw new IllegalArgumentException("水、牛奶没有瓶装");
-        };
+        return kind.bottle();
     }
 
     public static Item emptyBottle(DrinkKind kind) {
-        return switch (kind) {
-            case ORANGE_DRINK -> EMPTY_ORANGE_DRINK_BOTTLE;
-            case PLANT_PROTEIN_DRINK -> EMPTY_PLANT_PROTEIN_DRINK_BOTTLE;
-            case ORIENT_COLA -> EMPTY_ORIENT_COLA_BOTTLE;
-            case WATER, MILK -> net.minecraft.world.item.Items.GLASS_BOTTLE;   // 用不到：水、牛奶没有瓶装
-        };
+        return kind.emptyBottle();
     }
 
     public static final Item CHOPSTICKS = reg().items().register(
@@ -615,23 +647,26 @@ public final class HotPotContent {
     /** 由平台在 {@link #register} 里创建并赋值。 */
     public static CreativeModeTab ITEM_GROUP;
 
+    /**
+     * 创造栏里锅的顺序（用户 2026-10-24 定）：先铁锅全部、再铜锅全部，每种按
+     * 九宫格 / S / O / 方心 / 直隔 / 田字。和注册用的 {@link #POT_ORDER} 刻意不同，所以单独排一份，
+     * 别把注册顺序也一起改了（mryt233 改 2026-11-10）。
+     */
+    static final java.util.List<HotPotMaterial> CREATIVE_POT_ORDER = java.util.List.of(
+        HotPotMaterial.IRON, HotPotMaterial.IRON_S, HotPotMaterial.IRON_O,
+        HotPotMaterial.IRON_SQUARE, HotPotMaterial.IRON_SPLIT, HotPotMaterial.IRON_FOUR,
+        HotPotMaterial.COPPER, HotPotMaterial.COPPER_S, HotPotMaterial.COPPER_O,
+        HotPotMaterial.COPPER_SQUARE, HotPotMaterial.COPPER_SPLIT, HotPotMaterial.COPPER_FOUR);
+
     /** 创造栏里放什么：纯数据，平台只负责套上加载器的标签页外壳。 */
     public static void fillCreativeTab(CreativeModeTab.ItemDisplayParameters context, CreativeModeTab.Output entries) {
                 entries.accept(STOVE_ITEM);
                 entries.accept(TALL_STOVE_ITEM);
-                // 锅：先铁锅全部、再铜锅全部，每种按 九宫格 / S / O / 直隔 / 田字（用户 2026-10-24 定）
-                entries.accept(IRON_HOT_POT_ITEM);
-                entries.accept(IRON_S_POT_ITEM);
-                entries.accept(IRON_O_POT_ITEM);
-                entries.accept(IRON_SQUARE_POT_ITEM);
-                entries.accept(IRON_SPLIT_POT_ITEM);
-                entries.accept(IRON_FOUR_POT_ITEM);
-                entries.accept(COPPER_HOT_POT_ITEM);
-                entries.accept(COPPER_S_POT_ITEM);
-                entries.accept(COPPER_O_POT_ITEM);
-                entries.accept(COPPER_SQUARE_POT_ITEM);
-                entries.accept(COPPER_SPLIT_POT_ITEM);
-                entries.accept(COPPER_FOUR_POT_ITEM);
+                // 锅：先铁锅全部、再铜锅全部，每种按 九宫格 / S / O / 方心 / 直隔 / 田字（用户 2026-10-24 定）
+                // mryt233 改（2026-11-10，r147）：12 行手写改成按创造栏专用顺序循环（逐项和以前一致）
+                for (HotPotMaterial material : CREATIVE_POT_ORDER) {
+                    entries.accept(POT_ITEMS.get(material));
+                }
                 entries.accept(CHOPSTICKS);
                 entries.accept(RAW_TRIPE);
                 entries.accept(COOKED_TRIPE);
@@ -731,6 +766,64 @@ public final class HotPotContent {
     private HotPotContent() {
     }
 
+    /**
+     * mryt233 改（2026-11-10，r147）：盘子材质和 {@code content/materials.json} 的一致性核对。
+     * Java 侧的颜色 / 声音现在是材质记录上的字段，脚本侧的同一份数据在 materials.json 的 {@code plates} 段；
+     * 两边写岔了不会报错，只会让「生成脚本产出的贴图 / 模型」和「代码注册的属性」对不上。
+     * 启动时按 ID 核对一遍：材质名单顺序、地图颜色、声音名，不一致就抛异常（而不是安静地用着错的）。
+     *
+     * <p>materials.json 不在运行时资源里（它是生成脚本的源数据，不进 jar），所以用不到的时候跳过；
+     * 开发环境能读到就核对，正式包里读不到就跳过。</p>
+     */
+    public static void verifyPlateMaterials() {
+        java.nio.file.Path json = java.nio.file.Path.of("content", "materials.json");
+        if (!java.nio.file.Files.isRegularFile(json)) {
+            return;   // 正式包 / 工作目录不同：没有源数据可核，跳过
+        }
+        try {
+            String text = java.nio.file.Files.readString(json, java.nio.charset.StandardCharsets.UTF_8);
+            com.google.gson.JsonObject root = com.google.gson.JsonParser.parseString(text).getAsJsonObject();
+            com.google.gson.JsonArray plates = root.getAsJsonArray("plates");
+            if (plates == null) {
+                throw new IllegalStateException("content/materials.json 缺少 plates 段");
+            }
+            if (plates.size() != PLATE_MATERIALS.size()) {
+                throw new IllegalStateException("盘子材质数量不一致：Java " + PLATE_MATERIALS.size()
+                    + " 种，materials.json " + plates.size() + " 种");
+            }
+            for (int i = 0; i < plates.size(); i++) {
+                com.google.gson.JsonObject entry = plates.get(i).getAsJsonObject();
+                PlateMaterial material = PLATE_MATERIALS.get(i);
+                String jsonId = entry.get("id").getAsString();
+                if (!jsonId.equals(material.id())) {
+                    throw new IllegalStateException("第 " + i + " 种盘子材质顺序不一致：Java " + material.id()
+                        + "，materials.json " + jsonId);
+                }
+                String jsonSound = entry.has("sound") ? entry.get("sound").getAsString() : null;
+                if (jsonSound != null && !jsonSound.equals(soundName(material.sounds()))) {
+                    throw new IllegalStateException("盘子材质 " + material.id() + " 的声音不一致：Java "
+                        + soundName(material.sounds()) + "，materials.json " + jsonSound);
+                }
+            }
+        } catch (java.io.IOException error) {
+            HotPot.LOGGER.warn("[hotpot] 读取 content/materials.json 失败，跳过盘子材质一致性核对", error);
+        }
+    }
+
+    /** 声音类型的名字（和 materials.json 里的写法一致，见 tools/pixkit/materials.py）。 */
+    private static String soundName(net.minecraft.world.level.block.SoundType sounds) {
+        for (java.lang.reflect.Field field : net.minecraft.world.level.block.SoundType.class.getFields()) {
+            try {
+                if (field.getType() == net.minecraft.world.level.block.SoundType.class && field.get(null) == sounds) {
+                    return field.getName();
+                }
+            } catch (IllegalAccessException ignored) {
+                // 公开静态字段，取不到就继续
+            }
+        }
+        return "unknown";
+    }
+
     /** 在模组初始化阶段调用，确保注册顺序完成后输出一条可追踪日志。 */
     public static void register() {
         // 创造栏 / 菜单 / 方块实体类型统一走分域 Registrar（P1 第三批）
@@ -748,14 +841,16 @@ public final class HotPotContent {
         CUTTING_BOARD_BE = reg.blockEntities().register(HotPot.id("cutting_board"), CuttingBoardBlockEntity::new, CUTTING_BOARD);
         SAUCE_STATION_BE = reg.blockEntities().register(HotPot.id("sauce_station"), SauceStationBlockEntity::new,
             SAUCE_STATIONS.toArray(new net.minecraft.world.level.block.Block[0]));
+        // mryt233 改（2026-11-10，r147）：方块实体类型挂哪些锅也从 POT_ORDER 来（顺序照旧）
         HOT_POT_BE = reg.blockEntities().register(HotPot.id("hot_pot"), HotPotBlockEntity::new,
-            COPPER_HOT_POT, IRON_HOT_POT, COPPER_S_POT, COPPER_O_POT, IRON_S_POT, IRON_O_POT,
-            COPPER_SQUARE_POT, IRON_SQUARE_POT, COPPER_SPLIT_POT, IRON_SPLIT_POT, COPPER_FOUR_POT, IRON_FOUR_POT);
+            POT_ORDER.stream().map(m -> POT_BLOCKS.get(m)).toArray(net.minecraft.world.level.block.Block[]::new));
         STOVE_BE = reg.blockEntities().register(HotPot.id("stove"), StoveBlockEntity::new, STOVE, TALL_STOVE);
         BENCH_BE = reg.blockEntities().register(HotPot.id("bench"), BenchBlockEntity::new,
             TALL_BENCHES.toArray(new net.minecraft.world.level.block.Block[0]));
         // 触碰静态字段，明确让物品组在客户端和服务端都完成初始化。
         ITEM_GROUP.getDisplayName();
+        // mryt233 改（2026-11-10，r147）：核对盘子材质和生成脚本源数据一致（漏写 / 写岔直接报错）
+        verifyPlateMaterials();
         TripeLoot.register();
         GarnishLoot.register();
         OrangeLoot.register();
@@ -790,38 +885,24 @@ public final class HotPotContent {
         return icon;
     }
 
+    /**
+     * mryt233 改（2026-11-10，r147）：12 路 switch 改成查 {@link #POT_BLOCKS}。
+     * 加一种锅型只要在 {@link #POT_ORDER} 和 {@link HotPotMaterial} 里各加一个值。
+     */
     public static HotPotBlock blockFor(HotPotMaterial material) {
-        return switch (material) {
-            case COPPER -> COPPER_HOT_POT;
-            case IRON -> IRON_HOT_POT;
-            case COPPER_S -> COPPER_S_POT;
-            case COPPER_O -> COPPER_O_POT;
-            case IRON_S -> IRON_S_POT;
-            case IRON_O -> IRON_O_POT;
-            case COPPER_SQUARE -> COPPER_SQUARE_POT;
-            case IRON_SQUARE -> IRON_SQUARE_POT;
-            case COPPER_SPLIT -> COPPER_SPLIT_POT;
-            case IRON_SPLIT -> IRON_SPLIT_POT;
-            case COPPER_FOUR -> COPPER_FOUR_POT;
-            case IRON_FOUR -> IRON_FOUR_POT;
-        };
+        HotPotBlock block = POT_BLOCKS.get(material);
+        if (block == null) {
+            throw new IllegalStateException("锅材质 " + material + " 没有注册方块；加锅型时要在 POT_ORDER 里补上。");
+        }
+        return block;
     }
 
     public static BlockItem itemFor(HotPotMaterial material) {
-        return switch (material) {
-            case COPPER -> COPPER_HOT_POT_ITEM;
-            case IRON -> IRON_HOT_POT_ITEM;
-            case COPPER_S -> COPPER_S_POT_ITEM;
-            case COPPER_O -> COPPER_O_POT_ITEM;
-            case IRON_S -> IRON_S_POT_ITEM;
-            case IRON_O -> IRON_O_POT_ITEM;
-            case COPPER_SQUARE -> COPPER_SQUARE_POT_ITEM;
-            case IRON_SQUARE -> IRON_SQUARE_POT_ITEM;
-            case COPPER_SPLIT -> COPPER_SPLIT_POT_ITEM;
-            case IRON_SPLIT -> IRON_SPLIT_POT_ITEM;
-            case COPPER_FOUR -> COPPER_FOUR_POT_ITEM;
-            case IRON_FOUR -> IRON_FOUR_POT_ITEM;
-        };
+        BlockItem item = POT_ITEMS.get(material);
+        if (item == null) {
+            throw new IllegalStateException("锅材质 " + material + " 没有注册物品；加锅型时要在 POT_ORDER 里补上。");
+        }
+        return item;
     }
 
     private static HotPotBlock potBlock(HotPotMaterial material) {

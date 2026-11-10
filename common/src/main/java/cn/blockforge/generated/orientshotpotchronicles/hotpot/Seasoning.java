@@ -23,27 +23,58 @@ import java.util.function.Supplier;
  * 葱花、香菜碎末只提味，没有效果（用户）。
  * 2026-10-23 用户改：麻酱换成味精（原料小麦，提鲜：多回 2 点饥饿值）；醋的原料改成苹果或甜菜根（一种调料可以有几种原料）。
  * mryt233 改（2026-11-06，r137）：在蒜泥之后加蚝油、芝麻酱、花生碎、小米辣，现在共 14 种；原料表已按 r146f 改为单列分页（mryt233 改）。
+ *
+ * <p>mryt233 改（2026-11-10，r147）：把「效果种类 + 默认时长 + 默认等级 + 多回饥饿」全部收进
+ * 枚举构造参数。以前这些数字分两处写：{@code apply} 里的 switch 写效果种类与默认时长，
+ * 静态块里的 {@link Config#rememberSeasoning} 又抄一遍同样的数字，改一处忘另一处不会报错。
+ * 现在只有这一份数据，{@link #apply} 和配置默认值都从它读。</p>
  * 作者：mryt233 */
 public enum Seasoning {
-    MSG("msg", 0xFFECECF0, () -> Items.WHEAT),
-    CHILI_OIL("chili_oil", 0xFFC42816, () -> Items.BLAZE_POWDER),
-    SWEET_SOUR_SAUCE("sweet_sour_sauce", 0xFFC85A3C, () -> Items.SWEET_BERRIES),
-    HONEY("honey", 0xFFECA826, () -> Items.HONEY_BOTTLE),
-    SESAME_OIL("sesame_oil", 0xFFCC8A28, () -> Items.SUNFLOWER, () -> Items.PUMPKIN_SEEDS),   // 用户 2026-10-23：向日葵或南瓜种子
-    VINEGAR("vinegar", 0xFF462418, () -> Items.APPLE, () -> Items.BEETROOT),
-    SUGAR("sugar", 0xFFF0EEE8, () -> Items.SUGAR),
-    CHOPPED_SCALLION("chopped_scallion", 0xFF6CB03A, () -> HotPotContent.SCALLION),
-    MINCED_CILANTRO("minced_cilantro", 0xFF4E9A2C, () -> HotPotContent.CILANTRO),
-    GARLIC_PASTE("garlic_paste", 0xFFE8D696, () -> HotPotContent.GARLIC_PASTE),   // 蒜泥（2026-10-25 用户加，第 10 种）
+    /*
+     * mryt233 改（2026-11-10）：构造参数一览：
+     *   id        调料 ID（语言键与配置键都按它）
+     *   color     碗里这种调料的颜色（ARGB）
+     *   effect    主效果（null = 这种调料没有正面效果）
+     *   duration  主效果的默认时长（tick）；配成 0 或不配就不加
+     *   amplifier 主效果的默认等级（0 = I 级）
+     *   hunger    多回的饥饿值（只有味精用；0 = 不加）
+     *   removes   吃下时解除的状态效果（蜂蜜解毒解辣、醋解反胃解辣、折耳根碎解毒）
+     *   raws      能补这种调料的原料
+     */
+
+    MSG("msg", 0xFFECECF0, null, 0, 0, 2, new net.minecraft.core.Holder[0], () -> Items.WHEAT),
+    CHILI_OIL("chili_oil", 0xFFC42816, MobEffects.FIRE_RESISTANCE, 200, 0, 0, new net.minecraft.core.Holder[0],
+        () -> Items.BLAZE_POWDER),
+    SWEET_SOUR_SAUCE("sweet_sour_sauce", 0xFFC85A3C, MobEffects.MOVEMENT_SPEED, 200, 0, 0,
+        new net.minecraft.core.Holder[0], () -> Items.SWEET_BERRIES),
+    HONEY("honey", 0xFFECA826, null, 0, 0, 0,
+        new net.minecraft.core.Holder[]{MobEffects.HUNGER, MobEffects.POISON}, () -> Items.HONEY_BOTTLE),
+    SESAME_OIL("sesame_oil", 0xFFCC8A28, MobEffects.REGENERATION, 100, 0, 0, new net.minecraft.core.Holder[0],
+        () -> Items.SUNFLOWER, () -> Items.PUMPKIN_SEEDS),   // 用户 2026-10-23：向日葵或南瓜种子
+    VINEGAR("vinegar", 0xFF462418, null, 0, 0, 0,
+        new net.minecraft.core.Holder[]{MobEffects.CONFUSION, MobEffects.HUNGER}, () -> Items.APPLE, () -> Items.BEETROOT),
+    SUGAR("sugar", 0xFFF0EEE8, MobEffects.DIG_SPEED, 200, 0, 0, new net.minecraft.core.Holder[0], () -> Items.SUGAR),
+    CHOPPED_SCALLION("chopped_scallion", 0xFF6CB03A, null, 0, 0, 0, new net.minecraft.core.Holder[0],
+        () -> HotPotContent.SCALLION),
+    MINCED_CILANTRO("minced_cilantro", 0xFF4E9A2C, null, 0, 0, 0, new net.minecraft.core.Holder[0],
+        () -> HotPotContent.CILANTRO),
+    GARLIC_PASTE("garlic_paste", 0xFFE8D696, MobEffects.DAMAGE_RESISTANCE, 160, 0, 0,
+        new net.minecraft.core.Holder[0], () -> HotPotContent.GARLIC_PASTE),   // 蒜泥（2026-10-25 用户加，第 10 种）
     // mryt233 改（2026-11-06）：r137 新增 4 种蘸料，共 14 种。蚝油（水下呼吸）、芝麻酱（伤害吸收）、
     // 花生碎（跳跃提升）、小米辣（力量）；原料都是 r137 新加的蘸料原料，1 个原料照旧 4 份。
-    OYSTER_SAUCE("oyster_sauce", 0xFF5A321E, () -> HotPotContent.OYSTER_SAUCE),
-    SESAME_PASTE("sesame_paste", 0xFFC89E64, () -> HotPotContent.SESAME_PASTE),
-    CRUSHED_PEANUTS("crushed_peanuts", 0xFFDAB46E, () -> HotPotContent.CRUSHED_PEANUTS),
-    MILLET_CHILI("millet_chili", 0xFFE2281C, () -> HotPotContent.MILLET_CHILI),
+    OYSTER_SAUCE("oyster_sauce", 0xFF5A321E, MobEffects.WATER_BREATHING, 200, 0, 0,
+        new net.minecraft.core.Holder[0], () -> HotPotContent.OYSTER_SAUCE),
+    SESAME_PASTE("sesame_paste", 0xFFC89E64, MobEffects.ABSORPTION, 200, 0, 0,
+        new net.minecraft.core.Holder[0], () -> HotPotContent.SESAME_PASTE),
+    CRUSHED_PEANUTS("crushed_peanuts", 0xFFDAB46E, MobEffects.JUMP, 200, 0, 0,
+        new net.minecraft.core.Holder[0], () -> HotPotContent.CRUSHED_PEANUTS),
+    MILLET_CHILI("millet_chili", 0xFFE2281C, MobEffects.DAMAGE_BOOST, 160, 0, 0,
+        new net.minecraft.core.Holder[0], () -> HotPotContent.MILLET_CHILI),
     // mryt233 改（2026-11-06，r139）：第 15 种调料——折耳根碎（西南吃法：折耳根剁碎拌进蘸水）。
-    // 象征折耳根清热解毒：给 10 秒抗性提升 I（和蒜泥同一档，但时间更长），原料是折耳根碾成的碎末。
-    MINCED_ZHE_ER_GEN("minced_zhe_er_gen", 0xFFD8D2BC, () -> HotPotContent.MINCED_ZHE_ER_GEN);
+    // 象征折耳根清热解毒：给 10 秒抗性提升 I（和蒜泥同一档，但时间更长），原料是折耳根碾成的碎末；
+    // 顺手解掉中毒（毒也是「热毒」）。
+    MINCED_ZHE_ER_GEN("minced_zhe_er_gen", 0xFFD8D2BC, MobEffects.DAMAGE_RESISTANCE, 200, 0, 0,
+        new net.minecraft.core.Holder[]{MobEffects.POISON}, () -> HotPotContent.MINCED_ZHE_ER_GEN);
 
     public static final Seasoning[] ALL = values();
 
@@ -74,12 +105,30 @@ public enum Seasoning {
     private final String id;
     private final Supplier<Item>[] raws;
     private final int color;
+    /** 主效果（null = 这种调料没有正面效果）。 */
+    private final net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect> effect;
+    /** 主效果的默认时长 / 等级（配成 0 就不加）。 */
+    private final int defaultTicks;
+    private final int defaultAmplifier;
+    /** 多回的饥饿值（只有味精用）。 */
+    private final int defaultHunger;
+    /** 吃下时解除的状态效果。 */
+    private final net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect>[] removes;
 
     @SafeVarargs
-    Seasoning(String id, int color, Supplier<Item>... raws) {
+    Seasoning(String id, int color,
+              net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect> effect,
+              int defaultTicks, int defaultAmplifier, int defaultHunger,
+              net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect>[] removes,
+              Supplier<Item>... raws) {
         this.id = id;
         this.raws = raws;
         this.color = color;
+        this.effect = effect;
+        this.defaultTicks = defaultTicks;
+        this.defaultAmplifier = defaultAmplifier;
+        this.defaultHunger = defaultHunger;
+        this.removes = removes;
     }
 
     public String id() {
@@ -150,51 +199,33 @@ public enum Seasoning {
     /**
      * 吃下蘸过这种调料的菜时的效果。
      * 时长、等级、味精多回的饥饿值都能在配置文件里改（见 Config）。
+     *
+     * <p>mryt233 改（2026-11-10，r147）：不再是一个按调料写的 switch——效果种类、默认时长、
+     * 默认等级、解除哪些效果、多回多少饥饿都写在枚举构造参数里，这里只按数据执行。</p>
      */
     public void apply(LivingEntity user) {
-        switch (this) {
-            // 味精：提鲜，多回 2 点饥饿值（用户 2026-10-23 选的）
-            case MSG -> {
-                if (user instanceof Player player) {
-                    int hunger = Config.seasoningHunger(id, 2);
-                    if (hunger > 0) {
-                        player.getFoodData().eat(hunger, 0);
-                    }
-                }
-            }
-            case CHILI_OIL -> addEffect(user, MobEffects.FIRE_RESISTANCE, 200, 0);
-            case SWEET_SOUR_SAUCE -> addEffect(user, MobEffects.MOVEMENT_SPEED, 200, 0);
-            case HONEY -> {   // 解辣、解毒
-                user.removeEffect(MobEffects.HUNGER);
-                user.removeEffect(MobEffects.POISON);
-            }
-            case SESAME_OIL -> addEffect(user, MobEffects.REGENERATION, 100, 0);
-            case VINEGAR -> {   // 解反胃；2026-10-23 用户加：也解辣（去掉红汤的饥饿）
-                user.removeEffect(MobEffects.CONFUSION);
-                user.removeEffect(MobEffects.HUNGER);
-            }
-            case SUGAR -> addEffect(user, MobEffects.DIG_SPEED, 200, 0);
-            // 蒜泥：抗性提升 I 8 秒（「蒜能辟邪」，计划里的建议；新增）
-            case GARLIC_PASTE -> addEffect(user, MobEffects.DAMAGE_RESISTANCE, 160, 0);
-            // mryt233 改（2026-11-06）：r137 的 4 种新蘸料。
-            case OYSTER_SAUCE -> addEffect(user, MobEffects.WATER_BREATHING, 200, 0);   // 蚝油：水下呼吸 10 秒
-            case SESAME_PASTE -> addEffect(user, MobEffects.ABSORPTION, 200, 0);        // 芝麻酱：伤害吸收 I 10 秒
-            case CRUSHED_PEANUTS -> addEffect(user, MobEffects.JUMP, 200, 0);           // 花生碎：跳跃提升 I 10 秒
-            case MILLET_CHILI -> addEffect(user, MobEffects.DAMAGE_BOOST, 160, 0);      // 小米辣：力量 I 8 秒
-            // mryt233 改（2026-11-06，r139）：折耳根碎——清热解毒，抗性提升 I 10 秒；顺手解掉中毒（毒也是「热毒」）。
-            case MINCED_ZHE_ER_GEN -> {
-                addEffect(user, MobEffects.DAMAGE_RESISTANCE, 200, 0);
-                user.removeEffect(MobEffects.POISON);
-            }
-            case CHOPPED_SCALLION, MINCED_CILANTRO -> {
+        // 先解除（蜂蜜解毒解辣、醋解反胃解辣、折耳根碎解毒）
+        for (net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect> removed : removes) {
+            user.removeEffect(removed);
+        }
+        // 味精：提鲜，多回 2 点饥饿值（用户 2026-10-23 选的）
+        if (defaultHunger > 0 && user instanceof Player player) {
+            int hunger = Config.seasoningHunger(id, defaultHunger);
+            if (hunger > 0) {
+                player.getFoodData().eat(hunger, 0);
             }
         }
+        // 正面效果（没有效果的调料 effect 是 null，addEffect 会直接跳过）
+        addEffect(user, effect, defaultTicks, defaultAmplifier);
     }
 
-    /** 按配置给状态效果；时长配成 0 就不加。 */
+    /** 按配置给状态效果；时长配成 0 或这条效果不存在就不加。 */
     private void addEffect(LivingEntity user,
                            net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect> effect,
                            int defaultTicks, int defaultAmplifier) {
+        if (effect == null) {
+            return;
+        }
         int ticks = Config.seasoningTicks(id, defaultTicks);
         if (ticks <= 0) {
             return;
@@ -204,24 +235,12 @@ public enum Seasoning {
     }
 
     static {
-        // 默认值记进配置模板：duration / amplifier / hunger
-        Config.rememberSeasoning("msg", 0, 0, 2);
-        Config.rememberSeasoning("chili_oil", 200, 0, 0);
-        Config.rememberSeasoning("sweet_sour_sauce", 200, 0, 0);
-        Config.rememberSeasoning("honey", 0, 0, 0);
-        Config.rememberSeasoning("sesame_oil", 100, 0, 0);
-        Config.rememberSeasoning("vinegar", 0, 0, 0);
-        Config.rememberSeasoning("sugar", 200, 0, 0);
-        Config.rememberSeasoning("chopped_scallion", 0, 0, 0);
-        Config.rememberSeasoning("minced_cilantro", 0, 0, 0);
-        Config.rememberSeasoning("garlic_paste", 160, 0, 0);
-        // mryt233 改（2026-11-06）：r137 的 4 种新蘸料的默认时长 / 等级 / 多回饥饿值。
-        Config.rememberSeasoning("oyster_sauce", 200, 0, 0);
-        Config.rememberSeasoning("sesame_paste", 200, 0, 0);
-        Config.rememberSeasoning("crushed_peanuts", 200, 0, 0);
-        Config.rememberSeasoning("millet_chili", 160, 0, 0);
-        // mryt233 改（2026-11-06，r139）：折耳根碎（第 15 种）的默认时长 / 等级 / 多回饥饿值。
-        Config.rememberSeasoning("minced_zhe_er_gen", 200, 0, 0);
+        // 默认值记进配置模板：duration / amplifier / hunger。
+        // mryt233 改（2026-11-10，r147）：数字不再手抄一遍，直接从枚举自己的字段登记。
+        for (Seasoning seasoning : ALL) {
+            Config.rememberSeasoning(seasoning.id, seasoning.defaultTicks, seasoning.defaultAmplifier,
+                seasoning.defaultHunger);
+        }
     }
 
     /** mask 里的每种调料都生效一次。 */

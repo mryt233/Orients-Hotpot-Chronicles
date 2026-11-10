@@ -59,6 +59,9 @@ def registered_items(src: str) -> list[str]:
     soup = (MOD / "common/src/main/java/cn/blockforge/generated/orientshotpotchronicles/hotpot/SoupBase.java")
     if soup.is_file():
         text = soup.read_text(encoding="utf-8")
+        # mryt233 改（2026-11-10，r147）：碗 ID 从 bowlId() 的 switch 搬到了枚举构造参数
+        # （第二个参数就是碗物品 ID）。旧写法（switch）仍兼容，两种都能扫出来。
+        ids |= set(re.findall(r'^\s*[A-Z_]+\("soup\.[a-z0-9_]+",\s*"([a-z0-9_]+)"', text, re.M))
         for block in re.findall(r"public String bowlId\(\)\s*\{(.*?)\n    \}", text, re.S):
             ids |= set(re.findall(r'->\s*"([a-z0-9_]+)"', block))
     ids |= {p.stem for p in (ASSETS / "textures/item").glob("*.png")}

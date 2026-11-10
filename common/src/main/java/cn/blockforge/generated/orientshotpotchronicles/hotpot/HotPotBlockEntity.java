@@ -351,7 +351,8 @@ public class HotPotBlockEntity extends BlockEntity
         setSpicyOfSide(side, 0);   // mryt233 改（2026-11-05）：舀走汤底，辣度归零（r136a）
         updateSoupVisual();
         player.setItemInHand(hand, net.minecraft.world.item.ItemUtils.createFilledResult(stack, player, new ItemStack(soup.source())));
-        net.minecraft.sounds.SoundEvent sound = soup == SoupBase.SPICY ? SoundEvents.BUCKET_FILL_LAVA
+        // mryt233 改（2026-11-10，r147）：红汤用岩浆灌桶声，改成读 isSpicy() 属性
+        net.minecraft.sounds.SoundEvent sound = soup.isSpicy() ? SoundEvents.BUCKET_FILL_LAVA
             : soup.remainder() == net.minecraft.world.item.Items.BOWL ? SoundEvents.BOTTLE_FILL : SoundEvents.BUCKET_FILL;
         level.playSound(null, worldPosition, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
         markDirtyAndSync();
@@ -431,7 +432,9 @@ public class HotPotBlockEntity extends BlockEntity
         } else if (SoupBase.byId(bowlSoup(bigCell)) != null) {
             result = new ItemStack(HotPotContent.SOUP_BOWLS.get(bowlSoup(bigCell)));
             // mryt233 改（2026-11-05）：盛出来的红汤碗带着这一边的辣度档位，喝的时候按它给效果（r136a）
-            if (bowlSoup(bigCell) == SoupBase.SPICY.ordinal()) {
+            // mryt233 改（2026-11-10，r147）：红汤判断改成读 isSpicy() 属性
+            SoupBase bowl = SoupBase.byId(bowlSoup(bigCell));
+            if (bowl != null && bowl.isSpicy()) {
                 int spicy = spicyOfSide(soupSideOf(bigCell, bowlSoup(bigCell)));
                 if (spicy > 0) {
                     result.set(HotPotContent.SPICY_LEVEL, spicy);
@@ -471,6 +474,7 @@ public class HotPotBlockEntity extends BlockEntity
                 player.displayClientMessage(Component.translatable(key("msg.base_needs_clear")), true);
                 return false;
             }
+            // mryt233 改（2026-11-10）：锅底料只能加进清汤——清汤是唯一允许当底子的汤，这里保留按具体汤底判断
             if (current != SoupBase.CLEAR.ordinal()) {
                 player.displayClientMessage(Component.translatable(key("msg.base_only_clear")), true);
                 return false;
@@ -560,7 +564,9 @@ public class HotPotBlockEntity extends BlockEntity
             return false;
         }
         // 不是红汤（含这一边还没倒汤）：提示一句就吃掉这次点击，别让辣椒 / 冰块被当成食材塞进锅槽
-        if (SoupBase.byId(baseOfSide(side)) != SoupBase.SPICY) {
+        // mryt233 改（2026-11-10）：调辣度只对红汤有效，判定改走 isSpicy() 属性
+        SoupBase sideSoup = SoupBase.byId(baseOfSide(side));
+        if (sideSoup == null || !sideSoup.isSpicy()) {
             player.displayClientMessage(Component.translatable(key("msg.spicy_need_red_broth")), true);
             return true;
         }
@@ -1136,7 +1142,9 @@ public class HotPotBlockEntity extends BlockEntity
      */
     public static Component soupNameWithSpicy(int id, int spicy) {
         Component name = soupName(id);
-        if (SoupBase.byId(id) != SoupBase.SPICY || spicy < 0) {
+        // mryt233 改（2026-11-10）：红汤判定改走 isSpicy() 属性
+        SoupBase base = SoupBase.byId(id);
+        if (base == null || !base.isSpicy() || spicy < 0) {
             return name;   // 不是红汤，或者调用方不知道辣度（<0）就不带后缀
         }
         // 照任务单的样子写「红汤锅底（特辣）」；这里只包中文全角括号，汤底名和辣度名都还能各自翻译

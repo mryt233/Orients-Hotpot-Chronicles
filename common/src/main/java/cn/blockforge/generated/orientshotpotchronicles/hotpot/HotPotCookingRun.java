@@ -97,7 +97,8 @@ final class HotPotCookingRun {
         // mryt233 改（2026-11-05，r136a）：熟了的菜记下自己是在哪种汤底里煮出来的，
         // 红汤煮的还记下那一格所在那一边的辣度档位；吃的时候按这两样给风味加成（LivingEntityEatMixin）。
         result.set(HotPotContent.COOKED_IN_SOUP, soup.textureKey());
-        if (soup == SoupBase.SPICY) {
+        // mryt233 改（2026-11-10，r147）：红汤判断改成读 isSpicy() 属性
+        if (soup.isSpicy()) {
             int spicy = be.spicyOfSlot(slot);
             if (spicy > 0) {
                 result.set(HotPotContent.SPICY_LEVEL, spicy);

@@ -1,0 +1,2363 @@
+{
+  "soups": [
+    {
+      "ordinal": 0,
+      "name": "CLEAR",
+      "texture_key": "clear",
+      "name_key": "text.orients_hotpot_chronicles.soup.clear",
+      "speed": "1.000000",
+      "source": "minecraft:water_bucket",
+      "remainder": "minecraft:bucket",
+      "bowl_id": "clear_broth_bowl",
+      "bowl_hunger": 4,
+      "bowl_saturation": "0.600000",
+      "bonus_effects_by_spicy": [
+        {
+          "spicy": 0,
+          "effects": [
+            {
+              "effect": "minecraft:speed",
+              "duration": 300,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:saturation",
+              "duration": 1,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 1,
+          "effects": [
+            {
+              "effect": "minecraft:speed",
+              "duration": 300,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:saturation",
+              "duration": 1,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 2,
+          "effects": [
+            {
+              "effect": "minecraft:speed",
+              "duration": 300,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:saturation",
+              "duration": 1,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 3,
+          "effects": [
+            {
+              "effect": "minecraft:speed",
+              "duration": 300,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:saturation",
+              "duration": 1,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        }
+      ],
+      "registered_food": {
+        "nutrition": 4,
+        "saturation": "4.800000"
+      },
+      "is_additive_stack": false
+    },
+    {
+      "ordinal": 1,
+      "name": "RICH_STOCK",
+      "texture_key": "rich_stock",
+      "name_key": "text.orients_hotpot_chronicles.soup.rich_stock",
+      "speed": "0.850000",
+      "source": "minecraft:milk_bucket",
+      "remainder": "minecraft:bucket",
+      "bowl_id": "rich_stock_bowl",
+      "bowl_hunger": 4,
+      "bowl_saturation": "0.900000",
+      "bonus_effects_by_spicy": [
+        {
+          "spicy": 0,
+          "effects": [
+            {
+              "effect": "minecraft:resistance",
+              "duration": 300,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:absorption",
+              "duration": 600,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 1,
+          "effects": [
+            {
+              "effect": "minecraft:resistance",
+              "duration": 300,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:absorption",
+              "duration": 600,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 2,
+          "effects": [
+            {
+              "effect": "minecraft:resistance",
+              "duration": 300,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:absorption",
+              "duration": 600,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 3,
+          "effects": [
+            {
+              "effect": "minecraft:resistance",
+              "duration": 300,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:absorption",
+              "duration": 600,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        }
+      ],
+      "registered_food": {
+        "nutrition": 4,
+        "saturation": "7.200000"
+      },
+      "is_additive_stack": false
+    },
+    {
+      "ordinal": 2,
+      "name": "MUSHROOM",
+      "texture_key": "mushroom",
+      "name_key": "text.orients_hotpot_chronicles.soup.mushroom",
+      "speed": "1.150000",
+      "source": "minecraft:mushroom_stew",
+      "remainder": "minecraft:bowl",
+      "bowl_id": "mushroom_broth_bowl",
+      "bowl_hunger": 4,
+      "bowl_saturation": "0.600000",
+      "bonus_effects_by_spicy": [
+        {
+          "spicy": 0,
+          "effects": [
+            {
+              "effect": "minecraft:regeneration",
+              "duration": 200,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 1,
+          "effects": [
+            {
+              "effect": "minecraft:regeneration",
+              "duration": 200,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 2,
+          "effects": [
+            {
+              "effect": "minecraft:regeneration",
+              "duration": 200,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 3,
+          "effects": [
+            {
+              "effect": "minecraft:regeneration",
+              "duration": 200,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        }
+      ],
+      "registered_food": {
+        "nutrition": 4,
+        "saturation": "4.800000"
+      },
+      "is_additive_stack": false
+    },
+    {
+      "ordinal": 3,
+      "name": "SPICY",
+      "texture_key": "spicy",
+      "name_key": "text.orients_hotpot_chronicles.soup.spicy",
+      "speed": "1.300000",
+      "source": "minecraft:lava_bucket",
+      "remainder": "minecraft:bucket",
+      "bowl_id": "spicy_red_broth_bowl",
+      "bowl_hunger": 4,
+      "bowl_saturation": "0.600000",
+      "bonus_effects_by_spicy": [
+        {
+          "spicy": 0,
+          "effects": [
+            {
+              "effect": "minecraft:strength",
+              "duration": 180,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:speed",
+              "duration": 160,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 1,
+          "effects": [
+            {
+              "effect": "minecraft:strength",
+              "duration": 240,
+              "amplifier": 1,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:speed",
+              "duration": 220,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 2,
+          "effects": [
+            {
+              "effect": "minecraft:strength",
+              "duration": 300,
+              "amplifier": 1,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:speed",
+              "duration": 240,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:fire_resistance",
+              "duration": 300,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:hunger",
+              "duration": 60,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 3,
+          "effects": [
+            {
+              "effect": "minecraft:strength",
+              "duration": 360,
+              "amplifier": 1,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:speed",
+              "duration": 280,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:fire_resistance",
+              "duration": 600,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:hunger",
+              "duration": 100,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        }
+      ],
+      "registered_food": {
+        "nutrition": 4,
+        "saturation": "4.800000"
+      },
+      "is_additive_stack": false
+    },
+    {
+      "ordinal": 4,
+      "name": "TOMATO",
+      "texture_key": "tomato",
+      "name_key": "text.orients_hotpot_chronicles.soup.tomato",
+      "speed": "1.100000",
+      "source": "orients_hotpot_chronicles:tomato_soup_bucket",
+      "remainder": "minecraft:bucket",
+      "bowl_id": "tomato_soup_bowl",
+      "bowl_hunger": 4,
+      "bowl_saturation": "0.600000",
+      "bonus_effects_by_spicy": [
+        {
+          "spicy": 0,
+          "effects": [
+            {
+              "effect": "minecraft:haste",
+              "duration": 300,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 1,
+          "effects": [
+            {
+              "effect": "minecraft:haste",
+              "duration": 300,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 2,
+          "effects": [
+            {
+              "effect": "minecraft:haste",
+              "duration": 300,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 3,
+          "effects": [
+            {
+              "effect": "minecraft:haste",
+              "duration": 300,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        }
+      ],
+      "registered_food": {
+        "nutrition": 4,
+        "saturation": "4.800000"
+      },
+      "is_additive_stack": true
+    },
+    {
+      "ordinal": 5,
+      "name": "THREE_FRESH",
+      "texture_key": "three_fresh",
+      "name_key": "text.orients_hotpot_chronicles.soup.three_fresh",
+      "speed": "1.000000",
+      "source": "orients_hotpot_chronicles:three_fresh_soup_bucket",
+      "remainder": "minecraft:bucket",
+      "bowl_id": "three_fresh_soup_bowl",
+      "bowl_hunger": 4,
+      "bowl_saturation": "0.900000",
+      "bonus_effects_by_spicy": [
+        {
+          "spicy": 0,
+          "effects": [
+            {
+              "effect": "minecraft:water_breathing",
+              "duration": 400,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:luck",
+              "duration": 600,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 1,
+          "effects": [
+            {
+              "effect": "minecraft:water_breathing",
+              "duration": 400,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:luck",
+              "duration": 600,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 2,
+          "effects": [
+            {
+              "effect": "minecraft:water_breathing",
+              "duration": 400,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:luck",
+              "duration": 600,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "spicy": 3,
+          "effects": [
+            {
+              "effect": "minecraft:water_breathing",
+              "duration": 400,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            },
+            {
+              "effect": "minecraft:luck",
+              "duration": 600,
+              "amplifier": 0,
+              "ambient": false,
+              "visible": true
+            }
+          ]
+        }
+      ],
+      "registered_food": {
+        "nutrition": 4,
+        "saturation": "7.200000"
+      },
+      "is_additive_stack": true
+    }
+  ],
+  "seasonings": [
+    {
+      "ordinal": 0,
+      "id": "msg",
+      "color": "#FFECECF0",
+      "bit": 1,
+      "name_key": "text.orients_hotpot_chronicles.seasoning.msg",
+      "effect_key": "text.orients_hotpot_chronicles.seasoning.msg.effect",
+      "raws": [
+        "minecraft:wheat"
+      ],
+      "applied": {
+        "food_level": 12,
+        "effects": []
+      }
+    },
+    {
+      "ordinal": 1,
+      "id": "chili_oil",
+      "color": "#FFC42816",
+      "bit": 2,
+      "name_key": "text.orients_hotpot_chronicles.seasoning.chili_oil",
+      "effect_key": "text.orients_hotpot_chronicles.seasoning.chili_oil.effect",
+      "raws": [
+        "minecraft:blaze_powder"
+      ],
+      "applied": {
+        "food_level": 10,
+        "effects": [
+          {
+            "effect": "minecraft:fire_resistance",
+            "duration": 200,
+            "amplifier": 0
+          }
+        ]
+      }
+    },
+    {
+      "ordinal": 2,
+      "id": "sweet_sour_sauce",
+      "color": "#FFC85A3C",
+      "bit": 4,
+      "name_key": "text.orients_hotpot_chronicles.seasoning.sweet_sour_sauce",
+      "effect_key": "text.orients_hotpot_chronicles.seasoning.sweet_sour_sauce.effect",
+      "raws": [
+        "minecraft:sweet_berries"
+      ],
+      "applied": {
+        "food_level": 10,
+        "effects": [
+          {
+            "effect": "minecraft:speed",
+            "duration": 200,
+            "amplifier": 0
+          }
+        ]
+      }
+    },
+    {
+      "ordinal": 3,
+      "id": "honey",
+      "color": "#FFECA826",
+      "bit": 8,
+      "name_key": "text.orients_hotpot_chronicles.seasoning.honey",
+      "effect_key": "text.orients_hotpot_chronicles.seasoning.honey.effect",
+      "raws": [
+        "minecraft:honey_bottle"
+      ],
+      "applied": {
+        "food_level": 10,
+        "effects": []
+      }
+    },
+    {
+      "ordinal": 4,
+      "id": "sesame_oil",
+      "color": "#FFCC8A28",
+      "bit": 16,
+      "name_key": "text.orients_hotpot_chronicles.seasoning.sesame_oil",
+      "effect_key": "text.orients_hotpot_chronicles.seasoning.sesame_oil.effect",
+      "raws": [
+        "minecraft:sunflower",
+        "minecraft:pumpkin_seeds"
+      ],
+      "applied": {
+        "food_level": 10,
+        "effects": [
+          {
+            "effect": "minecraft:regeneration",
+            "duration": 100,
+            "amplifier": 0
+          }
+        ]
+      }
+    },
+    {
+      "ordinal": 5,
+      "id": "vinegar",
+      "color": "#FF462418",
+      "bit": 32,
+      "name_key": "text.orients_hotpot_chronicles.seasoning.vinegar",
+      "effect_key": "text.orients_hotpot_chronicles.seasoning.vinegar.effect",
+      "raws": [
+        "minecraft:apple",
+        "minecraft:beetroot"
+      ],
+      "applied": {
+        "food_level": 10,
+        "effects": []
+      }
+    },
+    {
+      "ordinal": 6,
+      "id": "sugar",
+      "color": "#FFF0EEE8",
+      "bit": 64,
+      "name_key": "text.orients_hotpot_chronicles.seasoning.sugar",
+      "effect_key": "text.orients_hotpot_chronicles.seasoning.sugar.effect",
+      "raws": [
+        "minecraft:sugar"
+      ],
+      "applied": {
+        "food_level": 10,
+        "effects": [
+          {
+            "effect": "minecraft:haste",
+            "duration": 200,
+            "amplifier": 0
+          }
+        ]
+      }
+    },
+    {
+      "ordinal": 7,
+      "id": "chopped_scallion",
+      "color": "#FF6CB03A",
+      "bit": 128,
+      "name_key": "text.orients_hotpot_chronicles.seasoning.chopped_scallion",
+      "effect_key": "text.orients_hotpot_chronicles.seasoning.chopped_scallion.effect",
+      "raws": [
+        "orients_hotpot_chronicles:scallion"
+      ],
+      "applied": {
+        "food_level": 10,
+        "effects": []
+      }
+    },
+    {
+      "ordinal": 8,
+      "id": "minced_cilantro",
+      "color": "#FF4E9A2C",
+      "bit": 256,
+      "name_key": "text.orients_hotpot_chronicles.seasoning.minced_cilantro",
+      "effect_key": "text.orients_hotpot_chronicles.seasoning.minced_cilantro.effect",
+      "raws": [
+        "orients_hotpot_chronicles:cilantro"
+      ],
+      "applied": {
+        "food_level": 10,
+        "effects": []
+      }
+    },
+    {
+      "ordinal": 9,
+      "id": "garlic_paste",
+      "color": "#FFE8D696",
+      "bit": 512,
+      "name_key": "text.orients_hotpot_chronicles.seasoning.garlic_paste",
+      "effect_key": "text.orients_hotpot_chronicles.seasoning.garlic_paste.effect",
+      "raws": [
+        "orients_hotpot_chronicles:garlic_paste"
+      ],
+      "applied": {
+        "food_level": 10,
+        "effects": [
+          {
+            "effect": "minecraft:resistance",
+            "duration": 160,
+            "amplifier": 0
+          }
+        ]
+      }
+    },
+    {
+      "ordinal": 10,
+      "id": "oyster_sauce",
+      "color": "#FF5A321E",
+      "bit": 1024,
+      "name_key": "text.orients_hotpot_chronicles.seasoning.oyster_sauce",
+      "effect_key": "text.orients_hotpot_chronicles.seasoning.oyster_sauce.effect",
+      "raws": [
+        "orients_hotpot_chronicles:oyster_sauce"
+      ],
+      "applied": {
+        "food_level": 10,
+        "effects": [
+          {
+            "effect": "minecraft:water_breathing",
+            "duration": 200,
+            "amplifier": 0
+          }
+        ]
+      }
+    },
+    {
+      "ordinal": 11,
+      "id": "sesame_paste",
+      "color": "#FFC89E64",
+      "bit": 2048,
+      "name_key": "text.orients_hotpot_chronicles.seasoning.sesame_paste",
+      "effect_key": "text.orients_hotpot_chronicles.seasoning.sesame_paste.effect",
+      "raws": [
+        "orients_hotpot_chronicles:sesame_paste"
+      ],
+      "applied": {
+        "food_level": 10,
+        "effects": [
+          {
+            "effect": "minecraft:absorption",
+            "duration": 200,
+            "amplifier": 0
+          }
+        ]
+      }
+    },
+    {
+      "ordinal": 12,
+      "id": "crushed_peanuts",
+      "color": "#FFDAB46E",
+      "bit": 4096,
+      "name_key": "text.orients_hotpot_chronicles.seasoning.crushed_peanuts",
+      "effect_key": "text.orients_hotpot_chronicles.seasoning.crushed_peanuts.effect",
+      "raws": [
+        "orients_hotpot_chronicles:crushed_peanuts"
+      ],
+      "applied": {
+        "food_level": 10,
+        "effects": [
+          {
+            "effect": "minecraft:jump_boost",
+            "duration": 200,
+            "amplifier": 0
+          }
+        ]
+      }
+    },
+    {
+      "ordinal": 13,
+      "id": "millet_chili",
+      "color": "#FFE2281C",
+      "bit": 8192,
+      "name_key": "text.orients_hotpot_chronicles.seasoning.millet_chili",
+      "effect_key": "text.orients_hotpot_chronicles.seasoning.millet_chili.effect",
+      "raws": [
+        "orients_hotpot_chronicles:millet_chili"
+      ],
+      "applied": {
+        "food_level": 10,
+        "effects": [
+          {
+            "effect": "minecraft:strength",
+            "duration": 160,
+            "amplifier": 0
+          }
+        ]
+      }
+    },
+    {
+      "ordinal": 14,
+      "id": "minced_zhe_er_gen",
+      "color": "#FFD8D2BC",
+      "bit": 16384,
+      "name_key": "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen",
+      "effect_key": "text.orients_hotpot_chronicles.seasoning.minced_zhe_er_gen.effect",
+      "raws": [
+        "orients_hotpot_chronicles:minced_zhe_er_gen"
+      ],
+      "applied": {
+        "food_level": 10,
+        "effects": [
+          {
+            "effect": "minecraft:resistance",
+            "duration": 200,
+            "amplifier": 0
+          }
+        ]
+      }
+    }
+  ],
+  "drinks": [
+    {
+      "ordinal": 0,
+      "id": "orange_drink",
+      "bottle_height": "15.000000",
+      "has_bottle": true,
+      "serialized": "orange_drink",
+      "cup": "orients_hotpot_chronicles:orange_drink_cup",
+      "drink": "orients_hotpot_chronicles:orange_drink",
+      "empty_bottle": "orients_hotpot_chronicles:empty_orange_drink_bottle",
+      "applied": {
+        "effects": [
+          {
+            "effect": "minecraft:speed",
+            "duration": 300,
+            "amplifier": 0
+          },
+          {
+            "effect": "minecraft:nausea",
+            "duration": 200,
+            "amplifier": 0
+          }
+        ]
+      }
+    },
+    {
+      "ordinal": 1,
+      "id": "plant_protein_drink",
+      "bottle_height": "15.000000",
+      "has_bottle": true,
+      "serialized": "plant_protein_drink",
+      "cup": "orients_hotpot_chronicles:plant_protein_drink_cup",
+      "drink": "orients_hotpot_chronicles:plant_protein_drink",
+      "empty_bottle": "orients_hotpot_chronicles:empty_plant_protein_drink_bottle",
+      "applied": {
+        "effects": []
+      }
+    },
+    {
+      "ordinal": 2,
+      "id": "orient_cola",
+      "bottle_height": "11.375000",
+      "has_bottle": true,
+      "serialized": "orient_cola",
+      "cup": "orients_hotpot_chronicles:orient_cola_cup",
+      "drink": "orients_hotpot_chronicles:orient_cola",
+      "empty_bottle": "orients_hotpot_chronicles:empty_orient_cola_bottle",
+      "applied": {
+        "effects": [
+          {
+            "effect": "minecraft:speed",
+            "duration": 300,
+            "amplifier": 0
+          },
+          {
+            "effect": "minecraft:nausea",
+            "duration": 200,
+            "amplifier": 0
+          },
+          {
+            "effect": "minecraft:haste",
+            "duration": 300,
+            "amplifier": 0
+          }
+        ]
+      }
+    },
+    {
+      "ordinal": 3,
+      "id": "water",
+      "bottle_height": "15.000000",
+      "has_bottle": false,
+      "serialized": "water",
+      "cup": "orients_hotpot_chronicles:water_cup",
+      "drink": "none",
+      "empty_bottle": "minecraft:glass_bottle",
+      "applied": {
+        "effects": [
+          {
+            "effect": "minecraft:hunger",
+            "duration": 200,
+            "amplifier": 0
+          },
+          {
+            "effect": "minecraft:nausea",
+            "duration": 200,
+            "amplifier": 0
+          }
+        ]
+      }
+    },
+    {
+      "ordinal": 4,
+      "id": "milk",
+      "bottle_height": "15.000000",
+      "has_bottle": false,
+      "serialized": "milk",
+      "cup": "orients_hotpot_chronicles:milk_cup",
+      "drink": "none",
+      "empty_bottle": "minecraft:glass_bottle",
+      "applied": {
+        "effects": []
+      }
+    }
+  ],
+  "pot_materials": [
+    {
+      "ordinal": 0,
+      "name": "COPPER",
+      "id_path": "copper_nine_grid_hotpot",
+      "texture_key": "copper",
+      "metal": "COPPER",
+      "layout": "NINE_GRID",
+      "model_key": "copper",
+      "instrument": "HARP",
+      "map_color": "COLOR_ORANGE #2C6DBA",
+      "sound": "minecraft:block.copper.break",
+      "hardness": "3.000000",
+      "block": "orients_hotpot_chronicles:copper_nine_grid_hotpot",
+      "item": "orients_hotpot_chronicles:copper_nine_grid_hotpot"
+    },
+    {
+      "ordinal": 1,
+      "name": "IRON",
+      "id_path": "iron_nine_grid_hotpot",
+      "texture_key": "iron",
+      "metal": "IRON",
+      "layout": "NINE_GRID",
+      "model_key": "iron",
+      "instrument": "IRON_XYLOPHONE",
+      "map_color": "METAL #909090",
+      "sound": "minecraft:block.metal.break",
+      "hardness": "5.000000",
+      "block": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+      "item": "orients_hotpot_chronicles:iron_nine_grid_hotpot"
+    },
+    {
+      "ordinal": 2,
+      "name": "COPPER_S",
+      "id_path": "copper_taiji_yuanyang_hotpot",
+      "texture_key": "copper",
+      "metal": "COPPER",
+      "layout": "YUANYANG_S",
+      "model_key": "copper_yuanyang_s",
+      "instrument": "HARP",
+      "map_color": "COLOR_ORANGE #2C6DBA",
+      "sound": "minecraft:block.copper.break",
+      "hardness": "3.000000",
+      "block": "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+      "item": "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot"
+    },
+    {
+      "ordinal": 3,
+      "name": "COPPER_O",
+      "id_path": "copper_round_yuanyang_hotpot",
+      "texture_key": "copper",
+      "metal": "COPPER",
+      "layout": "YUANYANG_O",
+      "model_key": "copper_yuanyang_o",
+      "instrument": "HARP",
+      "map_color": "COLOR_ORANGE #2C6DBA",
+      "sound": "minecraft:block.copper.break",
+      "hardness": "3.000000",
+      "block": "orients_hotpot_chronicles:copper_round_yuanyang_hotpot",
+      "item": "orients_hotpot_chronicles:copper_round_yuanyang_hotpot"
+    },
+    {
+      "ordinal": 4,
+      "name": "IRON_S",
+      "id_path": "iron_taiji_yuanyang_hotpot",
+      "texture_key": "iron",
+      "metal": "IRON",
+      "layout": "YUANYANG_S",
+      "model_key": "iron_yuanyang_s",
+      "instrument": "IRON_XYLOPHONE",
+      "map_color": "METAL #909090",
+      "sound": "minecraft:block.metal.break",
+      "hardness": "5.000000",
+      "block": "orients_hotpot_chronicles:iron_taiji_yuanyang_hotpot",
+      "item": "orients_hotpot_chronicles:iron_taiji_yuanyang_hotpot"
+    },
+    {
+      "ordinal": 5,
+      "name": "IRON_O",
+      "id_path": "iron_round_yuanyang_hotpot",
+      "texture_key": "iron",
+      "metal": "IRON",
+      "layout": "YUANYANG_O",
+      "model_key": "iron_yuanyang_o",
+      "instrument": "IRON_XYLOPHONE",
+      "map_color": "METAL #909090",
+      "sound": "minecraft:block.metal.break",
+      "hardness": "5.000000",
+      "block": "orients_hotpot_chronicles:iron_round_yuanyang_hotpot",
+      "item": "orients_hotpot_chronicles:iron_round_yuanyang_hotpot"
+    },
+    {
+      "ordinal": 6,
+      "name": "COPPER_SPLIT",
+      "id_path": "copper_split_yuanyang_hotpot",
+      "texture_key": "copper",
+      "metal": "COPPER",
+      "layout": "SPLIT",
+      "model_key": "copper_yuanyang_split",
+      "instrument": "HARP",
+      "map_color": "COLOR_ORANGE #2C6DBA",
+      "sound": "minecraft:block.copper.break",
+      "hardness": "3.000000",
+      "block": "orients_hotpot_chronicles:copper_split_yuanyang_hotpot",
+      "item": "orients_hotpot_chronicles:copper_split_yuanyang_hotpot"
+    },
+    {
+      "ordinal": 7,
+      "name": "IRON_SPLIT",
+      "id_path": "iron_split_yuanyang_hotpot",
+      "texture_key": "iron",
+      "metal": "IRON",
+      "layout": "SPLIT",
+      "model_key": "iron_yuanyang_split",
+      "instrument": "IRON_XYLOPHONE",
+      "map_color": "METAL #909090",
+      "sound": "minecraft:block.metal.break",
+      "hardness": "5.000000",
+      "block": "orients_hotpot_chronicles:iron_split_yuanyang_hotpot",
+      "item": "orients_hotpot_chronicles:iron_split_yuanyang_hotpot"
+    },
+    {
+      "ordinal": 8,
+      "name": "COPPER_FOUR",
+      "id_path": "copper_four_grid_hotpot",
+      "texture_key": "copper",
+      "metal": "COPPER",
+      "layout": "FOUR_GRID",
+      "model_key": "copper_four_grid",
+      "instrument": "HARP",
+      "map_color": "COLOR_ORANGE #2C6DBA",
+      "sound": "minecraft:block.copper.break",
+      "hardness": "3.000000",
+      "block": "orients_hotpot_chronicles:copper_four_grid_hotpot",
+      "item": "orients_hotpot_chronicles:copper_four_grid_hotpot"
+    },
+    {
+      "ordinal": 9,
+      "name": "IRON_FOUR",
+      "id_path": "iron_four_grid_hotpot",
+      "texture_key": "iron",
+      "metal": "IRON",
+      "layout": "FOUR_GRID",
+      "model_key": "iron_four_grid",
+      "instrument": "IRON_XYLOPHONE",
+      "map_color": "METAL #909090",
+      "sound": "minecraft:block.metal.break",
+      "hardness": "5.000000",
+      "block": "orients_hotpot_chronicles:iron_four_grid_hotpot",
+      "item": "orients_hotpot_chronicles:iron_four_grid_hotpot"
+    },
+    {
+      "ordinal": 10,
+      "name": "COPPER_SQUARE",
+      "id_path": "copper_square_yuanyang_hotpot",
+      "texture_key": "copper",
+      "metal": "COPPER",
+      "layout": "YUANYANG_SQUARE",
+      "model_key": "copper_yuanyang_square",
+      "instrument": "HARP",
+      "map_color": "COLOR_ORANGE #2C6DBA",
+      "sound": "minecraft:block.copper.break",
+      "hardness": "3.000000",
+      "block": "orients_hotpot_chronicles:copper_square_yuanyang_hotpot",
+      "item": "orients_hotpot_chronicles:copper_square_yuanyang_hotpot"
+    },
+    {
+      "ordinal": 11,
+      "name": "IRON_SQUARE",
+      "id_path": "iron_square_yuanyang_hotpot",
+      "texture_key": "iron",
+      "metal": "IRON",
+      "layout": "YUANYANG_SQUARE",
+      "model_key": "iron_yuanyang_square",
+      "instrument": "IRON_XYLOPHONE",
+      "map_color": "METAL #909090",
+      "sound": "minecraft:block.metal.break",
+      "hardness": "5.000000",
+      "block": "orients_hotpot_chronicles:iron_square_yuanyang_hotpot",
+      "item": "orients_hotpot_chronicles:iron_square_yuanyang_hotpot"
+    }
+  ],
+  "plate_materials": [
+    {
+      "material": "quartz",
+      "map_color": "QUARTZ #D3D9DC",
+      "sound": "minecraft:block.decorated_pot.break",
+      "hardness": "0.300000",
+      "item": "orients_hotpot_chronicles:quartz_small_dish"
+    },
+    {
+      "material": "bamboo",
+      "map_color": "SAND #8CC9D5",
+      "sound": "minecraft:block.bamboo_wood.break",
+      "hardness": "0.300000",
+      "item": "orients_hotpot_chronicles:bamboo_small_dish"
+    },
+    {
+      "material": "terracotta",
+      "map_color": "COLOR_ORANGE #2C6DBA",
+      "sound": "minecraft:block.decorated_pot.break",
+      "hardness": "0.300000",
+      "item": "orients_hotpot_chronicles:terracotta_small_dish"
+    },
+    {
+      "material": "copper",
+      "map_color": "COLOR_ORANGE #2C6DBA",
+      "sound": "minecraft:block.copper.break",
+      "hardness": "0.300000",
+      "item": "orients_hotpot_chronicles:copper_small_dish"
+    },
+    {
+      "material": "iron",
+      "map_color": "METAL #909090",
+      "sound": "minecraft:block.metal.break",
+      "hardness": "0.300000",
+      "item": "orients_hotpot_chronicles:iron_small_dish"
+    }
+  ],
+  "soup_visuals": [
+    {
+      "ordinal": 0,
+      "name": "NONE",
+      "serialized": "none",
+      "has_soup": false
+    },
+    {
+      "ordinal": 1,
+      "name": "CLEAR",
+      "serialized": "clear",
+      "has_soup": true
+    },
+    {
+      "ordinal": 2,
+      "name": "RICH_STOCK",
+      "serialized": "rich_stock",
+      "has_soup": true
+    },
+    {
+      "ordinal": 3,
+      "name": "MUSHROOM",
+      "serialized": "mushroom",
+      "has_soup": true
+    },
+    {
+      "ordinal": 4,
+      "name": "SPICY",
+      "serialized": "spicy",
+      "has_soup": true
+    },
+    {
+      "ordinal": 5,
+      "name": "TOMATO",
+      "serialized": "tomato",
+      "has_soup": true
+    },
+    {
+      "ordinal": 6,
+      "name": "THREE_FRESH",
+      "serialized": "three_fresh",
+      "has_soup": true
+    }
+  ],
+  "block_ids": [
+    "orients_hotpot_chronicles:jungle_bench",
+    "orients_hotpot_chronicles:iron_taiji_yuanyang_hotpot",
+    "orients_hotpot_chronicles:polished_andesite_hotpot_table",
+    "orients_hotpot_chronicles:copper_four_slot_square_plate",
+    "orients_hotpot_chronicles:spruce_stool",
+    "orients_hotpot_chronicles:copper_eight_slot_platter",
+    "orients_hotpot_chronicles:birch_tall_hotpot_table",
+    "orients_hotpot_chronicles:cherry_tall_hotpot_table",
+    "orients_hotpot_chronicles:mangrove_hotpot_table",
+    "orients_hotpot_chronicles:smooth_stone_tall_hotpot_table",
+    "orients_hotpot_chronicles:bamboo_five_slot_long_plate",
+    "orients_hotpot_chronicles:iron_four_slot_square_plate",
+    "orients_hotpot_chronicles:cut_copper_tall_hotpot_table",
+    "orients_hotpot_chronicles:warped_hotpot_table",
+    "orients_hotpot_chronicles:jungle_tall_hotpot_table",
+    "orients_hotpot_chronicles:jungle_hotpot_table",
+    "orients_hotpot_chronicles:bamboo_four_slot_square_plate",
+    "orients_hotpot_chronicles:iron_two_slot_plate",
+    "orients_hotpot_chronicles:iron_round_yuanyang_hotpot",
+    "orients_hotpot_chronicles:bamboo_tall_hotpot_table",
+    "orients_hotpot_chronicles:acacia_bench",
+    "orients_hotpot_chronicles:warped_bench",
+    "orients_hotpot_chronicles:copper_small_dish",
+    "orients_hotpot_chronicles:spruce_sauce_station",
+    "orients_hotpot_chronicles:copper_split_yuanyang_hotpot",
+    "orients_hotpot_chronicles:terracotta_eight_slot_platter",
+    "orients_hotpot_chronicles:crimson_hotpot_table",
+    "orients_hotpot_chronicles:oak_tall_hotpot_table",
+    "orients_hotpot_chronicles:iron_hotpot_table",
+    "orients_hotpot_chronicles:quartz_two_slot_plate",
+    "orients_hotpot_chronicles:iron_three_slot_long_plate",
+    "orients_hotpot_chronicles:tall_brick_stove",
+    "orients_hotpot_chronicles:acacia_stool",
+    "orients_hotpot_chronicles:spruce_tall_hotpot_table",
+    "orients_hotpot_chronicles:copper_nine_grid_hotpot",
+    "orients_hotpot_chronicles:spruce_hotpot_table",
+    "orients_hotpot_chronicles:iron_five_slot_long_plate",
+    "orients_hotpot_chronicles:crimson_stool",
+    "orients_hotpot_chronicles:tall_brick_stove_top",
+    "orients_hotpot_chronicles:copper_square_yuanyang_hotpot",
+    "orients_hotpot_chronicles:cut_copper_hotpot_table",
+    "orients_hotpot_chronicles:oak_bench",
+    "orients_hotpot_chronicles:mangrove_tall_hotpot_table",
+    "orients_hotpot_chronicles:warped_tall_hotpot_table",
+    "orients_hotpot_chronicles:mangrove_stool",
+    "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "orients_hotpot_chronicles:jungle_sauce_station",
+    "orients_hotpot_chronicles:iron_square_yuanyang_hotpot",
+    "orients_hotpot_chronicles:acacia_hotpot_table",
+    "orients_hotpot_chronicles:birch_hotpot_table",
+    "orients_hotpot_chronicles:copper_round_yuanyang_hotpot",
+    "orients_hotpot_chronicles:dark_oak_bench",
+    "orients_hotpot_chronicles:oak_hotpot_table",
+    "orients_hotpot_chronicles:birch_bench",
+    "orients_hotpot_chronicles:iron_small_dish",
+    "orients_hotpot_chronicles:cherry_stool",
+    "orients_hotpot_chronicles:oak_stool",
+    "orients_hotpot_chronicles:birch_sauce_station",
+    "orients_hotpot_chronicles:plates",
+    "orients_hotpot_chronicles:birch_stool",
+    "orients_hotpot_chronicles:dark_oak_stool",
+    "orients_hotpot_chronicles:cherry_bench",
+    "orients_hotpot_chronicles:terracotta_two_slot_plate",
+    "orients_hotpot_chronicles:terracotta_four_slot_square_plate",
+    "orients_hotpot_chronicles:quartz_three_slot_long_plate",
+    "orients_hotpot_chronicles:iron_four_grid_hotpot",
+    "orients_hotpot_chronicles:terracotta_small_dish",
+    "orients_hotpot_chronicles:polished_granite_tall_hotpot_table",
+    "orients_hotpot_chronicles:warped_sauce_station",
+    "orients_hotpot_chronicles:acacia_sauce_station",
+    "orients_hotpot_chronicles:polished_deepslate_hotpot_table",
+    "orients_hotpot_chronicles:drink",
+    "orients_hotpot_chronicles:copper_four_grid_hotpot",
+    "orients_hotpot_chronicles:bowl",
+    "orients_hotpot_chronicles:chopstick_rest",
+    "orients_hotpot_chronicles:drink_cauldron",
+    "orients_hotpot_chronicles:bamboo_hotpot_table",
+    "orients_hotpot_chronicles:mangrove_bench",
+    "orients_hotpot_chronicles:copper_two_slot_plate",
+    "orients_hotpot_chronicles:quartz_tall_hotpot_table",
+    "orients_hotpot_chronicles:polished_granite_hotpot_table",
+    "orients_hotpot_chronicles:quartz_five_slot_long_plate",
+    "orients_hotpot_chronicles:polished_diorite_hotpot_table",
+    "orients_hotpot_chronicles:bamboo_eight_slot_platter",
+    "orients_hotpot_chronicles:crimson_tall_hotpot_table",
+    "orients_hotpot_chronicles:cup",
+    "orients_hotpot_chronicles:polished_andesite_tall_hotpot_table",
+    "orients_hotpot_chronicles:sauce_bottle",
+    "orients_hotpot_chronicles:warped_stool",
+    "orients_hotpot_chronicles:bamboo_three_slot_long_plate",
+    "orients_hotpot_chronicles:cherry_sauce_station",
+    "orients_hotpot_chronicles:polished_blackstone_hotpot_table",
+    "orients_hotpot_chronicles:cutting_board",
+    "orients_hotpot_chronicles:quartz_four_slot_square_plate",
+    "orients_hotpot_chronicles:iron_eight_slot_platter",
+    "orients_hotpot_chronicles:acacia_tall_hotpot_table",
+    "orients_hotpot_chronicles:sauce_station_top",
+    "orients_hotpot_chronicles:quartz_eight_slot_platter",
+    "orients_hotpot_chronicles:mangrove_sauce_station",
+    "orients_hotpot_chronicles:polished_deepslate_tall_hotpot_table",
+    "orients_hotpot_chronicles:crimson_bench",
+    "orients_hotpot_chronicles:jungle_stool",
+    "orients_hotpot_chronicles:terracotta_five_slot_long_plate",
+    "orients_hotpot_chronicles:bamboo_two_slot_plate",
+    "orients_hotpot_chronicles:dark_oak_hotpot_table",
+    "orients_hotpot_chronicles:iron_tall_hotpot_table",
+    "orients_hotpot_chronicles:copper_five_slot_long_plate",
+    "orients_hotpot_chronicles:bamboo_sauce_station",
+    "orients_hotpot_chronicles:terracotta_three_slot_long_plate",
+    "orients_hotpot_chronicles:bamboo_small_dish",
+    "orients_hotpot_chronicles:polished_blackstone_tall_hotpot_table",
+    "orients_hotpot_chronicles:brick_stove",
+    "orients_hotpot_chronicles:iron_sauce_station",
+    "orients_hotpot_chronicles:bamboo_stool",
+    "orients_hotpot_chronicles:quartz_small_dish",
+    "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+    "orients_hotpot_chronicles:dark_oak_tall_hotpot_table",
+    "orients_hotpot_chronicles:polished_diorite_tall_hotpot_table",
+    "orients_hotpot_chronicles:bamboo_bench",
+    "orients_hotpot_chronicles:spruce_bench",
+    "orients_hotpot_chronicles:oak_sauce_station",
+    "orients_hotpot_chronicles:iron_split_yuanyang_hotpot",
+    "orients_hotpot_chronicles:dark_oak_sauce_station",
+    "orients_hotpot_chronicles:copper_three_slot_long_plate",
+    "orients_hotpot_chronicles:crimson_sauce_station",
+    "orients_hotpot_chronicles:cherry_hotpot_table",
+    "orients_hotpot_chronicles:smooth_stone_hotpot_table",
+    "orients_hotpot_chronicles:quartz_hotpot_table"
+  ],
+  "item_ids": [
+    "orients_hotpot_chronicles:cooked_squid_roll",
+    "orients_hotpot_chronicles:spruce_stool",
+    "orients_hotpot_chronicles:empty_orient_cola_bottle",
+    "orients_hotpot_chronicles:three_fresh_hotpot_base",
+    "orients_hotpot_chronicles:cherry_tall_hotpot_table",
+    "orients_hotpot_chronicles:tomato_soup_bucket",
+    "orients_hotpot_chronicles:mangrove_hotpot_table",
+    "orients_hotpot_chronicles:bamboo_five_slot_long_plate",
+    "orients_hotpot_chronicles:cut_copper_tall_hotpot_table",
+    "orients_hotpot_chronicles:warped_hotpot_table",
+    "orients_hotpot_chronicles:jungle_tall_hotpot_table",
+    "orients_hotpot_chronicles:jungle_hotpot_table",
+    "orients_hotpot_chronicles:plant_protein_drink",
+    "orients_hotpot_chronicles:zhe_er_gen",
+    "orients_hotpot_chronicles:hot_tofu",
+    "orients_hotpot_chronicles:iron_two_slot_plate",
+    "orients_hotpot_chronicles:cooked_pork_meatball",
+    "orients_hotpot_chronicles:bamboo_tall_hotpot_table",
+    "orients_hotpot_chronicles:dried_tofu",
+    "orients_hotpot_chronicles:minced_pork",
+    "orients_hotpot_chronicles:warped_bench",
+    "orients_hotpot_chronicles:copper_small_dish",
+    "orients_hotpot_chronicles:crimson_hotpot_table",
+    "orients_hotpot_chronicles:quartz_two_slot_plate",
+    "orients_hotpot_chronicles:tall_brick_stove",
+    "orients_hotpot_chronicles:pork_meatball",
+    "orients_hotpot_chronicles:acacia_stool",
+    "orients_hotpot_chronicles:shrimp_paste",
+    "orients_hotpot_chronicles:cilantro_mutton_meatball",
+    "orients_hotpot_chronicles:copper_nine_grid_hotpot",
+    "orients_hotpot_chronicles:spruce_hotpot_table",
+    "orients_hotpot_chronicles:iron_five_slot_long_plate",
+    "orients_hotpot_chronicles:cut_copper_hotpot_table",
+    "orients_hotpot_chronicles:spicy_red_broth_bowl",
+    "orients_hotpot_chronicles:rich_stock_bowl",
+    "orients_hotpot_chronicles:cold_tofu_cube",
+    "orients_hotpot_chronicles:warped_tall_hotpot_table",
+    "orients_hotpot_chronicles:cooked_beef_loin",
+    "orients_hotpot_chronicles:mangrove_stool",
+    "orients_hotpot_chronicles:cooked_zhe_er_gen_slice",
+    "orients_hotpot_chronicles:scallion",
+    "orients_hotpot_chronicles:pounded_meat",
+    "orients_hotpot_chronicles:peanut",
+    "orients_hotpot_chronicles:dark_oak_bench",
+    "orients_hotpot_chronicles:copper_round_yuanyang_hotpot",
+    "orients_hotpot_chronicles:raw_crispy_pork",
+    "orients_hotpot_chronicles:oak_hotpot_table",
+    "orients_hotpot_chronicles:birch_bench",
+    "orients_hotpot_chronicles:iron_kitchen_knife",
+    "orients_hotpot_chronicles:orient_cola",
+    "orients_hotpot_chronicles:garlic_paste",
+    "orients_hotpot_chronicles:oak_stool",
+    "orients_hotpot_chronicles:empty_orange_drink_bottle",
+    "orients_hotpot_chronicles:birch_sauce_station",
+    "orients_hotpot_chronicles:dark_oak_stool",
+    "orients_hotpot_chronicles:cherry_bench",
+    "orients_hotpot_chronicles:terracotta_two_slot_plate",
+    "orients_hotpot_chronicles:cooked_beef_meatball",
+    "orients_hotpot_chronicles:quartz_three_slot_long_plate",
+    "orients_hotpot_chronicles:iron_four_grid_hotpot",
+    "orients_hotpot_chronicles:terracotta_small_dish",
+    "orients_hotpot_chronicles:polished_granite_tall_hotpot_table",
+    "orients_hotpot_chronicles:warped_sauce_station",
+    "orients_hotpot_chronicles:ham_sausage",
+    "orients_hotpot_chronicles:soybean",
+    "orients_hotpot_chronicles:polished_deepslate_hotpot_table",
+    "orients_hotpot_chronicles:rolling_pin",
+    "orients_hotpot_chronicles:sweet_potato_skin",
+    "orients_hotpot_chronicles:lotus_root_slice",
+    "orients_hotpot_chronicles:orange_drink_cup",
+    "orients_hotpot_chronicles:shrimp",
+    "orients_hotpot_chronicles:bamboo_hotpot_table",
+    "orients_hotpot_chronicles:cooked_mutton_roll",
+    "orients_hotpot_chronicles:copper_two_slot_plate",
+    "orients_hotpot_chronicles:clear_broth_bowl",
+    "orients_hotpot_chronicles:three_fresh_soup_bucket",
+    "orients_hotpot_chronicles:cooked_dried_tofu",
+    "orients_hotpot_chronicles:polished_granite_hotpot_table",
+    "orients_hotpot_chronicles:bamboo_eight_slot_platter",
+    "orients_hotpot_chronicles:crimson_tall_hotpot_table",
+    "orients_hotpot_chronicles:cooked_shrimp",
+    "orients_hotpot_chronicles:polished_andesite_tall_hotpot_table",
+    "orients_hotpot_chronicles:cilantro_fish_ball",
+    "orients_hotpot_chronicles:orange_drink",
+    "orients_hotpot_chronicles:cooked_fish_ball",
+    "orients_hotpot_chronicles:warped_stool",
+    "orients_hotpot_chronicles:polished_blackstone_hotpot_table",
+    "orients_hotpot_chronicles:lotus_root",
+    "orients_hotpot_chronicles:squid_roll",
+    "orients_hotpot_chronicles:cutting_board",
+    "orients_hotpot_chronicles:ham_sausage_slice",
+    "orients_hotpot_chronicles:iron_eight_slot_platter",
+    "orients_hotpot_chronicles:acacia_tall_hotpot_table",
+    "orients_hotpot_chronicles:cooked_fatty_beef_roll",
+    "orients_hotpot_chronicles:mangrove_sauce_station",
+    "orients_hotpot_chronicles:dipping_sauce",
+    "orients_hotpot_chronicles:cooked_peeled_shrimp",
+    "orients_hotpot_chronicles:cooked_enoki_mushroom",
+    "orients_hotpot_chronicles:jungle_stool",
+    "orients_hotpot_chronicles:cooked_wide_noodles",
+    "orients_hotpot_chronicles:bamboo_two_slot_plate",
+    "orients_hotpot_chronicles:cilantro",
+    "orients_hotpot_chronicles:hot_tofu_cube",
+    "orients_hotpot_chronicles:dark_oak_hotpot_table",
+    "orients_hotpot_chronicles:iron_tall_hotpot_table",
+    "orients_hotpot_chronicles:cooked_potato_slice",
+    "orients_hotpot_chronicles:cooked_shrimp_paste",
+    "orients_hotpot_chronicles:copper_five_slot_long_plate",
+    "orients_hotpot_chronicles:bamboo_sauce_station",
+    "orients_hotpot_chronicles:terracotta_three_slot_long_plate",
+    "orients_hotpot_chronicles:bamboo_small_dish",
+    "orients_hotpot_chronicles:quartz_small_dish",
+    "orients_hotpot_chronicles:cooked_tripe",
+    "orients_hotpot_chronicles:polished_diorite_tall_hotpot_table",
+    "orients_hotpot_chronicles:cooked_tofu_skin",
+    "orients_hotpot_chronicles:bamboo_bench",
+    "orients_hotpot_chronicles:beef_loin",
+    "orients_hotpot_chronicles:spruce_bench",
+    "orients_hotpot_chronicles:raw_squid",
+    "orients_hotpot_chronicles:beef_loin_slice",
+    "orients_hotpot_chronicles:dark_oak_sauce_station",
+    "orients_hotpot_chronicles:orient_cola_cup",
+    "orients_hotpot_chronicles:crimson_sauce_station",
+    "orients_hotpot_chronicles:cherry_hotpot_table",
+    "orients_hotpot_chronicles:smooth_stone_hotpot_table",
+    "orients_hotpot_chronicles:crispy_pork",
+    "orients_hotpot_chronicles:jungle_bench",
+    "orients_hotpot_chronicles:iron_taiji_yuanyang_hotpot",
+    "orients_hotpot_chronicles:polished_andesite_hotpot_table",
+    "orients_hotpot_chronicles:copper_four_slot_square_plate",
+    "orients_hotpot_chronicles:cooked_cilantro_beef_meatball",
+    "orients_hotpot_chronicles:cooked_kelp",
+    "orients_hotpot_chronicles:copper_eight_slot_platter",
+    "orients_hotpot_chronicles:chili_pepper",
+    "orients_hotpot_chronicles:birch_tall_hotpot_table",
+    "orients_hotpot_chronicles:water_cup",
+    "orients_hotpot_chronicles:smooth_stone_tall_hotpot_table",
+    "orients_hotpot_chronicles:cilantro_pork_meatball",
+    "orients_hotpot_chronicles:iron_four_slot_square_plate",
+    "orients_hotpot_chronicles:bamboo_four_slot_square_plate",
+    "orients_hotpot_chronicles:crushed_peanuts",
+    "orients_hotpot_chronicles:garlic",
+    "orients_hotpot_chronicles:iron_round_yuanyang_hotpot",
+    "orients_hotpot_chronicles:plant_protein_drink_cup",
+    "orients_hotpot_chronicles:egg_fried_rice",
+    "orients_hotpot_chronicles:acacia_bench",
+    "orients_hotpot_chronicles:cold_tofu",
+    "orients_hotpot_chronicles:spruce_sauce_station",
+    "orients_hotpot_chronicles:copper_split_yuanyang_hotpot",
+    "orients_hotpot_chronicles:terracotta_eight_slot_platter",
+    "orients_hotpot_chronicles:mushroom_broth_bowl",
+    "orients_hotpot_chronicles:oak_tall_hotpot_table",
+    "orients_hotpot_chronicles:cooked_sweet_potato_skin",
+    "orients_hotpot_chronicles:iron_hotpot_table",
+    "orients_hotpot_chronicles:iron_three_slot_long_plate",
+    "orients_hotpot_chronicles:spruce_tall_hotpot_table",
+    "orients_hotpot_chronicles:bamboo_chopsticks",
+    "orients_hotpot_chronicles:minced_zhe_er_gen",
+    "orients_hotpot_chronicles:crimson_stool",
+    "orients_hotpot_chronicles:millet_chili",
+    "orients_hotpot_chronicles:copper_square_yuanyang_hotpot",
+    "orients_hotpot_chronicles:oak_bench",
+    "orients_hotpot_chronicles:mangrove_tall_hotpot_table",
+    "orients_hotpot_chronicles:sesame_paste",
+    "orients_hotpot_chronicles:tofu_skin",
+    "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "orients_hotpot_chronicles:jungle_sauce_station",
+    "orients_hotpot_chronicles:iron_square_yuanyang_hotpot",
+    "orients_hotpot_chronicles:mutton_meatball",
+    "orients_hotpot_chronicles:acacia_hotpot_table",
+    "orients_hotpot_chronicles:birch_hotpot_table",
+    "orients_hotpot_chronicles:cooked_ham_sausage_slice",
+    "orients_hotpot_chronicles:iron_small_dish",
+    "orients_hotpot_chronicles:cherry_stool",
+    "orients_hotpot_chronicles:empty_plant_protein_drink_bottle",
+    "orients_hotpot_chronicles:cloth_apron",
+    "orients_hotpot_chronicles:mutton_roll",
+    "orients_hotpot_chronicles:cooked_cilantro_pork_meatball",
+    "orients_hotpot_chronicles:boiled_crispy_pork",
+    "orients_hotpot_chronicles:birch_stool",
+    "orients_hotpot_chronicles:terracotta_four_slot_square_plate",
+    "orients_hotpot_chronicles:raw_ham_sausage",
+    "orients_hotpot_chronicles:tomato",
+    "orients_hotpot_chronicles:acacia_sauce_station",
+    "orients_hotpot_chronicles:cooked_greens",
+    "orients_hotpot_chronicles:copper_four_grid_hotpot",
+    "orients_hotpot_chronicles:cooked_mutton_meatball",
+    "orients_hotpot_chronicles:beef_meatball",
+    "orients_hotpot_chronicles:cooked_cilantro_mutton_meatball",
+    "orients_hotpot_chronicles:mangrove_bench",
+    "orients_hotpot_chronicles:greens",
+    "orients_hotpot_chronicles:glass_cup",
+    "orients_hotpot_chronicles:milk_cup",
+    "orients_hotpot_chronicles:quartz_tall_hotpot_table",
+    "orients_hotpot_chronicles:tomato_hotpot_base",
+    "orients_hotpot_chronicles:cilantro_beef_meatball",
+    "orients_hotpot_chronicles:quartz_five_slot_long_plate",
+    "orients_hotpot_chronicles:polished_diorite_hotpot_table",
+    "orients_hotpot_chronicles:tripe",
+    "orients_hotpot_chronicles:cooked_cilantro_fish_ball",
+    "orients_hotpot_chronicles:bamboo_three_slot_long_plate",
+    "orients_hotpot_chronicles:cherry_sauce_station",
+    "orients_hotpot_chronicles:peeled_shrimp",
+    "orients_hotpot_chronicles:quartz_four_slot_square_plate",
+    "orients_hotpot_chronicles:enoki_mushroom",
+    "orients_hotpot_chronicles:quartz_eight_slot_platter",
+    "orients_hotpot_chronicles:tomato_soup_bowl",
+    "orients_hotpot_chronicles:hotpot_guide",
+    "orients_hotpot_chronicles:polished_deepslate_tall_hotpot_table",
+    "orients_hotpot_chronicles:crimson_bench",
+    "orients_hotpot_chronicles:fatty_beef_roll",
+    "orients_hotpot_chronicles:potato_slice",
+    "orients_hotpot_chronicles:terracotta_five_slot_long_plate",
+    "orients_hotpot_chronicles:wide_noodles",
+    "orients_hotpot_chronicles:orange",
+    "orients_hotpot_chronicles:cooked_lotus_root_slice",
+    "orients_hotpot_chronicles:zhe_er_gen_slice",
+    "orients_hotpot_chronicles:blue_print_cloth_apron",
+    "orients_hotpot_chronicles:polished_blackstone_tall_hotpot_table",
+    "orients_hotpot_chronicles:brick_stove",
+    "orients_hotpot_chronicles:iron_sauce_station",
+    "orients_hotpot_chronicles:bamboo_stool",
+    "orients_hotpot_chronicles:dark_oak_tall_hotpot_table",
+    "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+    "orients_hotpot_chronicles:oyster_sauce",
+    "orients_hotpot_chronicles:fish_ball",
+    "orients_hotpot_chronicles:brown_trim_cloth_apron",
+    "orients_hotpot_chronicles:oak_sauce_station",
+    "orients_hotpot_chronicles:three_fresh_soup_bowl",
+    "orients_hotpot_chronicles:iron_split_yuanyang_hotpot",
+    "orients_hotpot_chronicles:cooked_beef_loin_slice",
+    "orients_hotpot_chronicles:copper_three_slot_long_plate",
+    "orients_hotpot_chronicles:quartz_hotpot_table"
+  ],
+  "creative_tab": [
+    "orients_hotpot_chronicles:brick_stove",
+    "orients_hotpot_chronicles:tall_brick_stove",
+    "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "orients_hotpot_chronicles:iron_taiji_yuanyang_hotpot",
+    "orients_hotpot_chronicles:iron_round_yuanyang_hotpot",
+    "orients_hotpot_chronicles:iron_square_yuanyang_hotpot",
+    "orients_hotpot_chronicles:iron_split_yuanyang_hotpot",
+    "orients_hotpot_chronicles:iron_four_grid_hotpot",
+    "orients_hotpot_chronicles:copper_nine_grid_hotpot",
+    "orients_hotpot_chronicles:copper_taiji_yuanyang_hotpot",
+    "orients_hotpot_chronicles:copper_round_yuanyang_hotpot",
+    "orients_hotpot_chronicles:copper_square_yuanyang_hotpot",
+    "orients_hotpot_chronicles:copper_split_yuanyang_hotpot",
+    "orients_hotpot_chronicles:copper_four_grid_hotpot",
+    "orients_hotpot_chronicles:bamboo_chopsticks",
+    "orients_hotpot_chronicles:tripe",
+    "orients_hotpot_chronicles:cooked_tripe",
+    "orients_hotpot_chronicles:fatty_beef_roll",
+    "orients_hotpot_chronicles:cooked_fatty_beef_roll",
+    "orients_hotpot_chronicles:mutton_roll",
+    "orients_hotpot_chronicles:cooked_mutton_roll",
+    "orients_hotpot_chronicles:beef_loin",
+    "orients_hotpot_chronicles:cooked_beef_loin",
+    "orients_hotpot_chronicles:beef_loin_slice",
+    "orients_hotpot_chronicles:cooked_beef_loin_slice",
+    "orients_hotpot_chronicles:potato_slice",
+    "orients_hotpot_chronicles:cooked_potato_slice",
+    "orients_hotpot_chronicles:soybean",
+    "orients_hotpot_chronicles:cold_tofu",
+    "orients_hotpot_chronicles:hot_tofu",
+    "orients_hotpot_chronicles:cold_tofu_cube",
+    "orients_hotpot_chronicles:hot_tofu_cube",
+    "orients_hotpot_chronicles:beef_meatball",
+    "orients_hotpot_chronicles:cooked_beef_meatball",
+    "orients_hotpot_chronicles:cilantro_beef_meatball",
+    "orients_hotpot_chronicles:cooked_cilantro_beef_meatball",
+    "orients_hotpot_chronicles:pork_meatball",
+    "orients_hotpot_chronicles:cooked_pork_meatball",
+    "orients_hotpot_chronicles:cilantro_pork_meatball",
+    "orients_hotpot_chronicles:cooked_cilantro_pork_meatball",
+    "orients_hotpot_chronicles:mutton_meatball",
+    "orients_hotpot_chronicles:cooked_mutton_meatball",
+    "orients_hotpot_chronicles:cilantro_mutton_meatball",
+    "orients_hotpot_chronicles:cooked_cilantro_mutton_meatball",
+    "orients_hotpot_chronicles:fish_ball",
+    "orients_hotpot_chronicles:cooked_fish_ball",
+    "orients_hotpot_chronicles:cilantro_fish_ball",
+    "orients_hotpot_chronicles:cooked_cilantro_fish_ball",
+    "orients_hotpot_chronicles:shrimp",
+    "orients_hotpot_chronicles:cooked_shrimp",
+    "orients_hotpot_chronicles:peeled_shrimp",
+    "orients_hotpot_chronicles:cooked_peeled_shrimp",
+    "orients_hotpot_chronicles:shrimp_paste",
+    "orients_hotpot_chronicles:cooked_shrimp_paste",
+    "orients_hotpot_chronicles:minced_pork",
+    "orients_hotpot_chronicles:raw_ham_sausage",
+    "orients_hotpot_chronicles:ham_sausage",
+    "orients_hotpot_chronicles:ham_sausage_slice",
+    "orients_hotpot_chronicles:cooked_ham_sausage_slice",
+    "orients_hotpot_chronicles:raw_crispy_pork",
+    "orients_hotpot_chronicles:crispy_pork",
+    "orients_hotpot_chronicles:boiled_crispy_pork",
+    "orients_hotpot_chronicles:dried_tofu",
+    "orients_hotpot_chronicles:cooked_dried_tofu",
+    "orients_hotpot_chronicles:tofu_skin",
+    "orients_hotpot_chronicles:cooked_tofu_skin",
+    "orients_hotpot_chronicles:wide_noodles",
+    "orients_hotpot_chronicles:cooked_wide_noodles",
+    "orients_hotpot_chronicles:sweet_potato_skin",
+    "orients_hotpot_chronicles:cooked_sweet_potato_skin",
+    "orients_hotpot_chronicles:enoki_mushroom",
+    "orients_hotpot_chronicles:cooked_enoki_mushroom",
+    "orients_hotpot_chronicles:greens",
+    "orients_hotpot_chronicles:cooked_greens",
+    "orients_hotpot_chronicles:lotus_root",
+    "orients_hotpot_chronicles:lotus_root_slice",
+    "orients_hotpot_chronicles:cooked_lotus_root_slice",
+    "orients_hotpot_chronicles:raw_squid",
+    "orients_hotpot_chronicles:squid_roll",
+    "orients_hotpot_chronicles:cooked_squid_roll",
+    "orients_hotpot_chronicles:egg_fried_rice",
+    "orients_hotpot_chronicles:zhe_er_gen",
+    "orients_hotpot_chronicles:zhe_er_gen_slice",
+    "orients_hotpot_chronicles:cooked_zhe_er_gen_slice",
+    "orients_hotpot_chronicles:minced_zhe_er_gen",
+    "orients_hotpot_chronicles:cloth_apron",
+    "orients_hotpot_chronicles:blue_print_cloth_apron",
+    "orients_hotpot_chronicles:brown_trim_cloth_apron",
+    "orients_hotpot_chronicles:hotpot_guide",
+    "orients_hotpot_chronicles:iron_kitchen_knife",
+    "orients_hotpot_chronicles:rolling_pin",
+    "orients_hotpot_chronicles:cutting_board",
+    "orients_hotpot_chronicles:clear_broth_bowl",
+    "orients_hotpot_chronicles:rich_stock_bowl",
+    "orients_hotpot_chronicles:mushroom_broth_bowl",
+    "orients_hotpot_chronicles:spicy_red_broth_bowl",
+    "orients_hotpot_chronicles:tomato_soup_bowl",
+    "orients_hotpot_chronicles:three_fresh_soup_bowl",
+    "orients_hotpot_chronicles:orange_drink",
+    "orients_hotpot_chronicles:empty_orange_drink_bottle",
+    "orients_hotpot_chronicles:plant_protein_drink",
+    "orients_hotpot_chronicles:empty_plant_protein_drink_bottle",
+    "orients_hotpot_chronicles:orient_cola",
+    "orients_hotpot_chronicles:empty_orient_cola_bottle",
+    "orients_hotpot_chronicles:glass_cup",
+    "orients_hotpot_chronicles:orange_drink_cup",
+    "orients_hotpot_chronicles:plant_protein_drink_cup",
+    "orients_hotpot_chronicles:orient_cola_cup",
+    "orients_hotpot_chronicles:water_cup",
+    "orients_hotpot_chronicles:milk_cup",
+    "orients_hotpot_chronicles:scallion",
+    "orients_hotpot_chronicles:cilantro",
+    "orients_hotpot_chronicles:orange",
+    "orients_hotpot_chronicles:garlic",
+    "orients_hotpot_chronicles:garlic_paste",
+    "orients_hotpot_chronicles:cooked_kelp",
+    "orients_hotpot_chronicles:tomato",
+    "orients_hotpot_chronicles:chili_pepper",
+    "orients_hotpot_chronicles:oyster_sauce",
+    "orients_hotpot_chronicles:sesame_paste",
+    "orients_hotpot_chronicles:peanut",
+    "orients_hotpot_chronicles:crushed_peanuts",
+    "orients_hotpot_chronicles:millet_chili",
+    "orients_hotpot_chronicles:tomato_hotpot_base",
+    "orients_hotpot_chronicles:three_fresh_hotpot_base",
+    "orients_hotpot_chronicles:tomato_soup_bucket",
+    "orients_hotpot_chronicles:three_fresh_soup_bucket",
+    "orients_hotpot_chronicles:oak_hotpot_table",
+    "orients_hotpot_chronicles:spruce_hotpot_table",
+    "orients_hotpot_chronicles:birch_hotpot_table",
+    "orients_hotpot_chronicles:jungle_hotpot_table",
+    "orients_hotpot_chronicles:acacia_hotpot_table",
+    "orients_hotpot_chronicles:dark_oak_hotpot_table",
+    "orients_hotpot_chronicles:mangrove_hotpot_table",
+    "orients_hotpot_chronicles:cherry_hotpot_table",
+    "orients_hotpot_chronicles:bamboo_hotpot_table",
+    "orients_hotpot_chronicles:crimson_hotpot_table",
+    "orients_hotpot_chronicles:warped_hotpot_table",
+    "orients_hotpot_chronicles:smooth_stone_hotpot_table",
+    "orients_hotpot_chronicles:polished_andesite_hotpot_table",
+    "orients_hotpot_chronicles:polished_diorite_hotpot_table",
+    "orients_hotpot_chronicles:polished_granite_hotpot_table",
+    "orients_hotpot_chronicles:polished_deepslate_hotpot_table",
+    "orients_hotpot_chronicles:polished_blackstone_hotpot_table",
+    "orients_hotpot_chronicles:quartz_hotpot_table",
+    "orients_hotpot_chronicles:cut_copper_hotpot_table",
+    "orients_hotpot_chronicles:iron_hotpot_table",
+    "orients_hotpot_chronicles:oak_stool",
+    "orients_hotpot_chronicles:spruce_stool",
+    "orients_hotpot_chronicles:birch_stool",
+    "orients_hotpot_chronicles:jungle_stool",
+    "orients_hotpot_chronicles:acacia_stool",
+    "orients_hotpot_chronicles:dark_oak_stool",
+    "orients_hotpot_chronicles:mangrove_stool",
+    "orients_hotpot_chronicles:cherry_stool",
+    "orients_hotpot_chronicles:bamboo_stool",
+    "orients_hotpot_chronicles:crimson_stool",
+    "orients_hotpot_chronicles:warped_stool",
+    "orients_hotpot_chronicles:oak_tall_hotpot_table",
+    "orients_hotpot_chronicles:spruce_tall_hotpot_table",
+    "orients_hotpot_chronicles:birch_tall_hotpot_table",
+    "orients_hotpot_chronicles:jungle_tall_hotpot_table",
+    "orients_hotpot_chronicles:acacia_tall_hotpot_table",
+    "orients_hotpot_chronicles:dark_oak_tall_hotpot_table",
+    "orients_hotpot_chronicles:mangrove_tall_hotpot_table",
+    "orients_hotpot_chronicles:cherry_tall_hotpot_table",
+    "orients_hotpot_chronicles:bamboo_tall_hotpot_table",
+    "orients_hotpot_chronicles:crimson_tall_hotpot_table",
+    "orients_hotpot_chronicles:warped_tall_hotpot_table",
+    "orients_hotpot_chronicles:smooth_stone_tall_hotpot_table",
+    "orients_hotpot_chronicles:polished_andesite_tall_hotpot_table",
+    "orients_hotpot_chronicles:polished_diorite_tall_hotpot_table",
+    "orients_hotpot_chronicles:polished_granite_tall_hotpot_table",
+    "orients_hotpot_chronicles:polished_deepslate_tall_hotpot_table",
+    "orients_hotpot_chronicles:polished_blackstone_tall_hotpot_table",
+    "orients_hotpot_chronicles:quartz_tall_hotpot_table",
+    "orients_hotpot_chronicles:cut_copper_tall_hotpot_table",
+    "orients_hotpot_chronicles:iron_tall_hotpot_table",
+    "orients_hotpot_chronicles:oak_bench",
+    "orients_hotpot_chronicles:spruce_bench",
+    "orients_hotpot_chronicles:birch_bench",
+    "orients_hotpot_chronicles:jungle_bench",
+    "orients_hotpot_chronicles:acacia_bench",
+    "orients_hotpot_chronicles:dark_oak_bench",
+    "orients_hotpot_chronicles:mangrove_bench",
+    "orients_hotpot_chronicles:cherry_bench",
+    "orients_hotpot_chronicles:bamboo_bench",
+    "orients_hotpot_chronicles:crimson_bench",
+    "orients_hotpot_chronicles:warped_bench",
+    "orients_hotpot_chronicles:quartz_small_dish",
+    "orients_hotpot_chronicles:quartz_two_slot_plate",
+    "orients_hotpot_chronicles:quartz_three_slot_long_plate",
+    "orients_hotpot_chronicles:quartz_four_slot_square_plate",
+    "orients_hotpot_chronicles:quartz_five_slot_long_plate",
+    "orients_hotpot_chronicles:quartz_eight_slot_platter",
+    "orients_hotpot_chronicles:bamboo_small_dish",
+    "orients_hotpot_chronicles:bamboo_two_slot_plate",
+    "orients_hotpot_chronicles:bamboo_three_slot_long_plate",
+    "orients_hotpot_chronicles:bamboo_four_slot_square_plate",
+    "orients_hotpot_chronicles:bamboo_five_slot_long_plate",
+    "orients_hotpot_chronicles:bamboo_eight_slot_platter",
+    "orients_hotpot_chronicles:terracotta_small_dish",
+    "orients_hotpot_chronicles:terracotta_two_slot_plate",
+    "orients_hotpot_chronicles:terracotta_three_slot_long_plate",
+    "orients_hotpot_chronicles:terracotta_four_slot_square_plate",
+    "orients_hotpot_chronicles:terracotta_five_slot_long_plate",
+    "orients_hotpot_chronicles:terracotta_eight_slot_platter",
+    "orients_hotpot_chronicles:copper_small_dish",
+    "orients_hotpot_chronicles:copper_two_slot_plate",
+    "orients_hotpot_chronicles:copper_three_slot_long_plate",
+    "orients_hotpot_chronicles:copper_four_slot_square_plate",
+    "orients_hotpot_chronicles:copper_five_slot_long_plate",
+    "orients_hotpot_chronicles:copper_eight_slot_platter",
+    "orients_hotpot_chronicles:iron_small_dish",
+    "orients_hotpot_chronicles:iron_two_slot_plate",
+    "orients_hotpot_chronicles:iron_three_slot_long_plate",
+    "orients_hotpot_chronicles:iron_four_slot_square_plate",
+    "orients_hotpot_chronicles:iron_five_slot_long_plate",
+    "orients_hotpot_chronicles:iron_eight_slot_platter",
+    "orients_hotpot_chronicles:oak_sauce_station",
+    "orients_hotpot_chronicles:spruce_sauce_station",
+    "orients_hotpot_chronicles:birch_sauce_station",
+    "orients_hotpot_chronicles:jungle_sauce_station",
+    "orients_hotpot_chronicles:acacia_sauce_station",
+    "orients_hotpot_chronicles:dark_oak_sauce_station",
+    "orients_hotpot_chronicles:mangrove_sauce_station",
+    "orients_hotpot_chronicles:cherry_sauce_station",
+    "orients_hotpot_chronicles:bamboo_sauce_station",
+    "orients_hotpot_chronicles:crimson_sauce_station",
+    "orients_hotpot_chronicles:warped_sauce_station",
+    "orients_hotpot_chronicles:iron_sauce_station"
+  ],
+  "config_defaults": {
+    "client": {
+      "particle_intensity": 100
+    },
+    "drink": {
+      "orange_drink": {
+        "duration": 300,
+        "amplifier": 0
+      },
+      "orient_cola": {
+        "duration": 300,
+        "amplifier": 0
+      },
+      "sip": {
+        "hunger": 2,
+        "saturation": 0.3
+      }
+    },
+    "food": {
+      "tripe": {
+        "hunger": 2,
+        "saturation": 0.3
+      },
+      "cooked_tripe": {
+        "hunger": 5,
+        "saturation": 0.6
+      },
+      "fatty_beef_roll": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "cooked_fatty_beef_roll": {
+        "hunger": 3,
+        "saturation": 0.6
+      },
+      "mutton_roll": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "cooked_mutton_roll": {
+        "hunger": 3,
+        "saturation": 0.6
+      },
+      "beef_loin": {
+        "hunger": 3,
+        "saturation": 0.3
+      },
+      "cooked_beef_loin": {
+        "hunger": 8,
+        "saturation": 0.8
+      },
+      "beef_loin_slice": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "cooked_beef_loin_slice": {
+        "hunger": 3,
+        "saturation": 0.6
+      },
+      "potato_slice": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "cooked_potato_slice": {
+        "hunger": 2,
+        "saturation": 0.6
+      },
+      "soybean": {
+        "hunger": 1,
+        "saturation": 0.1
+      },
+      "cold_tofu": {
+        "hunger": 2,
+        "saturation": 0.4
+      },
+      "hot_tofu": {
+        "hunger": 2,
+        "saturation": 0.4
+      },
+      "cold_tofu_cube": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "orange": {
+        "hunger": 4,
+        "saturation": 0.3
+      },
+      "garlic": {
+        "hunger": 1,
+        "saturation": 0.1
+      },
+      "garlic_paste": {
+        "hunger": 1,
+        "saturation": 0.1
+      },
+      "shrimp": {
+        "hunger": 1,
+        "saturation": 0.2
+      },
+      "cooked_shrimp": {
+        "hunger": 3,
+        "saturation": 0.5
+      },
+      "peeled_shrimp": {
+        "hunger": 1,
+        "saturation": 0.2
+      },
+      "cooked_peeled_shrimp": {
+        "hunger": 3,
+        "saturation": 0.6
+      },
+      "shrimp_paste": {
+        "hunger": 1,
+        "saturation": 0.2
+      },
+      "cooked_shrimp_paste": {
+        "hunger": 4,
+        "saturation": 0.6
+      },
+      "raw_ham_sausage": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "ham_sausage": {
+        "hunger": 3,
+        "saturation": 0.6
+      },
+      "ham_sausage_slice": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "cooked_ham_sausage_slice": {
+        "hunger": 2,
+        "saturation": 0.5
+      },
+      "oyster_sauce": {
+        "hunger": 1,
+        "saturation": 0.2
+      },
+      "sesame_paste": {
+        "hunger": 2,
+        "saturation": 0.3
+      },
+      "peanut": {
+        "hunger": 1,
+        "saturation": 0.2
+      },
+      "crushed_peanuts": {
+        "hunger": 1,
+        "saturation": 0.2
+      },
+      "millet_chili": {
+        "hunger": 1,
+        "saturation": 0.1
+      },
+      "raw_crispy_pork": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "crispy_pork": {
+        "hunger": 4,
+        "saturation": 0.6
+      },
+      "boiled_crispy_pork": {
+        "hunger": 6,
+        "saturation": 0.8
+      },
+      "dried_tofu": {
+        "hunger": 2,
+        "saturation": 0.3
+      },
+      "cooked_dried_tofu": {
+        "hunger": 4,
+        "saturation": 0.6
+      },
+      "tofu_skin": {
+        "hunger": 2,
+        "saturation": 0.3
+      },
+      "cooked_tofu_skin": {
+        "hunger": 4,
+        "saturation": 0.6
+      },
+      "wide_noodles": {
+        "hunger": 1,
+        "saturation": 0.2
+      },
+      "cooked_wide_noodles": {
+        "hunger": 4,
+        "saturation": 0.6
+      },
+      "sweet_potato_skin": {
+        "hunger": 1,
+        "saturation": 0.2
+      },
+      "cooked_sweet_potato_skin": {
+        "hunger": 4,
+        "saturation": 0.6
+      },
+      "enoki_mushroom": {
+        "hunger": 1,
+        "saturation": 0.2
+      },
+      "cooked_enoki_mushroom": {
+        "hunger": 3,
+        "saturation": 0.5
+      },
+      "greens": {
+        "hunger": 1,
+        "saturation": 0.2
+      },
+      "cooked_greens": {
+        "hunger": 3,
+        "saturation": 0.5
+      },
+      "lotus_root": {
+        "hunger": 2,
+        "saturation": 0.3
+      },
+      "lotus_root_slice": {
+        "hunger": 1,
+        "saturation": 0.2
+      },
+      "cooked_lotus_root_slice": {
+        "hunger": 3,
+        "saturation": 0.6
+      },
+      "raw_squid": {
+        "hunger": 2,
+        "saturation": 0.2
+      },
+      "squid_roll": {
+        "hunger": 1,
+        "saturation": 0.2
+      },
+      "cooked_squid_roll": {
+        "hunger": 4,
+        "saturation": 0.6
+      },
+      "egg_fried_rice": {
+        "hunger": 7,
+        "saturation": 0.8
+      },
+      "zhe_er_gen": {
+        "hunger": 1,
+        "saturation": 0.15
+      },
+      "zhe_er_gen_slice": {
+        "hunger": 1,
+        "saturation": 0.15
+      },
+      "cooked_zhe_er_gen_slice": {
+        "hunger": 3,
+        "saturation": 0.5
+      },
+      "minced_zhe_er_gen": {
+        "hunger": 1,
+        "saturation": 0.1
+      },
+      "tomato": {
+        "hunger": 2,
+        "saturation": 0.3
+      },
+      "chili_pepper": {
+        "hunger": 1,
+        "saturation": 0.1
+      },
+      "cooked_kelp": {
+        "hunger": 2,
+        "saturation": 0.3
+      },
+      "hot_tofu_cube": {
+        "hunger": 2,
+        "saturation": 0.6
+      },
+      "beef_meatball": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "pork_meatball": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "mutton_meatball": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "fish_ball": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "cilantro_beef_meatball": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "cilantro_pork_meatball": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "cilantro_mutton_meatball": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "cilantro_fish_ball": {
+        "hunger": 1,
+        "saturation": 0.3
+      },
+      "cooked_beef_meatball": {
+        "hunger": 3,
+        "saturation": 0.6
+      },
+      "cooked_pork_meatball": {
+        "hunger": 3,
+        "saturation": 0.6
+      },
+      "cooked_mutton_meatball": {
+        "hunger": 3,
+        "saturation": 0.6
+      },
+      "cooked_fish_ball": {
+        "hunger": 3,
+        "saturation": 0.6
+      },
+      "cooked_cilantro_beef_meatball": {
+        "hunger": 4,
+        "saturation": 0.6
+      },
+      "cooked_cilantro_pork_meatball": {
+        "hunger": 4,
+        "saturation": 0.6
+      },
+      "cooked_cilantro_mutton_meatball": {
+        "hunger": 4,
+        "saturation": 0.6
+      },
+      "cooked_cilantro_fish_ball": {
+        "hunger": 4,
+        "saturation": 0.6
+      },
+      "scallion": {
+        "hunger": 1,
+        "saturation": 0.1
+      },
+      "cilantro": {
+        "hunger": 1,
+        "saturation": 0.1
+      }
+    },
+    "soup_speed": {
+      "clear": 1.0,
+      "rich_stock": 0.85,
+      "mushroom": 1.15,
+      "spicy": 1.3,
+      "tomato": 1.1,
+      "three_fresh": 1.0
+    },
+    "soup_bowl": {
+      "clear": {
+        "hunger": 4,
+        "saturation": 0.6,
+        "duration": 300,
+        "amplifier": 0,
+        "second_duration": 1,
+        "second_amplifier": 0,
+        "fire_duration": 0,
+        "fire_amplifier": 0,
+        "hunger_duration": 0,
+        "hunger_amplifier": 0
+      },
+      "rich_stock": {
+        "hunger": 4,
+        "saturation": 0.9,
+        "duration": 300,
+        "amplifier": 0,
+        "second_duration": 600,
+        "second_amplifier": 0,
+        "fire_duration": 0,
+        "fire_amplifier": 0,
+        "hunger_duration": 0,
+        "hunger_amplifier": 0
+      },
+      "mushroom": {
+        "hunger": 4,
+        "saturation": 0.6,
+        "duration": 200,
+        "amplifier": 0,
+        "second_duration": 0,
+        "second_amplifier": 0,
+        "fire_duration": 0,
+        "fire_amplifier": 0,
+        "hunger_duration": 0,
+        "hunger_amplifier": 0
+      },
+      "spicy": {
+        "hunger": 4,
+        "saturation": 0.6,
+        "duration": 180,
+        "amplifier": 0,
+        "second_duration": 160,
+        "second_amplifier": 0,
+        "fire_duration": 300,
+        "fire_amplifier": 0,
+        "hunger_duration": 60,
+        "hunger_amplifier": 0
+      },
+      "tomato": {
+        "hunger": 4,
+        "saturation": 0.6,
+        "duration": 300,
+        "amplifier": 0,
+        "second_duration": 0,
+        "second_amplifier": 0,
+        "fire_duration": 0,
+        "fire_amplifier": 0,
+        "hunger_duration": 0,
+        "hunger_amplifier": 0
+      },
+      "three_fresh": {
+        "hunger": 4,
+        "saturation": 0.9,
+        "duration": 400,
+        "amplifier": 0,
+        "second_duration": 600,
+        "second_amplifier": 0,
+        "fire_duration": 0,
+        "fire_amplifier": 0,
+        "hunger_duration": 0,
+        "hunger_amplifier": 0
+      }
+    },
+    "cooking": {
+      "fallback_ticks": 200,
+      "fallback_xp": 0.15,
+      "xp_per_item": 0.7,
+      "items": {
+        "beef_loin_slice": 50,
+        "tripe": 50,
+        "enoki_mushroom": 50,
+        "greens": 50,
+        "fatty_beef_roll": 100,
+        "mutton_roll": 100,
+        "potato_slice": 100,
+        "cold_tofu_cube": 100,
+        "ham_sausage_slice": 100,
+        "peeled_shrimp": 100,
+        "lotus_root_slice": 100,
+        "squid_roll": 100,
+        "tofu_skin": 100,
+        "sweet_potato_skin": 100,
+        "shrimp": 150,
+        "shrimp_paste": 150,
+        "raw_ham_sausage": 150,
+        "dried_tofu": 150,
+        "wide_noodles": 150,
+        "raw_crispy_pork": 150,
+        "crispy_pork": 150,
+        "beef_loin": 200,
+        "beef_meatball": 200,
+        "pork_meatball": 200,
+        "mutton_meatball": 200,
+        "fish_ball": 200,
+        "cilantro_beef_meatball": 200,
+        "cilantro_pork_meatball": 200,
+        "cilantro_mutton_meatball": 200,
+        "cilantro_fish_ball": 200,
+        "zhe_er_gen_slice": 200
+      },
+      "tofu_cook_ticks": 200,
+      "tofu_overcook_ticks": 600
+    },
+    "fuel": {
+      "wood": {
+        "power": 0.65,
+        "burn_ticks": 300
+      },
+      "coal": {
+        "power": 1.0,
+        "burn_ticks": 1600
+      },
+      "lava": {
+        "power": 1.6,
+        "burn_ticks": 20000
+      }
+    },
+    "seasoning": {
+      "msg": {
+        "duration": 0,
+        "amplifier": 0,
+        "hunger": 2
+      },
+      "chili_oil": {
+        "duration": 200,
+        "amplifier": 0,
+        "hunger": 0
+      },
+      "sweet_sour_sauce": {
+        "duration": 200,
+        "amplifier": 0,
+        "hunger": 0
+      },
+      "honey": {
+        "duration": 0,
+        "amplifier": 0,
+        "hunger": 0
+      },
+      "sesame_oil": {
+        "duration": 100,
+        "amplifier": 0,
+        "hunger": 0
+      },
+      "vinegar": {
+        "duration": 0,
+        "amplifier": 0,
+        "hunger": 0
+      },
+      "sugar": {
+        "duration": 200,
+        "amplifier": 0,
+        "hunger": 0
+      },
+      "chopped_scallion": {
+        "duration": 0,
+        "amplifier": 0,
+        "hunger": 0
+      },
+      "minced_cilantro": {
+        "duration": 0,
+        "amplifier": 0,
+        "hunger": 0
+      },
+      "garlic_paste": {
+        "duration": 160,
+        "amplifier": 0,
+        "hunger": 0
+      },
+      "oyster_sauce": {
+        "duration": 200,
+        "amplifier": 0,
+        "hunger": 0
+      },
+      "sesame_paste": {
+        "duration": 200,
+        "amplifier": 0,
+        "hunger": 0
+      },
+      "crushed_peanuts": {
+        "duration": 200,
+        "amplifier": 0,
+        "hunger": 0
+      },
+      "millet_chili": {
+        "duration": 160,
+        "amplifier": 0,
+        "hunger": 0
+      },
+      "minced_zhe_er_gen": {
+        "duration": 200,
+        "amplifier": 0,
+        "hunger": 0
+      }
+    }
+  }
+}

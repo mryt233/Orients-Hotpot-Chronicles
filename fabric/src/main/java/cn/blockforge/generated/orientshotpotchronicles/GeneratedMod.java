@@ -81,6 +81,10 @@ public final class GeneratedMod implements ModInitializer {
         cn.blockforge.generated.orientshotpotchronicles.platform.FabricNetwork.register();
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTING.register(
             cn.blockforge.generated.orientshotpotchronicles.hotpot.Config::setServer);
+        // mryt233 改（2026-11-10，r147）：登记表在服务端开始启动时冻结（单人和专用服都覆盖）。
+        // 这个时机晚于兼容模块（Fabric 在 onInitialize 末尾跑 CompatRegistry.init）。
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTING.register(
+            server -> cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotHooks.freezeRegistries());
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(
             s -> cn.blockforge.generated.orientshotpotchronicles.hotpot.Config.setServer(null));
         // mryt233 改（2026-11-10）：玩家下线释放围裙热源缓存。

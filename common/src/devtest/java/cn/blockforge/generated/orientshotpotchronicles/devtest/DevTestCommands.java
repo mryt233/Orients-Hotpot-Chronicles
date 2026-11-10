@@ -67,12 +67,37 @@ public final class DevTestCommands {
                         }
                         return report(ctx, "no holder");
                     })))
+                // mryt233 改（2026-11-10）：打印某格的方块状态与方块实体类型（摆测试存档 / 核对用）。
+                .then(Commands.literal("block")
+                    .then(Commands.argument("pos", BlockPosArgument.blockPos()).executes(ctx -> {
+                        var pos = BlockPosArgument.getBlockPos(ctx, "pos");
+                        var world = ctx.getSource().getLevel();
+                        var state = world.getBlockState(pos);
+                        var be = world.getBlockEntity(pos);
+                        return report(ctx, "block " + pos.toShortString() + " = "
+                            + net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(state.getBlock())
+                            + " " + state + " | be=" + (be == null ? "none"
+                                : net.minecraft.core.registries.BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(be.getType())));
+                    })))
                 .then(Commands.literal("shape")
                     .then(Commands.argument("pos", BlockPosArgument.blockPos()).executes(ctx -> {
                         var pos = BlockPosArgument.getBlockPos(ctx, "pos");
                         var world = ctx.getSource().getLevel();
                         return report(ctx, "shape=" + world.getBlockState(pos).getCollisionShape(world, pos).bounds());
                     })))
+                // mryt233 改（2026-11-10）：按 SNBT 直接拿一件带组件的物品（摆测试存档的夹具用）。
+                .then(Commands.literal("holdsnbt")
+                    .then(Commands.argument("snbt", com.mojang.brigadier.arguments.StringArgumentType.greedyString())
+                        .executes(ctx -> {
+                            com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "snbt");
+                            var tag = net.minecraft.nbt.TagParser.parseTag(
+                                com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "snbt"));
+                            ItemStack stack = ItemStack.parseOptional(registryAccess, tag);
+                            ServerPlayer p = player(ctx);
+                            p.setItemInHand(InteractionHand.MAIN_HAND, stack);
+                            p.getFoodData().setFoodLevel(4);
+                            return report(ctx, "holdsnbt ok");
+                        })))
                 .then(Commands.literal("hold")
                     .then(Commands.argument("main", ItemArgument.item(registryAccess))
                         .executes(ctx -> hold(ctx, false))
@@ -107,6 +132,12 @@ public final class DevTestCommands {
                     .then(Commands.argument("id", net.minecraft.commands.arguments.ResourceLocationArgument.id())
                         .executes(DevTestCommands::recipe)))
                 .then(Commands.literal("show").executes(DevTestCommands::show))
+                // mryt233 改（2026-11-10）：重构前后属性 / 注册顺序快照对比（只用于开发环境）
+                .then(Commands.literal("dumpattrs")
+                    .then(Commands.argument("name", com.mojang.brigadier.arguments.StringArgumentType.word())
+                        .executes(ctx -> report(ctx, "attrs -> " + AttrDump.write(
+                            com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "name"),
+                            ctx.getSource().getLevel(), player(ctx))))))
                 // mryt233 改（2026-11-09，r146b）：打印胸甲槽那件的「算不算布围裙」，
                 // 三款防烫 / 特辣不冒火都走 ClothApronItem.wornBy，这个答案就是判定结果。
                 .then(Commands.literal("apron").executes(DevTestCommands::apron))
@@ -123,6 +154,27 @@ public final class DevTestCommands {
                 }))
                 .then(Commands.literal("stats").executes(ctx -> report(ctx,
                     "stats " + String.join(" ; ", cn.blockforge.orient.framework.loader.RuntimeStats.get().summary()))))
+                // mryt233 改（2026-11-10，r147）：核对登记表冻结状态与晚登记是否报错（3B）
+                .then(Commands.literal("freeze").executes(ctx -> {
+                    var cooking = cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCooking.class;
+                    String summary = "";
+                    try {
+                        summary = "cooking=" + (String) cooking.getMethod("registrySummary").invoke(null);
+                    } catch (ReflectiveOperationException error) {
+                        summary = "cooking=<读不到>";
+                    }
+                    String rejected;
+                    try {
+                        cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCooking.overcook(
+                            net.minecraft.world.item.Items.STICK, net.minecraft.world.item.Items.STICK);
+                        rejected = "未报错(错)";
+                    } catch (IllegalStateException error) {
+                        rejected = "已抛异常:" + error.getMessage();
+                    }
+                    return report(ctx, "registries " + summary
+                        + " | frozen=" + (Boolean) cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotHooks
+                            .registriesFrozen() + " | late=" + rejected);
+                }))
                 .then(Commands.literal("hooks").executes(ctx -> {
                     var host = new cn.blockforge.orient.framework.game.Hooks<java.util.function.Consumer<String>>();
                     java.util.List<String> seen = new java.util.ArrayList<>();
@@ -134,7 +186,8 @@ public final class DevTestCommands {
                     a.unregister();
                     int after = host.size();
                     return report(ctx, "hooks order=" + seen + " after-unregister=" + after
-                        + " content-hooks=" + cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotHooks.hookCounts());
+                        + " content-hooks=" + cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotHooks.hookCounts()
+                        + " heat-sources=" + cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotHeat.hookCount());
                 }))
                 .then(Commands.literal("openscreen")
                     .then(Commands.argument("player", com.mojang.brigadier.arguments.StringArgumentType.word())

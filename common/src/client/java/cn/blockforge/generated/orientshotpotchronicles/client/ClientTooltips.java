@@ -37,16 +37,17 @@ public final class ClientTooltips {
         if (soup != null) {
             // 任务单的写法：红汤后面接「· 特辣」（状态栏那边是「红汤锅底（特辣）」）
             Component soupName = Component.translatable(soup.nameKey());
-            if (soup == SoupBase.SPICY) {
+            // mryt233 改（2026-11-10，r147）：红汤判断改成 isSpicy() 属性
+            if (soup.isSpicy()) {
                 soupName = Component.empty().append(soupName).append(Component.literal(" · "))
                     .append(HotPotBlockEntity.spicyLevelText(spicy));
             }
             lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.cooked_in_soup"), soupName)
-                .withStyle(soup == SoupBase.SPICY ? ChatFormatting.RED : ChatFormatting.GOLD));
+                .withStyle(soup.isSpicy() ? ChatFormatting.RED : ChatFormatting.GOLD));
             appendSoupEffects(soup, spicy, food, lines);
         }
         if (food.getItem() instanceof SoupBowlItem bowl) {
-            if (bowl.soup() == SoupBase.SPICY) {
+            if (bowl.soup().isSpicy()) {
                 lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.spicy_level"),
                     HotPotBlockEntity.spicyLevelText(food.getOrDefault(HotPotContent.SPICY_LEVEL, 0)))
                     .withStyle(ChatFormatting.RED));

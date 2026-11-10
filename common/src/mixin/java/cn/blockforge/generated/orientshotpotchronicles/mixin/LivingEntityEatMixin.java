@@ -95,8 +95,8 @@ abstract class LivingEntityEatMixin {
                 boolean calmSpicy = mask != null
                     && ((mask & Seasoning.HONEY.bit()) != 0 || (mask & Seasoning.VINEGAR.bit()) != 0);
                 // 清汤、番茄汤本来就解冷锅反胃
-                if (soup == cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase.CLEAR
-                    || soup == cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase.TOMATO) {
+                // mryt233 改（2026-11-10，r147）：「是不是清汤 / 番茄」改成汤底自己的属性 clearsNausea()
+                if (soup.clearsNausea()) {
                     self.removeEffect(net.minecraft.world.effect.MobEffects.CONFUSION);
                 }
                 for (net.minecraft.world.effect.MobEffectInstance effect : soup.dishBonusEffects(spicy)) {
@@ -107,7 +107,8 @@ abstract class LivingEntityEatMixin {
                 }
                 // 变态辣且没解辣：嘴上 2 秒火苗，纯节目效果（前面刚给了抗火，不扣血）
                 // mryt233 改（2026-11-06，r139）：穿着布围裙就不点嘴上这簇火——布围裙挡的是溅起来的滚油与明火。
-                if (soup == cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase.SPICY
+                // mryt233 改（2026-11-10）：红汤判断改成 isSpicy() 属性
+                if (soup.isSpicy()
                     && spicy >= 3 && !calmSpicy
                     && !cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronItem.wornBy(self)) {
                     self.setRemainingFireTicks(Math.max(self.getRemainingFireTicks(), 40));

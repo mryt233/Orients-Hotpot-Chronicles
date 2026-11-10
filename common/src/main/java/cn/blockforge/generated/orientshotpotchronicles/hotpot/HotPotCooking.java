@@ -35,13 +35,14 @@ public final class HotPotCooking {
      * 以后直接改 config/orients_hotpot_chronicles.json，不用去改数据包熔炉配方。
      * 整块冷豆腐不在这里（它走 cooking.tofu_cook_ticks，见 cookTicks）。
      */
-    private static final java.util.Map<String, Integer> DEFAULT_ITEM_COOK_TICKS = new java.util.LinkedHashMap<>();
+    private static final FrozenRegistry<String, Integer> DEFAULT_ITEM_COOK_TICKS = new FrozenRegistry<>(
+        "默认涮煮时间表", "默认涮煮时间是启动期数据，加食材时在 registerDefaultItemCookTicks() 里登记。");
 
     static {
         // 默认值记进配置模板
         Config.rememberCooking(DEFAULT_FALLBACK_TICKS, DEFAULT_FALLBACK_XP, DEFAULT_XP_PER_ITEM);
         registerDefaultItemCookTicks();
-        DEFAULT_ITEM_COOK_TICKS.forEach(Config::rememberItemCookTicks);
+        DEFAULT_ITEM_COOK_TICKS.view().forEach(Config::rememberItemCookTicks);
     }
 
     /** 任务单定的四档默认涮煮时间：极快熟 50、快熟 100、中等 150、慢熟 200。 */
@@ -220,7 +221,9 @@ public final class HotPotCooking {
      * 只在锅里才有的产物（2026-10-25 用户：海带在火锅里煮成「熟海带」，原版熔炉 / 烟熏炉照旧出干海带）：
      * 耗时和经验还照原版配方，只换产物。以后锅（或模组别的厨具）专用的煮法都加在这里。新增
      */
-    private static final java.util.Map<Item, Item> POT_RESULTS = new java.util.HashMap<>();
+    // mryt233 改（2026-11-10，r147）：改成冻结登记表（见 FrozenRegistry / HotPotHooks.freezeRegistries）
+    private static final FrozenRegistry<Item, Item> POT_RESULTS = new FrozenRegistry<>(
+        "锅专用产物表", "锅专用煮法要在启动期登记（子模组在自己的兼容模块里调 potResult），冻结后不再接受登记。");
 
     public static void potResult(Item raw, Item cooked) {
         POT_RESULTS.put(raw, cooked);
@@ -231,7 +234,9 @@ public final class HotPotCooking {
      * 生食材 → 熟食的转换在 {@link #finish}；「熟食 → 煮过头产物」在这里登记，锅格到计时后换成 newItem。
      * 做成通用的表，别把豆腐写死在锅里：以后别的食材要「煮过头就碎」也加一行。
      */
-    private static final java.util.Map<Item, Item> OVERCOOK = new java.util.HashMap<>();
+    // mryt233 改（2026-11-10，r147）：改成冻结登记表
+    private static final FrozenRegistry<Item, Item> OVERCOOK = new FrozenRegistry<>(
+        "煮过头产物表", "煮过头的玩法要在启动期登记（子模组在自己的兼容模块里调 overcook），冻结后不再接受登记。");
 
     /** 登记「这样熟食在锅里继续煮过头会变成哪样」。 */
     public static void overcook(Item cooked, Item overcooked) {
@@ -272,7 +277,8 @@ public final class HotPotCooking {
         String path = itemPath(stack);
         if (path != null && Config.hasItemCookTicks(path)) {
             // 配置里有这一项就以配置为准；万一默认值表里没有，用兜底刻数当默认
-            return Config.itemCookTicks(path, DEFAULT_ITEM_COOK_TICKS.getOrDefault(path, DEFAULT_FALLBACK_TICKS));
+            Integer ticks = DEFAULT_ITEM_COOK_TICKS.get(path);
+            return Config.itemCookTicks(path, ticks == null ? DEFAULT_FALLBACK_TICKS : ticks);
         }
         return smeltingRecipe(world, stack).map(e -> e.value().getCookingTime()).orElse(Config.fallbackTicks(DEFAULT_FALLBACK_TICKS));
     }
@@ -316,6 +322,29 @@ public final class HotPotCooking {
     public static float xpFor(Level world, ItemStack raw) {
         return smeltingRecipe(world, raw).map(e -> Math.max(e.value().getExperience(), Config.xpPerItem(DEFAULT_XP_PER_ITEM)))
             .orElse(Config.fallbackXp(DEFAULT_FALLBACK_XP));
+    }
+
+    /*
+     * mryt233 改（2026-11-10，r147）：登记表冻结入口（由 HotPotHooks.freezeRegistries 在服务端启动时统一调）。
+     */
+
+    /** 冻结锅专用产物表、煮过头表、默认涮煮时间表（服务端启动时调用，幂等）。 */
+    public static void freezeRegistries() {
+        POT_RESULTS.freeze();
+        OVERCOOK.freeze();
+        DEFAULT_ITEM_COOK_TICKS.freeze();
+    }
+
+    /** 诊断：三张表是否都已经冻结。 */
+    public static boolean registriesFrozen() {
+        return POT_RESULTS.isFrozen() && OVERCOOK.isFrozen() && DEFAULT_ITEM_COOK_TICKS.isFrozen();
+    }
+
+    /** 诊断：某张表的名字 + 条数（测试与 /hpt 用）。 */
+    public static String registrySummary() {
+        return "pot_results=" + POT_RESULTS.size() + "/" + POT_RESULTS.isFrozen()
+            + " overcook=" + OVERCOOK.size() + "/" + OVERCOOK.isFrozen()
+            + " cook_ticks=" + DEFAULT_ITEM_COOK_TICKS.size() + "/" + DEFAULT_ITEM_COOK_TICKS.isFrozen();
     }
 
     /** 熟度千分比 [0..1]。 */

@@ -129,6 +129,9 @@ public final class HotPotNeoForge {
 
     private void onServerStarting(ServerStartingEvent event) {
         Config.setServer(event.getServer());
+        // mryt233 改（2026-11-10，r147）：登记表在服务端开始启动时冻结（单人和专用服都覆盖）。
+        // 这个时机晚于兼容模块（NeoForge 在 FMLCommonSetupEvent 跑 CompatRegistry.init）。
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotHooks.freezeRegistries();
     }
 
     private void onServerStopped(ServerStoppedEvent event) {
