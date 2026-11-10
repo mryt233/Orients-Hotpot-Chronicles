@@ -1,5 +1,7 @@
 package cn.blockforge.orient.framework.platform.neoforge;
 
+// mryt233 改（2026-11-10）：第三批 3C 平台接线。
+
 import cn.blockforge.orient.framework.loader.Framework;
 import cn.blockforge.orient.framework.loader.LootEventBridge;
 import cn.blockforge.orient.framework.loader.MenuOpener;
@@ -35,6 +37,8 @@ public final class NeoForgeFrameworkPlatform implements Platform {
     private static final Logger LOGGER = LoggerFactory.getLogger("orient-framework");
     private static NeoForgeFrameworkPlatform installed;
 
+    private final NeoForgeRuntimeEvents events = new NeoForgeRuntimeEvents();
+
     private final NeoForgeRegistrationApi registration = new NeoForgeRegistrationApi();
     private final NeoForgeNetworkApi network = new NeoForgeNetworkApi();
 
@@ -54,11 +58,12 @@ public final class NeoForgeFrameworkPlatform implements Platform {
                 Framework.install(platform);
             }
             installed = platform;
+            NeoForgeLootEvents.install();
             RuntimeStats.get().runtimeInit();
             modBus.addListener(platform.registration::onRegisterEvent);
             modBus.addListener(platform.network::onRegisterPayloads);
             if (FMLEnvironment.dist.isClient()) {
-                NeoForgeClientEvents.installLifecycle();
+                NeoForgeClientEvents.installLifecycle(modBus);
             }
             NeoForge.EVENT_BUS.addListener((ServerStartedEvent event) -> RuntimeStats.get().logSummary("server-started"));
             NeoForge.EVENT_BUS.addListener((ServerStoppingEvent event) -> RuntimeStats.get().logSummary("server-stopped"));
@@ -66,6 +71,11 @@ public final class NeoForgeFrameworkPlatform implements Platform {
                 RuntimeStats.get().process(), platform.getClass().getSimpleName(),
                 RuntimeStats.get().initCount(), RuntimeStats.get().installCount());
         }
+    }
+
+    @Override
+    public cn.blockforge.orient.framework.loader.RuntimeEvents events() {
+        return events;
     }
 
     @Override

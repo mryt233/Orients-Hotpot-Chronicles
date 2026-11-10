@@ -60,6 +60,15 @@ public final class HotPotClient implements ClientModInitializer {
                 callback.run();
             }
         });
+        // mryt233 改（2026-11-10）：独立探针只在显式开发参数下加载。
+        if (net.fabricmc.loader.api.FabricLoader.getInstance().isDevelopmentEnvironment() && Boolean.getBoolean("hotpot.opt3c")) {
+            try {
+                Class.forName("cn.blockforge.generated.orientshotpotchronicles.devtest.Opt3cFabricProbe")
+                    .getMethod("client").invoke(null);
+            } catch (ReflectiveOperationException error) {
+                throw new IllegalStateException("3C development probe failed", error);
+            }
+        }
         if (net.fabricmc.loader.api.FabricLoader.getInstance().isDevelopmentEnvironment()
             && Boolean.getBoolean("hotpot.clientProbe")) {
             try {

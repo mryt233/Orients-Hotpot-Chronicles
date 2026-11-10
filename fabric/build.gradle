@@ -9,6 +9,8 @@ plugins {
 // 资源（assets / data）统一放在 common，这里把它的资源目录并入 fabric 的资源集：
 // 合成一个模组打包，Fabric 才会去扫描这些配方和贴图（mryt233 2026-10-29）。
 sourceSets.main.resources.srcDirs += project(':common').file('src/main/resources')
+// mryt233 改（2026-11-10）：开发与生产均加载前置自带语言。
+sourceSets.main.resources.srcDirs += project(':framework:loader').file('src/main/resources')
 // mryt233 改：同一份原版客户端绘制在两个加载器各自编译，不混入 common 核心。
 sourceSets.main.java.srcDir project(':common').file('src/client/java')
 sourceSets.main.java.srcDir project(':common').file('src/mixin/java')
@@ -85,12 +87,20 @@ loom {
             if (project.hasProperty('hotpotClientProbe')) {
                 vmArg '-Dhotpot.clientProbe=true'
             }
+            // mryt233 改（2026-11-10）：只在显式开发验证中启用 3C 假内容。
+            if (project.hasProperty('hotpotOpt3c')) {
+                vmArg '-Dhotpot.opt3c=true'
+            }
             if (project.hasProperty('hotpotExpreg')) {
                 vmArg '-Dhotpot.expreg=true'
             }
         }
         server {
             runDir 'run-server'
+            // mryt233 改（2026-11-10）：只在显式开发验证中启用 3C 假内容。
+            if (project.hasProperty('hotpotOpt3c')) {
+                vmArg '-Dhotpot.opt3c=true'
+            }
             if (project.hasProperty('hotpotExpreg')) {
                 vmArg '-Dhotpot.expreg=true'
             }

@@ -80,6 +80,15 @@ public final class NeoForgeClient {
             for (var block : HotPotContent.SAUCE_STATIONS) {
                 ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutout());
             }
+        // mryt233 改（2026-11-10）：独立探针只在显式开发参数下加载。
+        if (!net.neoforged.fml.loading.FMLEnvironment.production && Boolean.getBoolean("hotpot.opt3c")) {
+            try {
+                Class.forName("cn.blockforge.generated.orientshotpotchronicles.devtest.Opt3cNeoForgeProbe")
+                    .getMethod("client").invoke(null);
+            } catch (ReflectiveOperationException error) {
+                throw new IllegalStateException("3C development probe failed", error);
+            }
+        }
             HotPotNeoForge.clientHooks(new cn.blockforge.orient.framework.loader.ClientHooks() {
                 @Override
                 public void onClientSetup(Runnable callback) {

@@ -250,14 +250,15 @@ def build() -> dict[str, Path]:
     # ---- Fabric：从 remapJar 产物拆两份（生产名 + refmap 由 Loom 处理）----
     fabric_entries = read_jar(production_jar("fabric", version))
     runtime_entries = {name: data for name, data in fabric_entries.items()
-                       if name.startswith(FRAMEWORK_PACKAGE)}
+                       # mryt233 改（2026-11-10）：前置资源随内嵌 Runtime 分发。
+                       if name.startswith((FRAMEWORK_PACKAGE, "assets/orient_framework/"))}
     runtime_entries["fabric.mod.json"] = runtime_fabric_meta()
     path = OUT / f"orient_framework-fabric-{RUNTIME_VERSION}.jar"
     write_jar(path, runtime_entries)
     results["runtime-fabric"] = path
 
     content_entries = {name: data for name, data in fabric_entries.items()
-                       if not name.startswith("cn/blockforge/orient/") and name != "fabric.mod.json"}
+                       if not name.startswith(("cn/blockforge/orient/", "assets/orient_framework/")) and name != "fabric.mod.json"}
     meta = json.loads(fabric_entries["fabric.mod.json"].decode("utf-8"))
     meta.setdefault("depends", {})["orient_framework"] = FABRIC_RUNTIME_RANGE
     content_entries["fabric.mod.json"] = json.dumps(meta, indent=2, ensure_ascii=False).encode()
@@ -268,7 +269,8 @@ def build() -> dict[str, Path]:
     # ---- NeoForge：官方名 jar 拆两份，Runtime 入口单独编译 ----
     neo_entries = read_jar(production_jar("neoforge", version))
     runtime_entries = {name: data for name, data in neo_entries.items()
-                       if name.startswith(FRAMEWORK_PACKAGE)}
+                       # mryt233 改（2026-11-10）：前置资源随内嵌 Runtime 分发。
+                       if name.startswith((FRAMEWORK_PACKAGE, "assets/orient_framework/"))}
     runtime_entries.update(compile_neoforge_runtime())
     runtime_entries["META-INF/neoforge.mods.toml"] = runtime_neoforge_meta()
     path = OUT / f"orient_framework-neoforge-{RUNTIME_VERSION}.jar"
@@ -276,7 +278,7 @@ def build() -> dict[str, Path]:
     results["runtime-neoforge"] = path
 
     content_entries = {name: data for name, data in neo_entries.items()
-                       if not name.startswith("cn/blockforge/orient/")
+                       if not name.startswith(("cn/blockforge/orient/", "assets/orient_framework/"))
                        and name != "META-INF/neoforge.mods.toml"}
     toml = neo_entries["META-INF/neoforge.mods.toml"].decode("utf-8").rstrip()
     content_entries["META-INF/neoforge.mods.toml"] = (toml + f"""

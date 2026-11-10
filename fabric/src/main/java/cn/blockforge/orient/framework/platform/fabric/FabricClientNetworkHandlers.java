@@ -1,5 +1,7 @@
 package cn.blockforge.orient.framework.platform.fabric;
 
+// mryt233 改（2026-11-10）：第三批 3C 平台接线。
+
 import cn.blockforge.orient.framework.loader.PayloadHandler;
 import cn.blockforge.orient.framework.game.ConfigBase;
 import cn.blockforge.orient.framework.loader.RuntimeStats;
@@ -44,6 +46,10 @@ final class FabricClientNetworkHandlers {
 
     /** 断线时输出客户端侧摘要，便于核对「单次发包 / 各处理一次」。 */
     static void installLifecycle() {
+        FabricClientContent.install();
+        net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STARTED.register(client ->
+            ((FabricRegistrationApi) cn.blockforge.orient.framework.loader.Framework.platform().registration())
+                .closeRegistration());
         // 配置门面：只有客户端主线程读客户端那份配置（前置检查 F3）
         ConfigBase.setClientThreadCheck(() -> Minecraft.getInstance().isSameThread());
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) ->

@@ -1,5 +1,7 @@
 package cn.blockforge.orient.framework.platform.neoforge;
 
+// mryt233 改（2026-11-10）：第三批 3C 补充平台能力。
+
 import cn.blockforge.orient.framework.loader.NetworkApi;
 import cn.blockforge.orient.framework.loader.PayloadHandler;
 import cn.blockforge.orient.framework.loader.ProtocolPolicy;
@@ -30,7 +32,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public final class NeoForgeNetworkApi implements NetworkApi {
     private static final Logger LOGGER = LoggerFactory.getLogger("orient-framework");
-    private static final int PROTOCOL_VERSION = 1;
 
     private record Channel<T extends CustomPacketPayload>(CustomPacketPayload.Type<T> type,
                                                            StreamCodec<? super RegistryFriendlyByteBuf, T> codec,

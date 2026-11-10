@@ -1,0 +1,16 @@
+{
+  "orient_framework.config.json_invalid": "Config is not valid JSON; using defaults, original file kept",
+  "orient_framework.config.root_not_object": "Config root must be an object; using defaults, original file kept",
+  "orient_framework.config.format_unsupported": "Unsupported config format version; using defaults, original file kept",
+  "orient_framework.config.format_invalid": "Invalid config format version; using defaults, original file kept",
+  "orient_framework.config.unknown_key": "Unknown config entry %s, ignored",
+  "orient_framework.config.not_object": "%s must be an object; default kept",
+  "orient_framework.config.not_number": "%s must be a number; default used",
+  "orient_framework.config.not_integer": "%s must be an integer; default used",
+  "orient_framework.config.out_of_range": "%s must be between %s and %s; default used",
+  "orient_framework.config.too_large": "Config file is too large; using defaults, original file kept",
+  "orient_framework.config.read_failed": "Could not read config (%s); using defaults, original file kept",
+  "orient_framework.config.write_failed": "Could not write config (%s); original file kept",
+  "orient_framework.disconnect.protocol": "Orient Framework network protocol mismatch (server %s, client %s). Please install the same mod version as the server.",
+  "orient_framework.disconnect.missing_channels": "This server requires network channels your client does not have: %s. Please install the same mod version as the server."
+}

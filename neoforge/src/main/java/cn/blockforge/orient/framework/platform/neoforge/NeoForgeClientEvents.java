@@ -1,5 +1,7 @@
 package cn.blockforge.orient.framework.platform.neoforge;
 
+// mryt233 改（2026-11-10）：第三批 3C 平台接线。
+
 import cn.blockforge.orient.framework.loader.RuntimeStats;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -10,6 +12,11 @@ import net.neoforged.neoforge.common.NeoForge;
  */
 public final class NeoForgeClientEvents {
     private NeoForgeClientEvents() {
+    }
+
+    public static void installLifecycle(net.neoforged.bus.api.IEventBus modBus) {
+        NeoForgeClientContent.install(modBus);
+        installLifecycle();
     }
 
     public static void installLifecycle() {
