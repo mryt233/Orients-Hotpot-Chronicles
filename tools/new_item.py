@@ -243,6 +243,12 @@ def plan_cooked(plan, raw, cooked):
     secs = float(cooked.get("cook_seconds", 5))
     ticks = int(round(secs * 20))
     rec = DATA / "recipe"
+    # mryt233 改（2026-11-11）：锅的专用煮法写成配方，不再生成 Java 登记。
+    pot = rec / f"pot_boiling/{raw['id']}.json"
+    plan.files[pot] = {"_说明": "作者：mryt233", "type": full("pot_boiling"),
+                       "ingredient": {"item": full(raw["id"])}, "result": {"id": full(cooked["id"])},
+                       "cook_ticks": max(1, ticks // 2)}
+    plan.step(pot, "锅专用煮法（自家涮煮时间配置优先）")
     for kind, t, suffix in (("smelting", ticks, ""), ("smoking", max(1, ticks // 2), "_from_smoking"),
                             ("campfire_cooking", ticks * 3, "_from_campfire_cooking")):
         p = rec / f"{cooked['id']}{suffix}.json"

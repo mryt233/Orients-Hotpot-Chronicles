@@ -5,7 +5,8 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCooking;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.Pounding;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotRecipes;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PoundingRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -22,14 +23,9 @@ import java.util.List;
  * 也不依赖加载器：两个平台的插件各自把这里的条目翻译成自己的展示格式，核心层不感知配方查看器是否存在。
  * <p>
  * 火锅涮煮的刻数与经验<b>每次调用都现读</b> {@link Config}，所以改完配置执行 {@code /orientshotpot reload}
- * 之后，在 JEI / REI 里重新打开的配方显示的就是新数值。
+ * 之后，再次枚举本数据源即可取得新数值；界面重建时机由查看器负责。
  * 作者：mryt233 */
 public final class HotPotRecipeViewerData {
-    /** 拍打配方的默认拍打次数（和砧板上的实际判定一致，见 {@link Pounding#HITS}）。 */
-    private static final int POUNDING_HITS = Pounding.HITS;
-    /** 火锅涮煮的默认经验（配置没有该项时使用）。 */
-    private static final float DEFAULT_XP = 0.35F;
-
     private HotPotRecipeViewerData() {
     }
 
@@ -99,114 +95,30 @@ public final class HotPotRecipeViewerData {
 
     // ------------------------------------------------------------------ 火锅涮煮
 
-    /**
-     * 一条涮煮配方的「骨架」：只放不随配置变的 ItemStack，刻数 / 经验留到每次枚举时现读配置。
-     *
-     * <p>mryt233 改（2026-11-07）：以前每次调用都重新 new 三十个条目的全部 ItemStack（约 160 个），
-     * 而 JEI / REI 每次打开配方页、切分类、搜索都会重新调一次。现在骨架只建一次，
-     * 刻数与经验仍然现读 {@link Config}，reload 后配方查看器照样立刻显示新数值。</p>
-     *
-     * <p>注意：{@code input} / {@code output} 这些栈在输出时<b>必须 {@code copy()}</b>——
-     * {@link ItemStack} 的 count 可变，直接返回共享栈会被配方查看器或别的调用方改坏。</p>
-     *
-     * @param configKey 配置里 {@code cooking.items.<configKey>} 的键；整块豆腐这类走专属键的为 null
-     */
-    private record CookingSkeleton(ResourceLocation id, String configKey, ItemStack input, ItemStack output,
-                                   ItemStack overcookOutput, int overcookTotalTicks, int defaultTicks) {
-    }
+    /** 旧无参数入口保留；客户端插件与开发导出显式传当前世界。 */
+    public static List<CookingEntry> cookingRecipes() { return cookingRecipes(HotPotRecipes.currentLevel()); }
 
-    /** 30 条涮煮配方的骨架（与 {@code HotPotCooking#registerDefaultItemCookTicks} 的四档默认一致：50 / 100 / 150 / 200）。 */
-    private static final List<CookingSkeleton> COOKING_SKELETONS = buildCookingSkeletons();
-
-    private static List<CookingSkeleton> buildCookingSkeletons() {
-        List<CookingSkeleton> list = new ArrayList<>(30);
-        list.add(cooking("fatty_beef_roll", HotPotContent.FATTY_BEEF_ROLL, HotPotContent.COOKED_FATTY_BEEF_ROLL, 100));
-        list.add(cooking("mutton_roll", HotPotContent.MUTTON_ROLL, HotPotContent.COOKED_MUTTON_ROLL, 100));
-        list.add(cooking("beef_loin", HotPotContent.BEEF_LOIN, HotPotContent.COOKED_BEEF_LOIN, 200));
-        list.add(cooking("beef_loin_slice", HotPotContent.BEEF_LOIN_SLICE, HotPotContent.COOKED_BEEF_LOIN_SLICE, 50));
-        list.add(cooking("tripe", HotPotContent.RAW_TRIPE, HotPotContent.COOKED_TRIPE, 50));
-        list.add(cooking("shrimp", HotPotContent.SHRIMP, HotPotContent.COOKED_SHRIMP, 150));
-        list.add(cooking("peeled_shrimp", HotPotContent.PEELED_SHRIMP, HotPotContent.COOKED_PEELED_SHRIMP, 100));
-        list.add(cooking("shrimp_paste", HotPotContent.SHRIMP_PASTE, HotPotContent.COOKED_SHRIMP_PASTE, 150));
-        list.add(cooking("potato_slice", HotPotContent.POTATO_SLICE, HotPotContent.COOKED_POTATO_SLICE, 100));
-        // 整块冷豆腐：刻数走 cooking.tofu_cook_ticks（默认 10 秒），经验用兜底值；
-        // 煮熟以后继续久煮会碎成 2 块热豆腐块（cooking.tofu_overcook_ticks，默认从下锅算 30 秒）。
-        list.add(new CookingSkeleton(
-            HotPot.id("hotpot_cooking/cold_tofu"),
-            null,
-            new ItemStack(HotPotContent.COLD_TOFU),
-            new ItemStack(HotPotContent.HOT_TOFU),
-            new ItemStack(HotPotContent.HOT_TOFU_CUBE, 2),
-            HotPotCooking.DEFAULT_OVERCOOK_TICKS,
-            0));
-        list.add(cooking("cold_tofu_cube", HotPotContent.COLD_TOFU_CUBE, HotPotContent.HOT_TOFU_CUBE, 100));
-        list.add(cooking("beef_meatball", HotPotContent.BEEF_MEATBALL, HotPotContent.COOKED_BEEF_MEATBALL, 200));
-        list.add(cooking("cilantro_beef_meatball", HotPotContent.CILANTRO_BEEF_MEATBALL,
-            HotPotContent.COOKED_CILANTRO_BEEF_MEATBALL, 200));
-        list.add(cooking("pork_meatball", HotPotContent.PORK_MEATBALL, HotPotContent.COOKED_PORK_MEATBALL, 200));
-        list.add(cooking("cilantro_pork_meatball", HotPotContent.CILANTRO_PORK_MEATBALL,
-            HotPotContent.COOKED_CILANTRO_PORK_MEATBALL, 200));
-        list.add(cooking("mutton_meatball", HotPotContent.MUTTON_MEATBALL, HotPotContent.COOKED_MUTTON_MEATBALL, 200));
-        list.add(cooking("cilantro_mutton_meatball", HotPotContent.CILANTRO_MUTTON_MEATBALL,
-            HotPotContent.COOKED_CILANTRO_MUTTON_MEATBALL, 200));
-        list.add(cooking("fish_ball", HotPotContent.FISH_BALL, HotPotContent.COOKED_FISH_BALL, 200));
-        list.add(cooking("cilantro_fish_ball", HotPotContent.CILANTRO_FISH_BALL,
-            HotPotContent.COOKED_CILANTRO_FISH_BALL, 200));
-        // r137 追加的 10 样新食材：酥肉两段（生酥肉 → 酥肉 → 煮酥肉，第二段下锅走锅专用产物表）。
-        list.add(cooking("raw_crispy_pork", HotPotContent.RAW_CRISPY_PORK, HotPotContent.CRISPY_PORK, 150));
-        list.add(cooking("crispy_pork", HotPotContent.CRISPY_PORK, HotPotContent.BOILED_CRISPY_PORK, 150));
-        list.add(cooking("dried_tofu", HotPotContent.DRIED_TOFU, HotPotContent.COOKED_DRIED_TOFU, 150));
-        list.add(cooking("tofu_skin", HotPotContent.TOFU_SKIN, HotPotContent.COOKED_TOFU_SKIN, 100));
-        list.add(cooking("wide_noodles", HotPotContent.WIDE_NOODLES, HotPotContent.COOKED_WIDE_NOODLES, 150));
-        list.add(cooking("sweet_potato_skin", HotPotContent.SWEET_POTATO_SKIN,
-            HotPotContent.COOKED_SWEET_POTATO_SKIN, 100));
-        list.add(cooking("enoki_mushroom", HotPotContent.ENOKI_MUSHROOM, HotPotContent.COOKED_ENOKI_MUSHROOM, 50));
-        list.add(cooking("greens", HotPotContent.GREENS, HotPotContent.COOKED_GREENS, 50));
-        list.add(cooking("lotus_root_slice", HotPotContent.LOTUS_ROOT_SLICE, HotPotContent.COOKED_LOTUS_ROOT_SLICE, 100));
-        list.add(cooking("squid_roll", HotPotContent.SQUID_ROLL, HotPotContent.COOKED_SQUID_ROLL, 100));
-        list.add(cooking("zhe_er_gen_slice", HotPotContent.ZHE_ER_GEN_SLICE, HotPotContent.COOKED_ZHE_ER_GEN_SLICE, 200));
-        return List.copyOf(list);
-    }
-
-    /** 造一条普通涮煮配方的骨架：没有煮老产物，刻数走 {@code cooking.items.<rawPath>}。 */
-    private static CookingSkeleton cooking(String rawPath, Item raw, Item cooked, int defaultTicks) {
-        return new CookingSkeleton(
-            HotPot.id("hotpot_cooking/" + rawPath),
-            rawPath,
-            new ItemStack(raw),
-            new ItemStack(cooked),
-            ItemStack.EMPTY,
-            0,
-            defaultTicks);
-    }
-
-    /**
-     * 全部 30 条火锅专属涮煮配方（r137 前 19 条 + 2026-11-06 追加的 10 条 + r139 折耳根段 1 条）；
-     * 刻数、经验每次调用现读配置，reload 后立即反映到配方查看器。
-     *
-     * <p>每条骨架后面的数字只是「配置里缺这一项时」的兜底值，和
-     * {@code HotPotCooking#registerDefaultItemCookTicks} 登记进配置模板的四档默认一致
-     * （极快熟 50、快熟 100、中等 150、慢熟 200）。</p>
-     */
-    public static List<CookingEntry> cookingRecipes() {
-        // 普通食材的经验走 cooking.xp_per_item；整块豆腐一直走 cooking.fallback_xp（原有行为，保持不变）
-        float itemXp = Config.xpPerItem(DEFAULT_XP);
-        float tofuXp = Config.fallbackXp(DEFAULT_XP);
-        List<CookingEntry> recipes = new ArrayList<>(COOKING_SKELETONS.size());
-        for (CookingSkeleton skeleton : COOKING_SKELETONS) {
-            boolean tofu = skeleton.configKey() == null;
-            // 只有整块豆腐走 cooking.tofu_*，其余走 cooking.items.<食材>
-            int cookTicks = tofu
-                ? Config.tofuCookTicks(HotPotContent.TOFU_COOK_TICKS)
-                : Config.itemCookTicks(skeleton.configKey(), skeleton.defaultTicks());
-            int overcookTotal = tofu
-                ? Config.tofuOvercookTicks(HotPotCooking.DEFAULT_OVERCOOK_TICKS)
-                : skeleton.overcookTotalTicks();
-            // 每个条目都 copy()：ItemStack 的 count 可变，共享同一个栈会被插件改坏
-            recipes.add(new CookingEntry(skeleton.id(), skeleton.input().copy(), skeleton.output().copy(), cookTicks,
-                tofu ? tofuXp : itemXp, skeleton.overcookOutput().copy(), overcookTotal));
+    /** mryt233 改（2026-11-11）：展示与实际下锅查询共用配置、产物与经验规则，不再手抄食材表。 */
+    public static List<CookingEntry> cookingRecipes(net.minecraft.world.level.Level level) {
+        if (level == null) return List.of();
+        List<CookingEntry> entries = new ArrayList<>();
+        for (Item item : net.minecraft.core.registries.BuiltInRegistries.ITEM) {
+            ItemStack input = new ItemStack(item);
+            if (!HotPotCooking.acceptable(level, input)) continue;
+            boolean custom = HotPotRecipes.boiling(level, input) != null;
+            boolean vanilla = HotPotCooking.smeltingRecipe(level, input).isPresent();
+            if (!custom && !vanilla) continue;
+            ItemStack output = HotPotCooking.finish(level, input, cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase.CLEAR);
+            ItemStack over = HotPotCooking.overcookResult(level, output.getItem());
+            var key = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item);
+            ResourceLocation id = HotPot.id("hotpot_cooking/" + (key.getNamespace().equals(HotPot.MOD_ID)
+                || key.getNamespace().equals("minecraft") ? key.getPath() : key.getNamespace() + "/" + key.getPath()));
+            entries.add(new CookingEntry(id, input, output, HotPotCooking.cookTicks(level, input),
+                HotPotCooking.xpFor(level, input), over.copy(),
+                over.isEmpty() ? 0 : HotPotCooking.overcookTicks(level, output.getItem())));
         }
-        return List.copyOf(recipes);
+        entries.sort(java.util.Comparator.comparing(e -> e.id().toString()));
+        return List.copyOf(entries);
     }
 
     // ------------------------------------------------------------------ 砧板切配
@@ -244,34 +156,24 @@ public final class HotPotRecipeViewerData {
 
     // ------------------------------------------------------------------ 擀面杖拍打
 
-    /** 全部 9 条擀面杖拍打配方（r137 前 7 条 + mryt233 改 2026-11-06 追加的花生、r139 折耳根）：拍 3 下出丸子 / 蒜泥 / 虾滑 / 花生碎，中间两下砧板上的样子也一并展示。 */
-    public static List<PoundingEntry> poundingRecipes() {
-        List<PoundingEntry> recipes = new ArrayList<>(9);
-        recipes.add(pounding("beef", Items.BEEF, HotPotContent.BEEF_MEATBALL, 3));
-        recipes.add(pounding("porkchop", Items.PORKCHOP, HotPotContent.PORK_MEATBALL, 3));
-        recipes.add(pounding("mutton", Items.MUTTON, HotPotContent.MUTTON_MEATBALL, 3));
-        recipes.add(pounding("cod", Items.COD, HotPotContent.FISH_BALL, 3));
-        recipes.add(pounding("salmon", Items.SALMON, HotPotContent.FISH_BALL, 3));
-        recipes.add(pounding("garlic", HotPotContent.GARLIC, HotPotContent.GARLIC_PASTE, 2));
-        recipes.add(pounding("peeled_shrimp", HotPotContent.PEELED_SHRIMP, HotPotContent.SHRIMP_PASTE, 1));
-        // r137：花生敲 3 下出 2 份花生碎。
-        recipes.add(pounding("peanut", HotPotContent.PEANUT, HotPotContent.CRUSHED_PEANUTS, 2));
-        // r139：折耳根敲 3 下出 2 份折耳根碎（蘸料台第 15 种调料的原料）。
-        recipes.add(pounding("zhe_er_gen", HotPotContent.ZHE_ER_GEN, HotPotContent.MINCED_ZHE_ER_GEN, 2));
-        return List.copyOf(recipes);
-    }
+    public static List<PoundingEntry> poundingRecipes() { return poundingRecipes(HotPotRecipes.currentLevel()); }
 
-    private static PoundingEntry pounding(String path, Item raw, Item output, int count) {
-        // mryt233 改（2026-11-07）：两个中间阶段的展示栈也统一从这里建，不再各写一次 new ItemStack(raw)
-        ItemStack stage = new ItemStack(raw);
-        return new PoundingEntry(
-            HotPot.id("pounding/" + path),
-            stage.copy(),
-            new ItemStack(HotPotContent.ROLLING_PIN),
-            Pounding.display(stage.copy(), 1),
-            Pounding.display(stage.copy(), 2),
-            new ItemStack(output, count),
-            POUNDING_HITS);
+    /** mryt233 改（2026-11-11）：按同步到客户端的捣制配方枚举，标签原料逐个展开。 */
+    public static List<PoundingEntry> poundingRecipes(net.minecraft.world.level.Level level) {
+        List<PoundingEntry> entries = new ArrayList<>();
+        for (var holder : HotPotRecipes.all(level, PoundingRecipe.TYPE)) {
+            var recipe = holder.value();
+            for (ItemStack input : recipe.ingredient().getItems()) {
+                if (HotPotRecipes.pounding(level, input) != recipe) continue;
+                var key = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(input.getItem());
+                ResourceLocation id = recipe.ingredient().getItems().length == 1 ? holder.id()
+                    : ResourceLocation.fromNamespaceAndPath(holder.id().getNamespace(), holder.id().getPath()
+                        + "/" + key.getNamespace() + "/" + key.getPath());
+                entries.add(new PoundingEntry(id, input.copy(), new ItemStack(HotPotContent.ROLLING_PIN),
+                    recipe.display(input, 1), recipe.display(input, 2), recipe.result(), recipe.hits()));
+            }
+        }
+        return List.copyOf(entries);
     }
 
     // ------------------------------------------------------------------ 工作台（催化剂）

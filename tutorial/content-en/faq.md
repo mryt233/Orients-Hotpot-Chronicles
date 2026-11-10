@@ -81,6 +81,7 @@ Yes. Starting in 0.2.2-alpha, you can select this mod in the **Mods menu** (inst
 - On **multiplayer servers**, edit only the server file; players receive it when joining and after each reload.
 - A bad entry (not a number, out of range, or a misspelled key) falls back to its default with a warning; if the whole file is broken, all defaults are used and **the broken file is kept as-is** so you can fix it.
 - Change recipes with a data pack, then run vanilla `/reload`.
+- {{dev}}Pot-only cooking and rolling-pin pounding can also be changed with data packs (recipe types `pot_boiling` and `pounding`); add items to the item tag `orients_hotpot_chronicles:not_pot_ingredient` to keep them out of the pot.<!-- mryt233 改（2026-11-11） -->
 - {{dev}}After a reload, **ingredients already in the pot keep their cooking progress** and the remaining time is recalculated.
 - {{dev}}`cooking.items.<item>` only applies to this mod's own ingredients; vanilla and other mods' ingredients cook by their own recipes.
 - Numbers in this guide are defaults; if a server changed its config, the server's values apply.

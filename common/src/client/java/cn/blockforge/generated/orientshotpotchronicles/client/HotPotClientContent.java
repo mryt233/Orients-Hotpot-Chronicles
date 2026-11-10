@@ -15,6 +15,8 @@ import net.minecraft.world.level.block.Block;
 public final class HotPotClientContent {
     private HotPotClientContent() { }
     public static void install() {
+        // mryt233 改（2026-11-11）：旧无世界入口的客户端回退，不持有世界。
+        HotPotRecipes.clientLevel(() -> Minecraft.getInstance().level);
         ClientContent client = ClientContent.get();
         ClientNetwork.install(payload -> Framework.platform().network().sendToServer(payload));
         ChopsticksAimClient.install();

@@ -70,10 +70,10 @@ public final class HotPotJeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        // 每次触发都重新枚举，刻数 / 经验是现读配置的，reload 后重新打开 JEI 就是新数值
-        registration.addRecipes(COOKING, HotPotRecipeViewerData.cookingRecipes());
+        // mryt233 改（2026-11-11）：枚举当前客户端配方与配置，实际界面重建由查看器生命周期负责。
+        registration.addRecipes(COOKING, HotPotRecipeViewerData.cookingRecipes(net.minecraft.client.Minecraft.getInstance().level));
         registration.addRecipes(CUTTING, HotPotRecipeViewerData.cuttingRecipes());
-        registration.addRecipes(POUNDING, HotPotRecipeViewerData.poundingRecipes());
+        registration.addRecipes(POUNDING, HotPotRecipeViewerData.poundingRecipes(net.minecraft.client.Minecraft.getInstance().level));
     }
 
     @Override

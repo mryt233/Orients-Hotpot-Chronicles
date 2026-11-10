@@ -140,6 +140,15 @@ public final class DevTestCommands {
                         .executes(DevTestCommands::recipe)))
                 .then(Commands.literal("show").executes(DevTestCommands::show))
                 // mryt233 改（2026-11-10）：重构前后属性 / 注册顺序快照对比（只用于开发环境）
+                // mryt233 改（2026-11-11）：全物品规则与展示清单的前后对照。
+                .then(Commands.literal("cookingstate")
+                    .then(Commands.argument("pos", BlockPosArgument.blockPos()).executes(ctx ->
+                        report(ctx, CookingState.read(ctx.getSource().getLevel(), BlockPosArgument.getBlockPos(ctx, "pos"))))))
+                .then(Commands.literal("dumpcooking")
+                    .then(Commands.argument("name", com.mojang.brigadier.arguments.StringArgumentType.word())
+                        .executes(ctx -> report(ctx, "cooking -> " + CookingDump.write(
+                            com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "name"),
+                            ctx.getSource().getLevel())))))
                 .then(Commands.literal("dumpattrs")
                     .then(Commands.argument("name", com.mojang.brigadier.arguments.StringArgumentType.word())
                         .executes(ctx -> report(ctx, "attrs -> " + AttrDump.write(

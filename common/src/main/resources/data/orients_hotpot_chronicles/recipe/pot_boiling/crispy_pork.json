@@ -1,0 +1,10 @@
+{
+  "_说明": "作者：mryt233",
+  "type": "orients_hotpot_chronicles:pot_boiling",
+  "ingredient": {
+    "item": "orients_hotpot_chronicles:crispy_pork"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:boiled_crispy_pork"
+  }
+}

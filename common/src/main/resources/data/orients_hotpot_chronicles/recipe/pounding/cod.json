@@ -1,0 +1,23 @@
+{
+  "_说明": "作者：mryt233",
+  "type": "orients_hotpot_chronicles:pounding",
+  "ingredient": {
+    "item": "minecraft:cod"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:fish_ball",
+    "count": 3
+  },
+  "stage1": {
+    "id": "orients_hotpot_chronicles:pounded_meat",
+    "components": {
+      "minecraft:custom_model_data": 7
+    }
+  },
+  "stage2": {
+    "id": "orients_hotpot_chronicles:pounded_meat",
+    "components": {
+      "minecraft:custom_model_data": 8
+    }
+  }
+}

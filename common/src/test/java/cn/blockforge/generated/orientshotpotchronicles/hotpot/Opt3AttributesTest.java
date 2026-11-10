@@ -23,6 +23,13 @@ class Opt3AttributesTest {
      */
     @BeforeAll
     static void bootstrapMinecraft() {
+        // mryt233 改（2026-11-11）：配方测试共用同一套注册表，版本只能初始化一次。
+        try {
+            net.minecraft.SharedConstants.getCurrentVersion();
+            net.minecraft.server.Bootstrap.bootStrap();
+            return;
+        } catch (IllegalStateException missingVersion) { }
+
         net.minecraft.SharedConstants.setVersion(new net.minecraft.WorldVersion() {
             private final net.minecraft.world.level.storage.DataVersion dataVersion =
                 new net.minecraft.world.level.storage.DataVersion(3955);

@@ -126,8 +126,9 @@ final class HotPotCookingRun {
             be.overcook[slot] = 0;
             return false;
         }
-        Item overcooked = HotPotCooking.overcookProduct(current.getItem());
-        if (overcooked == null) {
+        // mryt233 改（2026-11-11）：久煮也保留配方物品栈的组件。
+        ItemStack overcooked = HotPotCooking.overcookResult(world, current.getItem());
+        if (overcooked.isEmpty()) {
             return false;   // 这样熟食不会煮过头，一直留在锅里
         }
         // 鸳鸯锅：这边没汤就不继续煮（和没熟的时候一致）；汤底与速度沿用 cook 里预算好的那一份
@@ -144,7 +145,7 @@ final class HotPotCookingRun {
             return true;
         }
         int portions = Math.max(1, current.getCount());
-        ItemStack result = new ItemStack(overcooked, portions);
+        ItemStack result = overcooked.copyWithCount(portions);
         // mryt233 改（2026-11-05，r136a）：碎掉的豆腐块也是在原来那锅汤里煮出来的，汤底 / 辣度组件跟着带过去
         String cookedIn = current.get(HotPotContent.COOKED_IN_SOUP);
         if (cookedIn != null) {

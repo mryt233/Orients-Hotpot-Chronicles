@@ -234,7 +234,7 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
             // mryt233 改（2026-11-07）：捣的进度和切的进度分开记账以后，这里看的是「捣了几下」：
             // 敲一下（pounds = 1）只是捶了一下，折耳根这类还能正常切；捣到第二下起已经捶碎 / 成浆，
             // 就不再当食材切了。以前共用 cuts，敲一下就被当成「切过」，菜刀永远切不动，也不给提示。
-            if (Pounding.poundable(board.item()) && board.pounds() >= 2) {
+            if (Pounding.poundable(world, board.item()) && board.pounds() >= 2) {
                 if (!world.isClientSide) {
                     // 带兜底文案：万一语言文件还没补这个键，玩家看到的也是人话而不是键名
                     player.displayClientMessage(
@@ -278,7 +278,7 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
             }
             return ItemInteractionResult.SUCCESS;
         }
-        if (board.item().isEmpty() && (stack.is(CUTTABLE) || Pounding.poundable(stack))) {
+        if (board.item().isEmpty() && (stack.is(CUTTABLE) || Pounding.poundable(world, stack))) {
             if (!world.isClientSide) {
                 // 食物朝向单独记：放的人站在哪边，食物就朝哪边（和砧板自己的朝向无关，用户要分开）
                 board.setItem(stack.copyWithCount(1), player.getDirection().getOpposite());
@@ -294,17 +294,18 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
     private static ItemInteractionResult pound(ItemStack stack, Level world, BlockPos pos, Player player, InteractionHand hand,
                                           CuttingBoardBlockEntity board) {
         ItemStack meat = board.item();
-        Item ball = Pounding.result(meat);
-        if (ball == null) {
+        // mryt233 改（2026-11-11）：数量、次数及组件均由配方给出。
+        PoundingRecipe recipe = Pounding.recipe(world, meat);
+        if (recipe == null) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         if (!world.isClientSide) {
             // mryt233 改（2026-11-07）：捣的进度用 pounds 单独记，不再借用 cuts（切 / 捣分开记账）
             int hits = board.pounds() + 1;
-            if (hits >= Pounding.HITS) {
+            if (hits >= recipe.hits()) {
                 board.setItem(ItemStack.EMPTY);
                 Containers.dropItemStack(world, pos.getX() + 0.5, pos.getY() + TOP + 0.1, pos.getZ() + 0.5,
-                    new ItemStack(ball, Pounding.resultCount(meat)));
+                    recipe.result());
             } else {
                 board.setPounds(hits);
             }

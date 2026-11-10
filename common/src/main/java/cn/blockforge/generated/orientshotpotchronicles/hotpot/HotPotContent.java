@@ -1020,18 +1020,9 @@ public final class HotPotContent {
         GarnishLoot.register();
         OrangeLoot.register();
         DrinkCauldronBlock.registerEmptyCauldron();
-        HotPotCooking.potResult(net.minecraft.world.item.Items.KELP, COOKED_KELP);
-        // mryt233 改（2026-11-04）：豆腐改造（用户定）。
-        // 整块冷豆腐在锅里煮成热豆腐（不用原版熔炉配方，锅专用产物）；
-        // 热豆腐是熟的、放不回锅，继续煮到配置的时长就碎成热豆腐块。
+        // mryt233 改（2026-11-11）：四条锅专用煮法和豆腐久煮迁至数据配方，配置默认值保留。
         Config.rememberTofuCooking(TOFU_COOK_TICKS, TOFU_OVERCOOK_TICKS);
-        HotPotCooking.potResult(COLD_TOFU, HOT_TOFU);
-        HotPotCooking.overcook(HOT_TOFU, HOT_TOFU_CUBE);
-        // mryt233 改（2026-11-06）：酥肉二次下锅（r137）。生酥肉烧炼 / 涮成酥肉之后，酥肉本身还能再涮成煮酥肉；
-        // 它登记在锅专用产物表里，HotPotCooking.isCookedFood 会先放行，不会把它当成不能下锅的终态熟食。
-        HotPotCooking.potResult(CRISPY_PORK, BOILED_CRISPY_PORK);
-        // mryt233 改（2026-11-06，r139）：折耳根段在锅里涮成熟折耳根段（锅专用产物，不用熔炉配方）。
-        HotPotCooking.potResult(ZHE_ER_GEN_SLICE, COOKED_ZHE_ER_GEN_SLICE);
+        HotPotRecipes.register(registration);
         HotPotCriterion.register(registration);
         SoupBucketRecipe.register(registration);
         // mryt233 改（2026-11-09，r146b）：布围裙换款配方（任意一款 + 染料 → 指定款，保留耐久 / 附魔 / 名字）

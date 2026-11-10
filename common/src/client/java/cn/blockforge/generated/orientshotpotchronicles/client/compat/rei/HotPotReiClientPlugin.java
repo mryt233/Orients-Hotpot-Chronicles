@@ -88,14 +88,14 @@ public final class HotPotReiClientPlugin implements REIClientPlugin {
 
     @Override
     public void registerDisplays(DisplayRegistry registry) {
-        // 每次触发都重新枚举，刻数 / 经验是现读配置的，reload 后重新打开 REI 就是新数值
-        for (HotPotRecipeViewerData.CookingEntry recipe : HotPotRecipeViewerData.cookingRecipes()) {
+        // mryt233 改（2026-11-11）：枚举当前客户端配方与配置，实际界面重建由查看器生命周期负责。
+        for (HotPotRecipeViewerData.CookingEntry recipe : HotPotRecipeViewerData.cookingRecipes(net.minecraft.client.Minecraft.getInstance().level)) {
             registry.add(new CookingDisplay(recipe));
         }
         for (HotPotRecipeViewerData.CuttingEntry recipe : HotPotRecipeViewerData.cuttingRecipes()) {
             registry.add(new CuttingDisplay(recipe));
         }
-        for (HotPotRecipeViewerData.PoundingEntry recipe : HotPotRecipeViewerData.poundingRecipes()) {
+        for (HotPotRecipeViewerData.PoundingEntry recipe : HotPotRecipeViewerData.poundingRecipes(net.minecraft.client.Minecraft.getInstance().level)) {
             registry.add(new PoundingDisplay(recipe));
         }
     }

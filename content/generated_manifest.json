@@ -2230,6 +2230,24 @@
         "common/src/main/resources/assets/orients_hotpot_chronicles/textures/block/hot_pot_top_clear.png": "c158e9cdccdf3c5a8611bf35d7c2adbfbee79832c571fddd70bd09c47af5c8b2",
         "common/src/main/resources/assets/orients_hotpot_chronicles/textures/block/hot_pot_top_clear_boiling.png": "25c0b9ca9f31db77708d6683fdac0ee8bd520000448d68500ff8a00a86c13df3"
       }
+    },
+    "tools/gen_ingredient_rules.py": {
+      "files": {
+        "common/src/main/resources/data/orients_hotpot_chronicles/recipe/pot_boiling/cold_tofu.json": "1d9a8653bea270cca3c39bb0ff9bba7a1ae2c78cb0b14625a1ab22ef1c75dfb3",
+        "common/src/main/resources/data/orients_hotpot_chronicles/recipe/pot_boiling/crispy_pork.json": "fb2a8fc72862f21bc7e44dc53eccdc1e81ec5f81b96bdb982783f35bd5249569",
+        "common/src/main/resources/data/orients_hotpot_chronicles/recipe/pot_boiling/kelp.json": "fdaa12e9b2bd4a8ae565bac6ca2ffc641356788f765e6f1fb599ddc5440577d3",
+        "common/src/main/resources/data/orients_hotpot_chronicles/recipe/pot_boiling/zhe_er_gen_slice.json": "4101dc87f21948960130a884455716b2c4fd04b19a654a8f42011445eff79ddb",
+        "common/src/main/resources/data/orients_hotpot_chronicles/recipe/pounding/beef.json": "e4d3c62a3f561e1418e70dbc9bf3ee19711742fb2e4a7214a68bf590c44bbfcf",
+        "common/src/main/resources/data/orients_hotpot_chronicles/recipe/pounding/cod.json": "f452dd2a4d0f5929ad2368a6a1b51f347f7556fedefeed8f7b44d8a445990c2b",
+        "common/src/main/resources/data/orients_hotpot_chronicles/recipe/pounding/garlic.json": "58856919ab2098ac4b621d7317f8255dfb00a09f23aecc955c9f7780839ecab8",
+        "common/src/main/resources/data/orients_hotpot_chronicles/recipe/pounding/mutton.json": "5c83ba321eede332fdf62fe1bfec006a5a7c812063314ddc59ee7a75a46b1091",
+        "common/src/main/resources/data/orients_hotpot_chronicles/recipe/pounding/peanut.json": "d597fc55ee6e30dfad95400d9b320b37b09af8b8d95081ac35da955cb43651cf",
+        "common/src/main/resources/data/orients_hotpot_chronicles/recipe/pounding/peeled_shrimp.json": "dbc6a30e323db2f228d790424dcce8fb9844cf268aef069a677744aacb072db6",
+        "common/src/main/resources/data/orients_hotpot_chronicles/recipe/pounding/porkchop.json": "1110c078d4fe25e5354d5aba841b706caa8cc1de3d4e7b53d85ba2c477a5e4c2",
+        "common/src/main/resources/data/orients_hotpot_chronicles/recipe/pounding/salmon.json": "544a3dded48ad2b94bb40437d7edfb2449c8380a7c24b8e5a4e320a6ad342c47",
+        "common/src/main/resources/data/orients_hotpot_chronicles/recipe/pounding/zhe_er_gen.json": "ab95e9955dd91fcd1d452d7f0ef39d67e9ab46d3a236d300a7a037384d178045",
+        "common/src/main/resources/data/orients_hotpot_chronicles/tags/item/not_pot_ingredient.json": "953022703c94e3796a67d5d579f9d85c52e78c719fabfcd6b70a9ff47a519450"
+      }
     }
   },
   "merges": {

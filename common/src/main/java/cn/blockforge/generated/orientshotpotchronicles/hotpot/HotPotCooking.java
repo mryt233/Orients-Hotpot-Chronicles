@@ -88,8 +88,13 @@ public final class HotPotCooking {
     }
 
     public static void reviseCookTimes() {
+        cachedOutputsManager = null;
         COOK_REVISION.incrementAndGet();
     }
+
+    /** 数据包可追加或替换不许下锅的名单。mryt233 改（2026-11-11）。 */
+    public static final net.minecraft.tags.TagKey<Item> NOT_POT_INGREDIENT =
+        net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, HotPot.id("not_pot_ingredient"));
 
     private HotPotCooking() {
     }
@@ -100,18 +105,8 @@ public final class HotPotCooking {
      * 是加辣，不能被当成生食材塞进锅槽。
      */
     public static boolean acceptable(Level world, ItemStack stack) {
-        // mryt233 改（2026-11-06，r137）：调料原料（小米辣、蚝油、芝麻酱、花生、花生碎）跟辣椒一样不直接下锅，
-        // 它们是蘸料台的原料；整根莲藕、整只生鱿鱼要先在砧板上切好；蛋炒饭是成品，不是涮料。
-        // mryt233 改（2026-11-06，r139）：折耳根整根和折耳根碎也不直接下锅——整根要先在砧板上切成段，
-        // 碎末是蘸料台的原料（Seasoning.MINCED_ZHE_ER_GEN）。布围裙是装备，当然也不能涮。
-        if (stack.isEmpty() || stack.is(HotPotContent.CHOPSTICKS) || stack.is(HotPotContent.CHILI_PEPPER)
-            || stack.is(HotPotContent.MILLET_CHILI) || stack.is(HotPotContent.OYSTER_SAUCE)
-            || stack.is(HotPotContent.SESAME_PASTE) || stack.is(HotPotContent.PEANUT)
-            || stack.is(HotPotContent.CRUSHED_PEANUTS) || stack.is(HotPotContent.LOTUS_ROOT)
-            || stack.is(HotPotContent.RAW_SQUID) || stack.is(HotPotContent.EGG_FRIED_RICE)
-            || stack.is(HotPotContent.ZHE_ER_GEN) || stack.is(HotPotContent.MINCED_ZHE_ER_GEN)
-            // mryt233 改（2026-11-09，r146b）：布围裙有三款，认标签而不是单个常量
-            || ClothApronItem.isApron(stack)) {
+        // mryt233 改（2026-11-11）：数据包标签优先于配方与子模组放行钩子。
+        if (stack.isEmpty() || stack.is(NOT_POT_INGREDIENT)) {
             return false;
         }
         if (SoupBase.fromStack(stack) != null || PlateItem.placedFor(stack) != null) {
@@ -126,7 +121,8 @@ public final class HotPotCooking {
         // 这样常见火锅食材不会因为模组配方注册方式不同而完全放不进去。
         // 0.1.2-alpha 后用户报：对着锅右键什么都能下锅（木头煮成木炭、铁器煮成铁粒）——以前「熔炉能烧」也算。
         // 改成照烟熏炉：只收能吃的东西，或者有烟熏炉 / 营火配方的东西。
-        return stack.has(DataComponents.FOOD)
+        return HotPotRecipes.boiling(world, stack) != null
+            || stack.has(DataComponents.FOOD)
             || stack.is(ItemTags.MEAT)
             || stack.is(ItemTags.FISHES)
             || foodRecipe(world, stack, RecipeType.SMOKING).isPresent()
@@ -205,10 +201,11 @@ public final class HotPotCooking {
         // mryt233 改（2026-11-06，r137）：酥肉二次下锅。酥肉（crispy_pork）是烧炼配方的产物，按下面那条会被判成
         // 「已经熟了的食物」而不能下锅；但它登记在 POT_RESULTS 里还能继续涮成煮酥肉，所以先放行。
         // 煮酥肉在 POT_RESULTS.values() 里，紧接着的 containsValue 会把它拦下，不会无限往下煮。
-        if (POT_RESULTS.containsKey(stack.getItem())) {
+        if (HotPotRecipes.boiling(world, stack) != null || POT_RESULTS.containsKey(stack.getItem())) {
             return false;
         }
-        if (POT_RESULTS.containsValue(stack.getItem())) {
+        if (POT_RESULTS.containsValue(stack.getItem()) || HotPotRecipes.all(world, PotBoilingRecipe.TYPE).stream()
+            .anyMatch(e -> e.value().result().is(stack.getItem()))) {
             return true;   // 锅专用产物（熟海带、煮酥肉）也是熟的，不能再下锅
         }
         if (world == null || stack.isEmpty() || smeltingRecipe(world, stack).isPresent()) {
@@ -219,12 +216,13 @@ public final class HotPotCooking {
 
     /**
      * 只在锅里才有的产物（2026-10-25 用户：海带在火锅里煮成「熟海带」，原版熔炉 / 烟熏炉照旧出干海带）：
-     * 耗时和经验还照原版配方，只换产物。以后锅（或模组别的厨具）专用的煮法都加在这里。新增
+     * mryt233 改（2026-11-11）：内置条目迁到 pot_boiling 配方；本表仅保留子模组 Java 登记兼容。
      */
     // mryt233 改（2026-11-10，r147）：改成冻结登记表（见 FrozenRegistry / HotPotHooks.freezeRegistries）
     private static final FrozenRegistry<Item, Item> POT_RESULTS = new FrozenRegistry<>(
         "锅专用产物表", "锅专用煮法要在启动期登记（子模组在自己的兼容模块里调 potResult），冻结后不再接受登记。");
 
+    /** mryt233 改（2026-11-11）：保留启动期登记；同原料数据包配方优先，3B 冻结规则不变。 */
     public static void potResult(Item raw, Item cooked) {
         POT_RESULTS.put(raw, cooked);
     }
@@ -238,14 +236,29 @@ public final class HotPotCooking {
     private static final FrozenRegistry<Item, Item> OVERCOOK = new FrozenRegistry<>(
         "煮过头产物表", "煮过头的玩法要在启动期登记（子模组在自己的兼容模块里调 overcook），冻结后不再接受登记。");
 
-    /** 登记「这样熟食在锅里继续煮过头会变成哪样」。 */
+    /** mryt233 改（2026-11-11）：保留启动期登记；同熟食的数据包煮过头规则优先，冻结后拒绝登记。 */
     public static void overcook(Item cooked, Item overcooked) {
         OVERCOOK.put(cooked, overcooked);
     }
 
     /** 这样熟食的煮过头产物；没登记过返回 {@code null}（= 不会煮过头，一直留在锅里）。 */
     public static Item overcookProduct(Item cooked) {
-        return OVERCOOK.get(cooked);
+        return overcookProduct(HotPotRecipes.currentLevel(), cooked);
+    }
+
+    /** 带世界的查询避免客户端与集成服共用配方管理器。mryt233 改（2026-11-11）。 */
+    public static Item overcookProduct(Level world, Item cooked) {
+        ItemStack result = overcookResult(world, cooked);
+        return result.isEmpty() ? null : result.getItem();
+    }
+
+    /** mryt233 改（2026-11-11）：运行期保留配方产物组件，旧 Item 返回入口继续兼容。 */
+    public static ItemStack overcookResult(Level world, Item cooked) {
+        if (cooked == null) return ItemStack.EMPTY;
+        PotBoilingRecipe recipe = HotPotRecipes.overcooking(world, new ItemStack(cooked));
+        if (recipe != null) return recipe.overcookResult();
+        Item legacy = OVERCOOK.get(cooked);
+        return legacy == null ? ItemStack.EMPTY : new ItemStack(legacy);
     }
 
     /** 配置里没有「煮过头」这一项时的兜底总刻数（30 秒）。 */
@@ -254,13 +267,15 @@ public final class HotPotCooking {
     /**
      * 这样熟食在锅里从下锅到煮过头的总刻数（含煮熟那一段）。
      * mryt233 改（2026-11-04）：豆腐走配置 `cooking.tofu_overcook_ticks`（默认 600 = 30 秒；r134b 从 food.tofu 挪来），每次现读、reload 立即生效；
-     * 以后别的食材要煮过头，在这里补一个按 ID 取配置的分支即可，锅那边不用改。
+     * mryt233 改（2026-11-11）：新增久煮规则通过配方提供，只有自家豆腐保留原有专属配置键。
      */
     public static int overcookTicks(Level world, Item happyCooked) {
-        if (happyCooked == HotPotContent.HOT_TOFU) {
+        // mryt233 改（2026-11-11）：自家豆腐配置优先，第三方与未配项目读取配方。
+        if (happyCooked == HotPotContent.HOT_TOFU && Config.has("cooking.tofu_overcook_ticks")) {
             return Config.tofuOvercookTicks(DEFAULT_OVERCOOK_TICKS);
         }
-        return DEFAULT_OVERCOOK_TICKS;
+        PotBoilingRecipe recipe = HotPotRecipes.overcooking(world, new ItemStack(happyCooked));
+        return recipe == null ? DEFAULT_OVERCOOK_TICKS : recipe.overcookTicks().orElse(DEFAULT_OVERCOOK_TICKS);
     }
 
     /**
@@ -271,16 +286,25 @@ public final class HotPotCooking {
      * 烟熏炉、营火、熔炉配方，最后才用 cooking.fallback_ticks。
      */
     public static int cookTicks(Level world, ItemStack stack) {
-        if (stack.is(HotPotContent.COLD_TOFU)) {
-            return Config.tofuCookTicks(HotPotContent.TOFU_COOK_TICKS);
+        // mryt233 改（2026-11-11）：只给自家命名空间读取配置，缺配置才读配方。
+        Integer configured = null;
+        if (stack.is(HotPotContent.COLD_TOFU) && Config.has("cooking.tofu_cook_ticks")) {
+            configured = Config.tofuCookTicks(HotPotContent.TOFU_COOK_TICKS);
+        } else {
+            String path = itemPath(stack);
+            if (path != null && Config.hasItemCookTicks(path)) {
+                Integer ticks = DEFAULT_ITEM_COOK_TICKS.get(path);
+                configured = Config.itemCookTicks(path, ticks == null ? DEFAULT_FALLBACK_TICKS : ticks);
+            }
         }
-        String path = itemPath(stack);
-        if (path != null && Config.hasItemCookTicks(path)) {
-            // 配置里有这一项就以配置为准；万一默认值表里没有，用兜底刻数当默认
-            Integer ticks = DEFAULT_ITEM_COOK_TICKS.get(path);
-            return Config.itemCookTicks(path, ticks == null ? DEFAULT_FALLBACK_TICKS : ticks);
-        }
-        return smeltingRecipe(world, stack).map(e -> e.value().getCookingTime()).orElse(Config.fallbackTicks(DEFAULT_FALLBACK_TICKS));
+        return cookingTime(configured, HotPotRecipes.boiling(world, stack), () -> smeltingRecipe(world, stack)
+            .map(e -> e.value().getCookingTime()).orElse(Config.fallbackTicks(DEFAULT_FALLBACK_TICKS)));
+    }
+
+    /** 时间优先级与惰性兜底；单测也使用实际查询的选择函数。mryt233 改（2026-11-11）。 */
+    static int cookingTime(Integer configured, PotBoilingRecipe recipe, java.util.function.IntSupplier vanilla) {
+        if (configured != null) return configured;
+        return recipe != null && recipe.cookTicks().isPresent() ? recipe.cookTicks().get() : vanilla.getAsInt();
     }
 
     /** 每 tick 熟度增量：燃料功率 × 汤底倍率折算到千分比。 */
@@ -302,6 +326,9 @@ public final class HotPotCooking {
      */
     public static ItemStack finish(Level world, ItemStack raw, SoupBase soup) {
         int portions = Math.max(1, raw.getCount());
+        // mryt233 改（2026-11-11）：数据包 > Java 登记 > 烟熏 / 营火 / 食物熔炉 > 原物兜底。
+        PotBoilingRecipe recipe = HotPotRecipes.boiling(world, raw);
+        if (recipe != null) return recipe.result().copyWithCount(portions);
         Item potOnly = POT_RESULTS.get(raw.getItem());
         if (potOnly != null) {
             return new ItemStack(potOnly, portions);
@@ -320,6 +347,9 @@ public final class HotPotCooking {
 
     /** 煮熟一份食材应给的经验（熔炉同款：优先取配方经验，没有则兜底）。 */
     public static float xpFor(Level world, ItemStack raw) {
+        // mryt233 改（2026-11-11）：显式配方经验直接采用，缺省保留原来的经验下限与兜底。
+        PotBoilingRecipe recipe = HotPotRecipes.boiling(world, raw);
+        if (recipe != null && recipe.experience().isPresent()) return recipe.experience().get();
         return smeltingRecipe(world, raw).map(e -> Math.max(e.value().getExperience(), Config.xpPerItem(DEFAULT_XP_PER_ITEM)))
             .orElse(Config.fallbackXp(DEFAULT_FALLBACK_XP));
     }

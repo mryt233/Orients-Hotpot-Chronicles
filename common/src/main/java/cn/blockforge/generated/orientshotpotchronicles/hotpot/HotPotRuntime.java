@@ -32,6 +32,7 @@ public final class HotPotRuntime {
                 compatInitialized = true;
             }
             Config.setServer(server);
+            HotPotRecipes.setServer(server); // mryt233 改（2026-11-11）
             HotPotHooks.freezeRegistries();
         });
         events.onPlayerJoin(HotPotNetwork::sendConfig);
@@ -43,7 +44,7 @@ public final class HotPotRuntime {
             ClothApronProtection.clearCache();
             CuttingBoardBlock.clearCache();
         });
-        events.onServerStopped(server -> Config.setServer(null));
+        events.onServerStopped(server -> { Config.setServer(null); HotPotRecipes.setServer(null); });
         events.onCommands((dispatcher, context, selection) -> dispatcher.register(
             Commands.literal("orientshotpot").then(Commands.literal("reload")
                 .requires(source -> source.hasPermission(2)).executes(command -> {

@@ -1,0 +1,15 @@
+{
+  "_说明": "作者：mryt233",
+  "type": "orients_hotpot_chronicles:pot_boiling",
+  "ingredient": {
+    "item": "orients_hotpot_chronicles:cold_tofu"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:hot_tofu"
+  },
+  "cook_ticks": 200,
+  "overcook_result": {
+    "id": "orients_hotpot_chronicles:hot_tofu_cube"
+  },
+  "overcook_ticks": 600
+}
