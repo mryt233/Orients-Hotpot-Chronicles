@@ -10,7 +10,7 @@ import java.util.function.BiConsumer;
 
 /**
  * 动态物品绘制的加载器无关接线，Fabric/NeoForge 用 {@link #install} 装自己的注册入口。作者：mryt233
- * mryt233 改（2026-11-01，前置检查 W4）：统一走 install()；旧字段只为兼容保留。
+ * mryt233 改（2026-11-11）：Runtime 0.2.0 收紧旧字段，只通过 install() / register() 接线。
  */
 public final class ClientItemRenderers {
     @FunctionalInterface
@@ -19,9 +19,8 @@ public final class ClientItemRenderers {
                     MultiBufferSource buffers, int light, int overlay);
     }
 
-    /** 已弃用：旧内容包（Runtime 0.1.1）直接给这个字段赋值，保留二进制兼容，0.2.0 改为私有；新代码用 install。 */
-    @Deprecated(since = "0.1.2", forRemoval = true)
-    public static volatile BiConsumer<Item, Renderer> registrar = (item, renderer) -> {
+    /** mryt233 改（2026-11-11）：平台注册入口仅供内部持有。 */
+    private static volatile BiConsumer<Item, Renderer> registrar = (item, renderer) -> {
         throw new IllegalStateException("Client item renderer platform not installed");
     };
 

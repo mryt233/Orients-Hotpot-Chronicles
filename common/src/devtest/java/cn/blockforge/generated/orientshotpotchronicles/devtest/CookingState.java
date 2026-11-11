@@ -18,9 +18,13 @@ public final class CookingState {
             out.addProperty("display", Pounding.display(level, board.item(), board.cuts()).getComponentsPatch().toString());
         } else if (entity instanceof HotPotBlockEntity pot) {
             try {
+                // mryt233 改（2026-11-11）：熟度字段跟随槽位部件，探针输出不变。
+                var slotsField = HotPotBlockEntity.class.getDeclaredField("slots");
+                slotsField.setAccessible(true);
+                Object slots = slotsField.get(pot);
                 for (String key : new String[]{"doneness", "cookDur", "cooked", "overcook"}) {
-                    var field = HotPotBlockEntity.class.getDeclaredField(key); field.setAccessible(true);
-                    out.add(key, new Gson().toJsonTree(field.get(pot)));
+                    var field = slots.getClass().getDeclaredField(key); field.setAccessible(true);
+                    out.add(key, new Gson().toJsonTree(field.get(slots)));
                 }
                 out.addProperty("revision", HotPotCooking.cookRevision());
             } catch (ReflectiveOperationException error) { throw new IllegalStateException(error); }

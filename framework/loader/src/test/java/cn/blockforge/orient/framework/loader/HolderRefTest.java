@@ -46,7 +46,7 @@ class HolderRefTest {
     @Test
     void protocolAndRuntimeStayOnDeclaredVersions() {
         assertEquals(1, NetworkApi.PROTOCOL_VERSION);
-        // mryt233 改（2026-11-10）：新增生命周期接口对应 Runtime 0.1.6。
-        assertEquals("0.1.6", ApiVersion.RUNTIME);
+        // mryt233 改（2026-11-11）：删除弃用公开入口对应 Runtime 0.2.0，协议仍为 1。
+        assertEquals("0.2.0", ApiVersion.RUNTIME);
     }
 }

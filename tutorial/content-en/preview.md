@@ -19,6 +19,8 @@ Development Preview (not released yet; names and values may change). Everything 
 - **Recipe viewer cooking list completed and corrected**: The JEI / REI cooking list now includes the previously missing kelp, raw ham sausage, ham sausage slices, and vanilla raw meat, raw fish, potatoes and chorus fruit that can go straight into the pot; whole tofu now shows the actual 1 piece when overcooked, and re-boiling crispy pork shows the actual 0.15 XP. Only the display was corrected; actual cooking is unchanged.<!--清单#149-->
 <!-- mryt233 改（2026-11-11，r147 第三批 3G）。 -->
 - **Internal cleanup (no visible change)**: Right-click results and block save/load code now go through a small version-adapter module, making future ports to other Minecraft versions easier; gameplay and the save format are unchanged.<!--清单#150-->
+<!-- mryt233 改（2026-11-11，r147 第三批 3H 前半）。 -->
+- **Internal cleanup (no visible change)**: The hot pot block entity was split into smaller parts by responsibility, and the embedded framework was bumped to 0.2.0 with unused legacy interfaces removed. Gameplay and the save format are unchanged.<!--清单#151-->
 
 <!-- mryt233 改（r146f） -->
 ## Sauce station ingredient list: narrowed with pagination {#r146f}
