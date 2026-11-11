@@ -1,0 +1,8 @@
+{
+  "说明": "允许差异清单的写法示例（4D / 4E 按各自的新格式改）。entry、path 都是整串正则；kind 是 added / removed / changed / any。",
+  "rules": [
+    {"entry": "pot_.*|stove_.*", "path": "Base[BCD]?", "kind": "removed", "reason": "示例：旧的汤底序号键被新键取代"},
+    {"entry": "pot_.*|stove_.*", "path": "Soup(Id)?[BCD]?", "kind": "added", "reason": "示例：新的汤底 ID 键"},
+    {"entry": "chest_packed_pots\..*", "path": "components\.orients_hotpot_chronicles:pot_contents\.(Base[BCD]?|Soup(Id)?[BCD]?)", "kind": "any", "reason": "示例：打包锅里同样换键"}
+  ]
+}
