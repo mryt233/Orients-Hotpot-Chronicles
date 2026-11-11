@@ -12,7 +12,8 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotInteraction;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual;
 import java.util.List;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -60,8 +61,12 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
     private final int[][] cellSlots = new int[9][HotPotBlockEntity.SLOTS];
     private final int[] cellSlotCount = new int[9];
     /** 汤面贴图的 ID 按汤底预先拼好，不再每帧拼字符串（代码检查 W5）。 */
-    private static final ResourceLocation[] STILL = new ResourceLocation[SoupBase.values().length];
-    private static final ResourceLocation[] BOILING = new ResourceLocation[SoupBase.values().length];
+    // mryt233 改（2026-11-11，4B-2）：不再按枚举序号建数组，改成按登记表里的汤底定义（ID）缓存贴图，
+    // 贴图名仍是 block/hot_pot_top_<名字>[_boiling]，命名空间跟着汤底 ID，内置汤底的结果与以前相同。
+    private static final java.util.concurrent.ConcurrentHashMap<ResourceLocation, ResourceLocation> STILL_TEXTURES =
+        new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.concurrent.ConcurrentHashMap<ResourceLocation, ResourceLocation> BOILING_TEXTURES =
+        new java.util.concurrent.ConcurrentHashMap<>();
 
     /** 九宫格锅整面沸腾叠层（按方块状态里的汤面种类）。 */
     private static final ResourceLocation[] OVERLAY = new ResourceLocation[SoupVisual.values().length];
@@ -70,10 +75,18 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
         for (SoupVisual visual : SoupVisual.values()) {
             OVERLAY[visual.ordinal()] = HotPot.id("block/hot_pot_top_" + visual.getSerializedName() + "_boiling");
         }
-        for (SoupBase soup : SoupBase.values()) {
-            STILL[soup.ordinal()] = HotPot.id("block/hot_pot_top_" + soup.textureKey());
-            BOILING[soup.ordinal()] = HotPot.id("block/hot_pot_top_" + soup.textureKey() + "_boiling");
-        }
+    }
+
+    /** 汤面静态贴图（textures/block/hot_pot_top_&lt;名字&gt;.png）。 */
+    private static ResourceLocation stillTexture(SoupDef soup) {
+        return STILL_TEXTURES.computeIfAbsent(soup.id(),
+            id -> ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "block/hot_pot_top_" + id.getPath()));
+    }
+
+    /** 汤面沸腾贴图（…_boiling.png）。 */
+    private static ResourceLocation boilingTexture(SoupDef soup) {
+        return BOILING_TEXTURES.computeIfAbsent(soup.id(),
+            id -> ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "block/hot_pot_top_" + id.getPath() + "_boiling"));
     }
 
     public HotPotBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
@@ -183,21 +196,21 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
                                         float innerMin, float innerSize, float heat, float tickDelta,
                                         PoseStack matrices, MultiBufferSource consumers, int light) {
         for (int side = 0; side < layout.sides(); side++) {
-            SoupBase soup = SoupBase.byId(be.baseOfSide(side));
+            SoupDef soup = Soups.byIndex(be.baseOfSide(side));
             if (soup == null) {
                 continue;
             }
             List<float[]> regions = layout.regions(side);
-            TextureAtlasSprite still = sprite(STILL[soup.ordinal()]);
+            TextureAtlasSprite still = sprite(stillTexture(soup));
             drawRegions(regions, rotated, y, innerMin, innerSize, still, 255,
                 consumers.getBuffer(RenderType.entityCutout(TextureAtlas.LOCATION_BLOCKS)), matrices, light);
             if (heat > 0.01F) {
-                TextureAtlasSprite boiling = sprite(BOILING[soup.ordinal()]);
+                TextureAtlasSprite boiling = sprite(boilingTexture(soup));
                 drawRegions(regions, rotated, y + 0.001F, innerMin, innerSize, boiling,
                     Math.max(0, Math.min(255, Math.round(heat * 210F))),
                     consumers.getBuffer(RenderType.entityTranslucent(TextureAtlas.LOCATION_BLOCKS)), matrices, light);
                 final int s = side;
-                BoilingEffects.render(SoupVisual.fromBase(soup), y + 0.002F, innerMin, innerSize, heat,
+                BoilingEffects.render(SoupVisual.fromDef(soup), y + 0.002F, innerMin, innerSize, heat,
                     be.bubbleSeconds(tickDelta), (be.getBlockPos().hashCode() + side * 97) & 0x3FF, matrices, consumers, light,
                     (bx, bz) -> {
                         double[] m = PotLayout.toModel((bx - innerMin) / innerSize, (bz - innerMin) / innerSize, rotated);
@@ -218,13 +231,13 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
         PotLayout layout = material.layout();
         String[] keys = {"Base", "BaseB", "BaseC", "BaseD"};
         for (int side = 0; side < layout.sides(); side++) {
-            SoupBase soup = data.contains(keys[side]) ? SoupBase.byId(data.getInt(keys[side])) : null;
+            SoupDef soup = data.contains(keys[side]) ? Soups.byIndex(data.getInt(keys[side])) : null;
             if (soup == null) {
                 continue;
             }
             drawRegions(layout.regions(side), false, STANDALONE_SURFACE,
                 (float) HotPotInteraction.STANDALONE_INNER_MIN, (float) HotPotInteraction.STANDALONE_INNER_SIZE,
-                sprite(STILL[soup.ordinal()]), 255,
+                sprite(stillTexture(soup)), 255,
                 consumers.getBuffer(RenderType.entityCutout(TextureAtlas.LOCATION_BLOCKS)), matrices, light);
         }
     }

@@ -117,7 +117,7 @@ public final class HotPotCooking {
         if (stack.isEmpty() || stack.is(NOT_POT_INGREDIENT)) {
             return false;
         }
-        if (SoupBase.fromStack(stack) != null || PlateItem.placedFor(stack) != null) {
+        if (Soups.fromStack(stack) != null || PlateItem.placedFor(stack) != null) {
             return false;   // 汤底原料；碗、汤碗、橙子饮料这些（r99）
         }
         // 熟牛肉、烤土豆这类已经熟了的东西没有自己的熔炉配方，以前会掉进“无配方兜底”
@@ -333,6 +333,11 @@ public final class HotPotCooking {
      * 这是汤底风味加成要的：吃的时候按成品上的组件给效果。</p>
      */
     public static ItemStack finish(Level world, ItemStack raw, SoupBase soup) {
+        return finishWithSoup(world, raw, soup == null ? null : soup.def());   // mryt233 改（2026-11-11，4B-2）：旧签名保留给联动兼容和探针
+    }
+
+    /** 同上，按登记表里的汤底定义。 */
+    public static ItemStack finishWithSoup(Level world, ItemStack raw, SoupDef soup) {
         int portions = Math.max(1, raw.getCount());
         // mryt233 改（2026-11-11）：数据包 > Java 登记 > 烟熏 / 营火 / 食物熔炉 > 原物兜底。
         PotBoilingRecipe recipe = HotPotRecipes.boiling(world, raw);

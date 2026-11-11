@@ -495,7 +495,12 @@ public class HotPotBlockEntity extends SyncedBlockEntity
     }
 
     /** 这一格泡在哪种汤里（不用的格子 / 那边没汤 = null）。 */
-    public SoupBase soupForSlot(int slot) {
+    public SoupBase soupForSlot(int slot) {   // mryt233 改：保留旧公开签名，仅内置汤底有枚举值
+        SoupDef soup = soupDefForSlot(slot);
+        return soup == null ? null : SoupBase.byId(Soups.indexOf(soup));
+    }
+
+    public SoupDef soupDefForSlot(int slot) {
         return HotPotSoupOps.soupForSlot(this, slot);
     }
 
@@ -587,7 +592,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
 
     /** 一边汤底的名字（没汤 = 「无汤底」）。 */
     public static Component soupName(int id) {
-        SoupBase soup = SoupBase.byId(id);
+        SoupDef soup = Soups.byIndex(id);
         return soup == null ? Component.translatable(key("soup.none")) : Component.translatable(soup.nameKey());
     }
 
@@ -598,8 +603,8 @@ public class HotPotBlockEntity extends SyncedBlockEntity
     public static Component soupNameWithSpicy(int id, int spicy) {
         Component name = soupName(id);
         // mryt233 改（2026-11-10）：红汤判定改走 isSpicy() 属性
-        SoupBase base = SoupBase.byId(id);
-        if (base == null || !base.isSpicy() || spicy < 0) {
+        SoupDef base = Soups.byIndex(id);
+        if (base == null || !base.spicy() || spicy < 0) {
             return name;   // 不是红汤，或者调用方不知道辣度（<0）就不带后缀
         }
         // 照任务单的样子写「红汤锅底（特辣）」；这里只包中文全角括号，汤底名和辣度名都还能各自翻译

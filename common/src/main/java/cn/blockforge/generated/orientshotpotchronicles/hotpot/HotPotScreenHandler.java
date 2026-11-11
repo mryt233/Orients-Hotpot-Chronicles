@@ -185,7 +185,7 @@ public class HotPotScreenHandler extends PlayerInventoryMenu {
         if (stack.isEmpty()) {
             return -1F;
         }
-        SoupBase soup = SoupBase.byId(soupOfSlot(slot));
+        SoupDef soup = Soups.byIndex(soupOfSlot(slot));
         float power;
         if (fuelId() == HotPotBlockEntity.FUEL_OPEN_FIRE) {
             power = HotPotBlockEntity.OPEN_FIRE_POWER;   // 篝火上的锅（代码检查 B6）

@@ -57,10 +57,10 @@ final class HotPotCookingRun {
         PotLayout layout = be.layout();   // 这一刻的格局只取一次（代码检查 W2）
         // mryt233 改（2026-11-07）：每边的汤底与速度只取一次。
         // 以前在 81 格循环里逐格 soup.speedMul()，等于每刻做 81 次配置树遍历。
-        SoupBase[] soups = new SoupBase[PotLayout.MAX_SIDES];
+        SoupDef[] soups = new SoupDef[PotLayout.MAX_SIDES];
         float[] speedMul = new float[PotLayout.MAX_SIDES];
         for (int side = 0; side < layout.sides() && side < PotLayout.MAX_SIDES; side++) {
-            SoupBase base = SoupBase.byId(be.baseOfSide(side));
+            SoupDef base = Soups.byIndex(be.baseOfSide(side));
             soups[side] = base;
             speedMul[side] = base == null ? 1F : base.speedMul();
         }
@@ -79,7 +79,7 @@ final class HotPotCookingRun {
             }
             // 鸳鸯锅：每格用它那一边的汤；那边还没倒汤就不煮
             int side = layout.sideOfSlot(i);
-            SoupBase soup = side == PotLayout.NONE || side >= PotLayout.MAX_SIDES ? null : soups[side];
+            SoupDef soup = side == PotLayout.NONE || side >= PotLayout.MAX_SIDES ? null : soups[side];
             if (soup == null) {
                 continue;
             }
@@ -96,14 +96,14 @@ final class HotPotCookingRun {
     }
 
     /** 煮熟瞬间原地换成熟食，成品等待玩家从同一槽位取走。 */
-    private static void complete(HotPotBlockEntity be, Level world, int slot, SoupBase soup, ItemStack raw) {
+    private static void complete(HotPotBlockEntity be, Level world, int slot, SoupDef soup, ItemStack raw) {
         be.slots.xpValue()[slot] = HotPotCooking.xpFor(world, raw);
-        ItemStack result = HotPotCooking.finish(world, raw, soup);
+        ItemStack result = HotPotCooking.finishWithSoup(world, raw, soup);
         // mryt233 改（2026-11-05，r136a）：熟了的菜记下自己是在哪种汤底里煮出来的，
         // 红汤煮的还记下那一格所在那一边的辣度档位；吃的时候按这两样给风味加成（LivingEntityEatMixin）。
-        result.set(HotPotContent.COOKED_IN_SOUP, soup.textureKey());
+        result.set(HotPotContent.COOKED_IN_SOUP, soup.key());
         // mryt233 改（2026-11-10，r147）：红汤判断改成读 isSpicy() 属性
-        if (soup.isSpicy()) {
+        if (soup.spicy()) {
             int spicy = be.spicyOfSlot(slot);
             if (spicy > 0) {
                 result.set(HotPotContent.SPICY_LEVEL, spicy);
@@ -125,7 +125,7 @@ final class HotPotCookingRun {
      * 计时存在 {@code be.slots.overcook()[]}，会进存档，重启不丢。返回 true = 这一格变了（要标脏）。
      */
     private static boolean overcook(HotPotBlockEntity be, Level world, int slot, PotLayout layout,
-                                    SoupBase[] soups) {
+                                    SoupDef[] soups) {
         ItemStack current = be.slots.ingredients().getItem(slot);
         if (current.isEmpty()) {
             be.slots.overcook()[slot] = 0;
@@ -138,7 +138,7 @@ final class HotPotCookingRun {
         }
         // 鸳鸯锅：这边没汤就不继续煮（和没熟的时候一致）；汤底与速度沿用 cook 里预算好的那一份
         int side = layout.sideOfSlot(slot);
-        SoupBase soup = side == PotLayout.NONE || side >= PotLayout.MAX_SIDES ? null : soups[side];
+        SoupDef soup = side == PotLayout.NONE || side >= PotLayout.MAX_SIDES ? null : soups[side];
         if (soup == null) {
             return false;
         }

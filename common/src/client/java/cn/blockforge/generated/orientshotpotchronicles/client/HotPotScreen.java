@@ -10,7 +10,8 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCooking;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotScreenHandler;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.entity.player.Inventory;
@@ -63,11 +64,11 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
 
     /**
      * mryt233 改（2026-11-10，r147）：配色不再是一个按汤底写的 switch，直接读汤底定义上的颜色
-     * （{@link SoupBase#screenBase()} 等）。加汤底时颜色写在 {@code SoupBase} 的构造参数里，
+     * （{@link SoupDef#screenBase()} 等）。加汤底时颜色写在 {@code SoupBase} 的构造参数里，
      * 枚举构造漏写就编译不过，不会悄悄退化成红汤的配色。
      */
     private static Soup soup(int baseId) {
-        SoupBase soup = SoupBase.byId(baseId);
+        SoupDef soup = Soups.byIndex(baseId);
         if (soup == null) {
             return NO_SOUP;
         }
@@ -398,7 +399,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
     protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
         double t = Util.getMillis() / 1000.0;
         Soup soup = soup(menu.baseId());
-        SoupBase soupBase = SoupBase.byId(menu.baseId());
+        SoupDef soupBase = Soups.byIndex(menu.baseId());
 
         // 铭牌：小铜锅图标 + 标题
         int ix = 9;

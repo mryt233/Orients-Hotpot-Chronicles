@@ -955,7 +955,8 @@ public final class HotPotContent {
         COOKED_CILANTRO_FISH_BALL = foodItem(registration, "cooked_cilantro_fish_ball", 4, 0.6F);
         POUNDED_MEAT = registration.items().register( HotPot.id("pounded_meat"),
             new Item(new Item.Properties()));
-        SOUP_BOWLS = Arrays.stream(SoupBase.values())
+        // mryt233 改（2026-11-11，4B-2）：内置汤底从登记表取（前 6 项，顺序 = 旧序号），汤碗物品持有定义。
+        SOUP_BOWLS = Soups.builtins().stream()
             .map(soup -> registration.items().register( HotPot.id(soup.bowlId()),
                 new SoupBowlItem(soup)))
             .toList();

@@ -4,7 +4,8 @@ package cn.blockforge.generated.orientshotpotchronicles.client.config;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkKind;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotFuel;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
 import com.google.gson.JsonObject;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -32,11 +33,11 @@ public final class ConfigSchema {
             prop("fallback_ticks"), "fallback_ticks"));
         // 三种主力汤底的加热倍率（汤底本身决定涮煮快慢）
         out.add(field("soup_speed.spicy", false, 0.1, 10, 0.05, Unit.MULTIPLIER,
-            soupName(SoupBase.SPICY).copy().append(DOT).append(prop("speed")), "speed"));
+            soupName(Soups.get("spicy")).copy().append(DOT).append(prop("speed")), "speed"));
         out.add(field("soup_speed.clear", false, 0.1, 10, 0.05, Unit.MULTIPLIER,
-            soupName(SoupBase.CLEAR).copy().append(DOT).append(prop("speed")), "speed"));
+            soupName(Soups.get("clear")).copy().append(DOT).append(prop("speed")), "speed"));
         out.add(field("soup_speed.rich_stock", false, 0.1, 10, 0.05, Unit.MULTIPLIER,
-            soupName(SoupBase.RICH_STOCK).copy().append(DOT).append(prop("speed")), "speed"));
+            soupName(Soups.get("rich_stock")).copy().append(DOT).append(prop("speed")), "speed"));
         return out;
     }
 
@@ -72,8 +73,9 @@ public final class ConfigSchema {
         out.add(new Section(k("group.items"), items));
 
         List<Field> soup = new ArrayList<>();
-        for (SoupBase base : SoupBase.values()) {
-            soup.add(field("soup_speed." + base.textureKey(), false, 0.1, 10, 0.05, Unit.MULTIPLIER,
+        // mryt233 改（2026-11-11，4B-2）：设置界面只给内置汤底列配置项，从登记表取（前 6 项）
+        for (SoupDef base : Soups.builtins()) {
+            soup.add(field("soup_speed." + base.key(), false, 0.1, 10, 0.05, Unit.MULTIPLIER,
                 soupName(base).copy().append(DOT).append(prop("speed")), "speed"));
         }
         out.add(new Section(k("group.soup"), soup));
@@ -89,7 +91,7 @@ public final class ConfigSchema {
         out.add(new Section(k("group.fuel"), fuel));
 
         List<Field> bowl = new ArrayList<>();
-        for (SoupBase base : SoupBase.values()) {
+        for (SoupDef base : Soups.builtins()) {
             for (String key : new String[]{"hunger", "saturation", "duration", "amplifier",
                 "second_duration", "second_amplifier", "fire_duration", "fire_amplifier",
                 "hunger_duration", "hunger_amplifier"}) {
@@ -149,9 +151,9 @@ public final class ConfigSchema {
     }
 
     /** 汤碗一项：路径 soup_bowl.&lt;汤底&gt;.&lt;键&gt;，范围和单位按后缀分。 */
-    private Field bowlField(SoupBase base, String key) {
+    private Field bowlField(SoupDef base, String key) {
         Component label = soupName(base).copy().append(DOT).append(prop(key));
-        String[] path = {"soup_bowl", base.textureKey(), key};
+        String[] path = {"soup_bowl", base.key(), key};
         return switch (key) {
             case "hunger" -> new Field(path, true, 0, 100, 1, Unit.POINTS, label, k("help.hunger"), ItemStack.EMPTY);
             case "saturation" -> new Field(path, false, 0, 10, 0.05, Unit.PLAIN, label,

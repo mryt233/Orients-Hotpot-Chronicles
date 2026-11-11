@@ -35,29 +35,29 @@ public final class ClientTooltips {
      */
     public static void appendCookedSoup(ItemStack food, List<Component> lines) {
         String soupKey = food.get(HotPotContent.COOKED_IN_SOUP);
-        SoupBase soup = SoupBase.byTextureKey(soupKey);
+        SoupDef soup = Soups.get(soupKey);   // mryt233 改（2026-11-11，4B-2）：问登记表
         // 红汤碗和红汤里夹出来的菜都带 SPICY_LEVEL 组件，先取出来备用
         int spicy = Math.max(0, Math.min(3, food.getOrDefault(HotPotContent.SPICY_LEVEL, 0)));
         if (soup != null) {
             // 任务单的写法：红汤后面接「· 特辣」（状态栏那边是「红汤锅底（特辣）」）
             Component soupName = Component.translatable(soup.nameKey());
             // mryt233 改（2026-11-10，r147）：红汤判断改成 isSpicy() 属性
-            if (soup.isSpicy()) {
+            if (soup.spicy()) {
                 soupName = Component.empty().append(soupName).append(Component.literal(" · "))
                     .append(HotPotBlockEntity.spicyLevelText(spicy));
             }
             lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.cooked_in_soup"), soupName)
-                .withStyle(soup.isSpicy() ? ChatFormatting.RED : ChatFormatting.GOLD));
+                .withStyle(soup.spicy() ? ChatFormatting.RED : ChatFormatting.GOLD));
             appendSoupEffects(soup, spicy, food, lines);
         }
         if (food.getItem() instanceof SoupBowlItem bowl) {
-            if (bowl.soup().isSpicy()) {
+            if (bowl.soupDef().spicy()) {
                 lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.spicy_level"),
                     HotPotBlockEntity.spicyLevelText(food.getOrDefault(HotPotContent.SPICY_LEVEL, 0)))
                     .withStyle(ChatFormatting.RED));
             }
             // mryt233 改（2026-11-06，r139）：汤碗喝下去的效果和锅里涮出来的菜一样，也逐条列出来
-            appendSoupEffects(bowl.soup(), spicy, food, lines);
+            appendSoupEffects(bowl.soupDef(), spicy, food, lines);
         }
     }
 
@@ -67,7 +67,7 @@ public final class ClientTooltips {
      * 和原版状态效果提示的颜色一致。蘸了蜂蜜或醋的菜吃下去不会真的加负面效果，这里也不列，
      * 免得提示和实际吃下去的效果对不上（结算在 LivingEntityEatMixin）。
      */
-    private static void appendSoupEffects(SoupBase soup, int spicy, ItemStack food, List<Component> lines) {
+    private static void appendSoupEffects(SoupDef soup, int spicy, ItemStack food, List<Component> lines) {
         List<MobEffectInstance> effects = soup.dishBonusEffects(spicy);
         if (effects.isEmpty()) {
             return;

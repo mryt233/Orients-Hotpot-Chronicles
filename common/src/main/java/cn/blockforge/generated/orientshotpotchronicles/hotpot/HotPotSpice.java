@@ -66,8 +66,8 @@ final class HotPotSpice {
         }
         // 不是红汤（含这一边还没倒汤）：提示一句就吃掉这次点击，别让辣椒 / 冰块被当成食材塞进锅槽
         // mryt233 改（2026-11-10）：调辣度只对红汤有效，判定改走 isSpicy() 属性
-        SoupBase sideSoup = SoupBase.byId(be.baseOfSide(side));
-        if (sideSoup == null || !sideSoup.isSpicy()) {
+        SoupDef sideSoup = Soups.byIndex(be.baseOfSide(side));
+        if (sideSoup == null || !sideSoup.spicy()) {
             player.displayClientMessage(Component.translatable(key("msg.spicy_need_red_broth")), true);
             return true;
         }

@@ -24,15 +24,20 @@ import net.minecraft.world.level.Level;
  * 红汤碗还带着盛出时的辣度档位（SPICY_LEVEL 组件），3 级特辣喝完嘴上冒火（2 秒无伤火苗）。
  * 作者：mryt233 */
 public class SoupBowlItem extends Item {
-    private final SoupBase soup;
+    private final SoupDef soup;
 
+    /** mryt233 改（2026-11-11，4B-2）：保留枚举入口给探针和联动兼容。 */
     public SoupBowlItem(SoupBase soup) {
+        this(soup.def());
+    }
+
+    public SoupBowlItem(SoupDef soup) {
         super(new Item.Properties().stacksTo(1).food(foodOf(soup)));
         this.soup = soup;
     }
 
     /** 注册时的数值只作默认值和客户端显示用；真正的结算在 {@link #eating}（照 ConfiguredFoodItem 的思路）。 */
-    private static FoodProperties foodOf(SoupBase soup) {
+    private static FoodProperties foodOf(SoupDef soup) {
         return new FoodProperties.Builder()
             .nutrition(SoupBase.DEFAULT_BOWL_HUNGER)
             // mryt233 改（2026-11-10，r147）：饱和度系数改读汤底定义上的属性（以前是按具体汤底写的判断）
@@ -57,8 +62,14 @@ public class SoupBowlItem extends Item {
             .build();
     }
 
-    public SoupBase soup() {
+    /** 这碗汤对应的定义（登记表里的同一份）。 */
+    public SoupDef soupDef() {
         return soup;
+    }
+
+    /** 对应的内置枚举值；非内置汤底返回 null。保留给探针和联动兼容，游戏逻辑请用 {@link #soupDef()}。 */
+    public SoupBase soup() {
+        return SoupBase.byTextureKey(soup.key());
     }
 
     /** 点在方块顶面：像盘子一样摆上去；别的情况交给原版（对着空气 / 侧面右键就是喝）。 */
@@ -92,7 +103,7 @@ public class SoupBowlItem extends Item {
             // 3 级特辣：嘴上冒 2 秒火苗，纯节目效果（前面刚加的抗火罩着，不会扣血）
             // mryt233 改（2026-11-06，r139）：穿着布围裙时不再点火苗（防溅油装备挡滚油与明火）。
             // mryt233 改（2026-11-10）：红汤判断改成 isSpicy() 属性；特辣冒火苗属于红汤独有的玩法，保留特判
-            if (soup.isSpicy() && spicy >= 3 && !ClothApronItem.wornBy(user)) {
+            if (soup.spicy() && spicy >= 3 && !ClothApronItem.wornBy(user)) {
                 user.setRemainingFireTicks(Math.max(user.getRemainingFireTicks(), 40));
             }
         }

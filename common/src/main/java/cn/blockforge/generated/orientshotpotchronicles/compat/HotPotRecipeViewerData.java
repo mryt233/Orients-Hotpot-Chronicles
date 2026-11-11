@@ -1,7 +1,7 @@
 package cn.blockforge.generated.orientshotpotchronicles.compat;
 
 // mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
 import java.util.Comparator;
 import java.util.Locale;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -117,7 +117,7 @@ public final class HotPotRecipeViewerData {
             boolean custom = HotPotRecipes.boiling(level, input) != null;
             boolean vanilla = HotPotCooking.smeltingRecipe(level, input).isPresent();
             if (!custom && !vanilla) continue;
-            ItemStack output = HotPotCooking.finish(level, input, SoupBase.CLEAR);
+            ItemStack output = HotPotCooking.finishWithSoup(level, input, Soups.clear());
             ItemStack over = HotPotCooking.overcookResult(level, output.getItem());
             var key = BuiltInRegistries.ITEM.getKey(item);
             ResourceLocation id = HotPot.id("hotpot_cooking/" + (key.getNamespace().equals(HotPot.MOD_ID)

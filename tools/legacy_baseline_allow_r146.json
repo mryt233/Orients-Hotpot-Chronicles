@@ -1,0 +1,9 @@
+{
+  "说明": "0.2.2-alpha 旧档用 r146 及之后的代码打开时，预期会出现的差异（4A 预演用 r147 试验包实测得到）。4D / 4E 在此基础上再加各自新格式的规则。entry、path、old、new 都是整串正则。",
+  "rules": [
+    {"entry": "table_.*", "path": "Plates\\[\\d+\\]\\.Facing", "kind": "added", "new": "east|south",
+     "reason": "r146e 起桌面餐具多存 Facing；旧档缺这个键，读取时按 Axis 补默认（x -> east，z -> south）"},
+    {"entry": "table_.*", "path": "Plates\\[\\d+\\]\\.ChopsticksYaw", "kind": "added", "new": "45\\.0f|135\\.0f",
+     "reason": "r146e 起桌面餐具多存 ChopsticksYaw；旧档缺这个键，按 Axis 补默认（x -> 45，z -> 135）"}
+  ]
+}

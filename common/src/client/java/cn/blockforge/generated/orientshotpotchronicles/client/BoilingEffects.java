@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.function.BiPredicate;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.RenderType;
@@ -42,7 +43,7 @@ public final class BoilingEffects {
 
     /**
      * mryt233 改（2026-11-10，r147）：气泡配色不再是一个按汤底写的 switch，直接从汤底定义上读
-     * （{@link SoupBase#bubbleBody()} / {@link SoupBase#bubbleHi()}）。
+     * （{@link SoupDef#bubbleBody()} / {@link SoupDef#bubbleHi()}）。
      * 配色做成常量，读一次不再每帧 new（代码检查 W5，mryt233 2026-11-01）。
      * 以前这里写 {@code default -> PAL_SPICY}，加汤底漏写会悄悄用红汤的颜色；现在颜色是枚举构造参数的一部分，
      * 漏写编译就过不去。
@@ -51,8 +52,9 @@ public final class BoilingEffects {
 
     private static Map<SoupVisual, Palette> buildPalettes() {
         EnumMap<SoupVisual, Palette> map = new EnumMap<>(SoupVisual.class);
-        for (SoupBase base : SoupBase.values()) {
-            map.put(base.visual(), new Palette(base.bubbleBody(), base.bubbleHi()));
+        // mryt233 改（2026-11-11，4B-2）：内置汤底从登记表取；非内置汤底暂时没有汤面值（SoupVisual.NONE），不进配色表
+        for (SoupDef def : Soups.builtins()) {
+            map.put(def.visual(), new Palette(def.bubbleBody(), def.bubbleHi()));
         }
         return Collections.unmodifiableMap(map);
     }
@@ -60,7 +62,7 @@ public final class BoilingEffects {
     private static Palette palette(SoupVisual soup) {
         Palette palette = PALETTES.get(soup);
         if (palette == null) {
-            throw new IllegalStateException("汤面 " + soup + " 没有气泡配色；加汤底时要在 SoupBase 上补气泡配色。");
+            throw new IllegalStateException("汤面 " + soup + " 没有气泡配色；加汤底时要在汤底定义（SoupBase 构造参数 / SoupDef）上补气泡配色。");
         }
         return palette;
     }

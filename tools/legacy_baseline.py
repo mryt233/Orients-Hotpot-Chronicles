@@ -898,8 +898,13 @@ def load_allow(path: str | None) -> list[dict]:
     return json.loads(Path(path).read_text(encoding="utf-8"))["rules"]
 
 
-def rule_allows(rules, name, kind, path) -> str | None:
+def rule_allows(rules, name, kind, path, old_value="", new_value="") -> str | None:
+    """规则可选 old / new：对旧值 / 新值整串匹配的正则（不写就不限制）。"""
     for rule in rules:
+        if "old" in rule and not re.fullmatch(rule["old"], old_value):
+            continue
+        if "new" in rule and not re.fullmatch(rule["new"], new_value):
+            continue
         if not re.fullmatch(rule.get("entry", ".*"), name):
             continue
         if rule.get("kind", "any") not in ("any", kind):
@@ -926,7 +931,7 @@ def compare_dumps(old: dict, new: dict, rules) -> dict:
             continue
         bad, ok = [], []
         for kind, path, a, b in diffs:
-            reason = rule_allows(rules, name, kind, path)
+            reason = rule_allows(rules, name, kind, path, a, b)
             (ok if reason is not None else bad).append((kind, path, a, b, reason))
         if bad:
             report["unexpected"].append((name, bad))
@@ -968,6 +973,52 @@ def cmd_compare(args) -> int:
     bad = report["unexpected"] or report["missing"] or (args.text_exact and report["text_differs"])
     print("结论：" + ("有不在允许清单里的差异（见上）" if bad else "没有不在允许清单里的差异"))
     return 1 if bad else 0
+
+
+# ---------------------------------------------------------------------------
+# 配置文件对比（旧配置升级后：玩家改过的值保留、键只增不减；_ 开头的说明文字单独统计）
+# ---------------------------------------------------------------------------
+
+def flat_config(node, prefix=""):
+    out = {}
+    for k, v in node.items():
+        if isinstance(v, dict):
+            out.update(flat_config(v, prefix + k + "."))
+        else:
+            out[prefix + k] = v
+    return out
+
+
+def compare_config(old: dict, new: dict) -> dict:
+    fo, fn = flat_config(old), flat_config(new)
+    data_o = {k: v for k, v in fo.items() if not k.startswith("_")}
+    data_n = {k: v for k, v in fn.items() if not k.startswith("_")}
+    doc_o = {k: v for k, v in fo.items() if k.startswith("_")}
+    doc_n = {k: v for k, v in fn.items() if k.startswith("_")}
+    return {
+        "removed": sorted(k for k in data_o if k not in data_n),
+        "added": sorted(k for k in data_n if k not in data_o),
+        "changed": sorted((k, data_o[k], data_n[k]) for k in data_o if k in data_n and data_o[k] != data_n[k]),
+        "doc_changed": sorted(k for k in doc_o if k in doc_n and doc_o[k] != doc_n[k]),
+        "doc_added": sorted(k for k in doc_n if k not in doc_o),
+        "doc_removed": sorted(k for k in doc_o if k not in doc_n),
+        "values": len(data_o),
+    }
+
+
+def cmd_compare_config(args) -> int:
+    old = json.loads(Path(args.old).read_text(encoding="utf-8"))
+    new = json.loads(Path(args.new).read_text(encoding="utf-8"))
+    r = compare_config(old, new)
+    print(f"配置对比：数值键 {r['values']} 个；旧值被改 {len(r['changed'])}，旧键消失 {len(r['removed'])}，新增键 {len(r['added'])}；"
+          f"说明文字（_ 开头）被改写 {len(r['doc_changed'])}，新增 {len(r['doc_added'])}，消失 {len(r['doc_removed'])}")
+    for k, a, b in r["changed"]:
+        print(f"  [值变了] {k}: {a} -> {b}")
+    for k in r["removed"]:
+        print(f"  [键消失] {k}")
+    for k in r["added"]:
+        print(f"  [新增键] {k}")
+    return 1 if (r["changed"] or r["removed"]) else 0
 
 
 # ---------------------------------------------------------------------------
@@ -1056,6 +1107,102 @@ def cmd_prepare_world(args) -> int:
     return 0
 
 
+
+# ---------------------------------------------------------------------------
+# 烹饪探针：不靠开发命令，用灶台 + 燃料 + /tick 步进，比较两个版本“煮”的结果（4B-2 起用来验证汤底调用点改动）
+# ---------------------------------------------------------------------------
+
+# (名字, 灶台方块状态, 方块实体 NBT 里的汤底 / 辣度键) —— 六种汤、红汤四档辣度、鸳鸯和田字多边
+COOK_CASES = [
+    ("clear", "pot=iron_soup", dict(Base=0)),
+    ("rich_stock", "pot=iron_soup", dict(Base=1)),
+    ("mushroom", "pot=iron_soup", dict(Base=2)),
+    ("spicy_l0", "pot=iron_soup", dict(Base=3, Spicy=0)),
+    ("spicy_l1", "pot=iron_soup", dict(Base=3, Spicy=1)),
+    ("spicy_l2", "pot=iron_soup", dict(Base=3, Spicy=2)),
+    ("spicy_l3", "pot=iron_soup", dict(Base=3, Spicy=3)),
+    ("tomato", "pot=iron_soup", dict(Base=4)),
+    ("three_fresh", "pot=iron_soup", dict(Base=5)),
+    ("yuanyang_red_clear", "pot=iron_yuanyang_s_soup", dict(Base=3, BaseB=0, Spicy=2)),
+    ("four_grid_mixed", "pot=iron_four_grid_soup", dict(Base=1, BaseB=3, BaseC=5, BaseD=-1, SpicyB=1)),
+]
+COOK_SLOTS = {0: "beef_loin_slice", 1: "cold_tofu_cube", 2: "beef_loin", 3: "potato_slice", 4: "raw_ham_sausage",
+              20: "beef_loin_slice", 24: "cold_tofu_cube", 40: "potato_slice", 44: "beef_loin_slice",
+              60: "cold_tofu_cube", 62: "beef_loin_slice", 76: "potato_slice", 80: "beef_loin_slice"}
+COOK_STEPS = [30, 90, 400]   # 累计 tick：半熟 / 多数熟 / 全熟并开始煮过头计时
+
+
+def cook_probe(properties: Path) -> dict:
+    server = Server(properties)
+    entries = []
+
+    def gametime() -> int:
+        out = server.run("time query gametime").strip()
+        match = re.search(r"(-?\d+)\s*$", out)
+        if not match:
+            raise RuntimeError("无法读取游戏时间：" + out)
+        return int(match.group(1))
+
+    try:
+        server.run("forceload add 2016 2016 2079 2079")
+        deadline = time.monotonic() + 30
+        while True:
+            checks = [server.run(f"execute if loaded {x} 4 {z}") for x in (2030, 2066) for z in (2030, 2066)]
+            if all("Test passed" in result for result in checks):
+                break
+            if time.monotonic() >= deadline:
+                raise RuntimeError("探针区域区块未加载：" + repr(checks))
+            time.sleep(0.2)
+        result = server.run("fill 2030 3 2030 2066 3 2066 minecraft:stone")
+        if "filled " not in result.lower() and "No blocks were filled" not in result:
+            raise RuntimeError("探针地面设置失败：" + result)
+        result = server.run("fill 2030 4 2030 2066 12 2066 minecraft:air")
+        if "filled " not in result.lower() and "No blocks were filled" not in result:
+            raise RuntimeError("探针清场失败：" + result)
+        server.run("tick freeze")
+        items = ",".join(f"{{Slot:{slot}b,id:\"{P}{name}\",count:1}}" for slot, name in COOK_SLOTS.items())
+        for i, (name, state, nbt) in enumerate(COOK_CASES):
+            x = 2034 + 2 * i
+            nbt = dict(nbt, FuelType=1, BurnTicks=5000, BurnTotal=5000)
+            body = ",".join(f"{k}:{v}" for k, v in nbt.items())
+            result = server.run(f"setblock {x} {Y} 2040 {P}brick_stove[{state}]{{{body},Items:[{items}]}}")
+            if "Changed the block" not in result:
+                raise RuntimeError(f"探针场景 {name} 设置失败：{result}")
+        start = gametime()
+        done = 0
+        for step in COOK_STEPS:
+            server.run(f"tick step {step - done}")
+            target = start + step
+            deadline = time.monotonic() + max(30, (step - done) / 20 * 3)
+            while True:
+                current = gametime()
+                if current == target:
+                    break
+                if current > target or time.monotonic() >= deadline:
+                    raise RuntimeError(f"步进未精确到达目标：当前 {current}，目标 {target}")
+                time.sleep(0.2)
+            done = step
+            for i, (name, _, _) in enumerate(COOK_CASES):
+                x = 2034 + 2 * i
+                command = f"data get block {x} {Y} 2040"
+                entries.append({"name": f"cook_{name}_t{step}", "cmd": command, "out": server.run(command).strip()})
+        if not all("cooked_in_soup" in e["out"] for e in entries if e["name"].endswith("_t400")):
+            raise RuntimeError("未观察到熟食汤底组件，烹饪探针无效")
+        return {"meta": {"tool": "legacy_baseline.py cook-probe", "created": time.strftime("%Y-%m-%d %H:%M:%S")},
+                "entries": entries}
+    finally:
+        server.run("tick unfreeze")
+
+
+def cmd_cook_probe(args) -> int:
+    props = Path(args.properties) if args.properties else run_dir_of(args.loader) / "server.properties"
+    data = cook_probe(props)
+    data["meta"]["label"] = args.label or ""
+    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+    Path(args.output).write_text(json.dumps(data, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+    print(f"烹饪探针导出 {len(data['entries'])} 条 -> {args.output}")
+    return 0
+
 # ---------------------------------------------------------------------------
 # 一键建档
 # ---------------------------------------------------------------------------
@@ -1139,6 +1286,16 @@ def main(argv=None) -> int:
     p.add_argument("-v", "--verbose", action="store_true")
     p.add_argument("--text-exact", action="store_true", help="要求回执原文逐字相同（默认按内容比较，键顺序不同不算差异）")
     p.set_defaults(func=cmd_compare)
+    p = sub.add_parser("cook-probe", help="灶台烹饪探针：仅限专用测试世界，会清空所选区域；用 /tick 步进导出结果")
+    p.add_argument("--loader", choices=sorted(LOADERS), default="fabric")
+    p.add_argument("--properties")
+    p.add_argument("-o", "--output", required=True)
+    p.add_argument("--label", default="")
+    p.set_defaults(func=cmd_cook_probe)
+    p = sub.add_parser("compare-config", help="对比升级前后的配置文件（玩家改过的值是否保留）")
+    p.add_argument("old")
+    p.add_argument("new")
+    p.set_defaults(func=cmd_compare_config)
     p = sub.add_parser("fixtures", help="把导出整理成单测夹具")
     p.add_argument("dump")
     p.add_argument("-o", "--output", required=True)

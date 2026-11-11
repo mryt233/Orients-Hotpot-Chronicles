@@ -4,7 +4,8 @@ package cn.blockforge.generated.orientshotpotchronicles.client.config;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkKind;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
@@ -61,8 +62,8 @@ public final class ConfigField {
 
     public static final Component DOT = Component.literal(" · ");
 
-    public static Component soupName(SoupBase base) {
-        return Component.translatable("text." + HotPot.MOD_ID + ".soup." + base.textureKey());
+    public static Component soupName(SoupDef base) {
+        return Component.translatable("text." + HotPot.MOD_ID + ".soup." + base.key());
     }
 
     public static Component fuelName(String id) {

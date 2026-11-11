@@ -80,7 +80,7 @@ final class HotPotSoupOps {
             side = PotLayout.SIDE_A;
         }
         ItemStack stack = player.getItemInHand(hand);
-        SoupBase soup = SoupBase.byId(be.baseOfSide(side));
+        SoupDef soup = Soups.byIndex(be.baseOfSide(side));
         if (soup == null) {
             player.displayClientMessage(Component.translatable(key("msg.no_soup_to_scoop")), true);
             return false;
@@ -101,7 +101,7 @@ final class HotPotSoupOps {
         be.updateSoupVisual();
         player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, new ItemStack(soup.source())));
         // mryt233 改（2026-11-10，r147）：红汤用岩浆灌桶声，改成读 isSpicy() 属性
-        SoundEvent sound = soup.isSpicy() ? SoundEvents.BUCKET_FILL_LAVA
+        SoundEvent sound = soup.spicy() ? SoundEvents.BUCKET_FILL_LAVA
             : soup.remainder() == Items.BOWL ? SoundEvents.BOTTLE_FILL : SoundEvents.BUCKET_FILL;
         be.getLevel().playSound(null, be.getBlockPos(), sound, SoundSource.BLOCKS, 1.0F, 1.0F);
         be.markDirtyAndSync();
@@ -174,12 +174,12 @@ final class HotPotSoupOps {
                     Vec3.atCenterOf(be.getBlockPos()).add(0, 0.6, 0), Math.max(1, Math.round(xp)));
             }
             be.getLevel().playSound(null, be.getBlockPos(), SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.35F, 1.2F);
-        } else if (SoupBase.byId(be.bowlSoup(bigCell)) != null) {
+        } else if (Soups.byIndex(be.bowlSoup(bigCell)) != null) {
             result = new ItemStack(HotPotContent.SOUP_BOWLS.get(be.bowlSoup(bigCell)));
             // mryt233 改（2026-11-05）：盛出来的红汤碗带着这一边的辣度档位，喝的时候按它给效果（r136a）
             // mryt233 改（2026-11-10，r147）：红汤判断改成读 isSpicy() 属性
-            SoupBase bowl = SoupBase.byId(be.bowlSoup(bigCell));
-            if (bowl != null && bowl.isSpicy()) {
+            SoupDef bowl = Soups.byIndex(be.bowlSoup(bigCell));
+            if (bowl != null && bowl.spicy()) {
                 int spicy = be.spicyOfSide(be.soupSideOf(bigCell, be.bowlSoup(bigCell)));
                 if (spicy > 0) {
                     result.set(HotPotContent.SPICY_LEVEL, spicy);
@@ -207,7 +207,7 @@ final class HotPotSoupOps {
             side = PotLayout.SIDE_A;
         }
         ItemStack stack = player.getItemInHand(hand);
-        SoupBase soup = SoupBase.fromStack(stack);
+        SoupDef soup = Soups.fromStack(stack);
         if (soup == null) {
             return false;
         }
@@ -219,11 +219,11 @@ final class HotPotSoupOps {
                 return false;
             }
             // mryt233 改（2026-11-10）：锅底料只能加进清汤——清汤是唯一允许当底子的汤，这里保留按具体汤底判断
-            if (current != SoupBase.CLEAR.ordinal()) {
+            if (current != Soups.indexOf(Soups.clear())) {
                 player.displayClientMessage(Component.translatable(key("msg.base_only_clear")), true);
                 return false;
             }
-            be.setBaseOfSide(side, soup.ordinal());
+            be.setBaseOfSide(side, Soups.indexOf(soup));
             be.setSpicyOfSide(side, 0);   // mryt233 改（2026-11-05）：换汤底，辣度回到 0 档（r136a）
             consumeHand(player, hand, Items.AIR);
             be.updateSoupVisual();
@@ -235,7 +235,7 @@ final class HotPotSoupOps {
             player.displayClientMessage(Component.translatable(key("msg.already_soup")), true);
             return false;
         }
-        be.setBaseOfSide(side, soup.ordinal());
+        be.setBaseOfSide(side, Soups.indexOf(soup));
         be.setSpicyOfSide(side, 0);   // mryt233 改（2026-11-05）：倒新汤，辣度回到 0 档（微辣）（r136a）
         consumeHand(player, hand, soup.remainder());
         be.updateSoupVisual();
@@ -271,7 +271,7 @@ final class HotPotSoupOps {
         HotPotSoup.setBaseOfSide(be, side, id);
     }
 
-    static SoupBase soupForSlot(HotPotBlockEntity be, int slot) {
+    static SoupDef soupForSlot(HotPotBlockEntity be, int slot) {
         return HotPotSoup.forSlot(be, slot);
     }
 

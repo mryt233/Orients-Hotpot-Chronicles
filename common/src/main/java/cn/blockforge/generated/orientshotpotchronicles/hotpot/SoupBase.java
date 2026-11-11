@@ -12,7 +12,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +27,10 @@ import java.util.List;
  * 漏写不会有默认兜底——枚举构造必须写满，漏了编译就过不去。</p>
  *
  * <p>后续联动模组可通过 {@link #registerSource}（由兼容层转发）注册新的汤底来源。</p>
+ *
+ * <p>mryt233 改（2026-11-11，第四批 4B-1）：每个枚举值的全部定义抽成不可变记录 {@link SoupDef}，
+ * 类初始化时按枚举顺序登记进 {@link Soups}（登记表的前 6 项，顺序 = 旧存档里的汤底序号）。
+ * 枚举仍是内置定义的写法和对外入口，下面所有访问器转给定义；值、行为、存档、配置键都没变。</p>
  * 作者：mryt233 */
 public enum SoupBase {
     /*
@@ -130,33 +133,8 @@ public enum SoupBase {
         return CUSTOM_SOURCES.isFrozen();
     }
 
-    private final String nameKey;
-    private final String bowlId;
-    private final float speedMul;
-    private final Supplier<Item> sourceItem;
-    private final Item remainderItem;
-    /** 锅底料：加进清汤里把它变成这种汤（只有番茄 / 三鲜有）；没有就是 null。 */
-    private final Supplier<Item> additive;
-    private final int defaultBowlHunger;
-    private final float defaultBowlSaturation;
-    private final Holder<MobEffect> mainEffect;
-    private final int defaultDuration;
-    private final Holder<MobEffect> secondEffect;
-    private final int defaultSecondDuration;
-    private final Holder<MobEffect> fireEffect;
-    private final int defaultFireDuration;
-    private final Holder<MobEffect> hungerEffect;
-    private final int defaultHungerDuration;
-    private final boolean clearsNausea;
-    private final boolean spicy;
-    /** 界面汤面色块：底色 / 高光 / 暗部 / 食材小点颜色（几样轮换）。 */
-    private final int screenBase;
-    private final int screenHi;
-    private final int screenLo;
-    private final int[] screenBits;
-    /** 沸腾气泡：体色 / 高光。 */
-    private final int bubbleBody;
-    private final int bubbleHi;
+    /** 这个内置汤底的全部定义（mryt233 改 2026-11-11，4B-1：原来的 24 个字段收进这里）。 */
+    private final SoupDef def;
 
     // 原料用 Supplier：新汤底的原料是本模组物品，枚举初始化时 HotPotContent 可能还没注册好（2026-10-25）
     SoupBase(String nameKey, String bowlId, float speedMul,
@@ -170,36 +148,25 @@ public enum SoupBase {
              boolean clearsNausea, boolean spicy,
              int screenBase, int screenHi, int screenLo, int[] screenBits,
              int bubbleBody, int bubbleHi) {
-        this.nameKey = nameKey;
-        this.bowlId = bowlId;
-        this.speedMul = speedMul;
-        this.sourceItem = sourceItem;
-        this.remainderItem = remainderItem;
-        this.additive = additive;
-        this.defaultBowlHunger = bowlHunger;
-        this.defaultBowlSaturation = bowlSaturation;
-        this.mainEffect = mainEffect;
-        this.defaultDuration = duration;
-        this.secondEffect = secondEffect;
-        this.defaultSecondDuration = secondDuration;
-        this.fireEffect = fireEffect;
-        this.defaultFireDuration = fireDuration;
-        this.hungerEffect = hungerEffect;
-        this.defaultHungerDuration = hungerDuration;
-        this.clearsNausea = clearsNausea;
-        this.spicy = spicy;
-        this.screenBase = screenBase;
-        this.screenHi = screenHi;
-        this.screenLo = screenLo;
-        this.screenBits = screenBits;
-        this.bubbleBody = bubbleBody;
-        this.bubbleHi = bubbleHi;
+        this.def = new SoupDef(HotPot.id(name().toLowerCase(Locale.ROOT)), nameKey, bowlId, speedMul,
+            sourceItem, remainderItem, additive, bowlHunger, bowlSaturation,
+            mainEffect, duration, secondEffect, secondDuration, fireEffect, fireDuration,
+            hungerEffect, hungerDuration, clearsNausea, spicy,
+            screenBase, screenHi, screenLo, screenBits, bubbleBody, bubbleHi);
         // 默认速度记进配置模板，配置文件里同名项可以覆盖
-        Config.rememberSoupSpeed(textureKey(), speedMul);
+        Config.rememberSoupSpeed(textureKey(), speedMul);   // 构造参数 speedMul 即定义里的默认速度
     }
 
+    /** 这个汤底的定义（登记表里的同一份）。 */
+    public SoupDef def() {
+        return def;
+    }
+
+    // mryt233 改（2026-11-11，第四批 4B-2）：下面所有访问器和玩法方法都转给 SoupDef（实现搬过去了），
+    // 签名与数值不变；游戏里的调用点已改成问登记表 Soups 拿定义，这个枚举留给单测、探针和联动兼容。
+
     public String nameKey() {
-        return "text." + HotPot.MOD_ID + "." + nameKey;
+        return def.nameKey();
     }
 
     /**
@@ -211,58 +178,50 @@ public enum SoupBase {
     }
 
     /**
-     * 方块状态里的汤面值（{@link SoupVisual}）。
-     * mryt233 改（2026-11-10）：以前是 SoupVisual.fromBase 自己按名字循环找，现在两边都只按名字推，
-     * 找不到由 {@link SoupVisual#verifyAgainstSoupBases()} 在启动时报错。
+     * 方块状态里的汤面值（{@link SoupVisual}）。内置项按名字推，找不到由
+     * {@link SoupVisual#verifyAgainstSoupBases()} 在启动时报错。
      */
     public SoupVisual visual() {
-        for (SoupVisual candidate : SoupVisual.values()) {
-            if (candidate != SoupVisual.NONE && candidate.getSerializedName().equals(textureKey())) {
-                return candidate;
-            }
-        }
-        throw new IllegalStateException(
-            "汤底 " + name() + " 在 SoupVisual 里没有对应的汤面值（textureKey=" + textureKey() + "）");
+        return def.visual();
     }
 
     /**
-     * 手里这件是不是「加进清汤里」的锅底料（不是直接倒的汤）：番茄 / 三鲜锅底料，以及联动登记成番茄锅底的东西（农夫乐事的番茄）。
+     * 手里这件是不是「加进清汤里」的锅底料（不是直接倒的汤）：番茄 / 三鲜锅底料，以及联动登记成番茄锅底的东西。
      * 汤底桶（source）是直接倒的。2026-10-26 用户定。
      */
     public boolean isAdditive(ItemStack stack) {
-        return additive != null && !stack.is(sourceItem.get());
+        return def.isAdditive(stack);
     }
 
     public float speedMul() {
-        // 配置文件里的 soup_speed.<名字> 优先，没写就用枚举里的默认值
-        return Config.soupSpeed(textureKey(), speedMul);
+        return def.speedMul();
     }
 
     /** 倒进锅里的原料（水桶、牛奶桶、蘑菇煲、岩浆桶），舀出来时原样还回去。 */
     public Item source() {
-        return sourceItem.get();
+        return def.source();
     }
 
     public Item remainder() {
-        return remainderItem;
+        return def.remainder();
     }
 
-    /** 若手持物品可以当汤底倒入锅中，返回对应汤底，否则 null。 */
+    /**
+     * 若手持物品可以当汤底倒入锅中，返回对应汤底，否则 null。
+     * mryt233 改（2026-11-11，4B-2）：游戏里的调用点已改用 {@link Soups#fromStack}；这里保留枚举版本。
+     */
     public static SoupBase fromStack(ItemStack stack) {
         for (SoupBase base : BY_ID) {
-            if (stack.is(base.sourceItem.get()) || (base.additive != null && stack.is(base.additive.get()))) {
+            if (base.def.matchesSource(stack)) {
                 return base;
             }
         }
         return customSource(stack);
     }
 
-    /**
-     * 一碗汤的物品 ID，和显示名对得上（r102）：清汤 clear_broth_bowl、高汤 rich_stock_bowl ……
-     * mryt233 改（2026-11-10）：原来是一个 switch，现在写在枚举构造参数里。
-     */
+    /** 一碗汤的物品 ID，和显示名对得上（r102）：清汤 clear_broth_bowl、高汤 rich_stock_bowl …… */
     public String bowlId() {
-        return bowlId;
+        return def.bowlId();
     }
 
     public static SoupBase byId(int id) {
@@ -271,7 +230,8 @@ public enum SoupBase {
 
     /**
      * mryt233 改（2026-11-05，r136a）：从汤底的贴图名（{@link #textureKey()}，如 "spicy"）查回枚举。
-     * 菜上记着 COOKED_IN_SOUP 组件，吃的时候用这个查回汤底给风味加成；查不到（旧存档 / 别的模组乱写）返回 null。
+     * 菜上记着 COOKED_IN_SOUP 组件；查不到（旧存档 / 别的模组乱写）返回 null。
+     * mryt233 改（2026-11-11，4B-2）：游戏里的调用点已改用 {@link Soups#get(String)}。
      */
     public static SoupBase byTextureKey(String key) {
         if (key == null) {
@@ -291,204 +251,129 @@ public enum SoupBase {
      */
     public static final int DEFAULT_BOWL_HUNGER = 4;
 
-    /** 一碗汤的默认饱和度系数：高汤、三鲜汤更「浓」一些（用户定的）。mryt233 改（2026-11-10）：改成每个值自己的字段。 */
+    /** 一碗汤的默认饱和度系数：高汤、三鲜汤更「浓」一些（用户定的）。 */
     public float defaultBowlSaturation() {
-        return defaultBowlSaturation;
+        return def.defaultBowlSaturation();
     }
 
-    /**
-     * mryt233 改（2026-11-06，r139 / r140）：主效果的默认时长（tick），风味与数值按用户任务单定。
-     * 清汤速度 15 秒、高汤抗性 15 秒、菌汤生命恢复 10 秒、红汤力量 6 秒、番茄急迫 15 秒、三鲜水下呼吸 20 秒。
-     * mryt233 改（2026-11-10）：时长和效果种类都改成枚举构造参数。
-     */
+    /** 主效果的默认时长（tick）。清汤速度 15 秒、高汤抗性 15 秒、菌汤生命恢复 10 秒、红汤力量 6 秒、番茄急迫 15 秒、三鲜水下呼吸 20 秒。 */
     public int defaultDuration() {
-        return defaultDuration;
+        return def.defaultDuration();
     }
 
-    /**
-     * mryt233 改（2026-11-06，r139 / r140）：副效果的默认时长（tick）。每锅汤底最多两条正面效果，
-     * 第二条风味放在这里；没有副效果就是 0（不加）。
-     * 清汤饱和 1 tick（清爽解腻，一闪而过）、高汤伤害吸收 30 秒、红汤速度 6 秒、三鲜幸运 30 秒。
-     */
+    /** 副效果的默认时长（tick）；没有副效果就是 0。清汤饱和 1 tick、高汤伤害吸收 30 秒、红汤速度 6 秒、三鲜幸运 30 秒。 */
     public int defaultSecondDuration() {
-        return defaultSecondDuration;
+        return def.defaultSecondDuration();
     }
 
     /** 负面「饥饿」效果的默认时长：只有红汤有（特辣 6 秒，3 级特辣顺延至 8 秒，象征吃辣开胃易饿）。 */
     public int defaultHungerDuration() {
-        return defaultHungerDuration;
+        return def.defaultHungerDuration();
     }
 
     /** 「抗火」效果的默认时长：只有红汤有（15 秒，特辣以上才加；变态辣翻倍到 30 秒）。 */
     public int defaultFireDuration() {
-        return defaultFireDuration;
+        return def.defaultFireDuration();
     }
 
-    /** 这种汤底喝下 / 吃下时会不会解掉「反胃」（清汤、番茄汤）。mryt233 改（2026-11-10）：「是不是清汤或番茄」改成属性。 */
+    /** 这种汤底喝下 / 吃下时会不会解掉「反胃」（清汤、番茄汤）。 */
     public boolean clearsNausea() {
-        return clearsNausea;
+        return def.clearsNausea();
     }
 
     /** 这种汤底是不是红汤（吃特辣以上会点嘴上火苗、别处按「红汤」特判的地方看这一条）。 */
     public boolean isSpicy() {
-        return spicy;
+        return def.spicy();
     }
 
     /** 一碗汤回多少饥饿点数；配置 soup_bowl.&lt;汤底&gt;.hunger 优先。 */
     public int bowlHunger() {
-        return Config.soupBowlInt(textureKey(), "hunger", defaultBowlHunger);
+        return def.bowlHunger();
     }
 
     /** 一碗汤的饱和度系数；配置 soup_bowl.&lt;汤底&gt;.saturation 优先。 */
     public float bowlSaturation() {
-        return Config.soupBowlFloat(textureKey(), "saturation", defaultBowlSaturation);
+        return def.bowlSaturation();
     }
 
-    // ---------------------------------------------------------------- 配色（mryt233 改 2026-11-10）
+    // ---------------------------------------------------------------- 配色
 
     /** 锅里界面汤面色块：底色。 */
     public int screenBase() {
-        return screenBase;
+        return def.screenBase();
     }
 
     /** 锅里界面汤面色块：高光。 */
     public int screenHi() {
-        return screenHi;
+        return def.screenHi();
     }
 
     /** 锅里界面汤面色块：暗部。 */
     public int screenLo() {
-        return screenLo;
+        return def.screenLo();
     }
 
     /** 锅里界面上浮着的食材小点颜色（3 个，轮流用）。 */
     public int[] screenBits() {
-        return screenBits.clone();
+        return def.screenBits();   // 记录里读出来就是拷贝
     }
 
     /** 沸腾气泡的体色。 */
     public int bubbleBody() {
-        return bubbleBody;
+        return def.bubbleBody();
     }
 
     /** 沸腾气泡的高光色。 */
     public int bubbleHi() {
-        return bubbleHi;
+        return def.bubbleHi();
     }
 
-    /**
-     * 这种汤底自己那一套效果（不含红汤按辣度加强的部分）。
-     * 返回 null 表示这条效果不存在。
-     */
+    /** 这种汤底自己那一套效果（不含红汤按辣度加强的部分）；null 表示这条效果不存在。 */
     Holder<MobEffect> mainEffect() {
-        return mainEffect;
+        return def.mainEffect();
     }
 
     Holder<MobEffect> secondEffect() {
-        return secondEffect;
+        return def.secondEffect();
     }
 
     Holder<MobEffect> fireEffect() {
-        return fireEffect;
+        return def.fireEffect();
     }
 
     Holder<MobEffect> hungerEffect() {
-        return hungerEffect;
+        return def.hungerEffect();
     }
 
     /**
-     * 煮熟食物被吃下 / 一碗汤喝下时附加的效果（正负皆有，风味所在）。
-     * mryt233 改（2026-11-05）：时长和等级改成每次现读配置 soup_bowl.&lt;汤底&gt;，
-     * 改完 /orientshotpot reload 立即生效（以前写死在这里）。时长配成 0 或更小就不加这个效果。
-     * mryt233 改（2026-11-10，r147）：效果种类改成读枚举构造参数，不再是一个大 switch；
-     * 红汤按辣度加强的那一段留在 {@link #spicyBonusEffects(int)} 里，因为那是红汤独有的算法。
+     * 煮熟食物被吃下 / 一碗汤喝下时附加的效果（正负皆有，风味所在）。时长和等级现读配置 soup_bowl.&lt;汤底&gt;，
+     * 改完 /orientshotpot reload 立即生效。实现和各汤底的风味说明在 {@link SoupDef#dishBonusEffects(int)}。
      */
     public List<MobEffectInstance> dishBonusEffects() {
-        return dishBonusEffects(0);
+        return def.dishBonusEffects();
     }
 
-    /**
-     * 汤底给菜品 / 汤碗的风味加成。
-     * <p>mryt233 改（2026-11-06，r139）：按各汤底真实风味重排效果（用户任务单「汤底风味 Buff 映射合理化」）：
-     * <ul>
-     *   <li><b>红汤</b>（麻辣浓烈、发汗驱寒）：力量 + 移动速度；特辣 / 变态辣再追加抗火与适度饥饿（吃辣开胃易饿）。</li>
-     *   <li><b>清汤</b>（原汁原味、轻盈健步）：移动速度 I 15 秒 + 饱和度 1 tick（清爽解腻）。</li>
-     *   <li><b>高汤</b>（牛骨老鸡浓汤、坚韧滋补）：抗性提升 I 15 秒 + 伤害吸收 I 30 秒；<b>彻底移除缓慢</b>。</li>
-     *   <li><b>菌汤</b>（山珍菌菇、活血养生）：生命恢复 I 10 秒。</li>
-     *   <li><b>番茄汤</b>（酸甜浓郁、生津开胃）：急迫 I 15 秒（精力充沛）；喝下 / 吃下时另解反胃（见 {@link SoupBowlItem}）。</li>
-     *   <li><b>三鲜汤</b>（干贝海米、鲜掉眉毛）：水下呼吸 20 秒 + 幸运 I 30 秒（时来运转）。</li>
-     * </ul>
-     * 食材在哪种汤里煮出来就带哪种效果（HotPotCookingRun 写 COOKED_IN_SOUP 组件，吃的时候由
-     * LivingEntityEatMixin / {@link SoupBowlItem} 结算）。辣度超出 0..3 夹回来，传 0 就是微辣。
-     * 时长与等级全部现读配置：duration / amplifier 是主效果，second_duration / second_amplifier 是副效果，
-     * fire_* 与 hunger_* 只红汤用；任何一项配成 0 或不配（默认 0）就不加。
-     */
+    /** 带辣度档位的风味加成（红汤按辣度加强，其他汤底忽略辣度）。 */
     public List<MobEffectInstance> dishBonusEffects(int spicyLevel) {
-        if (spicy) {
-            // 红汤：辣度越高越上头，力量与速度的时长随档位递加，中辣起力量再升一级；
-            // 特辣 / 变态辣再加抗火（变态辣翻倍）与开胃易饿（越辣越饿）。
-            // mryt233 改（2026-11-10）：保留特判——这是红汤独有的「按辣度档位加强」算法，不是单纯的属性。
-            return spicyBonusEffects(spicyLevel);
-        }
-        List<MobEffectInstance> list = new ArrayList<>();
-        String id = textureKey();
-        int amplifier = Config.soupBowlInt(id, "amplifier", 0);
-        addEffect(list, mainEffect, Config.soupBowlInt(id, "duration", defaultDuration), amplifier);
-        addEffect(list, secondEffect, Config.soupBowlInt(id, "second_duration", defaultSecondDuration),
-            Config.soupBowlInt(id, "second_amplifier", 0));
-        return list;
-    }
-
-    /** 红汤按辣度档位加强的那一段（mryt233 改 2026-11-10：从 dishBonusEffects 拆出来，注明这是红汤独有的玩法）。 */
-    private List<MobEffectInstance> spicyBonusEffects(int spicyLevel) {
-        List<MobEffectInstance> list = new ArrayList<>();
-        String id = textureKey();
-        int ticks = Config.soupBowlInt(id, "duration", defaultDuration);
-        int amplifier = Config.soupBowlInt(id, "amplifier", 0);
-        int secondTicks = Config.soupBowlInt(id, "second_duration", defaultSecondDuration);
-        int secondAmp = Config.soupBowlInt(id, "second_amplifier", 0);
-        int spicy = Math.max(0, Math.min(3, spicyLevel));
-        // 越辣越上头：力量与速度的时长随档位递加，中辣起力量再升一级。
-        // 配成 0 的那一项保持关闭（不加辣度带来的时长），和别的汤底一样「0 = 不加」。
-        if (ticks > 0) {
-            ticks += spicy * 60;
-            amplifier += spicy >= 1 ? 1 : 0;
-        }
-        addEffect(list, mainEffect, ticks, amplifier);
-        int speedAdd = spicy == 1 ? 60 : (spicy == 2 ? 80 : (spicy >= 3 ? 120 : 0));
-        addEffect(list, secondEffect, secondTicks > 0 ? secondTicks + speedAdd : 0, secondAmp);
-        if (spicy >= 2) {
-            // 特辣 / 变态辣：发汗驱寒（抗火，变态辣加倍）+ 开胃易饿（饥饿，越辣越饿）
-            int fireTicks = Config.soupBowlInt(id, "fire_duration", defaultFireDuration);
-            addEffect(list, fireEffect, spicy >= 3 ? fireTicks * 2 : fireTicks,
-                Config.soupBowlInt(id, "fire_amplifier", 0));
-            int hungerTicks = Config.soupBowlInt(id, "hunger_duration", defaultHungerDuration);
-            // 配成 0 表示「红汤不加饥饿」：这时不再按辣度往上加，玩家的配置说了算
-            if (hungerTicks > 0 && spicy >= 3) {
-                hungerTicks += 40;
-            }
-            addEffect(list, hungerEffect, hungerTicks, Config.soupBowlInt(id, "hunger_amplifier", 0));
-        }
-        return list;
-    }
-
-    /** mryt233 改（2026-11-05）：按配置的时长加效果；时长 &lt;= 0 或这条效果不存在就不加。 */
-    private static void addEffect(List<MobEffectInstance> list, Holder<MobEffect> effect, int ticks, int amplifier) {
-        if (effect == null || ticks <= 0) {
-            return;
-        }
-        list.add(new MobEffectInstance(effect, ticks, amplifier, false, true));
+        return def.dishBonusEffects(spicyLevel);
     }
 
     static {
+        // mryt233 改（2026-11-11，第四批 4B-1）：先把六个内置定义按枚举顺序登记成登记表的前 6 项，
+        // 再做下面的配置模板记录和汤面核对。HotPotRuntime.install 在读配置之前强制初始化本类，
+        // 保证内置项在 Config.init 之前登记完。
+        for (SoupBase base : BY_ID) {
+            Soups.registerBuiltin(base.def);
+        }
+        Soups.builtinsDone();
         // mryt233 改（2026-11-06，r139）：六种汤碗的默认营养和效果记进配置模板。
         // 每种汤底都写满一组键（没有的效果登记 0），玩家打开配置文件就能看到全部可调项：
         // duration / amplifier 主效果，second_duration / second_amplifier 副效果，
         // fire_* 抗火、hunger_* 饥饿（这两组只有红汤用）。原来的 slow_* 已随「高汤不再缓慢」一起删掉。
         for (SoupBase base : BY_ID) {
-            Config.rememberSoupBowl(base.textureKey(), DEFAULT_BOWL_HUNGER, base.defaultBowlSaturation,
-                base.defaultDuration, 0, base.defaultSecondDuration, 0,
-                base.defaultFireDuration, 0, base.defaultHungerDuration, 0);
+            Config.rememberSoupBowl(base.textureKey(), DEFAULT_BOWL_HUNGER, base.defaultBowlSaturation(),
+                base.defaultDuration(), 0, base.defaultSecondDuration(), 0,
+                base.defaultFireDuration(), 0, base.defaultHungerDuration(), 0);
         }
         // 启动时核对「方块状态里的汤面」和「汤底枚举」一一对得上（不一致就直接报错，别等到进游戏才发现）
         SoupVisual.verifyAgainstSoupBases();

@@ -36,12 +36,13 @@ import java.util.function.Predicate;
  * <ul>
  *   <li>钩子（{@code register*}）：模组初始化 / 兼容模块 setup 时登记，之后一直有效，随时可以注销。</li>
  *   <li>锅专用产物 {@link HotPotCooking#potResult}、煮过头 {@link HotPotCooking#overcook}、
- *       第三方汤底来源 {@link SoupBase#registerSource}、第三方燃料 {@link HotPotFuel#registerCustomSource}：
+ *       第三方汤底来源 {@link SoupBase#registerSource}、汤底登记表 {@link Soups}、第三方燃料 {@link HotPotFuel#registerCustomSource}：
  *       这些表在<b>服务端开始启动那一刻</b>冻结（{@link #freezeRegistries()}，单人和专用服都会走到）。
  *       冻结之后再登记会抛 {@link IllegalStateException}，异常里写明是哪张表。
  *       冻结点在 {@link HotPotHooks#freezeRegistries()}：Fabric 在 {@code ServerLifecycleEvents.SERVER_STARTING}，
- *       NeoForge 在 {@code ServerAboutToStartEvent}——两边都晚于兼容模块（Fabric 初始化末尾 /
- *       NeoForge {@code FMLCommonSetupEvent}）。</li>
+ *       NeoForge 在 {@code ServerStartingEvent}（{@code HotPotRuntime} 的 {@code onServerStarting} 回调，
+ *       不是 {@code ServerAboutToStartEvent}；mryt233 改 2026-11-11 更正此前的说法）——两边都晚于兼容模块
+ *       （Fabric 初始化末尾 / NeoForge {@code FMLCommonSetupEvent}）。</li>
  * </ul>
  * <p>为什么冻结一次就一直冻：单人游戏退出世界再进另一个世界时不会重新登记，也不需要「解冻 / 再冻结」；
  * 若允许每次开服重新解冻，就会出现「刚进新世界那一小段窗口期里，晚到的第三方登记能够悄悄改掉已生效的表」
@@ -90,11 +91,14 @@ public final class HotPotHooks {
      * 冻结所有「登记期可写、之后只读」的表。
      * <p>mryt233 改（2026-11-10，r147）：服务端开始启动时调用（单人和专用服都覆盖），
      * 确保两个加载器上的兼容模块都已经登记完。重复调用是幂等的。</p>
-     * <p>冻结点：Fabric {@code ServerLifecycleEvents.SERVER_STARTING}／NeoForge {@code ServerAboutToStartEvent}。</p>
+     * <p>冻结点：Fabric {@code ServerLifecycleEvents.SERVER_STARTING}／NeoForge {@code ServerStartingEvent}
+     * （都是 {@code HotPotRuntime} 的 {@code onServerStarting} 回调；mryt233 改 2026-11-11 更正旧注释里的
+     * {@code ServerAboutToStartEvent}）。</p>
      */
     public static void freezeRegistries() {
         HotPotCooking.freezeRegistries();
         SoupBase.freezeSources();
+        Soups.freeze();   // mryt233 改（2026-11-11，4B-1）：汤底登记表
         HotPotFuel.freezeSources();
         if (!HotPotCooking.registriesFrozen()) {
             throw new IllegalStateException("登记表冻结失败");

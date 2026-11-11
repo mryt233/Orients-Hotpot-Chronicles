@@ -15,7 +15,7 @@ final class HotPotSoup {
     }
 
     static SoupVisual visual(HotPotBlockEntity be) {
-        return SoupVisual.fromBase(SoupBase.byId(be.bases[0]));
+        return SoupVisual.fromDef(Soups.byIndex(be.bases[0]));
     }
 
     /** 锅里有没有汤（鸳鸯 / 田字锅任一边有就算）。 */
@@ -40,9 +40,9 @@ final class HotPotSoup {
     }
 
     /** 这一格泡在哪种汤里（不用的格子 / 那边没汤 = null）。 */
-    static SoupBase forSlot(HotPotBlockEntity be, int slot) {
+    static SoupDef forSlot(HotPotBlockEntity be, int slot) {
         int side = be.layout().sideOfSlot(slot);
-        return side == PotLayout.NONE ? null : SoupBase.byId(baseOfSide(be, side));
+        return side == PotLayout.NONE ? null : Soups.byIndex(baseOfSide(be, side));
     }
 
     /** 拿碗盛汤盛哪边：准星那格那边有汤就盛那边，没有就盛另一边。 */
@@ -62,6 +62,6 @@ final class HotPotSoup {
 
     /** 方块状态里的汤面：九宫格锅照汤底；鸳鸯锅的汤面由渲染器按两边画，方块状态一律空。 */
     static SoupVisual blockVisual(HotPotBlockEntity be) {
-        return be.layout().multiSoup() ? SoupVisual.NONE : SoupVisual.fromBase(SoupBase.byId(be.bases[0]));
+        return be.layout().multiSoup() ? SoupVisual.NONE : SoupVisual.fromDef(Soups.byIndex(be.bases[0]));
     }
 }

@@ -7,7 +7,8 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronItem;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronProtection;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCriterion;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SeatEntity;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -104,8 +105,8 @@ abstract class LivingEntityEatMixin {
         // 状态效果；红汤再按它带来的辣度档位加强（0 微辣 ~ 3 变态辣）。
         String soupKey = stack.get(HotPotContent.COOKED_IN_SOUP);
         if (!world.isClientSide && soupKey != null) {
-            SoupBase soup =
-                SoupBase.byTextureKey(soupKey);
+            SoupDef soup =
+                Soups.get(soupKey);   // mryt233 改（2026-11-11，4B-2）：问登记表
             if (soup != null) {
                 LivingEntity self = (LivingEntity) (Object) this;
                 int spicy = stack.getOrDefault(HotPotContent.SPICY_LEVEL, 0);
@@ -126,7 +127,7 @@ abstract class LivingEntityEatMixin {
                 // 变态辣且没解辣：嘴上 2 秒火苗，纯节目效果（前面刚给了抗火，不扣血）
                 // mryt233 改（2026-11-06，r139）：穿着布围裙就不点嘴上这簇火——布围裙挡的是溅起来的滚油与明火。
                 // mryt233 改（2026-11-10）：红汤判断改成 isSpicy() 属性
-                if (soup.isSpicy()
+                if (soup.spicy()
                     && spicy >= 3 && !calmSpicy
                     && !ClothApronItem.wornBy(self)) {
                     self.setRemainingFireTicks(Math.max(self.getRemainingFireTicks(), 40));

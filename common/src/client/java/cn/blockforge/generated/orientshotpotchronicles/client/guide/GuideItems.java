@@ -2,7 +2,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.client.guide;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.component.CustomData;
@@ -33,8 +34,12 @@ public final class GuideItems {
         } else if (parts.length > 1) {
             try {
                 CompoundTag nbt = new CompoundTag();
-                nbt.putInt("Base", SoupBase.valueOf(
-                    parts[1].toUpperCase(Locale.ROOT)).ordinal());
+                // mryt233 改（2026-11-11，4B-2）：按名字问登记表，查不到沿用原来的“未知汤底”告警；仍写序号键 Base
+                SoupDef soup = Soups.get(parts[1].toLowerCase(Locale.ROOT));
+                if (soup == null) {
+                    throw new IllegalArgumentException(parts[1]);
+                }
+                nbt.putInt("Base", Soups.indexOf(soup));
                 stack.set(HotPotContent.POT_CONTENTS,
                     CustomData.of(nbt));
             } catch (IllegalArgumentException e) {

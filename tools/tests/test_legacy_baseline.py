@@ -144,5 +144,27 @@ class ScenarioTests(unittest.TestCase):
             self.assertEqual(json.loads(text)["soup_bowl"]["spicy"]["duration"], 240)
 
 
+class RuleValueAndConfigTests(unittest.TestCase):
+    def test_rule_can_restrict_old_and_new_values(self):
+        rules = [{"entry": "t", "path": "Facing", "kind": "added", "new": "east|south", "reason": "r"}]
+        self.assertEqual(lb.rule_allows(rules, "t", "added", "Facing", "", "east"), "r")
+        self.assertIsNone(lb.rule_allows(rules, "t", "added", "Facing", "", "up"))
+
+    def test_shipped_r146_allow_file_loads_and_matches_defaults(self):
+        rules = lb.load_allow(str(Path(lb.__file__).with_name("legacy_baseline_allow_r146.json")))
+        self.assertTrue(lb.rule_allows(rules, "table_oak_mixed", "added", "Plates[3].Facing", "", "south"))
+        self.assertTrue(lb.rule_allows(rules, "table_oak_mixed", "added", "Plates[3].ChopsticksYaw", "", "135.0f"))
+        self.assertIsNone(lb.rule_allows(rules, "pot_clear", "added", "Facing", "", "east"))
+
+    def test_compare_config_separates_values_from_doc_text(self):
+        old = {"_format": 1, "_字段说明": {"a": "旧"}, "x": {"y": 1, "z": 2}}
+        new = {"_format": 1, "_字段说明": {"a": "新"}, "x": {"y": 1, "z": 3, "w": 4}}
+        r = lb.compare_config(old, new)
+        self.assertEqual(r["changed"], [("x.z", 2, 3)])
+        self.assertEqual(r["added"], ["x.w"])
+        self.assertEqual(r["removed"], [])
+        self.assertEqual(r["doc_changed"], ["_字段说明.a"])
+
+
 if __name__ == "__main__":
     unittest.main()

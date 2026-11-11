@@ -337,7 +337,7 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
         boolean potHit = isPotHit(state, pos, hit);
         boolean hasPot = state.getValue(POT).hasPot();
         boolean servingTool = HotPotInteraction.isServingTool(stack);
-        boolean soupSource = SoupBase.fromStack(stack) != null;
+        boolean soupSource = Soups.fromStack(stack) != null;
         boolean ingredient = HotPotCooking.acceptable(world, stack);
         // mryt233 改（2026-11-05，r136a）：辣椒加辣、冰块降辣也算「冲着锅去的」，否则会被放行去开灶膛界面
         boolean spicyModifier = HotPotBlockEntity.isSpicyModifier(stack);
@@ -364,7 +364,7 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
     /** 手里这件东西是不是冲着锅去的（捞取工具、汤底、食材、调辣度的辣椒 / 冰块）。 */
     private static boolean potRelated(Level world, ItemStack stack) {
         return HotPotInteraction.isServingTool(stack)
-            || SoupBase.fromStack(stack) != null
+            || Soups.fromStack(stack) != null
             || HotPotBlockEntity.isSpicyModifier(stack)   // mryt233 改（2026-11-05，r136a）
             || HotPotCooking.acceptable(world, stack);
     }

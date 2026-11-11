@@ -247,7 +247,7 @@ public final class HotPotInteraction {
             }
             return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
         }
-        if (checks == null ? SoupBase.fromStack(stack) != null : checks[3]) {
+        if (checks == null ? Soups.fromStack(stack) != null : checks[3]) {
             if (!world.isClientSide && !be.pourSoup(player, hand, HotPotInteraction.sideFromHit(be, player, pos, hit, innerMin, innerSize))) {
                 return Use.blockItem(UseOutcome.FAIL, world.isClientSide);
             }

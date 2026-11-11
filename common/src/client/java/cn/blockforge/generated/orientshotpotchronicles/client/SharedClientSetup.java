@@ -18,7 +18,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import cn.blockforge.orient.framework.client.ClientItemRenderers;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.ItemStack;
@@ -52,8 +53,8 @@ public final class SharedClientSetup {
                         return 0F;
                     }
                     CompoundTag nbt = data.copyTag();
-                    SoupBase soup = nbt.contains("Base") ? SoupBase.byId(nbt.getInt("Base")) : null;
-                    return soup == null ? 0F : (soup.ordinal() + 1) / 10F;
+                    SoupDef soup = nbt.contains("Base") ? Soups.byIndex(nbt.getInt("Base")) : null;
+                    return soup == null ? 0F : (Soups.indexOf(soup) + 1) / 10F;
                 });
         }
         // 鸳鸯 / 田字锅的物品：锅身方块模型 + 按物品里存的每边汤底画汤面（任意组合都对，不用为每种组合做模型；新增）
