@@ -2,6 +2,7 @@
 package cn.blockforge.generated.orientshotpotchronicles.devtest;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.*;
+import cn.blockforge.generated.orientshotpotchronicles.client.HotPotConfigScreen;
 import cn.blockforge.orient.framework.client.ClientContent;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
@@ -53,7 +54,7 @@ public final class Opt3dClientProbe {
             server.execute(() -> server.getCommands().performPrefixedCommand(
                 server.getPlayerList().getPlayer(uuid).createCommandSourceStack().withPermission(4), args.get(1).getAsString()));
         } else if (action.equals("save_config")) {
-            if (!(mc.screen instanceof cn.blockforge.generated.orientshotpotchronicles.client.HotPotConfigScreen screen)) {
+            if (!(mc.screen instanceof HotPotConfigScreen screen)) {
                 throw new IllegalStateException("config screen required");
             }
             try {

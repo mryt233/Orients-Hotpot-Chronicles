@@ -1,3 +1,14 @@
+// mryt233 改（2026-11-11）：对应火锅本体 GuiKit，保留调用侧状态与配色。
+function inRect(mouse, x, y, w, h) {
+  return mouse && mouse[0] >= x && mouse[0] < x + w && mouse[1] >= y && mouse[1] < y + h;
+}
+function copperButton(g, x, y, w, h, bg, topColor) {
+  g.fill(x, y, x + w, y + h, bg);
+  g.fill(x, y, x + w, y + 1, topColor);
+}
+function valueBox(g, x, y, w, h, bg, topColor) {
+  copperButton(g, x, y, w, h, bg, topColor);
+}
 // Web ports of this mod's GUI screens for the workspace mod viewer (../../viewer).
 // Keep in sync with the Java screens when they change:
 //   stove  ← client/StoveScreen.java + hotpot/StoveScreenHandler.java
@@ -992,7 +1003,7 @@ function gbItemName(g, id) {
   return path;
 }
 // result item → { cells: 9 item ids (first item of a tag), count, kind: "grid" | "stonecutter" | "furnace", input }
-// (= GuideBookScreen.findRecipe / drawRecipe: crafting first, then stonecutting / smelting / smoking / campfire)
+// (= GuideRecipes.findRecipe / draw: crafting first, then stonecutting / smelting / smoking / campfire)
 const GB_CRAFT = /crafting_(shaped|shapeless)|soup_bucket/;
 function gbRecipe(id) {
   const pick = (ing) => {
@@ -1016,7 +1027,7 @@ function gbRecipe(id) {
   return { cells, count: (j.result && j.result.count) || 1, kind, input: pick(j.ingredient) };
 }
 // "<pot>#<soup>" (a pot holding that broth) → the pot item model with that soup surface, e.g. iron_hot_pot_tomato;
-// "<id>#lit" → the "<id>_lit" item model (the lit stove) (= GuideBookScreen.stack)
+// "<id>#lit" → the "<id>_lit" item model (the lit stove) (= GuideItems.of)
 function gbIcon(id) {
   if (id.endsWith("#lit")) return id.slice(0, -4) + "_lit";
   const m = /^(.*):(iron|copper)_nine_grid_hotpot#(\w+)$/.exec(id);
@@ -1025,7 +1036,7 @@ function gbIcon(id) {
 function gbTitle(g, e) {
   return e.title || gbItemName(g, e.icon);
 }
-// = GuideBookScreen.layout: one header block + the entry's blocks in source order, poured into columns
+// = GuideLayout.layout: one header block + the entry's blocks in source order, poured into columns
 const GB_ICON_STEP = 18, GB_ICON_PER_ROW = 6;
 function gbWrap(g, text, w) {
   return g.wrap(text === null || text === undefined ? "" : String(text), w);
@@ -1094,7 +1105,7 @@ function gbLayout(g, e) {
       } else if (b.k === "rule") flow.push({ kind: "rule", h: 7 });
     }
   }
-  // a block taller than a page (long English paragraphs, notes) is cut by lines, like GuideBookScreen.splitBlock
+  // a block taller than a page (long English paragraphs, notes) is cut by lines, like GuideLayout.splitBlock
   const splitBlock = (el) => {
     if (el.h <= GB.COL_H) return [el];
     if (el.kind === "icons") {
@@ -1137,9 +1148,6 @@ function gbState(s) {
   const entries = GB_CATS[cat] ? GB_CATS[cat].entries : [];
   const entry = Math.max(0, Math.min(parseInt(s.entry, 10) || 0, entries.length - 1));
   return { cat, entry, entries, e: entries[entry] };
-}
-function gbIn(m, x, y, w, h) {
-  return m && m[0] >= x && m[0] < x + w && m[1] >= y && m[1] < y + h;
 }
 // mryt233 改（2026-11-07）：固定步距、独立书签滚动与全文搜索，和游戏内书本保持一致。
 function gbStrip(s) {
@@ -1212,13 +1220,13 @@ function gbDrawSearch(g, s, mouse) {
   g.fill(x + 3, y + 3, x + w - 3, y + h - 3, 0xffdfc9a3);
   g.fill(x + 4, y + 4, x + w - 4, y + h - 4, 0xfff5ecd8);
   g.item("minecraft:compass", x + 7, y + 7);
-  g.text("×", x + w - 16, y + 10, gbIn(mouse, x + w - 20, y + 5, 16, 18) ? GB_COL.warn : GB_COL.heading);
+  g.text("×", x + w - 16, y + 10, inRect(mouse, x + w - 20, y + 5, 16, 18) ? GB_COL.warn : GB_COL.heading);
   g.fill(x + 6, y + 26, x + w - 6, y + 27, 0xffdfc9a3);
   g.enableScissor(x + 5, y + 31, x + w - 5, y + 31 + listH);
   for (let i = 0; i < s._hits.length; i++) {
     const ry = y + 31 + i * row - (s._hitScroll || 0), hit = s._hits[i];
     if (ry + row <= y + 31 || ry >= y + 31 + listH) continue;
-    if (gbIn(mouse, x + 5, ry, w - 10, row)) g.fill(x + 5, ry, x + w - 5, ry + row, 0x40dfc9a3);
+    if (inRect(mouse, x + 5, ry, w - 10, row)) g.fill(x + 5, ry, x + w - 5, ry + row, 0x40dfc9a3);
     g.item(gbIcon(hit.icon), x + 7, ry + 4);
     g.text(gbFit(g, hit.title, w - 38), x + 28, ry + 2, GB_COL.heading);
     g.text(gbFit(g, hit.snippet, w - 38), x + 28, ry + 13, GB_COL.muted);
@@ -1287,20 +1295,20 @@ const guideBook = {
     let hoverCat = -1, hoverEntry = -1;
     GB_CATS.forEach((c, i) => {
       const ty = catY(i);
-      const hover = !s._searchOpen && gbIn(mouse, bx - GB.CAT_W, ty, GB.CAT_W, catH);
+      const hover = !s._searchOpen && inRect(mouse, bx - GB.CAT_W, ty, GB.CAT_W, catH);
       if (hover) hoverCat = i;
       g.texture(GB_TEX, bx - 24 - (i === cat || hover ? 4 : 0), ty, 280, i === cat ? 24 : 0, GB.CAT_W, GB.TAB_H, 512, 256);
     });
     g.enableScissor(strip.left, by - 26, strip.right, by);
     entries.forEach((x, i) => {
       const tx = entX(i);
-      const hover = !s._searchOpen && gbIn(mouse, strip.left, by - 26, strip.right - strip.left, 26)
-        && gbIn(mouse, tx, by - 23, GB.ENTRY_W, 23);
+      const hover = !s._searchOpen && inRect(mouse, strip.left, by - 26, strip.right - strip.left, 26)
+        && inRect(mouse, tx, by - 23, GB.ENTRY_W, 23);
       if (hover) hoverEntry = i;
       g.texture(GB_TEX, tx, by - 20 - (i === entry || hover ? 3 : 0), 312, i === entry ? 24 : 0, GB.ENTRY_W, GB.TAB_H, 512, 256);
     });
     g.disableScissor();
-    const hoverSearch = gbIn(mouse, strip.searchX, by - 23, GB.ENTRY_W, 23);
+    const hoverSearch = inRect(mouse, strip.searchX, by - 23, GB.ENTRY_W, 23);
     g.enableScissor(strip.searchX, by - 26, strip.searchX + GB.ENTRY_W, by);
     g.texture(GB_TEX, strip.searchX, by - 20 - (s._searchOpen || hoverSearch ? 3 : 0), 312, s._searchOpen ? 24 : 0, GB.ENTRY_W, GB.TAB_H, 512, 256);
     g.disableScissor();
@@ -1378,7 +1386,7 @@ const guideBook = {
             g.texture(GB_TEX, gx + 74, gy + 18, 340, 0, 18, 18, 512, 256);
             g.item(id, gx + 75, gy + 19, count);
           } else {
-            // stonecutter / furnace: one ingredient, arrow, one result; small label above (= GuideBookScreen.drawRecipe)
+            // stonecutter / furnace: one ingredient, arrow, one result; small label above (= GuideRecipes.draw)
             const sx = gx + 12, sy = gy + 4;
             g.texture(GB_TEX, sx, sy, 340, 0, 18, 18, 512, 256);
             if (input) g.item(input, sx + 1, sy + 1);
@@ -1399,8 +1407,8 @@ const guideBook = {
     s._links = links;
     const atStart = cat === 0 && entry === 0 && spread === 0;
     const atEnd = cat === GB_CATS.length - 1 && entry === entries.length - 1 && spread === spreads - 1;
-    if (!atStart) g.texture(GB_TEX, bx + GB.LEFT_X, by + 159, gbIn(mouse, bx + GB.LEFT_X - 2, by + 158, 13, 11) ? 370 : 360, 0, 9, 9, 512, 256);
-    if (!atEnd) g.texture(GB_TEX, bx + GB.W - GB.LEFT_X - 9, by + 159, gbIn(mouse, bx + GB.W - GB.LEFT_X - 11, by + 158, 13, 11) ? 370 : 360, 9, 9, 9, 512, 256);
+    if (!atStart) g.texture(GB_TEX, bx + GB.LEFT_X, by + 159, inRect(mouse, bx + GB.LEFT_X - 2, by + 158, 13, 11) ? 370 : 360, 0, 9, 9, 512, 256);
+    if (!atEnd) g.texture(GB_TEX, bx + GB.W - GB.LEFT_X - 9, by + 159, inRect(mouse, bx + GB.W - GB.LEFT_X - 11, by + 158, 13, 11) ? 370 : 360, 9, 9, 9, 512, 256);
     if (spreads > 1) { const p = `${spread + 1} / ${spreads}`; g.text(p, bx + GB.RIGHT_X + GB.COL_W / 2 - g.width(p) / 2, by + 160, GB_COL.muted); }
     if (s._searchOpen) gbDrawSearch(g, s, mouse);
     if (hoverSearch) g.tooltip(["搜索"], mouse[0], mouse[1], w, GB.BY + GB.H);
@@ -1413,37 +1421,37 @@ const guideBook = {
     const { BX: bx, BY: by } = GB;
     const m = [mx, my];
     const strip = gbStrip(s);
-    if (gbIn(m, strip.searchX, by - 23, GB.ENTRY_W, 23)) { s._searchOpen = !s._searchOpen; return true; }
+    if (inRect(m, strip.searchX, by - 23, GB.ENTRY_W, 23)) { s._searchOpen = !s._searchOpen; return true; }
     if (s._searchOpen) {
       const { x, y, w, row, listH } = GB_FIND;
-      if (gbIn(m, x + w - 20, y + 5, 16, 18)) { s._searchOpen = false; return true; }
-      if (gbIn(m, x + 5, y + 31, w - 10, listH)) {
+      if (inRect(m, x + w - 20, y + 5, 16, 18)) { s._searchOpen = false; return true; }
+      if (inRect(m, x + 5, y + 31, w - 10, listH)) {
         const hit = (s._hits || [])[Math.floor((my - y - 31 + (s._hitScroll || 0)) / row)];
         if (hit) { gbSearchJump(s, hit); return true; }
       }
       return false;
     }
     if (strip.max > 0) {
-      if (gbIn(m, bx + 6, by - 26, 8, 26)) { s._entryScroll = Math.max(0, s._entryScroll - GB.ENTRY_STEP * 3); return true; }
-      if (gbIn(m, strip.right, by - 26, 8, 26)) { s._entryScroll = Math.min(strip.max, s._entryScroll + GB.ENTRY_STEP * 3); return true; }
+      if (inRect(m, bx + 6, by - 26, 8, 26)) { s._entryScroll = Math.max(0, s._entryScroll - GB.ENTRY_STEP * 3); return true; }
+      if (inRect(m, strip.right, by - 26, 8, 26)) { s._entryScroll = Math.min(strip.max, s._entryScroll + GB.ENTRY_STEP * 3); return true; }
     }
     const catStep = GB_CATS.length <= 1 ? GB.TAB_H
       : Math.min(GB.TAB_H, Math.max(9, Math.floor((GB.H - GB.TAB_H - 6) / (GB_CATS.length - 1))));
     const catH = GB.TAB_H;
-    for (let i = 0; i < GB_CATS.length; i++) if (gbIn(m, bx - GB.CAT_W, by + 6 + i * catStep, GB.CAT_W, catH)) { s.cat = String(i); s.entry = "0"; s.spread = "0"; return true; }
+    for (let i = 0; i < GB_CATS.length; i++) if (inRect(m, bx - GB.CAT_W, by + 6 + i * catStep, GB.CAT_W, catH)) { s.cat = String(i); s.entry = "0"; s.spread = "0"; return true; }
     const { cat, entry, entries } = gbState(s);
-    for (let i = 0; i < entries.length; i++) if (gbIn(m, strip.left, by - 26, strip.right - strip.left, 26)
-      && gbIn(m, strip.x(i), by - 23, GB.ENTRY_W, 23)) { s.entry = String(i); s.spread = "0"; return true; }
-    for (const [x, y, w2, h, c2, e2] of s._links || []) if (gbIn(m, x, y, w2, h)) { s.cat = String(c2); s.entry = String(e2); s.spread = "0"; return true; }
+    for (let i = 0; i < entries.length; i++) if (inRect(m, strip.left, by - 26, strip.right - strip.left, 26)
+      && inRect(m, strip.x(i), by - 23, GB.ENTRY_W, 23)) { s.entry = String(i); s.spread = "0"; return true; }
+    for (const [x, y, w2, h, c2, e2] of s._links || []) if (inRect(m, x, y, w2, h)) { s.cat = String(c2); s.entry = String(e2); s.spread = "0"; return true; }
     const spreads = s._spreads || 1;
     const spread = Math.min(parseInt(s.spread, 10) || 0, spreads - 1);
     const go = (c, en, sp) => { s.cat = String(c); s.entry = String(en); s.spread = String(sp); return true; };
-    if (gbIn(m, bx + GB.LEFT_X - 2, by + 158, 13, 11)) {
+    if (inRect(m, bx + GB.LEFT_X - 2, by + 158, 13, 11)) {
       if (spread > 0) return go(cat, entry, spread - 1);
       if (entry > 0) return go(cat, entry - 1, 9);
       if (cat > 0) return go(cat - 1, GB_CATS[cat - 1].entries.length - 1, 9);
     }
-    if (gbIn(m, bx + GB.W - GB.LEFT_X - 11, by + 158, 13, 11)) {
+    if (inRect(m, bx + GB.W - GB.LEFT_X - 11, by + 158, 13, 11)) {
       if (spread < spreads - 1) return go(cat, entry, spread + 1);
       if (entry < entries.length - 1) return go(cat, entry + 1, 0);
       if (cat < GB_CATS.length - 1) return go(cat + 1, 0, 0);
@@ -1453,11 +1461,11 @@ const guideBook = {
   wheel(s, mx, my, dx, dy) {
     const strip = gbStrip(s), { x, y, w, row, listH } = GB_FIND;
     if (s._searchOpen) {
-      if (gbIn([mx, my], x + 5, y + 31, w - 10, listH)) s._hitScroll = Math.max(0,
+      if (inRect([mx, my], x + 5, y + 31, w - 10, listH)) s._hitScroll = Math.max(0,
         Math.min(Math.max(0, (s._hits || []).length * row - listH), (s._hitScroll || 0) + Math.sign(dy) * row));
       return true;
     }
-    if (gbIn([mx, my], GB.BX, GB.BY - 26, GB.W, 28)) {
+    if (inRect([mx, my], GB.BX, GB.BY - 26, GB.W, 28)) {
       s._entryScroll = Math.max(0, Math.min(strip.max, s._entryScroll + Math.sign(dy || dx) * GB.ENTRY_STEP * 2));
       return true;
     }
@@ -1493,7 +1501,7 @@ const guideBook = {
 // players actually touch) and 高级 (everything else in collapsible groups, collapsed by default).
 // 和 Java 一样的规矩：面板宽度随画布自适应、每行只放一项、名字换行不截断、超出滚轮 / 滚动条、
 // [- 数值 +]（Shift 一次走 10 步）、点数值可直接键入（输错标红、不让保存）、↺ 只在当前值 ≠ 默认值时出现、
-// 「恢复默认」点一次变确认态再点一次才生效。默认值 / 范围全部照 Config.rememberXxx 和 Config.rule() 抄。
+// 「恢复默认」点一次变确认态再点一次才生效。字段表对应 ConfigSchema；默认值 / 范围照 Config.rememberXxx 和 Config.rule()。
 // 网页预览不写任何配置文件：改过的数值只存在本界面的 preview state 里；键入沿用 canvas 的 key 事件（Java 是 EditBox）。
 const CF = { W: 520, H: 390, TAB_W: 100, TAB_H: 20, TAB_GAP: 4, BTN: 16, VALUE_W: 108, RESET_W: 14,
   CTRL_GAP: 2, ROW_MIN_H: 30, HEADER_H: 20, BOTTOM_H: 20, SCROLL_W: 5, SCROLL_STEP: 24, LIST_TOP: 60 };
@@ -1815,21 +1823,18 @@ function cfListArea(s) {
   const bottom = CF.H - CF.BOTTOM_H - 16 - (s._noticeHeight || 0);
   return { top, bottom, view: Math.max(1, bottom - top) };
 }
-function cfIn(mouse, x, y, w, h) {
-  return !!mouse && mouse[0] >= x && mouse[0] < x + w && mouse[1] >= y && mouse[1] < y + h;
-}
 function cfCentre(g, text, cx, y, color, shadow) {
   g.text(text, cx - g.width(text) / 2, y, color, shadow !== false);
 }
-// 超宽就等比缩小（= Java drawFitted）
-function cfFit(g, text, cx, y, max, color) {
+// 超宽就等比缩小（= GuiKit.fittedText）
+function fittedText(g, text, cx, y, max, color) {
   if (g.width(text) <= max) { cfCentre(g, text, cx, y, color); return; }
   const k = Math.max(0.6, max / g.width(text));
   g.textScaled(text, cx - (g.width(text) * k) / 2, y + (1 - k) * 4, k, color, true);
 }
 function cfHeaderRow(g, s, el, lx, y, lw, mouse) {
   const open = s.expanded.indexOf(el.grp.id) >= 0;
-  const hover = cfIn(mouse, lx, y, lw, el.h);
+  const hover = inRect(mouse, lx, y, lw, el.h);
   g.fill(lx, y, lx + lw, y + el.h - 1, hover ? 0x30b47a1c : 0x204a2e12);
   g.fill(lx, y + el.h - 1, lx + lw, y + el.h, BRASS_DARK);
   g.text((open ? "\u25BE " : "\u25B8 ") + el.grp.title + "  (" + el.grp.fields.length + ")", lx + 6,
@@ -1843,7 +1848,7 @@ function cfHeaderRow(g, s, el, lx, y, lw, mouse) {
 function cfFieldRow(g, s, el, lx, y, lw, mouse) {
   const f = el.f, key = cfFieldKey(f);
   const area = cfListArea(s);
-  const hover = cfIn(mouse, lx, y, lw, el.h);
+  const hover = inRect(mouse, lx, y, lw, el.h);
   g.fill(lx, y, lx + lw, y + el.h - 1, hover ? 0x30ffffff : CF_COL.stripe);
   let labelX = lx + 6;
   const icon = f.item ? g.icons.get(f.item) : null;
@@ -1861,9 +1866,8 @@ function cfFieldRow(g, s, el, lx, y, lw, mouse) {
   const by = y + Math.floor((el.h - CF.BTN) / 2);
   const visible = (yy, hh) => yy >= area.top && yy + hh <= area.bottom;
   [[minusX, "-", -1], [plusX, "+", 1]].forEach(([bx, mark, dir]) => {
-    const hot = cfIn(mouse, bx, by, CF.BTN, CF.BTN);
-    g.fill(bx, by, bx + CF.BTN, by + CF.BTN, hot ? CF_COL.hover : CF_COL.panel);
-    g.fill(bx, by, bx + CF.BTN, by + 1, BRASS);
+    const hot = inRect(mouse, bx, by, CF.BTN, CF.BTN);
+    copperButton(g, bx, by, CF.BTN, CF.BTN, hot ? CF_COL.hover : CF_COL.panel, BRASS);
     cfCentre(g, mark, bx + CF.BTN / 2, by + 4, hot ? TITLE : CF_COL.text);
     if (!visible(by, CF.BTN)) return;
     s._acts.push({ x: bx, y: by, w: CF.BTN, h: CF.BTN, run: () => {
@@ -1875,11 +1879,9 @@ function cfFieldRow(g, s, el, lx, y, lw, mouse) {
     } });
   });
   const valueY = y + Math.floor((el.h - 16) / 2);
-  const vHover = cfIn(mouse, valueX, valueY, vw, 16);
+  const vHover = inRect(mouse, valueX, valueY, vw, 16);
   const editing = s.editing === key;
-  g.fill(valueX, valueY, valueX + vw, valueY + 16,
-    editing ? CF_COL.typedBg : (vHover ? CF_COL.valueBgHover : CF_COL.valueBg));
-  g.fill(valueX, valueY, valueX + vw, valueY + 1, vHover || editing ? BRASS_HI : BRASS_DARK);
+  valueBox(g, valueX, valueY, vw, 16, editing ? CF_COL.typedBg : (vHover ? CF_COL.valueBgHover : CF_COL.valueBg), vHover || editing ? BRASS_HI : BRASS_DARK);
   if (editing) {
     // 正在键入：把玩家敲的原文画在框里，不合法的标红（Java 里是 EditBox 的文字色）
     const typed = String(s.typed == null ? "" : s.typed);
@@ -1898,9 +1900,8 @@ function cfFieldRow(g, s, el, lx, y, lw, mouse) {
   }
   // ↺：只在当前值 ≠ 默认值（或输错了）时出现（= Java drawFieldControls）
   if (Math.abs(cfValue(s, f) - f.def) >= 5e-4 || s.bad[key] != null) {
-    const hot = cfIn(mouse, resetX, by, CF.RESET_W, CF.BTN);
-    g.fill(resetX, by, resetX + CF.RESET_W, by + CF.BTN, hot ? CF_COL.hover : CF_COL.panel);
-    g.fill(resetX, by, resetX + CF.RESET_W, by + 1, BRASS);
+    const hot = inRect(mouse, resetX, by, CF.RESET_W, CF.BTN);
+    copperButton(g, resetX, by, CF.RESET_W, CF.BTN, hot ? CF_COL.hover : CF_COL.panel, BRASS);
     cfCentre(g, "\u21BA", resetX + CF.RESET_W / 2, by + 3, hot ? TITLE : CF_COL.muted);
     if (visible(by, CF.BTN)) {
       s._acts.push({ x: resetX, y: by, w: CF.RESET_W, h: CF.BTN, run: () => {
@@ -1961,12 +1962,11 @@ const configScreen = {
     const startX = Math.floor((w - (CF.TAB_W * 2 + CF.TAB_GAP)) / 2);
     [["common", "常用"], ["advanced", "高级"]].forEach(([id, label], i) => {
       const x = startX + i * (CF.TAB_W + CF.TAB_GAP), y = 24;
-      const active = tab === id, hover = cfIn(s._mouse, x, y, CF.TAB_W, CF.TAB_H);
-      g.fill(x, y, x + CF.TAB_W, y + CF.TAB_H, active ? CF_COL.hover : (hover ? 0xff4a2e12 : CF_COL.panel));
-      g.fill(x, y, x + CF.TAB_W, y + 1, active ? BRASS_HI : BRASS);
+      const active = tab === id, hover = inRect(s._mouse, x, y, CF.TAB_W, CF.TAB_H);
+      copperButton(g, x, y, CF.TAB_W, CF.TAB_H, active ? CF_COL.hover : (hover ? 0xff4a2e12 : CF_COL.panel), active ? BRASS_HI : BRASS);
       if (active) g.fill(x, y + CF.TAB_H - 2, x + CF.TAB_W, y + CF.TAB_H, BRASS_HI);
       const key = CF_KEY("tab." + id);
-      cfFit(g, g.tr(key) === key ? label : g.tr(key), x + CF.TAB_W / 2, y + 6, CF.TAB_W - 8,
+      fittedText(g, g.tr(key) === key ? label : g.tr(key), x + CF.TAB_W / 2, y + 6, CF.TAB_W - 8,
         active ? TITLE : CF_COL.text);
       s._acts.push({ x, y, w: CF.TAB_W, h: CF.TAB_H, run: () => { s.tab = id; s._scroll = 0; s.editing = null; } });
     });
@@ -1999,9 +1999,8 @@ const configScreen = {
       percents.forEach((percent, i) => {
         const x = x0 + i * (qw + 4), y = hintY + 13;
         const chosen = Number(s.particles) === percent;
-        const hover = cfIn(s._mouse, x, y, qw, 12);
-        g.fill(x, y, x + qw, y + 12, chosen ? CF_COL.hover : (hover ? 0xff4a2e12 : CF_COL.panel));
-        g.fill(x, y, x + qw, y + 1, BRASS);
+        const hover = inRect(s._mouse, x, y, qw, 12);
+        copperButton(g, x, y, qw, 12, chosen ? CF_COL.hover : (hover ? 0xff4a2e12 : CF_COL.panel), BRASS);
         cfCentre(g, percent + "%", x + qw / 2, y + 2, chosen ? TITLE : CF_COL.text);
         s._acts.push({ x, y, w: qw, h: 12, run: () => {
           s.particles = percent;
@@ -2044,12 +2043,11 @@ const configScreen = {
     [["save", "保存并生效"], ["reset", "恢复默认"], ["cancel", "取消"]].forEach(([id, label], i) => {
       const x = bx0 + i * (btnW + gap);
       const confirming = i === 1 && s._confirm === true;
-      const hover = cfIn(s._mouse, x, by, btnW, CF.BOTTOM_H);
-      g.fill(x, by, x + btnW, by + CF.BOTTOM_H, confirming ? 0x60b47a1c : (hover ? 0xff4a2e12 : CF_COL.panel));
-      g.fill(x, by, x + btnW, by + 1, confirming ? CF_COL.confirm : BRASS);
+      const hover = inRect(s._mouse, x, by, btnW, CF.BOTTOM_H);
+      copperButton(g, x, by, btnW, CF.BOTTOM_H, confirming ? 0x60b47a1c : (hover ? 0xff4a2e12 : CF_COL.panel), confirming ? CF_COL.confirm : BRASS);
       const key = CF_KEY(id);
       const text = confirming ? "再点一次确认" : (g.tr(key) === key ? label : g.tr(key));
-      cfFit(g, text, x + btnW / 2, by + 6, btnW - 6, confirming ? CF_COL.confirm : CF_COL.text);
+      fittedText(g, text, x + btnW / 2, by + 6, btnW - 6, confirming ? CF_COL.confirm : CF_COL.text);
       const act = { x, y: by, w: btnW, h: CF.BOTTOM_H, run: () => {
         if (i === 0) {
           if (Object.keys(s.bad).length) {
@@ -2099,7 +2097,7 @@ const configScreen = {
       return true;
     }
     for (const act of s._acts || []) {
-      if (!cfIn([mx, my], act.x, act.y, act.w, act.h)) continue;
+      if (!inRect([mx, my], act.x, act.y, act.w, act.h)) continue;
       if (s.editing) {
         // 点别处：先把这一项的输入结算掉（合法写进副本；不合法标红留着）
         const f = s._fields ? s._fields[s.editing] : null;

@@ -1,10 +1,11 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+import static cn.blockforge.generated.orientshotpotchronicles.client.RenderSprites.sprite;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.RenderType;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -109,10 +110,6 @@ public class SauceStationRenderer implements BlockEntityRenderer<SauceStationBlo
             return null;
         }
         return sp;
-    }
-
-    private static TextureAtlasSprite sprite(ResourceLocation id) {
-        return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(id);
     }
 
     /**

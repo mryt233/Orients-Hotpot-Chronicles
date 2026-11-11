@@ -1,5 +1,7 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+import static cn.blockforge.generated.orientshotpotchronicles.client.RenderSprites.sprite;
+
 // mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlock;
@@ -13,7 +15,6 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual;
 import java.util.List;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.RenderType;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -226,10 +227,6 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
                 sprite(STILL[soup.ordinal()]), 255,
                 consumers.getBuffer(RenderType.entityCutout(TextureAtlas.LOCATION_BLOCKS)), matrices, light);
         }
-    }
-
-    private static TextureAtlasSprite sprite(ResourceLocation id) {
-        return Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(id);
     }
 
     /** 一边汤面的每一块：模型坐标的长方形换到世界（锅转了 90° 也跟着转），贴图按模型坐标取，和整张汤面贴图对得上。 */

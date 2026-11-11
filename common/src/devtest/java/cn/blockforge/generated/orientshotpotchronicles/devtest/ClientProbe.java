@@ -167,12 +167,15 @@ public final class ClientProbe {
                     }
                 }
 
+                // mryt233 改（2026-11-11）：只读排版导出，不进入成品包。
+                case "opt3h2" -> ConfigAt.run(mc, request.getAsJsonArray("extra"));
+                case "guideat" -> GuideAt.run(mc, request.getAsJsonArray("extra"));
                 case "guide" -> mc.setScreen(new GuideBookScreen());
                 // mryt233 改（2026-11-09，r146a）：截图用——打开游戏内设置界面
-                case "config" -> mc.setScreen(new cn.blockforge.generated.orientshotpotchronicles.client.HotPotConfigScreen(mc.screen));
+                case "config" -> mc.setScreen(new HotPotConfigScreen(mc.screen));
                 // 在设置界面里切页签 / 展开分组：extra = 参数（"advanced" / "expand:0" / "shift"）
                 case "configset" -> {
-                    if (!(mc.screen instanceof cn.blockforge.generated.orientshotpotchronicles.client.HotPotConfigScreen screen)) {
+                    if (!(mc.screen instanceof HotPotConfigScreen screen)) {
                         throw new IllegalStateException("Configset requires the config screen");
                     }
                     for (int i = 0; i < request.getAsJsonArray("extra").size(); i++) {
@@ -289,6 +292,8 @@ public final class ClientProbe {
         if (Boolean.getBoolean("hotpot.opt3c")) report.add("opt3c", Opt3cClientProbe.status());
         report.addProperty("screen", mc.screen == null ? "none" : mc.screen.getClass().getName());
         report.add("opt3d", Opt3dClientProbe.status());
+        report.add("guideat", GuideAt.result());
+        report.add("opt3h2", ConfigAt.result());
         report.addProperty("window_width", mc.getWindow().getWidth());
         report.addProperty("window_height", mc.getWindow().getHeight());
         report.addProperty("gui_width", mc.getWindow().getGuiScaledWidth());

@@ -5,6 +5,7 @@
 //   steam / stove flames ← hotpot/HotPotBlockEntity.clientTick
 //   heat ramp            ← clientHeat += (target - clientHeat) * 0.08 per tick
 // Animated block textures (boiling soup etc.) come from the models themselves.
+// mryt233 改（2026-11-11）：Java 方块图集查询移至 client/RenderSprites；此处绘制参数不变。
 import * as THREE from "three";
 import { BoxBatch, Particles, TexBoxBatch, hash, frac, easeOutCubic, easeInOutSine, mc, rand } from "/anim.js";
 

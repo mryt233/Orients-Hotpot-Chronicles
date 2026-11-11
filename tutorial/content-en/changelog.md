@@ -24,6 +24,7 @@ This page is updated with each release, **newest first**. The Development Previe
 <!-- mryt233 改（2026-11-11，r147 第三批 3G）。 -->
 - **Internal cleanup (no visible change)**: Right-click results and block save/load code now go through a small version-adapter module, making future ports to other Minecraft versions easier; gameplay and the save format are unchanged.<!--清单#150-->
 <!-- mryt233 改（2026-11-11，r147 第三批 3H 前半）。 -->
+- **Internal cleanup (no visible change)**: The guide book and settings screens were split into smaller parts by responsibility, and shared UI widgets plus one rendering lookup were merged into common helpers. Visuals, gameplay, config files and saves are unchanged.<!--清单#152-->
 - **Internal cleanup (no visible change)**: The hot pot block entity was split into smaller parts by responsibility, and the embedded framework was bumped to 0.2.0 with unused legacy interfaces removed. Gameplay and the save format are unchanged.<!--清单#151-->
 <!-- mryt233 改：r146d。 -->
 - **Bottle placement sounds**: full and partly drunk bottles play a bottle placement sound together with a gentle liquid sound. Orient Cola uses a clearer glass sound; empty bottles only play the bottle sound. This applies to both empty and occupied table surfaces.<!--清单#137-->

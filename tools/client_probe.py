@@ -15,7 +15,7 @@ def main():
     # mryt233 改（2026-11-10）：后台帧缓冲取证可显式延长等待，不改变默认行为。
     parser.add_argument("--timeout", type=float, default=25)
     parser.add_argument("id")
-    parser.add_argument("action", choices=("opt3d", "opt3c", "snapshot", "world", "language", "resize", "sauce", "sauceinput", "guide", "overview", "restock", "inventory", "creative", "aim",
+    parser.add_argument("action", choices=("opt3d", "opt3c", "snapshot", "opt3h2", "guideat", "world", "language", "resize", "sauce", "sauceinput", "guide", "overview", "restock", "inventory", "creative", "aim",
                                            "config", "configset", "wear", "view", "camera", "observe", "walk", "pose", "input", "useblock", "close", "disconnect", "stop"))
     parser.add_argument("extra", nargs="*")
     args = parser.parse_args()
@@ -40,7 +40,7 @@ def main():
     # mryt233 改（2026-11-09，r146a）：configset 的参数（advanced / common / expand:N）走 extra 数组
     # mryt233 改：合并实测增加真实按键与独立侧面跟拍输入。
     # mryt233 改（2026-11-10）：3C 专用请求沿用实例隔离与游戏内截图。
-    if args.action in ("opt3d", "opt3c", "configset", "wear", "view", "camera", "resize", "sauceinput", "language", "observe", "walk", "pose", "input", "useblock"):
+    if args.action in ("opt3h2", "guideat", "opt3d", "opt3c", "configset", "wear", "view", "camera", "resize", "sauceinput", "language", "observe", "walk", "pose", "input", "useblock"):
         payload["extra"] = list(args.extra)
     request = folder / "hotpot-probe-request.json"
     temp = request.with_suffix(".tmp")
