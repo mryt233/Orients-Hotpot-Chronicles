@@ -48,7 +48,7 @@ import java.util.List;
  * 一杯水 / 牛奶不回饥饿值（同原版），牛奶清掉所有效果。
  * 碰杯（干杯，r136b，2026-11-05 用户）：拿着装满饮品的玻璃杯，右键另一位持杯玩家、潜行对空气举杯、
  * 或者拿杯右键桌上摆着的满杯，都能碰一次杯；碰过的杯子上记 CHEERED 组件，喝下去多回 1 饥饿值、0.4 饱和度。作者：mryt233 */
-public class CupItem extends Item {
+public class CupItem extends Item implements TableItem {
     @Nullable
     private final DrinkKind kind;
 
@@ -75,8 +75,13 @@ public class CupItem extends Item {
     }
 
     @Override
+    public PlateBlock tableBlock(ItemStack stack) {
+        return HotPotContent.CUP_BLOCK;
+    }
+
+    @Override
     public InteractionResult useOn(UseOnContext context) {
-        return PlateItem.placeOn(context, HotPotContent.CUP_BLOCK, true);
+        return Use.item(TableObjects.placeOn(context, this), context.getLevel().isClientSide);
     }
 
     /** 物品栏里：空杯放在格子里，鼠标拿着饮料瓶右键点它 = 倒一杯（像原版收纳袋那样的点法）。 */

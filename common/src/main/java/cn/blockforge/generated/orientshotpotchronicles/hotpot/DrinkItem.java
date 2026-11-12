@@ -1,5 +1,7 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -23,7 +25,7 @@ import java.util.List;
  * 一瓶喝 4 口（用耐久条显示还剩多少），每口回 2 点饥饿值 + 种类自己的效果；喝完剩一个空瓶。
  * 点在方块顶面是摆上去（和盘子一样），对着空气右键是喝。配方先不做（用户）。
  * 作者：mryt233 */
-public class DrinkItem extends Item {
+public class DrinkItem extends Item implements TableItem {
     public static final int SIPS = 4;
     /** 每口的默认营养；实际值喝的时候读配置文件 drink.sip（代码检查 W7，mryt233 2026-11-01）。 */
     private static final int SIP_HUNGER = 2;
@@ -55,8 +57,18 @@ public class DrinkItem extends Item {
     }
 
     @Override
+    public PlateBlock tableBlock(ItemStack stack) {
+        return HotPotContent.DRINK_BLOCK;
+    }
+
+    @Override
+    public void playPlaceSound(Level world, BlockPos pos, ItemStack stack) {
+        DrinkBlock.playPlaceSound(world, pos, stack);
+    }
+
+    @Override
     public InteractionResult useOn(UseOnContext context) {
-        return PlateItem.placeOn(context, HotPotContent.DRINK_BLOCK, true);
+        return Use.item(TableObjects.placeOn(context, this), context.getLevel().isClientSide);
     }
 
     @Override

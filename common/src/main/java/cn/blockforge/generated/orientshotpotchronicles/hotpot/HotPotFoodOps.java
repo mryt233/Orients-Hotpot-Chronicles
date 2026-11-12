@@ -49,8 +49,9 @@ final class HotPotFoodOps {
             return false;
         }
         ItemStack held = player.getItemInHand(hand);
-        PlateBlock plateBlock = PlateItem.placedFor(held);
-        if (plateBlock == null || PlateItem.keepsSelf(held)) {
+        // mryt233 改（4H）：统一走 TableObjects 门面判断可自动摆上桌且非整件摆放的容器
+        PlateBlock plateBlock = TableObjects.placedFor(held);
+        if (plateBlock == null || TableObjects.keepsSelf(held)) {
             return false;
         }
         ItemContainerContents contents = held.getOrDefault(

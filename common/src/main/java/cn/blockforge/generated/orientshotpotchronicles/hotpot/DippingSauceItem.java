@@ -28,7 +28,7 @@ import java.util.List;
  * 能像盘子一样摆在桌上（筷子夹着菜点一下 = 蘸一口，效果记在菜上）；主手或副手拿着时，用筷子吃会自动蘸一口。
  * 蘸完 9 口变回原版的碗。名字一律叫「蘸料」，提示里列配料（用户）。
  * 作者：mryt233 */
-public class DippingSauceItem extends Item {
+public class DippingSauceItem extends Item implements TableItem {
     public DippingSauceItem() {
         super(new Item.Properties().stacksTo(1));
     }
@@ -141,11 +141,21 @@ public class DippingSauceItem extends Item {
     }
 
     @Override
+    public PlateBlock tableBlock(ItemStack stack) {
+        return HotPotContent.BOWL_BLOCK;
+    }
+
+    @Override
+    public ItemStack prepareForTable(ItemStack stack) {
+        return contents(stack).bites() > 0 ? stack : new ItemStack(Items.BOWL);
+    }
+
+    @Override
     public InteractionResult useOn(UseOnContext context) {
         if (context.getPlayer() != null && emptyBowlIfInvalid(context.getPlayer(), context.getHand())) {
             return Use.item(UseOutcome.SUCCESS, context.getLevel().isClientSide);
         }
-        return PlateItem.placeOn(context, HotPotContent.BOWL_BLOCK, true);
+        return Use.item(TableObjects.placeOn(context, this), context.getLevel().isClientSide);
     }
 
     @Override

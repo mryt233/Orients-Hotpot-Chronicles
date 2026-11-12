@@ -50,6 +50,9 @@ neoForge {
             if (project.hasProperty('hotpotExpreg')) {
                 systemProperty 'hotpot.expreg', 'true'
             }
+            if (project.hasProperty('hotpotOpt4g')) {
+                systemProperty 'hotpot.opt4g', 'true'
+            }
         }
         server {
             server()
@@ -61,6 +64,9 @@ neoForge {
             }
             if (project.hasProperty('hotpotExpreg')) {
                 systemProperty 'hotpot.expreg', 'true'
+            }
+            if (project.hasProperty('hotpotOpt4g')) {
+                systemProperty 'hotpot.opt4g', 'true'
             }
         }
     }

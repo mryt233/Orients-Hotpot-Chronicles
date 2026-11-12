@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.block.SoundType;
 
@@ -20,4 +23,28 @@ public class ChopstickRestBlock extends PlateBlock {
 
     @Override public double footprintLength() { return 9.5; }
     @Override public double footprintWidth() { return 4.5; }
+
+    // mryt233 改：桌面竹筷的高度、破坏粒子、朝向轴与不可叠架收口到 TableBlock 接口。
+    @Override
+    public boolean restsChopsticks(PlateHolderBlockEntity.Placed placed) {
+        return false;
+    }
+
+    @Override
+    public double tableHeight(PlateHolderBlockEntity.Placed placed) {
+        return PlateHolderBlockEntity.TABLE_CHOPSTICKS_H
+            + (Chopsticks.held(placed.self).isEmpty() ? 0 : PlateHolderBlockEntity.FOOD_H);
+    }
+
+    @Override
+    public BlockState breakParticleState(PlateHolderBlockEntity.Placed placed) {
+        // 迷你筷架没有单独的方块模型 json（由渲染器按代码画），挖掉时的碎屑改用竹板。
+        return Blocks.BAMBOO_PLANKS.defaultBlockState();
+    }
+
+    @Override
+    public void onLoadedOrAdded(PlateHolderBlockEntity.Placed placed, Direction facing) {
+        placed.axis = placed.facing.getAxis();
+        placed.chopsticksYaw = placed.axis == Direction.Axis.Z ? 135F : 45F;
+    }
 }

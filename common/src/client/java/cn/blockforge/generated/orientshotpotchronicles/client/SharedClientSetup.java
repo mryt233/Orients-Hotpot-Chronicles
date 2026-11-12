@@ -7,10 +7,10 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlock;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBowlItem;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.TableObjects;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -47,6 +47,8 @@ public final class SharedClientSetup {
     public static void registerItems() {
         SauceRender.register();
         HeldFoodItemRenderer.register();
+        // mryt233 改（4H）：桌面竹筷（迷你筷架 + 筷子）改走 TableBlockRenderers 回调登记。
+        TableBlockRenderers.registerBlock(HotPotContent.CHOPSTICK_REST_BLOCK, PlateHolderRenderer::renderChopstickRest);
         // 4F-3（mryt233）：通用汤碗（minecraft:builtin/entity）先画无汤面的木碗模型，再按 soup 组件画汤面
         ClientItemRenderers.register(HotPotContent.SOUP_BOWL,
             (stack, mode, matrices, consumers, light, overlay) -> {
@@ -121,9 +123,9 @@ public final class SharedClientSetup {
             return;
         }
         // 盘子和装菜的碗（r99）；汤碗、橙子饮料这种整件的不列菜
-        PlateBlock plate =
-            PlateItem.placedFor(stack);
-        if (plate == null || PlateItem.keepsSelf(stack)
+        // mryt233 改（4H）：先由 TableObjects 统一判定可自动摆上桌的物件，再排除整件摆放与空原版碗。
+        PlateBlock plate = TableObjects.placedFor(stack);
+        if (plate == null || TableObjects.keepsSelf(stack)
             || (stack.is(Items.BOWL) && !stack.has(DataComponents.CONTAINER))) {
             return;
         }

@@ -4,7 +4,6 @@ package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -18,8 +17,6 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -31,9 +28,24 @@ import net.minecraft.sounds.SoundSource;
  * Shift+右键桌面（或任何顶面能放东西的方块）的空白位置：把这双筷子（连同夹着的菜）直接摆到桌上，
  * 渲染器会在筷尖下方画一个迷你筷架（r136b，2026-11-05 用户，新增）。
  * 作者：mryt233 */
-public class ChopsticksItem extends Item {
+public class ChopsticksItem extends Item implements TableItem {
     public ChopsticksItem() {
         super(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON));
+    }
+
+    @Override
+    public PlateBlock tableBlock(ItemStack stack) {
+        return HotPotContent.CHOPSTICK_REST_BLOCK;
+    }
+
+    @Override
+    public boolean autoPlace(ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public void playAddSound(Level world, BlockPos pos, ItemStack stack) {
+        world.playSound(null, pos, SoundEvents.BAMBOO_PLACE, SoundSource.BLOCKS, 0.6F, 1.4F);
     }
 
     private static FoodProperties heldFood(ItemStack stack) {
@@ -83,7 +95,7 @@ public class ChopsticksItem extends Item {
             if (plate == null) {
                 // 点在盘子格的空白位置：把这一双竹筷（连夹着的菜）直接摆在桌上，渲染器会在筷尖下画迷你筷架。
                 // 空白处没有盘子可放菜，所以夹着菜也照摆（r136b，2026-11-05 用户，新增）
-                return placeTableChopsticks(context);
+                return Use.item(TableObjects.placeInHolderOrOn(context, this), world.isClientSide);
             }
             // mryt233 改：潜行绕过方块 useItemOn；夹菜点中心仍放菜/蘸料，点沿口连菜一起架放。
             double dx = hx - plate.x, dz = hz - plate.z;
@@ -119,41 +131,7 @@ public class ChopsticksItem extends Item {
             return Use.item(UseOutcome.PASS, world.isClientSide);
         }
         // 桌面 / 地面等方块的顶面：Shift+右键把这双筷子直接摆在上面（r136b，2026-11-05 用户，新增）
-        return placeTableChopsticks(context);
-    }
-
-    /**
-     * 把手里这一双竹筷（连同夹着的菜）直接摆到桌面上，靠的是借盘子格摆的一个
-     * {@link HotPotContent#CHOPSTICK_REST_BLOCK}；迷你筷架由渲染器画，方块本身不带模型。
-     * keepSelf = true，所以空手拿回来 / 挖掉时原样还回这双筷子。只在 Shift+右键桌面顶面时走到这里。
-     * （r136b，2026-11-05 用户，新增）
-     */
-    private static InteractionResult placeTableChopsticks(UseOnContext context) {
-        Level world = context.getLevel();
-        Player player = context.getPlayer();
-        BlockPos pos = context.getClickedPos();
-        // 火锅桌面的盘子格一般已经存在（点在桌面时射线打到的是那一格），这时要摆进眼前这一格，
-        // 不能走 placeOn 的「点到的方块上面一格」——那会摆到桌子顶上方的空气里
-        if (context.getClickedFace() == Direction.UP && world.getBlockState(pos).is(HotPotContent.PLATE_HOLDER)
-            && world.getBlockEntity(pos) instanceof PlateHolderBlockEntity holder) {
-            if (world.isClientSide) {
-                return Use.item(UseOutcome.SUCCESS, world.isClientSide);
-            }
-            double hx = (context.getClickLocation().x - pos.getX()) * 16;
-            double hz = (context.getClickLocation().z - pos.getZ()) * 16;
-            Direction.Axis axis = HotPotBlock.handleAxisFor(context.getHorizontalDirection());
-            if (holder.tryAdd(HotPotContent.CHOPSTICK_REST_BLOCK, axis, hx, hz, context.getItemInHand(), true,
-                context.getHorizontalDirection())) {
-                world.playSound(null, pos, SoundEvents.BAMBOO_PLACE, SoundSource.BLOCKS, 0.6F, 1.4F);
-                context.getItemInHand().consume(1, player);
-                return Use.item(UseOutcome.SUCCESS, world.isClientSide);
-            }
-            if (player != null) {
-                player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.plate_no_room")), true);
-            }
-            return Use.item(UseOutcome.FAIL, world.isClientSide);
-        }
-        return PlateItem.placeOn(context, HotPotContent.CHOPSTICK_REST_BLOCK, true);
+        return Use.item(TableObjects.placeInHolderOrOn(context, this), world.isClientSide);
     }
 
     @Override

@@ -232,31 +232,8 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
      * （：以前碎屑用默认状态，植物蛋白饮料挖掉飞出的是橙子饮料的碎屑，用户报）。
      */
     public static BlockState modelState(PlateHolderBlockEntity.Placed p) {
-        BlockState state = p.plate.defaultBlockState().setValue(PlateBlock.AXIS, p.axis);
-        if (p.plate instanceof BowlBlock
-            && p.self.getItem() instanceof SoupBowlItem bowl) {
-            SoupDef def = bowl.soupDef(p.self);
-            String raw = def == null ? bowl.rawSoupId(p.self) : null;
-            SoupVisual visual = def != null ? SoupVisual.fromDef(def)
-                : (raw != null && !raw.isEmpty() ? SoupVisual.OTHER : SoupVisual.NONE);
-            state = state.setValue(BowlBlock.SOUP, visual);
-        }
-        if (p.plate instanceof DrinkBlock) {
-            boolean empty = p.self.getItem() instanceof EmptyBottleItem;
-            DrinkKind kind = p.self.getItem() instanceof EmptyBottleItem e ? e.kind()
-                : p.self.getItem() instanceof DrinkItem d ? d.kind() : DrinkKind.ORANGE_DRINK;
-            state = state.setValue(DrinkBlock.EMPTY, empty).setValue(DrinkBlock.KIND, kind);
-        }
-        if (p.plate instanceof CupBlock) {
-            DrinkKind kind = p.self.getItem() instanceof CupItem cup ? cup.kind() : null;
-            state = state.setValue(DrinkBlock.EMPTY, kind == null).setValue(CupBlock.KIND, kind == null ? DrinkKind.ORANGE_DRINK : kind);
-        }
-        // mryt233 改（r146a，2026-11-08）：桌上的芝麻酱 / 蚝油瓶按 kind 选模型（渲染和挖掉时的碎屑共用）
-        if (p.plate instanceof SauceBottleBlock) {
-            SauceBottleKind kind = SauceBottleItem.kindOf(p.self);
-            state = state.setValue(SauceBottleBlock.KIND, kind == null ? SauceBottleKind.SESAME_PASTE : kind);
-        }
-        return state;
+        // mryt233 改（4H）：委托给 TableBlock#modelState
+        return p.plate.modelState(p);
     }
 
     /** 准星对着的是这一格里的哪个盘子（服务端和客户端同一套射线）。 */
@@ -279,12 +256,8 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
         if (plate == null) {
             return;
         }
-        BlockState plateState = modelState(plate);
-        if (plate.plate instanceof ChopstickRestBlock) {
-            // 迷你筷架没有单独的方块模型 json（由渲染器按代码画），挖掉时的碎屑改用竹板，
-            // 免得拿一个查不到模型的方块状态去生成粒子（r136b，2026-11-05 用户）
-            plateState = Blocks.BAMBOO_PLANKS.defaultBlockState();
-        }
+        // mryt233 改（4H）：碎屑粒子方块状态委托给 TableBlock#breakParticleState
+        BlockState plateState = plate.plate.breakParticleState(plate);
         world.levelEvent(null, LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(plateState));
         if (!player.isCreative()) {
             Block.popResource(world, pos, plate.toItem());
@@ -314,51 +287,23 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
             return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
         }
         double[] at = local(pos, hit);
-        // 拿饮料瓶右键桌上的空杯 = 倒一杯（2026-10-25，新增）；要在「再摆一个」之前判断，不然瓶子会被摆上去
+        // mryt233 改（4H）：对桌上已摆物件的点按交互（倒饮料/牛奶/水进空杯、满杯碰杯、筷子蘸料等）
+        // 统一委托给 TableBlock#useOnPlaced，且必须在自动补摆之前判断，避免拿着饮料右键空杯变成再摆一瓶。
         PlateHolderBlockEntity.Placed target = be.at(at[0], at[1]);
-        if (target != null && stack.getItem() instanceof DrinkItem drink && CupItem.isEmptyCup(target.self)) {
-            if (!world.isClientSide) {
-                target.self = new ItemStack(HotPotContent.cupFor(drink.kind()));
-                player.setItemInHand(hand, DrinkItem.pourOne(stack));
-                be.changed();
-                world.playSound(null, pos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 0.8F, 1.1F);
+        if (target != null) {
+            UseOutcome placedOutcome = target.plate.useOnPlaced(target, world, pos, be, player, hand, stack);
+            if (placedOutcome != UseOutcome.PASS) {
+                return Use.blockItem(placedOutcome, world.isClientSide);
             }
-            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
         }
-        // 拿水桶 / 奶桶右键桌上的空杯 = 倒一杯，桶不会空（2026-10-27 用户：原版的桶就无限倒）
-        DrinkKind fromBucket = CupItem.bucketKind(stack);
-        if (target != null && fromBucket != null && CupItem.isEmptyCup(target.self)) {
-            if (!world.isClientSide) {
-                target.self = new ItemStack(HotPotContent.cupFor(fromBucket));
-                be.changed();
-                world.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 0.6F, 1.2F);
-            }
-            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
-        }
-        // 拿着装满饮品的玻璃杯右键桌上摆着的满杯：跟桌上这杯碰一下（r136b，2026-11-05 用户，新增）
-        if (stack.getItem() instanceof CupItem handCup && handCup.kind() != null
-            && target != null && target.plate instanceof CupBlock
-            && target.self.getItem() instanceof CupItem tableCup && tableCup.kind() != null) {
-            if (!world.isClientSide) {
-                Vec3 at3 = Vec3.atCenterOf(pos).add(0, (lift(state) + PlateSize.CUP_H + 1.0) / 16.0, 0);
-                CupItem.cheers(world, player, stack, null, target.self, at3);
-                be.changed();   // 桌上的杯子也带上 CHEERED，客户端拿到的物品栈才是新的
-            }
-            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
-        }
-        PlateBlock placing = PlateItem.placedFor(stack);
+        PlateBlock placing = TableObjects.placedFor(stack);
         if (placing != null) {
             // 盘子、碗、汤碗、橙子饮料：在这一格再摆一个（r99 起碗和瓶子也走这里）
             if (!world.isClientSide) {
                 if (be.tryAdd(placing, HotPotBlock.handleAxisFor(player.getDirection()), at[0], at[1], stack,
-                    PlateItem.keepsSelf(stack))) {
+                    TableObjects.keepsSelf(stack))) {
                     // mryt233 改（r146d）：先按原物品辨认空瓶 / 饮料，再扣除，避免最后一个物品变成空栈。
-                    if (placing instanceof DrinkBlock) {
-                        DrinkBlock.playPlaceSound(world, pos, stack);
-                    } else {
-                        world.playSound(null, pos, placing.defaultBlockState().getSoundType().getPlaceSound(),
-                            SoundSource.BLOCKS, 1.0F, 1.0F);
-                    }
+                    TableObjects.playPlaceSound(world, pos, placing, stack);
                     stack.consume(1, player);
                 } else {
                     player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.plate_no_room")), true);
@@ -366,30 +311,11 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
             }
             return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
         }
-        PlateHolderBlockEntity.Placed plate = be.at(at[0], at[1]);
-        if (plate == null) {
+        if (target == null) {
             return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
         }
-        // 筷子夹着菜点桌上的蘸料碗 = 蘸一口，配料记在菜上，吃的时候生效
-        // （r103 有过，2026-10-23 去掉；2026-10-25 用户在开发计划「筷子新交互」里要回来。调整）
-        if (stack.is(HotPotContent.CHOPSTICKS) && plate.self.getItem() instanceof DippingSauceItem) {
-            if (!world.isClientSide) {
-                ItemStack held = Chopsticks.held(stack);
-                if (held.isEmpty() || !held.has(DataComponents.FOOD)) {
-                    player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.dip_need_food")), true);
-                } else {
-                    ItemStack dipped = held.copy();
-                    ItemStack left = DippingSauceItem.dipInto(plate.self, dipped);
-                    // 蘸完最后一口变回空碗：桌上这只碗变成能装菜的普通碗
-                    plate.self = left.getItem() instanceof DippingSauceItem ? left : ItemStack.EMPTY;
-                    Chopsticks.hold(stack, dipped);
-                    be.changed();
-                    world.playSound(null, pos, SoundEvents.HONEY_BLOCK_STEP, SoundSource.BLOCKS, 0.4F, 1.4F);
-                }
-            }
-            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
-        }
-        if (!plate.holdsFood() && (stack.is(HotPotContent.CHOPSTICKS) || PlateItem.holdsFood(world, stack))) {
+        PlateHolderBlockEntity.Placed plate = target;
+        if (!plate.holdsFood() && (stack.is(HotPotContent.CHOPSTICKS) || TableObjects.holdsFood(world, stack))) {
             // 汤碗、橙子饮料里放不了菜，也夹不出菜
             if (!world.isClientSide) {
                 player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.cannot_hold_food")), true);
@@ -427,7 +353,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
             }
             return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide);
         }
-        if (PlateItem.holdsFood(world, stack)) {
+        if (TableObjects.holdsFood(world, stack)) {
             if (!world.isClientSide) {
                 if (plate.add(stack)) {
                     stack.consume(1, player);

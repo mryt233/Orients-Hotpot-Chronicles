@@ -2,7 +2,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.compat.jade;
 
 // mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceBottleItem;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.ChopstickRestBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceBottleBlock;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock;
@@ -216,7 +217,7 @@ public final class HotPotJadePlugin implements IWailaPlugin {
                 appendMerged(merged, stack);
             }
         }
-        if (plate.self.is(HotPotContent.CHOPSTICKS)) {
+        if (plate.plate instanceof ChopstickRestBlock) {
             appendMerged(merged, Chopsticks.held(plate.self));
         }
         if (!plate.chopsticks.isEmpty()) {
@@ -308,8 +309,7 @@ public final class HotPotJadePlugin implements IWailaPlugin {
                     lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.sauce.bites"), contents.bites())
                         .withStyle(ChatFormatting.GRAY));
                 }
-            } else if (plate.self.getItem()
-                instanceof SauceBottleItem) {
+            } else if (plate.plate instanceof SauceBottleBlock) {
                 // mryt233 改（2026-11-09，r146c）：桌上的芝麻酱 / 蚝油瓶现在只是摆设——Jade 只显示名称
                 //（Jade 默认取方块名，PlateHolderBlock#getName 返回的就是这瓶的名字）+ 一行「怎么摆、怎么拿」；
                 // 效果说明和剩余次数两行随「桌上加料 / 每瓶次数」一起去掉了。
@@ -334,7 +334,7 @@ public final class HotPotJadePlugin implements IWailaPlugin {
                         lines.addAll(extra);
                     }
                 }
-            } else if (plate.self.is(HotPotContent.CHOPSTICKS)) {
+            } else if (plate.plate instanceof ChopstickRestBlock) {
                 SharedClientSetup.appendPlateTooltip(plate.self, lines);
             }
             if (!plate.chopsticks.isEmpty()) {

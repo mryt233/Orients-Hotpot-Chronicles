@@ -38,6 +38,9 @@ public final class SauceRender {
                     HotPotContent.BOWL_BLOCK.defaultBlockState(), matrices, consumers, light, overlay);
                 surface(DippingSauceItem.contents(stack).ids(), matrices, consumers, light);
             });
+        // mryt233 改（4H）：桌面蘸料碗酱面叠加改走 TableBlockRenderers 回调登记。
+        TableBlockRenderers.registerOverlay(HotPotContent.DIPPING_SAUCE,
+            (p, m, b, l) -> surface(DippingSauceItem.contents(p.self).ids(), m, b, l));
     }
 
     /** 酱面贴图（灰度，按调料平均色染色；tools/gen_sauce_station.py 的 bowl_surface_texture）。 */

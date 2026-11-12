@@ -1,7 +1,6 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 // mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
-import net.minecraft.world.item.Items;
 
 // mryt233 改（2026-11-11）：第三批 3G 存读档改走适配小包，键名与结构不变。
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.BeIo;
@@ -52,13 +51,11 @@ public class PlateHolderBlockEntity extends SyncedBlockEntity {
         public ItemStack chopsticks = ItemStack.EMPTY;
 
         /**
-         * 能不能架筷子：碗（空碗、汤碗、装菜的碗、蘸料碗）和盘子能，瓶子、杯子不能；
-         * 已经摆在桌上的筷子本身（{@link ChopstickRestBlock}）也不能再叠架第二双（r136b，2026-11-05 用户）。
+         * 能不能架筷子：委托给桌面方块 {@link TableBlock#restsChopsticks}。
+         * （mryt233 改，4H）
          */
         public boolean restsChopsticks() {
-            // mryt233 改（r146a，2026-11-08）：芝麻酱 / 蚝油瓶和饮料瓶、杯子一样，瓶口太小，架不了筷子
-            return !(plate instanceof DrinkBlock) && !(plate instanceof CupBlock)
-                && !(plate instanceof ChopstickRestBlock) && !(plate instanceof SauceBottleBlock);
+            return plate.restsChopsticks(this);
         }
 
         Placed(PlateBlock plate, double x, double z, Direction.Axis axis) {
@@ -118,27 +115,19 @@ public class PlateHolderBlockEntity extends SyncedBlockEntity {
          * 所以这里天然返回 false，不会往筷子上塞盘子菜（r136b，2026-11-05 用户）。
          */
         public boolean holdsFood() {
-            return self.isEmpty();
+            return plate.holdsFood(this);
         }
 
-        /** 变回手里的盘子物品（带着菜）；碗变回原版的碗，整件摆上来的原样还回去。 */
+        /** 变回手里的盘子物品（带着菜）；具体转换由桌面方块 {@link TableBlock#toTableItem} 负责。 */
         public ItemStack toItem() {
-            if (!self.isEmpty()) {
-                return self.copy();
-            }
-            ItemStack stack = plate instanceof BowlBlock ? new ItemStack(Items.BOWL) : new ItemStack(plate);
-            if (items.stream().anyMatch(s -> !s.isEmpty())) {
-                stack.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(items));
-            }
-            PlateItem.syncPlateModel(stack);
-            return stack;
+            return plate.toTableItem(this);
         }
     }
 
     private final List<Placed> plates = new ArrayList<>();
     private VoxelShape shape;
     /** 盘里的菜高出盘子多少像素（选中框 / 碰撞算上它）。 */
-    private static final double FOOD_H = 2.5;
+    static final double FOOD_H = 2.5;
 
     public PlateHolderBlockEntity(BlockPos worldPosition, BlockState state) {
         super(HotPotContent.PLATE_HOLDER_BE, worldPosition, state);
@@ -167,9 +156,10 @@ public class PlateHolderBlockEntity extends SyncedBlockEntity {
     public boolean tryAdd(PlateBlock plate, Direction.Axis axis, double hitX, double hitZ, ItemStack fromItem,
                           boolean keepSelf, Direction facing) {
         if (facing == null || !facing.getAxis().isHorizontal()) facing = Direction.EAST;
-        if (plate instanceof ChopstickRestBlock) axis = facing.getAxis();
         Placed p = new Placed(plate, 8, 8, axis);
         p.facing = facing;
+        // mryt233 改（4H）：onLoadedOrAdded 必须在算 halfX / halfZ 之前调用（例如竹筷会按朝向改轴向）
+        plate.onLoadedOrAdded(p, facing);
         double hx = p.halfX(), hz = p.halfZ();
         List<double[]> spots = new ArrayList<>();
         for (double x = hx; x <= 16 - hx + 1e-6; x += 0.5) {
@@ -183,7 +173,7 @@ public class PlateHolderBlockEntity extends SyncedBlockEntity {
                 p.x = s[0];
                 p.z = s[1];
                 if (keepSelf) {
-                    p.self = fromItem.copyWithCount(1);
+                    p.self = TableObjects.prepareForTable(fromItem).copyWithCount(1);
                 } else {
                     fromItem.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(p.items);
                 }
@@ -234,17 +224,8 @@ public class PlateHolderBlockEntity extends SyncedBlockEntity {
      * 直接摆在桌上的竹筷（{@link ChopstickRestBlock}）按筷架 + 筷子算（r136b，2026-11-05 用户）。
      */
     public static double heightOf(Placed p) {
-        if (p.plate instanceof ChopstickRestBlock) {
-            return TABLE_CHOPSTICKS_H + (Chopsticks.held(p.self).isEmpty() ? 0 : FOOD_H);
-        }
-        // mryt233 改（r146a，2026-11-08）：摆在桌上的芝麻酱 / 蚝油瓶按自己那种瓶子的高度算
-        // （芝麻酱矮罐 6 像素、蚝油细高瓶 8 像素，见 SauceBottleKind#bottleHeight）。
-        if (p.plate instanceof SauceBottleBlock) {
-            return SauceBottleBlock.heightOf(SauceBottleItem.kindOf(p.self));
-        }
-        DrinkKind kind = p.self.getItem() instanceof DrinkItem d ? d.kind()
-            : p.self.getItem() instanceof EmptyBottleItem e ? e.kind() : null;
-        return kind == null ? p.plate.size().height() : kind.bottleHeight();
+        // mryt233 改（4H）：委托给 TableBlock#tableHeight
+        return p.plate.tableHeight(p);
     }
 
     public static VoxelShape partShape(Placed p, double lift) {
@@ -309,7 +290,7 @@ public class PlateHolderBlockEntity extends SyncedBlockEntity {
                 // mryt233 改：旧档缺字段或字段损坏，使用构造时按 axis 得到的默认值。
                 Direction facing = Direction.byName(c.getString("Facing", ""));
                 if (facing != null && facing.getAxis().isHorizontal()) p.facing = facing;
-                if (plate instanceof ChopstickRestBlock) p.axis = p.facing.getAxis();
+                plate.onLoadedOrAdded(p, p.facing);
                 if (c.hasNumber("ChopsticksYaw")) {
                     float yaw = c.getFloat("ChopsticksYaw", 0F);
                     if (Float.isFinite(yaw)) p.chopsticksYaw = ((yaw % 360F) + 360F) % 360F;

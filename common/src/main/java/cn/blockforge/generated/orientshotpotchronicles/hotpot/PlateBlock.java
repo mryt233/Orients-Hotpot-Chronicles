@@ -16,7 +16,7 @@ import net.minecraft.core.Direction;
  * AXIS 只是给渲染选模型方向（长边沿 x 或 z）。
  * 2026-10-30 Mojang 映射迁移。
  */
-public class PlateBlock extends Block {
+public class PlateBlock extends Block implements TableBlock {
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
 
     private final String material;

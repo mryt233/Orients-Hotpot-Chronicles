@@ -40,4 +40,21 @@ public class SauceBottleBlock extends PlateBlock {
     public static double heightOf(SauceBottleKind kind) {
         return kind == null ? 8.0 : kind.bottleHeight();
     }
+
+    // mryt233 改：调料瓶桌面高度、状态与不可架筷收口到 TableBlock 接口。
+    @Override
+    public boolean restsChopsticks(PlateHolderBlockEntity.Placed placed) {
+        return false;
+    }
+
+    @Override
+    public double tableHeight(PlateHolderBlockEntity.Placed placed) {
+        return heightOf(SauceBottleItem.kindOf(placed.self));
+    }
+
+    @Override
+    public BlockState modelState(PlateHolderBlockEntity.Placed placed) {
+        SauceBottleKind kind = SauceBottleItem.kindOf(placed.self);
+        return super.modelState(placed).setValue(KIND, kind == null ? SauceBottleKind.SESAME_PASTE : kind);
+    }
 }

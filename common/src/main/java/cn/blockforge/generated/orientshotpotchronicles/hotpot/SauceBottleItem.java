@@ -4,7 +4,6 @@ package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 // mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
-import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.food.FoodProperties;
@@ -36,7 +35,7 @@ import java.util.List;
  * <p>照竹筷 {@link ChopsticksItem} 的规矩：不潜行时把这次点击让给方块自己的交互，
  * 瓶子上桌只认 Shift，免得手滑把桌上的菜盘当成摆放目标。
  * 作者：mryt233 */
-public class SauceBottleItem extends ConfiguredFoodItem {
+public class SauceBottleItem extends ConfiguredFoodItem implements TableItem {
     private final SauceBottleKind kind;
 
     /**
@@ -62,44 +61,27 @@ public class SauceBottleItem extends ConfiguredFoodItem {
     }
 
     @Override
+    public PlateBlock tableBlock(ItemStack stack) {
+        return HotPotContent.SAUCE_BOTTLE_BLOCK;
+    }
+
+    @Override
+    public boolean autoPlace(ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public void playAddSound(Level world, BlockPos pos, ItemStack stack) {
+        world.playSound(null, pos, SoundEvents.GLASS_PLACE, SoundSource.BLOCKS, 0.6F, 1.4F);
+    }
+
+    @Override
     public InteractionResult useOn(UseOnContext context) {
         // 拿瓶子上桌只认 Shift+右键（竹筷也是这个规矩）：不潜行时把这次点击让给方块
         if (context.getPlayer() == null || !context.getPlayer().isShiftKeyDown()) {
             return Use.item(UseOutcome.PASS, context.getLevel().isClientSide);
         }
-        return placeBottle(context);
-    }
-
-    /**
-     * 摆在桌面 / 地面上：点在桌面时射线打到的是那格 {@link PlateHolderBlock}，要摆进眼前这一格；
-     * 点在普通方块顶面时照 {@link PlateItem#placeOn} 的规矩摆到上面一格。
-     * 和竹筷 {@link ChopsticksItem} 一样走「整件摆上去」（keepSelf），所以拿回来时原样还回这瓶。
-     */
-    private InteractionResult placeBottle(UseOnContext context) {
-        Level world = context.getLevel();
-        BlockPos pos = context.getClickedPos();
-        if (context.getClickedFace() == Direction.UP
-            && world.getBlockState(pos).is(HotPotContent.PLATE_HOLDER)
-            && world.getBlockEntity(pos) instanceof PlateHolderBlockEntity holder) {
-            if (world.isClientSide) {
-                return Use.item(UseOutcome.SUCCESS, world.isClientSide);
-            }
-            double hx = (context.getClickLocation().x - pos.getX()) * 16;
-            double hz = (context.getClickLocation().z - pos.getZ()) * 16;
-            Direction.Axis axis = HotPotBlock.handleAxisFor(context.getHorizontalDirection());
-            if (holder.tryAdd(HotPotContent.SAUCE_BOTTLE_BLOCK, axis, hx, hz, context.getItemInHand(), true)) {
-                world.playSound(null, pos, SoundEvents.GLASS_PLACE,
-                    SoundSource.BLOCKS, 0.6F, 1.4F);
-                context.getItemInHand().consume(1, context.getPlayer());
-                return Use.item(UseOutcome.SUCCESS, world.isClientSide);
-            }
-            if (context.getPlayer() != null) {
-                context.getPlayer().displayClientMessage(
-                    Component.translatable(HotPotBlockEntity.key("msg.plate_no_room")), true);
-            }
-            return Use.item(UseOutcome.FAIL, world.isClientSide);
-        }
-        return PlateItem.placeOn(context, HotPotContent.SAUCE_BOTTLE_BLOCK, true);
+        return Use.item(TableObjects.placeInHolderOrOn(context, this), context.getLevel().isClientSide);
     }
 
     /**

@@ -94,6 +94,9 @@ loom {
             if (project.hasProperty('hotpotExpreg')) {
                 vmArg '-Dhotpot.expreg=true'
             }
+            if (project.hasProperty('hotpotOpt4g')) {
+                vmArg '-Dhotpot.opt4g=true'
+            }
         }
         server {
             runDir 'run-server'
@@ -103,6 +106,9 @@ loom {
             }
             if (project.hasProperty('hotpotExpreg')) {
                 vmArg '-Dhotpot.expreg=true'
+            }
+            if (project.hasProperty('hotpotOpt4g')) {
+                vmArg '-Dhotpot.opt4g=true'
             }
         }
     }

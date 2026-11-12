@@ -117,8 +117,9 @@ public final class HotPotCooking {
         if (stack.isEmpty() || stack.is(NOT_POT_INGREDIENT)) {
             return false;
         }
-        if (Soups.fromStack(stack) != null || PlateItem.placedFor(stack) != null) {
-            return false;   // 汤底原料；碗、汤碗、橙子饮料这些（r99）
+        // mryt233 改（4H）：所有桌面物件（盘子、碗、汤碗、蘸料碗、饮料/空瓶、杯子、蘸料瓶、竹筷等）均不可进锅涮煮
+        if (Soups.fromStack(stack) != null || TableObjects.item(stack) != null) {
+            return false;   // 汤底原料；碗、汤碗、橙子饮料等桌面物件（r99）
         }
         // 熟牛肉、烤土豆这类已经熟了的东西没有自己的熔炉配方，以前会掉进“无配方兜底”
         // 被当成焯菜再煮一遍（重新读条、还能重复刷经验），这里直接拒收。

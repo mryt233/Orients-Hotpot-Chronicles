@@ -1,18 +1,18 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 // mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.CupItem;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.ChopstickRestBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.CupBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkItem;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.EmptyBottleItem;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.TableItem;
 import java.util.function.Consumer;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.BenchBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTableBlock;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlock;
 import cn.blockforge.generated.orientshotpotchronicles.mixin.CreativeInventoryScreenAccessor;
 import net.minecraft.client.gui.GuiGraphics;
@@ -77,8 +77,11 @@ public final class CreativeSubTabs {
     }
 
     public static Sub categoryOf(ItemStack stack) {
-        if (stack.is(HotPotContent.CHOPSTICKS) || stack.getItem() instanceof PlateItem
-            || stack.getItem() instanceof CupItem) {
+        // mryt233 改（4H）：餐具与桌面容器/饮品判断收敛到 TableItem / TableBlock 接口，分类结果与原逻辑不变。
+        if (stack.getItem() instanceof TableItem tableItem
+            && (tableItem.tableBlock(stack) instanceof ChopstickRestBlock
+                || tableItem.tableBlock(stack) instanceof CupBlock
+                || !tableItem.keepsSelf(stack))) {
             return Sub.TABLEWARE;   // 玻璃杯（空的、装满的）算餐具（2026-10-26 用户报有的没分类，新增）
         }
         if (stack.is(HotPotContent.KITCHEN_KNIFE) || stack.is(HotPotContent.CUTTING_BOARD_ITEM)
@@ -93,8 +96,7 @@ public final class CreativeSubTabs {
         // 都带 DataComponents.FOOD 且不是 BlockItem，下面的条件会把它们自动归进「食物」子类，不用逐个列名字。
         if (stack.is(HotPotContent.RAW_TRIPE) || stack.is(HotPotContent.COOKED_TRIPE)
             || stack.is(HotPotContent.MINCED_PORK)
-            || stack.getItem() instanceof DrinkItem
-            || stack.getItem() instanceof EmptyBottleItem
+            || (stack.getItem() instanceof TableItem tableItem && tableItem.tableBlock(stack) instanceof DrinkBlock)
             || stack.getItem() instanceof DippingSauceItem
             || (!(stack.getItem() instanceof BlockItem) && stack.has(DataComponents.FOOD))) {
             return Sub.FOOD;

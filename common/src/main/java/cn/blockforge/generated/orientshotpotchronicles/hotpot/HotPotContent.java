@@ -38,6 +38,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Registry;
@@ -747,6 +748,7 @@ public final class HotPotContent {
         }
         BOWL_BLOCK = registration.blocks().register(
             HotPot.id("bowl"), new BowlBlock());
+        TableObjects.registerItem(Items.BOWL, TableObjects.bowlTableItem());
         DRINK_BLOCK = registration.blocks().register(
             HotPot.id("drink"), new DrinkBlock());
         CUP_BLOCK = registration.blocks().register(

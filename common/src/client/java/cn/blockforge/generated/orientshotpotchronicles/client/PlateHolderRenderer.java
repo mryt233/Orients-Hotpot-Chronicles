@@ -1,8 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 // mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+// mryt233 改（4H）：特殊桌面方块与整件叠加绘制改走 TableBlockRenderers 回调表。
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Chopsticks;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBowlItem;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual;
@@ -11,7 +11,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.ChopstickRestBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlockEntity;
@@ -34,8 +33,8 @@ import com.mojang.math.Axis;
  * 画一格里摆着的每个盘子和盘里的菜。盘子用它自己的方块模型（中心在方块中央、按 AXIS 选方向），
  * 平移到它的位置；菜怎么摆见 {@link PlateFoodRenderer}（手里 / 物品栏里的盘子也用它）。
  * <p>
- * 直接摆在桌面上的竹筷（{@link ChopstickRestBlock}，r136b 新增，2026-11-05 用户）不画方块模型，
- * 由这里用代码画一个迷你筷架，再把筷子垫在架子上——方块本身没有模型 json。
+ * 直接摆在桌面上的竹筷（{@link cn.blockforge.generated.orientshotpotchronicles.hotpot.ChopstickRestBlock}，r136b 新增，2026-11-05 用户）不画方块模型，
+ * 通过 {@link TableBlockRenderers} 登记的 {@link #renderChopstickRest} 用代码画一个迷你筷架，再把筷子垫在架子上——方块本身没有模型 json。
  */
 public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolderBlockEntity> {
     private final ItemRenderer itemRenderer;
@@ -63,23 +62,17 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
         for (PlateHolderBlockEntity.Placed p : be.plates()) {
             matrices.pushPose();
             matrices.translate((p.x - 8) / 16.0, lift / 16.0, (p.z - 8) / 16.0);
-            if (p.plate instanceof ChopstickRestBlock) {
-                // 直接摆在桌上的竹筷：方块本身没有模型 json（r136b，2026-11-05 用户），
-                // 迷你筷架 + 垫在上面的一双筷子全由代码画
-                matrices.pushPose();
-                matrices.translate(0.5, 0, 0.5);
-                // mryt233 改：局部 +x 是筷尖，依照完整四向旋转。
-                matrices.mulPose(Axis.YP.rotationDegrees(-90F - p.facing.toYRot()));
-                matrices.translate(-0.5, 0, -0.5);
-                renderMiniChopstickRest(matrices, vertexConsumers, light);
-                renderTableChopsticks(p, matrices, vertexConsumers, light);
-                matrices.popPose();
+            TableBlockRenderers.BlockRenderer blockRenderer = TableBlockRenderers.blockRenderer(p.plate);
+            if (blockRenderer != null) {
+                blockRenderer.render(be, p, matrices, vertexConsumers, light, overlay, itemRenderer, seed);
                 matrices.popPose();
                 continue;
             }
             blocks.renderSingleBlock(modelState(p), matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
-            if (p.self.getItem() instanceof DippingSauceItem) {
-                SauceRender.surface(DippingSauceItem.contents(p.self).ids(), matrices, vertexConsumers, light);
+            TableBlockRenderers.SelfOverlayRenderer overlayRenderer =
+                TableBlockRenderers.overlayRenderer(p.self.getItem());
+            if (overlayRenderer != null) {
+                overlayRenderer.render(p, matrices, vertexConsumers, light);
             } else if (p.self.getItem() instanceof SoupBowlItem bowl) {
                 SoupDef def = bowl.soupDef(p.self);
                 String raw = bowl.rawSoupId(p.self);
@@ -94,6 +87,21 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
             }
             matrices.popPose();
         }
+    }
+
+    /** 直接摆在桌上的竹筷：方块本身没有模型 json（r136b，2026-11-05 用户），迷你筷架 + 垫在上面的一双筷子全由代码画。 */
+    public static void renderChopstickRest(PlateHolderBlockEntity be, PlateHolderBlockEntity.Placed p,
+                                           PoseStack matrices, MultiBufferSource buffers,
+                                           int light, int overlay, ItemRenderer itemRenderer, int seed) {
+        matrices.pushPose();
+        matrices.translate(0.5, 0, 0.5);
+        // mryt233 改：局部 +x 是筷尖，依照完整四向旋转。
+        matrices.mulPose(Axis.YP.rotationDegrees(-90F - p.facing.toYRot()));
+        matrices.translate(-0.5, 0, -0.5);
+        BlockRenderDispatcher blocks = Minecraft.getInstance().getBlockRenderer();
+        renderMiniChopstickRest(blocks, matrices, buffers, light);
+        renderTableChopsticks(p, matrices, buffers, light, itemRenderer);
+        matrices.popPose();
     }
 
     // mryt233 改（r146e）：与 viewer/animations.js 共用同一套像素尺寸和变换顺序。
@@ -114,22 +122,24 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
         matrices.mulPose(Axis.YP.rotationDegrees(-90F - p.chopsticksYaw));
         // 尖端位于碗心；后段横搭近侧碗沿，尾端自然探出。
         matrices.translate(-LENGTH / 16, 0, 0);
-        renderBamboo(matrices, buffers, light, p.chopsticks);
+        renderBamboo(matrices, buffers, light, p.chopsticks, itemRenderer);
         matrices.popPose();
     }
 
-    private void renderMiniChopstickRest(PoseStack matrices, MultiBufferSource buffers, int light) {
+    private static void renderMiniChopstickRest(BlockRenderDispatcher blocks, PoseStack matrices,
+                                                MultiBufferSource buffers, int light) {
         BlockState porcelain = Blocks.SMOOTH_QUARTZ.defaultBlockState();
         BlockState wood = Blocks.DARK_OAK_PLANKS.defaultBlockState();
         double halfL = REST_LEN / 2, halfD = REST_DEPTH / 2;
-        miniBox(matrices, buffers, light, wood, REST_X-halfD-0.1, REST_X+halfD+0.1, 0, 0.35, 8-halfL-0.1, 8+halfL+0.1);
-        miniBox(matrices, buffers, light, porcelain, REST_X-halfD+0.05, REST_X+halfD-0.05, 0.35, REST_H, 8-halfL+0.15, 8+halfL-0.15);
-        miniBox(matrices, buffers, light, porcelain, REST_X-halfD+0.05, REST_X+halfD-0.05, 0.35, REST_LIP, 8-halfL, 8-halfL+0.4);
-        miniBox(matrices, buffers, light, porcelain, REST_X-halfD+0.05, REST_X+halfD-0.05, 0.35, REST_LIP, 8+halfL-0.4, 8+halfL);
+        miniBox(blocks, matrices, buffers, light, wood, REST_X-halfD-0.1, REST_X+halfD+0.1, 0, 0.35, 8-halfL-0.1, 8+halfL+0.1);
+        miniBox(blocks, matrices, buffers, light, porcelain, REST_X-halfD+0.05, REST_X+halfD-0.05, 0.35, REST_H, 8-halfL+0.15, 8+halfL-0.15);
+        miniBox(blocks, matrices, buffers, light, porcelain, REST_X-halfD+0.05, REST_X+halfD-0.05, 0.35, REST_LIP, 8-halfL, 8-halfL+0.4);
+        miniBox(blocks, matrices, buffers, light, porcelain, REST_X-halfD+0.05, REST_X+halfD-0.05, 0.35, REST_LIP, 8+halfL-0.4, 8+halfL);
     }
 
-    private void miniBox(PoseStack matrices, MultiBufferSource buffers, int light, BlockState state,
-                         double x0, double x1, double y0, double y1, double z0, double z1) {
+    private static void miniBox(BlockRenderDispatcher blocks, PoseStack matrices, MultiBufferSource buffers,
+                                int light, BlockState state,
+                                double x0, double x1, double y0, double y1, double z0, double z1) {
         matrices.pushPose();
         matrices.translate(x0 / 16, y0 / 16, z0 / 16);
         matrices.scale((float)((x1-x0)/16), (float)((y1-y0)/16), (float)((z1-z0)/16));
@@ -137,16 +147,17 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
         matrices.popPose();
     }
 
-    private void renderTableChopsticks(PlateHolderBlockEntity.Placed p, PoseStack matrices,
-                                       MultiBufferSource buffers, int light) {
+    private static void renderTableChopsticks(PlateHolderBlockEntity.Placed p, PoseStack matrices,
+                                              MultiBufferSource buffers, int light, ItemRenderer itemRenderer) {
         matrices.pushPose();
         matrices.translate(TAIL_X / 16, 0, 0.5);
         matrices.mulPose(Axis.ZP.rotation((float)TILT));
-        renderBamboo(matrices, buffers, light, p.self);
+        renderBamboo(matrices, buffers, light, p.self, itemRenderer);
         matrices.popPose();
     }
 
-    private void renderBamboo(PoseStack matrices, MultiBufferSource buffers, int light, ItemStack stack) {
+    private static void renderBamboo(PoseStack matrices, MultiBufferSource buffers, int light,
+                                     ItemStack stack, ItemRenderer itemRenderer) {
         var vc = buffers.getBuffer(RenderType.entityCutoutNoCull(BAMBOO));
         for (int side : new int[]{-1, 1}) {
             double z = side * (GAP + THICK) / 2;

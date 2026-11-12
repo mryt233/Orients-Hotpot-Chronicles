@@ -1,7 +1,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.mixin;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.TableObjects;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.Items;
@@ -20,9 +22,9 @@ abstract class BowlItemMixin {
     @Inject(method = "useOn", at = @At("HEAD"), cancellable = true)
     private void orientsHotpot$placeBowl(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
         if ((Object) this == Items.BOWL) {
-            InteractionResult result = PlateItem.placeOn(context, HotPotContent.BOWL_BLOCK, false);
-            if (result != InteractionResult.PASS) {
-                cir.setReturnValue(result);
+            UseOutcome outcome = TableObjects.placeOn(context, HotPotContent.BOWL_BLOCK, false);
+            if (outcome != UseOutcome.PASS) {
+                cir.setReturnValue(Use.item(outcome, context.getLevel().isClientSide));
             }
         }
     }

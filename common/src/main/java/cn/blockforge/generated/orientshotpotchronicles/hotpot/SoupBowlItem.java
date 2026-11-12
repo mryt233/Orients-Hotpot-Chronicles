@@ -1,6 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 // mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -30,7 +32,7 @@ import net.minecraft.world.level.Level;
  * mryt233 改（2026-11-05，r136a）：六种汤碗都按 SoupBase.dishBonusEffects(辣度) 结算，
  * 红汤碗还带着盛出时的辣度档位（SPICY_LEVEL 组件），3 级特辣喝完嘴上冒火（2 秒无伤火苗）。
  * 作者：mryt233 */
-public class SoupBowlItem extends Item {
+public class SoupBowlItem extends Item implements TableItem {
     private final ResourceLocation soupId;
     private final Function<ResourceLocation, SoupDef> resolver;
     private volatile SoupDef soup;
@@ -222,10 +224,15 @@ public class SoupBowlItem extends Item {
         return fallback;
     }
 
+    @Override
+    public PlateBlock tableBlock(ItemStack stack) {
+        return HotPotContent.BOWL_BLOCK;
+    }
+
     /** 点在方块顶面：像盘子一样摆上去；别的情况交给原版（对着空气 / 侧面右键就是喝）。 */
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        return PlateItem.placeOn(context, HotPotContent.BOWL_BLOCK, true);
+        return Use.item(TableObjects.placeOn(context, this), context.getLevel().isClientSide);
     }
 
     /**

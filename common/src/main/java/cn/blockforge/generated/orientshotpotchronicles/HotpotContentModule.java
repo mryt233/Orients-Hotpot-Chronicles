@@ -41,6 +41,9 @@ public final class HotpotContentModule implements ContentModule {
         if (Boolean.getBoolean("hotpot.opt4f")) {
             development("Opt4fProbe", "install", new Class<?>[]{RegistrationApi.class}, registration);
         }
+        if (Boolean.getBoolean("hotpot.opt4g")) {
+            development("Opt4gProbe", "install", new Class<?>[]{RegistrationApi.class}, registration);
+        }
     }
 
     @Override

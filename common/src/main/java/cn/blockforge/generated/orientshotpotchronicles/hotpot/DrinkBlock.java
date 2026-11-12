@@ -53,4 +53,25 @@ public class DrinkBlock extends PlateBlock {
         super.createBlockStateDefinition(builder);
         builder.add(EMPTY, KIND);
     }
+
+    // mryt233 改：饮料瓶桌面高度、状态与不可架筷收口到 TableBlock 接口。
+    @Override
+    public boolean restsChopsticks(PlateHolderBlockEntity.Placed placed) {
+        return false;
+    }
+
+    @Override
+    public double tableHeight(PlateHolderBlockEntity.Placed placed) {
+        DrinkKind kind = placed.self.getItem() instanceof DrinkItem d ? d.kind()
+            : placed.self.getItem() instanceof EmptyBottleItem e ? e.kind() : null;
+        return kind == null ? size().height() : kind.bottleHeight();
+    }
+
+    @Override
+    public BlockState modelState(PlateHolderBlockEntity.Placed placed) {
+        boolean empty = placed.self.getItem() instanceof EmptyBottleItem;
+        DrinkKind kind = placed.self.getItem() instanceof EmptyBottleItem e ? e.kind()
+            : placed.self.getItem() instanceof DrinkItem d ? d.kind() : DrinkKind.ORANGE_DRINK;
+        return super.modelState(placed).setValue(EMPTY, empty).setValue(KIND, kind);
+    }
 }
