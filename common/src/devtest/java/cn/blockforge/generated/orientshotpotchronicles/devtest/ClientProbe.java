@@ -268,6 +268,15 @@ public final class ClientProbe {
                         mc.disconnect();
                     }
                 }
+                case "connect" -> {
+                    String addr = request.getAsJsonArray("extra").get(0).getAsString();
+                    var srv = new net.minecraft.client.multiplayer.ServerData(
+                        "dev", addr, net.minecraft.client.multiplayer.ServerData.Type.OTHER);
+                    net.minecraft.client.gui.screens.ConnectScreen.startConnecting(
+                        new net.minecraft.client.gui.screens.TitleScreen(), mc,
+                        net.minecraft.client.multiplayer.resolver.ServerAddress.parseString(addr),
+                        srv, false, null);
+                }
                 case "stop" -> {
                     HotPot.LOGGER.info("[hotpot-probe] 开发客户端正常退出");
                     mc.stop();
@@ -300,6 +309,35 @@ public final class ClientProbe {
         report.addProperty("gui_height", mc.getWindow().getGuiScaledHeight());
         report.addProperty("gui_scale", mc.getWindow().getGuiScale());
         report.addProperty("jei_loaded", cn.blockforge.generated.orientshotpotchronicles.compat.HotPotCompat.isModLoaded("jei"));
+        report.addProperty("rei_loaded", cn.blockforge.generated.orientshotpotchronicles.compat.HotPotCompat.isModLoaded("roughlyenoughitems"));
+        if (mc.level != null) {
+            var opt4f = new com.google.gson.JsonObject();
+            var ginger = cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups.get("opt4fpack:ginger_soup");
+            if (ginger != null) {
+                opt4f.addProperty("ginger_soup", true);
+                opt4f.addProperty("ginger_speed", ginger.defaultSpeedMul());
+                opt4f.addProperty("ginger_name_key", ginger.nameKey());
+            }
+            var truffle = cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasonings.get("opt4fpack:truffle");
+            if (truffle != null) {
+                opt4f.addProperty("truffle", true);
+                opt4f.addProperty("truffle_garnish", truffle.garnish());
+                opt4f.addProperty("truffle_effect_key", truffle.effectKey());
+                var testSlice = new net.minecraft.world.item.ItemStack(
+                    cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.COOKED_BEEF_LOIN_SLICE);
+                testSlice.set(cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.COOKED_IN_SOUP, "opt4fpack:ginger_soup");
+                var sliceTips = new java.util.ArrayList<Component>();
+                ClientTooltips.append(testSlice, sliceTips);
+                var sauceStack = cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem.createWithId("opt4fpack:truffle");
+                var sauceTips = new java.util.ArrayList<Component>();
+                ClientTooltips.append(sauceStack, sauceTips);
+                opt4f.add("slice_tooltip", new com.google.gson.Gson().toJsonTree(sliceTips.stream().map(Component::getString).toList()));
+                opt4f.add("sauce_tooltip", new com.google.gson.Gson().toJsonTree(sauceTips.stream().map(Component::getString).toList()));
+            }
+            opt4f.addProperty("soups_count", cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups.size());
+            opt4f.addProperty("seasonings_count", cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasonings.size());
+            report.add("opt4f", opt4f);
+        }
         if (mc.screen instanceof HotPotConfigScreen config) {
             try {
                 for (String name : new String[]{"px", "py", "panelW", "panelH", "listX", "listW", "listTop", "listBottom", "tab"}) {
@@ -328,8 +366,13 @@ public final class ClientProbe {
                         var height = row.getClass().getDeclaredMethod("height"); height.setAccessible(true);
                         var seasoning = row.getClass().getDeclaredMethod("seasoning"); seasoning.setAccessible(true);
                         var inline = row.getClass().getDeclaredMethod("inline"); inline.setAccessible(true);
-                        if (seasoning.invoke(row) != cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning.ALL[total++].def())
+                        var s = (cn.blockforge.generated.orientshotpotchronicles.hotpot.SeasoningDef) seasoning.invoke(row);
+                        if (total < cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning.ALL.length
+                            && !cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceIds.fullId(s)
+                                .equals(cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceIds.fullId(
+                                    cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning.ALL[total].def())))
                             throw new IllegalStateException("Guide seasoning order changed");
+                        total++;
                         if (!(boolean) inline.invoke(row)) wrapped++;
                         for (String name : new String[]{"names", "effects"}) {
                             var lines = row.getClass().getDeclaredMethod(name); lines.setAccessible(true);
@@ -343,7 +386,7 @@ public final class ClientProbe {
                     if (y > 154) throw new IllegalStateException("Guide row outside content area");
                     bottom = Math.max(bottom, y);
                 }
-                if (total != cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning.ALL.length)
+                if (total < cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning.ALL.length)
                     throw new IllegalStateException("Guide seasoning missing");
                 report.addProperty("guide_content_verified", true);
                 report.addProperty("guide_wrapped_rows", wrapped);

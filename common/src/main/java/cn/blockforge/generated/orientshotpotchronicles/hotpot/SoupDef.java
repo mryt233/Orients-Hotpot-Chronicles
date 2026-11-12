@@ -90,7 +90,8 @@ public record SoupDef(
 
     /** 完整语言键；若 {@code langKey} 已带 {@code text.} 前缀（第三方自定义）则直接返回，否则拼 {@code text.<modid>.<langKey>}。 */
     public String nameKey() {
-        return langKey.startsWith("text.") ? langKey : "text." + HotPot.MOD_ID + "." + langKey;
+        return (langKey.startsWith("text.") || (langKey.contains(".") && !langKey.startsWith("soup.")))
+            ? langKey : "text." + HotPot.MOD_ID + "." + langKey;
     }
 
     /**
@@ -131,19 +132,20 @@ public record SoupDef(
 
     // ---------------------------------------------------------------- 配置覆盖后的数值
 
-    /** 加热速度倍率；配置 soup_speed.&lt;名字&gt; 优先，没写就用默认值。 */
+    /** 加热速度倍率；内置汤底按「配置显式修改 > 数据包 > 代码默认」，扩展与数据包汤底直接用定义值。 */
     public float speedMul() {
-        return Config.soupSpeed(key(), defaultSpeedMul);
+        return Soups.isBuiltin(id) ? Config.overriddenSoupSpeed(key(), defaultSpeedMul) : defaultSpeedMul;
     }
 
-    /** 一碗汤回多少饥饿点数；配置 soup_bowl.&lt;汤底&gt;.hunger 优先。 */
+    /** 一碗汤回多少饥饿点数；配置显式修改优先于数据包与代码默认。 */
     public int bowlHunger() {
-        return Config.soupBowlInt(key(), "hunger", defaultBowlHunger);
+        return Soups.isBuiltin(id) ? Config.overriddenSoupBowlInt(key(), "hunger", defaultBowlHunger) : defaultBowlHunger;
     }
 
-    /** 一碗汤的饱和度系数；配置 soup_bowl.&lt;汤底&gt;.saturation 优先。 */
+    /** 一碗汤的饱和度系数；配置显式修改优先于数据包与代码默认。 */
     public float bowlSaturation() {
-        return Config.soupBowlFloat(key(), "saturation", defaultBowlSaturation);
+        return Soups.isBuiltin(id)
+            ? Config.overriddenSoupBowlFloat(key(), "saturation", defaultBowlSaturation) : defaultBowlSaturation;
     }
 
     // ---------------------------------------------------------------- 风味加成
@@ -164,22 +166,27 @@ public record SoupDef(
             return spicyBonusEffects(spicyLevel);
         }
         List<MobEffectInstance> list = new ArrayList<>();
+        boolean builtin = Soups.isBuiltin(id);
         String name = key();
-        int amplifier = Config.soupBowlInt(name, "amplifier", 0);
-        addEffect(list, mainEffect, Config.soupBowlInt(name, "duration", defaultDuration), amplifier);
-        addEffect(list, secondEffect, Config.soupBowlInt(name, "second_duration", defaultSecondDuration),
-            Config.soupBowlInt(name, "second_amplifier", 0));
+        int amplifier = builtin ? Config.overriddenSoupBowlInt(name, "amplifier", 0) : 0;
+        addEffect(list, mainEffect,
+            builtin ? Config.overriddenSoupBowlInt(name, "duration", defaultDuration) : defaultDuration, amplifier);
+        addEffect(list, secondEffect,
+            builtin ? Config.overriddenSoupBowlInt(name, "second_duration", defaultSecondDuration) : defaultSecondDuration,
+            builtin ? Config.overriddenSoupBowlInt(name, "second_amplifier", 0) : 0);
         return list;
     }
 
     /** 红汤按辣度档位加强的那一段。 */
     List<MobEffectInstance> spicyBonusEffects(int spicyLevel) {
         List<MobEffectInstance> list = new ArrayList<>();
+        boolean builtin = Soups.isBuiltin(id);
         String name = key();
-        int ticks = Config.soupBowlInt(name, "duration", defaultDuration);
-        int amplifier = Config.soupBowlInt(name, "amplifier", 0);
-        int secondTicks = Config.soupBowlInt(name, "second_duration", defaultSecondDuration);
-        int secondAmp = Config.soupBowlInt(name, "second_amplifier", 0);
+        int ticks = builtin ? Config.overriddenSoupBowlInt(name, "duration", defaultDuration) : defaultDuration;
+        int amplifier = builtin ? Config.overriddenSoupBowlInt(name, "amplifier", 0) : 0;
+        int secondTicks = builtin
+            ? Config.overriddenSoupBowlInt(name, "second_duration", defaultSecondDuration) : defaultSecondDuration;
+        int secondAmp = builtin ? Config.overriddenSoupBowlInt(name, "second_amplifier", 0) : 0;
         int level = Math.max(0, Math.min(3, spicyLevel));
         // 越辣越上头：力量与速度的时长随档位递加，中辣起力量再升一级。
         // 配成 0 的那一项保持关闭（不加辣度带来的时长），和别的汤底一样「0 = 不加」。
@@ -192,15 +199,18 @@ public record SoupDef(
         addEffect(list, secondEffect, secondTicks > 0 ? secondTicks + speedAdd : 0, secondAmp);
         if (level >= 2) {
             // 特辣 / 变态辣：发汗驱寒（抗火，变态辣加倍）+ 开胃易饿（饥饿，越辣越饿）
-            int fireTicks = Config.soupBowlInt(name, "fire_duration", defaultFireDuration);
+            int fireTicks = builtin
+                ? Config.overriddenSoupBowlInt(name, "fire_duration", defaultFireDuration) : defaultFireDuration;
             addEffect(list, fireEffect, level >= 3 ? fireTicks * 2 : fireTicks,
-                Config.soupBowlInt(name, "fire_amplifier", 0));
-            int hungerTicks = Config.soupBowlInt(name, "hunger_duration", defaultHungerDuration);
+                builtin ? Config.overriddenSoupBowlInt(name, "fire_amplifier", 0) : 0);
+            int hungerTicks = builtin
+                ? Config.overriddenSoupBowlInt(name, "hunger_duration", defaultHungerDuration) : defaultHungerDuration;
             // 配成 0 表示「红汤不加饥饿」：这时不再按辣度往上加，玩家的配置说了算
             if (hungerTicks > 0 && level >= 3) {
                 hungerTicks += 40;
             }
-            addEffect(list, hungerEffect, hungerTicks, Config.soupBowlInt(name, "hunger_amplifier", 0));
+            addEffect(list, hungerEffect, hungerTicks,
+                builtin ? Config.overriddenSoupBowlInt(name, "hunger_amplifier", 0) : 0);
         }
         return list;
     }
@@ -216,6 +226,11 @@ public record SoupDef(
     /** 4F-1（mryt233）：构造自定义汤底定义。 */
     public static Builder builder(ResourceLocation id) {
         return new Builder(id);
+    }
+
+    /** 4F-2（mryt233）：基于当前定义创建可修改副本（供数据包叠加合并用）。 */
+    public Builder toBuilder() {
+        return new Builder(this);
     }
 
     /** 4F-1（mryt233）：汤底定义构造器（带合理默认值，支持延迟物品引用）。 */
@@ -250,6 +265,34 @@ public record SoupDef(
             this.id = Objects.requireNonNull(id, "id");
             this.langKey = "text." + id.getNamespace() + ".soup." + id.getPath();
             this.bowlId = id.getPath() + "_bowl";
+        }
+
+        private Builder(SoupDef base) {
+            this.id = base.id;
+            this.langKey = base.langKey;
+            this.bowlId = base.bowlId;
+            this.defaultSpeedMul = base.defaultSpeedMul;
+            this.sourceItem = base.sourceItem;
+            this.remainderItem = base.remainderItem;
+            this.additive = base.additive;
+            this.defaultBowlHunger = base.defaultBowlHunger;
+            this.defaultBowlSaturation = base.defaultBowlSaturation;
+            this.mainEffect = base.mainEffect;
+            this.defaultDuration = base.defaultDuration;
+            this.secondEffect = base.secondEffect;
+            this.defaultSecondDuration = base.defaultSecondDuration;
+            this.fireEffect = base.fireEffect;
+            this.defaultFireDuration = base.defaultFireDuration;
+            this.hungerEffect = base.hungerEffect;
+            this.defaultHungerDuration = base.defaultHungerDuration;
+            this.clearsNausea = base.clearsNausea;
+            this.spicy = base.spicy;
+            this.screenBase = base.screenBase;
+            this.screenHi = base.screenHi;
+            this.screenLo = base.screenLo;
+            this.screenBits = base.screenBits.clone();
+            this.bubbleBody = base.bubbleBody;
+            this.bubbleHi = base.bubbleHi;
         }
 
         public Builder langKey(String langKey) { this.langKey = Objects.requireNonNull(langKey, "langKey"); return this; }

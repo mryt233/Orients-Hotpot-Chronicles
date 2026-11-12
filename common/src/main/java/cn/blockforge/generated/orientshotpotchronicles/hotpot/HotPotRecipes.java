@@ -28,10 +28,18 @@ public final class HotPotRecipes {
         registration.recipeSerializers().register(HotPot.id("pot_boiling"), PotBoilingRecipe.SERIALIZER);
         registration.recipeTypes().register(HotPot.id("pounding"), PoundingRecipe.TYPE);
         registration.recipeSerializers().register(HotPot.id("pounding"), PoundingRecipe.SERIALIZER);
+        registration.recipeTypes().register(HotPot.id("soup_base"), SoupBaseRecipe.TYPE);
+        registration.recipeSerializers().register(HotPot.id("soup_base"), SoupBaseRecipe.SERIALIZER);
+        registration.recipeTypes().register(HotPot.id("seasoning"), SeasoningRecipe.TYPE);
+        registration.recipeSerializers().register(HotPot.id("seasoning"), SeasoningRecipe.SERIALIZER);
     }
     public static void setServer(MinecraftServer value) {
         server = value;
-        if (value == null) synchronized (SNAPSHOTS) { SNAPSHOTS.clear(); }
+        if (value == null) {
+            synchronized (SNAPSHOTS) { SNAPSHOTS.clear(); }
+            Soups.clearRuntimeCache();
+            Seasonings.clearRuntimeCache();
+        }
     }
     public static void clientLevel(Supplier<Level> supplier) { clientLevel = supplier; }
     public static Level currentLevel() {

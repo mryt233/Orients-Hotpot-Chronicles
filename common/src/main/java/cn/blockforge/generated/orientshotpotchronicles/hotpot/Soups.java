@@ -1,16 +1,23 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.WeakHashMap;
+import java.util.function.Consumer;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.Level;
 
 /**
  * 汤底登记表：ID → {@link SoupDef}，沿用第三批的 {@link FrozenRegistry}（启动期可写、服务端启动时冻结）。
@@ -35,8 +42,46 @@ public final class Soups {
     private static final Registry TABLE = new Registry();
     /** 内置项登记完了没有（让热路径上的 ensureBuiltins 不必每次都碰枚举）。 */
     private static volatile boolean builtinsReady;
+    private record CachedView(Object generation, Registry.View view) { }
+    private static final Map<RecipeManager, CachedView> SNAPSHOTS = new WeakHashMap<>();
 
     private Soups() {
+    }
+
+    static void clearRuntimeCache() {
+        synchronized (SNAPSHOTS) {
+            SNAPSHOTS.clear();
+        }
+    }
+
+    private static Registry.View active() {
+        ensureBuiltins();
+        Level level = HotPotRecipes.currentLevel();
+        if (level == null) {
+            return TABLE.baseView();
+        }
+        RecipeManager manager = level.getRecipeManager();
+        Object generation = manager.getRecipes();
+        synchronized (SNAPSHOTS) {
+            CachedView cached = SNAPSHOTS.get(manager);
+            if (cached != null && cached.generation() == generation) {
+                return cached.view();
+            }
+        }
+        List<RecipeHolder<SoupBaseRecipe>> recipes = HotPotRecipes.all(level, SoupBaseRecipe.TYPE);
+        Registry.View built = recipes.isEmpty()
+            ? TABLE.baseView()
+            : TABLE.overlay(recipes, HotPot.LOGGER::warn);
+        synchronized (SNAPSHOTS) {
+            SNAPSHOTS.put(manager, new CachedView(generation, built));
+        }
+        return built;
+    }
+
+    /** 是否是模组内置 6 种汤底之一（仅内置项读取 config 覆盖；4F-2）。 */
+    public static boolean isBuiltin(ResourceLocation id) {
+        ensureBuiltins();
+        return TABLE.isBuiltin(id);
     }
 
     /** 内置项登记：只给 {@link SoupBase} 的静态初始化用，按枚举顺序调用。 */
@@ -82,8 +127,7 @@ public final class Soups {
 
     /** 按完整 ID 查；没有返回 null。 */
     public static SoupDef get(ResourceLocation id) {
-        ensureBuiltins();
-        return TABLE.get(id);
+        return active().get(id);
     }
 
     /** 按 ID 文本查；不带命名空间（没有冒号）的一律按火锅命名空间解释。查不到或写法非法返回 null。 */
@@ -101,8 +145,7 @@ public final class Soups {
      * 内置项的序号就是旧存档里的汤底序号（清汤 0、高汤 1、菌汤 2、红汤 3、番茄 4、三鲜 5）。
      */
     public static SoupDef byIndex(int index) {
-        ensureBuiltins();
-        return TABLE.byIndex(index);
+        return active().byIndex(index);
     }
 
     /** 某个汤底的序号；传 null 或没登记过的返回 -1。 */
@@ -110,8 +153,7 @@ public final class Soups {
         if (def == null) {
             return -1;
         }
-        ensureBuiltins();
-        return TABLE.indexOf(def);
+        return active().indexOf(def);
     }
 
     /** 清汤（序号 0）。锅底料只能加进清汤这条旧规则要拿它比较。 */
@@ -127,20 +169,18 @@ public final class Soups {
         if (stack.isEmpty()) {
             return null;
         }
-        ensureBuiltins();
-        for (SoupDef def : TABLE.ordered) {
+        for (SoupDef def : active().ordered()) {
             if (def.matchesSource(stack)) {
                 return def;
             }
         }
         SoupBase custom = SoupBase.customSource(stack);
-        return custom == null ? null : custom.def();
+        return custom == null ? null : get(custom.def().id());
     }
 
     /** 全部汤底，按登记顺序（前 6 项是内置项，顺序 = 旧存档序号）。 */
     public static List<SoupDef> all() {
-        ensureBuiltins();
-        return TABLE.all();
+        return active().all();
     }
 
     /** 内置汤底（旧存档序号 0～5 对应的那 6 项）。 */
@@ -150,8 +190,7 @@ public final class Soups {
     }
 
     public static int size() {
-        ensureBuiltins();
-        return TABLE.size();
+        return active().size();
     }
 
     /** 冻结（幂等）。服务端开始启动时由 {@link HotPotHooks#freezeRegistries()} 调用。 */
@@ -170,15 +209,27 @@ public final class Soups {
         }
     }
 
-    /** 4F-1（mryt233）：独立登记表实例；主表与单测隔离实例共用，避免单测冻结进程全局表。 */
+    /** 4F-1 / 4F-2（mryt233）：独立登记表实例；主表与单测隔离实例共用，支持数据包配方叠加视图。 */
     static final class Registry {
+        record View(SoupDef[] ordered, Map<ResourceLocation, SoupDef> byId, Map<ResourceLocation, Integer> indexById) {
+            SoupDef get(ResourceLocation id) { return id == null ? null : byId.get(id); }
+            SoupDef byIndex(int index) { return index >= 0 && index < ordered.length ? ordered[index] : null; }
+            int indexOf(SoupDef def) {
+                if (def == null) return -1;
+                Integer idx = indexById.get(def.id());
+                return idx == null ? -1 : idx;
+            }
+            List<SoupDef> all() { return List.of(ordered); }
+            int size() { return ordered.length; }
+        }
+
         private final FrozenRegistry<ResourceLocation, SoupDef> registry = new FrozenRegistry<>(
             "汤底登记表", "汤底要在启动期登记（子模组在自己的兼容模块里登记），冻结后不再接受登记。");
         private final List<SoupDef> builtins = new ArrayList<>();
+        private final Set<ResourceLocation> builtinIds = new HashSet<>();
         private final List<SoupDef> extras = new ArrayList<>();
         private final Map<ResourceLocation, Item> bowls = new HashMap<>();
-        private volatile SoupDef[] ordered = new SoupDef[0];
-        private volatile Map<ResourceLocation, Integer> indexById = Map.of();
+        private volatile View view = new View(new SoupDef[0], Map.of(), Map.of());
 
         synchronized void registerBuiltin(SoupDef def) {
             Objects.requireNonNull(def, "def");
@@ -187,7 +238,8 @@ public final class Soups {
             }
             registry.put(def.id(), def);
             builtins.add(def);
-            rebuildSnapshotLocked();
+            builtinIds.add(def.id());
+            view = buildView(builtins, extras);
         }
 
         synchronized void register(SoupDef def) {
@@ -198,40 +250,74 @@ public final class Soups {
             registry.put(def.id(), def);
             extras.add(def);
             extras.sort(Comparator.comparing(d -> d.id().toString()));
-            rebuildSnapshotLocked();
+            view = buildView(builtins, extras);
         }
 
-        private void rebuildSnapshotLocked() {
-            SoupDef[] next = new SoupDef[builtins.size() + extras.size()];
+        private static View buildView(List<SoupDef> builtinList, List<SoupDef> extraList) {
+            SoupDef[] next = new SoupDef[builtinList.size() + extraList.size()];
+            Map<ResourceLocation, SoupDef> defs = new HashMap<>(next.length * 2);
             Map<ResourceLocation, Integer> ids = new HashMap<>(next.length * 2);
             int i = 0;
-            for (SoupDef entry : builtins) {
+            for (SoupDef entry : builtinList) {
                 next[i] = entry;
+                defs.put(entry.id(), entry);
                 ids.put(entry.id(), i++);
             }
-            for (SoupDef entry : extras) {
+            for (SoupDef entry : extraList) {
                 next[i] = entry;
+                defs.put(entry.id(), entry);
                 ids.put(entry.id(), i++);
             }
-            ordered = next;
-            indexById = Map.copyOf(ids);
+            return new View(next, Map.copyOf(defs), Map.copyOf(ids));
         }
 
-        SoupDef get(ResourceLocation id) { return id == null ? null : registry.get(id); }
-        SoupDef byIndex(int index) {
-            SoupDef[] snapshot = ordered;
-            return index >= 0 && index < snapshot.length ? snapshot[index] : null;
-        }
-        int indexOf(SoupDef def) {
-            if (def == null) {
-                return -1;
+        synchronized View overlay(List<RecipeHolder<SoupBaseRecipe>> recipes, Consumer<String> warn) {
+            if (recipes == null || recipes.isEmpty()) {
+                return view;
             }
-            Integer index = indexById.get(def.id());
-            return index == null ? -1 : index;
+            List<SoupDef> nextBuiltins = new ArrayList<>(builtins);
+            Map<ResourceLocation, Integer> builtinSlots = new HashMap<>(builtins.size() * 2);
+            for (int i = 0; i < nextBuiltins.size(); i++) {
+                builtinSlots.put(nextBuiltins.get(i).id(), i);
+            }
+            Map<ResourceLocation, SoupDef> nextExtras = new LinkedHashMap<>();
+            for (SoupDef extra : extras) {
+                nextExtras.put(extra.id(), extra);
+            }
+            for (RecipeHolder<SoupBaseRecipe> holder : recipes) {
+                ResourceLocation target = SoupBaseRecipe.targetId(holder.id());
+                if (target == null) {
+                    if (warn != null) {
+                        warn.accept("数据包汤底配方 " + holder.id() + " 未放在 recipe/soup/ 目录下，已跳过");
+                    }
+                    continue;
+                }
+                Integer slot = builtinSlots.get(target);
+                if (slot != null) {
+                    SoupDef merged = holder.value().resolve(target, nextBuiltins.get(slot), warn);
+                    if (merged != null) {
+                        nextBuiltins.set(slot, merged);
+                    }
+                } else {
+                    SoupDef merged = holder.value().resolve(target, nextExtras.get(target), warn);
+                    if (merged != null) {
+                        nextExtras.put(target, merged);
+                    }
+                }
+            }
+            List<SoupDef> sortedExtras = new ArrayList<>(nextExtras.values());
+            sortedExtras.sort(Comparator.comparing(d -> d.id().toString()));
+            return buildView(nextBuiltins, sortedExtras);
         }
-        List<SoupDef> all() { return List.of(ordered); }
+
+        View baseView() { return view; }
+        synchronized boolean isBuiltin(ResourceLocation id) { return id != null && builtinIds.contains(id); }
+        SoupDef get(ResourceLocation id) { return view.get(id); }
+        SoupDef byIndex(int index) { return view.byIndex(index); }
+        int indexOf(SoupDef def) { return view.indexOf(def); }
+        List<SoupDef> all() { return view.all(); }
         synchronized List<SoupDef> builtins() { return List.copyOf(builtins); }
-        int size() { return ordered.length; }
+        int size() { return view.size(); }
         synchronized void registerBowl(ResourceLocation soupId, Item bowl) {
             Objects.requireNonNull(soupId, "soupId");
             Objects.requireNonNull(bowl, "bowl");

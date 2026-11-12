@@ -103,7 +103,11 @@ public class SauceStationRenderer implements BlockEntityRenderer<SauceStationBlo
      * 原版图集对缺图统一返回同一个缺失精灵实例（{@code getOrDefault(id, missingSprite)}），用它来判定。
      */
     private static TextureAtlasSprite surfaceSprite(SeasoningDef s, boolean garnish) {
-        TextureAtlasSprite sp = sprite(HotPot.id(garnish ? "block/" + s.id() : "block/sauce_" + s.id()));
+        ResourceLocation texId = sauceTextureId(s.id(), garnish);
+        if (texId == null) {
+            return null;
+        }
+        TextureAtlasSprite sp = sprite(texId);
         TextureAtlasSprite missing = sprite(MissingTextureAtlasSprite.getLocation());
         if (sp.contents() == missing.contents()) {
             if (WARNED.add(s.id())) {
@@ -112,6 +116,16 @@ public class SauceStationRenderer implements BlockEntityRenderer<SauceStationBlo
             return null;
         }
         return sp;
+    }
+
+    private static ResourceLocation sauceTextureId(String id, boolean garnish) {
+        if (id == null || id.isEmpty()) {
+            return null;
+        }
+        int colon = id.indexOf(':');
+        String namespace = colon > 0 ? id.substring(0, colon) : HotPot.MOD_ID;
+        String path = colon >= 0 ? id.substring(colon + 1) : id;
+        return ResourceLocation.tryBuild(namespace, garnish ? "block/" + path : "block/sauce_" + path);
     }
 
     /**

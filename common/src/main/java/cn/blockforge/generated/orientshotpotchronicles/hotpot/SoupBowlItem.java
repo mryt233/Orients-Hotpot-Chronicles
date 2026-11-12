@@ -94,14 +94,18 @@ public class SoupBowlItem extends Item {
         return soupId;
     }
 
-    /** 这碗汤对应的定义（登记表里的同一份）。 */
+    /** 这碗汤对应的定义（随当前世界重载动态更新）。 */
     public SoupDef soupDef() {
-        SoupDef def = soup;
-        if (def == null) {
-            def = requireSoupDef(soupId, resolver);
-            soup = def;
+        SoupDef resolved = resolver.apply(soupId);
+        if (resolved != null) {
+            soup = resolved;
+            return resolved;
         }
-        return def;
+        SoupDef cached = soup;
+        if (cached != null) {
+            return cached;
+        }
+        return requireSoupDef(soupId, resolver);
     }
 
     static SoupDef requireSoupDef(ResourceLocation soupId, Function<ResourceLocation, SoupDef> resolver) {

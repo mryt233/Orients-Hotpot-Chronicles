@@ -93,7 +93,7 @@ public class SauceStationScreen extends AbstractContainerScreen<SauceStationScre
     }
 
     private static Component effect(SeasoningDef s) {
-        return Component.translatable(HotPotBlockEntity.key("seasoning." + s.id() + ".effect"));
+        return Component.translatable(s.effectKey());
     }
 
     @Override

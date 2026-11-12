@@ -77,11 +77,15 @@ public final class Config {
     /** mryt233 改（2026-11-05，r135e）：当前运行中的服务端（单人集成服用来就地重载）。 */
     private static volatile MinecraftServer activeServer;
 
+    /** 模板默认数值扁平缓存（4F-2 区分「配置显式修改」与「自动补全的模板默认值」）。 */
+    private static volatile java.util.Map<String, Double> defaultNumbers;
+
     private Config() {
     }
 
     public static void init(Path directory, boolean dedicated) {
         Config.directory = directory;
+        defaultNumbers = null;
         migrateLegacyKeys();
         BASE.init(directory, dedicated);
         // mryt233 改（2026-11-05，r135e）：读完本地文件后把客户端粒子强度取回来
@@ -89,6 +93,7 @@ public final class Config {
     }
 
     public static void load() {
+        defaultNumbers = null;
         migrateLegacyKeys();
         BASE.load();
         // mryt233 改（2026-11-05，r135e）：同上，load 之后本地文件里的值才是准的
@@ -96,6 +101,7 @@ public final class Config {
     }
 
     public static Loaded reload() {
+        defaultNumbers = null;
         migrateLegacyKeys();
         ConfigStore.Loaded loaded = BASE.reload();
         // mryt233 改（2026-11-05，r135e）：热重载也要刷新本地粒子强度
@@ -217,6 +223,7 @@ public final class Config {
 
     /** mryt233 改（2026-11-10）：保存结果如实回传；文件备份和安全写入统一交给 ConfigStore。 */
     public static synchronized Loaded saveAndReload(JsonObject edited) {
+        defaultNumbers = null;
         migrateLegacyKeys();
         ConfigStore.Saved saved = STORE.saveEdited(edited);
         if (saved.status() != ConfigStore.SaveStatus.FAILED) {
@@ -256,6 +263,57 @@ public final class Config {
         return STORE.contains(snapshot(), path);
     }
 
+    /**
+     * 仅当配置文件中显式存在且数值与模板默认值不同时才覆盖 {@code fallback}，
+     * 用于实现「配置文件显式修改 &gt; 数据包 &gt; 代码默认值」优先级（4F-2 拍板 12）。
+     */
+    public static float overriddenReal(String path, float fallback) {
+        if (!has(path)) {
+            return fallback;
+        }
+        double current = real(path, fallback);
+        Double def = defaultsNumbers().get(path);
+        return (def == null || Math.abs(current - def) > 1e-6) ? (float) current : fallback;
+    }
+
+    /** {@link #overriddenReal} 的整数版本。 */
+    public static int overriddenInt(String path, int fallback) {
+        if (!has(path)) {
+            return fallback;
+        }
+        int current = integer(path, fallback);
+        Double def = defaultsNumbers().get(path);
+        return (def == null || current != (int) (double) def) ? current : fallback;
+    }
+
+    private static java.util.Map<String, Double> defaultsNumbers() {
+        java.util.Map<String, Double> cached = defaultNumbers;
+        if (cached != null) {
+            return cached;
+        }
+        synchronized (Config.class) {
+            if (defaultNumbers != null) {
+                return defaultNumbers;
+            }
+            java.util.Map<String, Double> built = new java.util.HashMap<>();
+            flattenNumbers("", STORE.defaults(), built);
+            defaultNumbers = java.util.Map.copyOf(built);
+            return defaultNumbers;
+        }
+    }
+
+    private static void flattenNumbers(String prefix, JsonObject obj, java.util.Map<String, Double> out) {
+        for (var entry : obj.entrySet()) {
+            String key = prefix.isEmpty() ? entry.getKey() : prefix + "." + entry.getKey();
+            var value = entry.getValue();
+            if (value.isJsonObject()) {
+                flattenNumbers(key, value.getAsJsonObject(), out);
+            } else if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isNumber()) {
+                out.put(key, value.getAsDouble());
+            }
+        }
+    }
+
     public static int foodHunger(String id, int fallback) {
         return integer("food." + id + ".hunger", fallback);
     }
@@ -268,6 +326,11 @@ public final class Config {
         return (float) real("soup_speed." + id, fallback);
     }
 
+    /** 4F-2：配置显式修改 > 数据包 > 代码默认值（仅对内置汤底使用）。 */
+    public static float overriddenSoupSpeed(String id, float fallback) {
+        return overriddenReal("soup_speed." + id, fallback);
+    }
+
     /**
      * mryt233 改（2026-11-05）：汤碗分组里的整数项，路径 soup_bowl.&lt;汤底&gt;.&lt;键&gt;
      * （hunger / duration / amplifier / second_duration / second_amplifier / fire_duration / fire_amplifier /
@@ -278,9 +341,19 @@ public final class Config {
         return integer("soup_bowl." + id + "." + key, fallback);
     }
 
+    /** 4F-2：配置显式修改 > 数据包 > 代码默认值。 */
+    public static int overriddenSoupBowlInt(String id, String key, int fallback) {
+        return overriddenInt("soup_bowl." + id + "." + key, fallback);
+    }
+
     /** mryt233 改（2026-11-05）：汤碗的小数项（目前只有 saturation），路径 soup_bowl.&lt;汤底&gt;.&lt;键&gt;。 */
     public static float soupBowlFloat(String id, String key, float fallback) {
         return (float) real("soup_bowl." + id + "." + key, fallback);
+    }
+
+    /** 4F-2：配置显式修改 > 数据包 > 代码默认值。 */
+    public static float overriddenSoupBowlFloat(String id, String key, float fallback) {
+        return overriddenReal("soup_bowl." + id + "." + key, fallback);
     }
 
     public static float fuelPower(String id, float fallback) {
@@ -295,12 +368,27 @@ public final class Config {
         return integer("seasoning." + id + ".duration", fallback);
     }
 
+    /** 4F-2：配置显式修改 > 数据包 > 代码默认值。 */
+    public static int overriddenSeasoningTicks(String id, int fallback) {
+        return overriddenInt("seasoning." + id + ".duration", fallback);
+    }
+
     public static int seasoningAmplifier(String id, int fallback) {
         return integer("seasoning." + id + ".amplifier", fallback);
     }
 
+    /** 4F-2：配置显式修改 > 数据包 > 代码默认值。 */
+    public static int overriddenSeasoningAmplifier(String id, int fallback) {
+        return overriddenInt("seasoning." + id + ".amplifier", fallback);
+    }
+
     public static int seasoningHunger(String id, int fallback) {
         return integer("seasoning." + id + ".hunger", fallback);
+    }
+
+    /** 4F-2：配置显式修改 > 数据包 > 代码默认值。 */
+    public static int overriddenSeasoningHunger(String id, int fallback) {
+        return overriddenInt("seasoning." + id + ".hunger", fallback);
     }
 
     public static int drinkHunger(int fallback) {
@@ -372,6 +460,7 @@ public final class Config {
     }
 
     public static void rememberSoupSpeed(String id, float speed) {
+        defaultNumbers = null;
         ConfigStore.make(STORE.defaults(), "soup_speed").addProperty(id, speed);
     }
 
@@ -382,6 +471,7 @@ public final class Config {
     }
 
     public static void rememberSeasoning(String id, int duration, int amplifier, int hunger) {
+        defaultNumbers = null;
         JsonObject node = ConfigStore.make(STORE.defaults(), "seasoning", id);
         node.addProperty("duration", duration);
         node.addProperty("amplifier", amplifier);
@@ -406,6 +496,7 @@ public final class Config {
                                         int secondDuration, int secondAmplifier,
                                         int fireDuration, int fireAmplifier,
                                         int hungerDuration, int hungerAmplifier) {
+        defaultNumbers = null;
         JsonObject node = ConfigStore.make(STORE.defaults(), "soup_bowl", id);
         node.addProperty("hunger", hunger);
         node.addProperty("saturation", saturation);

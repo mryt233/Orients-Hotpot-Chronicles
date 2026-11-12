@@ -103,9 +103,11 @@ public final class ConfigSchema {
         out.add(new Section(k("group.bowl"), bowl));
 
         List<Field> seasoning = new ArrayList<>();
-        for (SeasoningDef s : Seasonings.all()) {
-            Component name = seasoningName(s.legacy());
-            if (s.legacy() == Seasoning.MSG) {
+        // 4F-2：与内置汤底一致，设置界面只给内置蘸料列配置项，不把数据包或外部扩展蘸料混入配置界面
+        for (Seasoning legacy : Seasoning.ALL) {
+            SeasoningDef s = legacy.def();
+            Component name = seasoningName(legacy);
+            if (legacy == Seasoning.MSG) {
                 // 味精只读 hunger（额外饥饿点数），另外两个键对它没有意义
                 seasoning.add(field("seasoning.msg.hunger", true, 0, 100, 1, Unit.POINTS,
                     name.copy().append(DOT).append(prop("hunger")), "hunger"));

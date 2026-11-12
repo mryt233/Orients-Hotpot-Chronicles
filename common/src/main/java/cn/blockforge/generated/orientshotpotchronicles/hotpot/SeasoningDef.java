@@ -36,6 +36,7 @@ public final class SeasoningDef {
     private final Supplier<Item>[] raws;
     private final float[][] dots;
     private final float dotSize;
+    private final boolean garnish;
     private final String nameKey;
     private final String effectKey;
     private volatile List<Item> rawList;
@@ -54,14 +55,15 @@ public final class SeasoningDef {
         this.removes = removes.clone(); this.raws = raws.clone();
         this.dots = index < DOTS.length ? copyDots(DOTS[index]) : generatedDots(id);
         this.dotSize = index == 7 || index == 8 ? 0.7F : 0.5F;
+        this.garnish = index == 7 || index == 8;
         this.nameKey = defaultKey(id, false);
         this.effectKey = defaultKey(id, true);
     }
 
     private SeasoningDef(Builder builder) {
-        this.legacy = null;
+        this.legacy = builder.legacy;
         this.id = builder.id;
-        this.index = -1;
+        this.index = builder.index;
         this.color = builder.color;
         this.effect = builder.effect;
         this.ticks = builder.ticks;
@@ -75,6 +77,7 @@ public final class SeasoningDef {
         this.raws = sources;
         this.dots = builder.dots != null ? copyDots(builder.dots) : generatedDots(this.id);
         this.dotSize = builder.dotSize;
+        this.garnish = builder.garnish;
         this.nameKey = builder.nameKey != null ? builder.nameKey : defaultKey(this.id, false);
         this.effectKey = builder.effectKey != null ? builder.effectKey : defaultKey(this.id, true);
     }
@@ -106,7 +109,7 @@ public final class SeasoningDef {
     public float dotX(int i) { return dots[i][0]; }
     public float dotZ(int i) { return dots[i][1]; }
     public float dotSize() { return dotSize; }
-    public boolean garnish() { return index == 7 || index == 8; }
+    public boolean garnish() { return garnish; }
     public Item raw() { return raws[0].get(); }
     public List<Item> raws() {
         List<Item> items = rawList;
@@ -131,15 +134,21 @@ public final class SeasoningDef {
     public String effectKey() { return effectKey; }
     public void apply(LivingEntity user) {
         for (Holder<MobEffect> removed : removes) user.removeEffect(removed);
-        if (hunger > 0 && user instanceof Player player) {
-            int amount = Config.seasoningHunger(id, hunger);
-            if (amount > 0) player.getFoodData().eat(amount, 0);
+        boolean builtin = Seasonings.isBuiltin(id);
+        int amount = builtin ? Config.overriddenSeasoningHunger(id, hunger) : hunger;
+        if (amount > 0 && user instanceof Player player) {
+            player.getFoodData().eat(amount, 0);
         }
         if (effect != null) {
-            int duration = Config.seasoningTicks(id, ticks);
-            if (duration > 0) user.addEffect(new MobEffectInstance(effect, duration,
-                Config.seasoningAmplifier(id, amplifier)));
+            int duration = builtin ? Config.overriddenSeasoningTicks(id, ticks) : ticks;
+            int amp = builtin ? Config.overriddenSeasoningAmplifier(id, amplifier) : amplifier;
+            if (duration > 0) user.addEffect(new MobEffectInstance(effect, duration, amp));
         }
+    }
+
+    /** 4F-2（mryt233）：基于当前定义创建可修改副本（供数据包叠加合并用）。 */
+    public Builder toBuilder() {
+        return new Builder(this);
     }
 
     /** 4F-1（mryt233）：构造自定义蘸料定义。 */
@@ -156,7 +165,9 @@ public final class SeasoningDef {
 
     /** 4F-1（mryt233）：蘸料定义构造器（支持延迟原料引用与自定义语言键）。 */
     public static final class Builder {
+        private final Seasoning legacy;
         private final String id;
+        private final int index;
         private int color = 0xFFD4A054;
         private Holder<MobEffect> effect;
         private int ticks;
@@ -166,11 +177,32 @@ public final class SeasoningDef {
         private final List<Supplier<Item>> raws = new ArrayList<>();
         private float[][] dots;
         private float dotSize = 0.5F;
+        private boolean garnish;
         private String nameKey;
         private String effectKey;
 
         private Builder(String id) {
+            this.legacy = null;
             this.id = id;
+            this.index = -1;
+        }
+
+        private Builder(SeasoningDef base) {
+            this.legacy = base.legacy;
+            this.id = base.id;
+            this.index = base.index;
+            this.color = base.color;
+            this.effect = base.effect;
+            this.ticks = base.ticks;
+            this.amplifier = base.amplifier;
+            this.hunger = base.hunger;
+            java.util.Collections.addAll(this.removes, base.removes);
+            java.util.Collections.addAll(this.raws, base.raws);
+            this.dots = base.dots == null ? null : copyDots(base.dots);
+            this.dotSize = base.dotSize;
+            this.garnish = base.garnish;
+            this.nameKey = base.nameKey;
+            this.effectKey = base.effectKey;
         }
 
         public Builder color(int color) { this.color = color; return this; }
@@ -185,6 +217,17 @@ public final class SeasoningDef {
                 for (Holder<MobEffect> removed : effects) removes.add(Objects.requireNonNull(removed, "removed"));
             }
             return this;
+        }
+        public Builder removes(List<Holder<MobEffect>> effects) {
+            removes.clear();
+            if (effects != null) {
+                for (Holder<MobEffect> removed : effects) removes.add(Objects.requireNonNull(removed, "removed"));
+            }
+            return this;
+        }
+        Builder replaceRaws(List<Supplier<Item>> sources) {
+            raws.clear();
+            return raws(sources);
         }
         public Builder raw(Supplier<Item> raw) {
             raws.add(Objects.requireNonNull(raw, "raw")); return this;
@@ -202,7 +245,7 @@ public final class SeasoningDef {
             }
             return this;
         }
-        public Builder garnish(boolean garnish) { this.dotSize = garnish ? 0.7F : 0.5F; return this; }
+        public Builder garnish(boolean garnish) { this.garnish = garnish; this.dotSize = garnish ? 0.7F : 0.5F; return this; }
         public Builder dots(float[][] dots, float dotSize) {
             this.dots = dots == null ? null : copyDots(dots);
             this.dotSize = dotSize;
