@@ -5,6 +5,8 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SeasoningDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasonings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.RenderType;
@@ -39,22 +41,10 @@ public final class SauceRender {
 
     /** 酱面贴图（灰度，按调料平均色染色；tools/gen_sauce_station.py 的 bowl_surface_texture）。 */
     private static final ResourceLocation SURFACE = HotPot.id("textures/misc/sauce_surface.png");
-    /** 每种调料撒在面上的两个小点（像素坐标，碗面 5.5..10.5），顺序同 Seasoning。 */
-    private static final float[][][] DOTS = {
-        {{6.2F, 6.6F}, {9.4F, 9.0F}}, {{7.4F, 6.0F}, {8.8F, 7.6F}}, {{6.0F, 8.6F}, {9.6F, 6.4F}},
-        {{7.8F, 9.4F}, {6.6F, 7.6F}}, {{8.4F, 6.8F}, {7.0F, 9.6F}}, {{9.2F, 8.2F}, {6.4F, 9.0F}},
-        {{7.6F, 7.0F}, {8.6F, 9.6F}}, {{6.8F, 6.2F}, {9.0F, 7.0F}, {7.4F, 8.8F}}, {{8.2F, 8.4F}, {6.0F, 7.2F}, {9.6F, 9.4F}},
-        {{7.0F, 8.0F}, {9.0F, 6.0F}},                       // 蒜泥（2026-10-25）
-        {{6.4F, 6.8F}, {8.2F, 9.2F}},                       // 蚝油（r137）
-        {{8.8F, 6.2F}, {7.2F, 8.0F}},                       // 芝麻酱（r137）
-        {{6.0F, 9.0F}, {9.4F, 7.4F}, {7.6F, 6.4F}},         // 花生碎（r137）
-        {{8.6F, 8.8F}, {6.6F, 6.2F}},                       // 小米辣（r137）
-        {{7.2F, 9.4F}, {9.2F, 6.6F}, {6.2F, 7.8F}}};        // 折耳根碎（r139）
-
     /**
      * 碗里的调料面（mask 为空就不画）。2026-10-23 用户说不像蘸料（原来是一层平涂的色），改成：
      * 有光泽的酱面（贴图按几种调料的平均色染色）+ 每种放进去的调料撒两三个它自己颜色的小点。
-     * mryt233 改：小点表按下标取，表比枚举短时退回最后一组，加新调料不会再把渲染打崩。
+     * mryt233 改（4C）：内置点位由定义持有，新增调料按 ID 生成点位。
      */
     public static void surface(int mask, PoseStack matrices, MultiBufferSource consumers, int light) {
         int color = Seasoning.mixColor(mask);
@@ -65,16 +55,14 @@ public final class SauceRender {
         float a = 0.5F - HALF, b = 0.5F + HALF, y = SURFACE_Y;
         quad(consumers.getBuffer(RenderType.entityCutoutNoCull(SURFACE)), e, light, color, a, y, a, b, y, b);
         VertexConsumer vc = consumers.getBuffer(RenderType.entityCutoutNoCull(WHITE));
-        for (Seasoning s : Seasoning.ALL) {
+        for (SeasoningDef s : Seasonings.all()) {
             if ((mask & s.bit()) == 0) {
                 continue;
             }
             int dot = darkenIfPale(s.color());
-            float size = (s == Seasoning.CHOPPED_SCALLION || s == Seasoning.MINCED_CILANTRO ? 0.7F : 0.5F) / 16F;
-            // 表跟着枚举一起长；万一以后加调料忘了补表，退回最后一组点，不要越界崩端
-            float[][] dots = DOTS[Math.min(s.ordinal(), DOTS.length - 1)];
-            for (float[] d : dots) {
-                float x = d[0] / 16F, z = d[1] / 16F;
+            float size = s.dotSize() / 16F;
+            for (int i = 0; i < s.dotCount(); i++) {
+                float x = s.dotX(i) / 16F, z = s.dotZ(i) / 16F;
                 quad(vc, e, light, dot, x, y + 0.001F, z, x + size, y + 0.001F, z + size);
             }
         }

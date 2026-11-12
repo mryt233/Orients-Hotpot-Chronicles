@@ -51,11 +51,7 @@ public enum SauceBottleKind implements StringRepresentable {
 
     /** 这瓶对应蘸料台上的哪种调料（说明里列它管什么用）。运行时现查。 */
     public Seasoning seasoning() {
-        for (Seasoning seasoning : Seasoning.ALL) {
-            if (seasoning.id().equals(seasoningId)) {
-                return seasoning;
-            }
-        }
-        return Seasoning.SESAME_PASTE;
+        SeasoningDef def = Seasonings.get(seasoningId);
+        return def == null ? Seasoning.SESAME_PASTE : def.legacy();
     }
 }

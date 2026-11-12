@@ -17,6 +17,8 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceContents;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SeasoningDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasonings;
 import cn.blockforge.generated.orientshotpotchronicles.client.ClientTooltips;
 import cn.blockforge.generated.orientshotpotchronicles.client.SharedClientSetup;
 import java.util.ArrayList;
@@ -202,7 +204,7 @@ public final class HotPotJadePlugin implements IWailaPlugin {
         if (plate.self.getItem() instanceof DippingSauceItem) {
             SauceContents contents = DippingSauceItem.contents(plate.self);
             if (contents.bites() > 0 && contents.mask() != 0) {
-                for (Seasoning seasoning : Seasoning.ALL) {
+                for (SeasoningDef seasoning : Seasonings.all()) {
                     if ((contents.mask() & seasoning.bit()) != 0 && !seasoning.raws().isEmpty()) {
                         appendMerged(merged, new ItemStack(seasoning.raw()));
                     }

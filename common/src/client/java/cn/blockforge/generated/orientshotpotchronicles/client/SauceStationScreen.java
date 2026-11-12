@@ -4,6 +4,8 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationScreenHandler;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SeasoningDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasonings;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.components.Tooltip;
@@ -46,7 +48,7 @@ public class SauceStationScreen extends AbstractContainerScreen<SauceStationScre
     private final List<List<GuideRow>> guidePages = new ArrayList<>();
     private Button previousPage, nextPage;
 
-    private record GuideRow(Seasoning seasoning, List<FormattedCharSequence> names,
+    private record GuideRow(SeasoningDef seasoning, List<FormattedCharSequence> names,
                             List<FormattedCharSequence> effects, boolean inline, int height) { }
 
     public SauceStationScreen(SauceStationScreenHandler handler, Inventory inventory, Component title) {
@@ -90,7 +92,7 @@ public class SauceStationScreen extends AbstractContainerScreen<SauceStationScre
         return Component.translatable(HotPotBlockEntity.key("screen.sauce.guide"));
     }
 
-    private static Component effect(Seasoning s) {
+    private static Component effect(SeasoningDef s) {
         return Component.translatable(HotPotBlockEntity.key("seasoning." + s.id() + ".effect"));
     }
 
@@ -108,7 +110,7 @@ public class SauceStationScreen extends AbstractContainerScreen<SauceStationScre
         }
         for (int i = 0; i < SauceStationBlockEntity.BOWLS; i++) {
             int sx = x + SauceStationScreenHandler.slotX(i), sy = y + SauceStationScreenHandler.slotY(i);
-            Seasoning s = menu.kind(i);
+            SeasoningDef s = menu.kindDef(i);
             // 格子里原料用完、碗里还剩份数：淡淡显示是哪种
             if (menu.getSlot(i).getItem().isEmpty() && s != null) {
                 g.renderItem(new ItemStack(s.rawShown(Util.getMillis())), sx, sy);
@@ -134,7 +136,7 @@ public class SauceStationScreen extends AbstractContainerScreen<SauceStationScre
         List<GuideRow> page = new ArrayList<>();
         guidePages.add(page);
         int used = 0;
-        for (Seasoning seasoning : Seasoning.ALL) {
+        for (SeasoningDef seasoning : Seasonings.all()) {
             Component name = Component.translatable(seasoning.nameKey());
             Component description = effect(seasoning);
             boolean inline = font.width(name) + 4 + font.width(description) <= TEXT_W;
@@ -229,7 +231,7 @@ public class SauceStationScreen extends AbstractContainerScreen<SauceStationScre
         for (int i = 0; i < SauceStationBlockEntity.BOWLS; i++) {
             Slot slot = menu.getSlot(i);
             if (slot.getItem().isEmpty() && isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY)) {
-                Seasoning s = menu.kind(i);
+                SeasoningDef s = menu.kindDef(i);
                 List<Component> lines = new ArrayList<>();
                 if (s == null) {
                     lines.add(Component.translatable(HotPotBlockEntity.key("screen.sauce.empty")));

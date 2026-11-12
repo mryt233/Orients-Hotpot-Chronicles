@@ -48,7 +48,7 @@ public class SauceStationScreenHandler extends PlayerInventoryMenu {
                 if (index < N) {
                     return be.portions(index);
                 }
-                Seasoning s = be.kind(index - N);
+                SeasoningDef s = be.kindDef(index - N);
                 return s == null ? 0 : s.ordinal() + 1;
             }
 
@@ -93,12 +93,15 @@ public class SauceStationScreenHandler extends PlayerInventoryMenu {
 
     /** 第 i 个碗装的调料；空碗返回 null。 */
     public Seasoning kind(int i) {
+        SeasoningDef def = kindDef(i);
+        return def == null ? null : def.legacy();
+    }
+
+    public SeasoningDef kindDef(int i) {  // mryt233 改：兼容原有菜单公开签名。
         ItemStack stack = raw.getItem(i);
-        if (!stack.isEmpty()) {
-            return Seasoning.ofRaw(stack);
-        }
+        if (!stack.isEmpty()) return Seasonings.ofRaw(stack);
         int k = data.get(N + i);
-        return k > 0 && data.get(i) > 0 ? Seasoning.ALL[k - 1] : null;
+        return k > 0 && data.get(i) > 0 ? Seasonings.byIndex(k - 1) : null;
     }
 
     @Override
@@ -126,8 +129,8 @@ public class SauceStationScreenHandler extends PlayerInventoryMenu {
 
         @Override
         public boolean mayPlace(ItemStack stack) {
-            Seasoning s = Seasoning.ofRaw(stack);
-            Seasoning k = kind(getContainerSlot());
+            SeasoningDef s = Seasonings.ofRaw(stack);
+            SeasoningDef k = kindDef(getContainerSlot());
             return s != null && (k == null || k == s);
         }
 
@@ -141,5 +144,5 @@ public class SauceStationScreenHandler extends PlayerInventoryMenu {
     protected int containerSlots() { return N; }
 
     @Override
-    protected boolean acceptsQuickMove(ItemStack stack) { return Seasoning.ofRaw(stack) != null; }
+    protected boolean acceptsQuickMove(ItemStack stack) { return Seasonings.ofRaw(stack) != null; }
 }

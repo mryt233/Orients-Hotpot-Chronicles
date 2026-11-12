@@ -16,7 +16,7 @@ public final class HotPotRuntime {
 
     public static void install(RuntimeHooks hooks) {
         HotPotFuel.values();
-        Seasoning.values();
+        Seasonings.all();
         // mryt233 改（2026-11-11，第四批 4B-1）：强制初始化 SoupBase，让六个内置汤底定义在读配置（Config.init）之前
         // 登记进汤底登记表（Soups）并把默认值记进配置模板。以前靠别的类碰巧先加载它。
         SoupBase.values();

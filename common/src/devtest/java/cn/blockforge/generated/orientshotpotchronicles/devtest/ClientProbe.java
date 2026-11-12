@@ -328,7 +328,7 @@ public final class ClientProbe {
                         var height = row.getClass().getDeclaredMethod("height"); height.setAccessible(true);
                         var seasoning = row.getClass().getDeclaredMethod("seasoning"); seasoning.setAccessible(true);
                         var inline = row.getClass().getDeclaredMethod("inline"); inline.setAccessible(true);
-                        if (seasoning.invoke(row) != cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning.ALL[total++])
+                        if (seasoning.invoke(row) != cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning.ALL[total++].def())
                             throw new IllegalStateException("Guide seasoning order changed");
                         if (!(boolean) inline.invoke(row)) wrapped++;
                         for (String name : new String[]{"names", "effects"}) {

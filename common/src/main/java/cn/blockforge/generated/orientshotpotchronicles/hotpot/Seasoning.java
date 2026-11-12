@@ -83,30 +83,7 @@ public enum Seasoning {
 
     public static final Seasoning[] ALL = values();
 
-    /**
-     * 原料 → 调料、每种调料的原料表：类加载时算一次（mryt233 改）。
-     * 以前 ofRaw 每次新建 15 个 List + 15 条 Stream，raws() 也被补货界面的槽位判定和原料表渲染
-     * （SauceStationScreen 每帧 drawGuide、SauceStationBlockEntity 的 changed / take）反复调用，
-     * 纯查表的事不该在每帧、每次点击的路径上分配。
-     */
-    private static final Map<Item, Seasoning> RAW_INDEX = new HashMap<>();
-    @SuppressWarnings("unchecked")
-    private static final List<Item>[] RAW_LISTS = new List[ALL.length];
-
-    static {
-        for (Seasoning s : ALL) {
-            List<Item> items = new ArrayList<>(s.raws.length);
-            for (Supplier<Item> raw : s.raws) {
-                items.add(raw.get());
-            }
-            RAW_LISTS[s.ordinal()] = List.copyOf(items);
-            for (Item raw : items) {
-                // 同一原料属于两种调料时取序号靠前的那个（和以前按 values() 顺序遍历取第一个一致）
-                RAW_INDEX.putIfAbsent(raw, s);
-            }
-        }
-    }
-
+    private final SeasoningDef def;
     private final String id;
     private final Supplier<Item>[] raws;
     private final int color;
@@ -126,6 +103,7 @@ public enum Seasoning {
               int defaultTicks, int defaultAmplifier, int defaultHunger,
               Holder<MobEffect>[] removes,
               Supplier<Item>... raws) {
+        this.def = new SeasoningDef(this, id, ordinal(), color, effect, defaultTicks, defaultAmplifier, defaultHunger, removes, raws);
         this.id = id;
         this.raws = raws;
         this.color = color;
@@ -135,6 +113,8 @@ public enum Seasoning {
         this.defaultHunger = defaultHunger;
         this.removes = removes;
     }
+
+    public SeasoningDef def() { return def; }
 
     public String id() {
         return id;
@@ -147,7 +127,7 @@ public enum Seasoning {
 
     /** 所有能补这种调料的原料（类加载时算好的常量表，直接返回，不再每次新建）。mryt233 改 */
     public List<Item> raws() {
-        return RAW_LISTS[ordinal()];
+        return def.raws();
     }
 
     /** 界面上空格子轮流显示的原料（有几种就每秒换一种）。 */
@@ -187,7 +167,7 @@ public enum Seasoning {
 
     /** 「 辣油：抗火 10 秒」这样一行灰字：蘸料碗、蘸过的菜的提示共用。 */
     public static void appendEffects(int mask, List<Component> lines) {
-        for (Seasoning s : ALL) {
+        for (SeasoningDef s : Seasonings.all()) {
             if ((mask & s.bit()) != 0) {
                 lines.add(Component.literal(" ").append(Component.translatable(HotPotBlockEntity.key("tooltip.sauce.line"),
                     Component.translatable(s.nameKey()), Component.translatable(s.effectKey())))
@@ -198,7 +178,8 @@ public enum Seasoning {
 
     /** 这件东西是哪种调料的原料；不是返回 null（mryt233 改：一次 Map 查表，不再遍历 15 种调料）。 */
     public static Seasoning ofRaw(ItemStack stack) {
-        return stack.isEmpty() ? null : RAW_INDEX.get(stack.getItem());
+        SeasoningDef found = Seasonings.ofRaw(stack);
+        return found == null ? null : found.legacy();
     }
 
     /**
@@ -209,34 +190,7 @@ public enum Seasoning {
      * 默认等级、解除哪些效果、多回多少饥饿都写在枚举构造参数里，这里只按数据执行。</p>
      */
     public void apply(LivingEntity user) {
-        // 先解除（蜂蜜解毒解辣、醋解反胃解辣、折耳根碎解毒）
-        for (Holder<MobEffect> removed : removes) {
-            user.removeEffect(removed);
-        }
-        // 味精：提鲜，多回 2 点饥饿值（用户 2026-10-23 选的）
-        if (defaultHunger > 0 && user instanceof Player player) {
-            int hunger = Config.seasoningHunger(id, defaultHunger);
-            if (hunger > 0) {
-                player.getFoodData().eat(hunger, 0);
-            }
-        }
-        // 正面效果（没有效果的调料 effect 是 null，addEffect 会直接跳过）
-        addEffect(user, effect, defaultTicks, defaultAmplifier);
-    }
-
-    /** 按配置给状态效果；时长配成 0 或这条效果不存在就不加。 */
-    private void addEffect(LivingEntity user,
-                           Holder<MobEffect> effect,
-                           int defaultTicks, int defaultAmplifier) {
-        if (effect == null) {
-            return;
-        }
-        int ticks = Config.seasoningTicks(id, defaultTicks);
-        if (ticks <= 0) {
-            return;
-        }
-        user.addEffect(new MobEffectInstance(effect, ticks,
-            Config.seasoningAmplifier(id, defaultAmplifier)));
+        def.apply(user);   // mryt233 改：旧入口保持，效果顺序由定义执行。
     }
 
     static {
@@ -250,7 +204,7 @@ public enum Seasoning {
 
     /** mask 里的每种调料都生效一次。 */
     public static void applyAll(int mask, LivingEntity user) {
-        for (Seasoning s : ALL) {
+        for (SeasoningDef s : Seasonings.all()) {
             if ((mask & s.bit()) != 0) {
                 s.apply(user);
             }
@@ -260,11 +214,11 @@ public enum Seasoning {
     /** mask 里几种调料的平均颜色（ARGB）；空的返回 0。 */
     public static int mixColor(int mask) {
         int r = 0, g = 0, b = 0, n = 0;
-        for (Seasoning s : ALL) {
+        for (SeasoningDef s : Seasonings.all()) {
             if ((mask & s.bit()) != 0) {
-                r += (s.color >> 16) & 255;
-                g += (s.color >> 8) & 255;
-                b += s.color & 255;
+                r += (s.color() >> 16) & 255;
+                g += (s.color() >> 8) & 255;
+                b += s.color() & 255;
                 n++;
             }
         }

@@ -245,11 +245,11 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
     }
 
     /** mryt233 改：名称与图标只显示所瞄小碗中仍有存货的调料。 */
-    private static Seasoning aimedSeasoning(BlockState state, LevelReader world, BlockPos pos, BlockHitResult hit) {
+    private static SeasoningDef aimedSeasoning(BlockState state, LevelReader world, BlockPos pos, BlockHitResult hit) {
         int bowl = aimed(state, pos, hit);
         if (bowl >= 0 && world.getBlockEntity(pos) instanceof SauceStationBlockEntity be
             && be.available(bowl) > 0) {
-            return be.kind(bowl);
+            return be.kindDef(bowl);
         }
         return null;
     }
@@ -265,7 +265,7 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
                 if (stationState.getBlock() instanceof SauceStationBlock) {
                     MutableComponent name =
                         Component.translatable(stationState.getBlock().getDescriptionId());
-                    Seasoning seasoning = aimedSeasoning(stationState, player.level(), stationPos, blockHit);
+                    SeasoningDef seasoning = aimedSeasoning(stationState, player.level(), stationPos, blockHit);
                     return seasoning == null ? name
                         : name.append(" · ").append(Component.translatable(seasoning.nameKey()));
                 }
@@ -289,7 +289,7 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
                 BlockPos hitPos = blockHit.getBlockPos();
                 if (hitPos.equals(pos)
                     || (hitPos.equals(pos.above()) && world.getBlockState(hitPos).is(HotPotContent.SAUCE_STATION_TOP))) {
-                    Seasoning seasoning = aimedSeasoning(state, world, pos, blockHit);
+                    SeasoningDef seasoning = aimedSeasoning(state, world, pos, blockHit);
                     if (seasoning != null && !seasoning.raws().isEmpty()) {
                         return new ItemStack(seasoning.raw());
                     }

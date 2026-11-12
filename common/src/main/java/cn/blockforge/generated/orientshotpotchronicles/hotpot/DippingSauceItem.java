@@ -81,7 +81,7 @@ public class DippingSauceItem extends Item {
     public static MutableComponent names(int mask) {
         MutableComponent out = Component.empty();
         boolean first = true;
-        for (Seasoning s : Seasoning.ALL) {
+        for (SeasoningDef s : Seasonings.all()) {
             if ((mask & s.bit()) != 0) {
                 if (!first) {
                     out.append(Component.translatable(HotPotBlockEntity.key("tooltip.sauce.sep")));

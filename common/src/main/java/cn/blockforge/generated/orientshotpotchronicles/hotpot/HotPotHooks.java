@@ -99,6 +99,7 @@ public final class HotPotHooks {
         HotPotCooking.freezeRegistries();
         SoupBase.freezeSources();
         Soups.freeze();   // mryt233 改（2026-11-11，4B-1）：汤底登记表
+        Seasonings.freeze();   // mryt233 改（4C）：蘸料登记表
         HotPotFuel.freezeSources();
         if (!HotPotCooking.registriesFrozen()) {
             throw new IllegalStateException("登记表冻结失败");

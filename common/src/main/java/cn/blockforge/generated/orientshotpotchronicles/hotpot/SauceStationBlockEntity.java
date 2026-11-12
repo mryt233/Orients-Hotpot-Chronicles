@@ -72,17 +72,20 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
 
     /** 第 i 个碗装的是哪种调料：格子里有原料看原料，没原料但还剩份数看剩的；空碗返回 null。 */
     public Seasoning kind(int i) {
+        SeasoningDef def = kindDef(i);
+        return def == null ? null : def.legacy();
+    }
+
+    public SeasoningDef kindDef(int i) {  // mryt233 改：旧公开入口保留枚举签名。
         ItemStack stack = raw.getItem(i);
-        if (!stack.isEmpty()) {
-            return Seasoning.ofRaw(stack);
-        }
-        return portions[i] > 0 && kinds[i] >= 0 ? Seasoning.ALL[kinds[i]] : null;
+        if (!stack.isEmpty()) return Seasonings.ofRaw(stack);
+        return portions[i] > 0 ? Seasonings.byIndex(kinds[i]) : null;
     }
 
     /** 这个碗收不收这件原料：空碗什么调料的原料都收，有东西的碗只收同一种。 */
     public boolean accepts(int i, ItemStack stack) {
-        Seasoning s = Seasoning.ofRaw(stack);
-        Seasoning k = kind(i);
+        SeasoningDef s = Seasonings.ofRaw(stack);
+        SeasoningDef k = kindDef(i);
         return s != null && (k == null || k == s);
     }
 
@@ -98,7 +101,7 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
             if (stack.isEmpty()) {
                 return false;
             }
-            kinds[i] = Seasoning.ofRaw(stack).ordinal();
+            kinds[i] = Seasonings.ofRaw(stack).ordinal();
             stack.shrink(1);
             portions[i] += PORTIONS_PER_RAW;
         }
@@ -112,14 +115,14 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
      * 已经有这种的不重复加（用户：同一种一碗只能加一次）；加到吃了一半的碗里，剩余口数不变。
      */
     public void serve(Player player, InteractionHand hand, int i) {
-        Seasoning s = kind(i);
+        SeasoningDef s = kindDef(i);
         if (s == null || available(i) == 0) {
             player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.bowl_empty")), true);
             return;
         }
         ItemStack held = player.getItemInHand(hand);
         boolean sauce = held.getItem() instanceof DippingSauceItem;
-        if (sauce && DippingSauceItem.contents(held).has(s)) {
+        if (sauce && DippingSauceItem.contents(held).has(s.legacy())) {
             player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.sauce_has"), Component.translatable(s.nameKey())), true);
             return;
         }
@@ -127,12 +130,12 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
             return;
         }
         if (sauce) {
-            held.set(HotPotContent.SAUCE, DippingSauceItem.contents(held).with(s));
-            if (DippingSauceItem.contents(held).mask() == (1 << Seasoning.ALL.length) - 1) {
+            held.set(HotPotContent.SAUCE, DippingSauceItem.contents(held).with(s.legacy()));
+            if (DippingSauceItem.contents(held).mask() == (1 << Seasonings.size()) - 1) {
                 HotPotCriterion.fire(player, "sauce_full");
             }
         } else {
-            player.setItemInHand(hand, ItemUtils.createFilledResult(held, player, DippingSauceItem.create(s)));
+            player.setItemInHand(hand, ItemUtils.createFilledResult(held, player, DippingSauceItem.create(s.legacy())));
         }
         level.playSound(null, worldPosition, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 0.6F, 1.4F);
     }
@@ -142,7 +145,7 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
         for (int i = 0; i < BOWLS; i++) {
             ItemStack stack = raw.getItem(i);
             if (!stack.isEmpty()) {
-                Seasoning s = Seasoning.ofRaw(stack);
+                SeasoningDef s = Seasonings.ofRaw(stack);
                 kinds[i] = s == null ? -1 : s.ordinal();
             } else if (portions[i] == 0) {
                 kinds[i] = -1;

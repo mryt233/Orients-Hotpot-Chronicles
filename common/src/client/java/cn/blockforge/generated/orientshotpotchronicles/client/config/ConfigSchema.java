@@ -4,6 +4,8 @@ package cn.blockforge.generated.orientshotpotchronicles.client.config;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkKind;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotFuel;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SeasoningDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasonings;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
 import com.google.gson.JsonObject;
@@ -101,9 +103,9 @@ public final class ConfigSchema {
         out.add(new Section(k("group.bowl"), bowl));
 
         List<Field> seasoning = new ArrayList<>();
-        for (Seasoning s : Seasoning.ALL) {
-            Component name = seasoningName(s);
-            if (s == Seasoning.MSG) {
+        for (SeasoningDef s : Seasonings.all()) {
+            Component name = seasoningName(s.legacy());
+            if (s.legacy() == Seasoning.MSG) {
                 // 味精只读 hunger（额外饥饿点数），另外两个键对它没有意义
                 seasoning.add(field("seasoning.msg.hunger", true, 0, 100, 1, Unit.POINTS,
                     name.copy().append(DOT).append(prop("hunger")), "hunger"));
