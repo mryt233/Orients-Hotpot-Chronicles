@@ -16,6 +16,7 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceContents;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceIds;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SeasoningDef;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasonings;
@@ -203,9 +204,9 @@ public final class HotPotJadePlugin implements IWailaPlugin {
         List<ItemStack> merged = new ArrayList<>();
         if (plate.self.getItem() instanceof DippingSauceItem) {
             SauceContents contents = DippingSauceItem.contents(plate.self);
-            if (contents.bites() > 0 && contents.mask() != 0) {
-                for (SeasoningDef seasoning : Seasonings.all()) {
-                    if ((contents.mask() & seasoning.bit()) != 0 && !seasoning.raws().isEmpty()) {
+            if (contents.bites() > 0 && !contents.isEmpty()) {
+                for (SeasoningDef seasoning : SauceIds.defs(contents.ids())) {
+                    if (!seasoning.raws().isEmpty()) {
                         appendMerged(merged, new ItemStack(seasoning.raw()));
                     }
                 }
@@ -303,7 +304,7 @@ public final class HotPotJadePlugin implements IWailaPlugin {
             if (plate.self.getItem() instanceof DippingSauceItem) {
                 SauceContents contents = DippingSauceItem.contents(plate.self);
                 if (contents.bites() > 0) {
-                    Seasoning.appendEffects(contents.mask(), lines);
+                    Seasoning.appendEffects(contents.ids(), lines);
                     lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.sauce.bites"), contents.bites())
                         .withStyle(ChatFormatting.GRAY));
                 }

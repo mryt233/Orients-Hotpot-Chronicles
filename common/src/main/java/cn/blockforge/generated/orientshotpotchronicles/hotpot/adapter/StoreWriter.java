@@ -28,6 +28,9 @@ public interface StoreWriter {
 
     void putIntArray(String key, int[] value);
 
+    /** mryt233：按原顺序写字符串列表。 */
+    void putStringList(String key, List<String> values);
+
     void putByteArray(String key, byte[] value);
 
     /** 单个物品；空栈跳过（1.21.1 的写法本来就是「非空才写」）。 */

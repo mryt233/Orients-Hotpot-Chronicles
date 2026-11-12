@@ -2,8 +2,10 @@ package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 // mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
 import java.util.Arrays;
+import java.util.List;
 // mryt233 改（2026-11-11）：第三批 3G 存读档改走适配小包，键名与结构不变。
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.BeIo;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.StoreReader;
 
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.Packet;
@@ -47,14 +49,17 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
         }
     };
     private final int[] portions = new int[BOWLS];
-    /** 每个碗已经化开的份数是哪种调料（Seasoning 序号，-1 = 没有）。 */
-    private final int[] kinds = new int[BOWLS];
+    /** mryt233：每碗持久化 ID；空字符串为空，未知 ID 保留。 */
+    private final String[] kindIds = new String[BOWLS];
+    /** 识别空槽被明确补货，避免无关槽变化抹掉未知 ID。 */
+    private final boolean[] rawWasEmpty = new boolean[BOWLS];
     /** 读存档时往格子里放东西，不要触发 changed（那时可能还在加载区块）。 */
     private boolean loading;
 
     public SauceStationBlockEntity(BlockPos worldPosition, BlockState state) {
         super(HotPotContent.SAUCE_STATION_BE, worldPosition, state);
-        Arrays.fill(kinds, -1);
+        Arrays.fill(kindIds, "");
+        Arrays.fill(rawWasEmpty, true);
         raw.addListener(inv -> {
             if (!loading) {
                 changed();
@@ -78,15 +83,29 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
 
     public SeasoningDef kindDef(int i) {  // mryt233 改：旧公开入口保留枚举签名。
         ItemStack stack = raw.getItem(i);
+        SeasoningDef saved = kindIds[i].isEmpty() ? null : SauceIds.def(kindIds[i]);
+        if (!kindIds[i].isEmpty() && saved == null && available(i) > 0) return null;
         if (!stack.isEmpty()) return Seasonings.ofRaw(stack);
-        return portions[i] > 0 ? Seasonings.byIndex(kinds[i]) : null;
+        return portions[i] > 0 ? saved : null;
+    }
+
+    /** 会话索引：-1 空，-2 未知，不将未知回写为空。 */
+    public int kindIndex(int i) {
+        SeasoningDef def = kindDef(i);
+        return slotIndex(kindIds[i], available(i), def == null ? -1 : Seasonings.indexOf(def),
+            !kindIds[i].isEmpty() && SauceIds.def(kindIds[i]) == null);
+    }
+
+    static int slotIndex(String id, int available, int knownIndex, boolean unknown) {
+        if (knownIndex >= 0) return knownIndex;
+        return available > 0 && !id.isEmpty() && unknown ? -2 : -1;
     }
 
     /** 这个碗收不收这件原料：空碗什么调料的原料都收，有东西的碗只收同一种。 */
     public boolean accepts(int i, ItemStack stack) {
         SeasoningDef s = Seasonings.ofRaw(stack);
         SeasoningDef k = kindDef(i);
-        return s != null && (k == null || k == s);
+        return s != null && kindIndex(i) != -2 && (k == null || k == s);
     }
 
     /** 这个碗一共还能打几次（已化开的份数 + 格子里的原料 × 4）。 */
@@ -101,7 +120,7 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
             if (stack.isEmpty()) {
                 return false;
             }
-            kinds[i] = Seasonings.ofRaw(stack).ordinal();
+            kindIds[i] = SauceIds.fullId(Seasonings.ofRaw(stack));
             stack.shrink(1);
             portions[i] += PORTIONS_PER_RAW;
         }
@@ -117,12 +136,13 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
     public void serve(Player player, InteractionHand hand, int i) {
         SeasoningDef s = kindDef(i);
         if (s == null || available(i) == 0) {
-            player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.bowl_empty")), true);
+            player.displayClientMessage(Component.translatable(HotPotBlockEntity.key(
+                kindIndex(i) == -2 ? "sauce.unknown" : "msg.bowl_empty")), true);
             return;
         }
         ItemStack held = player.getItemInHand(hand);
         boolean sauce = held.getItem() instanceof DippingSauceItem;
-        if (sauce && DippingSauceItem.contents(held).has(s.legacy())) {
+        if (sauce && DippingSauceItem.contents(held).has(SauceIds.fullId(s))) {
             player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.sauce_has"), Component.translatable(s.nameKey())), true);
             return;
         }
@@ -130,12 +150,12 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
             return;
         }
         if (sauce) {
-            held.set(HotPotContent.SAUCE, DippingSauceItem.contents(held).with(s.legacy()));
-            if (DippingSauceItem.contents(held).mask() == (1 << Seasonings.size()) - 1) {
+            held.set(HotPotContent.SAUCE, DippingSauceItem.contents(held).with(SauceIds.fullId(s)));
+            if (SauceIds.hasAllBuiltins(DippingSauceItem.contents(held).ids())) {   // mryt233 改（4E-2）：按内置 15 种算
                 HotPotCriterion.fire(player, "sauce_full");
             }
         } else {
-            player.setItemInHand(hand, ItemUtils.createFilledResult(held, player, DippingSauceItem.create(s.legacy())));
+            player.setItemInHand(hand, ItemUtils.createFilledResult(held, player, DippingSauceItem.createWithId(SauceIds.fullId(s))));
         }
         level.playSound(null, worldPosition, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 0.6F, 1.4F);
     }
@@ -144,12 +164,13 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
     public void changed() {
         for (int i = 0; i < BOWLS; i++) {
             ItemStack stack = raw.getItem(i);
-            if (!stack.isEmpty()) {
-                SeasoningDef s = Seasonings.ofRaw(stack);
-                kinds[i] = s == null ? -1 : s.ordinal();
-            } else if (portions[i] == 0) {
-                kinds[i] = -1;
-            }
+            boolean hadRaw = !rawWasEmpty[i];
+            boolean hasRaw = !stack.isEmpty();
+            rawWasEmpty[i] = !hasRaw;
+            SeasoningDef saved = kindIds[i].isEmpty() ? null : SauceIds.def(kindIds[i]);
+            SeasoningDef current = hasRaw ? Seasonings.ofRaw(stack) : null;
+            kindIds[i] = updatedKindId(kindIds[i], portions[i], hadRaw, hasRaw,
+                saved != null, current == null ? "" : SauceIds.fullId(current));
         }
         setChanged();
         if (level != null && !level.isClientSide) {
@@ -157,10 +178,19 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
         }
     }
 
+    static String updatedKindId(String id, int portions, boolean hadRaw, boolean hasRaw,
+                                boolean known, String newRawId) {
+        boolean newlyFilled = !hadRaw && hasRaw;
+        if (!id.isEmpty() && !known && (!newlyFilled || !hasRaw || portions > 0)) return id;
+        if (!hasRaw && portions > 0) return id;
+        return hasRaw ? newRawId : "";
+    }
+
     // mryt233 改（2026-11-11）：第三批 3G 存读档改走适配小包，键名、结构与兜底值不变。
     @Override
     protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
         super.saveAdditional(nbt, registries);
+        nbt.remove("Kinds");
         BeIo.write(nbt, registries, w -> {
             NonNullList<ItemStack> list = NonNullList.withSize(raw.getContainerSize(), ItemStack.EMPTY);
             for (int i = 0; i < raw.getContainerSize(); i++) {
@@ -168,7 +198,8 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
             }
             w.putItems(list);
             w.putIntArray("Portions", portions);
-            w.putIntArray("Kinds", kinds);
+            // mryt233：固定九个字符串，旧 Kinds 留待读兼容至下个大版本。
+            w.putStringList("KindIds", Arrays.asList(kindIds.clone()));
         });
     }
 
@@ -181,18 +212,27 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
             loading = true;
             for (int i = 0; i < raw.getContainerSize(); i++) {
                 raw.setItem(i, list.get(i));
+                rawWasEmpty[i] = list.get(i).isEmpty();
             }
             loading = false;
-            int[] p = r.getIntArray("Portions");
-            int[] k = r.getIntArray("Kinds");
-            for (int i = 0; i < BOWLS; i++) {
-                portions[i] = i < p.length ? p[i] : 0;
-                // 老存档（碗固定位置时）没有 Kinds：第 i 格原来就是第 i 种调料
-                kinds[i] = i < k.length ? k[i] : (portions[i] > 0 ? i : -1);
-            }
+            readKindIds(r, portions, kindIds);
         });
     }
 
+
+    /** mryt233：新键存在优先，坏类型/空列表不复活旧数据，且只保存 ID。 */
+    static void readKindIds(StoreReader r, int[] portions, String[] target) {
+        int[] p = r.getIntArray("Portions");
+        int[] old = r.getIntArray("Kinds");
+        List<String> ids = r.getStringList("KindIds");
+        boolean hasIds = r.has("KindIds"), hasKinds = r.has("Kinds");
+        for (int i = 0; i < BOWLS; i++) {
+            portions[i] = i < p.length ? p[i] : 0;
+            if (hasIds) target[i] = i < ids.size() ? ids.get(i) : "";
+            else if (hasKinds) target[i] = i < old.length ? SauceIds.legacyId(old[i]) : (portions[i] > 0 ? SauceIds.legacyId(i) : "");
+            else target[i] = portions[i] > 0 ? SauceIds.legacyId(i) : "";
+        }
+    }
 
     /** 保留公开入口，实际更新格式由公共基类提供。 */
     @Override

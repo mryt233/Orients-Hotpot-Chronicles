@@ -25,6 +25,9 @@ public interface StoreReader {
     /** 缺键回空数组（和 {@code CompoundTag.getIntArray} 一样）。 */
     int[] getIntArray(String key);
 
+    /** mryt233：按原顺序读取字符串列表；坏类型返回空列表。 */
+    List<String> getStringList(String key);
+
     /** 缺键回空数组（和 {@code CompoundTag.getByteArray} 一样）。 */
     byte[] getByteArray(String key);
 

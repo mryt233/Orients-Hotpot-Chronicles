@@ -73,9 +73,9 @@ public final class ClientTooltips {
             return;
         }
         // 蘸过解辣的东西（蜂蜜 / 醋）：红汤的饥饿不再叠上去，提示里也别写
-        Integer dipped = food.get(HotPotContent.DIPPED);
+        java.util.List<String> dipped = food.get(HotPotContent.DIPPED);   // mryt233 改（4E-1）
         boolean calmSpicy = dipped != null
-            && ((dipped & Seasoning.HONEY.bit()) != 0 || (dipped & Seasoning.VINEGAR.bit()) != 0);
+                && (SauceIds.containsDef(dipped, Seasoning.HONEY) || SauceIds.containsDef(dipped, Seasoning.VINEGAR));
         for (MobEffectInstance effect : effects) {
             if (calmSpicy && effect.getEffect().is(MobEffects.HUNGER)) {
                 continue;
@@ -119,8 +119,8 @@ public final class ClientTooltips {
      * 一行「蘸了：味精、辣油」+ 每种调料一行灰字效果；没蘸过的什么都不加。
      */
     public static void appendDipped(ItemStack food, List<Component> lines) {
-        Integer dipped = food.get(HotPotContent.DIPPED);
-        if (dipped == null || dipped == 0) {
+        java.util.List<String> dipped = food.get(HotPotContent.DIPPED);
+        if (dipped == null || dipped.isEmpty()) {
             return;
         }
         lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.dipped"),

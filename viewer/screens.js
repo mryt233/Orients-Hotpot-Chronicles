@@ -777,6 +777,7 @@ function sgWrap(text) {
 const SAUCE_LAYOUTS = {
   each: [0, 1, 2, 3, 4, 5, 6, 7, 8],
   mixed: [1, 1, 5, -1, 3, 1, 0, 7, -1],
+  unknown: [-2, 1, 2, 3, 4, 5, 6, 7, 8], // mryt233 改：-2 表示有存货但无法识别的调料。
 };
 // 2026-10-26: both sauce screens now use the wood frame of the stove / hot pot screens (GuiKit) with light shadowed text;
 // woodPanel = SauceStationScreen.panel, S_HINT = SauceStationScreen.HINT (mryt233)
@@ -805,7 +806,7 @@ const sauceStation = {
   size: (s) => [s.guide === "open" ? SS.W + SG.GAP + SG.W : SS.W, SS.H],
   textures: [],
   params: [
-    { key: "layout", label: "碗里放的", options: [["each", "九种各一碗"], ["mixed", "随便放（有重复、有空碗）"]], default: "mixed" },
+    { key: "layout", label: "碗里放的", options: [["each", "九种各一碗"], ["mixed", "随便放（有重复、有空碗）"], ["unknown", "含未知调料"]], default: "mixed" },
     { key: "stock", label: "存货", options: [["full", "都有"], ["some", "有几碗没货"], ["none", "全空"]], default: "some" },
     { key: "raw", label: "格子里的原料", options: [["yes", "还有没化开的原料"], ["no", "都化成份了"]], default: "yes" },
     { key: "guide", label: "原料表（?）", options: [["closed", "关"], ["open", "开"]], default: "open" },
@@ -814,7 +815,7 @@ const sauceStation = {
   derive(s) {
     const kinds = SAUCE_LAYOUTS[s.layout].map((k, i) => (s.stock === "none" || (s.stock === "some" && i % 4 === 2) ? -1 : k));
     // portions already in the bowl on the counter (raw items in the slot turn into portions as they get used)
-    const portions = kinds.map((k, i) => (k < 0 ? 0 : 1 + ((i * 5) % 4)));
+    const portions = kinds.map((k, i) => (k === -1 ? 0 : 1 + ((i * 5) % 4)));
     const raws = kinds.map((k, i) => (k < 0 || s.raw !== "yes" ? 0 : 1 + (i % 4)));
     return { kinds, portions, raws };
   },
@@ -923,7 +924,7 @@ const sauceStation = {
       const left = Math.min(SS.MAX, d.portions[slot.index] + d.raws[slot.index] * 4);
       const grey = 0xffaaaaaa;
       const leftLine = { text: g.tr(SAUCE_KEY("screen.sauce.left"), left, SS.MAX), color: grey };
-      if (k < 0) return [g.tr(SAUCE_KEY("screen.sauce.empty")), leftLine];
+      if (k < 0) return [g.tr(SAUCE_KEY(k === -2 ? "sauce.unknown" : "screen.sauce.empty")), leftLine];
       const [id, , , rawNames] = SAUCE_SEASONINGS[k];
       return [g.tr(SAUCE_KEY(`seasoning.${id}`)), { text: g.tr(SAUCE_KEY("screen.sauce.slot"), rawNames), color: grey }, leftLine];
     }
@@ -970,7 +971,7 @@ const sauceOverview = {
         g.fill(cx + 4, cy + SO.CARD_H - 8, cx + 4 + bw, cy + SO.CARD_H - 4, SLOT_SHADOW);
         g.fill(cx + 4, cy + SO.CARD_H - 8, cx + 4 + fw, cy + SO.CARD_H - 4, color);
       } else {
-        const t = g.tr(SAUCE_KEY("screen.sauce.empty_bowl"));
+        const t = g.tr(SAUCE_KEY(k === -2 ? "sauce.unknown" : "screen.sauce.empty_bowl"));
         g.text(t, cx + SO.CARD_W / 2 - g.width(t) / 2, cy + SO.CARD_H / 2 - 4, S_HINT, true);
       }
     });

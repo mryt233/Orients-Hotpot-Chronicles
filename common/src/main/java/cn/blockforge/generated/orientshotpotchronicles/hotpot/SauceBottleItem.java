@@ -108,7 +108,7 @@ public class SauceBottleItem extends ConfiguredFoodItem {
      */
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag type) {
-        Seasoning.appendEffects(kind.seasoning().bit(), tooltip);
+        Seasoning.appendEffects(java.util.List.of(SauceIds.fullId(kind.seasoning().def())), tooltip);
         tooltip.add(Component.translatable(HotPotBlockEntity.key("tooltip.sauce_bottle.hint"))
             .withStyle(ChatFormatting.DARK_GRAY));
     }

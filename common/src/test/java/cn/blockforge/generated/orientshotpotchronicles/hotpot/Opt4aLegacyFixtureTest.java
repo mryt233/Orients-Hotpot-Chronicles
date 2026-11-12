@@ -32,6 +32,7 @@ class Opt4aLegacyFixtureTest {
 
     @BeforeAll
     static void load() throws Exception {
+        Opt3AttributesTest.bootstrapMinecraft();
         entries = readJson("fixtures.json").getAsJsonObject("entries");
     }
 
@@ -103,17 +104,17 @@ class Opt4aLegacyFixtureTest {
             CompoundTag item = tag("chest_sauce_bowls.slot" + slot);
             Tag raw = item.getCompound("components").get("orients_hotpot_chronicles:sauce");
             SauceContents contents = SauceContents.CODEC.parse(NbtOps.INSTANCE, raw).getOrThrow();
-            assertEquals(expected[slot][0], contents.mask(), "slot" + slot);
+            assertEquals(SauceIds.fromMask(expected[slot][0]), contents.ids(), "slot" + slot);   // mryt233 改（4E-1）：位掩码翻译成 ID 列表
             assertEquals(expected[slot][1], contents.bites(), "slot" + slot);
         }
         assertFalse(tag("chest_sauce_bowls.slot10").contains("components"), "无组件的蘸料碗");
         // 14 种满的碗和 15 种满的碗只差最高位
         assertEquals(SauceContents.CODEC.parse(NbtOps.INSTANCE,
                 tag("chest_sauce_bowls.slot2").getCompound("components").get("orients_hotpot_chronicles:sauce"))
-            .getOrThrow().mask() & ~16384,
+            .getOrThrow().ids().stream().filter(id -> !id.equals(SauceIds.fromMask(16384).get(0))).toList(),
             SauceContents.CODEC.parse(NbtOps.INSTANCE,
                 tag("chest_sauce_bowls.slot4").getCompound("components").get("orients_hotpot_chronicles:sauce"))
-            .getOrThrow().mask());
+            .getOrThrow().ids());
     }
 
     @Test

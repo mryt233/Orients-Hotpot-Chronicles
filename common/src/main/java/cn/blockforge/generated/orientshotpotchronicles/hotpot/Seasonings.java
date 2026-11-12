@@ -19,6 +19,7 @@ public final class Seasonings {
     }
     public static List<SeasoningDef> all() { return TABLE.all(); }
     public static int size() { return TABLE.all().size(); }
+    public static int indexOf(SeasoningDef def) { return def == null ? -1 : TABLE.all().indexOf(def); }
     public static SeasoningDef byIndex(int index) { return TABLE.byIndex(index); }
     public static SeasoningDef ofRaw(ItemStack stack) { return stack.isEmpty() ? null : TABLE.raw(stack.getItem()); }
     public static SeasoningDef get(String id) { return TABLE.byId(id); }

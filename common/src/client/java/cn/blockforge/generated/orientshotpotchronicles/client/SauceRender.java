@@ -4,6 +4,7 @@ import cn.blockforge.orient.framework.client.ClientItemRenderers;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceIds;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SeasoningDef;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasonings;
@@ -35,7 +36,7 @@ public final class SauceRender {
             (stack, mode, matrices, consumers, light, overlay) -> {
                 Minecraft.getInstance().getBlockRenderer().renderSingleBlock(
                     HotPotContent.BOWL_BLOCK.defaultBlockState(), matrices, consumers, light, overlay);
-                surface(DippingSauceItem.contents(stack).mask(), matrices, consumers, light);
+                surface(DippingSauceItem.contents(stack).ids(), matrices, consumers, light);
             });
     }
 
@@ -46,8 +47,12 @@ public final class SauceRender {
      * 有光泽的酱面（贴图按几种调料的平均色染色）+ 每种放进去的调料撒两三个它自己颜色的小点。
      * mryt233 改（4C）：内置点位由定义持有，新增调料按 ID 生成点位。
      */
-    public static void surface(int mask, PoseStack matrices, MultiBufferSource consumers, int light) {
-        int color = Seasoning.mixColor(mask);
+    @Deprecated public static void surface(int mask, PoseStack matrices, MultiBufferSource consumers, int light) {
+        surface(SauceIds.fromMask(mask), matrices, consumers, light);
+    }
+
+    public static void surface(java.util.List<String> ids, PoseStack matrices, MultiBufferSource consumers, int light) {
+        int color = Seasoning.mixColor(ids);
         if (color == 0) {
             return;
         }
@@ -55,10 +60,7 @@ public final class SauceRender {
         float a = 0.5F - HALF, b = 0.5F + HALF, y = SURFACE_Y;
         quad(consumers.getBuffer(RenderType.entityCutoutNoCull(SURFACE)), e, light, color, a, y, a, b, y, b);
         VertexConsumer vc = consumers.getBuffer(RenderType.entityCutoutNoCull(WHITE));
-        for (SeasoningDef s : Seasonings.all()) {
-            if ((mask & s.bit()) == 0) {
-                continue;
-            }
+        for (SeasoningDef s : SauceIds.defs(ids)) {
             int dot = darkenIfPale(s.color());
             float size = s.dotSize() / 16F;
             for (int i = 0; i < s.dotCount(); i++) {

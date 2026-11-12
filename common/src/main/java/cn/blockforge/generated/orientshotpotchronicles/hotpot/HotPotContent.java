@@ -475,7 +475,7 @@ public final class HotPotContent {
     /** 一碗蘸料里放了哪几种、还能蘸几口。 */
     public static DataComponentType<SauceContents> SAUCE;
     /** 菜蘸过哪几种调料（Seasoning.bit 的组合）；吃下去时生效（LivingEntityEatMixin）。 */
-    public static DataComponentType<Integer> DIPPED;
+    public static DataComponentType<java.util.List<String>> DIPPED;
     // mryt233 改（2026-11-05）：汤底风味加成（r136a）。菜记着自己是在哪种汤底里煮出来的，
     // 吃下去时按汤底（红汤再按辣度档位）补一份状态效果，见 SoupBase.dishBonusEffects(int) 与 LivingEntityEatMixin。
     /** 这道菜是在哪种汤底里煮出来的（SoupBase.textureKey()，如 "spicy"、"mushroom"）；吃下时给汤底风味加成。 */
@@ -990,8 +990,8 @@ public final class HotPotContent {
         SAUCE = registration.components().register( HotPot.id("sauce"),
             DataComponentType.<SauceContents>builder().persistent(SauceContents.CODEC).networkSynchronized(SauceContents.PACKET_CODEC).build());
         DIPPED = registration.components().register( HotPot.id("dipped"),
-            DataComponentType.<Integer>builder().persistent(Codec.INT)
-                .networkSynchronized(ByteBufCodecs.VAR_INT).build());
+            DataComponentType.<java.util.List<String>>builder().persistent(SauceContents.DIPPED_CODEC)
+                .networkSynchronized(SauceContents.DIPPED_PACKET_CODEC).build());   // mryt233 改（4E-1）
         COOKED_IN_SOUP = registration.components().register(HotPot.id("cooked_in_soup"),
             DataComponentType.<String>builder().persistent(Codec.STRING)
                 .networkSynchronized(ByteBufCodecs.STRING_UTF8).build());

@@ -57,6 +57,14 @@ public final class CompoundReader implements StoreReader {
     }
 
     @Override
+    public List<String> getStringList(String key) {
+        ListTag list = tag.getList(key, Tag.TAG_STRING);
+        List<String> result = new ArrayList<>(list.size());
+        for (int i = 0; i < list.size(); i++) result.add(list.getString(i));
+        return List.copyOf(result);
+    }
+
+    @Override
     public byte[] getByteArray(String key) {
         return tag.getByteArray(key);
     }

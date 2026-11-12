@@ -76,7 +76,7 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
             }
             blocks.renderSingleBlock(modelState(p), matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
             if (p.self.getItem() instanceof DippingSauceItem) {
-                SauceRender.surface(DippingSauceItem.contents(p.self).mask(), matrices, vertexConsumers, light);
+                SauceRender.surface(DippingSauceItem.contents(p.self).ids(), matrices, vertexConsumers, light);
             }
             PlateFoodRenderer.render(p.plate.size(), p.axis, p.items, matrices, vertexConsumers, light,
                 be.getLevel(), seed, itemRenderer);

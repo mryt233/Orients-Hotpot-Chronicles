@@ -48,8 +48,8 @@ public class SauceStationScreenHandler extends PlayerInventoryMenu {
                 if (index < N) {
                     return be.portions(index);
                 }
-                SeasoningDef s = be.kindDef(index - N);
-                return s == null ? 0 : s.ordinal() + 1;
+                int kind = be.kindIndex(index - N);
+                return kind == -2 ? -1 : kind + 1;
             }
 
             @Override
@@ -97,7 +97,10 @@ public class SauceStationScreenHandler extends PlayerInventoryMenu {
         return def == null ? null : def.legacy();
     }
 
+    public boolean unknownKind(int i) { return data.get(N + i) == -1; }
+
     public SeasoningDef kindDef(int i) {  // mryt233 改：兼容原有菜单公开签名。
+        if (unknownKind(i)) return null;
         ItemStack stack = raw.getItem(i);
         if (!stack.isEmpty()) return Seasonings.ofRaw(stack);
         int k = data.get(N + i);
@@ -131,7 +134,7 @@ public class SauceStationScreenHandler extends PlayerInventoryMenu {
         public boolean mayPlace(ItemStack stack) {
             SeasoningDef s = Seasonings.ofRaw(stack);
             SeasoningDef k = kindDef(getContainerSlot());
-            return s != null && (k == null || k == s);
+            return s != null && !unknownKind(getContainerSlot()) && (k == null || k == s);
         }
 
         @Override

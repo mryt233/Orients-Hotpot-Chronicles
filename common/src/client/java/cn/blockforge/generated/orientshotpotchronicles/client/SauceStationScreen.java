@@ -234,7 +234,7 @@ public class SauceStationScreen extends AbstractContainerScreen<SauceStationScre
                 SeasoningDef s = menu.kindDef(i);
                 List<Component> lines = new ArrayList<>();
                 if (s == null) {
-                    lines.add(Component.translatable(HotPotBlockEntity.key("screen.sauce.empty")));
+                    lines.add(Component.translatable(HotPotBlockEntity.key(menu.unknownKind(i) ? "sauce.unknown" : "screen.sauce.empty")));
                 } else {
                     lines.add(Component.translatable(s.nameKey()));
                     lines.add(Component.translatable(HotPotBlockEntity.key("screen.sauce.slot"), s.rawNames()).withStyle(ChatFormatting.GRAY));

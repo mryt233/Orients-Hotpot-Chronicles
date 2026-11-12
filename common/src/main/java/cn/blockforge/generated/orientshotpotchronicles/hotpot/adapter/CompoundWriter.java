@@ -4,6 +4,7 @@ package cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter;
 import java.util.List;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.ContainerHelper;
@@ -53,6 +54,13 @@ public final class CompoundWriter implements StoreWriter {
     @Override
     public void putIntArray(String key, int[] value) {
         tag.putIntArray(key, value);
+    }
+
+    @Override
+    public void putStringList(String key, List<String> values) {
+        ListTag list = new ListTag();
+        for (String value : values) list.add(StringTag.valueOf(value));
+        tag.put(key, list);
     }
 
     @Override

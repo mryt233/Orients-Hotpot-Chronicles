@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceIds;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.entity.LivingEntity;
@@ -97,9 +98,9 @@ abstract class LivingEntityEatMixin {
     @Inject(method = "eat(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/food/FoodProperties;)Lnet/minecraft/world/item/ItemStack;", at = @At("HEAD"))
     private void orientsHotpot$sauceEffects(Level world, ItemStack stack, FoodProperties food,
                                            CallbackInfoReturnable<ItemStack> cir) {
-        Integer mask = stack.get(HotPotContent.DIPPED);
-        if (!world.isClientSide && mask != null && mask != 0) {
-            Seasoning.applyAll(mask, (LivingEntity) (Object) this);
+        java.util.List<String> dipped = stack.get(HotPotContent.DIPPED);   // mryt233 改（4E-1）：ID 列表
+        if (!world.isClientSide && dipped != null && !dipped.isEmpty()) {
+            Seasoning.applyAll(dipped, (LivingEntity) (Object) this);
         }
         // mryt233 改（2026-11-05，r136a）：汤底风味加成。这道菜是在哪种汤里煮出来的，就补一份那种汤的
         // 状态效果；红汤再按它带来的辣度档位加强（0 微辣 ~ 3 变态辣）。
@@ -111,8 +112,8 @@ abstract class LivingEntityEatMixin {
                 LivingEntity self = (LivingEntity) (Object) this;
                 int spicy = stack.getOrDefault(HotPotContent.SPICY_LEVEL, 0);
                 // 同时蘸了解辣的东西（蜂蜜 / 醋）：负面效果不再叠上去
-                boolean calmSpicy = mask != null
-                    && ((mask & Seasoning.HONEY.bit()) != 0 || (mask & Seasoning.VINEGAR.bit()) != 0);
+                boolean calmSpicy = dipped != null
+                    && (SauceIds.containsDef(dipped, Seasoning.HONEY) || SauceIds.containsDef(dipped, Seasoning.VINEGAR));
                 // 清汤、番茄汤本来就解冷锅反胃
                 // mryt233 改（2026-11-10，r147）：「是不是清汤 / 番茄」改成汤底自己的属性 clearsNausea()
                 if (soup.clearsNausea()) {
@@ -144,10 +145,10 @@ abstract class LivingEntityEatMixin {
                 || stack.is(HotPotContent.COOKED_ZHE_ER_GEN_SLICE)) {
                 HotPotCriterion.fire(player, "eat_zhe_er_gen");
             }
-            if (mask != null && mask != 0) {
+            if (dipped != null && !dipped.isEmpty()) {
                 HotPotCriterion.fire(player, "eat_dipped");
                 // mryt233 改（2026-11-06，r139「调味宗师」）：这一口蘸到了 5 种以上调料才算。
-                if (Integer.bitCount(mask) >= 5) {
+                if (dipped.size() >= 5) {
                     HotPotCriterion.fire(player, "sauce_master_5");
                 }
             }

@@ -20,6 +20,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.ChatFormatting;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,13 +35,20 @@ public class DippingSauceItem extends Item {
 
     public static SauceContents contents(ItemStack stack) {
         SauceContents c = stack.get(HotPotContent.SAUCE);
-        return c == null ? new SauceContents(0, 0) : c;
+        return c == null ? SauceContents.empty() : c;
     }
 
     /** 新打的一碗：只有这一种调料、满 9 口。 */
     public static ItemStack create(Seasoning first) {
         ItemStack stack = new ItemStack(HotPotContent.DIPPING_SAUCE);
-        stack.set(HotPotContent.SAUCE, new SauceContents(first.bit(), SauceContents.FULL_BITES));
+        stack.set(HotPotContent.SAUCE, new SauceContents(List.of(SauceIds.fullId(first.def())), SauceContents.FULL_BITES));
+        return stack;
+    }
+
+    /** 按登记 ID 新建，旧枚举入口继续兼容。 */
+    public static ItemStack createWithId(String id) {
+        ItemStack stack = new ItemStack(HotPotContent.DIPPING_SAUCE);
+        stack.set(HotPotContent.SAUCE, new SauceContents(List.of(id), SauceContents.FULL_BITES));
         return stack;
     }
 
@@ -62,7 +70,9 @@ public class DippingSauceItem extends Item {
         if (!(sauce.getItem() instanceof DippingSauceItem) || contents(sauce).bites() <= 0) {
             return sauce;
         }
-        food.set(HotPotContent.DIPPED, food.getOrDefault(HotPotContent.DIPPED, 0) | contents(sauce).mask());
+        List<String> merged = new ArrayList<>(food.getOrDefault(HotPotContent.DIPPED, List.of()));
+        merged.addAll(contents(sauce).ids());
+        food.set(HotPotContent.DIPPED, SauceIds.normalize(merged));   // mryt233 改（4E-1）：ID 集合合并
         return bite(sauce);
     }
 
@@ -78,17 +88,17 @@ public class DippingSauceItem extends Item {
     }
 
     /** 「麻酱、辣油、葱花」这样的配料名单。 */
-    public static MutableComponent names(int mask) {
+    @Deprecated public static MutableComponent names(int mask) { return names(SauceIds.fromMask(mask)); }
+
+    public static MutableComponent names(List<String> ids) {
         MutableComponent out = Component.empty();
         boolean first = true;
-        for (SeasoningDef s : Seasonings.all()) {
-            if ((mask & s.bit()) != 0) {
-                if (!first) {
-                    out.append(Component.translatable(HotPotBlockEntity.key("tooltip.sauce.sep")));
-                }
-                out.append(Component.translatable(s.nameKey()));
-                first = false;
-            }
+        for (String id : SauceIds.normalize(ids)) {
+            SeasoningDef s = SauceIds.def(id);
+            if (!first) out.append(Component.translatable(HotPotBlockEntity.key("tooltip.sauce.sep")));
+            out.append(s == null ? Component.translatable(HotPotBlockEntity.key("sauce.unknown")).append(" (" + id + ")")
+                : Component.translatable(s.nameKey()));
+            first = false;
         }
         return out;
     }
@@ -146,7 +156,7 @@ public class DippingSauceItem extends Item {
             return;
         }
         // 每种配料一行，带效果（用户 2026-10-25：蘸料的属性要显示对应调料和 buff）
-        Seasoning.appendEffects(c.mask(), tooltip);
+        Seasoning.appendEffects(c.ids(), tooltip);
         tooltip.add(Component.translatable(HotPotBlockEntity.key("tooltip.sauce.bites"), c.bites()).withStyle(ChatFormatting.GRAY));
     }
 }

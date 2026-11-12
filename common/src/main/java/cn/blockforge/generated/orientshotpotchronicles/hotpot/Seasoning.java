@@ -166,9 +166,16 @@ public enum Seasoning {
     }
 
     /** 「 辣油：抗火 10 秒」这样一行灰字：蘸料碗、蘸过的菜的提示共用。 */
-    public static void appendEffects(int mask, List<Component> lines) {
-        for (SeasoningDef s : Seasonings.all()) {
-            if ((mask & s.bit()) != 0) {
+    @Deprecated public static void appendEffects(int mask, List<Component> lines) { appendEffects(SauceIds.fromMask(mask), lines); }
+
+    public static void appendEffects(List<String> ids, List<Component> lines) {
+        // mryt233 改（4E-1）：按调料 ID 列表，不再用位掩码。
+        for (String id : SauceIds.normalize(ids)) {
+            SeasoningDef s = SauceIds.def(id);
+            if (s == null) {
+                lines.add(Component.translatable(HotPotBlockEntity.key("sauce.unknown")).append(" (" + id + ")")
+                    .withStyle(ChatFormatting.GRAY));
+            } else {
                 lines.add(Component.literal(" ").append(Component.translatable(HotPotBlockEntity.key("tooltip.sauce.line"),
                     Component.translatable(s.nameKey()), Component.translatable(s.effectKey())))
                     .withStyle(ChatFormatting.GRAY));
@@ -202,25 +209,25 @@ public enum Seasoning {
         }
     }
 
-    /** mask 里的每种调料都生效一次。 */
-    public static void applyAll(int mask, LivingEntity user) {
-        for (SeasoningDef s : Seasonings.all()) {
-            if ((mask & s.bit()) != 0) {
-                s.apply(user);
-            }
+    /** ID 列表里的每种调料都生效一次（未知 ID 跳过）。 */
+    @Deprecated public static void applyAll(int mask, LivingEntity user) { applyAll(SauceIds.fromMask(mask), user); }
+
+    public static void applyAll(List<String> ids, LivingEntity user) {
+        for (SeasoningDef s : SauceIds.defs(ids)) {
+            s.apply(user);
         }
     }
 
-    /** mask 里几种调料的平均颜色（ARGB）；空的返回 0。 */
-    public static int mixColor(int mask) {
+    /** ID 列表里几种调料的平均颜色（ARGB）；空的返回 0。 */
+    @Deprecated public static int mixColor(int mask) { return mixColor(SauceIds.fromMask(mask)); }
+
+    public static int mixColor(List<String> ids) {
         int r = 0, g = 0, b = 0, n = 0;
-        for (SeasoningDef s : Seasonings.all()) {
-            if ((mask & s.bit()) != 0) {
-                r += (s.color() >> 16) & 255;
-                g += (s.color() >> 8) & 255;
-                b += s.color() & 255;
-                n++;
-            }
+        for (SeasoningDef s : SauceIds.defs(ids)) {
+            r += (s.color() >> 16) & 255;
+            g += (s.color() >> 8) & 255;
+            b += s.color() & 255;
+            n++;
         }
         return n == 0 ? 0 : 0xFF000000 | (r / n) << 16 | (g / n) << 8 | (b / n);
     }
