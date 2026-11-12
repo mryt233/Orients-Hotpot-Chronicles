@@ -12,6 +12,7 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotScreenHandler;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupIds;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.entity.player.Inventory;
@@ -431,7 +432,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
         Component name = layout.multiSoup()
             ? HotPotBlockEntity.soupText(layout, menu::baseOfSide).copy().withStyle(menu.hasSoup() ? ChatFormatting.GOLD : ChatFormatting.GRAY)
             : soupBase == null
-                ? Component.translatable(HotPotBlockEntity.key("soup.none")).withStyle(ChatFormatting.GRAY)
+                ? HotPotBlockEntity.soupName(menu.baseId()).copy().withStyle(ChatFormatting.GRAY)
                 : Component.translatable(soupBase.nameKey()).withStyle(ChatFormatting.GOLD);
         int nameX = swatchX + 4;
         int room = right - nameX;
@@ -590,7 +591,9 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
             ? HotPotBlockEntity.soupName(menu.soupOfSlot(index))
             : Component.translatable(HotPotBlockEntity.key("ui.cell"), cell / 3 + 1, cell % 3 + 1);
         Component status;
-        if (menu.soupOfSlot(index) < 0) {
+        if (menu.soupOfSlot(index) == SoupIds.UNKNOWN) {
+            status = HotPotBlockEntity.soupName(SoupIds.UNKNOWN).copy().withStyle(ChatFormatting.GRAY);
+        } else if (menu.soupOfSlot(index) == SoupIds.EMPTY) {
             status = Component.translatable(HotPotBlockEntity.key("ui.no_soup_yet")).withStyle(ChatFormatting.GRAY);
         } else if (menu.isCooked(index)) {
             status = Component.translatable(HotPotBlockEntity.key("ui.cooked")).withStyle(ChatFormatting.GREEN);

@@ -11,17 +11,17 @@ final class HotPotSoup {
     }
 
     static int base(HotPotBlockEntity be) {
-        return be.bases[0];
+        return SoupIds.index(be.bases[0]);
     }
 
     static SoupVisual visual(HotPotBlockEntity be) {
-        return SoupVisual.fromDef(Soups.byIndex(be.bases[0]));
+        return SoupVisual.fromDef(Soups.get(be.bases[0]));
     }
 
     /** 锅里有没有汤（鸳鸯 / 田字锅任一边有就算）。 */
     static boolean has(HotPotBlockEntity be) {
-        for (int id : be.bases) {
-            if (id >= 0) {
+        for (String id : be.bases) {
+            if (!id.isEmpty()) {
                 return true;
             }
         }
@@ -30,12 +30,13 @@ final class HotPotSoup {
 
     /** 某一边的汤底编号（-1 = 没汤）。 */
     static int baseOfSide(HotPotBlockEntity be, int side) {
-        return side >= 0 && side < be.bases.length ? be.bases[side] : -1;
+        return side >= 0 && side < be.bases.length ? SoupIds.index(be.bases[side]) : SoupIds.EMPTY;
     }
 
     static void setBaseOfSide(HotPotBlockEntity be, int side, int id) {
         if (side >= 0 && side < be.bases.length) {
-            be.bases[side] = id;
+            if (id == SoupIds.UNKNOWN) throw new IllegalArgumentException("未知汤底不能从索引恢复 ID");
+            be.bases[side] = SoupIds.id(id);
         }
     }
 
@@ -49,12 +50,13 @@ final class HotPotSoup {
     static int bowlSoup(HotPotBlockEntity be, int bigCell) {
         int side = be.layout().sideOfCell(bigCell);
         int id = side == PotLayout.NONE ? -1 : baseOfSide(be, side);
-        if (id >= 0) {
+        if (id != SoupIds.EMPTY) {
             return id;
         }
-        for (int other : be.bases) {
-            if (other >= 0) {
-                return other;
+        for (String other : be.bases) {
+            int index = SoupIds.index(other);
+            if (index != SoupIds.EMPTY) {
+                return index;
             }
         }
         return -1;
@@ -62,6 +64,13 @@ final class HotPotSoup {
 
     /** 方块状态里的汤面：九宫格锅照汤底；鸳鸯锅的汤面由渲染器按两边画，方块状态一律空。 */
     static SoupVisual blockVisual(HotPotBlockEntity be) {
-        return be.layout().multiSoup() ? SoupVisual.NONE : SoupVisual.fromDef(Soups.byIndex(be.bases[0]));
+        if (be.layout().multiSoup()) return SoupVisual.NONE;
+        // 未知 ID 暂时不能解析时，沿用方块已有汤面，不把未知汤修成空锅。
+        if (SoupIds.index(be.bases[0]) == SoupIds.UNKNOWN) {
+            var state = be.getBlockState();
+            if (StoveBlock.isStove(state)) return state.getValue(StoveBlock.SOUP);
+            if (state.getBlock() instanceof HotPotBlock) return state.getValue(HotPotBlock.SOUP);
+        }
+        return SoupVisual.fromDef(Soups.get(be.bases[0]));
     }
 }

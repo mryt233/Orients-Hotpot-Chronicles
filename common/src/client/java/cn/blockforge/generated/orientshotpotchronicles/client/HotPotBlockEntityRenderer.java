@@ -14,6 +14,7 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotInteraction;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupIds;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual;
 import java.util.List;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -137,7 +138,7 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
             if (side == PotLayout.NONE) {
                 continue;
             }
-            boolean cellSoup = be.baseOfSide(side) >= 0;
+            boolean cellSoup = be.baseOfSide(side) != SoupIds.EMPTY;
             float cellY = cellSoup ? soupY : floorY;
             double[] cc = layout.cellCenter(bigCell);   // 以前这一句里调了两次，每次都 new 一个 double[2]
             double[] center = PotLayout.toWorld(cc[0], cc[1], rotated && layout.multiSoup());
@@ -229,9 +230,8 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
                                        CompoundTag data, PoseStack matrices,
                                        MultiBufferSource consumers, int light) {
         PotLayout layout = material.layout();
-        String[] keys = {"Base", "BaseB", "BaseC", "BaseD"};
         for (int side = 0; side < layout.sides(); side++) {
-            SoupDef soup = data.contains(keys[side]) ? Soups.byIndex(data.getInt(keys[side])) : null;
+            SoupDef soup = Soups.get(SoupIds.fromPotTag(data, side));
             if (soup == null) {
                 continue;
             }

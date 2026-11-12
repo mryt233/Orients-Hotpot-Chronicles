@@ -313,10 +313,10 @@ const hotpot = {
   params: [
     { key: "pot", label: "锅", options: [["copper", "铜锅"], ["iron", "铁锅"]], default: "copper" },
     { key: "layout", label: "分格", options: [["nine", "九宫格"], ["s", "太极鸳鸯"], ["o", "圆心鸳鸯"], ["square", "方心鸳鸯"], ["split", "直隔鸳鸯"], ["four", "田字"]], default: "nine" },
-    { key: "soup", label: "汤底（第 1 边）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["", "空锅"]], default: "spicy" },
-    { key: "soup2", label: "第 2 边", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["", "没汤"]], default: "clear" },
-    { key: "soup3", label: "第 3 边（田字）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["", "没汤"]], default: "mushroom" },
-    { key: "soup4", label: "第 4 边（田字）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["", "没汤"]], default: "" },
+    { key: "soup", label: "汤底（第 1 边）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["unknown", "未知汤底"], ["", "空锅"]], default: "spicy" },
+    { key: "soup2", label: "第 2 边", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["unknown", "未知汤底"], ["", "没汤"]], default: "clear" },
+    { key: "soup3", label: "第 3 边（田字）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["unknown", "未知汤底"], ["", "没汤"]], default: "mushroom" },
+    { key: "soup4", label: "第 4 边（田字）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["unknown", "未知汤底"], ["", "没汤"]], default: "" },
     { key: "fire", label: "灶火", options: [["on", "在烧"], ["off", "熄了"], ["none", "没灶台"]], default: "on" },
     { key: "ratio", label: "剩余燃烧", range: [0.05, 1, 0.05], default: 0.6 },
     { key: "food", label: "锅里", options: [["cooking", "正在煮"], ["raw", "刚下锅"], ["cooked", "全熟了"], ["empty", "空的"]], default: "cooking" },
@@ -346,14 +346,14 @@ const hotpot = {
       if (d.sideOf(i) < 0) continue;   // PotSlot.isEnabled：鸳鸯 / 田字锅压到隔板的格子空着
       const p = preset[i];
       const soup = d.soupOf(i);
-      const cooked = !!(p && p[2] && soup);
+      const cooked = !!(p && p[2] && soup && soup !== "unknown");
       pot.push({
         // slot.x/y is the item position; the 18px cell starts one pixel up-left
         x: d.multi ? HP.GRID_X + YY_INSET + col * 18 + 1 : HP.GRID_X + col * 18 + Math.floor(col / 3) * HP.GAP + 1,
         y: d.multi ? HP.GRID_Y + YY_INSET + row * 18 + 1 : HP.GRID_Y + row * 18 + Math.floor(row / 3) * HP.GAP + 1,
         kind: "pot", index: i,
         item: p ? (cooked ? COOKED[p[0]] || p[0] : p[0]) : undefined,
-        doneness: p && soup ? p[1] || 0 : 0,
+        doneness: p && soup && soup !== "unknown" ? p[1] || 0 : 0,
         cooked,
       });
     }
@@ -624,7 +624,7 @@ const hotpot = {
     g.fill(ix + 2, iy + 2, ix + 12, iy + 10, m.dark);
     g.fill(ix + 1, iy + 1, ix + 13, iy + 4, m.mid);
     g.fill(ix + 1, iy + 1, ix + 13, iy + 2, m.light);
-    g.fill(ix + 3, iy + 4, ix + 11, iy + 9, d.hasSoup ? (SOUPS[d.soup].base) : 0xff1a1a1e);
+    g.fill(ix + 3, iy + 4, ix + 11, iy + 9, d.hasSoup ? (SOUPS[d.soup]?.base ?? 0xff1b1c20) : 0xff1a1a1e);
     g.fill(ix + 6, iy + 4, ix + 7, iy + 9, m.mid);
     g.fill(ix + 3, iy + 6, ix + 11, iy + 7, m.mid);
     g.fill(ix, iy + 2, ix + 1, iy + 5, m.dark);
@@ -641,11 +641,11 @@ const hotpot = {
     for (const id of d.sideSoups) {
       const sw = multi ? 5 : 9;
       g.fill(swatchX, 26, swatchX + sw, 35, RIM_LINE);
-      g.fill(swatchX + 1, 27, swatchX + sw - 1, 34, id ? SOUPS[id].base : 0xff1b1c20);
+      g.fill(swatchX + 1, 27, swatchX + sw - 1, 34, SOUPS[id]?.base ?? 0xff1b1c20);
       swatchX += sw + (multi ? 1 : 0);
     }
     const soupName = (id) => g.tr(key(id ? `soup.${id}` : "soup.none"));
-    const name = { text: d.sideSoups.map(soupName).join(" / "), color: d.hasSoup ? F.GOLD : F.GRAY };
+    const name = { text: d.sideSoups.map(soupName).join(" / "), color: d.hasSoup && (multi || d.soup !== "unknown") ? F.GOLD : F.GRAY };
     const nameX = swatchX + 4, room = right - nameX, width = g.width(name.text);
     if (width > room && room > 0) {
       const k = Math.max(0.5, room / width);
@@ -700,7 +700,8 @@ const hotpot = {
     const d = this.derive(s);
     const cell = Math.floor(Math.floor(slot.index / 9) / 3) * 3 + Math.floor((slot.index % 9) / 3);
     let status;
-    if (!d.soupOf(slot.index)) status = { text: g.tr(key("ui.no_soup_yet")), color: F.GRAY };
+    if (d.soupOf(slot.index) === "unknown") status = { text: g.tr(key("soup.unknown")), color: F.GRAY };
+    else if (!d.soupOf(slot.index)) status = { text: g.tr(key("ui.no_soup_yet")), color: F.GRAY };
     else if (slot.cooked) status = { text: g.tr(key("ui.cooked")), color: F.GREEN };
     else if (d.burnTicks <= 0) status = { text: g.tr(key("ui.no_fire")), color: F.RED };
     else status = { text: g.tr(key("ui.wait"), (((1000 - slot.doneness) / 1000) * 10).toFixed(1)), color: F.YELLOW };

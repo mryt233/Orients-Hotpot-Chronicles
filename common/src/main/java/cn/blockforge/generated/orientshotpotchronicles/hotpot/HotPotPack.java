@@ -42,7 +42,7 @@ final class HotPotPack {
             be.resetSlot(i, ItemStack.EMPTY);
         }
         be.slots.pendingXp(0F);
-        Arrays.fill(be.bases, -1);
+        Arrays.fill(be.bases, "");
         Arrays.fill(be.spicyLevels, 0);   // mryt233 改（2026-11-05）：整锅打包后清空，辣度也清掉（r136a）
         be.setChanged();
     }

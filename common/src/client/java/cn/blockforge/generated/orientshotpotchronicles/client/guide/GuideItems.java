@@ -34,12 +34,12 @@ public final class GuideItems {
         } else if (parts.length > 1) {
             try {
                 CompoundTag nbt = new CompoundTag();
-                // mryt233 改（2026-11-11，4B-2）：按名字问登记表，查不到沿用原来的“未知汤底”告警；仍写序号键 Base
+                // mryt233 改（2026-11-12，4D）：指南锅按登记 ID 写新格式。
                 SoupDef soup = Soups.get(parts[1].toLowerCase(Locale.ROOT));
                 if (soup == null) {
                     throw new IllegalArgumentException(parts[1]);
                 }
-                nbt.putInt("Base", Soups.indexOf(soup));
+                nbt.putString("Soup", soup.id().toString());
                 stack.set(HotPotContent.POT_CONTENTS,
                     CustomData.of(nbt));
             } catch (IllegalArgumentException e) {

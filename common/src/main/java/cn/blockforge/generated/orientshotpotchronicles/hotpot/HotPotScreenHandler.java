@@ -100,7 +100,7 @@ public class HotPotScreenHandler extends PlayerInventoryMenu {
 
     public boolean hasSoup() {
         for (int side = 0; side < PotLayout.MAX_SIDES; side++) {
-            if (baseOfSide(side) >= 0) {
+            if (baseOfSide(side) != SoupIds.EMPTY) {
                 return true;
             }
         }

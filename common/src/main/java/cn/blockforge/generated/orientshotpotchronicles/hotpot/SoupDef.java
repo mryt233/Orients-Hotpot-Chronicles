@@ -80,7 +80,7 @@ public record SoupDef(
     // ---------------------------------------------------------------- 名字与外观
 
     /**
-     * 配置键 / 菜上 {@code cooked_in_soup} 记的名字 / 汤面贴图名：火锅自己的汤底是短名（clear、spicy），
+     * 配置键 / 汤面贴图名：火锅自己的汤底是短名（clear、spicy），
      * 别的命名空间的汤底是完整 ID。内置项等于旧的 {@code SoupBase.textureKey()}。
      */
     public String key() {

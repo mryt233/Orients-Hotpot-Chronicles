@@ -30,7 +30,7 @@ final class HotPotSoupOps {
     private HotPotSoupOps() { }
 
     static void clearSoupState(HotPotBlockEntity be) {
-        Arrays.fill(be.bases, -1);
+        Arrays.fill(be.bases, "");
         Arrays.fill(be.spicyLevels, 0);   // mryt233 改（2026-11-05）：汤底没了，辣度一起归零（r136a）
         be.updateSoupVisual();
         be.markDirtyAndSync();
@@ -81,6 +81,15 @@ final class HotPotSoupOps {
         }
         ItemStack stack = player.getItemInHand(hand);
         SoupDef soup = Soups.byIndex(be.baseOfSide(side));
+        if (soup == null && be.baseOfSide(side) == SoupIds.UNKNOWN) {
+            be.dropContents(side);
+            be.setBaseOfSide(side, SoupIds.EMPTY);
+            be.setSpicyOfSide(side, 0);
+            be.updateSoupVisual();
+            be.getLevel().playSound(null, be.getBlockPos(), SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.6F, 1.0F);
+            be.markDirtyAndSync();
+            return true;
+        }
         if (soup == null) {
             player.displayClientMessage(Component.translatable(key("msg.no_soup_to_scoop")), true);
             return false;
@@ -117,10 +126,11 @@ final class HotPotSoupOps {
         float xp = 0;
         List<Integer> order = new ArrayList<>();
         // 鸳鸯 / 田字锅只盛和准星那一边同一种汤底里的菜（两边汤底一样就都能盛；用户定）
-        int soup = be.baseOfSide(be.layout().sideOfCell(Math.max(0, bigCell)));
+        int soupSide = be.layout().sideOfCell(Math.max(0, bigCell));
+        String soup = soupSide == PotLayout.NONE ? "" : be.bases[soupSide];
         for (int i = 0; i < 9; i++) {
             int cell = (Math.max(0, bigCell) + i) % 9;
-            if (be.layout().usesCell(cell) && (!be.layout().multiSoup() || be.baseOfSide(be.layout().sideOfCell(cell)) == soup)) {
+            if (be.layout().usesCell(cell) && (!be.layout().multiSoup() || SoupIds.same(be.bases[be.layout().sideOfCell(cell)], soup))) {
                 order.add(cell);
             }
         }
@@ -231,7 +241,7 @@ final class HotPotSoupOps {
             be.markDirtyAndSync();
             return true;
         }
-        if (be.baseOfSide(side) >= 0) {
+        if (be.baseOfSide(side) != SoupIds.EMPTY) {
             player.displayClientMessage(Component.translatable(key("msg.already_soup")), true);
             return false;
         }

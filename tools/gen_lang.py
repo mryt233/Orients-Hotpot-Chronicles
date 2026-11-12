@@ -4568,6 +4568,8 @@ def main():
     for code, table in L.items():
         by_full = {full_key(k): v for k, v in table.items()}
         by_full.update(SAVE_RESULT_TEXT["en_us"])
+        # mryt233：未知汤底尚未翻译的语言使用英文占位。
+        by_full[full_key("soup.unknown")] = "Unknown soup"
         for wood, name in zip(TABLE_WOODS, TABLE_NAMES[code]):
             by_full[full_key(f"block.{wood}_hotpot_table")] = name
         for wood, name in zip(TABLE_WOODS, BENCH_NAMES[code]):

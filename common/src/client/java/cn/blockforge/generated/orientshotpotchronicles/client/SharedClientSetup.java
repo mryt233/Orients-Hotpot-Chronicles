@@ -20,6 +20,7 @@ import cn.blockforge.orient.framework.client.ClientItemRenderers;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupIds;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.ItemStack;
@@ -53,7 +54,7 @@ public final class SharedClientSetup {
                         return 0F;
                     }
                     CompoundTag nbt = data.copyTag();
-                    SoupDef soup = nbt.contains("Base") ? Soups.byIndex(nbt.getInt("Base")) : null;
+                    SoupDef soup = Soups.get(SoupIds.fromPotTag(nbt, 0));
                     return soup == null ? 0F : (Soups.indexOf(soup) + 1) / 10F;
                 });
         }
@@ -159,11 +160,10 @@ public final class SharedClientSetup {
             stack.getItem() instanceof BlockItem bi
                 && bi.getBlock() instanceof HotPotBlock pot
                 ? pot.material().layout() : PotLayout.NINE_GRID;
-        String[] keys = {"Base", "BaseB", "BaseC", "BaseD"};
         // mryt233 改（2026-11-05，r136a）：红汤边在提示里也带辣度档位，比如「红汤锅底（特辣）」
         String[] spicyKeys = {"Spicy", "SpicyB", "SpicyC", "SpicyD"};
         Component soupName = HotPotBlockEntity.soupText(layout,
-            side -> nbt.contains(keys[side]) ? nbt.getInt(keys[side]) : -1,
+            side -> SoupIds.index(SoupIds.fromPotTag(nbt, side)),
             side -> nbt.contains(spicyKeys[side]) ? nbt.getInt(spicyKeys[side]) : 0);
         lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.pot.soup"), soupName)
             .withStyle(ChatFormatting.GRAY));

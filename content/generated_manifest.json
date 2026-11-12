@@ -1888,14 +1888,14 @@
     },
     "tools/gen_lang.py": {
       "files": {
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/de_de.json": "eb87d64b7e90579504ea4b19fad8446bcbd6176d8a8cbca512da6a9a5c1c5f84",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/es_es.json": "05e4bfbdac31074478c75b70bc72134dee12e2d5ddeaef2ecf0b31e70a22b2e4",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/fr_fr.json": "b8f6b28f659ae41d99048d96e79be1b47e97a5d77dbec07c5b4b282639e60d3e",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/ja_jp.json": "3d0e3e3498a2fbd3e8bda6ebb06784f2a88de1d14d0ed7736d10065a4f4666b7",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/ko_kr.json": "8c21d3ccb648db1e177102ce8067b090c199a117a41e74f2168d4757197909b1",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/pt_br.json": "eea55f94567b3f5228aef9672282b735b02aad2c891a9ce1d6604a6151170675",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/ru_ru.json": "4bfbc3d97c086fc4d4e714792c68fee0cd5fa59679c40a51d1a8d4d47b520387",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/zh_tw.json": "69958d3abe72029d9e3855f92792582e080a41cccd381900926213bdf67acfdb"
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/de_de.json": "02f90e7f277779d55dcb073762f8c3967cd3048cb2e9c593f20ccb5039242638",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/es_es.json": "4f78b468b41391f6376378226dbbde2ee354f1307c6a3efae98a749a82ba941d",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/fr_fr.json": "e6723da67d6ece15999b8053d2a8f0700f03abcb6b9f7026608918b65091d197",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/ja_jp.json": "3a0f7c3466eb877dfa33befaf888f0c9d82ae5416096a22d71bd5ab0098ec447",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/ko_kr.json": "9e2edfa95e9ea8efa7aa4351c6495cff871fb8df467adb036f6eb0d92bf1f72b",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/pt_br.json": "aa043d4a25f19439d35d0553a94fc408ad4d2181e516e36fb127b065e22816d4",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/ru_ru.json": "8fca954b242ef9047258c2bff0c7741ddb7d058127d6464ab9df456b201ed045",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/zh_tw.json": "561290a07eb493a071efa8b172217ff42bed73e25dd44c6854b35597e0e52954"
       }
     },
     "tools/gen_cup.py": {

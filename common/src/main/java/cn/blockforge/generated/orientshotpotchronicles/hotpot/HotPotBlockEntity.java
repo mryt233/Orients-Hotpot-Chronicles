@@ -48,10 +48,10 @@ public class HotPotBlockEntity extends SyncedBlockEntity
     // mryt233 改（2026-11-11）：81 格并行状态由同一个部件持有。
     final HotPotSlots slots = new HotPotSlots(this);
     /**
-     * 每边一种汤底（-1 = 没汤）：九宫格锅只用第 0 边；鸳鸯锅 0、1；田字锅 0..3（PotLayout）。
+     * 每边一种汤底（空字符串 = 没汤，未知 ID 原样保留）：九宫格锅只用第 0 边；鸳鸯锅 0、1；田字锅 0..3（PotLayout）。
      * 汤底不和格局绑定，任何汤底（包括以后新加的）都能倒进任何一边。调整（原来是单个 base）。
      */
-    final int[] bases = {-1, -1, -1, -1};
+    final String[] bases = {"", "", "", ""};   // mryt233：持久化 ID，不在读档时解析。
     /**
      * mryt233 改（2026-11-05）：每边的红汤辣度档位（r136a），和 {@link #bases} 一一对应：
      * 0 = 微辣（刚倒进红汤的档位）、1 = 中辣、2 = 特辣、3 = 3 级特辣。
@@ -122,7 +122,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
 
     /** 这一边轮换相位每刻走多少：那边有汤且锅是冷的走慢档，否则快档（同渲染器原来的判断）。 */
     private float cycleRate(int side) {
-        return baseOfSide(side) >= 0 && clientHeat < 0.5F ? BOB_COLD_OMEGA : BOB_OMEGA;
+        return baseOfSide(side) != SoupIds.EMPTY && clientHeat < 0.5F ? BOB_COLD_OMEGA : BOB_OMEGA;
     }
 
     /** 某一边轮换相位，partial = 这一刻已经过去的比例（渲染插值用）。 */
@@ -176,6 +176,8 @@ public class HotPotBlockEntity extends SyncedBlockEntity
         if (StoveBlock.isStove(state)) {
             StovePot pot = state.getValue(StoveBlock.POT);
             if (!pot.hasPot()) {
+                // 未知 ID 必须保留，避免视觉修复写掉未来版本的数据。
+                for (String id : bases) if (SoupIds.index(id) == SoupIds.UNKNOWN) return;
                 // 旧版灶台没有锅库存，不能凭空猜材质；清理无法显示的幽灵内容与汤底。
                 if (filledSlots() > 0) {
                     clearContent();
@@ -547,10 +549,10 @@ public class HotPotBlockEntity extends SyncedBlockEntity
 
     public int propertyAt(int index) {
         if (index == 0) {
-            return bases[0];
+            return SoupIds.index(bases[0]);
         }
         if (index >= PROP_EXTRA_BASES && index < PROP_COUNT) {
-            return bases[index - PROP_EXTRA_BASES + 1];
+            return SoupIds.index(bases[index - PROP_EXTRA_BASES + 1]);
         }
         if (index >= 4 && index < 4 + SLOTS) {
             return slots.doneness()[index - 4];
@@ -593,7 +595,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
     /** 一边汤底的名字（没汤 = 「无汤底」）。 */
     public static Component soupName(int id) {
         SoupDef soup = Soups.byIndex(id);
-        return soup == null ? Component.translatable(key("soup.none")) : Component.translatable(soup.nameKey());
+        return soup == null ? Component.translatable(key(id == SoupIds.UNKNOWN ? "soup.unknown" : "soup.none")) : Component.translatable(soup.nameKey());
     }
 
     /**
@@ -695,7 +697,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
     // ------------------------------------------------------------------ 整锅打包 / 冷热
 
     /** 存进锅物品里的字段名，复制方块（Ctrl+中键）时要从方块实体数据里去掉，免得重复。 */
-    private static final String[] POT_DATA_KEYS = {"Base", "BaseB", "BaseC", "BaseD",
+    private static final String[] POT_DATA_KEYS = {"Soup", "SoupB", "SoupC", "SoupD", "Base", "BaseB", "BaseC", "BaseD",
         "Spicy", "SpicyB", "SpicyC", "SpicyD",   // mryt233 改（2026-11-05）：每边辣度档位也由 pot_contents 打包（r136a）
         "Doneness", "Cooked", "Overcook", "SlotXp", "PendingXp", "Items"};
 

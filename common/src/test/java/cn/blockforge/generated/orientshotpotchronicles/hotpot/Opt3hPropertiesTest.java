@@ -17,7 +17,7 @@ class Opt3hPropertiesTest {
     @Test
     void propertiesZeroThroughNinetyKeepTheirOriginalIndices() throws ReflectiveOperationException {
         HotPotBlockEntity pot = new HotPotBlockEntity(BlockEntityType.CHEST, BlockPos.ZERO, Blocks.CHEST.defaultBlockState());
-        pot.bases[0] = 4;
+        pot.bases[0] = SoupIds.legacy(4);
         var progressField = HotPotSlots.class.getDeclaredField("doneness");
         progressField.setAccessible(true);
         int[] progress = (int[]) progressField.get(pot.slots);
@@ -42,7 +42,7 @@ class Opt3hPropertiesTest {
         assertNull(pot.getLevel());
         assertEquals(91, expected.length);
         for (int i = 0; i < expected.length; i++) assertEquals(expected[i], pot.propertyAt(i), "property " + i);
-        pot.bases[1] = 1; pot.bases[2] = 2; pot.bases[3] = 3;
+        pot.bases[1] = SoupIds.legacy(1); pot.bases[2] = SoupIds.legacy(2); pot.bases[3] = SoupIds.legacy(3);
         assertEquals(94, HotPotBlockEntity.PROP_COUNT);
         assertEquals(91, HotPotBlockEntity.PROP_EXTRA_BASES);
         assertEquals(1, pot.propertyAt(91));

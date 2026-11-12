@@ -38,9 +38,11 @@ public final class HotPotStorage {
     // mryt233 改（2026-11-11）：第三批 3G 存读档改走适配小包，键名、结构与兜底值不变。
     static void write(HotPotBlockEntity be, CompoundTag nbt, HolderLookup.Provider registries) {
         int slots = HotPotBlockEntity.SLOTS;
+        // 旧键仍可读到下个大版本，但新写出的内容不保留旧序号。
+        for (String key : BASE_KEYS) nbt.remove(key);
         BeIo.write(nbt, registries, w -> {
             for (int side = 0; side < be.bases.length; side++) {
-                w.putInt(BASE_KEYS[side], be.bases[side]);
+                SoupIds.write(w, side, be.bases[side]);
                 // mryt233 改（2026-11-05）：每边的红汤辣度档位（r136a），区块存档和整锅打包（pot_contents）都要带着
                 w.putInt(SPICY_KEYS[side], be.spicyLevels[side]);
             }
@@ -77,7 +79,7 @@ public final class HotPotStorage {
         int slots = HotPotBlockEntity.SLOTS;
         BeIo.read(nbt, registries, r -> {
             for (int side = 0; side < be.bases.length; side++) {
-                be.bases[side] = r.getInt(BASE_KEYS[side], -1);
+                be.bases[side] = SoupIds.read(r, side);
                 // mryt233 改（2026-11-05）：旧存档没有辣度键 = 微辣（0 档）；超出 0..3 的值夹回来
                 int spicy = r.getInt(SPICY_KEYS[side], 0);
                 be.spicyLevels[side] = Math.max(0, Math.min(3, spicy));
