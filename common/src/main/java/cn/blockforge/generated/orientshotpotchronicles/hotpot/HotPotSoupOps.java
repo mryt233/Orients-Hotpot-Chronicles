@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemContainerContents;
@@ -185,11 +186,17 @@ final class HotPotSoupOps {
             }
             be.getLevel().playSound(null, be.getBlockPos(), SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.35F, 1.2F);
         } else if (Soups.byIndex(be.bowlSoup(bigCell)) != null) {
-            result = new ItemStack(HotPotContent.SOUP_BOWLS.get(be.bowlSoup(bigCell)));
             // mryt233 改（2026-11-05）：盛出来的红汤碗带着这一边的辣度档位，喝的时候按它给效果（r136a）
             // mryt233 改（2026-11-10，r147）：红汤判断改成读 isSpicy() 属性
+            // mryt233 改（2026-11-13，4F-1）：支持子模组登记的专属汤碗；暂无专属碗（4F-3 前）不崩
             SoupDef bowl = Soups.byIndex(be.bowlSoup(bigCell));
-            if (bowl != null && bowl.spicy()) {
+            Item bowlItem = Soups.bowlItem(bowl);
+            if (bowlItem == null) {
+                player.displayClientMessage(Component.translatable(key("msg.bowl_nothing")), true);
+                return false;
+            }
+            result = new ItemStack(bowlItem);
+            if (bowl.spicy()) {
                 int spicy = be.spicyOfSide(be.soupSideOf(bigCell, be.bowlSoup(bigCell)));
                 if (spicy > 0) {
                     result.set(HotPotContent.SPICY_LEVEL, spicy);

@@ -79,6 +79,15 @@ public final class DevTestCommands {
                 .then(Commands.literal("opt3d").then(Commands.argument("action", com.mojang.brigadier.arguments.StringArgumentType.word())
                     .executes(ctx -> report(ctx, Opt3dRuntimeProbe.run(ctx.getSource(),
                         com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "action"))))))
+                .then(Commands.literal("opt4f")
+                    .then(Commands.argument("action", com.mojang.brigadier.arguments.StringArgumentType.word())
+                        .executes(ctx -> report(ctx, Opt4fProbe.run(player(ctx),
+                            com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "action"),
+                            BlockPos.ZERO)))
+                        .then(Commands.argument("pos", BlockPosArgument.blockPos()).executes(ctx ->
+                            report(ctx, Opt4fProbe.run(player(ctx),
+                                com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "action"),
+                                BlockPosArgument.getBlockPos(ctx, "pos")))))))
                 .then(Commands.literal("facing")
                     .then(Commands.argument("yaw", com.mojang.brigadier.arguments.FloatArgumentType.floatArg())
                         .executes(ctx -> {

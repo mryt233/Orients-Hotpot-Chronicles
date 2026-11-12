@@ -38,6 +38,9 @@ public final class HotpotContentModule implements ContentModule {
     @Override
     public void register(RegistrationApi registration) {
         HotPotContent.register(registration);
+        if (Boolean.getBoolean("hotpot.opt4f")) {
+            development("Opt4fProbe", "install", new Class<?>[]{RegistrationApi.class}, registration);
+        }
     }
 
     @Override

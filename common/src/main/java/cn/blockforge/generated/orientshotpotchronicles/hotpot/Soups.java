@@ -2,11 +2,14 @@ package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -29,13 +32,7 @@ import net.minecraft.world.item.ItemStack;
  * 索引数组每次登记整体替换（读取不加锁，拿到的总是某一时刻完整的快照）。</p>
  * 作者：mryt233 */
 public final class Soups {
-    private static final FrozenRegistry<ResourceLocation, SoupDef> REGISTRY = new FrozenRegistry<>(
-        "汤底登记表", "汤底要在启动期登记（子模组在自己的兼容模块里登记），冻结后不再接受登记。");
-    /** 内置项（前 6 项）的顺序副本；只在 {@link SoupBase} 静态初始化期间写。 */
-    private static final List<SoupDef> BUILTIN = new ArrayList<>();
-    /** 按登记顺序排列的快照（每次登记整体替换）。 */
-    private static volatile SoupDef[] ordered = new SoupDef[0];
-    private static volatile Map<ResourceLocation, Integer> indexById = Map.of();
+    private static final Registry TABLE = new Registry();
     /** 内置项登记完了没有（让热路径上的 ensureBuiltins 不必每次都碰枚举）。 */
     private static volatile boolean builtinsReady;
 
@@ -43,12 +40,8 @@ public final class Soups {
     }
 
     /** 内置项登记：只给 {@link SoupBase} 的静态初始化用，按枚举顺序调用。 */
-    static synchronized void registerBuiltin(SoupDef def) {
-        if (REGISTRY.containsKey(def.id())) {
-            throw new IllegalStateException("内置汤底 ID 重复：" + def.id());
-        }
-        appendLocked(def);
-        BUILTIN.add(def);
+    static void registerBuiltin(SoupDef def) {
+        TABLE.registerBuiltin(def);
     }
 
     /** {@link SoupBase} 登记完全部内置项后调用一次。 */
@@ -57,39 +50,40 @@ public final class Soups {
     }
 
     /** 内置项还没登记完时也能用（给 {@link SoupVisual} 在 {@link SoupBase} 初始化期间核对用）。 */
-    static synchronized List<SoupDef> builtinsSoFar() {
-        return List.copyOf(BUILTIN);
+    static List<SoupDef> builtinsSoFar() {
+        return TABLE.builtins();
     }
 
     /**
-     * 登记一种新汤底（包可见：公开入口留给 4F-1）。ID 不能与已有项重复；冻结后抛 {@link IllegalStateException}。
+     * 4F-1（mryt233）：公开汤底登记入口（启动期调用，冻结后抛 {@link IllegalStateException}；ID 重复抛 {@link IllegalArgumentException}）。
      */
-    static void register(SoupDef def) {
+    public static void register(SoupDef def) {
+        Objects.requireNonNull(def, "def");
         ensureBuiltins();   // 不能放进下面的同步块：SoupBase 初始化时也要拿这把锁，两边先后顺序不同会死锁
-        registerLocked(def);
+        TABLE.register(def);
     }
 
-    private static synchronized void registerLocked(SoupDef def) {
-        if (REGISTRY.containsKey(def.id())) {
-            throw new IllegalArgumentException("汤底 ID 已被登记：" + def.id());
+    /** 4F-1（mryt233）：登记专属汤碗（由 {@link SoupBowlItem#SoupBowlItem(ResourceLocation)} 调用）。 */
+    static void registerBowl(ResourceLocation soupId, Item bowl) {
+        TABLE.registerBowl(soupId, bowl);
+    }
+
+    /** 4F-1（mryt233）：盛这种汤用的碗（内置前 6 项走 {@code SOUP_BOWLS}，否则查专属碗，没有返回 null）。 */
+    public static Item bowlItem(SoupDef def) {
+        if (def == null) {
+            return null;
         }
-        appendLocked(def);
-    }
-
-    private static void appendLocked(SoupDef def) {
-        REGISTRY.put(def.id(), def);   // 冻结后这里抛 IllegalStateException，快照不变
-        SoupDef[] next = Arrays.copyOf(ordered, ordered.length + 1);
-        next[next.length - 1] = def;
-        Map<ResourceLocation, Integer> ids = new HashMap<>(indexById);
-        ids.put(def.id(), next.length - 1);
-        ordered = next;
-        indexById = Map.copyOf(ids);
+        int idx = indexOf(def);
+        if (HotPotContent.SOUP_BOWLS != null && idx >= 0 && idx < HotPotContent.SOUP_BOWLS.size()) {
+            return HotPotContent.SOUP_BOWLS.get(idx);
+        }
+        return TABLE.bowlItem(def);
     }
 
     /** 按完整 ID 查；没有返回 null。 */
     public static SoupDef get(ResourceLocation id) {
         ensureBuiltins();
-        return REGISTRY.get(id);
+        return TABLE.get(id);
     }
 
     /** 按 ID 文本查；不带命名空间（没有冒号）的一律按火锅命名空间解释。查不到或写法非法返回 null。 */
@@ -108,8 +102,7 @@ public final class Soups {
      */
     public static SoupDef byIndex(int index) {
         ensureBuiltins();
-        SoupDef[] snapshot = ordered;
-        return index >= 0 && index < snapshot.length ? snapshot[index] : null;
+        return TABLE.byIndex(index);
     }
 
     /** 某个汤底的序号；传 null 或没登记过的返回 -1。 */
@@ -118,8 +111,7 @@ public final class Soups {
             return -1;
         }
         ensureBuiltins();
-        Integer index = indexById.get(def.id());
-        return index == null ? -1 : index;
+        return TABLE.indexOf(def);
     }
 
     /** 清汤（序号 0）。锅底料只能加进清汤这条旧规则要拿它比较。 */
@@ -136,7 +128,7 @@ public final class Soups {
             return null;
         }
         ensureBuiltins();
-        for (SoupDef def : ordered) {
+        for (SoupDef def : TABLE.ordered) {
             if (def.matchesSource(stack)) {
                 return def;
             }
@@ -148,33 +140,105 @@ public final class Soups {
     /** 全部汤底，按登记顺序（前 6 项是内置项，顺序 = 旧存档序号）。 */
     public static List<SoupDef> all() {
         ensureBuiltins();
-        return List.of(ordered);
+        return TABLE.all();
     }
 
     /** 内置汤底（旧存档序号 0～5 对应的那 6 项）。 */
     public static List<SoupDef> builtins() {
         ensureBuiltins();
-        return builtinsSoFar();
+        return TABLE.builtins();
     }
 
     public static int size() {
         ensureBuiltins();
-        return ordered.length;
+        return TABLE.size();
     }
 
     /** 冻结（幂等）。服务端开始启动时由 {@link HotPotHooks#freezeRegistries()} 调用。 */
     static void freeze() {
         ensureBuiltins();
-        REGISTRY.freeze();
+        TABLE.freeze();
     }
 
     public static boolean isFrozen() {
-        return REGISTRY.isFrozen();
+        return TABLE.isFrozen();
     }
 
     private static void ensureBuiltins() {
         if (!builtinsReady) {
             SoupBase.values();   // 触发 SoupBase 的静态初始化（同一线程正在初始化时直接返回）
         }
+    }
+
+    /** 4F-1（mryt233）：独立登记表实例；主表与单测隔离实例共用，避免单测冻结进程全局表。 */
+    static final class Registry {
+        private final FrozenRegistry<ResourceLocation, SoupDef> registry = new FrozenRegistry<>(
+            "汤底登记表", "汤底要在启动期登记（子模组在自己的兼容模块里登记），冻结后不再接受登记。");
+        private final List<SoupDef> builtins = new ArrayList<>();
+        private final List<SoupDef> extras = new ArrayList<>();
+        private final Map<ResourceLocation, Item> bowls = new HashMap<>();
+        private volatile SoupDef[] ordered = new SoupDef[0];
+        private volatile Map<ResourceLocation, Integer> indexById = Map.of();
+
+        synchronized void registerBuiltin(SoupDef def) {
+            Objects.requireNonNull(def, "def");
+            if (registry.containsKey(def.id())) {
+                throw new IllegalStateException("内置汤底 ID 重复：" + def.id());
+            }
+            registry.put(def.id(), def);
+            builtins.add(def);
+            rebuildSnapshotLocked();
+        }
+
+        synchronized void register(SoupDef def) {
+            Objects.requireNonNull(def, "def");
+            if (registry.containsKey(def.id())) {
+                throw new IllegalArgumentException("汤底 ID 已被登记：" + def.id());
+            }
+            registry.put(def.id(), def);
+            extras.add(def);
+            extras.sort(Comparator.comparing(d -> d.id().toString()));
+            rebuildSnapshotLocked();
+        }
+
+        private void rebuildSnapshotLocked() {
+            SoupDef[] next = new SoupDef[builtins.size() + extras.size()];
+            Map<ResourceLocation, Integer> ids = new HashMap<>(next.length * 2);
+            int i = 0;
+            for (SoupDef entry : builtins) {
+                next[i] = entry;
+                ids.put(entry.id(), i++);
+            }
+            for (SoupDef entry : extras) {
+                next[i] = entry;
+                ids.put(entry.id(), i++);
+            }
+            ordered = next;
+            indexById = Map.copyOf(ids);
+        }
+
+        SoupDef get(ResourceLocation id) { return id == null ? null : registry.get(id); }
+        SoupDef byIndex(int index) {
+            SoupDef[] snapshot = ordered;
+            return index >= 0 && index < snapshot.length ? snapshot[index] : null;
+        }
+        int indexOf(SoupDef def) {
+            if (def == null) {
+                return -1;
+            }
+            Integer index = indexById.get(def.id());
+            return index == null ? -1 : index;
+        }
+        List<SoupDef> all() { return List.of(ordered); }
+        synchronized List<SoupDef> builtins() { return List.copyOf(builtins); }
+        int size() { return ordered.length; }
+        synchronized void registerBowl(ResourceLocation soupId, Item bowl) {
+            Objects.requireNonNull(soupId, "soupId");
+            Objects.requireNonNull(bowl, "bowl");
+            bowls.putIfAbsent(soupId, bowl);
+        }
+        synchronized Item bowlItem(SoupDef def) { return def == null ? null : bowls.get(def.id()); }
+        void freeze() { registry.freeze(); }
+        boolean isFrozen() { return registry.isFrozen(); }
     }
 }

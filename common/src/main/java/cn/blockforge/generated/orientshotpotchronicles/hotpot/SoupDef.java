@@ -11,6 +11,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 /**
  * 一种汤底的全部「定义」：它是谁、倒进去的是什么、喝下去有什么效果、界面和气泡长什么色；
@@ -87,9 +88,9 @@ public record SoupDef(
         return HotPot.MOD_ID.equals(id.getNamespace()) ? id.getPath() : id.toString();
     }
 
-    /** 完整语言键 text.&lt;modid&gt;.soup.xxx。 */
+    /** 完整语言键；若 {@code langKey} 已带 {@code text.} 前缀（第三方自定义）则直接返回，否则拼 {@code text.<modid>.<langKey>}。 */
     public String nameKey() {
-        return "text." + HotPot.MOD_ID + "." + langKey;
+        return langKey.startsWith("text.") ? langKey : "text." + HotPot.MOD_ID + "." + langKey;
     }
 
     /**
@@ -210,5 +211,94 @@ public record SoupDef(
             return;
         }
         list.add(new MobEffectInstance(effect, ticks, amplifier, false, true));
+    }
+
+    /** 4F-1（mryt233）：构造自定义汤底定义。 */
+    public static Builder builder(ResourceLocation id) {
+        return new Builder(id);
+    }
+
+    /** 4F-1（mryt233）：汤底定义构造器（带合理默认值，支持延迟物品引用）。 */
+    public static final class Builder {
+        private final ResourceLocation id;
+        private String langKey;
+        private String bowlId;
+        private float defaultSpeedMul = 1.0F;
+        private Supplier<Item> sourceItem;
+        private Item remainderItem = Items.AIR;
+        private Supplier<Item> additive;
+        private int defaultBowlHunger = SoupBase.DEFAULT_BOWL_HUNGER;
+        private float defaultBowlSaturation = 0.6F;
+        private Holder<MobEffect> mainEffect;
+        private int defaultDuration;
+        private Holder<MobEffect> secondEffect;
+        private int defaultSecondDuration;
+        private Holder<MobEffect> fireEffect;
+        private int defaultFireDuration;
+        private Holder<MobEffect> hungerEffect;
+        private int defaultHungerDuration;
+        private boolean clearsNausea;
+        private boolean spicy;
+        private int screenBase = 0xFFD9C7A3;
+        private int screenHi = 0xFFF1E5C9;
+        private int screenLo = 0xFFB8A37D;
+        private int[] screenBits = {0xFF8C7A5B, 0xFFE6D6B8};
+        private int bubbleBody = 0xFFF3EAD6;
+        private int bubbleHi = 0xFFFFFFFF;
+
+        private Builder(ResourceLocation id) {
+            this.id = Objects.requireNonNull(id, "id");
+            this.langKey = "text." + id.getNamespace() + ".soup." + id.getPath();
+            this.bowlId = id.getPath() + "_bowl";
+        }
+
+        public Builder langKey(String langKey) { this.langKey = Objects.requireNonNull(langKey, "langKey"); return this; }
+        public Builder bowlId(String bowlId) { this.bowlId = Objects.requireNonNull(bowlId, "bowlId"); return this; }
+        public Builder speed(float speedMul) { this.defaultSpeedMul = speedMul; return this; }
+        public Builder source(Supplier<Item> sourceItem) { return source(sourceItem, Items.AIR); }
+        public Builder source(Supplier<Item> sourceItem, Item remainderItem) {
+            this.sourceItem = Objects.requireNonNull(sourceItem, "sourceItem");
+            this.remainderItem = Objects.requireNonNull(remainderItem, "remainderItem");
+            return this;
+        }
+        public Builder additive(Supplier<Item> additive) { this.additive = Objects.requireNonNull(additive, "additive"); return this; }
+        public Builder bowlFood(int hunger, float saturation) {
+            this.defaultBowlHunger = hunger;
+            this.defaultBowlSaturation = saturation;
+            return this;
+        }
+        public Builder mainEffect(Holder<MobEffect> effect, int durationTicks) {
+            this.mainEffect = effect; this.defaultDuration = durationTicks; return this;
+        }
+        public Builder secondEffect(Holder<MobEffect> effect, int durationTicks) {
+            this.secondEffect = effect; this.defaultSecondDuration = durationTicks; return this;
+        }
+        public Builder fireEffect(Holder<MobEffect> effect, int durationTicks) {
+            this.fireEffect = effect; this.defaultFireDuration = durationTicks; return this;
+        }
+        public Builder hungerEffect(Holder<MobEffect> effect, int durationTicks) {
+            this.hungerEffect = effect; this.defaultHungerDuration = durationTicks; return this;
+        }
+        public Builder clearsNausea(boolean clearsNausea) { this.clearsNausea = clearsNausea; return this; }
+        public Builder spicy(boolean spicy) { this.spicy = spicy; return this; }
+        public Builder screenColors(int base, int hi, int lo, int... bits) {
+            this.screenBase = base; this.screenHi = hi; this.screenLo = lo;
+            if (bits != null && bits.length > 0) this.screenBits = bits.clone();
+            return this;
+        }
+        public Builder bubbleColors(int body, int hi) {
+            this.bubbleBody = body; this.bubbleHi = hi; return this;
+        }
+
+        public SoupDef build() {
+            if (sourceItem == null && additive == null) {
+                throw new IllegalStateException("汤底 " + id + " 必须设置倒入原料 source 或锅底料 additive");
+            }
+            Supplier<Item> resolvedSource = sourceItem != null ? sourceItem : () -> Items.AIR;
+            return new SoupDef(id, langKey, bowlId, defaultSpeedMul, resolvedSource, remainderItem, additive,
+                defaultBowlHunger, defaultBowlSaturation, mainEffect, defaultDuration, secondEffect, defaultSecondDuration,
+                fireEffect, defaultFireDuration, hungerEffect, defaultHungerDuration, clearsNausea, spicy,
+                screenBase, screenHi, screenLo, screenBits, bubbleBody, bubbleHi);
+        }
     }
 }
