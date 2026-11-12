@@ -96,15 +96,16 @@ public record SoupDef(
 
     /**
      * 方块状态里的汤面值。内置项按名字对应 {@link SoupVisual}（启动时核对过一一对得上）；
-     * 其他汤底在 4F-3 有 {@code OTHER} 之前暂时映射为 {@link SoupVisual#NONE}（锅里不画汤面，不崩）。
+     * 其他汤底统一映射为 {@link SoupVisual#OTHER}（mryt233 改，4F-3）。
      */
     public SoupVisual visual() {
         for (SoupVisual candidate : SoupVisual.values()) {
-            if (candidate != SoupVisual.NONE && candidate.getSerializedName().equals(key())) {
+            if (candidate != SoupVisual.NONE && candidate != SoupVisual.OTHER
+                && candidate.getSerializedName().equals(key())) {
                 return candidate;
             }
         }
-        return SoupVisual.NONE;
+        return SoupVisual.OTHER;
     }
 
     // ---------------------------------------------------------------- 原料

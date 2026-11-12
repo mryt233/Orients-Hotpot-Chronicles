@@ -85,7 +85,7 @@ class Opt3AttributesTest {
     void drinkAndVisualOrderAreUnchanged() {
         assertArrayEquals(new String[]{"ORANGE_DRINK", "PLANT_PROTEIN_DRINK", "ORIENT_COLA", "WATER", "MILK"},
             java.util.Arrays.stream(DrinkKind.values()).map(Enum::name).toArray(String[]::new));
-        assertArrayEquals(new String[]{"NONE", "CLEAR", "RICH_STOCK", "MUSHROOM", "SPICY", "TOMATO", "THREE_FRESH"},
+        assertArrayEquals(new String[]{"NONE", "CLEAR", "RICH_STOCK", "MUSHROOM", "SPICY", "TOMATO", "THREE_FRESH", "OTHER"},
             java.util.Arrays.stream(SoupVisual.values()).map(Enum::name).toArray(String[]::new));
     }
 

@@ -188,14 +188,14 @@ final class HotPotSoupOps {
         } else if (Soups.byIndex(be.bowlSoup(bigCell)) != null) {
             // mryt233 改（2026-11-05）：盛出来的红汤碗带着这一边的辣度档位，喝的时候按它给效果（r136a）
             // mryt233 改（2026-11-10，r147）：红汤判断改成读 isSpicy() 属性
-            // mryt233 改（2026-11-13，4F-1）：支持子模组登记的专属汤碗；暂无专属碗（4F-3 前）不崩
+            // mryt233 改（2026-11-13，4F-3）：优先专属碗，否则走通用汤碗 + soup 组件
             SoupDef bowl = Soups.byIndex(be.bowlSoup(bigCell));
-            Item bowlItem = Soups.bowlItem(bowl);
-            if (bowlItem == null) {
+            ItemStack bowlStack = Soups.bowlStack(bowl);
+            if (bowlStack.isEmpty()) {
                 player.displayClientMessage(Component.translatable(key("msg.bowl_nothing")), true);
                 return false;
             }
-            result = new ItemStack(bowlItem);
+            result = bowlStack;
             if (bowl.spicy()) {
                 int spicy = be.spicyOfSide(be.soupSideOf(bigCell, be.bowlSoup(bigCell)));
                 if (spicy > 0) {

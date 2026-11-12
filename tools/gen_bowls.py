@@ -65,6 +65,9 @@ def main():
                 write(root / f"models/block/bowl_{name}_soup_{soup}.json",
                       {"parent": "minecraft:block/block", "textures": t,
                        "elements": els + [surface(soup_y, soup_half)]})
+            # mryt233 改：其他汤底由客户端按定义画汤面，方块模型只保留空木碗本体。
+            write(root / f"models/block/bowl_{name}_soup_other.json",
+                  {"parent": "minecraft:block/block", "textures": textures, "elements": els})
     print("ok")
 
 
@@ -86,11 +89,11 @@ BOWL_DISPLAY = {
 
 
 def game_files():
-    """摆在桌上的碗（方块状态 bowl：汤底 × 方向）、四种汤碗物品、装菜的碗（原版 bowl 的自定义模型数据 1）。"""
+    """摆在桌上的碗（方块状态 bowl：汤底 × 方向）、各种汤碗物品、装菜的碗（原版 bowl 的自定义模型数据 1）。"""
     for root in ASSET_ROOTS:
         variants = {}
         for axis in ("x", "z"):
-            for soup in ["none"] + SOUPS:
+            for soup in ["none"] + SOUPS + ["other"]:
                 model = f"{MODID}:block/bowl_{GAME_SHAPE}" + ("" if soup == "none" else f"_soup_{soup}")
                 v = {"model": model}
                 if axis == "z":
@@ -103,6 +106,11 @@ def game_files():
                        "tomato": "tomato_soup_bowl", "three_fresh": "three_fresh_soup_bowl"}[soup]   # 物品 ID（r102 起和显示名对得上）
             write(root / f"models/item/{bowl_id}.json",
                   {"parent": f"{MODID}:block/bowl_{GAME_SHAPE}_soup_{soup}", "display": BOWL_DISPLAY})
+        write(root / "models/item/soup_bowl.json", {
+            "parent": "minecraft:builtin/entity",
+            "display": BOWL_DISPLAY,
+            "textures": {"particle": f"{MODID}:block/bowl_wood"},
+        })
         write(root / "models/item/bowl_with_food.json", {"parent": "minecraft:builtin/entity", "display": BOWL_DISPLAY})
         # 原版的碗：平时照原版，装着菜（自定义模型数据 1）切到上面那个，由 HeldFoodItemRenderer 画立体的碗和菜
         mc = root.parent / "minecraft"

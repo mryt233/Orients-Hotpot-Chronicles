@@ -23,7 +23,21 @@ ROOTS = [RES / "assets" / MODID]
 
 # 新汤：(照哪锅汤的明暗, 汤色 暗 → 亮, 撒的料 [(颜色, 个数)])
 NEW = {e["id"]: tuples(e["new_texture"]) for e in materials()["soups"] if "new_texture" in e}
-BLOCKSTATES = ["bowl", "brick_stove", "tall_brick_stove", "iron_nine_grid_hotpot", "copper_nine_grid_hotpot"]
+# mryt233 改：bowl.json 已由 gen_bowls.py 独立全量生成，此处不再改写。
+BLOCKSTATES = ["brick_stove", "tall_brick_stove", "iron_nine_grid_hotpot", "copper_nine_grid_hotpot"]
+OTHER_BLOCKSTATES = {"brick_stove", "iron_nine_grid_hotpot", "copper_nine_grid_hotpot"}
+OTHER_SOUP_MODEL = {
+    "credit": "Orient's Hotpot Chronicles",
+    "ambientocclusion": False,
+    "textures": {"particle": f"{MODID}:block/hot_pot_top_clear"},
+    "elements": [],
+}
+OTHER_MODEL_NAMES = (
+    "standalone_soup_other",
+    "standalone_soup_other_boiling",
+    "stove_soup_other",
+    "stove_soup_other_boiling",
+)
 
 
 def lerp(a, b, t):
@@ -61,22 +75,21 @@ def main():
             for f in sorted((root / "models/block").glob("*spicy*.json")):
                 text = f.read_text(encoding="utf-8").replace("spicy", name)
                 write_text(f.parent / f.name.replace("spicy", name), text)
+        for model_name in OTHER_MODEL_NAMES:
+            write(root / f"models/block/{model_name}.json", OTHER_SOUP_MODEL)
         for bs in BLOCKSTATES:
             f = root / "blockstates" / f"{bs}.json"
             d = json.loads(f.read_text(encoding="utf-8"))
-            if "variants" in d:
-                for key in [k for k in d["variants"] if "soup=spicy" in k]:
-                    for name in NEW:
-                        d["variants"][key.replace("spicy", name)] = json.loads(
-                            json.dumps(d["variants"][key]).replace("spicy", name))
-            else:
-                parts = d["multipart"]
-                have = {json.dumps(p, sort_keys=True) for p in parts}
-                for p in [p for p in parts if p.get("when", {}).get("soup") == "spicy"]:
-                    for name in NEW:
-                        q = json.loads(json.dumps(p).replace("spicy", name))
-                        if json.dumps(q, sort_keys=True) not in have:
-                            parts.append(q)
+            parts = d["multipart"]
+            have = {json.dumps(p, sort_keys=True) for p in parts}
+            targets = list(NEW) + (["other"] if bs in OTHER_BLOCKSTATES else [])
+            for p in [p for p in parts if p.get("when", {}).get("soup") == "spicy"]:
+                for name in targets:
+                    q = json.loads(json.dumps(p).replace("spicy", name))
+                    raw = json.dumps(q, sort_keys=True)
+                    if raw not in have:
+                        parts.append(q)
+                        have.add(raw)
             write(f, d)
     print("ok")
 

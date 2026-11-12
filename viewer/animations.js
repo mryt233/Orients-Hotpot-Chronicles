@@ -6,6 +6,7 @@
 //   heat ramp            ← clientHeat += (target - clientHeat) * 0.08 per tick
 // Animated block textures (boiling soup etc.) come from the models themselves.
 // mryt233 改（2026-11-11）：Java 方块图集查询移至 client/RenderSprites；此处绘制参数不变。
+// mryt233 改（2026-11-13）：支持 other 通用自定义汤底预览与沸腾配色兜底。
 import * as THREE from "three";
 import { BoxBatch, Particles, TexBoxBatch, hash, frac, easeOutCubic, easeInOutSine, mc, rand } from "/anim.js";
 
@@ -35,7 +36,32 @@ const PALETTES = {
   spicy: { body: 0xbe3325, hi: 0xd8553a, shadow: 0x7e1c16 },
   tomato: { body: 0xe2563a, hi: 0xff9a6a, shadow: 0x962a18 },
   three_fresh: { body: 0xe6d8b0, hi: 0xfff6dc, shadow: 0xb2a072 },
+  other: { body: 0xd9c7a3, hi: 0xf1e5c9, shadow: 0xb8a37d },
 };
+const soupPalette = (soup) => PALETTES[soup] || PALETTES.other;
+const isBuiltinSoup = (soup) => Object.hasOwn(PALETTES, soup) && soup !== "other";
+
+async function buildSoupMesh(ctx, modid, soup, lit, y, innerMin, innerSize, regions) {
+  const builtin = isBuiltinSoup(soup);
+  const texName = builtin ? soup : "clear";
+  const tex = await ctx.texture(`${modid}:block/hot_pot_top_${texName}${lit ? "_boiling" : ""}`);
+  const pos = [], uv = [];
+  for (const [u0, v0, u1, v1] of regions) {
+    const X = (u) => innerMin + innerSize * u - 0.5, Z = (v) => innerMin + innerSize * v - 0.5;
+    const quad = [[u0, v1], [u1, v1], [u1, v0], [u0, v0]];
+    for (const t of [0, 1, 2, 0, 2, 3]) {
+      const [u, v] = quad[t];
+      pos.push(X(u), y - 0.5, Z(v));
+      uv.push(u, 1 - v);
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  geo.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+  const matOpts = { map: tex.texture || tex, side: THREE.DoubleSide };
+  if (!builtin) matOpts.color = soupPalette(soup).body;
+  return new THREE.Mesh(geo, new THREE.MeshBasicMaterial(matOpts));
+}
 
 // ---------------------------------------------------------------- BoilingEffects port
 
@@ -43,8 +69,8 @@ const PALETTES = {
 // smaller cubes that fly apart, then they drop back and sink, leaving a faint ripple.
 // All pure functions of time (same hash / easing as the Java side).
 function boilingEffects(batch, soup, pot, heat, t, salt, keepAt = null) {
-  if (heat < 0.05) return;
-  const pal = PALETTES[soup];
+  if (!soup || soup === "none" || heat < 0.05) return;
+  const pal = soupPalette(soup);
   const { innerMin, innerSize } = pot;
   const y = pot.surface + 0.002;
   const box = (x0, y0, z0, x1, y1, z1, top, side, alpha = 1) => batch.box(mc(x0), mc(y0), mc(z0), mc(x1), mc(y1), mc(z1), top, side, alpha);
@@ -124,10 +150,12 @@ async function buildScene(ctx, s, kind) {
   const lift = kind === "tallStove" ? TALL_LIFT : 0;
   // 鸳鸯 / 田字锅（2026-10-26）：锅身模型换成那种锅的，汤面不走方块状态（soup=none），照 HotPotBlockEntityRenderer.renderSideSoups 按边画
   const shape = s.shape && s.shape !== "nine" ? YY_SHAPES.find((x) => x[0] === s.shape) : null;
-  if (stoveLike) state = { lit: String(lit), facing: "north", pot: shape ? `${s.pot}_${shape[1]}_soup` : `${s.pot}_soup`, soup: shape ? "none" : s.soup, pot_axis: "x" };
+  const customSingleSoup = !shape && kind !== "stoveOnly" && s.soup && s.soup !== "none" && !isBuiltinSoup(s.soup);
+  const blockSoup = shape || customSingleSoup ? "none" : s.soup;
+  if (stoveLike) state = { lit: String(lit), facing: "north", pot: shape ? `${s.pot}_${shape[1]}_soup` : `${s.pot}_soup`, soup: blockSoup, pot_axis: "x" };
   // an empty stove in game is pot=none, soup=none (StoveBlock default state), so no soup is drawn
   else if (kind === "stoveOnly") state = { lit: String(lit), facing: "north", pot: "none", soup: "none", pot_axis: "x" };
-  else state = { soup: s.soup, boiling: String(lit), axis: "x" };
+  else state = { soup: blockSoup, boiling: String(lit), axis: "x" };
   const potId = shape ? { s: "taiji_yuanyang_hotpot", o: "round_yuanyang_hotpot", square: "square_yuanyang_hotpot", split: "split_yuanyang_hotpot", four: "four_grid_hotpot" }[shape[0]] : "nine_grid_hotpot";
   if (kind === "pot" && shape) state = { axis: "x" };
   const blockId = kind === "pot" ? `${s.pot}_${potId}` : kind === "tallStove" ? "tall_brick_stove" : "brick_stove";
@@ -140,23 +168,13 @@ async function buildScene(ctx, s, kind) {
   const hasSoup = kind !== "stoveOnly";
   // 每边的汤（第 1 边 = 汤底，第 2 边 = 第 2 边汤底，田字锅 3 / 4 边轮流用这两种）
   const sideSoups = shape ? [...Array(shape[2])].map((_, i) => (i % 2 === 0 ? s.soup : s.soup2 || "clear")) : null;
+  if (customSingleSoup) {
+    root.add(await buildSoupMesh(ctx, ctx.modid, s.soup, lit, pot.surface + 0.001, pot.innerMin, pot.innerSize, [[0, 0, 1, 1]]));
+  }
   if (shape && hasSoup) {
     for (let side = 0; side < shape[2]; side++) {
-      const tex = await ctx.texture(`${ctx.modid}:block/hot_pot_top_${sideSoups[side]}${lit ? "_boiling" : ""}`);
-      const pos = [], uv = [];
-      for (const [u0, v0, u1, v1] of yyRegions(shape[0], side)) {
-        const X = (u) => pot.innerMin + pot.innerSize * u - 0.5, Z = (v) => pot.innerMin + pot.innerSize * v - 0.5;
-        const quad = [[u0, v1], [u1, v1], [u1, v0], [u0, v0]];
-        for (const t of [0, 1, 2, 0, 2, 3]) {
-          const [u, v] = quad[t];
-          pos.push(X(u), pot.surface + 0.001 - 0.5, Z(v));
-          uv.push(u, 1 - v);
-        }
-      }
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
-      geo.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
-      root.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex.texture || tex, side: THREE.DoubleSide })));
+      if (!sideSoups[side] || sideSoups[side] === "none") continue;
+      root.add(await buildSoupMesh(ctx, ctx.modid, sideSoups[side], lit, pot.surface + 0.001, pot.innerMin, pot.innerSize, yyRegions(shape[0], side)));
     }
   }
   const batch = new BoxBatch();
@@ -291,8 +309,8 @@ async function buildScene(ctx, s, kind) {
 const POT = { key: "pot", label: "锅", options: [["copper", "铜锅"], ["iron", "铁锅"]], default: "copper" };
 // 锅形（2026-10-26 用户：灶台上煮火锅里把各个锅形加上）：nine = 九宫格，其余同 YY_SHAPES
 const SHAPE = { key: "shape", label: "锅形", options: [["nine", "九宫格"], ["s", "太极鸳鸯"], ["o", "圆心鸳鸯"], ["square", "方心鸳鸯"], ["split", "直隔鸳鸯"], ["four", "田字"]], default: "nine" };
-const SOUP2 = { key: "soup2", label: "第 2 边汤底（鸳鸯 / 田字锅）", options: [["clear", "清汤"], ["spicy", "红汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"]], default: "clear" };
-const SOUP = { key: "soup", label: "汤底", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"]], default: "spicy" };
+const SOUP2 = { key: "soup2", label: "第 2 边汤底（鸳鸯 / 田字锅）", options: [["clear", "清汤"], ["spicy", "红汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["other", "自定义汤底"]], default: "clear" };
+const SOUP = { key: "soup", label: "汤底", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["other", "自定义汤底"]], default: "spicy" };
 const FIRE = { key: "fire", label: "灶火", options: [["on", "点着"], ["off", "熄灭"]], default: "on", live: true };
 const FOOD = { key: "food", label: "食材", options: [["on", "放几样"], ["off", "不放"]], default: "on" };
 
@@ -875,22 +893,8 @@ async function buildYuanyang(ctx, s) {
     root.add(pot);
     const soups = [s.soupA, s.soupB, s.soupC, s.soupD];
     for (let side = 0; side < sides; side++) {
-      if (soups[side] === "none") continue;
-      const tex = await ctx.texture(`${ns}:block/hot_pot_top_${soups[side]}${s.fire === "on" ? "_boiling" : ""}`);
-      const pos = [], uv = [];
-      for (const [u0, v0, u1, v1] of yyRegions(shape, side)) {
-        const X = (u) => (1.5 + 13 * u) / 16 - 0.5, Z = (v) => (1.5 + 13 * v) / 16 - 0.5;
-        const quad = [[u0, v1], [u1, v1], [u1, v0], [u0, v0]];
-        for (const t of [0, 1, 2, 0, 2, 3]) {
-          const [u, v] = quad[t];
-          pos.push(X(u), 5.6 / 16 - 0.5, Z(v));
-          uv.push(u, 1 - v);
-        }
-      }
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
-      geo.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
-      const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex.texture || tex, side: THREE.DoubleSide }));
+      if (!soups[side] || soups[side] === "none") continue;
+      const mesh = await buildSoupMesh(ctx, ns, soups[side], s.fire === "on", 5.6 / 16, 1.5 / 16, 13 / 16, yyRegions(shape, side));
       const g = new THREE.Group();
       g.position.set(x, 0, 0);
       g.add(mesh);
@@ -1008,10 +1012,10 @@ export default [
     desc: "2026-10-23：锅身同九宫格锅（同大小、同贴图），隔板换成太极（S 形）、圆心（中间一圈）、中间一道直隔板、田字十字。每边一种汤，任意汤底都能放任意一边（汤面由渲染器按贴图画）。S 形左右各 4 格、O 形圈外 6 圈里 2、直隔板左右各 3、田字每块 2 格。合成：同金属九宫格锅 + 同金属锭（锭在左 = S、锭在下 = O、锭在上 = 直隔板、锭在左右 = 田字）",
     params: [{ key: "shape", label: "形状", options: [["all", "五种并排"], ["s", "太极"], ["o", "圆心"], ["square", "方心"], ["split", "直隔板"], ["four", "田字"]], default: "all" },
       POT,
-      { key: "soupA", label: "第 1 边（S 左 / O 圈外 / 直隔左 / 田字左上）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["none", "没汤"]], default: "spicy" },
-      { key: "soupB", label: "第 2 边（S 右 / O 圈里 / 直隔右 / 田字右上）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["none", "没汤"]], default: "clear" },
-      { key: "soupC", label: "第 3 边（田字右下）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["none", "没汤"]], default: "mushroom" },
-      { key: "soupD", label: "第 4 边（田字左下）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["none", "没汤"]], default: "rich_stock" },
+      { key: "soupA", label: "第 1 边（S 左 / O 圈外 / 直隔左 / 田字左上）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["other", "自定义汤底"], ["none", "没汤"]], default: "spicy" },
+      { key: "soupB", label: "第 2 边（S 右 / O 圈里 / 直隔右 / 田字右上）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["other", "自定义汤底"], ["none", "没汤"]], default: "clear" },
+      { key: "soupC", label: "第 3 边（田字右下）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["other", "自定义汤底"], ["none", "没汤"]], default: "mushroom" },
+      { key: "soupD", label: "第 4 边（田字左下）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["other", "自定义汤底"], ["none", "没汤"]], default: "rich_stock" },
       { key: "fire", label: "火", options: [["off", "冷锅"], ["on", "沸腾贴图"]], default: "off" }],
     build: buildYuanyang,
   },

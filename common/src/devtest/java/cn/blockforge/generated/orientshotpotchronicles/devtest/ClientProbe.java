@@ -317,7 +317,28 @@ public final class ClientProbe {
                 opt4f.addProperty("ginger_soup", true);
                 opt4f.addProperty("ginger_speed", ginger.defaultSpeedMul());
                 opt4f.addProperty("ginger_name_key", ginger.nameKey());
+                opt4f.addProperty("ginger_visual", ginger.visual().getSerializedName());
+                var bowlStack = cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups.bowlStack(ginger);
+                opt4f.addProperty("ginger_bowl_item",
+                    net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(bowlStack.getItem()).toString());
+                opt4f.addProperty("ginger_bowl_comp",
+                    bowlStack.get(cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.SOUP));
+                opt4f.addProperty("ginger_bowl_name", bowlStack.getHoverName().getString());
+                var bowlTips = new java.util.ArrayList<Component>();
+                ClientTooltips.append(bowlStack, bowlTips);
+                opt4f.add("ginger_bowl_tooltip", new com.google.gson.Gson().toJsonTree(bowlTips.stream().map(Component::getString).toList()));
             }
+            var clearBowl = cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups.bowlStack(
+                cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups.clear());
+            opt4f.addProperty("clear_bowl_item",
+                net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(clearBowl.getItem()).toString());
+            var unknownBowl = new net.minecraft.world.item.ItemStack(
+                cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.SOUP_BOWL);
+            unknownBowl.set(cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.SOUP, "missing:nope");
+            opt4f.addProperty("unknown_bowl_name", unknownBowl.getHoverName().getString());
+            var unknownTips = new java.util.ArrayList<Component>();
+            ClientTooltips.append(unknownBowl, unknownTips);
+            opt4f.add("unknown_bowl_tooltip", new com.google.gson.Gson().toJsonTree(unknownTips.stream().map(Component::getString).toList()));
             var truffle = cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasonings.get("opt4fpack:truffle");
             if (truffle != null) {
                 opt4f.addProperty("truffle", true);

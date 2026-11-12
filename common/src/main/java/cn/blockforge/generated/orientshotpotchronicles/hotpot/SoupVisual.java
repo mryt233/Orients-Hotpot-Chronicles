@@ -16,7 +16,8 @@ public enum SoupVisual implements StringRepresentable {
     MUSHROOM("mushroom"),
     SPICY("spicy"),
     TOMATO("tomato"),
-    THREE_FRESH("three_fresh");
+    THREE_FRESH("three_fresh"),
+    OTHER("other");
 
     private final String name;
 
@@ -40,7 +41,7 @@ public enum SoupVisual implements StringRepresentable {
         return base.visual();
     }
 
-    /** mryt233 改（2026-11-11，4B-2）：按登记表里的定义取汤面值；没有汤（null）= 空锅，非内置汤底暂为空（见 {@link SoupDef#visual()}）。 */
+    /** mryt233 改（2026-11-11，4B-2；4F-3 补 OTHER）：按登记表里的定义取汤面值；没有汤（null）= 空锅，非内置汤底映射为 {@link #OTHER}（见 {@link SoupDef#visual()}）。 */
     public static SoupVisual fromDef(SoupDef def) {
         return def == null ? NONE : def.visual();
     }
@@ -59,7 +60,7 @@ public enum SoupVisual implements StringRepresentable {
             String key = def.id().getPath();
             boolean found = false;
             for (SoupVisual visual : values()) {
-                if (visual != NONE && visual.name.equals(key)) {
+                if (visual != NONE && visual != OTHER && visual.name.equals(key)) {
                     found = true;
                     break;
                 }

@@ -65,11 +65,13 @@ final class HotPotSoup {
     /** 方块状态里的汤面：九宫格锅照汤底；鸳鸯锅的汤面由渲染器按两边画，方块状态一律空。 */
     static SoupVisual blockVisual(HotPotBlockEntity be) {
         if (be.layout().multiSoup()) return SoupVisual.NONE;
-        // 未知 ID 暂时不能解析时，沿用方块已有汤面，不把未知汤修成空锅。
+        // 未知 ID 暂时不能解析时，沿用方块已有汤面，不把未知汤修成空锅；若仍为 NONE 则兜底用 OTHER（4F-3）。
         if (SoupIds.index(be.bases[0]) == SoupIds.UNKNOWN) {
             var state = be.getBlockState();
-            if (StoveBlock.isStove(state)) return state.getValue(StoveBlock.SOUP);
-            if (state.getBlock() instanceof HotPotBlock) return state.getValue(HotPotBlock.SOUP);
+            SoupVisual existing = SoupVisual.NONE;
+            if (StoveBlock.isStove(state)) existing = state.getValue(StoveBlock.SOUP);
+            else if (state.getBlock() instanceof HotPotBlock) existing = state.getValue(HotPotBlock.SOUP);
+            return existing != SoupVisual.NONE ? existing : SoupVisual.OTHER;
         }
         return SoupVisual.fromDef(Soups.get(be.bases[0]));
     }

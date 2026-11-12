@@ -241,7 +241,11 @@ const SOUPS = {
   spicy: { base: 0xffb32a1e, hi: 0xffffb070, lo: 0xffd94a2e, bits: [0xffe8862a, 0xff7a1408, 0xff3a1208] },
   tomato: { base: 0xffd8482a, hi: 0xffff9a6a, lo: 0xffe86040, bits: [0xfff2c14a, 0xffb82818, 0xff6faf3a] },
   three_fresh: { base: 0xffd8c79a, hi: 0xfffff6dc, lo: 0xffe6d8b0, bits: [0xff8a5a34, 0xfff08a30, 0xff3e7a3a] },
+  // 4F-3（mryt233 改）：自定义 / 扩展汤底通用预览配色（同 SoupDef.Builder 默认色）；未知或空锅仍走暗色兜底
+  other: { base: 0xffd9c7a3, hi: 0xfff1e5c9, lo: 0xffb8a37d, bits: [0xff8c7a5b, 0xffe6d6b8] },
 };
+const resolveSoup = (id) => (!id || id === "unknown" ? null : SOUPS[id] || SOUPS.other);
+const soupLabel = (g, id) => (!id ? g.tr(key("soup.none")) : id === "other" ? "自定义汤底" : g.tr(key(`soup.${id}`)));
 // = PotLayout：每个大格属于哪边汤（-1 = 不用），几边（鸳鸯锅 / 田字锅，2026-10-23 mryt233 加）
 const LAYOUTS = {
   nine: { sides: 1, cells: [0, 0, 0, 0, 0, 0, 0, 0, 0] },
@@ -313,10 +317,10 @@ const hotpot = {
   params: [
     { key: "pot", label: "锅", options: [["copper", "铜锅"], ["iron", "铁锅"]], default: "copper" },
     { key: "layout", label: "分格", options: [["nine", "九宫格"], ["s", "太极鸳鸯"], ["o", "圆心鸳鸯"], ["square", "方心鸳鸯"], ["split", "直隔鸳鸯"], ["four", "田字"]], default: "nine" },
-    { key: "soup", label: "汤底（第 1 边）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["unknown", "未知汤底"], ["", "空锅"]], default: "spicy" },
-    { key: "soup2", label: "第 2 边", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["unknown", "未知汤底"], ["", "没汤"]], default: "clear" },
-    { key: "soup3", label: "第 3 边（田字）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["unknown", "未知汤底"], ["", "没汤"]], default: "mushroom" },
-    { key: "soup4", label: "第 4 边（田字）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["unknown", "未知汤底"], ["", "没汤"]], default: "" },
+    { key: "soup", label: "汤底（第 1 边）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["other", "自定义汤底"], ["unknown", "未知汤底"], ["", "空锅"]], default: "spicy" },
+    { key: "soup2", label: "第 2 边", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["other", "自定义汤底"], ["unknown", "未知汤底"], ["", "没汤"]], default: "clear" },
+    { key: "soup3", label: "第 3 边（田字）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["other", "自定义汤底"], ["unknown", "未知汤底"], ["", "没汤"]], default: "mushroom" },
+    { key: "soup4", label: "第 4 边（田字）", options: [["spicy", "红汤"], ["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["tomato", "番茄"], ["three_fresh", "三鲜"], ["other", "自定义汤底"], ["unknown", "未知汤底"], ["", "没汤"]], default: "" },
     { key: "fire", label: "灶火", options: [["on", "在烧"], ["off", "熄了"], ["none", "没灶台"]], default: "on" },
     { key: "ratio", label: "剩余燃烧", range: [0.05, 1, 0.05], default: 0.6 },
     { key: "food", label: "锅里", options: [["cooking", "正在煮"], ["raw", "刚下锅"], ["cooked", "全熟了"], ["empty", "空的"]], default: "cooking" },
@@ -416,7 +420,7 @@ const hotpot = {
     if (!d.multi) return this.soup(g, d, gx, gy, t, d.soup, null);
     g.fill(gx, gy, gx + GW, gy + GW, m.mid);
     d.sideSoups.forEach((id, side) => {
-      const color = SOUPS[id] ? SOUPS[id].base : 0xff1b1c20;
+      const color = resolveSoup(id)?.base ?? 0xff1b1c20;
       for (const r of d.yy.regions[side]) g.fill(gx + Math.round(r[0] * GW), gy + Math.round(r[1] * GW), gx + Math.round(r[2] * GW), gy + Math.round(r[3] * GW), color);
     });
     g.fill(gx, gy, gx + GW, gy + 4, 0x30000000);
@@ -430,7 +434,7 @@ const hotpot = {
   // bubbles swell in place (ease-out-back) then pop into a fading ring (ease-out-cubic)
   // keep(x, y)：鸳鸯 / 田字锅只画落在这一边的东西；null = 整锅（同时铺底色）
   soup(g, d, gx, gy, t, soupId, keep) {
-    const soup = SOUPS[soupId];
+    const soup = resolveSoup(soupId);
     if (!keep) {
       g.fill(gx, gy, gx + GW, gy + GW, soup ? soup.base : 0xff1b1c20);
       // depth: darker toward the pot wall
@@ -624,7 +628,7 @@ const hotpot = {
     g.fill(ix + 2, iy + 2, ix + 12, iy + 10, m.dark);
     g.fill(ix + 1, iy + 1, ix + 13, iy + 4, m.mid);
     g.fill(ix + 1, iy + 1, ix + 13, iy + 2, m.light);
-    g.fill(ix + 3, iy + 4, ix + 11, iy + 9, d.hasSoup ? (SOUPS[d.soup]?.base ?? 0xff1b1c20) : 0xff1a1a1e);
+    g.fill(ix + 3, iy + 4, ix + 11, iy + 9, d.hasSoup ? (resolveSoup(d.soup)?.base ?? 0xff1b1c20) : 0xff1a1a1e);
     g.fill(ix + 6, iy + 4, ix + 7, iy + 9, m.mid);
     g.fill(ix + 3, iy + 6, ix + 11, iy + 7, m.mid);
     g.fill(ix, iy + 2, ix + 1, iy + 5, m.dark);
@@ -641,11 +645,10 @@ const hotpot = {
     for (const id of d.sideSoups) {
       const sw = multi ? 5 : 9;
       g.fill(swatchX, 26, swatchX + sw, 35, RIM_LINE);
-      g.fill(swatchX + 1, 27, swatchX + sw - 1, 34, SOUPS[id]?.base ?? 0xff1b1c20);
+      g.fill(swatchX + 1, 27, swatchX + sw - 1, 34, resolveSoup(id)?.base ?? 0xff1b1c20);
       swatchX += sw + (multi ? 1 : 0);
     }
-    const soupName = (id) => g.tr(key(id ? `soup.${id}` : "soup.none"));
-    const name = { text: d.sideSoups.map(soupName).join(" / "), color: d.hasSoup && (multi || d.soup !== "unknown") ? F.GOLD : F.GRAY };
+    const name = { text: d.sideSoups.map((id) => soupLabel(g, id)).join(" / "), color: d.hasSoup && (multi || d.soup !== "unknown") ? F.GOLD : F.GRAY };
     const nameX = swatchX + 4, room = right - nameX, width = g.width(name.text);
     if (width > room && room > 0) {
       const k = Math.max(0.5, room / width);
@@ -708,7 +711,7 @@ const hotpot = {
     return [
       { text: itemName, color: F.WHITE },
       // 鸳鸯 / 田字锅：改成这一格泡在哪种汤里
-      d.multi ? { text: g.tr(key(d.soupOf(slot.index) ? `soup.${d.soupOf(slot.index)}` : "soup.none")), color: F.GRAY }
+      d.multi ? { text: soupLabel(g, d.soupOf(slot.index)), color: F.GRAY }
         : { text: g.tr(key("ui.cell"), Math.floor(cell / 3) + 1, (cell % 3) + 1), color: F.GRAY },
       status,
     ];

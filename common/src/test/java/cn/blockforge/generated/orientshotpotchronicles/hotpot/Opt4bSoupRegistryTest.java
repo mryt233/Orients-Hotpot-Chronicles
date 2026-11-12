@@ -135,7 +135,7 @@ class Opt4bSoupRegistryTest {
         int index = Soups.indexOf(later);
         assertTrue(index >= 6);
         assertSame(later, Soups.byIndex(index));
-        assertEquals(SoupVisual.NONE, later.visual(), "非内置汤底暂时没有汤面值");
+        assertEquals(SoupVisual.OTHER, later.visual(), "非内置汤底统一映射为 OTHER");
         assertEquals("opt4b_index_soup", later.key(), "火锅命名空间的汤底用短名");
         for (int i = 0; i < 6; i++) {
             assertEquals(SoupBase.values()[i].def(), Soups.byIndex(i), "内置序号不被新登记挤动");

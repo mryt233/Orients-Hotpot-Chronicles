@@ -49,15 +49,28 @@ public final class ClientTooltips {
             lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.cooked_in_soup"), soupName)
                 .withStyle(soup.spicy() ? ChatFormatting.RED : ChatFormatting.GOLD));
             appendSoupEffects(soup, spicy, food, lines);
+        } else if (soupKey != null && !soupKey.isEmpty()) {
+            lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.cooked_in_soup"),
+                Component.translatable("text.orients_hotpot_chronicles.soup.unknown").append(" (" + soupKey + ")"))
+                .withStyle(ChatFormatting.GRAY));
         }
         if (food.getItem() instanceof SoupBowlItem bowl) {
-            if (bowl.soupDef().spicy()) {
-                lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.spicy_level"),
-                    HotPotBlockEntity.spicyLevelText(food.getOrDefault(HotPotContent.SPICY_LEVEL, 0)))
-                    .withStyle(ChatFormatting.RED));
+            SoupDef bowlDef = bowl.soupDef(food);
+            if (bowlDef != null) {
+                if (bowlDef.spicy()) {
+                    lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.spicy_level"),
+                        HotPotBlockEntity.spicyLevelText(spicy))
+                        .withStyle(ChatFormatting.RED));
+                }
+                // mryt233 改（2026-11-06，r139）：汤碗喝下去的效果和锅里涮出来的菜一样，也逐条列出来
+                appendSoupEffects(bowlDef, spicy, food, lines);
+            } else {
+                String rawId = bowl.rawSoupId(food);
+                if (rawId != null && !rawId.isEmpty()) {
+                    lines.add(Component.translatable("text.orients_hotpot_chronicles.soup.unknown")
+                        .append(" (" + rawId + ")").withStyle(ChatFormatting.GRAY));
+                }
             }
-            // mryt233 改（2026-11-06，r139）：汤碗喝下去的效果和锅里涮出来的菜一样，也逐条列出来
-            appendSoupEffects(bowl.soupDef(), spicy, food, lines);
         }
     }
 

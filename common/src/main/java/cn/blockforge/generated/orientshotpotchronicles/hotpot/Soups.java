@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 汤底登记表：ID → {@link SoupDef}，沿用第三批的 {@link FrozenRegistry}（启动期可写、服务端启动时冻结）。
@@ -123,6 +124,11 @@ public final class Soups {
             return HotPotContent.SOUP_BOWLS.get(idx);
         }
         return TABLE.bowlItem(def);
+    }
+
+    /** 4F-3（mryt233）：按汤底生成可盛出的汤碗物品栈（优先专属碗，否则走通用汤碗；未初始化通用汤碗时返回空栈）。 */
+    public static ItemStack bowlStack(@Nullable SoupDef def) {
+        return SoupBowlItem.createFor(def);
     }
 
     /** 按完整 ID 查；没有返回 null。 */

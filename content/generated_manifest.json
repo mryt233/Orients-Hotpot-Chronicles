@@ -265,13 +265,13 @@
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/oak_tall_hotpot_table.json": "0c12f8cd44f98bc6f0c2e87ed3b9445d426725da1326bce880ef5eaa03ce551e",
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/spruce_bench.json": "e6a5a9054ca851dfc2f57bb6dbd92c4e40758a894a8aafce0fd76c5e1d0d62fa",
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/spruce_tall_hotpot_table.json": "080a4e40fa1952c9af1804481d1ebdce077921b32de2dd3c6795c1d1e00b1276",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/tall_brick_stove.json": "cdf73d7f8dbef7eafba33ae59ceeeebab5145e9233c42712d1b1c477f22fbc91",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/tall_brick_stove.json": "8a78a0467f203ff34486459426dcaa0d2784bb2d056e8a9b8e781f7227bc74b5",
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/warped_bench.json": "64b5e26b5d68f8fa5d4853d1e7e9947592df87eb4bac443ce981d54220e84377",
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/warped_tall_hotpot_table.json": "6336d016abaa1afe73fef4be40340c524bb87369fa9b395b2c0c12d545029f92",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/acacia_bench.json": "47dc42137308e788b5afaa1dee7539d7e0c06764d495b2f5e0877eb492d0aa35",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/acacia_bench_left.json": "6ee9fdc1f678e5a0fb5bc4a311091c56fd87c12a756425be0aad053188cd12a4",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/acacia_bench_middle.json": "4c1610d880ad6787284e6e5e9353bae51f9a39e542225cd4c0f4952cd37d226e",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/acacia_bench_right.json": "1d8263bb64b6988b175c77a87b60bcec3bd476791d22fde0e59803481f5f6142",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/acacia_bench.json": "aa37367773d399d813d0fec599b5e0bb6a5b72d413440a15655a117e528a75d0",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/acacia_bench_left.json": "0e665bf789dc281525c5d79f847d0ec6c999e850d77a94dd0e11fffe7161a0f0",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/acacia_bench_middle.json": "b238a4495d18b4bdb493496e461843729bb209167241794835a5d9b98b2ef359",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/acacia_bench_right.json": "6d77a586edfc7f6bd65403a5138f11640c9450e726ebd08cb641219aa9e5648d",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/acacia_tall_hotpot_table.json": "4ccf6001eb379f5463d9af7e4c787d541a2cd7deb14f2716f5811dab3d94a29d",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/acacia_tall_hotpot_table_e.json": "3fb9d072088a6701b746d54c15f9d443d211bbd45ca9a146f8af506160a3bafd",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/acacia_tall_hotpot_table_es.json": "fc8de00aaf17d47702b5fd27c9b85824b3debcad93f58d379da7d4e5030c3ccc",
@@ -304,10 +304,10 @@
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/acacia_tall_hotpot_table_s.json": "f0e42087f3a4b3cb7f603b1f706568e5ba3fdcdd44cacfcb7e4c58883bdb3c15",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/acacia_tall_hotpot_table_sw.json": "96d95f79f7b70343d45eb5a71c4d7be4d00ca4578d37b84ca3b61296eea00961",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/acacia_tall_hotpot_table_w.json": "6b2da8b0c84c2e2e7ba695dc8764c844ca14d8ddd62b5b0b9e4f85d3b6cbac7e",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bamboo_bench.json": "43e9ffc8522c4362479d7d6054eeae9aaea26e4b62098c87a8930fd486b8488a",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bamboo_bench_left.json": "984f4bd8af324103e6edd442f51a01452821ffd7ae2f0e4548966952d807fca2",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bamboo_bench_middle.json": "3cdb287c0db8957e622a2fd6fbaf26714754838cf8de4818b6e41af08bf06727",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bamboo_bench_right.json": "fba0561b84ee63f5de6b407155f3572e4aea898f3754a5fb7dc19bb409bf728e",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bamboo_bench.json": "cfe5381d0e93991c644bc9afc96218de65b825b80c1fc2a14a4d876d1a24722b",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bamboo_bench_left.json": "98209fbe9f645372effb7277c28385d0c91ba70f0a803d9c61446ae17cd5ff6f",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bamboo_bench_middle.json": "c3cfd57ec51e876c5ca7ced28193261b063296babc2add2c1f3218880b474540",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bamboo_bench_right.json": "8132879e1aa445c6fc98377b2468e40376b3a7322716e39317ee5360c16eebfe",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bamboo_tall_hotpot_table.json": "9ce93998631600bb4c77e6f50b310da317ccab1223152d038f07447cf4149ac5",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bamboo_tall_hotpot_table_e.json": "762a2d52f7c83a8369ced51cc83dc7b154aa6e149b7f278c12a60b29e3bcf9a5",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bamboo_tall_hotpot_table_es.json": "f55f91f7add3a70a2c7e6068a569258f2c619e15d80ba2c651afc4662498cdb2",
@@ -340,10 +340,10 @@
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bamboo_tall_hotpot_table_s.json": "18fded36f1ab3470f4328d28076312892dd9de2e5c7db9667b5d11be743bf106",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bamboo_tall_hotpot_table_sw.json": "6e1348c4cdc5cef5a09fa4c31ff5a39851e6e729b818558ed51a5831726bb78c",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bamboo_tall_hotpot_table_w.json": "f156153a7dddff1ac0c2094ff73a6526430aa1690ce827d167f1752da8ab850a",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/birch_bench.json": "904ba9e66c49b4939757ada2a96d437ff3d537a865384b5040ae00f0c50693ed",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/birch_bench_left.json": "00b50324d61da2f613fc25a84447e21ccbcbf2b5572c77967b3e11712223680c",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/birch_bench_middle.json": "bee1f14d4a65725650fe55dc0721a519e7148d969d980fd1a3e88ebc746c12ab",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/birch_bench_right.json": "4f85f8e7793013a93fb0a8cfe323b5d07b9f1efe273ff9cc298d94f433a8f2f4",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/birch_bench.json": "d5085a11d6e2594b4863ff069f26d231036d5046aed59a0884db96f94ff4ae0b",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/birch_bench_left.json": "be5138bc4966cbc1df73e5a96bcff8b2ef69f30c264925d2c430bd12f8a374bc",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/birch_bench_middle.json": "2065f0691eec72bb87dcda700771089e331b99f5620bb3ff1af6e51a7f3d6a41",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/birch_bench_right.json": "4008e2e97a379e308d56b9b08dd0f61f32a2407fb23446241e30ea6d4b1a539e",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/birch_tall_hotpot_table.json": "486ae609226aed0341d64ccdb8f8f7dd84efd6e50cc54cfb9f5fa457f9da1935",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/birch_tall_hotpot_table_e.json": "dfd67778966cdc6bb1903f1d81a4e0deacf4262239cba6f40adcc42822aaa9fa",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/birch_tall_hotpot_table_es.json": "5dba39b8b513afe5a9d45e6f068b8ea26921b4ea4e41c70fb33616ee56d65647",
@@ -376,10 +376,10 @@
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/birch_tall_hotpot_table_s.json": "2ed242944843a29091a4567f44b78f47f2ac2d4991f2a28c7509a0d6dd56f9c5",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/birch_tall_hotpot_table_sw.json": "b825c784c581182a9a3cb38a66da90a7175b151690aef643d55c276a8f205875",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/birch_tall_hotpot_table_w.json": "8fcdf65ec6fcf50bed0db8d58565757c593e009afcde884d4974a5a790ce182d",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/cherry_bench.json": "fb4e5cabd5b65d0535b8091f0c05953b9027c60511c31b289a67403ecde02855",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/cherry_bench_left.json": "afd396451ce2eae5c0130af4d5242d893b0a82ef7287f5e1ab2e0dfd6443ec89",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/cherry_bench_middle.json": "085137d6ba08fd60198504a4e62d71bd8e80e93ad88c3611e4a227ab416a31b1",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/cherry_bench_right.json": "b5c1855bd4ca5f2ee50d6ee4b8afd763288f43bf510da2a3939c8e4d705446a1",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/cherry_bench.json": "a3fcfeaf07d10a23cf2adc1288603b909e7a8a932a10639410199266fe297574",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/cherry_bench_left.json": "48e245316a26c746b80207f9b55e9b7ff481a2e2308ba6e8922de888a9d160d3",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/cherry_bench_middle.json": "bfbff0dedfa8369ec4abc3667127c410a67b213a63121bad20fb68f5ba5da21c",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/cherry_bench_right.json": "7843e639fed089e17d46e0dea6b433542efa172449fcf7422421319b5c315edb",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/cherry_tall_hotpot_table.json": "553d44db3c0c0cfbbc7b66fc6557e93777a121dba4d8cb8232a0dca2741e6833",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/cherry_tall_hotpot_table_e.json": "9bcefe728cec7e04a2eab8b5ddccc142e9be7cedcab3254a472e12289c0da4a3",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/cherry_tall_hotpot_table_es.json": "e7cdc2cb9b76bd803923528c69ea7373c244de104220c291f35b88a2fff2a773",
@@ -412,10 +412,10 @@
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/cherry_tall_hotpot_table_s.json": "91480ea26c9bcc9e3db57c3739aeccd1c6a8df0071a0091d003a470145a84669",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/cherry_tall_hotpot_table_sw.json": "ac5b300491274a368869f0226ad641d7bb9eda722d68370ccf08bd4f7eb33111",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/cherry_tall_hotpot_table_w.json": "5d1e68d13a5099f97619b3b1602898fdb6ed8d8d35cffe1c4e44a2071896906d",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/crimson_bench.json": "52af34e6343df62c77942692d48581b273c7655a5fc10ad4d3549ebd24c76f55",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/crimson_bench_left.json": "efffefef38f23281f1c89b6b6ffba88d6ff64be7a63264e28831d90c48c7a520",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/crimson_bench_middle.json": "e440e9609795a6e9e12b602beea41aa18eca2611c409655f80494f1598bc4ca5",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/crimson_bench_right.json": "7f11ce84ed4f2d7a7ad1cd12fa9aef2355965d227beedf813ce5b28fab860fa1",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/crimson_bench.json": "a229310ad700708cd79c820f96adf26b0a854371eb97135253d5156c14581b93",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/crimson_bench_left.json": "15bef14b4c42003fd9f5c5745a8b62b1b3ca5685403fae6a42a5761930d521d7",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/crimson_bench_middle.json": "f39dc7250c60f226d0fe81c1e2093a6792ff92f692a3fbe22f9a538d585a2ff8",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/crimson_bench_right.json": "0fb776024034e33ef1ed6b774c6e8fa1982a484ce03ece86bd48eb11b9272de7",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/crimson_tall_hotpot_table.json": "488a903951481110db9f7f6f27bbca6348c2c3299d441758eefeacaf2ecb1f4c",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/crimson_tall_hotpot_table_e.json": "cd3863636e715bef62b67e45e9802bd6fbf6e4e0050e2e96cda9b7c47f455aa0",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/crimson_tall_hotpot_table_es.json": "b354b3564404d13268f0dd3e7b6aaeec3c4903f8599684a208c324d90fb02fa3",
@@ -448,10 +448,10 @@
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/crimson_tall_hotpot_table_s.json": "f257f77de6fb0ceb42401aefb264bcd675a192aa72978e7d33f70e9ecfc1c671",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/crimson_tall_hotpot_table_sw.json": "17083195ce299b6f4c2c7e1b79ae3408f7cd987097d4b852417dce52f27464e9",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/crimson_tall_hotpot_table_w.json": "9b6d15b25ec8ac56a5bc89eebbaa26f0d788ce44da33a6a2b5738e707cd04cfd",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/dark_oak_bench.json": "7bb55eb5d4ba8001c35abe1d271d70a3c6b671ec85b0cb8d1d521013ecf8c38b",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/dark_oak_bench_left.json": "2f3d17c7faa71e18eee52c21f96c0af9722d485d27c3df29cfe9211cb304f37d",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/dark_oak_bench_middle.json": "0a0af719f05e1a48b32706188aa4f921ca2bec15fd570c2ed60387176fd7a042",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/dark_oak_bench_right.json": "4e2957db66caa14d1857b9496128265b76636f9ec8112cf3254a2a7746d7bead",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/dark_oak_bench.json": "0b42970e2760d7f9f25a4c8b260c3c138eef4a4a764e9438203647f18dfd5fa9",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/dark_oak_bench_left.json": "9ff57396928732626587e5be86f4a2308bef0cae861cc20c12947a1fd9cfad0f",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/dark_oak_bench_middle.json": "4e47407c4b630027d01faa719b7925133f1aa99a0fdb28f7899b0c4f9d726c3c",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/dark_oak_bench_right.json": "a4df862bf6e99075fcd34a9f20db89bea8cd902530099f88e2b5f3e0a9721fa3",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/dark_oak_tall_hotpot_table.json": "1d36bd6680b0c5450fa7b62efa4f74f1c935638dd3ab2c181546c227561bc353",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/dark_oak_tall_hotpot_table_e.json": "1eaede33bf86d02ef7fbac8b61f50b9f480115dcf469e043b63b3a81c50e0a2f",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/dark_oak_tall_hotpot_table_es.json": "7b2081ff6bad160e17a2dc7e9982e53e53e294b6609b69f1d0071fe442021e40",
@@ -484,10 +484,10 @@
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/dark_oak_tall_hotpot_table_s.json": "755e299469d5d8f33921f459fa10e0d2ca6e394581cc8fb4585062ad5dbdb9d9",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/dark_oak_tall_hotpot_table_sw.json": "7a1749771b17b17193b6295d351ac6d3fdf92ee02649b1126bfdd32b6b441803",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/dark_oak_tall_hotpot_table_w.json": "20d090e32690be429b4cbf1d3ad1305c782943408e66fe74a35010af051d23cb",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/jungle_bench.json": "e72bfaf1e43bc26e8edb2f7255bebc551f16b70a7a0eaa59127eda92923d6e92",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/jungle_bench_left.json": "0cb500ff8d582538429c6e6f82a3532b73d5d06f62062b538e3f5e2d36822f6e",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/jungle_bench_middle.json": "d251965409f77103e05f3d3e0014ff00407211034f4f48c26795b2ec1423074a",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/jungle_bench_right.json": "fdacbd2ff2c3cab94ce2099cbb0b42485149bbc070cc10993d979b424ec3880b",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/jungle_bench.json": "a3e9a8f847e1d36e59d38d4df5de9560e86d70823c911afb5cb417a87a79b2f8",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/jungle_bench_left.json": "befade63557a2b8317911b67599b57d101b7dd3c248d7b6730956c0f11c8a195",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/jungle_bench_middle.json": "c6d437f2c612e3e3ecf0b869ab57e8ff1a81c50155825eba8178323f5756463c",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/jungle_bench_right.json": "9e1c69ca9333f9c91683e090be9c096110ab8d946401729b2587f22a50b630e6",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/jungle_tall_hotpot_table.json": "83a0754e1e14768eef91f72dcede3bd1ec76af369e0cd4e6c99204a67ba4ac74",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/jungle_tall_hotpot_table_e.json": "391873b4d6c0256be77c1c6c95a6265079ae1074ae337ca0974c8b6f2153dd81",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/jungle_tall_hotpot_table_es.json": "8525b7c2b3a8b0b612e663494f5f248ce66f573aa5b3dc634f70d0069555f117",
@@ -520,10 +520,10 @@
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/jungle_tall_hotpot_table_s.json": "da8cdf672caf574d502e8b29a40ebb884f0fa614d41c44f925d6fb829fcb3fdb",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/jungle_tall_hotpot_table_sw.json": "a713d3085c4686848845f4ea8e5fb2bc46a0dd7a1eb557cbfc4ff0e6b1f889b8",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/jungle_tall_hotpot_table_w.json": "b9519acbe4c8f070fab9d0792041165581ab1959e367c62e91945045f6de33db",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/mangrove_bench.json": "8cd2bd24a8e0532cddc701ea791abe1138398f373849e39f57f83df32c0766ae",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/mangrove_bench_left.json": "565ed588e4cf6aa996ef1ee4866def28c902e520858250bac7ba9f1cd9a9b999",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/mangrove_bench_middle.json": "5f97c77031687e9f3f7a478ba36c109b2649c7cefee796995b20d933fe7c3406",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/mangrove_bench_right.json": "ccba7f6c5e3078a6af207090d6c07e9441e35610c13e243e0771cc802240b744",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/mangrove_bench.json": "f4bce64abfaadf0c8475a9c9ec93f36e5390dcfb5639bb19b91856c2197fdf2e",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/mangrove_bench_left.json": "7c17f3da4c958ea5410b375a8a2ae253f1b4b0571acc3fde8c25e07b6e89198f",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/mangrove_bench_middle.json": "7587bdba895b230db3d249637d60a18593661e6a994b03164ce756fe390e70b9",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/mangrove_bench_right.json": "bbfb117f3cff68b6c91a0233f92340e70912bfccebf1025f5420843d4380c242",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/mangrove_tall_hotpot_table.json": "5fc50bc138c41d88474a394b5951786f68fb88a301e01d35c40c5236fc3d6d1d",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/mangrove_tall_hotpot_table_e.json": "5eb2f35b99998ffebe023a300e0b9a8194b81533364d036addca02fb186907bd",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/mangrove_tall_hotpot_table_es.json": "0360d42a52b648942dd9dae2923efd5776da53b92a960d466c3f6ab1126055dd",
@@ -556,10 +556,10 @@
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/mangrove_tall_hotpot_table_s.json": "2ce0a4dafc70bbd5661578397b698ed0a359361c78cc86a84ba802bad98354f3",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/mangrove_tall_hotpot_table_sw.json": "55281e0b9832248fb72b70598fefc337ad51770116ae3dfed62220348e1419b8",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/mangrove_tall_hotpot_table_w.json": "f4de66d775930628e686eeb064406bb81c8316a4f20c2a74b561813399cf1208",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/oak_bench.json": "9fb159a8e53a7d11b36eea80688ff12df9e6eb6215c9230ef09be1ab6c5d29f0",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/oak_bench_left.json": "08b526eb028a1cb097437519b592593aaee59fbd8ea56c8fbc4c1edb8e53f8cf",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/oak_bench_middle.json": "300e1182a82f4f0076df285e2339c87540316d995495b8e792f5549b46f5f784",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/oak_bench_right.json": "7061f44fbfdd4a7778673f2633a914df572309c39f7e50653022c08beb3c6ebf",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/oak_bench.json": "d11110cab4051f31f9850924d33ecdc88a36e81befb5ae8c4731e52d3a02dbdb",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/oak_bench_left.json": "2a5b97995450c9b9020d7089be8827d28d504af120fb25fdb9d7f2427588b585",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/oak_bench_middle.json": "72149f236764fc710b828bec05b2a1d746c38b0d7faee48285addd17de5cfdc0",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/oak_bench_right.json": "e9bb6c9d636fee9ea3a1de5dd5e518259f5b9f9641081e558fbc8354978aca9e",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/oak_tall_hotpot_table.json": "9a69df08b13e337cd42de7aa9138b00339443d1be118e6402198ab8285fa734c",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/oak_tall_hotpot_table_e.json": "f577ca5a41d5c33bcc68f5740ebde8bd62a20b7cb86c86c37406b186a198982b",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/oak_tall_hotpot_table_es.json": "13f286be2b4aaeef30a133abfc31387d465261aeb3c5b58a098397385cbb24b2",
@@ -592,10 +592,10 @@
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/oak_tall_hotpot_table_s.json": "ee0b0e4985d36446c435d0870b707d70ef924d6b509fac06bff5b789d40ac91f",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/oak_tall_hotpot_table_sw.json": "9654c5739e7d188da60794c46ed38db00cd8f1a805d8f0acca1364c7d2b23d95",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/oak_tall_hotpot_table_w.json": "9ae88b80c6e9e4c5515cee84c29c4e2d6b6968b122a4f454c5a8c53b220f6665",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/spruce_bench.json": "ed5f69c488763bc4788405bfadf9410c2f9088ee5b9975e854bd05aa7eeace51",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/spruce_bench_left.json": "789f6a94f388af6f7019de2e33e347d0fee5bfdb84d2c3ecf6fb5cbc547ee2fd",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/spruce_bench_middle.json": "99080f9815a4c22762b84bc3682ecc4cfa9ad0c3b03be116239da29674027655",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/spruce_bench_right.json": "fe7184e7fa6584d8f69b303ecef12bf714db324e444f2df714330df9c8a95085",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/spruce_bench.json": "a243d99f76ba616e5f7e2938f47bfb60591d17e7d4219b427489249cf6eb79ef",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/spruce_bench_left.json": "bcf20af116369c66cd7f9c526c48cf72c4815637963038fcdbc2609f06cf4fe7",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/spruce_bench_middle.json": "986646b35e89f45946bae28176aec590df42b6654c5c2722bd1ae5229e8bf3bd",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/spruce_bench_right.json": "0940bb42ed0290e7907eccd950bc77309c624b355df374de7cfd6fd4faca8d96",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/spruce_tall_hotpot_table.json": "3734febc08629ebdeb403a337b2dfbbffe35e95df7cd0964e6c7ace9386a9bce",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/spruce_tall_hotpot_table_e.json": "ed6fa0ce9aa6005f0e699ecd500cc9dbf14298761c011973cbe32a0b6f3fe535",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/spruce_tall_hotpot_table_es.json": "67af8a7318c5f1bae8c60eaf2f6648823271265fe2a2e26ec061f21790e36ffd",
@@ -690,10 +690,10 @@
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/template/tall_hotpot_table_s.json": "dd50bdd536c50434010c5bae2bb0a6935060b4f22d0f0e6e553869f6ab1e4c43",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/template/tall_hotpot_table_sw.json": "5f3f0da1ff73557bcb89a3e7e71bd90a3f2b4469efb8b521772348ec83c7fb2b",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/template/tall_hotpot_table_w.json": "2a4bf33a747c85d76210ccc2aeb3c3d94d390e8c28385b4b23f36c04a5b96642",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/warped_bench.json": "09520083c4553318b221d3acff0a9022cd816a3689de83445060c2ad07edc87f",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/warped_bench_left.json": "1b7deb60f753ed5595716226837df76324c54750ce7504caa03975035b07e710",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/warped_bench_middle.json": "9c53a2781dfa8a9ce4248e54f98efd25cc9cafd35a9499e1818084c063f77c46",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/warped_bench_right.json": "c64ce960872200431b28f226a9d96a9cf8b2d2c90f07bc593171bb4e249c39a3",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/warped_bench.json": "af8ebc7ee835a1ec0427ef3ca3270edeac29707bf79c98e24a44200d9c4591b8",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/warped_bench_left.json": "5953a575663502fc1245abd176ea858038e7082634d7d826ddabf0af98cda7a3",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/warped_bench_middle.json": "6a863949561933f42ecb32ece25153111eb83d06603d08a6e3aa08b6a68ce340",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/warped_bench_right.json": "d27b2c7064d7241927175da0a29e38c2a159dcfe3eaab815d0555c073c6555c4",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/warped_tall_hotpot_table.json": "242b2e422fbca70daabfb2cebfb4a16538668bd74326cd18af227b19736164be",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/warped_tall_hotpot_table_e.json": "aeb8700a60dbca6d291a123d6fd7ddc4f2267c85a3510908a4a8a269d8bedbb2",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/warped_tall_hotpot_table_es.json": "b21ab65e259c977c1ae0775b5d0164b86a5ae4b62e68621e63a930656b381d3c",
@@ -796,7 +796,9 @@
         "common/src/main/resources/data/orients_hotpot_chronicles/recipe/spruce_tall_hotpot_table.json": "b054e6086dac9a7b3f528e4fb0bc569907dab025a6a6269d940866bb0db0df42",
         "common/src/main/resources/data/orients_hotpot_chronicles/recipe/tall_brick_stove.json": "0c31c17f10b3f13491a34327c2d5466871a884320806c1ae26f7a30723fa5059",
         "common/src/main/resources/data/orients_hotpot_chronicles/recipe/warped_bench.json": "454c72ce73885ce628ff50e95dfe778eb81515ceb641eb1bb7bd2bc9d48f04fa",
-        "common/src/main/resources/data/orients_hotpot_chronicles/recipe/warped_tall_hotpot_table.json": "01864df075a03c786714ec6c78994f3bd587fade89d630c651a2d5f461c1a2ab"
+        "common/src/main/resources/data/orients_hotpot_chronicles/recipe/warped_tall_hotpot_table.json": "01864df075a03c786714ec6c78994f3bd587fade89d630c651a2d5f461c1a2ab",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/tall_stove_soup_other.json": "e9471209fb1325f2e8ea7cfe113173c0e435a96717b230d049ab6e777cc50886",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/tall_stove_soup_other_boiling.json": "e9471209fb1325f2e8ea7cfe113173c0e435a96717b230d049ab6e777cc50886"
       }
     },
     "tools/gen_benches.py": {
@@ -1787,7 +1789,7 @@
     "tools/gen_bowls.py": {
       "files": {
         "common/src/main/resources/assets/minecraft/models/item/bowl.json": "95a64e2604a491f2a8ead9ef6e54516adea772fa1e2622e7996567552793ead3",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/bowl.json": "0f0cf554cffdd8353ece537fae4ab950b26752fad136450e5c6f02e380854f0b",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/bowl.json": "992f61182968bdcae1d28c12cb2f753146b76f245bfd00c69b51ef6402626335",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bowl_b.json": "41394ffde59cfac1766372e699beb834db3a413c8ef2a5eef7a261c15d24b517",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bowl_b_soup_clear.json": "5e5b35d49155a4ab57a55a9f6bdedfc74f183cde05c89d70474537a0217ce0cc",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bowl_b_soup_mushroom.json": "04a413475d642f70c6434bc6f01364e403b8d38d8b3460adadd60e9127851c2e",
@@ -1801,16 +1803,17 @@
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/item/rich_stock_bowl.json": "7bcca993c983bcd4477c8333dd2c28fa8b1c6fcf163677fbea19774f68219f8c",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/item/spicy_red_broth_bowl.json": "17be82e7924495bb37718f9b05449990d3d3d74e6dcac13efd1635046f549f04",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/item/three_fresh_soup_bowl.json": "10a45b33908927f2b5238fbafe7840097073535adf24b4771c3298015453d39b",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/item/tomato_soup_bowl.json": "12760ecbc598540109c930a6c713e7d2ec6168aeed36faf4561fedf3502c6cda"
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/item/tomato_soup_bowl.json": "12760ecbc598540109c930a6c713e7d2ec6168aeed36faf4561fedf3502c6cda",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bowl_b_soup_other.json": "910508df99118ad1ab10ec8b8429f0651bcb6693aeca2e1fb6185cf134b52343",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/item/soup_bowl.json": "0be905cb8dbe98aa262bd4f7892e42fd27ee83d9b773bfe4d59f8a70d85202f7"
       }
     },
     "tools/gen_new_soups.py": {
       "files": {
-        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/bowl.json": "0f0cf554cffdd8353ece537fae4ab950b26752fad136450e5c6f02e380854f0b",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/brick_stove.json": "2bfa754aef9252e26d35f1f999c33bde2ecc9446d304ec0874066f3c805e69a6",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/copper_nine_grid_hotpot.json": "696eb19a97c477769d4cf5bac9ac7d4eb874470876517a5f657752b763067373",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/iron_nine_grid_hotpot.json": "311a10d22965b24e0d1498927dc381b44f767ed7c6e9dd67c8f53db14d8e33a5",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/tall_brick_stove.json": "cdf73d7f8dbef7eafba33ae59ceeeebab5145e9233c42712d1b1c477f22fbc91",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/brick_stove.json": "e8cec69778f88a6e484f795aed43b50895f2e0a418a1aaea6170d86f5e06e172",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/copper_nine_grid_hotpot.json": "3164920c84f9cdfc2eec03dc697a257e619f658396724776b8cc29d0e2759dcf",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/iron_nine_grid_hotpot.json": "71c9c26a7183f6e059c25f8d25a2d8e3a17cf79b0bd23d290e0fc9c6a3a8b581",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/tall_brick_stove.json": "8a78a0467f203ff34486459426dcaa0d2784bb2d056e8a9b8e781f7227bc74b5",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bowl_b_soup_three_fresh.json": "32d231f22f94f0fb0b485198bb3ef50822ca89999c1ee282745598b843622749",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bowl_b_soup_tomato.json": "2d035c045ec4babcdef7ed78edc10d8e1a89cecdc6770e03990c8848505d5b10",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/standalone_soup_three_fresh.json": "e18bfb2e30b9b9161d2b78542b14393c9c836152ef567a50bde6571e13b995e4",
@@ -1830,7 +1833,11 @@
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/tall_stove_soup_tomato.json": "0f93ab8d9d04c2d01cc36a6ed9aeadaa49a66158043be5650cee90ea0b557375",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/tall_stove_soup_tomato_boiling.json": "a3ed12bd0d9afcd161b375b9240a01489177bd21b4e954d97507752c15f61a8a",
         "common/src/main/resources/assets/orients_hotpot_chronicles/textures/block/hot_pot_top_three_fresh.png": "79416657ea97d9b54dd272a95482462bdd96fc8a45263d8dfe0559822a5b0c42",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/textures/block/hot_pot_top_tomato.png": "cd7cfcf2ddd8df4d50256aee2c7684e34187c58538bd0eb8f5dc0cc7548dcdaf"
+        "common/src/main/resources/assets/orients_hotpot_chronicles/textures/block/hot_pot_top_tomato.png": "cd7cfcf2ddd8df4d50256aee2c7684e34187c58538bd0eb8f5dc0cc7548dcdaf",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/standalone_soup_other.json": "e9471209fb1325f2e8ea7cfe113173c0e435a96717b230d049ab6e777cc50886",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/standalone_soup_other_boiling.json": "e9471209fb1325f2e8ea7cfe113173c0e435a96717b230d049ab6e777cc50886",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/stove_soup_other.json": "e9471209fb1325f2e8ea7cfe113173c0e435a96717b230d049ab6e777cc50886",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/stove_soup_other_boiling.json": "e9471209fb1325f2e8ea7cfe113173c0e435a96717b230d049ab6e777cc50886"
       }
     },
     "tools/gen_boiling.py": {
@@ -1888,14 +1895,14 @@
     },
     "tools/gen_lang.py": {
       "files": {
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/de_de.json": "7748db15b78b3e1265a26a51d48e55ba04798a8d2354267aa9e39280140e27c7",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/es_es.json": "4090d9ec58ba8357fde86b948e633d3ed8452da049cb5df4d8a1d27e61ec06a6",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/fr_fr.json": "9d22e67c2bd2eac02cd3b7d2a8b8a82ee4f1ec17fe4fcbc490cf33ceda19f642",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/ja_jp.json": "21e4f171e866078fc0212703a16c85fffafcd7f1d24c0caa313189840ec028d3",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/ko_kr.json": "f05b9d4eee863451264abd633e3be6147ff75e2e29b8b7c1f0e90488600505a7",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/pt_br.json": "ef208afc5de56f9ae9b9fd1473c0f7505f2cc8f382f84ce842ac183d0cd0e780",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/ru_ru.json": "1e6dbcef3c7d577e626557e77a10a7c072a2fb06036b48a3b1220c96ecc237f2",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/zh_tw.json": "802c20ea6424de9ca475b1f6bece3587ad432bda97378cd8d2a2849618aca204"
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/de_de.json": "a43e4867cb657f2ec3f574f1516281d8f70f86785e1f3233130234f6a427841c",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/es_es.json": "e92f70f73173c3c2960777575b1feedbe274f42e2f4243136f1dcc877c5641fc",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/fr_fr.json": "85d47fd774cbffa1a7665b2f5725d262861374d6291d309d758c01aad6196fe2",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/ja_jp.json": "e936ed0699c4b527fa7482001a43eb5013814162c81431fe0cc78dbe9f4e55f9",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/ko_kr.json": "7f2c562c3bc4aaf25621262a73ef7671637fb214d2b72d09c62fbf16e5c9b5bf",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/pt_br.json": "aeec4b3ba5a9864a34ebebb135754e8163a00187b9527b5ec38d411ae9ebdefe",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/ru_ru.json": "4efca2b6efb50bd2ee60708dcbe6e8f4171a34b7ed28eaaa3327c45cc7c5b60c",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/lang/zh_tw.json": "11edd8dc7a0589d2afd47a817a7cd9ce722de8b29138f2227a6ca323d8762007"
       }
     },
     "tools/gen_cup.py": {
@@ -2083,7 +2090,7 @@
     },
     "tools/gen_yuanyang.py": {
       "files": {
-        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/brick_stove.json": "2bfa754aef9252e26d35f1f999c33bde2ecc9446d304ec0874066f3c805e69a6",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/brick_stove.json": "e8cec69778f88a6e484f795aed43b50895f2e0a418a1aaea6170d86f5e06e172",
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/copper_four_grid_hotpot.json": "0ba62040c233741629013731b84ee4beb1977d41ace6465b991adc570ee2f36e",
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/copper_round_yuanyang_hotpot.json": "1001c4ea0655aa3d60276c4f0f225d468fabd5298d7b91d23a17eeaae96131a0",
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/copper_split_yuanyang_hotpot.json": "7c1de21ba40ab58f827dc2b8fa5910fcaa31d20845b7aba32a2255f8a803d633",
@@ -2162,13 +2169,13 @@
     "tools/gen_pot_on_campfire.py": {
       "files": {
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/copper_four_grid_hotpot.json": "0ba62040c233741629013731b84ee4beb1977d41ace6465b991adc570ee2f36e",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/copper_nine_grid_hotpot.json": "696eb19a97c477769d4cf5bac9ac7d4eb874470876517a5f657752b763067373",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/copper_nine_grid_hotpot.json": "3164920c84f9cdfc2eec03dc697a257e619f658396724776b8cc29d0e2759dcf",
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/copper_round_yuanyang_hotpot.json": "1001c4ea0655aa3d60276c4f0f225d468fabd5298d7b91d23a17eeaae96131a0",
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/copper_split_yuanyang_hotpot.json": "7c1de21ba40ab58f827dc2b8fa5910fcaa31d20845b7aba32a2255f8a803d633",
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/copper_square_yuanyang_hotpot.json": "154a302b464be36304c09f21ac7077a3406685c6ca3cc67f31eb6c6b3344438a",
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/copper_taiji_yuanyang_hotpot.json": "cb5bff7e869b4d43d6fc85ebfbe0d8348d7f00bf7638304f195e568fff8654d1",
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/iron_four_grid_hotpot.json": "179bd3ec791d31f73f653a16d8e065500f13f5a0864bc66596cdce29a78134df",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/iron_nine_grid_hotpot.json": "311a10d22965b24e0d1498927dc381b44f767ed7c6e9dd67c8f53db14d8e33a5",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/iron_nine_grid_hotpot.json": "71c9c26a7183f6e059c25f8d25a2d8e3a17cf79b0bd23d290e0fc9c6a3a8b581",
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/iron_round_yuanyang_hotpot.json": "802f80b83c5ba010540c4527782ad9ddc11b127270db83de1dd542e141995fe6",
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/iron_split_yuanyang_hotpot.json": "be8f253c1fc69b3a57698e89291a120de25f01716a8af041d7ecf336493ad3f5",
         "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/iron_square_yuanyang_hotpot.json": "6a9c412fec9480c1352098f716593d45b122fd80e8071b38b6cdd8403dc127d0",
@@ -2196,7 +2203,9 @@
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/standalone_soup_three_fresh_boiling_on_campfire.json": "a66e591de380c291379959a40a2471996d5e76918dfda3d0c733e9e93d7dfa00",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/standalone_soup_three_fresh_on_campfire.json": "df3b6d11004baa1660e35b20d927ce7b05d42366d98d726c4ce5c3569fbf9ced",
         "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/standalone_soup_tomato_boiling_on_campfire.json": "10a05d9e26b6f29048c3d965763817af981a4b4d3158ae8d42ffc38874939368",
-        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/standalone_soup_tomato_on_campfire.json": "8ba8aa2dc8b186a8917d35fa22df097cb182e65dc185340a1c5007876f1d6673"
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/standalone_soup_tomato_on_campfire.json": "8ba8aa2dc8b186a8917d35fa22df097cb182e65dc185340a1c5007876f1d6673",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/standalone_soup_other_boiling_on_campfire.json": "e9471209fb1325f2e8ea7cfe113173c0e435a96717b230d049ab6e777cc50886",
+        "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/standalone_soup_other_on_campfire.json": "e9471209fb1325f2e8ea7cfe113173c0e435a96717b230d049ab6e777cc50886"
       }
     },
     "tools/gen_plant_protein_drink.py": {
@@ -2269,7 +2278,7 @@
         "tools/gen_tall.py"
       ],
       "reason": "各脚本保留完整已有标签/资源后补本脚本内容，独立重生成的最终字节一致。",
-      "sha256": "cdf73d7f8dbef7eafba33ae59ceeeebab5145e9233c42712d1b1c477f22fbc91"
+      "sha256": "8a78a0467f203ff34486459426dcaa0d2784bb2d056e8a9b8e781f7227bc74b5"
     },
     "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/tall_stove_copper_four_grid_hot_pot_shell.json": {
       "order": [
@@ -2393,14 +2402,6 @@
       "reason": "各脚本保留完整已有标签/资源后补本脚本内容，独立重生成的最终字节一致。",
       "sha256": "83aa30178802439270d213a4fb5ca1e996384e2e00c838b62e1b59539625b5e1"
     },
-    "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/bowl.json": {
-      "order": [
-        "tools/gen_new_soups.py",
-        "tools/gen_bowls.py"
-      ],
-      "reason": "各脚本保留完整已有标签/资源后补本脚本内容，独立重生成的最终字节一致。",
-      "sha256": "0f0cf554cffdd8353ece537fae4ab950b26752fad136450e5c6f02e380854f0b"
-    },
     "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/bowl_b_soup_three_fresh.json": {
       "order": [
         "tools/gen_new_soups.py",
@@ -2423,7 +2424,7 @@
         "tools/gen_yuanyang.py"
       ],
       "reason": "各脚本保留完整已有标签/资源后补本脚本内容，独立重生成的最终字节一致。",
-      "sha256": "2bfa754aef9252e26d35f1f999c33bde2ecc9446d304ec0874066f3c805e69a6"
+      "sha256": "e8cec69778f88a6e484f795aed43b50895f2e0a418a1aaea6170d86f5e06e172"
     },
     "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/copper_nine_grid_hotpot.json": {
       "order": [
@@ -2431,7 +2432,7 @@
         "tools/gen_pot_on_campfire.py"
       ],
       "reason": "各脚本保留完整已有标签/资源后补本脚本内容，独立重生成的最终字节一致。",
-      "sha256": "696eb19a97c477769d4cf5bac9ac7d4eb874470876517a5f657752b763067373"
+      "sha256": "3164920c84f9cdfc2eec03dc697a257e619f658396724776b8cc29d0e2759dcf"
     },
     "common/src/main/resources/assets/orients_hotpot_chronicles/blockstates/iron_nine_grid_hotpot.json": {
       "order": [
@@ -2439,7 +2440,7 @@
         "tools/gen_pot_on_campfire.py"
       ],
       "reason": "各脚本保留完整已有标签/资源后补本脚本内容，独立重生成的最终字节一致。",
-      "sha256": "311a10d22965b24e0d1498927dc381b44f767ed7c6e9dd67c8f53db14d8e33a5"
+      "sha256": "71c9c26a7183f6e059c25f8d25a2d8e3a17cf79b0bd23d290e0fc9c6a3a8b581"
     },
     "common/src/main/resources/assets/orients_hotpot_chronicles/models/block/standalone_soup_three_fresh_boiling_on_campfire.json": {
       "order": [

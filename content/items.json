@@ -1,5 +1,5 @@
 {
-  "_说明": "内容清单（mryt233 建，gen_content_manifest.py 生成）：117 个物品。每条记录描述一个物品，check_content.py 用它核对贴图 / 模型 / 配方 / 语言 / 指南是否齐全，并核对 hunger / saturation 与代码是否一致。改数值可以直接改这里的 hunger / saturation，再跑 gen_food_numbers.py --apply 写回代码。",
+  "_说明": "内容清单（mryt233 建，gen_content_manifest.py 生成）：118 个物品。每条记录描述一个物品，check_content.py 用它核对贴图 / 模型 / 配方 / 语言 / 指南是否齐全，并核对 hunger / saturation 与代码是否一致。改数值可以直接改这里的 hunger / saturation，再跑 gen_food_numbers.py --apply 写回代码。",
   "_字段": {
     "id": "物品 ID（不含命名空间）",
     "block": "是不是方块物品（有 block 模型）",
@@ -1076,6 +1076,13 @@
       "food": true,
       "hunger": 1,
       "saturation": 0.2,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "soup_bowl",
+      "block": false,
+      "food": false,
       "recipes": [],
       "guide": false
     },

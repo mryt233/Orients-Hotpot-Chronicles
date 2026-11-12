@@ -1,0 +1,8 @@
+{
+  "credit": "Orient's Hotpot Chronicles",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "orients_hotpot_chronicles:block/hot_pot_top_clear"
+  },
+  "elements": []
+}

@@ -3,14 +3,21 @@ package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.mojang.serialization.Codec;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -127,7 +134,8 @@ class Opt4fRegistrationTest {
             .build();
         assertEquals("text.example.soup.herb", herb.nameKey());
         assertEquals("example:herb", herb.key());
-        assertEquals(SoupVisual.NONE, herb.visual(), "4F-1 期间非内置汤底暂映射为 NONE");
+        assertEquals(SoupVisual.OTHER, herb.visual(), "4F-3 起非内置汤底统一映射为 OTHER");
+        assertEquals(SoupVisual.NONE, SoupVisual.fromDef(null));
         assertEquals(1.5F, herb.speedMul());
         assertEquals(6, herb.bowlHunger());
         assertEquals(0.8F, herb.bowlSaturation());
@@ -178,5 +186,83 @@ class Opt4fRegistrationTest {
         HotPotStorage.write(pot, saved, null);
         assertEquals("other_mod:missing_soup", saved.getString("Soup"));
         assertEquals(SoupIds.UNKNOWN, SoupIds.index("other_mod:missing_soup"));
+        assertEquals(SoupVisual.OTHER, HotPotSoup.blockVisual(pot), "未解析汤底在方块状态仍为 NONE 时应兜底用 OTHER");
+    }
+
+    @Test
+    void genericSoupBowlComponentResolutionNamingAndRouting() throws Exception {
+        assertNotNull(SoupBowlItem.class.getConstructor());
+        assertEquals(SoupBowlItem.class, HotPotContent.class.getField("SOUP_BOWL").getType());
+        assertEquals(DataComponentType.class, HotPotContent.class.getField("SOUP").getType());
+
+        DataComponentType<String> soupComponent = DataComponentType.<String>builder()
+            .persistent(Codec.STRING)
+            .networkSynchronized(ByteBufCodecs.STRING_UTF8)
+            .build();
+        Soups.Registry registry = new Soups.Registry();
+        for (SoupBase base : SoupBase.values()) {
+            registry.registerBuiltin(base.def());
+        }
+        ResourceLocation customId = ResourceLocation.fromNamespaceAndPath("opt4f_unit", "ginger");
+        SoupDef ginger = SoupDef.builder(customId)
+            .source(() -> Items.BEETROOT_SOUP, Items.BOWL)
+            .bowlFood(6, 0.85F)
+            .build();
+        registry.register(ginger);
+
+        // 组件读写与未知汤底解析
+        ItemStack generic = new ItemStack(Items.BOWL);
+        generic.set(soupComponent, customId.toString());
+        assertEquals(customId.toString(), SoupBowlItem.rawSoupId(null, generic, soupComponent));
+        SoupDef resolved = SoupBowlItem.resolveGenericSoup(
+            SoupBowlItem.rawSoupId(null, generic, soupComponent),
+            id -> {
+                ResourceLocation loc = ResourceLocation.tryParse(id);
+                return loc == null ? null : registry.get(loc);
+            });
+        assertSame(ginger, resolved);
+
+        generic.set(soupComponent, "deleted_pack:missing");
+        String unknownRaw = SoupBowlItem.rawSoupId(null, generic, soupComponent);
+        assertEquals("deleted_pack:missing", unknownRaw);
+        assertNull(SoupBowlItem.resolveGenericSoup(unknownRaw, id -> {
+            ResourceLocation loc = ResourceLocation.tryParse(id);
+            return loc == null ? null : registry.get(loc);
+        }));
+        assertNull(SoupBowlItem.resolveGenericSoup("Bad Id!", id -> null));
+
+        // 名称占位：已解析显示 soup_bowl.named(nameKey)，未解析显示 soup_bowl.unknown(raw)
+        Component fallback = Component.literal("fallback");
+        Component named = SoupBowlItem.bowlName(ginger, null, fallback);
+        TranslatableContents namedContents = assertInstanceOf(TranslatableContents.class, named.getContents());
+        assertEquals("item.orients_hotpot_chronicles.soup_bowl.named", namedContents.getKey());
+        Component arg = assertInstanceOf(Component.class, namedContents.getArgs()[0]);
+        assertEquals(ginger.nameKey(), assertInstanceOf(TranslatableContents.class, arg.getContents()).getKey());
+
+        Component unknown = SoupBowlItem.bowlName(null, "deleted_pack:missing", fallback);
+        TranslatableContents unknownContents = assertInstanceOf(TranslatableContents.class, unknown.getContents());
+        assertEquals("item.orients_hotpot_chronicles.soup_bowl.unknown", unknownContents.getKey());
+        assertEquals("deleted_pack:missing", unknownContents.getArgs()[0]);
+        assertSame(fallback, SoupBowlItem.bowlName(null, null, fallback));
+
+        // 未知汤底吃下去回退安全默认营养与空碗
+        FoodProperties unknownFood = SoupBowlItem.eating(null);
+        assertEquals(SoupBase.DEFAULT_BOWL_HUNGER, unknownFood.nutrition());
+        assertEquals(2F * SoupBase.DEFAULT_BOWL_HUNGER * 0.6F, unknownFood.saturation(), 1e-4F);
+        assertTrue(unknownFood.usingConvertsTo().isPresent());
+        assertTrue(unknownFood.usingConvertsTo().get().is(Items.BOWL));
+
+        // 内置 / 专属碗 vs 通用碗分流，及未注册 SOUP_BOWL 时的安全兜底
+        assertTrue(SoupBowlItem.createFor(null).isEmpty());
+        assertTrue(Soups.bowlStack(null).isEmpty());
+        assertTrue(Soups.bowlStack(ginger).isEmpty(), "测试未初始化 SOUP_BOWL 时应安全返回空栈");
+
+        ItemStack dedicated = SoupBowlItem.createFor(SoupBase.CLEAR.def(), Items.MUSHROOM_STEW, Items.BOWL, soupComponent);
+        assertTrue(dedicated.is(Items.MUSHROOM_STEW));
+        assertNull(dedicated.get(soupComponent));
+
+        ItemStack customStack = SoupBowlItem.createFor(ginger, null, Items.BOWL, soupComponent);
+        assertTrue(customStack.is(Items.BOWL));
+        assertEquals(customId.toString(), customStack.get(soupComponent));
     }
 }

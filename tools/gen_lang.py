@@ -64,7 +64,8 @@ L["zh_tw"] = {
     "mm.description": "灶台上咕嘟作響的重慶九宮格：往灶膛添燃料，把銅鍋或鐵鍋坐上灶，倒湯底，在 9x9 小格裡下菜，像熔爐一樣煮熟後直接取菜（帶經驗）。用筷子在鍋裡一口吃掉熟食；圍著燒火的鍋還能慢慢回血。鍋連湯帶菜整鍋收走，冷鍋吃了可能反胃。",
     "fuel.idle": "空燒（不耗燃料）",
     "msg.no_soup_to_scoop": "鍋裡沒有湯底可以舀",
-    "msg.seat_taken": "這個位置已經有人坐了"
+    "msg.seat_taken": "這個位置已經有人坐了",
+    "item.soup_bowl": "一碗湯", "item.soup_bowl.named": "一碗%s", "item.soup_bowl.unknown": "未知湯碗（%s）"
 }
 
 L["ja_jp"] = {
@@ -96,7 +97,8 @@ L["ja_jp"] = {
     "mm.description": "レンガのかまどでぐつぐつ煮える重慶の九宮格火鍋：かまどに燃料をくべ、銅か鉄の鍋を乗せ、スープを注ぎ、9x9 のマスに具材を入れて、かまどのように煮えたら取り出せます（経験値つき）。すべて箸一膳で。燃えている鍋のそばにいるとゆっくり回復し、鍋はスープと具材ごと持ち運べますが、冷めた鍋から食べると気分が悪くなることがあります。",
     "fuel.idle": "空焚き中（燃料を使わない）",
     "msg.no_soup_to_scoop": "鍋にすくえるスープがありません",
-    "msg.seat_taken": "そこにはもう誰かが座っています"
+    "msg.seat_taken": "そこにはもう誰かが座っています",
+    "item.soup_bowl": "Soup Bowl", "item.soup_bowl.named": "%s Bowl", "item.soup_bowl.unknown": "Unknown Soup Bowl (%s)"
 }
 
 L["ko_kr"] = {
@@ -128,7 +130,8 @@ L["ko_kr"] = {
     "mm.description": "벽돌 화덕 위에서 보글보글 끓는 충칭식 구궁격 훠궈: 화덕에 연료를 넣고, 구리나 철 냄비를 올리고, 육수를 붓고, 9x9 칸에 재료를 넣으면 화로처럼 익어서 바로 꺼낼 수 있습니다 (경험치 지급). 모두 젓가락 한 벌로. 불이 붙은 냄비 곁에 있으면 천천히 회복되고, 냄비는 육수와 재료째 들고 다닐 수 있지만, 식은 냄비에서 먹으면 속이 울렁거릴 수 있습니다.",
     "fuel.idle": "빈불 (연료 소모 없음)",
     "msg.no_soup_to_scoop": "냄비에 퍼낼 육수가 없습니다",
-    "msg.seat_taken": "이미 누가 앉아 있습니다"
+    "msg.seat_taken": "이미 누가 앉아 있습니다",
+    "item.soup_bowl": "Soup Bowl", "item.soup_bowl.named": "%s Bowl", "item.soup_bowl.unknown": "Unknown Soup Bowl (%s)"
 }
 
 L["ru_ru"] = {
@@ -160,7 +163,8 @@ L["ru_ru"] = {
     "mm.description": "Кипящий чунцинский хого на девять ячеек на кирпичной печи: подбросьте топлива, поставьте медный или железный котёл, налейте бульон, положите продукты в сетку 9x9 и доставайте их готовыми (с опытом, как из печи) - всё одной парой палочек. Рядом с горящим котлом здоровье медленно восстанавливается; котёл можно забрать целиком с бульоном и едой, но еда из холодного котла может вызвать тошноту.",
     "fuel.idle": "Томится (без расхода топлива)",
     "msg.no_soup_to_scoop": "В котле нет бульона, который можно зачерпнуть",
-    "msg.seat_taken": "Здесь уже кто-то сидит"
+    "msg.seat_taken": "Здесь уже кто-то сидит",
+    "item.soup_bowl": "Soup Bowl", "item.soup_bowl.named": "%s Bowl", "item.soup_bowl.unknown": "Unknown Soup Bowl (%s)"
 }
 
 L["de_de"] = {
@@ -192,7 +196,8 @@ L["de_de"] = {
     "mm.description": "Ein brodelnder Chongqing-Neun-Felder-Hotpot auf einem Ziegelherd: Herd befeuern, einen Kupfer- oder Eisentopf aufsetzen, Brühe eingießen, Zutaten in das 9x9-Raster legen und gar wieder herausnehmen (mit Ofen-EP) - alles mit einem Paar Stäbchen. Neben einem brennenden Topf regenerierst du langsam; den ganzen Topf kannst du samt Brühe und Essen mitnehmen, aber Essen aus einem kalten Topf kann dir übel machen.",
     "fuel.idle": "Köchelt (kein Brennstoffverbrauch)",
     "msg.no_soup_to_scoop": "Im Topf ist keine Brühe zum Schöpfen",
-    "msg.seat_taken": "Dort sitzt schon jemand"
+    "msg.seat_taken": "Dort sitzt schon jemand",
+    "item.soup_bowl": "Soup Bowl", "item.soup_bowl.named": "%s Bowl", "item.soup_bowl.unknown": "Unknown Soup Bowl (%s)"
 }
 
 L["fr_fr"] = {
@@ -224,7 +229,8 @@ L["fr_fr"] = {
     "mm.description": "Une fondue chinoise de Chongqing à neuf cases qui bouillonne sur un fourneau en briques : alimentez le fourneau, posez une marmite en cuivre ou en fer, versez un bouillon, placez les ingrédients dans la grille 9x9 et sortez-les cuits (avec l'XP du four) - le tout avec une seule paire de baguettes. Près d'une marmite qui chauffe, vous régénérez lentement ; la marmite s'emporte entière avec bouillon et nourriture, mais manger dans une marmite froide peut vous donner la nausée.",
     "fuel.idle": "Mijote (sans combustible)",
     "msg.no_soup_to_scoop": "Il n'y a pas de bouillon à puiser dans la marmite",
-    "msg.seat_taken": "Quelqu'un est déjà assis là"
+    "msg.seat_taken": "Quelqu'un est déjà assis là",
+    "item.soup_bowl": "Soup Bowl", "item.soup_bowl.named": "%s Bowl", "item.soup_bowl.unknown": "Unknown Soup Bowl (%s)"
 }
 
 L["es_es"] = {
@@ -256,7 +262,8 @@ L["es_es"] = {
     "mm.description": "Un hotpot de Chongqing de nueve casillas burbujeando sobre un fogón de ladrillo: alimenta el fogón, coloca una olla de cobre o hierro, echa un caldo, pon los ingredientes en la cuadrícula de 9x9 y sácalos cocinados (con la experiencia del horno), todo con un solo par de palillos. Junto a una olla encendida te regeneras poco a poco; puedes llevarte la olla entera con caldo y comida, pero comer de una olla fría puede darte náuseas.",
     "fuel.idle": "A fuego lento (sin gastar combustible)",
     "msg.no_soup_to_scoop": "No hay caldo en la olla que recoger",
-    "msg.seat_taken": "Ya hay alguien sentado ahí"
+    "msg.seat_taken": "Ya hay alguien sentado ahí",
+    "item.soup_bowl": "Soup Bowl", "item.soup_bowl.named": "%s Bowl", "item.soup_bowl.unknown": "Unknown Soup Bowl (%s)"
 }
 
 L["pt_br"] = {
@@ -288,7 +295,8 @@ L["pt_br"] = {
     "mm.description": "Um hotpot de Chongqing de nove casas borbulhando num fogão de tijolos: alimente o fogão, coloque uma panela de cobre ou ferro, despeje um caldo, ponha os ingredientes na grade 9x9 e tire-os cozidos (com a experiência da fornalha) - tudo com um único par de hashis. Perto de uma panela acesa você regenera devagar; dá para levar a panela inteira com caldo e comida, mas comer de uma panela fria pode dar enjoo.",
     "fuel.idle": "Fervendo (sem gastar combustível)",
     "msg.no_soup_to_scoop": "Não há caldo na panela para pegar",
-    "msg.seat_taken": "Já tem alguém sentado aí"
+    "msg.seat_taken": "Já tem alguém sentado aí",
+    "item.soup_bowl": "Soup Bowl", "item.soup_bowl.named": "%s Bowl", "item.soup_bowl.unknown": "Unknown Soup Bowl (%s)"
 }
 
 # 每种木头的火锅桌名字（顺序同 TABLE_WOODS），按各语言原版木板的叫法

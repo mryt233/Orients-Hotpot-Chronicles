@@ -40,6 +40,8 @@ public final class BoilingEffects {
 
     /** 清水锅的气泡配色（子模组画水锅时用）。 */
     private static final Palette WATER = new Palette(0x5A8FD8, 0xC8E2FF);
+    /** 未知汤底（如卸载数据包/子模组后的残余汤面）使用的中性气泡配色。 */
+    private static final Palette UNKNOWN = new Palette(0xFFB8AEC8, 0xFFEAE4F2);
 
     /**
      * mryt233 改（2026-11-10，r147）：气泡配色不再是一个按汤底写的 switch，直接从汤底定义上读
@@ -60,6 +62,9 @@ public final class BoilingEffects {
     }
 
     private static Palette palette(SoupVisual soup) {
+        if (soup == SoupVisual.OTHER) {
+            return UNKNOWN;
+        }
         Palette palette = PALETTES.get(soup);
         if (palette == null) {
             throw new IllegalStateException("汤面 " + soup + " 没有气泡配色；加汤底时要在汤底定义（SoupBase 构造参数 / SoupDef）上补气泡配色。");
@@ -68,6 +73,21 @@ public final class BoilingEffects {
     }
 
     private BoilingEffects() {
+    }
+
+    /** 按汤底定义直接渲染气泡（4F-3：支持非内置 SoupVisual.OTHER 汤底及未知汤底兜底）。 */
+    static void render(SoupDef soup, float surfaceY, float innerMin, float innerSize, float heat,
+                       double seconds, int salt, PoseStack matrices, MultiBufferSource consumers, int light) {
+        render(soup, surfaceY, innerMin, innerSize, heat, seconds, salt, matrices, consumers, light, null);
+    }
+
+    /** 按汤底定义与区域过滤渲染气泡。 */
+    static void render(SoupDef soup, float surfaceY, float innerMin, float innerSize, float heat,
+                       double seconds, int salt, PoseStack matrices, MultiBufferSource consumers, int light,
+                       BiPredicate<Double, Double> keepAt) {
+        Palette pal = soup == null ? UNKNOWN : new Palette(soup.bubbleBody(), soup.bubbleHi());
+        renderWithPalette(pal, surfaceY, innerMin, innerSize, heat, seconds, salt,
+            matrices, consumers, light, keepAt);
     }
 
     /**

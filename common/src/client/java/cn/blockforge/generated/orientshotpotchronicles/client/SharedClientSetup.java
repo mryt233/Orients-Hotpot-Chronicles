@@ -1,6 +1,7 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 // mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.BowlBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Chopsticks;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial;
@@ -8,6 +9,8 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBowlItem;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -44,6 +47,19 @@ public final class SharedClientSetup {
     public static void registerItems() {
         SauceRender.register();
         HeldFoodItemRenderer.register();
+        // 4F-3（mryt233）：通用汤碗（minecraft:builtin/entity）先画无汤面的木碗模型，再按 soup 组件画汤面
+        ClientItemRenderers.register(HotPotContent.SOUP_BOWL,
+            (stack, mode, matrices, consumers, light, overlay) -> {
+                Minecraft.getInstance().getBlockRenderer().renderSingleBlock(
+                    HotPotContent.BOWL_BLOCK.defaultBlockState().setValue(BowlBlock.SOUP, SoupVisual.OTHER),
+                    matrices, consumers, light, overlay);
+                if (stack.getItem() instanceof SoupBowlItem bowl) {
+                    SoupDef def = bowl.soupDef(stack);
+                    if (def != null || bowl.rawSoupId(stack) != null) {
+                        HotPotBlockEntityRenderer.renderBowlSurface(def, matrices, consumers, light);
+                    }
+                }
+            });
         // 装着汤的锅物品（掉在地上、物品栏里）显示对应汤面：谓词 = (汤底编号 + 1) / 10，没汤为 0（r94）
         for (Item pot : new Item[]{
             HotPotContent.IRON_HOT_POT_ITEM, HotPotContent.COPPER_HOT_POT_ITEM}) {

@@ -4,7 +4,10 @@ package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 import java.util.Objects;
 import java.util.function.Function;
 
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.world.effect.MobEffectInstance;
 
 import net.minecraft.world.food.FoodProperties;
@@ -31,6 +34,14 @@ public class SoupBowlItem extends Item {
     private final ResourceLocation soupId;
     private final Function<ResourceLocation, SoupDef> resolver;
     private volatile SoupDef soup;
+
+    /** 4F-3（mryt233）：通用汤碗构造器，具体汤底由物品栈上的 {@link HotPotContent#SOUP} 组件指定。 */
+    public SoupBowlItem() {
+        super(new Item.Properties().stacksTo(1).food(foodOf((SoupDef) null)));
+        this.soupId = null;
+        this.resolver = Soups::get;
+        this.soup = null;
+    }
 
     /** mryt233 改（2026-11-11，4B-2）：保留枚举入口给探针和联动兼容。 */
     public SoupBowlItem(SoupBase soup) {
@@ -74,28 +85,92 @@ public class SoupBowlItem extends Item {
     }
 
     /**
-     * mryt233 改（2026-11-05）：喝的那一刻按配置重建营养组件（饥饿值 + 饱和度系数），
-     * 所以改完 config/orients_hotpot_chronicles.json 执行 /orientshotpot reload 就能立即生效。
-     * 留下空碗、饱了也能喝这两项跟注册时保持一致。
+     * mryt233 改（2026-11-05；4F-3 兼容通用汤碗）：喝的那一刻按配置重建营养组件（饥饿值 + 饱和度系数），
+     * 所以改完 config/orients_hotpot_chronicles.json 执行 /orientshotpot reload 就能立即生效；
+     * 未知汤底（如卸载数据包后残留的通用汤碗）回退安全默认值。
      */
-    private FoodProperties eating() {
-        SoupDef def = soupDef();
+    static FoodProperties eating(@Nullable SoupDef def) {
+        int hunger = def != null ? def.bowlHunger() : SoupBase.DEFAULT_BOWL_HUNGER;
+        float saturation = def != null ? def.bowlSaturation() : 0.6F;
         // saturationModifier 收的是系数（原版内部按 2×营养换算成饱和点数），和配置里 food.<物品>.saturation 含义一致
         return new FoodProperties.Builder()
-            .nutrition(def.bowlHunger())
-            .saturationModifier(def.bowlSaturation())
+            .nutrition(hunger)
+            .saturationModifier(saturation)
             .usingConvertsTo(Items.BOWL)
             .alwaysEdible()
             .build();
     }
 
-    /** 汤底 ID。 */
+    /** 汤底 ID；通用汤碗返回 null。 */
+    @Nullable
     public ResourceLocation soupId() {
         return soupId;
     }
 
-    /** 这碗汤对应的定义（随当前世界重载动态更新）。 */
+    /** 物品栈上记录的原始汤底 ID 文本（固定汤碗返回自身 ID，通用汤碗读 {@link HotPotContent#SOUP} 组件）。 */
+    @Nullable
+    public String rawSoupId(@Nullable ItemStack stack) {
+        return rawSoupId(soupId, stack, HotPotContent.SOUP);
+    }
+
+    @Nullable
+    static String rawSoupId(@Nullable ResourceLocation fixedSoupId, @Nullable ItemStack stack,
+                            @Nullable DataComponentType<String> soupComponent) {
+        if (fixedSoupId != null) {
+            return fixedSoupId.toString();
+        }
+        if (stack == null || soupComponent == null) {
+            return null;
+        }
+        return stack.get(soupComponent);
+    }
+
+    /** 按物品栈解析汤底定义：固定汤碗走延迟解析；通用汤碗按 {@link HotPotContent#SOUP} 查询，解析不到返回 null。 */
+    @Nullable
+    public SoupDef soupDef(@Nullable ItemStack stack) {
+        if (soupId != null) {
+            return soupDef();
+        }
+        return resolveGenericSoup(rawSoupId(stack), Soups::get);
+    }
+
+    @Nullable
+    static SoupDef resolveGenericSoup(@Nullable String raw, Function<String, SoupDef> lookup) {
+        if (raw == null || raw.isEmpty()) {
+            return null;
+        }
+        return lookup.apply(raw);
+    }
+
+    /** 按汤底构造可盛出的汤碗物品栈：优先专属碗，否则使用通用汤碗并写入 {@link HotPotContent#SOUP}。 */
+    public static ItemStack createFor(@Nullable SoupDef soup) {
+        return createFor(soup, Soups.bowlItem(soup), HotPotContent.SOUP_BOWL, HotPotContent.SOUP);
+    }
+
+    static ItemStack createFor(@Nullable SoupDef soup, @Nullable Item dedicatedBowl,
+                               @Nullable Item genericBowl, @Nullable DataComponentType<String> soupComponent) {
+        if (soup == null) {
+            return ItemStack.EMPTY;
+        }
+        if (dedicatedBowl != null && dedicatedBowl != genericBowl) {
+            return new ItemStack(dedicatedBowl);
+        }
+        if (genericBowl == null) {
+            return ItemStack.EMPTY;
+        }
+        ItemStack stack = new ItemStack(genericBowl);
+        if (soupComponent != null) {
+            stack.set(soupComponent, soup.id().toString());
+        }
+        return stack;
+    }
+
+    /** 这碗汤对应的定义（随当前世界重载动态更新；通用汤碗请调用 {@link #soupDef(ItemStack)}）。 */
+    @Nullable
     public SoupDef soupDef() {
+        if (soupId == null) {
+            return null;
+        }
         SoupDef resolved = resolver.apply(soupId);
         if (resolved != null) {
             soup = resolved;
@@ -117,8 +192,34 @@ public class SoupBowlItem extends Item {
     }
 
     /** 对应的内置枚举值；非内置汤底返回 null。保留给探针和联动兼容，游戏逻辑请用 {@link #soupDef()}。 */
+    @Nullable
     public SoupBase soup() {
-        return SoupBase.byTextureKey(soupDef().key());
+        SoupDef def = soupDef();
+        return def == null ? null : SoupBase.byTextureKey(def.key());
+    }
+
+    @Override
+    public Component getName(ItemStack stack) {
+        if (soupId != null) {
+            return super.getName(stack);
+        }
+        SoupDef def = soupDef(stack);
+        String raw = def == null ? rawSoupId(stack) : null;
+        return bowlName(def, raw, super.getName(stack));
+    }
+
+    static Component bowlName(@Nullable SoupDef def, @Nullable String rawSoupId, Component fallback) {
+        if (def != null) {
+            return Component.translatable(
+                "item.orients_hotpot_chronicles.soup_bowl.named",
+                Component.translatable(def.nameKey()));
+        }
+        if (rawSoupId != null && !rawSoupId.isEmpty()) {
+            return Component.translatable(
+                "item.orients_hotpot_chronicles.soup_bowl.unknown",
+                rawSoupId);
+        }
+        return fallback;
     }
 
     /** 点在方块顶面：像盘子一样摆上去；别的情况交给原版（对着空气 / 侧面右键就是喝）。 */
@@ -128,24 +229,26 @@ public class SoupBowlItem extends Item {
     }
 
     /**
-     * mryt233 改（2026-11-07）：辣度必须在吃之前读。
+     * mryt233 改（2026-11-07；4F-3 兼容通用汤碗）：汤底定义与辣度必须在吃之前读。
      * <p>user.eat(...) 内部会 stack.consume(1, user)，把这一碗吃到 0 个；空栈的 getComponents()
-     * 返回 DataComponentMap.EMPTY，此后再读 SPICY_LEVEL 只能拿到兜底的 0，红汤的等级加成、抗火，
-     * 以及 3 级特辣喝完嘴上冒火都会静默失效。与 LivingEntityEatMixin 在 eat 的 HEAD 处读组件保持同一口径。</p>
+     * 返回 DataComponentMap.EMPTY，此后再读 SPICY_LEVEL 或 SOUP 都会失效。
+     * 未知汤底（def == null）按安全默认值吃掉并返还空碗，不施加未知效果。</p>
      */
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity user) {
-        // mryt233 改（2026-11-07）：先把辣度取成快照，再交给原版结算；吃过之后再读必然读到 0 档
-        int spicy = Math.max(0, Math.min(3, stack.getOrDefault(HotPotContent.SPICY_LEVEL, 0)));
+        // mryt233 改（2026-11-07）：先把汤底定义与辣度取成快照，再交给原版结算
+        SoupDef def = soupDef(stack);
+        int spicy = HotPotContent.SPICY_LEVEL != null
+            ? Math.max(0, Math.min(3, stack.getOrDefault(HotPotContent.SPICY_LEVEL, 0)))
+            : 0;
         // mryt233 改（2026-11-05）：营养按配置现算再吃；和 ConfiguredFoodItem 一样用 user.eat 结算
-        ItemStack result = user.eat(world, stack, eating());
-        if (!world.isClientSide) {
-            SoupDef def = soupDef();
+        ItemStack result = user.eat(world, stack, eating(def));
+        if (!world.isClientSide && def != null) {
             // mryt233 改（2026-11-10，r147）：「喝下解反胃」改成汤底自己的属性（清汤、番茄汤为 true）
             if (def.clearsNausea()) {
                 user.removeEffect(MobEffects.CONFUSION);
             }
-            // mryt233 改（2026-11-05，r136a）：六种汤碗统一按 SoupBase.dishBonusEffects(辣度) 结算，
+            // mryt233 改（2026-11-05，r136a）：汤碗统一按 SoupDef.dishBonusEffects(辣度) 结算，
             // 红汤碗的辣度是盛出来时装在 SPICY_LEVEL 组件里的（0 档 = 微辣，和以前一样）。
             for (MobEffectInstance effect : def.dishBonusEffects(spicy)) {
                 user.addEffect(effect);

@@ -3,6 +3,9 @@ package cn.blockforge.generated.orientshotpotchronicles.client;
 // mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Chopsticks;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBowlItem;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
@@ -77,6 +80,12 @@ public final class PlateHolderRenderer implements BlockEntityRenderer<PlateHolde
             blocks.renderSingleBlock(modelState(p), matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
             if (p.self.getItem() instanceof DippingSauceItem) {
                 SauceRender.surface(DippingSauceItem.contents(p.self).ids(), matrices, vertexConsumers, light);
+            } else if (p.self.getItem() instanceof SoupBowlItem bowl) {
+                SoupDef def = bowl.soupDef(p.self);
+                String raw = bowl.rawSoupId(p.self);
+                if ((def != null && def.visual() == SoupVisual.OTHER) || (def == null && raw != null)) {
+                    HotPotBlockEntityRenderer.renderBowlSurface(def, matrices, vertexConsumers, light);
+                }
             }
             PlateFoodRenderer.render(p.plate.size(), p.axis, p.items, matrices, vertexConsumers, light,
                 be.getLevel(), seed, itemRenderer);

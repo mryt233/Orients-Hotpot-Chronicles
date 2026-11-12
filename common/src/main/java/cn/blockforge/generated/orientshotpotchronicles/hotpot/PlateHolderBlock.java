@@ -235,8 +235,11 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline 
         BlockState state = p.plate.defaultBlockState().setValue(PlateBlock.AXIS, p.axis);
         if (p.plate instanceof BowlBlock
             && p.self.getItem() instanceof SoupBowlItem bowl) {
-            state = state.setValue(BowlBlock.SOUP,
-                SoupVisual.fromDef(bowl.soupDef()));
+            SoupDef def = bowl.soupDef(p.self);
+            String raw = def == null ? bowl.rawSoupId(p.self) : null;
+            SoupVisual visual = def != null ? SoupVisual.fromDef(def)
+                : (raw != null && !raw.isEmpty() ? SoupVisual.OTHER : SoupVisual.NONE);
+            state = state.setValue(BowlBlock.SOUP, visual);
         }
         if (p.plate instanceof DrinkBlock) {
             boolean empty = p.self.getItem() instanceof EmptyBottleItem;

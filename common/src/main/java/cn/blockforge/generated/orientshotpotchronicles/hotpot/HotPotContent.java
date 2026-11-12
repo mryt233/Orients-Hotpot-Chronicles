@@ -427,6 +427,8 @@ public final class HotPotContent {
 
     /** 一碗汤（r99）：顺序同 SoupBase（清汤、高汤、菌汤、红汤）。 */
     public static List<SoupBowlItem> SOUP_BOWLS;
+    /** 通用汤碗（mryt233，4F-3）：未登记专属碗的自定义 / 数据包汤底共用，通过 {@link #SOUP} 组件区分汤底。 */
+    public static SoupBowlItem SOUP_BOWL;
 
     /** 饮料（r99 橙子饮料，r101 维二）和喝完的空瓶。 */
     public static DrinkItem ORANGE_DRINK;
@@ -480,6 +482,8 @@ public final class HotPotContent {
     // 吃下去时按汤底（红汤再按辣度档位）补一份状态效果，见 SoupBase.dishBonusEffects(int) 与 LivingEntityEatMixin。
     /** 这道菜是在哪种汤底里煮出来的（SoupBase.textureKey()，如 "spicy"、"mushroom"）；吃下时给汤底风味加成。 */
     public static DataComponentType<String> COOKED_IN_SOUP;
+    /** 通用汤碗所盛汤底的完整 ID（mryt233，4F-3）。 */
+    public static DataComponentType<String> SOUP;
     /** 红汤辣度档位（0=微辣，1=中辣，2=特辣，3=变态辣）：记在红汤煮出的菜或盛出的红汤碗上。 */
     public static DataComponentType<Integer> SPICY_LEVEL;
     // mryt233 改（2026-11-10）：干杯与桌面筷架使用的组件和方块引用（干杯标记、桌面迷你筷架）。
@@ -960,6 +964,7 @@ public final class HotPotContent {
             .map(soup -> registration.items().register( HotPot.id(soup.bowlId()),
                 new SoupBowlItem(soup)))
             .toList();
+        SOUP_BOWL = registration.items().register(HotPot.id("soup_bowl"), new SoupBowlItem());
         ORANGE_DRINK = registration.items().register(
             HotPot.id("orange_drink"), new DrinkItem(DrinkKind.ORANGE_DRINK));
         EMPTY_ORANGE_DRINK_BOTTLE = registration.items().register(
@@ -993,6 +998,9 @@ public final class HotPotContent {
             DataComponentType.<java.util.List<String>>builder().persistent(SauceContents.DIPPED_CODEC)
                 .networkSynchronized(SauceContents.DIPPED_PACKET_CODEC).build());   // mryt233 改（4E-1）
         COOKED_IN_SOUP = registration.components().register(HotPot.id("cooked_in_soup"),
+            DataComponentType.<String>builder().persistent(Codec.STRING)
+                .networkSynchronized(ByteBufCodecs.STRING_UTF8).build());
+        SOUP = registration.components().register(HotPot.id("soup"),
             DataComponentType.<String>builder().persistent(Codec.STRING)
                 .networkSynchronized(ByteBufCodecs.STRING_UTF8).build());
         SPICY_LEVEL = registration.components().register(HotPot.id("spicy_level"),
