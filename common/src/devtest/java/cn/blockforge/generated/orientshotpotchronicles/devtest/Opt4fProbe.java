@@ -73,8 +73,33 @@ public final class Opt4fProbe {
             case "refill" -> refillStation(player, pos);
             case "stowe_sauce" -> storeMainToBag(player);
             case "equip_sauce" -> equipBagToOffhand(player);
+            case "p2_put_wheat" -> putItemToStation(player, pos, new ItemStack(Items.WHEAT, 1));
+            case "p2_put_sugar" -> putItemToStation(player, pos, new ItemStack(Items.SUGAR, 1));
+            case "p2_status" -> stationStatus(player, pos);
             default -> "unknown action=" + action;
         };
+    }
+
+    private static String putItemToStation(ServerPlayer player, BlockPos pos, ItemStack stack) {
+        if (!(player.serverLevel().getBlockEntity(pos) instanceof SauceStationBlockEntity be)) {
+            return "no sauce station at " + pos.toShortString();
+        }
+        SauceStationScreenHandler menu = new SauceStationScreenHandler(1, player.getInventory(), be);
+        player.getInventory().setItem(9, stack);
+        menu.quickMoveStack(player, 9);
+        be.setChanged();
+        return stationStatus(player, pos);
+    }
+
+    private static String stationStatus(ServerPlayer player, BlockPos pos) {
+        if (!(player.serverLevel().getBlockEntity(pos) instanceof SauceStationBlockEntity be)) {
+            return "no sauce station at " + pos.toShortString();
+        }
+        return "station raw0=" + be.rawInventory().getItem(0).getCount()
+            + " kindIndex0=" + be.kindIndex(0) + " portions0=" + be.portions(0)
+            + " avail0=" + be.available(0)
+            + " def0=" + (be.kindDef(0) != null ? be.kindDef(0).id() : "null")
+            + " def1=" + (be.kindDef(1) != null ? be.kindDef(1).id() : "null");
     }
 
     private static String verifyFreeze() {

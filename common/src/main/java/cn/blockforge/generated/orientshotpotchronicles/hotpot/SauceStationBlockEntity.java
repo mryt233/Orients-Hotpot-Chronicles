@@ -53,13 +53,21 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
     private final String[] kindIds = new String[BOWLS];
     /** 识别空槽被明确补货，避免无关槽变化抹掉未知 ID。 */
     private final boolean[] rawWasEmpty = new boolean[BOWLS];
+    /** mryt233：记录各槽上次见到的原料，以区分玩家换料与配方重载导致的映射变化。 */
+    private final ItemStack[] lastRaw = new ItemStack[BOWLS];
     /** 读存档时往格子里放东西，不要触发 changed（那时可能还在加载区块）。 */
     private boolean loading;
 
     public SauceStationBlockEntity(BlockPos worldPosition, BlockState state) {
-        super(HotPotContent.SAUCE_STATION_BE, worldPosition, state);
+        this(HotPotContent.SAUCE_STATION_BE, worldPosition, state);
+    }
+
+    SauceStationBlockEntity(net.minecraft.world.level.block.entity.BlockEntityType<?> type,
+                            BlockPos worldPosition, BlockState state) {
+        super(type, worldPosition, state);
         Arrays.fill(kindIds, "");
         Arrays.fill(rawWasEmpty, true);
+        Arrays.fill(lastRaw, ItemStack.EMPTY);
         raw.addListener(inv -> {
             if (!loading) {
                 changed();
@@ -85,8 +93,13 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
         ItemStack stack = raw.getItem(i);
         SeasoningDef saved = kindIds[i].isEmpty() ? null : SauceIds.def(kindIds[i]);
         if (!kindIds[i].isEmpty() && saved == null && available(i) > 0) return null;
+        if (portions[i] > 0 && saved != null) {
+            if (stack.isEmpty() || sameRawKind(lastRaw[i], stack)) return saved;
+            SeasoningDef current = Seasonings.ofRaw(stack);
+            return current != null ? current : saved;
+        }
         if (!stack.isEmpty()) return Seasonings.ofRaw(stack);
-        return portions[i] > 0 ? saved : null;
+        return null;
     }
 
     /** 会话索引：-1 空，-2 未知，不将未知回写为空。 */
@@ -117,10 +130,11 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
     private boolean take(int i) {
         if (portions[i] == 0) {
             ItemStack stack = raw.getItem(i);
-            if (stack.isEmpty()) {
+            SeasoningDef next = stack.isEmpty() ? null : Seasonings.ofRaw(stack);
+            if (next == null) {
                 return false;
             }
-            kindIds[i] = SauceIds.fullId(Seasonings.ofRaw(stack));
+            kindIds[i] = SauceIds.fullId(next);
             stack.shrink(1);
             portions[i] += PORTIONS_PER_RAW;
         }
@@ -166,11 +180,13 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
             ItemStack stack = raw.getItem(i);
             boolean hadRaw = !rawWasEmpty[i];
             boolean hasRaw = !stack.isEmpty();
+            boolean sameRaw = hasRaw && sameRawKind(lastRaw[i], stack);
             rawWasEmpty[i] = !hasRaw;
+            lastRaw[i] = stack.copy();
             SeasoningDef saved = kindIds[i].isEmpty() ? null : SauceIds.def(kindIds[i]);
             SeasoningDef current = hasRaw ? Seasonings.ofRaw(stack) : null;
             kindIds[i] = updatedKindId(kindIds[i], portions[i], hadRaw, hasRaw,
-                saved != null, current == null ? "" : SauceIds.fullId(current));
+                saved != null, current == null ? "" : SauceIds.fullId(current), sameRaw);
         }
         setChanged();
         if (level != null && !level.isClientSide) {
@@ -178,10 +194,20 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
         }
     }
 
+    private static boolean sameRawKind(ItemStack previous, ItemStack current) {
+        return !previous.isEmpty() && !current.isEmpty() && ItemStack.isSameItemSameComponents(previous, current);
+    }
+
     static String updatedKindId(String id, int portions, boolean hadRaw, boolean hasRaw,
                                 boolean known, String newRawId) {
+        return updatedKindId(id, portions, hadRaw, hasRaw, known, newRawId, false);
+    }
+
+    static String updatedKindId(String id, int portions, boolean hadRaw, boolean hasRaw,
+                                boolean known, String newRawId, boolean sameRaw) {
         boolean newlyFilled = !hadRaw && hasRaw;
         if (!id.isEmpty() && !known && (!newlyFilled || !hasRaw || portions > 0)) return id;
+        if (!id.isEmpty() && known && portions > 0 && hasRaw && (newRawId.isEmpty() || sameRaw)) return id;
         if (!hasRaw && portions > 0) return id;
         return hasRaw ? newRawId : "";
     }
@@ -211,8 +237,10 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
             r.loadItems(list);
             loading = true;
             for (int i = 0; i < raw.getContainerSize(); i++) {
-                raw.setItem(i, list.get(i));
-                rawWasEmpty[i] = list.get(i).isEmpty();
+                ItemStack loaded = list.get(i);
+                raw.setItem(i, loaded);
+                rawWasEmpty[i] = loaded.isEmpty();
+                lastRaw[i] = loaded.copy();
             }
             loading = false;
             readKindIds(r, portions, kindIds);

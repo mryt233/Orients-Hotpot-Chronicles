@@ -143,6 +143,13 @@ public final class ClientProbe {
                         new OpenSauceRestockPayload(pos).handle(player);
                     });
                 }
+                case "sauce_restock" -> {
+                    if (!(mc.screen instanceof SauceOverviewScreen ov)) throw new IllegalStateException("SauceOverviewScreen required");
+                    ov.children().stream()
+                        .filter(w -> w instanceof net.minecraft.client.gui.components.Button)
+                        .map(w -> (net.minecraft.client.gui.components.Button) w)
+                        .findFirst().orElseThrow().onPress();
+                }
                 case "sauceinput" -> {
                     if (!(mc.screen instanceof SauceStationScreen screen)) throw new IllegalStateException("Sauce screen required");
                     for (var value : request.getAsJsonArray("extra")) {
@@ -357,6 +364,14 @@ public final class ClientProbe {
             }
             opt4f.addProperty("soups_count", cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups.size());
             opt4f.addProperty("seasonings_count", cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasonings.size());
+            for (int sx : new int[]{2040, 2042}) {
+                if (mc.level.getBlockEntity(new BlockPos(sx, 4, 2040)) instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlockEntity be) {
+                    var sdef = be.kindDef(0);
+                    opt4f.addProperty("station_" + sx + "_def0", sdef != null ? sdef.id() : "null");
+                    opt4f.addProperty("station_" + sx + "_portions0", be.portions(0));
+                    opt4f.addProperty("station_" + sx + "_avail0", be.available(0));
+                }
+            }
             report.add("opt4f", opt4f);
         }
         if (mc.screen instanceof HotPotConfigScreen config) {
@@ -372,6 +387,14 @@ public final class ClientProbe {
         }
         if (mc.screen instanceof SauceStationScreen sauce) {
             try {
+                var menu = sauce.getMenu();
+                var mdef = menu.kindDef(0);
+                report.addProperty("sauce_menu_def0", mdef != null ? mdef.id() : "null");
+                report.addProperty("sauce_menu_avail0", menu.available(0));
+                report.addProperty("sauce_menu_unknown0", menu.unknownKind(0));
+                report.addProperty("sauce_menu_mayPlace_lapis", menu.getSlot(0).mayPlace(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LAPIS_LAZULI)));
+                report.addProperty("sauce_menu_mayPlace_brick", menu.getSlot(0).mayPlace(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.BRICK)));
+                report.addProperty("sauce_menu_mayPlace_wheat", menu.getSlot(0).mayPlace(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.WHEAT)));
                 for (String name : new String[]{"guidePage", "guideOpen"}) {
                     var field = SauceStationScreen.class.getDeclaredField(name);
                     field.setAccessible(true);

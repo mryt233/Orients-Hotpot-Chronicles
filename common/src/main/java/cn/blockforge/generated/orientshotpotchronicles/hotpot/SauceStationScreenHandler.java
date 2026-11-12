@@ -99,12 +99,17 @@ public class SauceStationScreenHandler extends PlayerInventoryMenu {
 
     public boolean unknownKind(int i) { return data.get(N + i) == -1; }
 
-    public SeasoningDef kindDef(int i) {  // mryt233 改：兼容原有菜单公开签名。
+    public SeasoningDef kindDef(int i) {  // mryt233 改：兼容原有菜单公开签名；服务端委托给方块实体，客户端优先读已化开份数的同步索引。
+        if (station != null) {
+            return station.kindDef(i);
+        }
         if (unknownKind(i)) return null;
-        ItemStack stack = raw.getItem(i);
-        if (!stack.isEmpty()) return Seasonings.ofRaw(stack);
         int k = data.get(N + i);
-        return k > 0 && data.get(i) > 0 ? Seasonings.byIndex(k - 1) : null;
+        if (data.get(i) > 0 && k > 0) {
+            return Seasonings.byIndex(k - 1);
+        }
+        ItemStack stack = raw.getItem(i);
+        return !stack.isEmpty() ? Seasonings.ofRaw(stack) : null;
     }
 
     @Override

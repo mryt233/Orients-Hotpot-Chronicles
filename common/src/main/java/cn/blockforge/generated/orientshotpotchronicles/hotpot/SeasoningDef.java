@@ -115,9 +115,14 @@ public final class SeasoningDef {
         List<Item> items = rawList;
         if (items == null) {
             List<Item> found = new ArrayList<>(raws.length);
-            for (Supplier<Item> raw : raws) found.add(raw.get());
+            for (Supplier<Item> raw : raws) {
+                Item item = raw.get();
+                if (item != null) found.add(item);
+            }
             items = List.copyOf(found);
-            rawList = items;
+            if (found.size() == raws.length) {
+                rawList = items;
+            }
         }
         return items;
     }
