@@ -1,6 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.Component;
 
 /**
  * 火锅 / 灶膛界面共用的画框、槽位、缓动与随机工具。
@@ -27,6 +29,35 @@ public final class GuiKit {
     public static final int TITLE = 0xFFF0D9A8;
 
     private GuiKit() {
+    }
+
+    // mryt233 改（2026-11-11）：共用命中、文字缩放及按钮像素；状态配色由调用方保留。
+    public static boolean hit(double mx, double my, int x, int y, int w, int h) {
+        return mx >= x && mx < x + w && my >= y && my < y + h;
+    }
+
+    public static void copperButton(GuiGraphics g, int x, int y, int w, int h, int bg, int topColor) {
+        g.fill(x, y, x + w, y + h, bg);
+        g.fill(x, y, x + w, y + 1, topColor);
+    }
+
+    public static void valueBox(GuiGraphics g, int x, int y, int w, int h, int bg, int topColor) {
+        copperButton(g, x, y, w, h, bg, topColor);
+    }
+
+    /** 居中画一行字；宽度超过 max 就等比缩小，不截断成看不懂的残字。 */
+    public static void fittedText(GuiGraphics g, Font font, Component text, int centerX, int y, int max, int color) {
+        int w = font.width(text);
+        if (w <= max) {
+            g.drawCenteredString(font, text, centerX, y, color);
+            return;
+        }
+        float scale = Math.max(0.6F, max / (float) w);
+        g.pose().pushPose();
+        g.pose().translate(centerX, y + 4, 0);
+        g.pose().scale(scale, scale, 1F);
+        g.drawCenteredString(font, text, 0, -4, color);
+        g.pose().popPose();
     }
 
     // ------------------------------------------------------------------ 画框

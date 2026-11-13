@@ -31,7 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class FabricNetworkApi implements NetworkApi {
     private static final Logger LOGGER = LoggerFactory.getLogger("orient-framework");
-    private static final int PROTOCOL_VERSION = 1;
 
     private final java.util.Map<ResourceLocation, StreamCodec<? super RegistryFriendlyByteBuf, ?>> codecs = new ConcurrentHashMap<>();
     private final Set<String> registered = ConcurrentHashMap.newKeySet();

@@ -2,14 +2,20 @@
 <!-- mryt233 改，2026-10-30：补齐 #30–#71 正式版记录；r130 单列开发版。 -->
 # Changelog
 
-This page is updated with each release, **newest first**. The Development Preview describes completed work that is not yet released. **Gameplay in this guide follows released 0.2.2-alpha.**
+This page is updated with each release, **newest first**. The Development Preview describes completed work that is not yet released. **Gameplay in this guide follows packaged 0.3.0-alpha.**
 
 :::tip
 **Maintenance note (players can skip this):** every game change gets a numbered entry in the unreleased section of `docs/移植同步清单.md`. The `<!--清单#N-->` markers in `preview.md` link to those entries. `python tools/build_tutorial.py` checks for omissions. At release time, move the preview into the release history and start a new preview.
 :::
 
-<!-- mryt233 改，2026-11-08：0.2.2-alpha 发布，开发版预览改名为版本号，再开一段空的预览。 -->
+<!-- mryt233 改，2026-11-13：0.3.0-alpha 打包收口，开发版预览改名为 0.3.0-alpha，再开一段空的预览。 -->
 ## Development Preview {{dev}} {#unreleased}
+
+Content for the next cycle is in planning; **0.3.1** is planned to add interchangeable tabletop and base materials for hotpot tables.
+
+## 0.3.0-alpha{{since:0.3.0-alpha}} {#v030}
+
+Packaged on 2026-11-13 (`r146–r148`, checklist #133–#159). **Simultaneous 8-JAR release for Minecraft 1.21.1 (Fabric, NeoForge), 1.20.1 (Fabric, Forge), 26.1.x (Fabric 26.1–26.1.2, NeoForge 26.1.2), and 26.2 (Fabric, NeoForge)**—every jar bundles `orient_framework 0.2.0`. Automatically upgrades `0.2.2-alpha` saves and configs; because multiplayer sync packets now carry full ID lists, both client and server must run `0.3.0-alpha`.
 
 <!-- mryt233 改（2026-11-13，r148 第四批 4I～4K-2） -->
 - **Pot warmth, cold-pot nausea, and cheers values in config**: Added 3 groups (13 keys, including the "blocks" distance unit) in the **Advanced** settings tab; setting `warmth.duration` or `cheers.*_duration` to `0` skips that effect, and `/orientshotpot reload` applies immediately (see [Settings & Config](faq.html#config)).<!--清单#156-->
@@ -44,9 +50,9 @@ This page is updated with each release, **newest first**. The Development Previe
 <!-- mryt233 改（r146f） -->
 - **Single-column paginated sauce station list**: the panel is narrowed and names and effects wrap across lines; turn pages with bottom arrows or the scroll wheel, page numbers are remembered during the current session, and JEI / REI avoid this area automatically.<!--清单#140-->
 
-The next development build is being updated; new content will appear in the [Development Preview](preview.html) first.
-<!-- mryt233 改，2026-11-09：r146b 布围裙三款 + 穿戴只围前面。 -->
-- **Three cloth apron styles**: linen / blue print / brown trim, all with the same effect; recolour any style with a dye in a crafting grid while keeping durability, enchantments and custom names; when worn it hangs from your chest to just above the knees and the hem swings with your legs. ([Plates, Bowls & Drinks](tableware.html#apron_styles))<!--清单#136-->
+<!-- mryt233 改，2026-11-13：0.3.0-alpha 已收口，保留分段提示。 -->
+<!-- mryt233 改，2026-11-09：r146b/r146g 布围裙三款与垂至膝上穿戴模型。 -->
+- **Three cloth apron styles & redesigned worn model**: linen / blue print / brown trim, all with the same effect; recolour any style with a dye in a crafting grid while keeping durability, enchantments and custom names; the redesigned apron fits close to the chest and hangs to just above the knees, swinging smoothly with the stepping leg and resting flat when seated. ([Plates, Bowls & Drinks](tableware.html#apron_styles))<!--清单#136--><!--清单#141-->
 <!-- mryt233 改，2026-11-09：r146a 三项（菜刀朝向、设置界面、芝麻酱蚝油上桌）。 -->
 - **Fixed the iron kitchen knife orientation**: handle at lower left, tip at upper right and edge facing lower right are now painted into the texture, so inventory / held / guide / web / viewer all match and the model no longer flips; regenerating the texture cannot flip it back. ([Ingredients](ingredients.html#board))<!--清单#133-->
 - **Settings screen split into Common / Advanced**: Common holds the particle slider and the few values players change most; everything else is grouped into collapsible sections. Each row has [- value unit +], Shift steps by 10, clicking the value lets you type (invalid input turns red), a per-row reset appears only when changed, Reset All asks for confirmation, and hovering shows a plain-language hint. ([FAQ](faq.html#config))<!--清单#134-->

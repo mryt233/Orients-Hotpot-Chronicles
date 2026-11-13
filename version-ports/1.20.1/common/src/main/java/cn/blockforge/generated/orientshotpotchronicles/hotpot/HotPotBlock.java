@@ -1,45 +1,54 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.network.chat.Component;
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+// mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
 import cn.blockforge.orient.framework.compat.DataComponents;
 import cn.blockforge.orient.framework.compat.ItemContainerContents;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
+import cn.blockforge.orient.framework.compat.ItemData;
+import cn.blockforge.orient.framework.compat.ItemInteractionBlock;
 import cn.blockforge.orient.framework.compat.ItemInteractionResult;
-import net.minecraft.world.phys.BlockHitResult;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 /** 独立摆放的九宫格火锅；坐上灶台后由 {@link StoveBlock} 承载。 */
-public class HotPotBlock extends Block implements EntityBlock , cn.blockforge.orient.framework.compat.ItemInteractionBlock {
+public class HotPotBlock extends Block implements EntityBlock, ItemInteractionBlock {
     private static final VoxelShape BODY = Block.box(1, 0, 1, 15, 5, 15);
     private static final VoxelShape RIM_NORTH = Block.box(0, 5, 0, 16, 7, 1.5);
     private static final VoxelShape RIM_SOUTH = Block.box(0, 5, 14.5, 16, 7, 16);
@@ -66,7 +75,7 @@ public class HotPotBlock extends Block implements EntityBlock , cn.blockforge.or
     private static final VoxelShape POT_SHAPE_LOW = POT_SHAPE.move(0, -CAMPFIRE_DROP / 16.0, 0);
 
     public static boolean campfireBelow(BlockGetter world, BlockPos pos) {
-        return world.getBlockState(pos.below()).is(net.minecraft.tags.BlockTags.CAMPFIRES);
+        return world.getBlockState(pos.below()).is(BlockTags.CAMPFIRES);
     }
 
     private static VoxelShape shapeOf(BlockState state) {
@@ -101,15 +110,16 @@ public class HotPotBlock extends Block implements EntityBlock , cn.blockforge.or
         return material;
     }
 
-    /** mryt233 改：旧版没有 copy_components，在原有锅掉落上保存内容。 */
+    /** mryt233 改：1.20.1 没有 copy_components，在原有锅掉落上保存内容。 */
     @Override
-    public java.util.List<ItemStack> getDrops(BlockState state,
-            net.minecraft.world.level.storage.loot.LootParams.Builder builder) {
-        java.util.List<ItemStack> drops = super.getDrops(state, builder);
-        BlockEntity entity = builder.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY);
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+        List<ItemStack> drops = super.getDrops(state, builder);
+        BlockEntity entity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (entity instanceof HotPotBlockEntity be && be.hasPotContents()) {
             for (int i = 0; i < drops.size(); i++) {
-                if (drops.get(i).is(asItem())) drops.set(i, be.toPotItem(material));
+                if (drops.get(i).is(asItem())) {
+                    drops.set(i, be.toPotItem(material));
+                }
             }
         }
         return drops;
@@ -153,36 +163,36 @@ public class HotPotBlock extends Block implements EntityBlock , cn.blockforge.or
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world,
-                                  BlockPos pos, CollisionContext context) {
+                               BlockPos pos, CollisionContext context) {
         return shapeOf(state);
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter world,
-                                           BlockPos pos, CollisionContext context) {
+                                        BlockPos pos, CollisionContext context) {
         return shapeOf(state);
     }
 
     /** 下面的方块变了（篝火放上 / 拆掉）：跟着沉下去或抬回来。 */
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
-                                     LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+                                  LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
         if (direction == Direction.DOWN) {
-            return state.setValue(ON_CAMPFIRE, neighborState.is(net.minecraft.tags.BlockTags.CAMPFIRES));
+            return state.setValue(ON_CAMPFIRE, neighborState.is(BlockTags.CAMPFIRES));
         }
         return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
     }
 
     @Override
-    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(HAS_SOUP, SOUP, BOILING, AXIS, ON_CAMPFIRE);
     }
 
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player,
-                                               BlockHitResult hit) {
+                                            BlockHitResult hit) {
         if (!(world.getBlockEntity(pos) instanceof HotPotBlockEntity be)) {
-            return InteractionResult.PASS;
+            return Use.blockEmpty(UseOutcome.PASS, world.isClientSide);
         }
         // 空手潜行右键 = 把锅连汤带食材拿进背包，和灶台上拆锅一样（用户报：篝火上的锅 Shift+右键拿不下来；新增）
         if (player.isShiftKeyDown()) {
@@ -196,7 +206,7 @@ public class HotPotBlock extends Block implements EntityBlock , cn.blockforge.or
                 world.playSound((Player) null, pos, SoundEvents.ANVIL_LAND,
                     SoundSource.BLOCKS, 0.25F, 0.75F);
             }
-            return InteractionResult.SUCCESS;
+            return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide);
         }
         int bigCell = HotPotInteraction.cellFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN,
             HotPotInteraction.STANDALONE_INNER_SIZE);   // mryt233 改（清单 #107）：多传 player，按视线与汤面交点算格
@@ -206,101 +216,29 @@ public class HotPotBlock extends Block implements EntityBlock , cn.blockforge.or
         if (!world.isClientSide && !be.collectShown(player, bigCell)) {
             player.displayClientMessage(be.statusText(), true);
         }
-        return InteractionResult.SUCCESS;
+        return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide);
     }
 
     @Override
     public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
-                                              Player player, InteractionHand hand, BlockHitResult hit) {
+                                           Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(world.getBlockEntity(pos) instanceof HotPotBlockEntity be)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
         }
         // 其他模组的东西先处理，比如空碗要先盛汤（见 HotPotHooks）
         ItemInteractionResult hooked = HotPotHooks.blockUse(world, player, hand, stack, pos, state, hit);
         if (hooked != null) {
             return hooked;
         }
-        int bigCell = HotPotInteraction.cellFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN,
-            HotPotInteraction.STANDALONE_INNER_SIZE);   // mryt233 改（清单 #107）：多传 player，按视线与汤面交点算格
-        int cookedSlot = be.firstCookedSlotInCell(bigCell);
-
-        if (isPlate(stack)) {
-            if (!world.isClientSide) {
-                be.pourPlate(player, hand);
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
-        if (be.canScoopWith(stack)) {
-            if (!world.isClientSide) {
-                be.scoopSoup(player, hand, HotPotInteraction.sideFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE));
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
-        if (stack.is(Items.BOWL)) {
-            if (world.isClientSide) {
-                HotPotInteraction.clientChopsticksAim.accept(be, bigCell);   // 碗先盛看到的那样（2026-10-26）
-            }
-            if (!world.isClientSide) {
-                be.serveWithBowl(player, hand, bigCell);
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
-        if (HotPotInteraction.isServingTool(stack)) {
-            if (stack.is(HotPotContent.CHOPSTICKS)) {
-                // 夹着的是熟菜（下不了锅）：不管锅，交给筷子吃（按住右键吃）。以前会提示「煮不了」，
-                // 刚从锅里夹起来、右键还按着时就吃不上（用户报：筷子夹起来的菜吃不了。调整）
-                ItemStack held = Chopsticks.held(stack);
-                if (!held.isEmpty() && !HotPotCooking.acceptable(world, held)) {
-                    return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
-                }
-                // 筷子上夹着菜：放进准星对着的那一格；空筷子：夹起这一格的一样熟食
-                // （2026-10-25 用户定的新交互；开锅界面改成拿筷子 Shift+右键，见 ChopsticksItem.useOnBlock。调整）
-                if (world.isClientSide && Chopsticks.held(stack).isEmpty()) {
-                    // 告诉服务端这一刻浮在这格上的是哪样，夹的就是看到的那样（用户 2026-10-25）
-                    HotPotInteraction.clientChopsticksAim.accept(be, bigCell);
-                }
-                if (!world.isClientSide) {
-                    if (!Chopsticks.held(stack).isEmpty()) {
-                        be.insertHeld(player, stack, be.firstEmptySlotInCell(bigCell));
-                    } else if (!be.pickShown(player, stack, bigCell)) {
-                        player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.no_cooked_here")), true);
-                    }
-                }
-                return ItemInteractionResult.SUCCESS;
-            }
-            if (!world.isClientSide && !be.collectCookedSlot(player, cookedSlot)) {
-                player.displayClientMessage(Component.translatable(
-                    HotPotBlockEntity.key("msg.no_cooked_here")), true);
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
-        // mryt233 改（2026-11-05，清单 #116）：辣椒加辣、冰块降辣——排在倒汤底之后、下锅食材之前
-        if (HotPotBlockEntity.isSpicyModifier(stack)) {
-            if (!world.isClientSide && !be.adjustSpiciness(player, hand, HotPotInteraction.sideFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE))) {
-                return ItemInteractionResult.FAIL;
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
-        if (SoupBase.fromStack(stack) != null) {
-            if (!world.isClientSide && !be.pourSoup(player, hand, HotPotInteraction.sideFromHit(be, player, pos, hit, HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE))) {
-                return ItemInteractionResult.FAIL;
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
-        if (HotPotCooking.acceptable(world, stack)) {
-            if (!world.isClientSide && !be.insertIngredient(player, hand, be.firstEmptySlotInCell(bigCell))) {
-                return ItemInteractionResult.FAIL;
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return HotPotInteraction.useItem(be, stack, world, pos, player, hand, hit,
+            HotPotInteraction.STANDALONE_INNER_MIN, HotPotInteraction.STANDALONE_INNER_SIZE);
     }
 
     /** 手里拿的是盘子（点锅就是把盘里的菜倒进去）。 */
     public static boolean isPlate(ItemStack stack) {
         if (stack.is(Items.BOWL)) {
             // 装着菜的碗也是整碗倒进锅（r99）；空碗是盛
-            return cn.blockforge.orient.framework.compat.ItemData.getOrDefault(stack, DataComponents.CONTAINER, ItemContainerContents.EMPTY)
+            return ItemData.getOrDefault(stack, DataComponents.CONTAINER, ItemContainerContents.EMPTY)
                 .nonEmptyStream().findAny().isPresent();
         }
         return stack.getItem() instanceof BlockItem item && item.getBlock() instanceof PlateBlock;
@@ -311,7 +249,7 @@ public class HotPotBlock extends Block implements EntityBlock , cn.blockforge.or
      * 生存模式照原版在物品栏里找同样的锅（给带内容的锅就对不上普通的空锅）。新增
      */
     @Override
-    public ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter world, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
         Player player = PlateHolderBlock.pickPlayer.get();
         if (player != null && player.isCreative() && world.getBlockEntity(pos) instanceof HotPotBlockEntity be) {
             return be.toPotItem(material);
@@ -323,7 +261,7 @@ public class HotPotBlock extends Block implements EntityBlock , cn.blockforge.or
     // 2026-10-26 用户报 bug，去掉：锅和普通方块一样能悬空放。调整
 
     /**
-     * 正常挖下来时，汤底和食材由战利品表（copy_components）打包进锅物品，不再散落一地。
+     * 正常挖下来时，汤底和食材打包进锅物品，不再散落一地。
      * 只有空手等挖不下锅的情况，锅本身不掉，才把食材撒出来，免得白白消失。
      */
     @Override
@@ -360,8 +298,8 @@ public class HotPotBlock extends Block implements EntityBlock , cn.blockforge.or
 
     /** mryt233 改：1.20.1 的单回调交互入口。 */
     @Override
-    public net.minecraft.world.InteractionResult use(BlockState state, Level world, BlockPos pos,
-            Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level world, BlockPos pos,
+                                 Player player, InteractionHand hand, BlockHitResult hit) {
         return dispatchUse(state, world, pos, player, hand, hit);
     }
 }

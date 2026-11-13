@@ -1,6 +1,8 @@
-// mryt233 改：26.1 原版 API。
+// mryt233 改：26.1 原版 API；合入 Use 适配。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.AbstractCauldronBlock;
@@ -134,7 +136,7 @@ public class DrinkCauldronBlock extends AbstractCauldronBlock {
                 replaceHeld(player, hand, stack, new ItemStack(HotPotContent.cupFor(kind)));
                 took(state, world, pos, player, used, 1);
             }
-            return InteractionResult.SUCCESS;
+            return Use.blockItem(UseOutcome.SUCCESS_SOFT, world.isClientSide());
         }
         if (stack.is(Items.GLASS_BOTTLE) || stack.is(HotPotContent.emptyBottle(kind))) {
             if (!world.isClientSide()) {
@@ -144,9 +146,9 @@ public class DrinkCauldronBlock extends AbstractCauldronBlock {
                 replaceHeld(player, hand, stack, bottle);
                 took(state, world, pos, player, used, n);
             }
-            return InteractionResult.SUCCESS;
+            return Use.blockItem(UseOutcome.SUCCESS_SOFT, world.isClientSide());
         }
-        return InteractionResult.TRY_WITH_EMPTY_HAND;
+        return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide());
     }
 
     /** 倒进去。state 为 null 表示原版空炼药锅。 */
@@ -161,20 +163,20 @@ public class DrinkCauldronBlock extends AbstractCauldronBlock {
             kind = cup.kind();
             have = 1;
         } else {
-            return InteractionResult.TRY_WITH_EMPTY_HAND;
+            return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide());
         }
         int sips = state == null ? 0 : state.getValue(SIPS);
         if (state != null && state.getValue(KIND) != kind) {
             if (!world.isClientSide()) {
                 player.sendOverlayMessage(Component.translatable(HotPotBlockEntity.key("msg.cauldron_other_drink")));
             }
-            return InteractionResult.FAIL;
+            return Use.blockItem(UseOutcome.FAIL, world.isClientSide());
         }
         int n = Math.min(MAX - sips, have);
         if (n <= 0) {
             // mryt233 改（2026-11-07）：锅满了就吃掉这次右键。以前回 PASS，原版接着调手里物品的
             // useOn → DrinkItem 会把整瓶饮料摆到锅盖上，玩家看到的是「倒不进去、还白丢一瓶」
-            return InteractionResult.CONSUME;
+            return Use.blockItem(UseOutcome.CONSUME, world.isClientSide());
         }
         if (!world.isClientSide()) {
             net.minecraft.world.item.Item used = stack.getItem();
@@ -193,7 +195,7 @@ public class DrinkCauldronBlock extends AbstractCauldronBlock {
             sound(world, pos, SoundEvents.BOTTLE_EMPTY);
             world.gameEvent(null, GameEvent.FLUID_PLACE, pos);
         }
-        return InteractionResult.SUCCESS;
+        return Use.blockItem(UseOutcome.SUCCESS_SOFT, world.isClientSide());
     }
 
     /**

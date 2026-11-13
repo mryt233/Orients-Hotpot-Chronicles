@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "axis=x,kind=sesame_paste": {
+      "model": "orients_hotpot_chronicles:block/sauce_bottle_sesame_paste"
+    },
+    "axis=z,kind=sesame_paste": {
+      "model": "orients_hotpot_chronicles:block/sauce_bottle_sesame_paste",
+      "y": 90
+    },
+    "axis=x,kind=oyster_sauce": {
+      "model": "orients_hotpot_chronicles:block/sauce_bottle_oyster_sauce"
+    },
+    "axis=z,kind=oyster_sauce": {
+      "model": "orients_hotpot_chronicles:block/sauce_bottle_oyster_sauce",
+      "y": 90
+    }
+  }
+}

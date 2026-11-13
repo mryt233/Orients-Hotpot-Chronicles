@@ -1,14 +1,16 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.Locale;
+
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.Map;
-
 /**
  * 燃料档位：只决定灶火强度（影响烹饪速度），燃烧时长则完全沿用
- * 原版熔炉的燃料数据（{@link AbstractFurnaceBlockEntity#createFuelTimeMap()}）。
+ * 原版熔炉的燃料数据（{@link AbstractFurnaceBlockEntity#getFuel()}；1.21.1 里这张表由原版自己
+ * 缓存并在数据包重载时由 {@link AbstractFurnaceBlockEntity#invalidateCache()} 重建）。
  * 木材 &lt; 煤炭/木炭 &lt; 岩浆桶。
  *
  * <p>同一个档位里所有燃料的燃烧时长各不相同，比如木板 300 tick、原木 300 tick、
@@ -21,8 +23,12 @@ public enum HotPotFuel {
 
     private static final HotPotFuel[] BY_ID = values();
 
-    /** 第三方燃料映射到哪一档（兼容层注册进来）。 */
-    private static final java.util.Map<Item, HotPotFuel> CUSTOM_SOURCES = new java.util.HashMap<>();
+    /**
+     * 第三方燃料映射到哪一档（兼容层注册进来）。
+     * mryt233 改（2026-11-10，r147）：改成冻结登记表——启动期登记，服务端启动后不再接受新的登记。
+     */
+    private static final FrozenRegistry<Item, HotPotFuel> CUSTOM_SOURCES = new FrozenRegistry<>(
+        "第三方燃料表", "燃料档要在启动期登记（子模组在自己的兼容模块里调 registerCustomSource），冻结后不再接受登记。");
 
     /** 注册「某种第三方燃料算哪一档」。 */
     public static void registerCustomSource(Item item, HotPotFuel fuel) {
@@ -34,11 +40,15 @@ public enum HotPotFuel {
         return stack.isEmpty() ? null : CUSTOM_SOURCES.get(stack.getItem());
     }
 
-    /**
-     * 原版熔炉燃料表，首次使用时构建并缓存。Fabric 会把
-     * {@code FuelRegistry} 里注册的燃料并入这张表，所以联动模组的数据也能生效。
-     */
-    private static volatile Map<Item, Integer> vanillaFuels;
+    /** mryt233 改（2026-11-10）：冻结第三方燃料表（服务端启动时由 HotPotHooks 统一调，幂等）。 */
+    static void freezeSources() {
+        CUSTOM_SOURCES.freeze();
+    }
+
+    /** 诊断：第三方燃料表冻了没有。 */
+    public static boolean sourcesFrozen() {
+        return CUSTOM_SOURCES.isFrozen();
+    }
 
     private final String nameKey;
     private final float power;
@@ -54,11 +64,11 @@ public enum HotPotFuel {
 
     /** 配置文件里用的键，和枚举名一致的小写形式。 */
     public String configKey() {
-        return name().toLowerCase(java.util.Locale.ROOT);
+        return name().toLowerCase(Locale.ROOT);
     }
 
     public String nameKey() {
-        return "text." + cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot.MOD_ID + "." + nameKey;
+        return "text." + HotPot.MOD_ID + "." + nameKey;
     }
 
     public float power() {
@@ -74,7 +84,12 @@ public enum HotPotFuel {
         return id >= 0 && id < BY_ID.length ? BY_ID[id] : null;
     }
 
-    /** 该物品在原版熔炉里的燃烧时长（tick）；不能当燃料时返回 0。 */
+    /**
+     * 该物品在原版熔炉里的燃烧时长（tick）；不能当燃料时返回 0。
+     * <p>mryt233 改（2026-11-07）：不再自己缓存一份燃料表。原版 AbstractFurnaceBlockEntity.getFuel()
+     * 内部已经是 volatile 缓存并在数据包重载时由 invalidateCache() 重建；
+     * 这里再存一层 Map 引用会永远拿第一次的旧表，导致 reload 后新增 / 移除的燃料不生效。</p>
+     */
     public static int burnTicksOf(ItemStack stack) {
         if (stack.isEmpty()) {
             return 0;
@@ -83,7 +98,7 @@ public enum HotPotFuel {
         if (custom != null) {
             return custom.defaultTicks;
         }
-        Integer ticks = vanillaFuels().get(stack.getItem());
+        Integer ticks = AbstractFurnaceBlockEntity.getFuel().get(stack.getItem());
         return ticks == null ? 0 : ticks;
     }
 
@@ -101,19 +116,5 @@ public enum HotPotFuel {
             return COAL;
         }
         return WOOD;
-    }
-
-    private static Map<Item, Integer> vanillaFuels() {
-        Map<Item, Integer> map = vanillaFuels;
-        if (map == null) {
-            synchronized (HotPotFuel.class) {
-                map = vanillaFuels;
-                if (map == null) {
-                    map = AbstractFurnaceBlockEntity.getFuel();
-                    vanillaFuels = map;
-                }
-            }
-        }
-        return map;
     }
 }

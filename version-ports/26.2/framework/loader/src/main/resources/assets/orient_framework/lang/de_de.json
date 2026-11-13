@@ -1,0 +1,16 @@
+{
+  "orient_framework.config.json_invalid": "Konfiguration ist kein gültiges JSON; Standardwerte werden verwendet, Originaldatei bleibt erhalten",
+  "orient_framework.config.root_not_object": "Die oberste Ebene der Konfiguration muss ein Objekt sein; Standardwerte werden verwendet, Originaldatei bleibt erhalten",
+  "orient_framework.config.format_unsupported": "Nicht unterstützte Version des Konfigurationsformats; Standardwerte werden verwendet, Originaldatei bleibt erhalten",
+  "orient_framework.config.format_invalid": "Ungültige Version des Konfigurationsformats; Standardwerte werden verwendet, Originaldatei bleibt erhalten",
+  "orient_framework.config.unknown_key": "Unbekannter Konfigurationseintrag %s wurde ignoriert",
+  "orient_framework.config.not_object": "%s muss ein Objekt sein; Standardwert beibehalten",
+  "orient_framework.config.not_number": "%s muss eine Zahl sein; Standardwert verwendet",
+  "orient_framework.config.not_integer": "%s muss eine ganze Zahl sein; Standardwert verwendet",
+  "orient_framework.config.out_of_range": "%s muss zwischen %s und %s liegen; Standardwert verwendet",
+  "orient_framework.config.too_large": "Konfigurationsdatei ist zu groß; Standardwerte werden verwendet, Originaldatei bleibt erhalten",
+  "orient_framework.config.read_failed": "Konfiguration konnte nicht gelesen werden (%s); Standardwerte werden verwendet, Originaldatei bleibt erhalten",
+  "orient_framework.config.write_failed": "Konfiguration konnte nicht geschrieben werden (%s); Originaldatei bleibt erhalten",
+  "orient_framework.disconnect.protocol": "Netzwerkprotokoll von Orient Framework passt nicht (Server %s, Client %s). Installiere dieselben Mod-Versionen wie der Server.",
+  "orient_framework.disconnect.missing_channels": "Der Server benötigt Netzwerkkanäle, die deinem Client fehlen: %s. Installiere dieselben Mod-Versionen wie der Server."
+}

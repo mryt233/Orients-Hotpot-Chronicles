@@ -1564,7 +1564,7 @@ const CF_HELP = {
   loot_shrimp_fishing_weight: "钓鱼获得带壳虾的权重，0 = 钓不到（修改后需 /reload 生效）。",
 };
 // 常用页：粒子强度（滑块）+ 这几项（= Java commonFields()）
-// help = 悬停那句白话的键（= 游戏里 config.help.<key>，主会话补进语言文件与 Config.fieldHelp）
+// help = 悬停那句白话的键（= 游戏里 config.help.<key>，同步至语言文件与 Config.fieldHelp）
 const CF_COMMON = [
   { path: ["fuel", "coal", "power"], name: "煤炭 · 灶火功率", def: 1.0, min: 0.1, max: 10, step: 0.05, unit: "multiplier", help: "power" },
   { path: ["cooking", "fallback_ticks"], name: "涮煮兜底时间", def: 200, min: 1, max: 100000, step: 10, unit: "tick", help: "fallback_ticks" },

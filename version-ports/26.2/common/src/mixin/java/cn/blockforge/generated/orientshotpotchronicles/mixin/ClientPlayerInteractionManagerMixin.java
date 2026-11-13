@@ -1,10 +1,14 @@
 package cn.blockforge.generated.orientshotpotchronicles.mixin;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.CuttingBoardBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.CuttingBoardBlockEntity;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlock;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,14 +28,14 @@ abstract class ClientPlayerInteractionManagerMixin {
         }
         BlockState state = client.level.getBlockState(pos);
         // 高灶台上半截对着锅挖 = 只挖下面灶上的锅：以前漏了这种，上半截先被预测成空气、闪一下（代码检查 B7，mryt233 2026-11-01）
-        boolean topOverPot = state.is(cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.STOVE_TOP)
+        boolean topOverPot = state.is(HotPotContent.STOVE_TOP)
             && StoveBlock.aimsAtPot(client.level.getBlockState(pos.below()), pos.below(), client.player);
         // 灶上的锅只挖锅；盘子格只挖准星对着的那个盘子：都不能先把整格预测成空气
         if (topOverPot || StoveBlock.aimsAtPot(state, pos, client.player)
-            || state.is(cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent.PLATE_HOLDER)
-            || (client.level.getBlockEntity(pos) instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.CuttingBoardBlockEntity board
+            || state.is(HotPotContent.PLATE_HOLDER)
+            || (client.level.getBlockEntity(pos) instanceof CuttingBoardBlockEntity board
                 && !board.item().isEmpty()
-                && cn.blockforge.generated.orientshotpotchronicles.hotpot.CuttingBoardBlock.aimsAtItem(pos, client.player))) {
+                && CuttingBoardBlock.aimsAtItem(pos, client.player))) {
             cir.setReturnValue(false);
         }
     }

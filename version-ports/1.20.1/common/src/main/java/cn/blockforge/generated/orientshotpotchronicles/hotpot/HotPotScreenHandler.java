@@ -1,30 +1,32 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import cn.blockforge.orient.framework.compat.DataComponents;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.Container;
-import net.minecraft.world.item.ItemStack;
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.inventory.DataSlot;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.ClickType;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.network.chat.Component;
-import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 /**
  * 筷子视角的火锅屏幕：九宫格 × 3x3 = 81 个食材槽，
  * 摆放为 9x9 的锅面，大格之间留分界。用法像熔炉：
  * 生的放进去，熟的直接取出来（取出时结算经验）。
  */
-public class HotPotScreenHandler extends AbstractContainerMenu {
+public class HotPotScreenHandler extends PlayerInventoryMenu {
     /** 大格间缝隙（像素）。 */
     public static final int GAP = 4;
     /** 锅面网格左上角（界面坐标）；每格 18 像素，物品画在格内向右下偏 1 像素处。 */
@@ -36,7 +38,7 @@ public class HotPotScreenHandler extends AbstractContainerMenu {
     public static final int HOTBAR_Y = 186;
 
     private final Container pot;
-    private final net.minecraft.world.level.Level world;
+    private final Level world;
     private final HotPotBlockEntity serverBe;
     private final DataSlot[] properties;
     private final int[] clientData = new int[HotPotBlockEntity.PROP_COUNT];
@@ -75,51 +77,17 @@ public class HotPotScreenHandler extends AbstractContainerMenu {
             addSlot(new PotSlot(pot, i, x, y));
         }
         // 玩家背包
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(playerInventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18));
-            }
-        }
-        for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(playerInventory, col, INV_X + col * 18, HOTBAR_Y));
-        }
+        addPlayerInventory(playerInventory, INV_X, INV_Y, HOTBAR_Y);
 
-        properties = new DataSlot[HotPotBlockEntity.PROP_COUNT];
-        for (int i = 0; i < properties.length; i++) {
-            final int index = i;
-            if (be != null) {
-                properties[i] = addDataSlot(new DataSlot() {
-                    @Override
-                    public int get() {
-                        return be.propertyAt(index);
-                    }
-
-                    @Override
-                    public void set(int value) {
-                    }
-                });
-            } else {
-                properties[i] = addDataSlot(new DataSlot() {
-                    @Override
-                    public int get() {
-                        return clientData[index];
-                    }
-
-                    @Override
-                    public void set(int value) {
-                        clientData[index] = value;
-                    }
-                });
-            }
-        }
+        properties = bindData(clientData, be == null ? null : be::propertyAt);
     }
 
     private static Container clientInventory(Inventory playerInventory, BlockPos pos) {
-        net.minecraft.world.level.Level world = playerInventory.player.level();
+        Level world = playerInventory.player.level();
         if (world.getBlockEntity(pos) instanceof HotPotBlockEntity be) {
             return be;
         }
-        return new net.minecraft.world.SimpleContainer(HotPotBlockEntity.SLOTS);
+        return new SimpleContainer(HotPotBlockEntity.SLOTS);
     }
 
     // ------------------------------------------------------------------ UI 数据
@@ -215,7 +183,7 @@ public class HotPotScreenHandler extends AbstractContainerMenu {
         if (stack.isEmpty()) {
             return -1F;
         }
-        SoupBase soup = SoupBase.byId(soupOfSlot(slot));
+        SoupDef soup = Soups.byIndex(soupOfSlot(slot));
         float power;
         if (fuelId() == HotPotBlockEntity.FUEL_OPEN_FIRE) {
             power = HotPotBlockEntity.OPEN_FIRE_POWER;   // 篝火上的锅（代码检查 B6）
@@ -267,10 +235,6 @@ public class HotPotScreenHandler extends AbstractContainerMenu {
     private boolean collecting = false;
     private int collectSoup = -1;
 
-    /** 冷锅吃东西反胃的概率和时长（时长同原版河豚的反胃 15 秒）。 */
-    private static final float COLD_NAUSEA_CHANCE = 0.3F;
-    private static final int COLD_NAUSEA_TICKS = 300;
-
     /** 光标拿着筷子、左键点锅里的熟食：直接夹起来一口吃掉（只认熟食，其它情况照原版处理）。 */
     @Override
     public void clicked(int slotId, int button, ClickType actionType, Player player) {
@@ -311,6 +275,10 @@ public class HotPotScreenHandler extends AbstractContainerMenu {
             player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.too_full")), true);
             return;
         }
+        // mryt233 改（2026-11-10）：与筷子物品一致，接管时保留锅槽与经验。
+        if (HotPotHooks.beforeEating(getCarried(), player)) {
+            return;
+        }
         int index = slot.getContainerSlot();
         ItemStack eaten = slot.remove(1);
         serverBe.grantTakeXp(player, index, 1);
@@ -319,10 +287,12 @@ public class HotPotScreenHandler extends AbstractContainerMenu {
         }
         // 主手或副手拿着蘸料：吃之前自动蘸一口（r103，用户：两种都要；2026-10-25 主手也算，调整）
         DippingSauceItem.dipFromHands(player, eaten);
+        HotPotHooks.onEating(world, player, eaten);
         player.eat(world, eaten.copy());
-        // 冷锅：没坐在烧着的灶台（或其他热源）上，吃了有概率反胃
-        if (!serverBe.isHeated() && world.random.nextFloat() < COLD_NAUSEA_CHANCE) {
-            player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, COLD_NAUSEA_TICKS, 0));
+        // 冷锅：没坐在烧着的灶台（或其他热源）上，吃了有概率反胃（mryt233 改：读取 Config.coldPot*，duration <= 0 时跳过）
+        int nauseaDuration = Config.coldPotNauseaDuration();
+        if (!serverBe.isHeated() && nauseaDuration > 0 && world.random.nextFloat() < Config.coldPotNauseaChance()) {
+            player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, nauseaDuration, 0));
             player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.cold_pot")), true);
         }
         if (!player.getAbilities().instabuild) {
@@ -339,44 +309,7 @@ public class HotPotScreenHandler extends AbstractContainerMenu {
     /** shift 键：背包 → 锅里空格；锅里 → 背包，并按实际移动数量结算经验。 */
     @Override
     public ItemStack quickMoveStack(Player player, int slotId) {
-        if (slotId < 0 || slotId >= slots.size()) {
-            return ItemStack.EMPTY;
-        }
-        Slot slot = slots.get(slotId);
-        if (!slot.hasItem()) {
-            return ItemStack.EMPTY;
-        }
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        int before = stack.getCount();
-        boolean fromPot = slot instanceof PotSlot;
-        boolean cookedOutput = fromPot && isCooked(slot.getContainerSlot());
-
-        if (fromPot) {
-            if (!moveItemStackTo(stack, HotPotBlockEntity.SLOTS, slots.size(), true)) {
-                return ItemStack.EMPTY;
-            }
-        } else if (!moveItemStackTo(stack, 0, HotPotBlockEntity.SLOTS, false)) {
-            return ItemStack.EMPTY;
-        }
-
-        int moved = before - stack.getCount();
-        if (moved <= 0) {
-            return ItemStack.EMPTY;
-        }
-        if (cookedOutput && serverBe != null) {
-            serverBe.grantTakeXp(player, slot.getContainerSlot(), moved);
-        }
-        if (stack.isEmpty()) {
-            slot.set(ItemStack.EMPTY);
-            if (fromPot && serverBe != null) {
-                serverBe.onSlotEmptied(slot.getContainerSlot());
-            }
-        } else {
-            slot.setChanged();
-        }
-        broadcastChanges();
-        return original;
+        return super.quickMoveStack(player, slotId);
     }
 
     @Override
@@ -442,6 +375,44 @@ public class HotPotScreenHandler extends AbstractContainerMenu {
                 }
             }
         }
+    }
 
+    @Override
+    protected int containerSlots() {
+        return HotPotBlockEntity.SLOTS;
+    }
+
+    @Override
+    protected boolean fromContainer(Slot slot, int slotId) {
+        return slot instanceof PotSlot;
+    }
+
+    @Override
+    protected boolean requireMovedCount() {
+        return true;
+    }
+
+    @Override
+    protected boolean quickMoveOutput(Slot slot, boolean fromContainer) {
+        return fromContainer && isCooked(slot.getContainerSlot());
+    }
+
+    @Override
+    protected void onQuickMoved(Player player, Slot slot, boolean fromContainer, int moved, boolean cookedOutput) {
+        if (cookedOutput && serverBe != null) {
+            serverBe.grantTakeXp(player, slot.getContainerSlot(), moved);
+        }
+    }
+
+    @Override
+    protected void onQuickEmptied(Slot slot, boolean fromContainer) {
+        if (fromContainer && serverBe != null) {
+            serverBe.onSlotEmptied(slot.getContainerSlot());
+        }
+    }
+
+    @Override
+    protected void afterQuickMove() {
+        broadcastChanges();
     }
 }

@@ -1,37 +1,55 @@
-// mryt233 改：26.1 原版 API。
+// mryt233 改：26.2 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.ChatFormatting;
-
-import java.util.List;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.context.UseOnContext;
 
 /**
  * 一碗蘸料（r103，用户定）：拿碗在蘸料台上一种一种打出来，组件 sauce 记着放了哪几种、还能蘸几口（9 口）。
  * 能像盘子一样摆在桌上（筷子夹着菜点一下 = 蘸一口，效果记在菜上）；主手或副手拿着时，用筷子吃会自动蘸一口。
  * 蘸完 9 口变回原版的碗。名字一律叫「蘸料」，提示里列配料（用户）。
  * 作者：mryt233 */
-public class DippingSauceItem extends Item {
+public class DippingSauceItem extends Item implements TableItem {
     public DippingSauceItem(Item.Properties properties) {
         super(properties.stacksTo(1));
     }
 
     public static SauceContents contents(ItemStack stack) {
         SauceContents c = stack.get(HotPotContent.SAUCE);
-        return c == null ? new SauceContents(0, 0) : c;
+        return c == null ? SauceContents.empty() : c;
     }
 
     /** 新打的一碗：只有这一种调料、满 9 口。 */
     public static ItemStack create(Seasoning first) {
         ItemStack stack = new ItemStack(HotPotContent.DIPPING_SAUCE);
-        stack.set(HotPotContent.SAUCE, new SauceContents(first.bit(), SauceContents.FULL_BITES));
+        stack.set(HotPotContent.SAUCE, new SauceContents(List.of(SauceIds.fullId(first.def())), SauceContents.FULL_BITES));
+        return stack;
+    }
+
+    /** 按登记 ID 新建，旧枚举入口继续兼容。 */
+    public static ItemStack createWithId(String id) {
+        ItemStack stack = new ItemStack(HotPotContent.DIPPING_SAUCE);
+        stack.set(HotPotContent.SAUCE, new SauceContents(List.of(id), SauceContents.FULL_BITES));
         return stack;
     }
 
@@ -39,7 +57,7 @@ public class DippingSauceItem extends Item {
     public static ItemStack bite(ItemStack stack) {
         SauceContents left = contents(stack).bitten();
         if (left.bites() <= 0) {
-            return new ItemStack(net.minecraft.world.item.Items.BOWL);
+            return new ItemStack(Items.BOWL);
         }
         stack.set(HotPotContent.SAUCE, left);
         return stack;
@@ -53,13 +71,15 @@ public class DippingSauceItem extends Item {
         if (!(sauce.getItem() instanceof DippingSauceItem) || contents(sauce).bites() <= 0) {
             return sauce;
         }
-        food.set(HotPotContent.DIPPED, food.getOrDefault(HotPotContent.DIPPED, 0) | contents(sauce).mask());
+        List<String> merged = new ArrayList<>(food.getOrDefault(HotPotContent.DIPPED, List.of()));
+        merged.addAll(contents(sauce).ids());
+        food.set(HotPotContent.DIPPED, SauceIds.normalize(merged));
         return bite(sauce);
     }
 
     /** 吃之前：主手或副手拿着蘸料就自动蘸一口（先看副手；用户 2026-10-25：另一只手主副都行）。 */
-    public static void dipFromHands(net.minecraft.world.entity.LivingEntity user, ItemStack food) {
-        for (net.minecraft.world.InteractionHand hand : new net.minecraft.world.InteractionHand[]{net.minecraft.world.InteractionHand.OFF_HAND, net.minecraft.world.InteractionHand.MAIN_HAND}) {
+    public static void dipFromHands(LivingEntity user, ItemStack food) {
+        for (InteractionHand hand : new InteractionHand[]{InteractionHand.OFF_HAND, InteractionHand.MAIN_HAND}) {
             ItemStack sauce = user.getItemInHand(hand);
             if (sauce.getItem() instanceof DippingSauceItem && contents(sauce).bites() > 0) {
                 user.setItemInHand(hand, dipInto(sauce, food));
@@ -69,51 +89,40 @@ public class DippingSauceItem extends Item {
     }
 
     /** 「麻酱、辣油、葱花」这样的配料名单。 */
-    public static MutableComponent names(int mask) {
+    @Deprecated public static MutableComponent names(int mask) { return names(SauceIds.fromMask(mask)); }
+
+    public static MutableComponent names(List<String> ids) {
         MutableComponent out = Component.empty();
         boolean first = true;
-        for (Seasoning s : Seasoning.ALL) {
-            if ((mask & s.bit()) != 0) {
-                if (!first) {
-                    out.append(Component.translatable(HotPotBlockEntity.key("tooltip.sauce.sep")));
-                }
-                out.append(Component.translatable(s.nameKey()));
-                first = false;
+        for (String id : SauceIds.normalize(ids)) {
+            SeasoningDef s = SauceIds.def(id);
+            if (!first) {
+                out.append(Component.translatable(HotPotBlockEntity.key("tooltip.sauce.sep")));
             }
+            out.append(s == null ? Component.translatable(HotPotBlockEntity.key("sauce.unknown")).append(" (" + id + ")")
+                : Component.translatable(s.nameKey()));
+            first = false;
         }
         return out;
     }
 
     /**
-     * mryt233 改（2026-11-04）：没有蘸料（口数 <= 0）的蘸料物品是非法状态——创造栏不再发它，
-     * 但 /give 一个不带组件的、存档里留下的、别的模组给的，都可能混进来。在背包里一 tick 就换成原版空碗。
-     * mryt233 改（2026-11-07）：改成在当前槽位原地换成空碗。以前是先 setCount(0) 再补一只碗，
-     * 两步之间客户端还显示原物；而且躺在非玩家容器里（箱子、方块实体、别的模组的容器）时
-     * 只清数量、不补碗，等于把碗一起吞掉。
+     * mryt233 改（2026-11-04）：没有蘸料（口数 <= 0）的蘸料物品是非法状态，在背包里一 tick 就换成原版空碗。
      */
     @Override
-    public void inventoryTick(ItemStack stack, net.minecraft.server.level.ServerLevel world,
-                              net.minecraft.world.entity.Entity entity, net.minecraft.world.entity.EquipmentSlot slot) {
-        // mryt233 改（2026-11-08，26.x）：方法签名换成 (ServerLevel, Entity, EquipmentSlot)，只在服务端调用；
-        // 槽位换物品改由 {@link net.minecraft.world.entity.player.Inventory} 里的辅助方法照容器下标替换。
+    public void inventoryTick(ItemStack stack, ServerLevel world, Entity entity, EquipmentSlot slot) {
         if (contents(stack).bites() > 0) {
             return;
         }
-        if (!(entity instanceof net.minecraft.world.entity.player.Player player)) {
-            // mryt233 改（2026-11-07）：非玩家容器不处理，避免吞物品
+        if (!(entity instanceof Player player)) {
             return;
         }
         emptyBowlInInventory(player, stack);
     }
 
-    /**
-     * 把玩家背包里的这一份空蘸料原地换成空碗。
-     * mryt233 改（2026-11-08，26.x）：{@code Inventory.tick()} 不再把槽位下标传给 {@code inventoryTick}，
-     * 这里按背包容器逐格找同一份（数量与组件都对得上），找到就原位替换，一次到位、不经过「数量清 0」的中间状态。
-     */
-    private static void emptyBowlInInventory(net.minecraft.world.entity.player.Player player, ItemStack stack) {
-        net.minecraft.world.entity.player.Inventory inventory = player.getInventory();
-        ItemStack bowl = new ItemStack(net.minecraft.world.item.Items.BOWL);
+    private static void emptyBowlInInventory(Player player, ItemStack stack) {
+        Inventory inventory = player.getInventory();
+        ItemStack bowl = new ItemStack(Items.BOWL);
         for (int i = 0; i < inventory.getContainerSize(); i++) {
             if (inventory.getItem(i) == stack) {
                 inventory.setItem(i, bowl);
@@ -122,37 +131,45 @@ public class DippingSauceItem extends Item {
         }
     }
 
-    /** mryt233 改（2026-11-04）：手里这碗要是空的（非法状态）就换成空碗。inventoryTick 只在东西进背包时才跑，
-     *  拿在手里、一开始就是空的那种靠这里兜住。 */
-    private static boolean emptyBowlIfInvalid(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
+    /** 手里这碗要是空的（非法状态）就换成空碗。 */
+    private static boolean emptyBowlIfInvalid(Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (contents(stack).bites() > 0) {
             return false;
         }
-        if (!player.level().isClientSide()) {   // 换碗只在服务端做，客户端等同步（mryt233 改）
-            player.setItemInHand(hand, new ItemStack(net.minecraft.world.item.Items.BOWL));
+        if (!player.level().isClientSide()) {
+            player.setItemInHand(hand, new ItemStack(Items.BOWL));
         }
         return true;
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext context) {
-        if (context.getPlayer() != null && emptyBowlIfInvalid(context.getPlayer(), context.getHand())) {
-            return InteractionResult.SUCCESS;
-        }
-        return PlateItem.placeOn(context, HotPotContent.BOWL_BLOCK, true);
+    public PlateBlock tableBlock(ItemStack stack) {
+        return HotPotContent.BOWL_BLOCK;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display, java.util.function.Consumer<Component> tooltip, TooltipFlag type) {
+    public ItemStack prepareForTable(ItemStack stack) {
+        return contents(stack).bites() > 0 ? stack : new ItemStack(Items.BOWL);
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        if (context.getPlayer() != null && emptyBowlIfInvalid(context.getPlayer(), context.getHand())) {
+            return Use.item(UseOutcome.SUCCESS, context.getLevel().isClientSide());
+        }
+        return Use.item(TableObjects.placeOn(context, this), context.getLevel().isClientSide());
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context,
+                                TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag type) {
         SauceContents c = contents(stack);
-        // mryt233 改（2026-11-04）：口数为 0 的是非法状态（进背包就会被换成空碗），说明里不显示「还能蘸 0 口」。
         if (c.bites() <= 0) {
             return;
         }
-        // 每种配料一行，带效果（用户 2026-10-25：蘸料的属性要显示对应调料和 buff）
-        java.util.List<Component> effects = new java.util.ArrayList<>();
-        Seasoning.appendEffects(c.mask(), effects);
+        List<Component> effects = new ArrayList<>();
+        Seasoning.appendEffects(c.ids(), effects);
         effects.forEach(tooltip);
         tooltip.accept(Component.translatable(HotPotBlockEntity.key("tooltip.sauce.bites"), c.bites()).withStyle(ChatFormatting.GRAY));
     }

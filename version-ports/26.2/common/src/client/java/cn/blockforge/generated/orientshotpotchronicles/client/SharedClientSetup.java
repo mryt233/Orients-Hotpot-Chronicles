@@ -1,23 +1,33 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
-import cn.blockforge.orient.framework.client.ClientItemRenderers;
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.BowlBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Chopsticks;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBowlItem;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupIds;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.TableObjects;
+import cn.blockforge.orient.framework.client.ClientItemRenderers;
+import java.util.ArrayList;
+import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemContainerContents;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.ChatFormatting;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotScreenHandler;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveScreenHandler;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.network.chat.Component;
-
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 
 /** 两个平台共用的物品绘制/提示，不包含加载器 API。作者：mryt233 */
 public final class SharedClientSetup {
@@ -26,10 +36,24 @@ public final class SharedClientSetup {
     public static void registerItems() {
         SauceRender.register();
         HeldFoodItemRenderer.register();
+        // mryt233 改（4H）：桌面竹筷（迷你筷架 + 筷子）改走 TableBlockRenderers 回调登记。
+        TableBlockRenderers.registerBlock(HotPotContent.CHOPSTICK_REST_BLOCK, PlateHolderRenderer::renderChopstickRest);
+        // 4F-3（mryt233）：通用汤碗（minecraft:builtin/entity）先画无汤面的木碗模型，再按 soup 组件画汤面
+        ClientItemRenderers.register(HotPotContent.SOUP_BOWL,
+            (stack, mode, matrices, consumers, light, overlay) -> {
+                RenderItems.INSTANCE.renderSingleBlock(
+                    HotPotContent.BOWL_BLOCK.defaultBlockState().setValue(BowlBlock.SOUP, SoupVisual.OTHER),
+                    matrices, consumers, light, overlay);
+                if (stack.getItem() instanceof SoupBowlItem bowl) {
+                    SoupDef def = bowl.soupDef(stack);
+                    if (def != null || bowl.rawSoupId(stack) != null) {
+                        HotPotBlockEntityRenderer.renderBowlSurface(def, matrices, consumers, light);
+                    }
+                }
+            });
         // mryt233 改：汤底谓词由平台注册 SoupItemProperty，物品定义引用。
         // 鸳鸯 / 田字锅的物品：锅身方块模型 + 按物品里存的每边汤底画汤面（任意组合都对，不用为每种组合做模型；新增）
-        for (cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial material
-            : cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial.values()) {
+        for (HotPotMaterial material : HotPotMaterial.values()) {
             if (!material.layout().multiSoup()) {
                 continue;
             }
@@ -45,15 +69,14 @@ public final class SharedClientSetup {
                 });
         }
         // 鼠标中键选盘子：复制准星对着的那一个（连菜一起），由客户端告诉方块是谁在选
-        cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlock.pickPlayer =
-            () -> net.minecraft.client.Minecraft.getInstance().player;
+        PlateHolderBlock.pickPlayer = () -> Minecraft.getInstance().player;
         // mryt233 改（26.x）：条凳的斜腿已写进方块模型，物品直接用方块模型（tools/gen_bench_legs.py），不再这里补画。
     }
 
     /** 盘子：装了几样 / 能装几样，下面列出每一样；筷子：夹着什么。 */
-    public static void appendPlateTooltip(ItemStack stack, java.util.List<Component> lines) {
+    public static void appendPlateTooltip(ItemStack stack, List<Component> lines) {
         if (stack.is(HotPotContent.CHOPSTICKS)) {
-            ItemStack held = cn.blockforge.generated.orientshotpotchronicles.hotpot.Chopsticks.held(stack);
+            ItemStack held = Chopsticks.held(stack);
             if (!held.isEmpty()) {
                 lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.chopsticks.holding"), held.getHoverName())
                     .withStyle(ChatFormatting.GRAY));
@@ -65,20 +88,20 @@ public final class SharedClientSetup {
             return;
         }
         // 盘子和装菜的碗（r99）；汤碗、橙子饮料这种整件的不列菜
-        cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateBlock plate =
-            cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem.placedFor(stack);
-        if (plate == null || cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateItem.keepsSelf(stack)
-            || (stack.is(net.minecraft.world.item.Items.BOWL) && !stack.has(net.minecraft.core.component.DataComponents.CONTAINER))) {
+        // mryt233 改（4H）：先由 TableObjects 统一判定可自动摆上桌的物件，再排除整件摆放与空原版碗。
+        PlateBlock plate = TableObjects.placedFor(stack);
+        if (plate == null || TableObjects.keepsSelf(stack)
+            || (stack.is(Items.BOWL) && !stack.has(DataComponents.CONTAINER))) {
             return;
         }
         ItemContainerContents contents = stack.getOrDefault(
-            net.minecraft.core.component.DataComponents.CONTAINER, ItemContainerContents.EMPTY);
-        java.util.List<ItemStack> foods = contents.nonEmptyItemCopyStream().toList();
+            DataComponents.CONTAINER, ItemContainerContents.EMPTY);
+        List<ItemStack> foods = contents.nonEmptyItemCopyStream().toList();
         lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.plate.count"), foods.size(), plate.size().capacity())
             .withStyle(ChatFormatting.GRAY));
         // 像原版收纳袋：同样的菜合成一行，后面写数量（r91）
-        java.util.List<ItemStack> kinds = new java.util.ArrayList<>();
-        java.util.List<Integer> counts = new java.util.ArrayList<>();
+        List<ItemStack> kinds = new ArrayList<>();
+        List<Integer> counts = new ArrayList<>();
         for (ItemStack food : foods) {
             int at = -1;
             for (int k = 0; k < kinds.size(); k++) {
@@ -109,22 +132,21 @@ public final class SharedClientSetup {
     }
 
     /** 装着东西的锅物品：提示里写汤底和食材份数。 */
-    public static void appendPotTooltip(ItemStack stack, java.util.List<Component> lines) {
+    public static void appendPotTooltip(ItemStack stack, List<Component> lines) {
         CustomData data = stack.get(HotPotContent.POT_CONTENTS);
         if (data == null) {
             return;
         }
         CompoundTag nbt = data.copyTag();
         // 鸳鸯 / 田字锅：每边的汤底用「/」列出来（同锅的状态栏，调整）
-        cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout layout =
+        PotLayout layout =
             stack.getItem() instanceof BlockItem bi
-                && bi.getBlock() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock pot
-                ? pot.material().layout() : cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout.NINE_GRID;
-        String[] keys = {"Base", "BaseB", "BaseC", "BaseD"};
+                && bi.getBlock() instanceof HotPotBlock pot
+                ? pot.material().layout() : PotLayout.NINE_GRID;
         // mryt233 改（2026-11-05，r136a）：红汤边在提示里也带辣度档位，比如「红汤锅底（特辣）」
         String[] spicyKeys = {"Spicy", "SpicyB", "SpicyC", "SpicyD"};
         Component soupName = HotPotBlockEntity.soupText(layout,
-            side -> nbt.getIntOr(keys[side], -1),
+            side -> SoupIds.index(SoupIds.fromPotTag(nbt, side)),
             side -> nbt.getIntOr(spicyKeys[side], 0));
         lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.pot.soup"), soupName)
             .withStyle(ChatFormatting.GRAY));

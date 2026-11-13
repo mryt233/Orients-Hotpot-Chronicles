@@ -2,11 +2,15 @@
 package cn.blockforge.generated.orientshotpotchronicles.mixin;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronItem;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.HighStoolBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Config;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCriterion;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceIds;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SeatEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
+import java.util.List;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -37,20 +41,21 @@ abstract class FoodConsumeMixin {
     private void orientsHotpot$consume(Level world, LivingEntity user, ItemStack stack,
                                        CallbackInfoReturnable<ItemStack> callback) {
         if (world.isClientSide() || !stack.has(DataComponents.FOOD)) { return; }
-        Integer mask = stack.get(HotPotContent.DIPPED);
-        if (mask != null && mask != 0) { Seasoning.applyAll(mask, user); }
+        List<String> dipped = stack.get(HotPotContent.DIPPED);   // mryt233 改（4E-1）：ID 列表
+        if (dipped != null && !dipped.isEmpty()) { Seasoning.applyAll(dipped, user); }
         // mryt233 改（2026-11-05，r136a）：汤底风味加成。这道菜是在哪种汤里煮出来的，就补一份那种汤的
         // 状态效果；红汤再按它带来的辣度档位加强（0 微辣 ~ 3 变态辣）。
         String soupKey = stack.get(HotPotContent.COOKED_IN_SOUP);
         if (soupKey != null) {
-            SoupBase soup = SoupBase.byTextureKey(soupKey);
+            SoupDef soup = Soups.get(soupKey);   // mryt233 改（2026-11-11，4B-2）：问登记表
             if (soup != null) {
                 int spicy = stack.getOrDefault(HotPotContent.SPICY_LEVEL, 0);
                 // 同时蘸了解辣的东西（蜂蜜 / 醋）：负面效果不再叠上去
-                boolean calmSpicy = mask != null
-                    && ((mask & Seasoning.HONEY.bit()) != 0 || (mask & Seasoning.VINEGAR.bit()) != 0);
+                boolean calmSpicy = dipped != null
+                    && (SauceIds.containsDef(dipped, Seasoning.HONEY) || SauceIds.containsDef(dipped, Seasoning.VINEGAR));
                 // 清汤、番茄汤本来就解冷锅反胃
-                if (soup == SoupBase.CLEAR || soup == SoupBase.TOMATO) {
+                // mryt233 改（2026-11-10，r147）：「是不是清汤 / 番茄」改成汤底自己的属性 clearsNausea()
+                if (soup.clearsNausea()) {
                     user.removeEffect(MobEffects.NAUSEA);
                 }
                 for (MobEffectInstance effect : soup.dishBonusEffects(spicy)) {
@@ -59,10 +64,15 @@ abstract class FoodConsumeMixin {
                     }
                     user.addEffect(effect);
                 }
-                // 变态辣且没解辣：嘴上 2 秒火苗，纯节目效果（前面刚给了抗火，不扣血）
+                // 变态辣且没解辣：嘴上冒火苗，纯节目效果（前面刚给了抗火，不扣血）
                 // mryt233 改（2026-11-06，r139）：穿着布围裙就不点嘴上这簇火——布围裙挡的是溅起来的滚油与明火。
-                if (soup == SoupBase.SPICY && spicy >= 3 && !calmSpicy && !ClothApronItem.wornBy(user)) {
-                    user.setRemainingFireTicks(Math.max(user.getRemainingFireTicks(), 40));
+                // mryt233 改（2026-11-10）：红汤判断改成 isSpicy() 属性；mryt233 改（第四批 4J）：改读 Config.spicyMouthFire*
+                int mouthFireTicks = Config.spicyMouthFireTicks();
+                if (soup.spicy()
+                    && mouthFireTicks > 0 && spicy >= Config.spicyMouthFireFromLevel()
+                    && !calmSpicy
+                    && !ClothApronItem.wornBy(user)) {
+                    user.setRemainingFireTicks(Math.max(user.getRemainingFireTicks(), mouthFireTicks));
                 }
             }
         }
@@ -75,25 +85,18 @@ abstract class FoodConsumeMixin {
                 || stack.is(HotPotContent.COOKED_ZHE_ER_GEN_SLICE)) {
                 HotPotCriterion.fire(player, "eat_zhe_er_gen");
             }
-            if (mask != null && mask != 0) {
+            if (dipped != null && !dipped.isEmpty()) {
                 HotPotCriterion.fire(player, "eat_dipped");
                 // mryt233 改（2026-11-06，r139「调味宗师」）：这一口蘸到了 5 种以上调料才算。
-                if (Integer.bitCount(mask) >= 5) {
+                if (dipped.size() >= 5) {
                     HotPotCriterion.fire(player, "sauce_master_5");
                 }
             }
             // 座位只取一次：getVehicle() 每帧都可能变，同一段判定里必须用同一个对象
-            if (player.getVehicle() instanceof cn.blockforge.generated.orientshotpotchronicles.hotpot.SeatEntity seat) {
-                // 所有座位（一格高条凳 <wood>_bench、高脚凳 <wood>_high_stool）都给「坐着吃」
+            if (player.getVehicle() instanceof SeatEntity) {
+                // mryt233 改（2026-11-10）：运行时仅保留条凳座位，高凳已归档。
                 HotPotCriterion.fire(player, "eat_seated");
-                // mryt233 改（2026-11-07）：「围炉而坐 / eat_seated_bench」只认一格高条凳的座位。
-                // 以前用 getClass() == SeatEntity.class 反推「恰好是条凳座位」——一旦 SeatEntity 被改成 abstract，
-                // 或条凳座位换了子类，这里就静默失效 / 静默归错，且没有任何报错。
-                // 现在反着写：只要不是高脚凳的座位（HighStoolBlock.Seat）就算条凳座位，
-                // 高脚凳以后再加子类也仍然被排除在外。
-                if (!(seat instanceof HighStoolBlock.Seat)) {
-                    HotPotCriterion.fire(player, "eat_seated_bench");
-                }
+                HotPotCriterion.fire(player, "eat_seated_bench");
             }
         }
     }

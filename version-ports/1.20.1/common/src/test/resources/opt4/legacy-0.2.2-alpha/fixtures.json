@@ -1,0 +1,749 @@
+{
+ "meta": {
+  "source": "0.2.2-alpha 已发布 jar 真跑建档后用 /data get 导出（tools/legacy_baseline.py）",
+  "loader": "fabric",
+  "scenario": 1,
+  "dumped": "2026-11-11 12:47:45",
+  "note": "snbt 字段是 /data get 的原样回执去掉前缀，可用原版 TagParser 读回；item 条目另拆出 id / count / components。Fabric 与 NeoForge 两端导出的回执原文逐字相同。"
+ },
+ "entries": {
+  "pot_clear": {
+   "cmd": "data get block 34 4 34",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 0, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 34, y: 4, Items: [], z: 34, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_rich_stock": {
+   "cmd": "data get block 36 4 34",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 1, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 36, y: 4, Items: [], z: 34, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_mushroom": {
+   "cmd": "data get block 38 4 34",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 2, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 38, y: 4, Items: [], z: 34, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_spicy_l0": {
+   "cmd": "data get block 40 4 34",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 40, y: 4, Items: [], z: 34, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_spicy_l1": {
+   "cmd": "data get block 42 4 34",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 1, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 42, y: 4, Items: [], z: 34, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_spicy_l2": {
+   "cmd": "data get block 44 4 34",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 2, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 44, y: 4, Items: [], z: 34, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_spicy_l3": {
+   "cmd": "data get block 46 4 34",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 3, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 46, y: 4, Items: [], z: 34, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_tomato": {
+   "cmd": "data get block 48 4 34",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 4, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 48, y: 4, Items: [], z: 34, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_three_fresh": {
+   "cmd": "data get block 50 4 34",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 5, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 50, y: 4, Items: [], z: 34, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_with_food": {
+   "cmd": "data get block 52 4 34",
+   "snbt": "{Doneness: [I; 30, 50, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 1B, 1B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 1B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 2, PendingXp: 1.5f, Base: 3, Overcook: [I; 0, 0, 300, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 52, y: 4, Items: [{count: 1, Slot: 0b, id: \"orients_hotpot_chronicles:beef_loin_slice\"}, {count: 1, Slot: 1b, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}, {count: 1, Slot: 2b, id: \"orients_hotpot_chronicles:hot_tofu_cube\"}, {count: 1, Slot: 40b, id: \"orients_hotpot_chronicles:cooked_potato_slice\"}], z: 34, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_taiji_red_clear": {
+   "cmd": "data get block 34 4 36",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 2, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 34, y: 4, Items: [], z: 36, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: 0, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_round_tomato_three": {
+   "cmd": "data get block 36 4 36",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 4, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 36, y: 4, Items: [], z: 36, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: 5, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_split_rich_mushroom": {
+   "cmd": "data get block 38 4 36",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 1, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 38, y: 4, Items: [], z: 36, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: 2, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_square_tf_red3": {
+   "cmd": "data get block 40 4 36",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 5, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 40, y: 4, Items: [], z: 36, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 3, BaseC: -1, BaseB: 3, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_four_all": {
+   "cmd": "data get block 42 4 36",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 0, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 42, y: 4, Items: [], z: 36, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: 5, SpicyB: 1, BaseC: 4, BaseB: 3, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_four_gaps": {
+   "cmd": "data get block 44 4 36",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 44, y: 4, Items: [], z: 36, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 3, BaseD: -1, SpicyB: 0, BaseC: 3, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_taiji_one_side": {
+   "cmd": "data get block 46 4 36",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 2, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 46, y: 4, Items: [], z: 36, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "pot_empty": {
+   "cmd": "data get block 48 4 36",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: -1, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 48, y: 4, Items: [], z: 36, id: \"orients_hotpot_chronicles:hot_pot\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}"
+  },
+  "stove_iron_clear": {
+   "cmd": "data get block 34 4 38",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, BurnTotal: 0, PendingXp: 0.0f, Base: 0, FuelType: -1, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Fuel: {Items: []}, x: 34, y: 4, Items: [], z: 38, id: \"orients_hotpot_chronicles:stove\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BurnTicks: 0, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0, IdleFlame: 0b}"
+  },
+  "stove_yuanyang_s": {
+   "cmd": "data get block 36 4 38",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 1, BurnTotal: 0, PendingXp: 0.0f, Base: 3, FuelType: -1, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Fuel: {Items: []}, x: 36, y: 4, Items: [], z: 38, id: \"orients_hotpot_chronicles:stove\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BurnTicks: 0, BaseB: 1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0, IdleFlame: 0b}"
+  },
+  "stove_four_grid": {
+   "cmd": "data get block 38 4 38",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, BurnTotal: 0, PendingXp: 0.0f, Base: 2, FuelType: -1, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Fuel: {Items: []}, x: 38, y: 4, Items: [], z: 38, id: \"orients_hotpot_chronicles:stove\", SpicyC: 0, BaseD: 3, SpicyB: 0, BaseC: 5, BurnTicks: 0, BaseB: 4, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 2, IdleFlame: 0b}"
+  },
+  "stove_no_pot": {
+   "cmd": "data get block 40 4 38",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, BurnTotal: 0, PendingXp: 0.0f, Base: -1, FuelType: -1, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Fuel: {Items: []}, x: 40, y: 4, Items: [], z: 38, id: \"orients_hotpot_chronicles:stove\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BurnTicks: 0, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0, IdleFlame: 0b}"
+  },
+  "stove_with_fuel": {
+   "cmd": "data get block 42 4 38",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 3, BurnTotal: 0, PendingXp: 0.0f, Base: 3, FuelType: 1, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Fuel: {Items: [{count: 7, Slot: 0b, id: \"minecraft:coal\"}]}, x: 42, y: 4, Items: [], z: 38, id: \"orients_hotpot_chronicles:stove\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BurnTicks: 0, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0, IdleFlame: 1b}"
+  },
+  "stove_tall": {
+   "cmd": "data get block 44 4 38",
+   "snbt": "{Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, BurnTotal: 0, PendingXp: 0.0f, Base: 1, FuelType: -1, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Fuel: {Items: []}, x: 44, y: 4, Items: [], z: 38, id: \"orients_hotpot_chronicles:stove\", SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BurnTicks: 0, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0, IdleFlame: 0b}"
+  },
+  "station_kinds_0_8": {
+   "cmd": "data get block 34 4 40",
+   "snbt": "{Portions: [I; 4, 3, 2, 1, 4, 3, 2, 1, 4], x: 34, y: 4, Items: [{count: 1, Slot: 0b, id: \"minecraft:wheat\"}, {count: 2, Slot: 1b, id: \"minecraft:blaze_powder\"}, {count: 3, Slot: 2b, id: \"minecraft:sweet_berries\"}, {count: 1, Slot: 3b, id: \"minecraft:honey_bottle\"}, {count: 2, Slot: 4b, id: \"minecraft:sunflower\"}, {count: 3, Slot: 5b, id: \"minecraft:apple\"}, {count: 1, Slot: 6b, id: \"minecraft:sugar\"}, {count: 2, Slot: 7b, id: \"orients_hotpot_chronicles:scallion\"}, {count: 3, Slot: 8b, id: \"orients_hotpot_chronicles:cilantro\"}], z: 40, id: \"orients_hotpot_chronicles:sauce_station\", Kinds: [I; 0, 1, 2, 3, 4, 5, 6, 7, 8]}"
+  },
+  "station_kinds_9_14": {
+   "cmd": "data get block 36 4 40",
+   "snbt": "{Portions: [I; 4, 0, 2, 0, 1, 3, 0, 0, 0], x: 36, y: 4, Items: [{count: 5, Slot: 0b, id: \"orients_hotpot_chronicles:garlic_paste\"}, {count: 2, Slot: 1b, id: \"orients_hotpot_chronicles:oyster_sauce\"}, {count: 2, Slot: 2b, id: \"orients_hotpot_chronicles:sesame_paste\"}, {count: 2, Slot: 3b, id: \"orients_hotpot_chronicles:crushed_peanuts\"}, {count: 2, Slot: 4b, id: \"orients_hotpot_chronicles:millet_chili\"}, {count: 2, Slot: 5b, id: \"orients_hotpot_chronicles:minced_zhe_er_gen\"}], z: 40, id: \"orients_hotpot_chronicles:sauce_station\", Kinds: [I; 9, 10, 11, 12, 13, 14, -1, -1, -1]}"
+  },
+  "station_all_empty": {
+   "cmd": "data get block 38 4 40",
+   "snbt": "{Portions: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 38, y: 4, Items: [], z: 40, id: \"orients_hotpot_chronicles:sauce_station\", Kinds: [I; -1, -1, -1, -1, -1, -1, -1, -1, -1]}"
+  },
+  "station_portions_no_raw": {
+   "cmd": "data get block 40 4 40",
+   "snbt": "{Portions: [I; 6, 0, 3, 0, 0, 0, 0, 0, 1], x: 40, y: 4, Items: [], z: 40, id: \"orients_hotpot_chronicles:sauce_station\", Kinds: [I; 2, -1, 7, -1, -1, -1, -1, -1, 14]}"
+  },
+  "station_legacy_no_kinds": {
+   "cmd": "data get block 42 4 40",
+   "snbt": "{Portions: [I; 3, 0, 2, 0, 0, 0, 0, 0, 1], x: 42, y: 4, Items: [], z: 40, id: \"orients_hotpot_chronicles:sauce_station\", Kinds: [I; 0, -1, 2, -1, -1, -1, -1, -1, 8]}"
+  },
+  "station_raw_only": {
+   "cmd": "data get block 44 4 40",
+   "snbt": "{Portions: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0], x: 44, y: 4, Items: [{count: 4, Slot: 0b, id: \"minecraft:apple\"}, {count: 2, Slot: 4b, id: \"minecraft:pumpkin_seeds\"}, {count: 3, Slot: 5b, id: \"minecraft:beetroot\"}], z: 40, id: \"orients_hotpot_chronicles:sauce_station\", Kinds: [I; -1, -1, -1, -1, -1, -1, -1, -1, -1]}"
+  },
+  "table_oak_mixed": {
+   "cmd": "data get block 34 5 42",
+   "snbt": "{x: 34, y: 5, z: 42, id: \"orients_hotpot_chronicles:plates\", Plates: [{X: 3.0d, Z: 3.0d, Items: [], Self: {components: {\"orients_hotpot_chronicles:spicy_level\": 2, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\"}, count: 1, id: \"orients_hotpot_chronicles:spicy_red_broth_bowl\"}, Axis: \"x\", Plate: \"orients_hotpot_chronicles:bowl\"}, {X: 8.0d, Z: 3.0d, Items: [], Self: {components: {\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 32767}}, count: 1, id: \"orients_hotpot_chronicles:dipping_sauce\"}, Axis: \"x\", Plate: \"orients_hotpot_chronicles:bowl\"}, {X: 13.0d, Z: 3.0d, Items: [], Chopsticks: {components: {\"orients_hotpot_chronicles:held_food\": {components: {\"orients_hotpot_chronicles:spicy_level\": 3, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 6}, count: 1, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}}, count: 1, id: \"orients_hotpot_chronicles:bamboo_chopsticks\"}, Self: {components: {\"orients_hotpot_chronicles:sauce\": {bites: 5, mask: 6}}, count: 1, id: \"orients_hotpot_chronicles:dipping_sauce\"}, Axis: \"x\", Plate: \"orients_hotpot_chronicles:bowl\"}, {X: 3.0d, Z: 8.0d, Items: [], Self: {count: 1, id: \"orients_hotpot_chronicles:orange_drink\"}, Axis: \"x\", Plate: \"orients_hotpot_chronicles:drink\"}, {X: 8.0d, Z: 8.0d, Items: [], Self: {count: 1, id: \"orients_hotpot_chronicles:orange_drink_cup\"}, Axis: \"x\", Plate: \"orients_hotpot_chronicles:cup\"}, {X: 3.0d, Z: 13.0d, Items: [{count: 1, Slot: 0b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"clear\", \"orients_hotpot_chronicles:dipped\": 17}, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}, {count: 1, Slot: 1b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"three_fresh\", \"orients_hotpot_chronicles:dipped\": 32767}, id: \"orients_hotpot_chronicles:cooked_potato_slice\"}, {count: 1, Slot: 2b, id: \"orients_hotpot_chronicles:greens\"}], Axis: \"x\", Plate: \"orients_hotpot_chronicles:iron_small_dish\"}]}"
+  },
+  "table_iron_bowl_food": {
+   "cmd": "data get block 36 5 42",
+   "snbt": "{x: 36, y: 5, z: 42, id: \"orients_hotpot_chronicles:plates\", Plates: [{X: 4.0d, Z: 4.0d, Items: [{count: 1, Slot: 0b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"rich_stock\", \"orients_hotpot_chronicles:dipped\": 4}, id: \"orients_hotpot_chronicles:cooked_mutton_roll\"}], Axis: \"x\", Plate: \"orients_hotpot_chronicles:bowl\"}, {X: 12.0d, Z: 4.0d, Items: [], Self: {components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"tomato\"}, count: 1, id: \"orients_hotpot_chronicles:tomato_soup_bowl\"}, Axis: \"x\", Plate: \"orients_hotpot_chronicles:bowl\"}, {X: 8.0d, Z: 11.0d, Items: [{count: 1, Slot: 0b, id: \"orients_hotpot_chronicles:cooked_fish_ball\"}, {count: 1, Slot: 1b, id: \"orients_hotpot_chronicles:beef_loin_slice\"}], Axis: \"z\", Plate: \"orients_hotpot_chronicles:quartz_two_slot_plate\"}, {X: 13.0d, Z: 12.0d, Items: [], Self: {components: {\"orients_hotpot_chronicles:held_food\": {components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"mushroom\", \"orients_hotpot_chronicles:dipped\": 8192}, count: 1, id: \"orients_hotpot_chronicles:cooked_squid_roll\"}}, count: 1, id: \"orients_hotpot_chronicles:bamboo_chopsticks\"}, Axis: \"x\", Plate: \"orients_hotpot_chronicles:chopstick_rest\"}]}"
+  },
+  "table_andesite_bowls_all_soups": {
+   "cmd": "data get block 38 5 42",
+   "snbt": "{x: 38, y: 5, z: 42, id: \"orients_hotpot_chronicles:plates\", Plates: [{X: 3.0d, Z: 3.0d, Items: [], Self: {components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"clear\"}, count: 1, id: \"orients_hotpot_chronicles:clear_broth_bowl\"}, Axis: \"x\", Plate: \"orients_hotpot_chronicles:bowl\"}, {X: 8.0d, Z: 3.0d, Items: [], Self: {count: 1, id: \"orients_hotpot_chronicles:rich_stock_bowl\"}, Axis: \"x\", Plate: \"orients_hotpot_chronicles:bowl\"}, {X: 13.0d, Z: 3.0d, Items: [], Self: {count: 1, id: \"orients_hotpot_chronicles:mushroom_broth_bowl\"}, Axis: \"x\", Plate: \"orients_hotpot_chronicles:bowl\"}, {X: 3.0d, Z: 9.0d, Items: [], Self: {components: {\"orients_hotpot_chronicles:spicy_level\": 0}, count: 1, id: \"orients_hotpot_chronicles:spicy_red_broth_bowl\"}, Axis: \"x\", Plate: \"orients_hotpot_chronicles:bowl\"}, {X: 8.0d, Z: 9.0d, Items: [], Self: {count: 1, id: \"orients_hotpot_chronicles:tomato_soup_bowl\"}, Axis: \"x\", Plate: \"orients_hotpot_chronicles:bowl\"}, {X: 13.0d, Z: 9.0d, Items: [], Self: {count: 1, id: \"orients_hotpot_chronicles:three_fresh_soup_bowl\"}, Axis: \"x\", Plate: \"orients_hotpot_chronicles:bowl\"}]}"
+  },
+  "table_tall_quartz": {
+   "cmd": "data get block 40 5 42",
+   "snbt": "{x: 40, y: 5, z: 42, id: \"orients_hotpot_chronicles:plates\", Plates: [{X: 4.0d, Z: 4.0d, Items: [], Self: {components: {\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 16384}}, count: 1, id: \"orients_hotpot_chronicles:dipping_sauce\"}, Axis: \"x\", Plate: \"orients_hotpot_chronicles:bowl\"}, {X: 11.0d, Z: 11.0d, Items: [{count: 1, Slot: 0b, components: {\"orients_hotpot_chronicles:dipped\": 1}, id: \"orients_hotpot_chronicles:cooked_enoki_mushroom\"}], Axis: \"x\", Plate: \"orients_hotpot_chronicles:quartz_small_dish\"}]}"
+  },
+  "chest_sauce_bowls.slot0": {
+   "cmd": "data get block 34 4 46 Items[{Slot:0b}]",
+   "snbt": "{count: 1, Slot: 0b, components: {\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 1}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:dipping_sauce",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 1}}"
+   }
+  },
+  "chest_sauce_bowls.slot1": {
+   "cmd": "data get block 34 4 46 Items[{Slot:1b}]",
+   "snbt": "{count: 1, Slot: 1b, components: {\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 16384}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:dipping_sauce",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 16384}}"
+   }
+  },
+  "chest_sauce_bowls.slot2": {
+   "cmd": "data get block 34 4 46 Items[{Slot:2b}]",
+   "snbt": "{count: 1, Slot: 2b, components: {\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 32767}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:dipping_sauce",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 32767}}"
+   }
+  },
+  "chest_sauce_bowls.slot3": {
+   "cmd": "data get block 34 4 46 Items[{Slot:3b}]",
+   "snbt": "{count: 1, Slot: 3b, components: {\"orients_hotpot_chronicles:sauce\": {bites: 4, mask: 32767}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:dipping_sauce",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:sauce\": {bites: 4, mask: 32767}}"
+   }
+  },
+  "chest_sauce_bowls.slot4": {
+   "cmd": "data get block 34 4 46 Items[{Slot:4b}]",
+   "snbt": "{count: 1, Slot: 4b, components: {\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 16383}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:dipping_sauce",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 16383}}"
+   }
+  },
+  "chest_sauce_bowls.slot5": {
+   "cmd": "data get block 34 4 46 Items[{Slot:5b}]",
+   "snbt": "{count: 1, Slot: 5b, components: {\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 32766}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:dipping_sauce",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 32766}}"
+   }
+  },
+  "chest_sauce_bowls.slot6": {
+   "cmd": "data get block 34 4 46 Items[{Slot:6b}]",
+   "snbt": "{count: 1, Slot: 6b, components: {\"orients_hotpot_chronicles:sauce\": {bites: 1, mask: 10}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:dipping_sauce",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:sauce\": {bites: 1, mask: 10}}"
+   }
+  },
+  "chest_sauce_bowls.slot7": {
+   "cmd": "data get block 34 4 46 Items[{Slot:7b}]",
+   "snbt": "{count: 1, Slot: 7b, components: {\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 0}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:dipping_sauce",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 0}}"
+   }
+  },
+  "chest_sauce_bowls.slot8": {
+   "cmd": "data get block 34 4 46 Items[{Slot:8b}]",
+   "snbt": "{count: 1, Slot: 8b, components: {\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 32771}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:dipping_sauce",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 32771}}"
+   }
+  },
+  "chest_sauce_bowls.slot9": {
+   "cmd": "data get block 34 4 46 Items[{Slot:9b}]",
+   "snbt": "{count: 1, Slot: 9b, components: {\"orients_hotpot_chronicles:sauce\": {bites: 0, mask: 255}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:dipping_sauce",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:sauce\": {bites: 0, mask: 255}}"
+   }
+  },
+  "chest_sauce_bowls.slot10": {
+   "cmd": "data get block 34 4 46 Items[{Slot:10b}]",
+   "snbt": "{count: 1, Slot: 10b, id: \"orients_hotpot_chronicles:dipping_sauce\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:dipping_sauce",
+    "count": "1",
+    "components_snbt": "{}"
+   }
+  },
+  "chest_dipped_dishes.slot0": {
+   "cmd": "data get block 36 4 46 Items[{Slot:0b}]",
+   "snbt": "{count: 1, Slot: 0b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"clear\", \"orients_hotpot_chronicles:dipped\": 2}, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_beef_loin_slice",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"clear\", \"orients_hotpot_chronicles:dipped\": 2}"
+   }
+  },
+  "chest_dipped_dishes.slot1": {
+   "cmd": "data get block 36 4 46 Items[{Slot:1b}]",
+   "snbt": "{count: 1, Slot: 1b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"rich_stock\", \"orients_hotpot_chronicles:dipped\": 8}, id: \"orients_hotpot_chronicles:cooked_potato_slice\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_potato_slice",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"rich_stock\", \"orients_hotpot_chronicles:dipped\": 8}"
+   }
+  },
+  "chest_dipped_dishes.slot2": {
+   "cmd": "data get block 36 4 46 Items[{Slot:2b}]",
+   "snbt": "{count: 1, Slot: 2b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"mushroom\", \"orients_hotpot_chronicles:dipped\": 32}, id: \"orients_hotpot_chronicles:cooked_mutton_roll\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_mutton_roll",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"mushroom\", \"orients_hotpot_chronicles:dipped\": 32}"
+   }
+  },
+  "chest_dipped_dishes.slot3": {
+   "cmd": "data get block 36 4 46 Items[{Slot:3b}]",
+   "snbt": "{count: 1, Slot: 3b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 128}, id: \"orients_hotpot_chronicles:cooked_greens\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_greens",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 128}"
+   }
+  },
+  "chest_dipped_dishes.slot4": {
+   "cmd": "data get block 36 4 46 Items[{Slot:4b}]",
+   "snbt": "{count: 1, Slot: 4b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"tomato\", \"orients_hotpot_chronicles:dipped\": 512}, id: \"orients_hotpot_chronicles:cooked_fish_ball\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_fish_ball",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"tomato\", \"orients_hotpot_chronicles:dipped\": 512}"
+   }
+  },
+  "chest_dipped_dishes.slot5": {
+   "cmd": "data get block 36 4 46 Items[{Slot:5b}]",
+   "snbt": "{count: 1, Slot: 5b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"three_fresh\", \"orients_hotpot_chronicles:dipped\": 2048}, id: \"orients_hotpot_chronicles:cooked_squid_roll\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_squid_roll",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"three_fresh\", \"orients_hotpot_chronicles:dipped\": 2048}"
+   }
+  },
+  "chest_dipped_dishes.slot6": {
+   "cmd": "data get block 36 4 46 Items[{Slot:6b}]",
+   "snbt": "{count: 1, Slot: 6b, components: {\"orients_hotpot_chronicles:spicy_level\": 0, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 1}, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_beef_loin_slice",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:spicy_level\": 0, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 1}"
+   }
+  },
+  "chest_dipped_dishes.slot7": {
+   "cmd": "data get block 36 4 46 Items[{Slot:7b}]",
+   "snbt": "{count: 1, Slot: 7b, components: {\"orients_hotpot_chronicles:spicy_level\": 1, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 2}, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_beef_loin_slice",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:spicy_level\": 1, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 2}"
+   }
+  },
+  "chest_dipped_dishes.slot8": {
+   "cmd": "data get block 36 4 46 Items[{Slot:8b}]",
+   "snbt": "{count: 1, Slot: 8b, components: {\"orients_hotpot_chronicles:spicy_level\": 2, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 4}, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_beef_loin_slice",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:spicy_level\": 2, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 4}"
+   }
+  },
+  "chest_dipped_dishes.slot9": {
+   "cmd": "data get block 36 4 46 Items[{Slot:9b}]",
+   "snbt": "{count: 1, Slot: 9b, components: {\"orients_hotpot_chronicles:spicy_level\": 3, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 8}, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_beef_loin_slice",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:spicy_level\": 3, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 8}"
+   }
+  },
+  "chest_dipped_dishes.slot10": {
+   "cmd": "data get block 36 4 46 Items[{Slot:10b}]",
+   "snbt": "{count: 1, Slot: 10b, components: {\"orients_hotpot_chronicles:dipped\": 32767}, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_beef_loin_slice",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:dipped\": 32767}"
+   }
+  },
+  "chest_dipped_dishes.slot11": {
+   "cmd": "data get block 36 4 46 Items[{Slot:11b}]",
+   "snbt": "{count: 1, Slot: 11b, components: {\"orients_hotpot_chronicles:dipped\": 0}, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_beef_loin_slice",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:dipped\": 0}"
+   }
+  },
+  "chest_dipped_dishes.slot12": {
+   "cmd": "data get block 36 4 46 Items[{Slot:12b}]",
+   "snbt": "{count: 1, Slot: 12b, components: {\"orients_hotpot_chronicles:dipped\": 32768}, id: \"orients_hotpot_chronicles:cooked_potato_slice\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_potato_slice",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:dipped\": 32768}"
+   }
+  },
+  "chest_dipped_dishes.slot13": {
+   "cmd": "data get block 36 4 46 Items[{Slot:13b}]",
+   "snbt": "{count: 1, Slot: 13b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"three_fresh\", \"orients_hotpot_chronicles:dipped\": 16384}, id: \"orients_hotpot_chronicles:cooked_potato_slice\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_potato_slice",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"three_fresh\", \"orients_hotpot_chronicles:dipped\": 16384}"
+   }
+  },
+  "chest_dipped_dishes.slot14": {
+   "cmd": "data get block 36 4 46 Items[{Slot:14b}]",
+   "snbt": "{count: 1, Slot: 14b, id: \"orients_hotpot_chronicles:beef_loin_slice\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:beef_loin_slice",
+    "count": "1",
+    "components_snbt": "{}"
+   }
+  },
+  "chest_dipped_dishes.slot15": {
+   "cmd": "data get block 36 4 46 Items[{Slot:15b}]",
+   "snbt": "{count: 1, Slot: 15b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"minecraft:unknown_future\"}, id: \"orients_hotpot_chronicles:cooked_enoki_mushroom\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_enoki_mushroom",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"minecraft:unknown_future\"}"
+   }
+  },
+  "chest_soup_bowls.slot0": {
+   "cmd": "data get block 38 4 46 Items[{Slot:0b}]",
+   "snbt": "{count: 1, Slot: 0b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"clear\"}, id: \"orients_hotpot_chronicles:clear_broth_bowl\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:clear_broth_bowl",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"clear\"}"
+   }
+  },
+  "chest_soup_bowls.slot1": {
+   "cmd": "data get block 38 4 46 Items[{Slot:1b}]",
+   "snbt": "{count: 1, Slot: 1b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"rich_stock\"}, id: \"orients_hotpot_chronicles:rich_stock_bowl\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:rich_stock_bowl",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"rich_stock\"}"
+   }
+  },
+  "chest_soup_bowls.slot2": {
+   "cmd": "data get block 38 4 46 Items[{Slot:2b}]",
+   "snbt": "{count: 1, Slot: 2b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"mushroom\"}, id: \"orients_hotpot_chronicles:mushroom_broth_bowl\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:mushroom_broth_bowl",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"mushroom\"}"
+   }
+  },
+  "chest_soup_bowls.slot3": {
+   "cmd": "data get block 38 4 46 Items[{Slot:3b}]",
+   "snbt": "{count: 1, Slot: 3b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\"}, id: \"orients_hotpot_chronicles:spicy_red_broth_bowl\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:spicy_red_broth_bowl",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\"}"
+   }
+  },
+  "chest_soup_bowls.slot4": {
+   "cmd": "data get block 38 4 46 Items[{Slot:4b}]",
+   "snbt": "{count: 1, Slot: 4b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"tomato\"}, id: \"orients_hotpot_chronicles:tomato_soup_bowl\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:tomato_soup_bowl",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"tomato\"}"
+   }
+  },
+  "chest_soup_bowls.slot5": {
+   "cmd": "data get block 38 4 46 Items[{Slot:5b}]",
+   "snbt": "{count: 1, Slot: 5b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"three_fresh\"}, id: \"orients_hotpot_chronicles:three_fresh_soup_bowl\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:three_fresh_soup_bowl",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"three_fresh\"}"
+   }
+  },
+  "chest_soup_bowls.slot6": {
+   "cmd": "data get block 38 4 46 Items[{Slot:6b}]",
+   "snbt": "{count: 1, Slot: 6b, components: {\"orients_hotpot_chronicles:spicy_level\": 0, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\"}, id: \"orients_hotpot_chronicles:spicy_red_broth_bowl\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:spicy_red_broth_bowl",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:spicy_level\": 0, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\"}"
+   }
+  },
+  "chest_soup_bowls.slot7": {
+   "cmd": "data get block 38 4 46 Items[{Slot:7b}]",
+   "snbt": "{count: 1, Slot: 7b, components: {\"orients_hotpot_chronicles:spicy_level\": 1, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\"}, id: \"orients_hotpot_chronicles:spicy_red_broth_bowl\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:spicy_red_broth_bowl",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:spicy_level\": 1, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\"}"
+   }
+  },
+  "chest_soup_bowls.slot8": {
+   "cmd": "data get block 38 4 46 Items[{Slot:8b}]",
+   "snbt": "{count: 1, Slot: 8b, components: {\"orients_hotpot_chronicles:spicy_level\": 2, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\"}, id: \"orients_hotpot_chronicles:spicy_red_broth_bowl\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:spicy_red_broth_bowl",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:spicy_level\": 2, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\"}"
+   }
+  },
+  "chest_soup_bowls.slot9": {
+   "cmd": "data get block 38 4 46 Items[{Slot:9b}]",
+   "snbt": "{count: 1, Slot: 9b, components: {\"orients_hotpot_chronicles:spicy_level\": 3, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\"}, id: \"orients_hotpot_chronicles:spicy_red_broth_bowl\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:spicy_red_broth_bowl",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:spicy_level\": 3, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\"}"
+   }
+  },
+  "chest_soup_bowls.slot10": {
+   "cmd": "data get block 38 4 46 Items[{Slot:10b}]",
+   "snbt": "{count: 1, Slot: 10b, id: \"orients_hotpot_chronicles:clear_broth_bowl\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:clear_broth_bowl",
+    "count": "1",
+    "components_snbt": "{}"
+   }
+  },
+  "chest_soup_bowls.slot11": {
+   "cmd": "data get block 38 4 46 Items[{Slot:11b}]",
+   "snbt": "{count: 1, Slot: 11b, components: {\"orients_hotpot_chronicles:held_food\": {components: {\"orients_hotpot_chronicles:spicy_level\": 3, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 6}, count: 1, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}}, id: \"orients_hotpot_chronicles:bamboo_chopsticks\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:bamboo_chopsticks",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:held_food\": {components: {\"orients_hotpot_chronicles:spicy_level\": 3, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 6}, count: 1, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}}"
+   }
+  },
+  "chest_soup_bowls.slot12": {
+   "cmd": "data get block 38 4 46 Items[{Slot:12b}]",
+   "snbt": "{count: 1, Slot: 12b, components: {\"orients_hotpot_chronicles:held_food\": {components: {\"orients_hotpot_chronicles:dipped\": 32767}, count: 1, id: \"orients_hotpot_chronicles:cooked_potato_slice\"}}, id: \"orients_hotpot_chronicles:bamboo_chopsticks\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:bamboo_chopsticks",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:held_food\": {components: {\"orients_hotpot_chronicles:dipped\": 32767}, count: 1, id: \"orients_hotpot_chronicles:cooked_potato_slice\"}}"
+   }
+  },
+  "chest_soup_bowls.slot13": {
+   "cmd": "data get block 38 4 46 Items[{Slot:13b}]",
+   "snbt": "{count: 1, Slot: 13b, id: \"orients_hotpot_chronicles:bamboo_chopsticks\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:bamboo_chopsticks",
+    "count": "1",
+    "components_snbt": "{}"
+   }
+  },
+  "chest_soup_bowls.slot14": {
+   "cmd": "data get block 38 4 46 Items[{Slot:14b}]",
+   "snbt": "{count: 1, Slot: 14b, id: \"orients_hotpot_chronicles:glass_cup\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:glass_cup",
+    "count": "1",
+    "components_snbt": "{}"
+   }
+  },
+  "chest_packed_pots.a0": {
+   "cmd": "data get block 40 4 46 Items[{Slot:0b}]",
+   "snbt": "{count: 1, Slot: 0b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 0, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:iron_nine_grid_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 0, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.b0": {
+   "cmd": "data get block 42 4 46 Items[{Slot:0b}]",
+   "snbt": "{count: 1, Slot: 0b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 30, 50, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 1B, 1B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 1B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 2, PendingXp: 1.5f, Base: 3, Overcook: [I; 0, 0, 300, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [{count: 1, Slot: 0b, id: \"orients_hotpot_chronicles:beef_loin_slice\"}, {count: 1, Slot: 1b, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}, {count: 1, Slot: 2b, id: \"orients_hotpot_chronicles:hot_tofu_cube\"}, {count: 1, Slot: 40b, id: \"orients_hotpot_chronicles:cooked_potato_slice\"}], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:iron_nine_grid_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 30, 50, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 1B, 1B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 1B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 2, PendingXp: 1.5f, Base: 3, Overcook: [I; 0, 0, 300, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [{count: 1, Slot: 0b, id: \"orients_hotpot_chronicles:beef_loin_slice\"}, {count: 1, Slot: 1b, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}, {count: 1, Slot: 2b, id: \"orients_hotpot_chronicles:hot_tofu_cube\"}, {count: 1, Slot: 40b, id: \"orients_hotpot_chronicles:cooked_potato_slice\"}], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.a1": {
+   "cmd": "data get block 40 4 46 Items[{Slot:1b}]",
+   "snbt": "{count: 1, Slot: 1b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 1, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:iron_nine_grid_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 1, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.b1": {
+   "cmd": "data get block 42 4 46 Items[{Slot:1b}]",
+   "snbt": "{count: 1, Slot: 1b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 2, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: 0, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:iron_taiji_yuanyang_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:iron_taiji_yuanyang_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 2, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: 0, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.a2": {
+   "cmd": "data get block 40 4 46 Items[{Slot:2b}]",
+   "snbt": "{count: 1, Slot: 2b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 2, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:iron_nine_grid_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 2, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.b2": {
+   "cmd": "data get block 42 4 46 Items[{Slot:2b}]",
+   "snbt": "{count: 1, Slot: 2b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 4, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: 5, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:copper_round_yuanyang_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:copper_round_yuanyang_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 4, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: 5, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.a3": {
+   "cmd": "data get block 40 4 46 Items[{Slot:3b}]",
+   "snbt": "{count: 1, Slot: 3b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:iron_nine_grid_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.b3": {
+   "cmd": "data get block 42 4 46 Items[{Slot:3b}]",
+   "snbt": "{count: 1, Slot: 3b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 1, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: 2, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:iron_split_yuanyang_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:iron_split_yuanyang_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 1, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: 2, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.a4": {
+   "cmd": "data get block 40 4 46 Items[{Slot:4b}]",
+   "snbt": "{count: 1, Slot: 4b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 1, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:iron_nine_grid_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 1, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.b4": {
+   "cmd": "data get block 42 4 46 Items[{Slot:4b}]",
+   "snbt": "{count: 1, Slot: 4b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 5, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 3, BaseC: -1, BaseB: 3, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:copper_square_yuanyang_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:copper_square_yuanyang_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 5, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 3, BaseC: -1, BaseB: 3, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.a5": {
+   "cmd": "data get block 40 4 46 Items[{Slot:5b}]",
+   "snbt": "{count: 1, Slot: 5b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 2, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:iron_nine_grid_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 2, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.b5": {
+   "cmd": "data get block 42 4 46 Items[{Slot:5b}]",
+   "snbt": "{count: 1, Slot: 5b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 0, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: 5, SpicyB: 1, BaseC: 4, BaseB: 3, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:iron_four_grid_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:iron_four_grid_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 0, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: 5, SpicyB: 1, BaseC: 4, BaseB: 3, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.a6": {
+   "cmd": "data get block 40 4 46 Items[{Slot:6b}]",
+   "snbt": "{count: 1, Slot: 6b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 3, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:iron_nine_grid_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 3, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.b6": {
+   "cmd": "data get block 42 4 46 Items[{Slot:6b}]",
+   "snbt": "{count: 1, Slot: 6b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 3, BaseD: -1, SpicyB: 0, BaseC: 3, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:copper_four_grid_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:copper_four_grid_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 3, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 3, BaseD: -1, SpicyB: 0, BaseC: 3, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.a7": {
+   "cmd": "data get block 40 4 46 Items[{Slot:7b}]",
+   "snbt": "{count: 1, Slot: 7b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 4, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:iron_nine_grid_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 4, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.b7": {
+   "cmd": "data get block 42 4 46 Items[{Slot:7b}]",
+   "snbt": "{count: 1, Slot: 7b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 2, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:iron_taiji_yuanyang_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:iron_taiji_yuanyang_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 2, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.a8": {
+   "cmd": "data get block 40 4 46 Items[{Slot:8b}]",
+   "snbt": "{count: 1, Slot: 8b, components: {\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 5, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}, id: \"orients_hotpot_chronicles:iron_nine_grid_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:pot_contents\": {Doneness: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Cooked: [B; 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B, 0B], Spicy: 0, PendingXp: 0.0f, Base: 5, Overcook: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], Items: [], SpicyC: 0, BaseD: -1, SpicyB: 0, BaseC: -1, BaseB: -1, SlotXp: [I; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], SpicyD: 0}}"
+   }
+  },
+  "chest_packed_pots.b8": {
+   "cmd": "data get block 42 4 46 Items[{Slot:8b}]",
+   "snbt": "{count: 1, Slot: 8b, id: \"orients_hotpot_chronicles:iron_nine_grid_hotpot\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:iron_nine_grid_hotpot",
+    "count": "1",
+    "components_snbt": "{}"
+   }
+  },
+  "shulker_box.block": {
+   "cmd": "data get block 44 4 46 Items",
+   "snbt": "[{count: 1, Slot: 0b, components: {\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 32767}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}, {count: 1, Slot: 1b, components: {\"orients_hotpot_chronicles:sauce\": {bites: 2, mask: 5}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}, {count: 1, Slot: 2b, components: {\"orients_hotpot_chronicles:spicy_level\": 1, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 21}, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}, {count: 1, Slot: 3b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"three_fresh\"}, id: \"orients_hotpot_chronicles:three_fresh_soup_bowl\"}, {count: 1, Slot: 4b, components: {\"orients_hotpot_chronicles:held_food\": {components: {\"orients_hotpot_chronicles:dipped\": 3}, count: 1, id: \"orients_hotpot_chronicles:cooked_greens\"}}, id: \"orients_hotpot_chronicles:bamboo_chopsticks\"}]"
+  },
+  "shulker_box.item_in_chest": {
+   "cmd": "data get block 46 4 46 Items[{Slot:0b}]",
+   "snbt": "{count: 1, Slot: 0b, components: {\"minecraft:container\": [{item: {count: 1, components: {\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 32767}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}, slot: 0}, {item: {count: 1, components: {\"orients_hotpot_chronicles:sauce\": {bites: 2, mask: 5}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}, slot: 1}, {item: {count: 1, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:spicy_level\": 1, \"orients_hotpot_chronicles:dipped\": 21}, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}, slot: 2}, {item: {count: 1, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"three_fresh\"}, id: \"orients_hotpot_chronicles:three_fresh_soup_bowl\"}, slot: 3}, {item: {count: 1, components: {\"orients_hotpot_chronicles:held_food\": {count: 1, components: {\"orients_hotpot_chronicles:dipped\": 3}, id: \"orients_hotpot_chronicles:cooked_greens\"}}, id: \"orients_hotpot_chronicles:bamboo_chopsticks\"}, slot: 4}]}, id: \"minecraft:shulker_box\"}",
+   "item": {
+    "id": "minecraft:shulker_box",
+    "count": "1",
+    "components_snbt": "{\"minecraft:container\": [{item: {count: 1, components: {\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 32767}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}, slot: 0}, {item: {count: 1, components: {\"orients_hotpot_chronicles:sauce\": {bites: 2, mask: 5}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}, slot: 1}, {item: {count: 1, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:spicy_level\": 1, \"orients_hotpot_chronicles:dipped\": 21}, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}, slot: 2}, {item: {count: 1, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"three_fresh\"}, id: \"orients_hotpot_chronicles:three_fresh_soup_bowl\"}, slot: 3}, {item: {count: 1, components: {\"orients_hotpot_chronicles:held_food\": {count: 1, components: {\"orients_hotpot_chronicles:dipped\": 3}, id: \"orients_hotpot_chronicles:cooked_greens\"}}, id: \"orients_hotpot_chronicles:bamboo_chopsticks\"}, slot: 4}]}"
+   }
+  },
+  "barrel_misc.slot0": {
+   "cmd": "data get block 48 4 46 Items[{Slot:0b}]",
+   "snbt": "{count: 1, Slot: 0b, components: {\"orients_hotpot_chronicles:sauce\": {bites: 7, mask: 1023}}, id: \"orients_hotpot_chronicles:dipping_sauce\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:dipping_sauce",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:sauce\": {bites: 7, mask: 1023}}"
+   }
+  },
+  "barrel_misc.slot13": {
+   "cmd": "data get block 48 4 46 Items[{Slot:13b}]",
+   "snbt": "{count: 1, Slot: 13b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"mushroom\", \"orients_hotpot_chronicles:dipped\": 1024}, id: \"orients_hotpot_chronicles:cooked_lotus_root_slice\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_lotus_root_slice",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"mushroom\", \"orients_hotpot_chronicles:dipped\": 1024}"
+   }
+  },
+  "barrel_misc.slot26": {
+   "cmd": "data get block 48 4 46 Items[{Slot:26b}]",
+   "snbt": "{count: 1, Slot: 26b, components: {\"orients_hotpot_chronicles:cooked_in_soup\": \"mushroom\"}, id: \"orients_hotpot_chronicles:mushroom_broth_bowl\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:mushroom_broth_bowl",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:cooked_in_soup\": \"mushroom\"}"
+   }
+  },
+  "entity_item_sauce": {
+   "cmd": "data get entity @e[tag=opt4a_item,limit=1] Item",
+   "snbt": "{components: {\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 32767}}, count: 1, id: \"orients_hotpot_chronicles:dipping_sauce\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:dipping_sauce",
+    "count": "1",
+    "components_snbt": "{\"orients_hotpot_chronicles:sauce\": {bites: 9, mask: 32767}}"
+   }
+  },
+  "entity_item_dish": {
+   "cmd": "data get entity @e[tag=opt4a_item2,limit=1] Item",
+   "snbt": "{components: {\"orients_hotpot_chronicles:spicy_level\": 2, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 21}, count: 3, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}",
+   "item": {
+    "id": "orients_hotpot_chronicles:cooked_beef_loin_slice",
+    "count": "3",
+    "components_snbt": "{\"orients_hotpot_chronicles:spicy_level\": 2, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 21}"
+   }
+  },
+  "entity_stand_hands": {
+   "cmd": "data get entity @e[tag=opt4a_stand,limit=1] HandItems",
+   "snbt": "[{components: {\"orients_hotpot_chronicles:held_food\": {components: {\"orients_hotpot_chronicles:spicy_level\": 3, \"orients_hotpot_chronicles:cooked_in_soup\": \"spicy\", \"orients_hotpot_chronicles:dipped\": 6}, count: 1, id: \"orients_hotpot_chronicles:cooked_beef_loin_slice\"}}, count: 1, id: \"orients_hotpot_chronicles:bamboo_chopsticks\"}, {components: {\"orients_hotpot_chronicles:sauce\": {bites: 3, mask: 6}}, count: 1, id: \"orients_hotpot_chronicles:dipping_sauce\"}]"
+  }
+ }
+}

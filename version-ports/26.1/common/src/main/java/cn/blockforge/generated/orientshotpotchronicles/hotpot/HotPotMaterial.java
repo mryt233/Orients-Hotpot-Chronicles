@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.Locale;
+
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.block.SoundType;
@@ -48,7 +51,7 @@ public enum HotPotMaterial {
 
     /** 模型里侧壁贴图的名称后缀（block/hot_pot_&lt;copper/iron&gt;_side）：鸳鸯锅和同金属的九宫格锅共用贴图。 */
     public String textureKey() {
-        return metal().name().toLowerCase(java.util.Locale.ROOT);
+        return metal().name().toLowerCase(Locale.ROOT);
     }
 
     /** 锅的金属：COPPER 或 IRON（鸳鸯锅归到同金属的九宫格锅）。 */

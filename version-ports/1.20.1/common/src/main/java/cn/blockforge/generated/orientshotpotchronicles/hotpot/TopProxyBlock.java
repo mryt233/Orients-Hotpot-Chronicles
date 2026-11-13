@@ -1,0 +1,134 @@
+// 作者：mryt233
+package cn.blockforge.generated.orientshotpotchronicles.hotpot;
+
+// mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
+import cn.blockforge.orient.framework.compat.ItemInteractionBlock;
+import cn.blockforge.orient.framework.compat.ItemInteractionResult;
+import cn.blockforge.orient.framework.game.PartOutline;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+
+/** 上半截公共行为；形状只读自身 below，禁止在形状查询中访问世界或开启 dynamicShape。 */
+public abstract class TopProxyBlock<T extends Enum<T> & StringRepresentable> extends Block implements PartOutline, ItemInteractionBlock {
+    protected TopProxyBlock(Properties properties) { super(properties); }
+
+    protected abstract EnumProperty<T> belowProperty();
+    protected abstract T belowOf(BlockState state);
+    protected abstract boolean accepts(BlockState state);
+    protected abstract VoxelShape[] outlines();
+    protected VoxelShape[] collisions() { return outlines(); }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(belowProperty());
+    }
+
+    @Override
+    public RenderShape getRenderShape(BlockState state) { return RenderShape.INVISIBLE; }
+
+    @Override
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+        return outlines()[state.getValue(belowProperty()).ordinal()];
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+        return collisions()[state.getValue(belowProperty()).ordinal()];
+    }
+
+    @Override
+    public VoxelShape aimedPart(BlockState state, BlockGetter world, BlockPos pos, Player player) {
+        BlockState below = world.getBlockState(pos.below());
+        if (accepts(below)) {
+            VoxelShape part = ((PartOutline) below.getBlock()).aimedPart(below, world, pos.below(), player);
+            return part == null ? null : part.move(0, -1, 0);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
+        return belowOf(world.getBlockState(pos.below())).ordinal() != 0;
+    }
+
+    @Override
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
+                                  LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+        if (direction != Direction.DOWN) return state;
+        T below = belowOf(neighborState);
+        return below.ordinal() == 0 ? Blocks.AIR.defaultBlockState() : state.setValue(belowProperty(), below);
+    }
+
+    private static BlockHitResult toBelow(BlockPos pos, BlockHitResult hit) {
+        return new BlockHitResult(hit.getLocation(), hit.getDirection(), pos.below(), hit.isInside());
+    }
+
+    @Override
+    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
+                                           Player player, InteractionHand hand, BlockHitResult hit) {
+        BlockState below = world.getBlockState(pos.below());
+        return accepts(below) ? ItemInteractionBlock.useItemOn(below, stack, world, player, hand, toBelow(pos, hit))
+            : Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
+    }
+
+    @Override
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        BlockState below = world.getBlockState(pos.below());
+        return accepts(below) ? ItemInteractionBlock.useWithoutItem(below, world, player, toBelow(pos, hit))
+            : Use.blockEmpty(UseOutcome.PASS, world.isClientSide);
+    }
+
+    /** mryt233 改：1.20.1 的单回调交互入口。 */
+    @Override
+    public InteractionResult use(BlockState state, Level world, BlockPos pos,
+                                 Player player, InteractionHand hand, BlockHitResult hit) {
+        return dispatchUse(state, world, pos, player, hand, hit);
+    }
+
+    @Override
+    public float getDestroyProgress(BlockState state, Player player, BlockGetter world, BlockPos pos) {
+        BlockState below = world.getBlockState(pos.below());
+        return accepts(below) ? below.getDestroyProgress(player, world, pos.below())
+            : super.getDestroyProgress(state, player, world, pos);
+    }
+
+    protected void beforeDestroyBelow(Level world, BlockPos pos, BlockState below, Player player) { }
+
+    @Override
+    public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+        BlockState below = world.getBlockState(pos.below());
+        if (!world.isClientSide && accepts(below)) {
+            boolean drop = !player.isCreative() && player.hasCorrectToolForDrops(below);
+            beforeDestroyBelow(world, pos.below(), below, player);
+            world.destroyBlock(pos.below(), drop, player);
+        }
+        super.playerWillDestroy(world, pos, state, player);
+    }
+
+    @Override
+    public ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
+        BlockState below = world.getBlockState(pos.below());
+        return accepts(below) ? below.getBlock().getCloneItemStack(world, pos.below(), below)
+            : super.getCloneItemStack(world, pos, state);
+    }
+}

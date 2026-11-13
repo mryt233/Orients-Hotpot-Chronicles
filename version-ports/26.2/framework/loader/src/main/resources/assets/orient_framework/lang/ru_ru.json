@@ -1,0 +1,16 @@
+{
+  "orient_framework.config.json_invalid": "Файл настроек не является корректным JSON; используются значения по умолчанию, исходный файл сохранён",
+  "orient_framework.config.root_not_object": "Корень файла настроек должен быть объектом; используются значения по умолчанию, исходный файл сохранён",
+  "orient_framework.config.format_unsupported": "Неподдерживаемая версия формата настроек; используются значения по умолчанию, исходный файл сохранён",
+  "orient_framework.config.format_invalid": "Неверная версия формата настроек; используются значения по умолчанию, исходный файл сохранён",
+  "orient_framework.config.unknown_key": "Неизвестный параметр %s пропущен",
+  "orient_framework.config.not_object": "%s должен быть объектом; оставлено значение по умолчанию",
+  "orient_framework.config.not_number": "%s должен быть числом; возвращено значение по умолчанию",
+  "orient_framework.config.not_integer": "%s должен быть целым числом; возвращено значение по умолчанию",
+  "orient_framework.config.out_of_range": "%s должен быть от %s до %s; возвращено значение по умолчанию",
+  "orient_framework.config.too_large": "Файл настроек слишком большой; используются значения по умолчанию, исходный файл сохранён",
+  "orient_framework.config.read_failed": "Не удалось прочитать настройки (%s); используются значения по умолчанию, исходный файл сохранён",
+  "orient_framework.config.write_failed": "Не удалось записать настройки (%s); исходный файл сохранён",
+  "orient_framework.disconnect.protocol": "Несовпадение сетевого протокола Orient Framework (сервер %s, клиент %s). Установите те же версии модов, что и на сервере.",
+  "orient_framework.disconnect.missing_channels": "Серверу нужны сетевые каналы, которых нет у вашего клиента: %s. Установите те же версии модов, что и на сервере."
+}

@@ -1,29 +1,25 @@
-// mryt233 改：26.1 原版标识符类型。
+// 作者：mryt233；mryt233 改（2026-11-10）
 package cn.blockforge.generated.orientshotpotchronicles.platform;
 
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.ShrimpFishing;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
-import net.minecraft.world.level.storage.loot.entries.LootItem;
-import net.minecraft.resources.Identifier;
 
-/**
- * 钓鱼钓到虾（2026-10-26 用户：加虾，目前靠钓鱼获得）：往原版「钓鱼 · 鱼」那张表里唯一的池子加一项虾，权重 20
- * （同池原版：鳕鱼 60、鲑鱼 25、河豚 13、热带鱼 2），钓到鱼的时候约 1/6 是虾。不额外多掉东西。
- * 作者：mryt233 */
+/** Fabric 原生 modifyPools 保留鱼池的条目、条件和每次仅掉一件的语义。 */
 public final class ShrimpLoot {
-    public static final int WEIGHT = 20;
-    private static final Identifier FISHING_FISH = Identifier.withDefaultNamespace("gameplay/fishing/fish");
+    /** 保留旧常量入口，数值的唯一定义在公共代码。 */
+    public static final int WEIGHT = ShrimpFishing.WEIGHT;
+    private static boolean registered = false;
 
     private ShrimpLoot() {
     }
 
-    static void register() {
-        LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) -> {
-            boolean builtin = source.isBuiltin();
-            if (!builtin || !key.identifier().equals(FISHING_FISH)) {
-                return;
+    public static void register() {
+        if (registered) return;
+        LootTableEvents.MODIFY.register((key, builder, source, registries) -> {
+            if (source.isBuiltin() && key.identifier().equals(ShrimpFishing.FISHING_FISH)) {
+                builder.modifyPools(pool -> pool.add(ShrimpFishing.entry()));
             }
-            tableBuilder.modifyPools(pool -> pool.add(LootItem.lootTableItem(HotPotContent.SHRIMP).setWeight(WEIGHT)));
         });
+        registered = true;
     }
 }

@@ -1,21 +1,26 @@
 // mryt233 改：26.1 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.core.Direction;
+
+// mryt233 改（2026-11-11）：第三批 3G 存读档改走适配小包，键名与结构不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.BeIo;
+
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.BlockPos;
 
 /**
  * 砧板上放着的那一件东西（2026-10-23）。变了就存档并同步给客户端，CuttingBoardRenderer 画在板面上。
  * 作者：mryt233 */
-public class CuttingBoardBlockEntity extends BlockEntity {
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+public class CuttingBoardBlockEntity extends SyncedBlockEntity {
     private ItemStack item = ItemStack.EMPTY;
     /**
      * 一刀一刀切的东西已经切了几刀。
@@ -26,7 +31,7 @@ public class CuttingBoardBlockEntity extends BlockEntity {
     /** 擀面杖已经捣了几下（和 cuts 分开记账，见上）。 */
     private int pounds;
     /** 板上食物的朝向（放食物时人站的那一边），和砧板自己的 facing 分开（用户 0.1.2-alpha 后要求）。 */
-    private net.minecraft.core.Direction itemFacing = net.minecraft.core.Direction.SOUTH;
+    private Direction itemFacing = Direction.SOUTH;
 
     public CuttingBoardBlockEntity(BlockPos pos, BlockState state) {
         super(HotPotContent.CUTTING_BOARD_BE, pos, state);
@@ -75,11 +80,11 @@ public class CuttingBoardBlockEntity extends BlockEntity {
         sync();
     }
 
-    public net.minecraft.core.Direction itemFacing() {
+    public Direction itemFacing() {
         return itemFacing;
     }
 
-    public void setItem(ItemStack stack, net.minecraft.core.Direction facing) {
+    public void setItem(ItemStack stack, Direction facing) {
         itemFacing = facing;
         setItem(stack);
     }
@@ -92,34 +97,37 @@ public class CuttingBoardBlockEntity extends BlockEntity {
         sync();
     }
 
+    // mryt233 改（2026-11-11）：第三批 3G 存读档改走适配小包，键名、结构与兜底值不变。
     @Override
     protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput nbt) {
         super.saveAdditional(nbt);
-        if (!item.isEmpty()) {
-            nbt.store("Item", ItemStack.CODEC, item);
-        }
-        // 板空了也要写点东西：原版客户端收到空的方块实体数据会直接跳过，板上的东西就一直画着
-        // （用户报：捣完丸子、切完肉卷，板上的东西都不消失——凡是把板拿空的都这样；修复）
-        nbt.putInt("Cuts", cuts);
-        // mryt233 改（2026-11-07）：捣的下数单独存一个键，老存档没有 Pounds 时按 0 读（等价于没捣过）
-        nbt.putInt("Pounds", pounds);
-        nbt.putString("ItemFacing", itemFacing.getSerializedName());
+        BeIo.write(nbt, w -> {
+            w.putItem("Item", item);
+            // 板空了也要写点东西：原版客户端收到空的方块实体数据会直接跳过，板上的东西就一直画着
+            // （用户报：捣完丸子、切完肉卷，板上的东西都不消失——凡是把板拿空的都这样；修复）
+            w.putInt("Cuts", cuts);
+            // mryt233 改（2026-11-07）：捣的下数单独存一个键，老存档没有 Pounds 时按 0 读（等价于没捣过）
+            w.putInt("Pounds", pounds);
+            w.putString("ItemFacing", itemFacing.getSerializedName());
+        });
     }
 
     @Override
     protected void loadAdditional(net.minecraft.world.level.storage.ValueInput nbt) {
         super.loadAdditional(nbt);
-        item = nbt.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY);
-        cuts = nbt.getIntOr("Cuts", 0);
-        pounds = nbt.getIntOr("Pounds", 0);   // mryt233 改（2026-11-07）：老存档没有这个键，取 0
-        net.minecraft.core.Direction f = net.minecraft.core.Direction.byName(nbt.getStringOr("ItemFacing", "south"));
-        itemFacing = f != null && f.getAxis().isHorizontal() ? f : net.minecraft.core.Direction.SOUTH;
+        BeIo.read(nbt, r -> {
+            item = r.getItem("Item");
+            cuts = r.getInt("Cuts", 0);
+            pounds = r.getInt("Pounds", 0);   // mryt233 改（2026-11-07）：老存档没有这个键，按 0 读
+            Direction f = Direction.byName(r.getString("ItemFacing", ""));
+            itemFacing = f != null && f.getAxis().isHorizontal() ? f : Direction.SOUTH;
+        });
     }
 
+
+    /** 保留公开入口，实际更新格式由公共基类提供。 */
     @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
+    public Packet<ClientGamePacketListener> getUpdatePacket() { return super.getUpdatePacket(); }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {

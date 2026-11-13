@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.List;
+
 import com.mojang.serialization.Codec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -48,7 +51,7 @@ public final class HeldFood {
 
     @Override
     public int hashCode() {
-        return ItemStack.hashStackList(java.util.List.of(stack));
+        return ItemStack.hashStackList(List.of(stack));
     }
 
     @Override

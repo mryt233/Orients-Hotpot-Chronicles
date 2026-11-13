@@ -14,7 +14,6 @@
     与 forge:tags/items/foods.json（Forge）
 """
 import json
-import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -113,6 +112,7 @@ def main():
         raise SystemExit(f"主工程资源目录不存在：{source_data}")
 
     written = 0
+    wanted = set()
     for source in source_data.rglob("*.json"):
         parts = list(source.relative_to(source_data).parts)
         namespace = parts[0]
@@ -139,6 +139,7 @@ def main():
         target = OUTPUT / "data" / namespace / Path(*parts[1:])
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        wanted.add(target.relative_to(OUTPUT / "data").as_posix())
         written += 1
 
     # 1.20.1 的通用食物标签：Fabric 用 c:，Forge 用 forge:
@@ -147,21 +148,18 @@ def main():
         target = OUTPUT / "data" / Path(*target_rel)
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(json.dumps(foods, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        wanted.add(target.relative_to(OUTPUT / "data").as_posix())
         written += 1
 
-    # 清掉本脚本负责的旧目录里已不存在的文件（不递归删目录，只删文件）
-    wanted = {p.relative_to(OUTPUT / "data").as_posix()
-              for p in (OUTPUT / "data").rglob("*.json")}
+    # 清掉本脚本负责的旧目录里已不存在或已剔除的文件（不递归删目录，只删文件）
     removed = 0
     for namespace_dir in (OUTPUT / "data").iterdir():
         if not namespace_dir.is_dir():
             continue
         for target in namespace_dir.rglob("*.json"):
             rel = target.relative_to(OUTPUT / "data").as_posix()
-            if rel not in wanted:
+            if rel in wanted:
                 continue
-            # 只清本脚本产出的分类：recipes / loot_tables / advancements / tags
-            # （c / forge 的通用食物标签是本脚本额外生成的一份，源目录里没有对应文件，跳过）
             parts_of_rel = rel.split("/")
             if len(parts_of_rel) < 2:
                 continue
@@ -170,19 +168,8 @@ def main():
             parent = parts_of_rel[1]
             if parent not in {"recipes", "loot_tables", "advancements", "tags"}:
                 continue
-            source_parts = list(Path(rel).parts)
-            if source_parts[1] == "recipes":
-                source_parts[1] = "recipe"
-            elif source_parts[1] == "loot_tables":
-                source_parts[1] = "loot_table"
-            elif source_parts[1] == "advancements":
-                source_parts[1] = "advancement"
-            elif source_parts[1] == "tags":
-                rev = {v: k for k, v in TAGS.items()}
-                source_parts[2] = rev.get(source_parts[2], source_parts[2])
-            if not (source_data.joinpath(*source_parts)).is_file():
-                target.unlink()
-                removed += 1
+            target.unlink()
+            removed += 1
 
     pack = OUTPUT / "pack.mcmeta"
     pack.write_text(json.dumps({"pack": {"pack_format": 15,

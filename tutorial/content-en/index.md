@@ -3,7 +3,7 @@
 # Minecraft [Orient's Hotpot Chronicles] Mod — Player Guide
 
 :::tip
-**This guide covers released 0.2.2-alpha, demonstrated with Minecraft 1.21.1 Fabric** (1.21.1 NeoForge, 1.20.1 Fabric / Forge, and 26.1.x & 26.2 Fabric / NeoForge play the same; see [Downloads, Installation & Feedback](install.html)). This release adds Crispy Pork, Dried Tofu, Tofu Skin, Wide Potato Noodles, Sweet Potato Skin, Enoki Mushrooms, Bok Choy, Lotus Root Slices, Squid Rolls, Egg Fried Rice, Chili Peppers, Houttuynia Root, and hot/cold Tofu, expands seasonings to 15, and introduces 4-level Spicy Red Broth, six broth flavor bonuses, tabletop chopsticks with mini porcelain rests, stackable bench ladders, cup toasting, the Cloth Apron, in-book guide search, a mod menu settings screen, and JEI / REI & Jade support.
+**This guide covers packaged 0.3.0-alpha, demonstrated with Minecraft 1.21.1 Fabric** (1.21.1 NeoForge, 1.20.1 Fabric / Forge, and 26.1.x & 26.2 Fabric / NeoForge play the same; see [Downloads, Installation & Feedback](install.html)). This release adds three Cloth Apron styles with dye recoloring and an updated waist-to-knee apron model, decorative tabletop sesame paste and oyster sauce bottles, two-tone chopsticks resting on mini saddle rests and bowl rims, Common/Advanced settings with 37 new gameplay/loot config keys, a paginated single-column sauce station reference, and open data-pack & add-on registration for broths, seasonings, generic `soup_bowl`, pot-boiling, and pounding recipes.
 :::
 
 {{icons:brick_stove,iron_nine_grid_hotpot,bamboo_chopsticks,oak_hotpot_table,oak_stool,quartz_eight_slot_platter,oak_sauce_station,cutting_board}}
@@ -49,7 +49,7 @@ Shapelessly craft an **Iron Kitchen Knife + book** into a Hotpot Guide (the knif
 
 ## Supported versions and downloads
 
-0.2.2-alpha simultaneously supports **Minecraft 1.21.1 (Fabric, NeoForge)**, **1.20.1 (Fabric, Forge)**, **26.1.x (Fabric, NeoForge)**, and **26.2 (Fabric, NeoForge)**. **This guide demonstrates 1.21.1 Fabric.** Download links (CurseForge, Modrinth, GitHub), installation steps, and feedback channels (GitHub and QQ) are on [Downloads, Installation & Feedback](install.html).
+0.3.0-alpha simultaneously supports **Minecraft 1.21.1 (Fabric, NeoForge)**, **1.20.1 (Fabric, Forge)**, **26.1.x (Fabric, NeoForge)**, and **26.2 (Fabric, NeoForge)**. **This guide demonstrates 1.21.1 Fabric.** Download links (CurseForge, Modrinth, GitHub), installation steps, and feedback channels (GitHub and QQ) are on [Downloads, Installation & Feedback](install.html).
 
 :::warn
 The mod is still in **alpha** and has only had preliminary testing. When upgrading worlds from 0.1.0-alpha.1, modded items may disappear or change. **Back up your world first**; a new world is recommended.

@@ -1,34 +1,30 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import cn.blockforge.orient.framework.game.PartOutline;
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
-import cn.blockforge.orient.framework.compat.ItemInteractionResult;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * 蘸料台的「上半截」（2026-10-23 用户：1.5 格高肯定占 2 格）：看不见，占住蘸料台头顶那一格，
  * 别的方块放不进来、不会和台子穿插。做法同高灶台的 StoveTopBlock：形状 = 下面蘸料台的形状下移一格，
  * 点它（打蘸料、开补货界面）原样转给下面的蘸料台，挖它 = 挖蘸料台；下面不是蘸料台了它自己消失。
  * 作者：mryt233 */
-public class SauceStationTopBlock extends net.minecraft.world.level.block.Block implements PartOutline , cn.blockforge.orient.framework.compat.ItemInteractionBlock {
+public class SauceStationTopBlock extends TopProxyBlock<SauceStationTopBlock.Below> {
+    /**
+     * mryt233 改（2026-11-05）：硬度 2.0 与下面蘸料台一致（木 3.0 / 铁 6.0 的爆炸抗性那一半由
+     * {@link #getDestroyProgress} 转发给下面的方块算，这里只保底）；不强制工具。
+     * 挖它会连下面整个蘸料台一起挖掉（见 {@link #playerWillDestroy}），掉落由下面那块决定。
+     */
     public SauceStationTopBlock() {
         super(BlockBehaviour.Properties.of()
             .mapColor(MapColor.WOOD)
@@ -44,7 +40,7 @@ public class SauceStationTopBlock extends net.minecraft.world.level.block.Block 
      * 下面蘸料台的朝向，记在自己的方块状态里（mryt233 2026-11-01）。以前形状现读下面方块、还开了 dynamicShape，
      * 光照线程调 getShape 读世界会和主线程互等，整服卡死（同 {@link StoveTopBlock.Below}）。
      */
-    public enum Below implements net.minecraft.util.StringRepresentable {
+    public enum Below implements StringRepresentable {
         NONE("none", null), NORTH("north", Direction.NORTH), EAST("east", Direction.EAST),
         SOUTH("south", Direction.SOUTH), WEST("west", Direction.WEST);
 
@@ -74,27 +70,12 @@ public class SauceStationTopBlock extends net.minecraft.world.level.block.Block 
         }
     }
 
-    public static final net.minecraft.world.level.block.state.properties.EnumProperty<Below> BELOW =
-        net.minecraft.world.level.block.state.properties.EnumProperty.create("below", Below.class);
-
-    @Override
-    public void createBlockStateDefinition(
-            net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
-        builder.add(BELOW);
-    }
+    public static final EnumProperty<Below> BELOW =
+        EnumProperty.create("below", Below.class);
 
     /** 给这个蘸料台配的上半截状态。 */
     public static BlockState mirroring(BlockState station) {
         return HotPotContent.SAUCE_STATION_TOP.defaultBlockState().setValue(BELOW, Below.of(station));
-    }
-
-    private static boolean stationBelow(BlockGetter world, BlockPos pos) {
-        return world.getBlockState(pos.below()).getBlock() instanceof SauceStationBlock;
-    }
-
-    @Override
-    public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.INVISIBLE;
     }
 
     /** 各朝向预先算好的形状：下面蘸料台的形状往下挪一格。 */
@@ -108,112 +89,42 @@ public class SauceStationTopBlock extends net.minecraft.world.level.block.Block 
         }
     }
 
-    /** 形状只看自己的状态，绝不读世界（见 {@link Below}）。 */
+    /** mryt233 改：沿用下方材质名称与同一小碗的调料判定。 */
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        return OUTLINES[state.getValue(BELOW).ordinal()];
-    }
-
-    @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        return COLLISIONS[state.getValue(BELOW).ordinal()];
-    }
-
-    /** 选中框照下面蘸料台的规则（只框对着的碗），挪到这一格的坐标。 */
-    @Override
-    public VoxelShape aimedPart(BlockState state, BlockGetter world, BlockPos pos, Player player) {
-        BlockState below = world.getBlockState(pos.below());
-        if (below.getBlock() instanceof SauceStationBlock station) {
-            VoxelShape part = station.aimedPart(below, world, pos.below(), player);
-            return part == null ? null : part.move(0, -1, 0);
-        }
-        return null;
-    }
-
-    @Override
-    public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
-        return stationBelow(world, pos);
-    }
-
-    @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
-                                     LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
-        if (direction != Direction.DOWN) {
-            return state;
-        }
-        // 下面变了：不是蘸料台就消失，否则照新朝向更新（用传进来的 neighborState，不再读世界）
-        Below below = Below.of(neighborState);
-        return below == Below.NONE ? net.minecraft.world.level.block.Blocks.AIR.defaultBlockState() : state.setValue(BELOW, below);
-    }
-
-    /** 准星位置不变，只把「点到的方块」换成下面的蘸料台（SauceStationBlock.aimed 按准星位置算碗）。 */
-    private static BlockHitResult toStation(BlockPos pos, BlockHitResult hit) {
-        return new BlockHitResult(hit.getLocation(), hit.getDirection(), pos.below(), hit.isInside());
-    }
-
-    @Override
-    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
-                                              Player player, InteractionHand hand, BlockHitResult hit) {
-        BlockState below = world.getBlockState(pos.below());
-        if (!(below.getBlock() instanceof SauceStationBlock)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-        }
-        return cn.blockforge.orient.framework.compat.ItemInteractionBlock.useItemOn(below, stack, world, player, hand, toStation(pos, hit));
-    }
-
-    @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
-        BlockState below = world.getBlockState(pos.below());
-        if (!(below.getBlock() instanceof SauceStationBlock)) {
-            return InteractionResult.PASS;
-        }
-        return cn.blockforge.orient.framework.compat.ItemInteractionBlock.useWithoutItem(below, world, player, toStation(pos, hit));
-    }
-
-    /** 挖的快慢按下面的蘸料台算（木头的用斧、铁的用镐）。 */
-    @Override
-    public float getDestroyProgress(BlockState state, Player player, BlockGetter world, BlockPos pos) {
-        BlockState below = world.getBlockState(pos.below());
-        return below.getBlock() instanceof SauceStationBlock
-            ? below.getDestroyProgress(player, world, pos.below())
-            : super.getDestroyProgress(state, player, world, pos);
-    }
-
-    /** 挖上半截 = 挖整个蘸料台（工具对才掉蘸料台，格子里的原料照常掉出来）。 */
-    @Override
-    public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        BlockState below = world.getBlockState(pos.below());
-        if (!world.isClientSide && below.getBlock() instanceof SauceStationBlock) {
-            boolean drop = !player.isCreative() && player.hasCorrectToolForDrops(below);
-            world.destroyBlock(pos.below(), drop, player);
-        }
-        super.playerWillDestroy(world, pos, state, player);
-    }
-
-    /** mryt233 改（清单 #129）：沿用下方材质名称与同一小碗的调料判定。 */
-    @Override
-    public net.minecraft.network.chat.MutableComponent getName() {
-        net.minecraft.network.chat.MutableComponent name = SauceStationBlock.aimedName(PlateHolderBlock.pickPlayer.get());
+    public MutableComponent getName() {
+        MutableComponent name = SauceStationBlock.aimedName(PlateHolderBlock.pickPlayer.get());
         return name == null ? super.getName() : name;
     }
 
     @Override
-    public ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter world, BlockPos pos, BlockState state) {
-        return new ItemStack(world.getBlockState(pos.below()).getBlock());
+    protected EnumProperty<Below> belowProperty() {
+        return BELOW;
     }
 
-    /** mryt233 改：1.20.1 的单回调交互入口。 */
     @Override
-    public net.minecraft.world.InteractionResult use(BlockState state, Level world, BlockPos pos,
-            Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
-        return dispatchUse(state, world, pos, player, hand, hit);
+    protected Below belowOf(BlockState state) {
+        return Below.of(state);
     }
 
-    /** mryt233 改：旧版 Forge 读取方块扩展；数值与底本的原版火表一致。 */
-    public boolean isFlammable(BlockState state, net.minecraft.world.level.BlockGetter world,
-            BlockPos pos, net.minecraft.core.Direction face) { return cn.blockforge.generated.orientshotpotchronicles.hotpot.FireRules.flammable(world.getBlockState(pos.below()).getBlock()); }
-    public int getFlammability(BlockState state, net.minecraft.world.level.BlockGetter world,
-            BlockPos pos, net.minecraft.core.Direction face) { return isFlammable(state, world, pos, face) ? 20 : 0; }
-    public int getFireSpreadSpeed(BlockState state, net.minecraft.world.level.BlockGetter world,
-            BlockPos pos, net.minecraft.core.Direction face) { return isFlammable(state, world, pos, face) ? 5 : 0; }
+    @Override
+    protected boolean accepts(BlockState state) {
+        return state.getBlock() instanceof SauceStationBlock;
+    }
+
+    @Override
+    protected VoxelShape[] outlines() {
+        return OUTLINES;
+    }
+
+    @Override
+    protected VoxelShape[] collisions() {
+        return COLLISIONS;
+    }
+
+    /** 保留原有公开入口，供外部调用。 */
+    @Override
+    public net.minecraft.world.phys.shapes.VoxelShape aimedPart(BlockState state, net.minecraft.world.level.BlockGetter world,
+                                                                 net.minecraft.core.BlockPos pos, net.minecraft.world.entity.player.Player player) {
+        return super.aimedPart(state, world, pos, player);
+    }
 }

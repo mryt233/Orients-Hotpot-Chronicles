@@ -37,6 +37,7 @@ public final class NeoForgeFrameworkPlatform implements Platform {
 
     private final NeoForgeRegistrationApi registration = new NeoForgeRegistrationApi();
     private final NeoForgeNetworkApi network = new NeoForgeNetworkApi();
+    private final NeoForgeRuntimeEvents events = new NeoForgeRuntimeEvents();
 
     private NeoForgeFrameworkPlatform() {
     }
@@ -55,10 +56,11 @@ public final class NeoForgeFrameworkPlatform implements Platform {
             }
             installed = platform;
             RuntimeStats.get().runtimeInit();
+            NeoForgeLootEvents.install();
             modBus.addListener(platform.registration::onRegisterEvent);
             modBus.addListener(platform.network::onRegisterPayloads);
             if (FMLEnvironment.getDist().isClient()) {
-                NeoForgeClientEvents.installLifecycle();
+                NeoForgeClientEvents.installLifecycle(modBus);
             }
             NeoForge.EVENT_BUS.addListener((ServerStartedEvent event) -> RuntimeStats.get().logSummary("server-started"));
             NeoForge.EVENT_BUS.addListener((ServerStoppingEvent event) -> RuntimeStats.get().logSummary("server-stopped"));
@@ -76,6 +78,11 @@ public final class NeoForgeFrameworkPlatform implements Platform {
     @Override
     public NetworkApi network() {
         return network;
+    }
+
+    @Override
+    public cn.blockforge.orient.framework.loader.RuntimeEvents events() {
+        return events;
     }
 
     @Override
@@ -101,6 +108,12 @@ public final class NeoForgeFrameworkPlatform implements Platform {
     @Override
     public boolean isDevelopmentEnvironment() {
         return !FMLEnvironment.isProduction();
+    }
+
+    // mryt233 改（2026-11-10）：配置初始化需要的环境信息。
+    @Override
+    public boolean isDedicatedServer() {
+        return FMLEnvironment.getDist().isDedicatedServer();
     }
 
     private record Provider(MenuProviderLike menu) implements MenuProvider {

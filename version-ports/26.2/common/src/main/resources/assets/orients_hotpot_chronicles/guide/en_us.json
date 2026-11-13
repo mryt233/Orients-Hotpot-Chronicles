@@ -769,7 +769,7 @@
        "k": "note",
        "t": "Tip",
        "b": [
-        "Play the heat levels against chili oil, honey and vinegar: chili oil adds Fire Resistance, while honey and vinegar clear the Hunger that spicy broth brings. Food dipped in honey or vinegar will not leave you hungry from the heat, and your mouth will not catch fire."
+        "Play the heat levels against chili oil, honey and vinegar: chili oil adds Fire Resistance, while honey and vinegar clear the Hunger that spicy broth brings. Food dipped in honey or vinegar will not leave you hungry from the heat, and your mouth will not catch fire. （Development Preview）You can also adjust spicy level duration steps, Fire Resistance, and mouth-fire thresholds under the \"Spicy Broth Levels\" group in Numeric Config."
        ],
        "s": "tip"
       },
@@ -971,7 +971,7 @@
       },
       {
        "k": "p",
-       "t": "A pot is cold when it is not on a burning stove or lit campfire. The broth is still and ingredients float in it. Eating from a cold pot with chopsticks has a 30% chance of causing Nausea for 15 seconds—avoid cold food to keep from upsetting your stomach. Drinking a Plant Protein Drink, a bowl of clear broth, or dipping with vinegar clears it."
+       "t": "A pot is cold when it is not on a burning stove or lit campfire. The broth is still and ingredients float in it. Eating from a cold pot with chopsticks has a 30% chance of causing Nausea for 15 seconds—avoid cold food to keep from upsetting your stomach (（Development Preview）chance and duration can be adjusted under the \"Cold Pot Nausea\" group in Numeric Config). Drinking a Plant Protein Drink, a bowl of clear broth, or dipping with vinegar clears it."
       }
      ]
     },
@@ -1011,7 +1011,7 @@
      "blocks": [
       {
        "k": "p",
-       "t": "A heated pot refreshes Regeneration I for 10 seconds every four seconds on players within six blocks, like a beacon's area effect. Staying beside a pot keeps restoring health, and sharing a table makes it even livelier."
+       "t": "A heated pot refreshes Regeneration I for 10 seconds every four seconds on players within six blocks, like a beacon's area effect. Staying beside a pot keeps restoring health, and sharing a table makes it even livelier. （Development Preview）(Interval, radius, duration, and level can be adjusted under the \"Pot Warmth Healing\" group in Numeric Config; set duration to 0 to disable.)"
       }
      ]
     },
@@ -1441,6 +1441,14 @@
       {
        "k": "p",
        "t": "A square-tipped Chinese cleaver with 250 durability. It also works as a weapon, dealing four damage."
+      },
+      {
+       "k": "note",
+       "t": "Tip",
+       "b": [
+        "The orientation is baked into the texture: handle at the lower left, tip at the upper right, edge facing lower right. The inventory, the held item, the in-game Hotpot Guide, the web tutorial and the viewer all look exactly the same, because nothing flips the model any more — re-running the texture generator cannot flip it back either. When held in hand the blade ends up on the other side, matching the inventory icon; that is expected."
+       ],
+       "s": "tip"
       },
       {
        "k": "sub",
@@ -2139,6 +2147,11 @@
        "k": "bul",
        "t": "Cooked Kelp: cook vanilla kelp in a hotpot to restore 2 hunger points. Furnaces, smokers, and campfires still produce dried kelp.",
        "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "（Development Preview）Default drop chances for grass, lily pads, mushrooms, and beef loin can all be adjusted in Numeric Config or under \"Loot Drops\" in the settings screen (tomatoes now have their own separate entry; changes require /reload to take effect).",
+       "d": 0
       }
      ]
     },
@@ -2328,8 +2341,8 @@
       },
       {
        "k": "tr",
-       "icon": "minecraft:bowl",
-       "t": "Mixing a sauce　Hold a vanilla bowl (Bowl) and rig…",
+       "icon": "orients_hotpot_chronicles:sesame_paste",
+       "t": "Placing sesame paste and oyster sauce　Besides being used to mix sauces a…",
        "go": [
         3,
         3
@@ -2338,10 +2351,19 @@
       {
        "k": "tr",
        "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
-       "t": "Dipping food　There are three ways:",
+       "t": "Mixing a sauce　Hold a vanilla bowl (Bowl) and rig…",
        "go": [
         3,
         4
+       ]
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:oak_sauce_station",
+       "t": "Dipping food　There are three ways:",
+       "go": [
+        3,
+        5
        ]
       }
      ]
@@ -2424,7 +2446,7 @@
        "k": "note",
        "t": "Tip",
        "b": [
-        "With more seasonings, the help panel splits into two columns. When the number of seasonings goes over 10 (there are 15 now), the effect reference opened by ? changes from one long strip into a tidy two-column panel — eight seasonings on the left, seven on the right, all readable at a glance without having to scroll. Older saves with nine kinds or fewer on the station keep the original single column."
+        "Development preview: the ingredient list now uses a single paginated column. Clicking ? opens a narrow panel matching the main interface width, displaying names and effects in full with text wrapping; turn pages using the bottom arrows or the mouse wheel over the panel, and reopening it remembers your last page. The main interface and ingredient list are centered together, and installed JEI / REI will avoid this area."
        ],
        "s": "tip"
       }
@@ -2571,7 +2593,56 @@
      ]
     },
     {
-     "icon": "minecraft:bowl",
+     "icon": "orients_hotpot_chronicles:sesame_paste",
+     "title": "Placing sesame paste and oyster sauce",
+     "blocks": [
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:sesame_paste",
+        "orients_hotpot_chronicles:oyster_sauce"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "Besides being used to mix sauces at the station, sesame paste and oyster sauce can also be placed on the table as a decoration."
+      },
+      {
+       "k": "num",
+       "t": "Place it: hold sesame paste or oyster sauce and Shift + right-click an empty spot on a hotpot table or tall hotpot table. Like chopsticks and sauce bowls it takes one plate slot, and several things can share that slot. It appears as a small 3D bottle matching its icon: sesame paste is a short labelled glass jar, oyster sauce a slim dark bottle.",
+       "n": 1,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "Pick it back up: right-click it empty-handed to put it back in your inventory; mining the bottle takes only that bottle. Mining the table drops every piece of tableware in that slot.",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "Decoration only: a bottle on the table cannot be dipped into and cannot season food. To add this seasoning to a dish, go to the sauce station and mix a bowl as before (or dip at a sauce bowl on the table with chopsticks).",
+       "n": 3,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "The bottle can still be eaten as before (same hunger value); placing it is just for looks.",
+       "n": 4,
+       "d": 0
+      },
+      {
+       "k": "note",
+       "t": "Tip",
+       "b": [
+        "Fill a slot if it fits: sesame paste, oyster sauce, sauce bowls and plates can share one slot — a row of bottles makes the table look like a real hotpot restaurant."
+       ],
+       "s": "tip"
+      }
+     ]
+    },
+    {
+     "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
      "title": "Mixing a sauce",
      "blocks": [
       {
@@ -2630,7 +2701,7 @@
      ]
     },
     {
-     "icon": "orients_hotpot_chronicles:bamboo_chopsticks",
+     "icon": "orients_hotpot_chronicles:oak_sauce_station",
      "title": "Dipping food",
      "blocks": [
       {
@@ -3153,7 +3224,7 @@
       },
       {
        "k": "p",
-       "t": "Drinking the cup turns it back into an empty cup and uses up the bonus, so toast again for more. Toasting unlocks the \"Cheers!\" advancement."
+       "t": "Drinking the cup turns it back into an empty cup and uses up the bonus, so toast again for more. Toasting unlocks the \"Cheers!\" advancement. （Development Preview）(Cooldown, Luck/Regeneration duration and level, and first-sip bonus hunger/saturation can be adjusted under the \"Cheers Toast\" group in Numeric Config.)"
       },
       {
        "k": "note",
@@ -3216,6 +3287,81 @@
        ]
       },
       {
+       "k": "sub",
+       "t": "◆ Three styles and recolouring",
+       "l": 3
+      },
+      {
+       "k": "icons",
+       "ids": [
+        "orients_hotpot_chronicles:cloth_apron",
+        "orients_hotpot_chronicles:blue_print_cloth_apron",
+        "orients_hotpot_chronicles:brown_trim_cloth_apron"
+       ]
+      },
+      {
+       "k": "p",
+       "t": "There are three styles of cloth apron. Their effect, durability, enchantability and repair materials are identical — only the fabric pattern differs:"
+      },
+      {
+       "k": "th",
+       "t": "Style　Look"
+      },
+      {
+       "k": "tr",
+       "t": "Linen Cloth Apron Linen Cloth Apron　Plain linen, the default",
+       "icon": "orients_hotpot_chronicles:cloth_apron"
+      },
+      {
+       "k": "tr",
+       "t": "Blue Print Cloth Apron Blue Print Cloth Apron　Indigo with tiny single-pixel white flowers",
+       "icon": "orients_hotpot_chronicles:blue_print_cloth_apron"
+      },
+      {
+       "k": "tr",
+       "t": "Brown Trim Cloth Apron Brown Trim Cloth Apron　Linen with dark brown trim all round and a small pocket on the hem",
+       "icon": "orients_hotpot_chronicles:brown_trim_cloth_apron"
+      },
+      {
+       "k": "p",
+       "t": "Recolouring: in a crafting grid, any style + a dye (shapeless) turns it into another style —"
+      },
+      {
+       "k": "bul",
+       "t": "any style + white dye → linen",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "any style + blue dye → blue print",
+       "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "any style + brown dye → brown trim",
+       "d": 0
+      },
+      {
+       "k": "p",
+       "t": "Recolouring is the same apron with a new look: durability, enchantments and any custom name are all kept, and it only costs one dye. Adding the dye of the style it already is changes nothing (you get the apron back)."
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:cloth_apron",
+        "orients_hotpot_chronicles:blue_print_cloth_apron",
+        "orients_hotpot_chronicles:brown_trim_cloth_apron"
+       ]
+      },
+      {
+       "k": "note",
+       "t": "Tip",
+       "b": [
+        "How it looks when worn: the apron sits close to the body and hangs from your chest down to just above the knees, one piece of cloth in front of both legs; when you walk, the hem swings forward with whichever leg steps out, and it lies flat on your lap when you sit. It only wraps a little around the sides; the sleeves and back are transparent, with just the neck strap showing behind your neck."
+       ],
+       "s": "tip"
+      },
+      {
        "k": "p",
        "t": "Once you wear it:"
       },
@@ -3267,22 +3413,22 @@
       },
       {
        "k": "bul",
-       "t": "Pick up food from bowls and plates: right-click a bowl or plate to pick up the last-added portion (you can see it at the chopstick tips while held).",
+       "t": "Pick up food from bowls and plates: right-click a bowl or plate to pick up the last-added portion.",
        "d": 0
       },
       {
        "k": "bul",
-       "t": "Add food to the pot: right-click the pot while holding a raw ingredient to place it in the targeted large cell (into the pot).",
+       "t": "Add food to the pot: right-click the pot while holding a raw ingredient to place it in the pot.",
        "d": 0
       },
       {
        "k": "bul",
-       "t": "Eat: while holding cooked food, hold right-click to eat it (aiming at the air, the pot, a bowl, or a plate all work). You can eat even when full (the hunger bar stays put, saturation is still added). Any dipping-sauce effects apply too.",
+       "t": "Eat: while holding cooked food, hold right-click to eat it. You can eat even when full (the hunger bar stays put, saturation is still added). Any dipping-sauce effects apply too.",
        "d": 0
       },
       {
        "k": "bul",
-       "t": "Put food back: sneak + right-click a bowl or plate while holding food; the food goes back and the chopsticks stay in your hand.",
+       "t": "Put food back: sneak + right-click the center of a bowl or plate while holding food; the food goes back and the chopsticks stay in your hand.",
        "d": 0
       },
       {
@@ -3292,12 +3438,12 @@
       },
       {
        "k": "bul",
-       "t": "Rest chopsticks on bowls and plates: Shift + right-click a placed bowl or plate with empty chopsticks (if they hold food, the first press puts the food back and the next one rests them). The chopsticks rest across its rim. Right-click with an empty hand to retrieve them. Breaking the bowl drops the chopsticks too.",
+       "t": "Rest on bowl or plate rims (Development Preview): Shift + right-click the rim; chopsticks rest pointing toward the center from whichever side you click, and chopsticks holding food will rest along with the food. When clicking the center of a bowl or plate, empty chopsticks rest on the side closest to the player based on player facing (chopsticks holding food will still place the food or dip first). The resting angle snaps to steps of 22.5°; right-click with an empty hand to retrieve the chopsticks, and breaking the bowl or plate drops the chopsticks too.",
        "d": 0
       },
       {
        "k": "bul",
-       "t": "Lay them straight on the tabletop: aim at an empty spot on a hotpot table or tall hotpot table and hold Shift + right-click. The chopsticks (and whatever they are holding) are placed on the table, and a dainty white porcelain mini chopstick rest appears under the tips — a small base with two slightly upturned ends and a shallow groove in the middle that keeps the tips off the tabletop. Right-click again or break the rest to take the chopsticks back; no extra rest item is dropped.",
+       "t": "Lay them straight on the tabletop: aim at an empty spot on a hotpot table or tall hotpot table and hold Shift + right-click; any held food is kept, and a white porcelain mini chopstick rest is added automatically. Development Preview: two straight bamboo sticks about 8.5 pixels long lie parallel with their tips resting across the white porcelain saddle and ends resting on the table; tips point where you face, ends point toward you, placeable in all four cardinal directions. They land on the nearest empty spot near the clicked position, occupying 9.5×4.5 pixels; a prompt appears if they don't fit without consuming items. Right-click with an empty hand or mine them to retrieve both the chopsticks and held food as they were, without dropping a separate chopstick rest.",
        "d": 0
       },
       {
@@ -4113,6 +4259,28 @@
      "blocks": [
       {
        "k": "sub",
+       "t": "Blue Print Cloth Apron",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:blue_print_cloth_apron"
+       ]
+      },
+      {
+       "k": "sub",
+       "t": "Brown Trim Cloth Apron",
+       "l": 3
+      },
+      {
+       "k": "recipes",
+       "ids": [
+        "orients_hotpot_chronicles:brown_trim_cloth_apron"
+       ]
+      },
+      {
+       "k": "sub",
        "t": "Cilantro Meatballs (4 types)",
        "l": 3
       },
@@ -4127,12 +4295,13 @@
       },
       {
        "k": "sub",
-       "t": "Cloth Apron",
+       "t": "Cloth Apron (2 types)",
        "l": 3
       },
       {
        "k": "recipes",
        "ids": [
+        "orients_hotpot_chronicles:cloth_apron",
         "orients_hotpot_chronicles:cloth_apron"
        ]
       },
@@ -5257,7 +5426,7 @@
       },
       {
        "k": "sub",
-       "t": "Ingredients (98 types)",
+       "t": "Ingredients (101 types)",
        "l": 2
       },
       {
@@ -5277,8 +5446,18 @@
       },
       {
        "k": "tr",
+       "icon": "orients_hotpot_chronicles:blue_print_cloth_apron",
+       "t": "Blue Print Cloth Apron　blue_print_cloth_apron"
+      },
+      {
+       "k": "tr",
        "icon": "orients_hotpot_chronicles:boiled_crispy_pork",
        "t": "Boiled Crispy Pork　boiled_crispy_pork"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:brown_trim_cloth_apron",
+       "t": "Brown Trim Cloth Apron　brown_trim_cloth_apron"
       },
       {
        "k": "tr",
@@ -5318,7 +5497,7 @@
       {
        "k": "tr",
        "icon": "orients_hotpot_chronicles:cloth_apron",
-       "t": "Cloth Apron　cloth_apron"
+       "t": "Linen Cloth Apron　cloth_apron"
       },
       {
        "k": "tr",
@@ -5679,6 +5858,11 @@
        "k": "tr",
        "icon": "orients_hotpot_chronicles:shrimp_paste",
        "t": "Shrimp Paste　shrimp_paste"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:soup_bowl",
+       "t": "Soup Bowl　soup_bowl"
       },
       {
        "k": "tr",

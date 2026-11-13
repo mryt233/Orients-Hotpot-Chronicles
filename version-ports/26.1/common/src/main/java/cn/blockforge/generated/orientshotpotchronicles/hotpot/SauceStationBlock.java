@@ -1,6 +1,8 @@
-// mryt233 改：26.1 原版 API。
+// mryt233 改：26.1 原版 API；合入 SeasoningDef 与 Use 适配。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
 import cn.blockforge.orient.framework.game.PartOutline;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.Block;
@@ -233,11 +235,11 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
     }
 
     /** mryt233 改：名称与图标只显示所瞄小碗中仍有存货的调料。 */
-    private static Seasoning aimedSeasoning(BlockState state, LevelReader world, BlockPos pos, BlockHitResult hit) {
+    private static SeasoningDef aimedSeasoning(BlockState state, LevelReader world, BlockPos pos, BlockHitResult hit) {
         int bowl = aimed(state, pos, hit);
         if (bowl >= 0 && world.getBlockEntity(pos) instanceof SauceStationBlockEntity be
             && be.available(bowl) > 0) {
-            return be.kind(bowl);
+            return be.kindDef(bowl);
         }
         return null;
     }
@@ -253,7 +255,7 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
                 if (stationState.getBlock() instanceof SauceStationBlock) {
                     net.minecraft.network.chat.MutableComponent name =
                         Component.translatable(stationState.getBlock().getDescriptionId());
-                    Seasoning seasoning = aimedSeasoning(stationState, player.level(), stationPos, blockHit);
+                    SeasoningDef seasoning = aimedSeasoning(stationState, player.level(), stationPos, blockHit);
                     return seasoning == null ? name
                         : name.append(" · ").append(Component.translatable(seasoning.nameKey()));
                 }
@@ -277,7 +279,7 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
                 BlockPos hitPos = blockHit.getBlockPos();
                 if (hitPos.equals(pos)
                     || (hitPos.equals(pos.above()) && world.getBlockState(hitPos).is(HotPotContent.SAUCE_STATION_TOP))) {
-                    Seasoning seasoning = aimedSeasoning(state, world, pos, blockHit);
+                    SeasoningDef seasoning = aimedSeasoning(state, world, pos, blockHit);
                     if (seasoning != null && !seasoning.raws().isEmpty()) {
                         return new ItemStack(seasoning.raw());
                     }
@@ -291,16 +293,16 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
                                              Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(stack.is(Items.BOWL) || stack.getItem() instanceof DippingSauceItem)) {
-            return InteractionResult.TRY_WITH_EMPTY_HAND;
+            return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide());
         }
         int bowl = aimed(state, pos, hit);
         if (bowl < 0 || !(world.getBlockEntity(pos) instanceof SauceStationBlockEntity be)) {
-            return InteractionResult.TRY_WITH_EMPTY_HAND;
+            return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide());
         }
         if (!world.isClientSide()) {
             be.serve(player, hand, bowl);
         }
-        return InteractionResult.SUCCESS;
+        return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
     }
 
     @Override
@@ -309,7 +311,7 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
         if (world.isClientSide() && world.getBlockEntity(pos) instanceof SauceStationBlockEntity) {
             openOverview.accept(pos, Component.translatable(this.getDescriptionId()));
         }
-        return InteractionResult.SUCCESS;
+        return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide());
     }
 
     /** 客户端打开总览界面（HotPotClient 填上；服务端什么也不做）。 */

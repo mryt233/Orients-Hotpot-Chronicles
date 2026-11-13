@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.core.Direction;
+
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
@@ -26,7 +29,7 @@ public final class TableDecor {
     public static double liftOf(BlockGetter world, BlockPos pos, BlockState state) {
         if (world == null || !state.is(TABLE_DECORATIONS)
             || (state.hasProperty(BlockStateProperties.HANGING) && state.getValue(BlockStateProperties.HANGING))
-            || (state.hasProperty(BlockStateProperties.FACING) && state.getValue(BlockStateProperties.FACING) != net.minecraft.core.Direction.UP)) {
+            || (state.hasProperty(BlockStateProperties.FACING) && state.getValue(BlockStateProperties.FACING) != Direction.UP)) {
             // 挂着的灯笼、横着贴在旁边的末地烛 / 紫水晶不是放在桌面上的，不挪
             return 0;
         }

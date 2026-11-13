@@ -4,6 +4,10 @@ package cn.blockforge.generated.orientshotpotchronicles.hotpot;
  * 盘子的大小：几列几行就能放几样食物。一格方块里能摆几个由占地决定（用户要求）：小碟 5×5 一格 5 个（四角 + 中间），
  * 长盘宽 6 一格 2 个，2x2 方盘 11×11 一格 1 个，也能混着摆。尺寸（像素）与 tools/gen_plates.py 的 SIZES 一致，
  * 长边沿方块的 x（axis=z 时整体转 90°）。
+ * <p>
+ * <b>不要往这里再加枚举常量</b>（mryt233，2026-11-05）：{@link HotPotContent} 用 {@code PlateSize.values()} 循环
+ * 给每种材质注册一盘一盘，枚举里多一个值就会多注册一件本不该存在的盘子。桌面上那双垫着迷你筷架的竹筷
+ * （{@link ChopstickRestBlock}）只借 {@link #S1X1} 容量；mryt233 改（r146e）：占地独立覆盖，不增加枚举。
  */
 public enum PlateSize {
     S1X1("1x1", "small_dish", 1, 1, 5, 5),

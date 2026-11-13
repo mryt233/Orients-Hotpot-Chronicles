@@ -7,6 +7,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -14,31 +15,49 @@ import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
 import net.minecraft.world.level.Level;
 
-/** 26.1 客户端不再接收完整配方，随现有配置通道同步厨具实际使用的配方。 */
+/** 26.2 客户端不再接收完整配方，随现有配置通道同步厨具与数据包定义实际使用的配方。 */
 public final class RecipeSync {
     private static volatile List<RecipeHolder<?>> clientRecipes = List.of();
 
-    private RecipeSync() { }
+    private RecipeSync() {
+    }
 
     public static List<RecipeHolder<?>> snapshot(MinecraftServer server) {
+        if (server == null) {
+            return List.of();
+        }
         return server.overworld().recipeAccess().getRecipes().stream()
-            .filter(holder -> holder.value() instanceof AbstractCookingRecipe
-                || holder.value() instanceof StonecutterRecipe
-                || holder.value() instanceof net.minecraft.world.item.crafting.CraftingRecipe).toList();
+            .filter(holder -> {
+                Recipe<?> recipe = holder.value();
+                return recipe instanceof AbstractCookingRecipe
+                    || recipe instanceof StonecutterRecipe
+                    || recipe instanceof CraftingRecipe
+                    || recipe instanceof PotBoilingRecipe
+                    || recipe instanceof PoundingRecipe
+                    || recipe instanceof SoupBaseRecipe
+                    || recipe instanceof SeasoningRecipe;
+            })
+            .toList();
     }
 
     /** 平台网络接收器在客户端主线程调用。 */
     public static void accept(List<RecipeHolder<?>> recipes) {
         clientRecipes = List.copyOf(recipes);
+        HotPotRecipes.clearRuntimeCache();
+        Soups.clearRuntimeCache();
+        Seasonings.clearRuntimeCache();
     }
 
     public static void clearClient() {
         clientRecipes = List.of();
+        HotPotRecipes.clearRuntimeCache();
+        Soups.clearRuntimeCache();
+        Seasonings.clearRuntimeCache();
     }
 
-    /** 当前配方来源的身份对象，给「配方变了就失效」的缓存当键用。作者：mryt233 */
+    /** 当前配方来源的身份对象（26.2 服务端每次 /reload 返回新的 ImmutableMap.values 实例），给缓存当键用。作者：mryt233 */
     public static Object source(Level level) {
-        return level instanceof ServerLevel server ? server.recipeAccess() : clientRecipes;
+        return level instanceof ServerLevel server ? server.recipeAccess().getRecipes() : clientRecipes;
     }
 
     public static Iterable<RecipeHolder<?>> recipes(Level level) {

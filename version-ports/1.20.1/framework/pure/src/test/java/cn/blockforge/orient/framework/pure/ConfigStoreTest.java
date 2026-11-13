@@ -205,6 +205,61 @@ class ConfigStoreTest {
         return result;
     }
 
+    // mryt233 改（2026-11-10）：主动保存的磁盘结果、内存回退和坏文件保护。
+    @Test
+    void editedSaveReportsWrittenAndPreservesUnknownValues() throws IOException {
+        Files.writeString(configFile(), "{\"limit\":8,\"unknown\":42}");
+        var saved = store.saveEdited(json("{\"limit\":6}"));
+        assertEquals(ConfigStore.SaveStatus.WRITTEN, saved.status());
+        assertNull(saved.backup());
+        assertEquals(6, store.serverData().get("limit").getAsInt());
+        assertEquals(42, json(Files.readString(configFile())).get("unknown").getAsInt());
+    }
+
+    @Test
+    void editedSaveReportsMemoryOnlyWhenParentCannotBeCreated() throws IOException {
+        Path blocked = directory.resolve("blocked");
+        Files.writeString(blocked, "keep");
+        store.init(blocked);
+        var saved = store.saveEdited(json("{\"limit\":6}"));
+        assertEquals(ConfigStore.SaveStatus.MEMORY_ONLY, saved.status());
+        assertFalse(saved.reason().isBlank());
+        assertEquals(6, store.serverData().get("limit").getAsInt());
+        assertEquals("keep", Files.readString(blocked));
+    }
+
+    @Test
+    void editedSaveBacksUpMalformedDocumentBeforeReplacingIt() throws IOException {
+        byte[] broken = "{\n  \"limit\": ".getBytes(StandardCharsets.UTF_8);
+        Files.write(configFile(), broken);
+        var saved = store.saveEdited(json("{\"limit\":6}"));
+        assertEquals(ConfigStore.SaveStatus.WRITTEN, saved.status());
+        assertTrue(saved.backup().getFileName().toString().startsWith(FILE_NAME + ".broken-"));
+        assertArrayEquals(broken, Files.readAllBytes(saved.backup()));
+        assertEquals(6, json(Files.readString(configFile())).get("limit").getAsInt());
+        assertTrue(loggedWarnings.stream().anyMatch(text -> text.contains(saved.backup().toString())));
+    }
+
+    @Test
+    void editedSaveBacksUpOversizedDocument() throws IOException {
+        byte[] oversized = "x".repeat(5000).getBytes(StandardCharsets.UTF_8);
+        Files.write(configFile(), oversized);
+        var saved = store.saveEdited(json("{\"limit\":6}"));
+        assertEquals(ConfigStore.SaveStatus.WRITTEN, saved.status());
+        assertArrayEquals(oversized, Files.readAllBytes(saved.backup()));
+    }
+
+    @Test
+    void editedSaveDoesNotApplyChangesWhenOriginalCannotBePreserved() throws IOException {
+        Files.createDirectory(configFile());
+        Files.writeString(configFile().resolve("keep"), "original");
+        JsonObject before = store.serverData().deepCopy();
+        var saved = store.saveEdited(json("{\"limit\":6}"));
+        assertEquals(ConfigStore.SaveStatus.FAILED, saved.status());
+        assertEquals(before, store.serverData());
+        assertEquals("original", Files.readString(configFile().resolve("keep")));
+    }
+
     private Path configFile() {
         return directory.resolve(FILE_NAME);
     }

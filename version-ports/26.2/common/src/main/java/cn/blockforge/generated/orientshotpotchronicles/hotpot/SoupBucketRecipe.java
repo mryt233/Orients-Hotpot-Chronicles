@@ -1,27 +1,29 @@
+// mryt233 改：26.2 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+import cn.blockforge.orient.framework.loader.Framework;
+import cn.blockforge.orient.framework.loader.RegistrationApi;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.NormalCraftingRecipe;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
-import net.minecraft.world.item.crafting.NormalCraftingRecipe;
-import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.PlacementInfo;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.Level;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.network.codec.ByteBufCodecs;
+
 import java.util.List;
-import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.Registry;
-import net.minecraft.core.NonNullList;
 
 /**
  * 汤底桶的合成（2026-10-26 用户：水桶 + 火锅底料在工作台直接合成番茄 / 三鲜汤底桶）：和原版无序合成一样，
@@ -67,8 +69,14 @@ public class SoupBucketRecipe extends NormalCraftingRecipe {
     @Override
     public List<RecipeDisplay> display() { return delegate.display(); }
 
+    // mryt233 改（2026-11-10）：登记由内容模块传入的注册能力完成，保留旧入口。
+    @Deprecated
     public static void register() {
-        Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, HotPot.id("soup_bucket"), SERIALIZER);
+        register(Framework.platform().registration());
+    }
+
+    public static void register(RegistrationApi registration) {
+        registration.recipeSerializers().register(HotPot.id("soup_bucket"), SERIALIZER);
     }
 
     @Override
@@ -86,5 +94,4 @@ public class SoupBucketRecipe extends NormalCraftingRecipe {
     public RecipeSerializer<SoupBucketRecipe> getSerializer() {
         return SERIALIZER;
     }
-
 }

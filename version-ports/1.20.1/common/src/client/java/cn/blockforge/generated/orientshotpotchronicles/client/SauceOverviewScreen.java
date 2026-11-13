@@ -1,10 +1,13 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.ChatFormatting;
+
 import cn.blockforge.orient.framework.client.ClientNetwork;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.network.OpenSauceRestockPayload;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlockEntity;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SeasoningDef;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
@@ -74,7 +77,7 @@ public class SauceOverviewScreen extends Screen {
         List<Component> hoverLines = null;
         for (int i = 0; i < SauceStationBlockEntity.BOWLS; i++) {
             int cx = x + CARD_X + (i % 3) * STEP_X, cy = y + CARD_Y + (i / 3) * STEP_Y;
-            Seasoning s = be.kind(i);
+            SeasoningDef s = be.kindDef(i);
             int left = Math.min(MAX, be.available(i));
             // 卡片 = 放大的凹槽：左上压暗、右下透亮
             g.fill(cx, cy, cx + CARD_W, cy + CARD_H, SLOT_LIGHT);
@@ -90,18 +93,18 @@ public class SauceOverviewScreen extends Screen {
                 g.fill(cx + 4, cy + CARD_H - 8, cx + 4 + bw, cy + CARD_H - 4, SLOT_SHADOW);
                 g.fill(cx + 4, cy + CARD_H - 8, cx + 4 + fw, cy + CARD_H - 4, s.color());
             } else {
-                g.drawCenteredString(font, Component.translatable(HotPotBlockEntity.key("screen.sauce.empty_bowl")),
+                g.drawCenteredString(font, Component.translatable(HotPotBlockEntity.key(be.kindIndex(i) == -2 ? "sauce.unknown" : "screen.sauce.empty_bowl")),
                     cx + CARD_W / 2, cy + CARD_H / 2 - 4, SauceStationScreen.HINT);
             }
             if (mouseX >= cx && mouseX < cx + CARD_W && mouseY >= cy && mouseY < cy + CARD_H) {
                 hoverLines = new ArrayList<>();
                 if (s == null || left == 0) {
-                    hoverLines.add(Component.translatable(HotPotBlockEntity.key("screen.sauce.empty")));
+                    hoverLines.add(Component.translatable(HotPotBlockEntity.key(be.kindIndex(i) == -2 ? "sauce.unknown" : "screen.sauce.empty")));
                 } else {
                     hoverLines.add(Component.translatable(s.nameKey()));
-                    hoverLines.add(Component.translatable(HotPotBlockEntity.key("seasoning." + s.id() + ".effect")).withStyle(net.minecraft.ChatFormatting.GRAY));
+                    hoverLines.add(Component.translatable(s.effectKey()).withStyle(ChatFormatting.GRAY));
                 }
-                hoverLines.add(Component.translatable(HotPotBlockEntity.key("screen.sauce.left"), left, MAX).withStyle(net.minecraft.ChatFormatting.GRAY));
+                hoverLines.add(Component.translatable(HotPotBlockEntity.key("screen.sauce.left"), left, MAX).withStyle(ChatFormatting.GRAY));
             }
         }
         if (hoverLines != null) {

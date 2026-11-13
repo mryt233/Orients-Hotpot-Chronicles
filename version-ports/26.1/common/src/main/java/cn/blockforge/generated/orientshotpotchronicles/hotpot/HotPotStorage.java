@@ -1,26 +1,26 @@
 // mryt233 改：26.1 存档入口，保持所有键名和槽位格式。
+// mryt233 改（2026-11-11）：仅将槽位字段访问转给 HotPotSlots，职责与执行顺序不变。
+// mryt233 改（2026-11-11）：第三批 3G 存读档改走适配小包，键名与结构不变。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.ListTag;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.BeIo;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.StoreReader;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.StoreWriter;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.StoredItem;
+import java.util.Arrays;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.ContainerHelper;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.minecraft.world.level.storage.TagValueInput;
-import net.minecraft.util.ProblemReporter;
-import com.mojang.serialization.Codec;
-import java.nio.ByteBuffer;
 
 /**
  * 锅的存档读写（从 {@link HotPotBlockEntity} 抽出来）：
  * 汤底、81 格食材、熟度、经验。方块存档和「装着东西的锅」物品共用这一份格式。
  * <p>
  * 只做序列化，不含任何玩法判断；所以能独立成类。
- * 字段本身仍在 {@link HotPotBlockEntity} 里（同包可见），这里直接读写。
+ * 槽位字段由 {@link HotPotSlots} 持有；序列化仍统一在这里读写。
  * 作者：mryt233 */
 public final class HotPotStorage {
     /** 存档里每边汤底的字段名（第 0 边沿用老存档的 Base）。 */
@@ -34,88 +34,104 @@ public final class HotPotStorage {
     private HotPotStorage() {
     }
 
-    /** 写锅里的东西。 */
-    static void write(HotPotBlockEntity be, CompoundTag nbt, HolderLookup.Provider registries) {
-        var output = StorageSupport.output(registries);
-        write(be, output);
-        nbt.merge(output.buildResult());
+    /** 写锅里的东西（方块实体 26.1 ValueOutput 入口）。 */
+    static void write(HotPotBlockEntity be, ValueOutput nbt) {
+        BeIo.write(nbt, w -> writeTo(be, w));
     }
 
-    static void write(HotPotBlockEntity be, ValueOutput nbt) {
+    /** 写锅里的东西（物品组件 / CompoundTag 入口）。 */
+    static void write(HotPotBlockEntity be, CompoundTag nbt, HolderLookup.Provider registries) {
+        // 旧键仍可读到下个大版本，但新写出的内容不保留旧序号。
+        for (String key : BASE_KEYS) {
+            nbt.remove(key);
+        }
+        BeIo.write(nbt, registries, w -> writeTo(be, w));
+    }
+
+    private static void writeTo(HotPotBlockEntity be, StoreWriter w) {
         int slots = HotPotBlockEntity.SLOTS;
         for (int side = 0; side < be.bases.length; side++) {
-            nbt.putInt(BASE_KEYS[side], be.bases[side]);
+            SoupIds.write(w, side, be.bases[side]);
             // mryt233 改（2026-11-05）：每边的红汤辣度档位（r136a），区块存档和整锅打包（pot_contents）都要带着
-            nbt.putInt(SPICY_KEYS[side], be.spicyLevels[side]);
+            w.putInt(SPICY_KEYS[side], be.spicyLevels[side]);
         }
         // mryt233 改（2026-11-07）：IntArrayTag 是直接存数组引用（不 clone），
         // 不拷贝就会让 NBT 别名着方块实体的活数组：打包成锅物品之后再清空锅，
         // 熟度 / 过头计时会被一起抹掉。这里的出口虽然都还会再 copy 一次，但不该靠那个巧合。
-        nbt.putIntArray("Doneness", be.doneness.clone());
+        w.putIntArray("Doneness", be.slots.doneness().clone());
         byte[] cookedBytes = new byte[slots];
         for (int i = 0; i < slots; i++) {
-            cookedBytes[i] = (byte) (be.cooked[i] ? 1 : 0);
+            cookedBytes[i] = (byte) (be.slots.cooked()[i] ? 1 : 0);
         }
-        nbt.store("Cooked", Codec.BYTE_BUFFER, ByteBuffer.wrap(cookedBytes));
+        w.putByteArray("Cooked", cookedBytes);
         // mryt233 改（2026-11-04）：熟了以后在锅里继续煮的刻数（豆腐煮过头碎块用），重启不丢。
-        nbt.putIntArray("Overcook", be.overcook.clone());   // mryt233 改（2026-11-07）：同上，防御性拷贝
+        w.putIntArray("Overcook", be.slots.overcook().clone());   // mryt233 改（2026-11-07）：同上，防御性拷贝
         int[] xp = new int[slots];
         for (int i = 0; i < slots; i++) {
-            xp[i] = Math.round(be.xpValue[i] * 100F);
+            xp[i] = Math.round(be.slots.xpValue()[i] * 100F);
         }
-        nbt.putIntArray("SlotXp", xp);
-        nbt.putFloat("PendingXp", be.pendingXp);
+        w.putIntArray("SlotXp", xp);
+        w.putFloat("PendingXp", be.slots.pendingXp());
         // 用带 Slot 索引的列表保存 81 格，避免 SimpleInventory.toNbtList 只按顺序
         // 写出、恢复时把物品重排到槽 0（表现为「物品乱换位置 / 全部挤到左上角」）。
         NonNullList<ItemStack> list = NonNullList.withSize(slots, ItemStack.EMPTY);
         for (int i = 0; i < slots; i++) {
-            list.set(i, be.ingredients.getItem(i));
+            list.set(i, be.slots.ingredients().getItem(i));
         }
-        ContainerHelper.saveAllItems(nbt, list);
+        w.putItems(list);
     }
 
-    /** 读锅里的东西；读完顺手修复方块状态。 */
-    static void read(HotPotBlockEntity be, CompoundTag nbt, HolderLookup.Provider registries) {
-        read(be, TagValueInput.create(ProblemReporter.DISCARDING, registries, nbt));
-    }
-
+    /** 读锅里的东西（方块实体 26.1 ValueInput 入口）；读完顺手修复方块状态。 */
     static void read(HotPotBlockEntity be, ValueInput nbt) {
+        BeIo.read(nbt, r -> readFrom(be, r));
+        finishRead(be);
+    }
+
+    /** 读锅里的东西（物品组件 / CompoundTag 入口）；读完顺手修复方块状态。 */
+    static void read(HotPotBlockEntity be, CompoundTag nbt, HolderLookup.Provider registries) {
+        BeIo.read(nbt, registries, r -> readFrom(be, r));
+        finishRead(be);
+    }
+
+    private static void readFrom(HotPotBlockEntity be, StoreReader r) {
         int slots = HotPotBlockEntity.SLOTS;
         for (int side = 0; side < be.bases.length; side++) {
-            be.bases[side] = nbt.getIntOr(BASE_KEYS[side], -1);
+            be.bases[side] = SoupIds.read(r, side);
             // mryt233 改（2026-11-05）：旧存档没有辣度键 = 微辣（0 档）；超出 0..3 的值夹回来
-            int spicy = nbt.getIntOr(SPICY_KEYS[side], 0);
+            int spicy = r.getInt(SPICY_KEYS[side], 0);
             be.spicyLevels[side] = Math.max(0, Math.min(3, spicy));
         }
-        java.util.Arrays.fill(be.doneness, 0);
+        Arrays.fill(be.slots.doneness(), 0);
         // mryt233 改（2026-11-07）：getIntArray 返回的是标签内部那个数组，这里用 System.arraycopy
         // 逐份拷进方块实体自己的数组（写侧对应地 clone 再放进标签），两边都不互相持有引用。
-        int[] loaded = nbt.getIntArray("Doneness").orElseGet(() -> new int[0]);
-        System.arraycopy(loaded, 0, be.doneness, 0, Math.min(loaded.length, slots));
-        java.util.Arrays.fill(be.cooked, false);
-        ByteBuffer buffer = nbt.read("Cooked", Codec.BYTE_BUFFER).orElseGet(() -> ByteBuffer.allocate(0));
-        byte[] cookedBytes = new byte[buffer.remaining()];
-        buffer.get(cookedBytes);
+        int[] loaded = r.getIntArray("Doneness");
+        System.arraycopy(loaded, 0, be.slots.doneness(), 0, Math.min(loaded.length, slots));
+        Arrays.fill(be.slots.cooked(), false);
+        byte[] cookedBytes = r.getByteArray("Cooked");
         for (int i = 0; i < slots; i++) {
-            be.cooked[i] = i < cookedBytes.length && cookedBytes[i] != 0;
+            be.slots.cooked()[i] = i < cookedBytes.length && cookedBytes[i] != 0;
         }
-        java.util.Arrays.fill(be.overcook, 0);
-        int[] overdue = nbt.getIntArray("Overcook").orElseGet(() -> new int[0]);   // mryt233 改（2026-11-07）：同上，靠 System.arraycopy 拷进自有数组
-        System.arraycopy(overdue, 0, be.overcook, 0, Math.min(overdue.length, slots));
-        java.util.Arrays.fill(be.xpValue, 0F);
-        int[] xp = nbt.getIntArray("SlotXp").orElseGet(() -> new int[0]);   // mryt233 改（2026-11-07）：同上，逐项换算写进自有数组
+        Arrays.fill(be.slots.overcook(), 0);
+        int[] overdue = r.getIntArray("Overcook");   // mryt233 改（2026-11-07）：同上，靠 System.arraycopy 拷进自有数组
+        System.arraycopy(overdue, 0, be.slots.overcook(), 0, Math.min(overdue.length, slots));
+        Arrays.fill(be.slots.xpValue(), 0F);
+        int[] xp = r.getIntArray("SlotXp");   // mryt233 改（2026-11-07）：同上，逐项换算写进自有数组
         for (int i = 0; i < Math.min(xp.length, slots); i++) {
-            be.xpValue[i] = xp[i] / 100F;
+            be.slots.xpValue()[i] = xp[i] / 100F;
         }
-        be.pendingXp = nbt.getFloatOr("PendingXp", 0F);
+        be.slots.pendingXp(r.getFloat("PendingXp", 0F));
         // 按 Slot 索引恢复，不再依赖 SimpleInventory.readNbtList 的顺序重排。
-        loadIngredients(be, nbt);
+        loadIngredients(be, r);
+    }
+
+    private static void finishRead(HotPotBlockEntity be) {
+        int slots = HotPotBlockEntity.SLOTS;
         // 兼容处理：旧版本或异常网络包可能曾把堆叠数量写入锅槽；加载时按物理槽语义截断，
         // 但保留每份物品自身的 NBT / Data Component，避免生熟状态被粗暴合并。
         for (int i = 0; i < slots; i++) {
-            ItemStack stack = be.ingredients.getItem(i);
-            be.tracked[i] = stack.copy();
-            be.cookDur[i] = stack.isEmpty() ? 0 : HotPotCooking.cookTicks(be.getLevel(), stack);
+            ItemStack stack = be.slots.ingredients().getItem(i);
+            be.slots.tracked()[i] = stack.copy();
+            be.slots.cookDur()[i] = stack.isEmpty() ? 0 : HotPotCooking.cookTicks(be.getLevel(), stack);
         }
         be.markNeedsVisualRepair();
         be.repairVisualState();
@@ -126,20 +142,19 @@ public final class HotPotStorage {
      * 旧版（{@code SimpleInventory.toNbtList} 生成、无 {@code Slot} 字段）退化为按写入顺序
      * 依次放入 0..N，保持与旧行为一致。这样无论走哪条路径，物品都不会被重排到左上角。
      */
-    private static void loadIngredients(HotPotBlockEntity be, ValueInput nbt) {
+    // mryt233 改（2026-11-11）：第三批 3G，读原语交出来的条目带着「有没有 Slot」，按原规则放回槽。
+    private static void loadIngredients(HotPotBlockEntity be, StoreReader reader) {
         int slots = HotPotBlockEntity.SLOTS;
-        be.ingredients.clearContent();
-        var list = nbt.childrenListOrEmpty("Items");
+        be.slots.ingredients().clearContent();
         int sequential = 0;
-        for (ValueInput entry : list) {
-            int slot = entry.getInt("Slot").isPresent() ? (entry.getByteOr("Slot", (byte) 0) & 0xFF) : sequential;
-            ItemStack parsed = entry.read(ItemStack.MAP_CODEC).orElse(ItemStack.EMPTY);
-            ItemStack stack = parsed == null ? ItemStack.EMPTY : parsed;
+        for (StoredItem entry : reader.items()) {
+            int slot = entry.hasSlot() ? entry.slot() : sequential;
+            ItemStack stack = entry.stack();
             if (slot >= 0 && slot < slots && !stack.isEmpty()) {
                 if (stack.getCount() > 1) {
                     stack = stack.copyWithCount(1);
                 }
-                be.ingredients.setItem(slot, stack);
+                be.slots.ingredients().setItem(slot, stack);
             }
             sequential++;
         }

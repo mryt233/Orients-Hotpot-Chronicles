@@ -1,0 +1,25 @@
+{
+  "_说明": "作者：mryt233",
+  "type": "orients_hotpot_chronicles:pounding",
+  "ingredient": "minecraft:beef",
+  "result": {
+    "id": "orients_hotpot_chronicles:beef_meatball",
+    "count": 3
+  },
+  "stage1": {
+    "id": "orients_hotpot_chronicles:pounded_meat",
+    "components": {
+      "minecraft:custom_model_data": {
+        "floats": [1]
+      }
+    }
+  },
+  "stage2": {
+    "id": "orients_hotpot_chronicles:pounded_meat",
+    "components": {
+      "minecraft:custom_model_data": {
+        "floats": [2]
+      }
+    }
+  }
+}

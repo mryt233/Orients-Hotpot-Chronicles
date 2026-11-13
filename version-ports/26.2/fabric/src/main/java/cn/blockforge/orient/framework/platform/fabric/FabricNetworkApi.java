@@ -32,7 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class FabricNetworkApi implements NetworkApi {
     private static final Logger LOGGER = LoggerFactory.getLogger("orient-framework");
-    private static final int PROTOCOL_VERSION = 1;
 
     private final Set<String> registered = ConcurrentHashMap.newKeySet();
     /** 必需通道 id（两个方向都算），握手时发给客户端核对。 */

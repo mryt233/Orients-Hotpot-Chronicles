@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.Locale;
+
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -20,8 +23,12 @@ public enum HotPotFuel {
 
     private static final HotPotFuel[] BY_ID = values();
 
-    /** 第三方燃料映射到哪一档（兼容层注册进来）。 */
-    private static final java.util.Map<Item, HotPotFuel> CUSTOM_SOURCES = new java.util.HashMap<>();
+    /**
+     * 第三方燃料映射到哪一档（兼容层注册进来）。
+     * mryt233 改（2026-11-10，r147）：改成冻结登记表——启动期登记，服务端启动后不再接受新的登记。
+     */
+    private static final FrozenRegistry<Item, HotPotFuel> CUSTOM_SOURCES = new FrozenRegistry<>(
+        "第三方燃料表", "燃料档要在启动期登记（子模组在自己的兼容模块里调 registerCustomSource），冻结后不再接受登记。");
 
     /** 注册「某种第三方燃料算哪一档」。 */
     public static void registerCustomSource(Item item, HotPotFuel fuel) {
@@ -31,6 +38,16 @@ public enum HotPotFuel {
     /** 这件物品作为第三方燃料算哪一档；不是注册过的返回 null。 */
     public static HotPotFuel customSource(ItemStack stack) {
         return stack.isEmpty() ? null : CUSTOM_SOURCES.get(stack.getItem());
+    }
+
+    /** mryt233 改（2026-11-10）：冻结第三方燃料表（服务端启动时由 HotPotHooks 统一调，幂等）。 */
+    static void freezeSources() {
+        CUSTOM_SOURCES.freeze();
+    }
+
+    /** 诊断：第三方燃料表冻了没有。 */
+    public static boolean sourcesFrozen() {
+        return CUSTOM_SOURCES.isFrozen();
     }
 
     private final String nameKey;
@@ -47,11 +64,11 @@ public enum HotPotFuel {
 
     /** 配置文件里用的键，和枚举名一致的小写形式。 */
     public String configKey() {
-        return name().toLowerCase(java.util.Locale.ROOT);
+        return name().toLowerCase(Locale.ROOT);
     }
 
     public String nameKey() {
-        return "text." + cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot.MOD_ID + "." + nameKey;
+        return "text." + HotPot.MOD_ID + "." + nameKey;
     }
 
     public float power() {

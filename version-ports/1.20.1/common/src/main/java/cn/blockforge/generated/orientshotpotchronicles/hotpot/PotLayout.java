@@ -119,10 +119,16 @@ public enum PotLayout {
     public static final int GUI_INSET = 4;
     public static final int GUI_SIZE = 170;
 
-    private int[] slotSides;
-    private int[] slotSpots;
+    private volatile int[] slotSides;
+    private volatile int[] slotSpots;
 
-    private synchronized void ensureSlots() {
+    /**
+     * mryt233 改（2026-11-07）：去掉 synchronized。
+     * <p>烹饪每刻对 81 个槽调 sideOfSlot / spotOfSlot，以前每次都要抢枚举实例的监视器锁。
+     * 这里只做一次惰性计算，靠「先写 spots、后写 sides」的一次性发布保证读侧看不到半成品
+     * （读侧只检查 slotSides，它非空时 spots 一定已经写好）。</p>
+     */
+    private void ensureSlots() {
         if (slotSides != null) {
             return;
         }
@@ -263,35 +269,44 @@ public enum PotLayout {
         return rotated ? new double[]{1 - v, u} : new double[]{u, v};
     }
 
-    private List<float[]>[] regionCache;
+    private volatile List<float[]>[] regionCache;
 
     /**
      * 一边汤面由哪些长方块拼成（模型坐标比例 {u0, v0, u1, v1}）：按半像素格子分类、一行一行合并，
      * 和 gen_yuanyang.py 生成隔板用的格子同一套。
+     * mryt233 改（2026-11-07）：区域缓存只算一次，不再 synchronized（服务端与渲染线程各算各的，结果只读）。
      */
     @SuppressWarnings("unchecked")
-    public synchronized List<float[]> regions(int side) {
-        if (regionCache == null) {
-            regionCache = new List[MAX_SIDES];
-            for (int i = 0; i < MAX_SIDES; i++) {
-                regionCache[i] = new ArrayList<>();
-            }
-            int n = (int) (INNER_PX * 2);
-            for (int j = 0; j < n; j++) {
-                int i = 0;
-                while (i < n) {
-                    int s = sideAt((i + 0.5) / n, (j + 0.5) / n);
-                    int k = i;
-                    while (k < n && sideAt((k + 0.5) / n, (j + 0.5) / n) == s) {
-                        k++;
-                    }
-                    if (s != NONE) {
-                        regionCache[s].add(new float[]{(float) i / n, (float) j / n, (float) k / n, (float) (j + 1) / n});
-                    }
-                    i = k;
+    public List<float[]> regions(int side) {
+        List<float[]>[] cache = regionCache;
+        if (cache == null) {
+            cache = buildRegions();
+            regionCache = cache;
+        }
+        return cache[side];
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<float[]>[] buildRegions() {
+        List<float[]>[] cache = new List[MAX_SIDES];
+        for (int i = 0; i < MAX_SIDES; i++) {
+            cache[i] = new ArrayList<>();
+        }
+        int n = (int) (INNER_PX * 2);
+        for (int j = 0; j < n; j++) {
+            int i = 0;
+            while (i < n) {
+                int s = sideAt((i + 0.5) / n, (j + 0.5) / n);
+                int k = i;
+                while (k < n && sideAt((k + 0.5) / n, (j + 0.5) / n) == s) {
+                    k++;
                 }
+                if (s != NONE) {
+                    cache[s].add(new float[]{(float) i / n, (float) j / n, (float) k / n, (float) (j + 1) / n});
+                }
+                i = k;
             }
         }
-        return regionCache[side];
+        return cache;
     }
 }

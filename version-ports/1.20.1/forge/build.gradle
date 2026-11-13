@@ -63,13 +63,14 @@ tasks.named('compileJava') { dependsOn ':common:classes', 'frameworkRuntimeClass
 tasks.named('processResources', ProcessResources) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     dependsOn ':common:processResources'
+    inputs.property 'version', project.version // mryt233 改：version 变更时触发 mods.toml 重新展开
     filteringCharset = 'UTF-8'
     filesMatching('META-INF/mods.toml') { expand version: project.version }
 }
 
 def runtimeJar = tasks.register('runtimeJar', Jar) {
     archiveBaseName = 'orient_framework-1.20.1-forge'
-    archiveVersion = '0.1.3'
+    archiveVersion = project.framework_version
     from sourceSets.frameworkRuntime.output
     from(layout.buildDirectory.dir('mixin')) { include 'orient_framework.refmap.json' }
     manifest.attributes 'MixinConfigs': 'orient_framework.mixins.json'

@@ -29,6 +29,6 @@ configurations {
     fabricRuntimeElements {
         canBeConsumed = true
         canBeResolved = false
-        outgoing.capability('cn.blockforge.orient:orient_framework-fabric:0.1.2')
+        outgoing.capability("cn.blockforge.orient:orient_framework-fabric:${project.framework_version}")
     }
 }

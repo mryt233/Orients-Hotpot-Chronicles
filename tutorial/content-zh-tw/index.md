@@ -3,7 +3,7 @@
 # 我的世界[之晗的火鍋物語]模組-遊玩教程
 
 :::tip
-**本教程對應已釋出的 0.2.2-alpha，用 Minecraft 1.21.1 Fabric 演示**（1.21.1 NeoForge、1.20.1 Fabric / Forge、26.1.x 與 26.2 的 Fabric / NeoForge 玩法相同，見[下載、安裝與回報](install.html)）。這一版新加了酥肉、豆乾、腐竹、寬粉、苕皮、金針菇、青菜、蓮藕片、魷魚捲、蛋炒飯、辣椒、折耳根與冷熱豆腐，補齊 15 種沾醬小料，加入紅湯 4 檔辣度、六種湯底專屬風味、竹筷擺桌面（配白瓷迷你筷架）、長凳疊梯子、碰杯乾杯、布圍裙、指南書內搜尋、模組選單設定介面，並深度適配了 JEI / REI 與 Jade 資訊指示器。
+**本教程對應已打包的 0.3.0-alpha，用 Minecraft 1.21.1 Fabric 演示**（1.21.1 NeoForge、1.20.1 Fabric / Forge、26.1.x 與 26.2 的 Fabric / NeoForge 玩法相同，見[下載、安裝與回報](install.html)）。本版新增藍印花／棕邊三款布圍裙及染色換款、芝麻醬與蠔油桌面擺設、竹筷立體雙色擺桌與沿口架碗、常用／進階設定介面與 37 項新可調數值（圍鍋回血、冷鍋反胃、碰杯、辣度、戰利品掉率）、單列翻頁沾醬原料表，並開放資料包與子模組新增湯底、沾醬、通用湯碗及鍋內／搗製配方。
 :::
 
 {{icons:brick_stove,iron_nine_grid_hotpot,bamboo_chopsticks,oak_hotpot_table,oak_stool,quartz_eight_slot_platter,oak_sauce_station,cutting_board}}
@@ -50,7 +50,7 @@
 
 ## 支援哪些版本、去哪下載
 
-0.2.2-alpha 同步支援 **Minecraft 1.21.1（Fabric、NeoForge）**、**1.20.1（Fabric、Forge）**、**26.1.x（Fabric、NeoForge）** 和 **26.2（Fabric、NeoForge）**；**本教程用 1.21.1 Fabric 演示**；下載連結（CurseForge、Modrinth、MC 百科、GitHub）、安裝步驟、回報方式（GitHub、QQ 群）見 [下載、安裝與回報](install.html)。
+0.3.0-alpha 同步支援 **Minecraft 1.21.1（Fabric、NeoForge）**、**1.20.1（Fabric、Forge）**、**26.1.x（Fabric、NeoForge）** 和 **26.2（Fabric、NeoForge）**；**本教程用 1.21.1 Fabric 演示**；下載連結（CurseForge、Modrinth、MC 百科、GitHub）、安裝步驟、回報方式（GitHub、QQ 群）見 [下載、安裝與回報](install.html)。
 
 :::warn
 模組還在 **alpha** 階段，只做過初步測試。0.1.0-alpha.1 舊存檔升級後東西可能遺失或變樣，**升級前先備份存檔**，最好在新存檔裡玩。

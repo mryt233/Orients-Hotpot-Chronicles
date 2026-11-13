@@ -7,6 +7,7 @@ import cn.blockforge.orient.framework.loader.MenuProviderLike;
 import cn.blockforge.orient.framework.loader.NetworkApi;
 import cn.blockforge.orient.framework.loader.Platform;
 import cn.blockforge.orient.framework.loader.RegistrationApi;
+import cn.blockforge.orient.framework.loader.RuntimeEvents;
 import cn.blockforge.orient.framework.loader.RuntimeStats;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -34,6 +35,7 @@ public final class FabricFrameworkPlatform implements Platform {
 
     private final FabricRegistrationApi registration = new FabricRegistrationApi();
     private final FabricNetworkApi network = new FabricNetworkApi();
+    private final FabricRuntimeEvents events = new FabricRuntimeEvents();
 
     private FabricFrameworkPlatform() {
     }
@@ -59,6 +61,8 @@ public final class FabricFrameworkPlatform implements Platform {
             LOGGER.info("[ORIENT-FW] init process={} platform={} count={} installs={}",
                 RuntimeStats.get().process(), platform.getClass().getSimpleName(),
                 RuntimeStats.get().initCount(), RuntimeStats.get().installCount());
+            FabricLootEvents.install();
+            ServerLifecycleEvents.SERVER_STARTING.register(server -> platform.registration.closeRegistration());
             ServerLifecycleEvents.SERVER_STARTED.register(server -> RuntimeStats.get().logSummary("server-started"));
             ServerLifecycleEvents.SERVER_STOPPED.register(server -> RuntimeStats.get().logSummary("server-stopped"));
         }
@@ -72,6 +76,11 @@ public final class FabricFrameworkPlatform implements Platform {
     @Override
     public NetworkApi network() {
         return network;
+    }
+
+    @Override
+    public RuntimeEvents events() {
+        return events;
     }
 
     @Override
@@ -97,6 +106,12 @@ public final class FabricFrameworkPlatform implements Platform {
     @Override
     public boolean isDevelopmentEnvironment() {
         return FabricLoader.getInstance().isDevelopmentEnvironment();
+    }
+
+    // mryt233 改（2026-11-10）：配置初始化需要的环境信息。
+    @Override
+    public boolean isDedicatedServer() {
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
     }
 
     private record Factory(MenuProviderLike menu, BlockPos data) implements ExtendedMenuProvider<BlockPos> {

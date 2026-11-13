@@ -277,6 +277,46 @@
       "apply": {
         "model": "orients_hotpot_chronicles:block/standalone_soup_three_fresh_boiling_on_campfire"
       }
+    },
+    {
+      "when": {
+        "soup": "other",
+        "boiling": "false",
+        "on_campfire": "false"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_other"
+      }
+    },
+    {
+      "when": {
+        "soup": "other",
+        "boiling": "false",
+        "on_campfire": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_other_on_campfire"
+      }
+    },
+    {
+      "when": {
+        "soup": "other",
+        "boiling": "true",
+        "on_campfire": "false"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_other_boiling"
+      }
+    },
+    {
+      "when": {
+        "soup": "other",
+        "boiling": "true",
+        "on_campfire": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/standalone_soup_other_boiling_on_campfire"
+      }
     }
   ]
 }

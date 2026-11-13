@@ -1,7 +1,7 @@
 # 我的世界[之晗的火锅物语]模组-游玩教程
 
 :::tip
-**本教程对应已发布的 0.2.2-alpha，用 Minecraft 1.21.1 Fabric 演示**（1.21.1 NeoForge、1.20.1 Fabric / Forge、26.1.x 与 26.2 的 Fabric / NeoForge 玩法相同，见[下载、安装与反馈](install.html)）。这一版新加了酥肉、豆干、腐竹、宽粉、苕皮、金针菇、青菜、藕片、鱿鱼卷、蛋炒饭、辣椒、折耳根与冷热豆腐，补齐 15 种蘸料，加入红汤 4 档辣度、六种汤底专属风味、竹筷摆桌面（配白瓷迷你筷架）、条凳叠梯子、碰杯干杯、布围裙、指南书内搜索、模组菜单配置界面，并深度适配了 JEI / REI 与 Jade 信息指示器。
+**本教程对应已打包的 0.3.0-alpha，用 Minecraft 1.21.1 Fabric 演示**（1.21.1 NeoForge、1.20.1 Fabric / Forge、26.1.x 与 26.2 的 Fabric / NeoForge 玩法相同，见[下载、安装与反馈](install.html)）。本版新增蓝印花/棕边三款布围裙及染色换款、芝麻酱与蚝油桌面摆设、竹筷立体双色摆桌与沿口架碗、常用/高级设置界面与 37 项新可调数值（围锅回血、冷锅反胃、碰杯、辣度、战利品掉率）、单列翻页蘸料原料表，并开放数据包与子模组新增汤底、蘸料、通用汤碗及锅内/捣制配方。
 :::
 
 {{icons:brick_stove,iron_nine_grid_hotpot,bamboo_chopsticks,oak_hotpot_table,oak_stool,quartz_eight_slot_platter,oak_sauce_station,cutting_board}}
@@ -48,7 +48,7 @@
 
 ## 支持哪些版本、去哪下载
 
-0.2.2-alpha 同步支持 **Minecraft 1.21.1（Fabric、NeoForge）**、**1.20.1（Fabric、Forge）**、**26.1.x（Fabric、NeoForge）** 和 **26.2（Fabric、NeoForge）**；**本教程用 1.21.1 Fabric 演示**；下载地址（CurseForge、Modrinth、MC 百科、GitHub）、安装步骤、反馈方式（GitHub、QQ 群）见 [下载、安装与反馈](install.html)。
+0.3.0-alpha 同步支持 **Minecraft 1.21.1（Fabric、NeoForge）**、**1.20.1（Fabric、Forge）**、**26.1.x（Fabric、NeoForge）** 和 **26.2（Fabric、NeoForge）**；**本教程用 1.21.1 Fabric 演示**；下载地址（CurseForge、Modrinth、MC 百科、GitHub）、安装步骤、反馈方式（GitHub、QQ 群）见 [下载、安装与反馈](install.html)。
 
 :::warn
 模组还在 **alpha** 阶段，只做过初步测试。0.1.0-alpha.1 旧存档升级后东西可能丢失或变样，**升级前先备份存档**，最好在新存档里玩。

@@ -29,7 +29,7 @@ public class CuttingBoardRenderer extends cn.blockforge.orient.framework.client.
             return;
         }
         // 捣丸子的中间阶段（捶碎 / 肉浆）：换成对应样子的物品，和生肉一样按物品画，是立体的
-        stack = cn.blockforge.generated.orientshotpotchronicles.hotpot.Pounding.display(stack, be.cuts());
+        stack = cn.blockforge.generated.orientshotpotchronicles.hotpot.Pounding.display(be.getLevel(), stack, be.cuts());
         matrices.pushPose();
         matrices.translate(0.5, CuttingBoardBlock.TOP + 0.02, 0.5);
         // 物品的「上方」朝远离放砧板的人那边，站在放的位置看是正的（2026-10-23 用户：板上的东西要朝着玩家）

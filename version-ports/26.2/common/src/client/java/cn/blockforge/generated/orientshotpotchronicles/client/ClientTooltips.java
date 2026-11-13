@@ -1,8 +1,12 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.Locale;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -31,28 +35,42 @@ public final class ClientTooltips {
      */
     public static void appendCookedSoup(ItemStack food, List<Component> lines) {
         String soupKey = food.get(HotPotContent.COOKED_IN_SOUP);
-        SoupBase soup = SoupBase.byTextureKey(soupKey);
+        SoupDef soup = Soups.get(soupKey);   // mryt233 改（2026-11-11，4B-2）：问登记表
         // 红汤碗和红汤里夹出来的菜都带 SPICY_LEVEL 组件，先取出来备用
         int spicy = Math.max(0, Math.min(3, food.getOrDefault(HotPotContent.SPICY_LEVEL, 0)));
         if (soup != null) {
             // 任务单的写法：红汤后面接「· 特辣」（状态栏那边是「红汤锅底（特辣）」）
             Component soupName = Component.translatable(soup.nameKey());
-            if (soup == SoupBase.SPICY) {
+            // mryt233 改（2026-11-10，r147）：红汤判断改成 isSpicy() 属性
+            if (soup.spicy()) {
                 soupName = Component.empty().append(soupName).append(Component.literal(" · "))
                     .append(HotPotBlockEntity.spicyLevelText(spicy));
             }
             lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.cooked_in_soup"), soupName)
-                .withStyle(soup == SoupBase.SPICY ? ChatFormatting.RED : ChatFormatting.GOLD));
+                .withStyle(soup.spicy() ? ChatFormatting.RED : ChatFormatting.GOLD));
             appendSoupEffects(soup, spicy, food, lines);
+        } else if (soupKey != null && !soupKey.isEmpty()) {
+            lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.cooked_in_soup"),
+                Component.translatable("text.orients_hotpot_chronicles.soup.unknown").append(" (" + soupKey + ")"))
+                .withStyle(ChatFormatting.GRAY));
         }
         if (food.getItem() instanceof SoupBowlItem bowl) {
-            if (bowl.soup() == SoupBase.SPICY) {
-                lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.spicy_level"),
-                    HotPotBlockEntity.spicyLevelText(food.getOrDefault(HotPotContent.SPICY_LEVEL, 0)))
-                    .withStyle(ChatFormatting.RED));
+            SoupDef bowlDef = bowl.soupDef(food);
+            if (bowlDef != null) {
+                if (bowlDef.spicy()) {
+                    lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.spicy_level"),
+                        HotPotBlockEntity.spicyLevelText(spicy))
+                        .withStyle(ChatFormatting.RED));
+                }
+                // mryt233 改（2026-11-06，r139）：汤碗喝下去的效果和锅里涮出来的菜一样，也逐条列出来
+                appendSoupEffects(bowlDef, spicy, food, lines);
+            } else {
+                String rawId = bowl.rawSoupId(food);
+                if (rawId != null && !rawId.isEmpty()) {
+                    lines.add(Component.translatable("text.orients_hotpot_chronicles.soup.unknown")
+                        .append(" (" + rawId + ")").withStyle(ChatFormatting.GRAY));
+                }
             }
-            // mryt233 改（2026-11-06，r139）：汤碗喝下去的效果和锅里涮出来的菜一样，也逐条列出来
-            appendSoupEffects(bowl.soup(), spicy, food, lines);
         }
     }
 
@@ -62,15 +80,15 @@ public final class ClientTooltips {
      * 和原版状态效果提示的颜色一致。蘸了蜂蜜或醋的菜吃下去不会真的加负面效果，这里也不列，
      * 免得提示和实际吃下去的效果对不上（结算在 LivingEntityEatMixin）。
      */
-    private static void appendSoupEffects(SoupBase soup, int spicy, ItemStack food, List<Component> lines) {
+    private static void appendSoupEffects(SoupDef soup, int spicy, ItemStack food, List<Component> lines) {
         List<MobEffectInstance> effects = soup.dishBonusEffects(spicy);
         if (effects.isEmpty()) {
             return;
         }
         // 蘸过解辣的东西（蜂蜜 / 醋）：红汤的饥饿不再叠上去，提示里也别写
-        Integer dipped = food.get(HotPotContent.DIPPED);
+        java.util.List<String> dipped = food.get(HotPotContent.DIPPED);   // mryt233 改（4E-1）
         boolean calmSpicy = dipped != null
-            && ((dipped & Seasoning.HONEY.bit()) != 0 || (dipped & Seasoning.VINEGAR.bit()) != 0);
+                && (SauceIds.containsDef(dipped, Seasoning.HONEY) || SauceIds.containsDef(dipped, Seasoning.VINEGAR));
         for (MobEffectInstance effect : effects) {
             if (calmSpicy && effect.getEffect().is(MobEffects.HUNGER)) {
                 continue;
@@ -106,7 +124,7 @@ public final class ClientTooltips {
             return "∞";
         }
         int seconds = (ticks + 19) / 20;
-        return (seconds / 60) + ":" + String.format(java.util.Locale.ROOT, "%02d", seconds % 60);
+        return (seconds / 60) + ":" + String.format(Locale.ROOT, "%02d", seconds % 60);
     }
 
     /**
@@ -114,8 +132,8 @@ public final class ClientTooltips {
      * 一行「蘸了：味精、辣油」+ 每种调料一行灰字效果；没蘸过的什么都不加。
      */
     public static void appendDipped(ItemStack food, List<Component> lines) {
-        Integer dipped = food.get(HotPotContent.DIPPED);
-        if (dipped == null || dipped == 0) {
+        java.util.List<String> dipped = food.get(HotPotContent.DIPPED);
+        if (dipped == null || dipped.isEmpty()) {
             return;
         }
         lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.dipped"),
@@ -128,7 +146,7 @@ public final class ClientTooltips {
         var id = BuiltInRegistries.ITEM.getKey(stack.getItem());
         if (HotPot.MOD_ID.equals(id.getNamespace())) {
             String key = "tooltip." + HotPot.MOD_ID + ".flavor." + id.getPath();
-            if (net.minecraft.locale.Language.getInstance().has(key)) {
+            if (Language.getInstance().has(key)) {
                 lines.add(Component.translatable(key).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
             }
         }

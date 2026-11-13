@@ -264,6 +264,24 @@
     },
     {
       "when": {
+        "soup": "other",
+        "lit": "false"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/tall_stove_soup_other"
+      }
+    },
+    {
+      "when": {
+        "soup": "other",
+        "lit": "true"
+      },
+      "apply": {
+        "model": "orients_hotpot_chronicles:block/tall_stove_soup_other_boiling"
+      }
+    },
+    {
+      "when": {
         "pot": "copper_yuanyang_s",
         "pot_axis": "x"
       },

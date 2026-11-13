@@ -1,6 +1,15 @@
 // mryt233 改：26.1 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.core.Direction;
+
+// mryt233 改（2026-11-11）：第三批 3G 存读档改走适配小包，键名与结构不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.BeIo;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.level.block.LevelEvent;
+import org.jetbrains.annotations.Nullable;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.api.HotpotScreens;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -9,14 +18,12 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.server.level.ServerPlayer;
@@ -106,27 +113,33 @@ public class StoveBlockEntity extends HotPotBlockEntity {
         } else if (burnTicks > 0 && world.getGameTime() % 20L == 0L) {
             setChanged();
         }
-        if (lit && world.getGameTime() % WARMTH_INTERVAL == 0L && pot != null) {
-            giveWarmth(world, worldPosition);
+        int warmthDuration = Config.warmthDuration();
+        if (lit && warmthDuration > 0 && world.getGameTime() % Math.max(1, Config.warmthIntervalTicks()) == 0L && pot != null) {
+            giveWarmth(world, worldPosition, warmthDuration);
         }
         super.serverTick(world);
     }
 
-    /** 围锅回血：每 4 秒给范围内玩家续一次生命恢复 I，做法同原版信标（环境效果、粒子很淡）。 */
-    static final long WARMTH_INTERVAL = 80L;
-    private static final int WARMTH_RANGE = 6;
-    private static final int WARMTH_DURATION = 200;
-
-    /** 给 pos 周围的玩家续生命恢复；篝火上的独立锅（r102）也用这个。 */
+    /** 围锅回血：默认每 4 秒给范围内玩家续一次生命恢复 I，做法同原版信标（环境效果、粒子很淡）；mryt233 改：参数读取 Config.warmth*()。 */
     static void giveWarmth(Level world, BlockPos worldPosition) {
-        AABB area = new AABB(worldPosition).inflate(WARMTH_RANGE);
+        giveWarmth(world, worldPosition, Config.warmthDuration());
+    }
+
+    /** 给 pos 周围的玩家续生命恢复；duration <= 0 时直接跳过扫描与加效果。 */
+    static void giveWarmth(Level world, BlockPos worldPosition, int duration) {
+        if (duration <= 0) {
+            return;
+        }
+        int range = Math.max(1, Config.warmthRange());
+        int amplifier = Math.max(0, Config.warmthAmplifier());
+        AABB area = new AABB(worldPosition).inflate(range);
         for (Player player : world.getEntitiesOfClass(Player.class, area)) {
-            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, WARMTH_DURATION, 0, true, true));
+            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, duration, amplifier, true, true));
         }
     }
 
     /** 被这台灶台加热的锅：坐在灶里的锅就是自己，否则是正上方的旧式独立锅。 */
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     private HotPotBlockEntity heatedPot() {
         if (hasPot()) {
             return this;
@@ -174,7 +187,7 @@ public class StoveBlockEntity extends HotPotBlockEntity {
      * mryt233 改（2026-11-07）：返回是否真的装上。调用方要据此决定要不要读锅内容、扣锅物品；
      * 以前是 void，装不上也照扣，等于把玩家一整锅东西吞掉。
      */
-    public boolean attachPot(HotPotMaterial material, net.minecraft.core.Direction.Axis handleAxis) {
+    public boolean attachPot(HotPotMaterial material, Direction.Axis handleAxis) {
         if (level == null || level.isClientSide() || material == null) {
             return false;
         }
@@ -235,7 +248,7 @@ public class StoveBlockEntity extends HotPotBlockEntity {
         }
         HotPotBlock potBlock = HotPotContent.blockFor(material);
         BlockState potState = potBlock.defaultBlockState();
-        level.levelEvent(null, net.minecraft.world.level.block.LevelEvent.PARTICLES_DESTROY_BLOCK, worldPosition, Block.getId(potState));
+        level.levelEvent(null, LevelEvent.PARTICLES_DESTROY_BLOCK, worldPosition, Block.getId(potState));
         if (!player.isCreative()) {
             if (player.hasCorrectToolForDrops(potState)) {
                 Block.popResource(level, worldPosition, toPotItem(material));
@@ -243,7 +256,7 @@ public class StoveBlockEntity extends HotPotBlockEntity {
                 dropContents();
             }
             player.getMainHandItem().mineBlock(level, potState, worldPosition, player);
-            player.awardStat(net.minecraft.stats.Stats.BLOCK_MINED.get(potBlock));
+            player.awardStat(Stats.BLOCK_MINED.get(potBlock));
             player.causeFoodExhaustion(0.005F);
         }
         removePot();
@@ -337,33 +350,37 @@ public class StoveBlockEntity extends HotPotBlockEntity {
 
     // ------------------------------------------------------------------ NBT
 
+    // mryt233 改（2026-11-11）：第三批 3G 存读档改走适配小包，键名、结构与兜底值不变。
     @Override
     protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput nbt) {
         super.saveAdditional(nbt);
-        nbt.putInt("BurnTicks", burnTicks);
-        nbt.putInt("BurnTotal", burnTotal);
-        nbt.putInt("FuelType", fuelType);
-        nbt.putBoolean("IdleFlame", idleFlame);
-        // 灶膛燃料单独存进 "Fuel" 子标签，避开父类 81 格用的 "Items" 键。
-        NonNullList<ItemStack> list = NonNullList.withSize(FUEL_SLOTS, ItemStack.EMPTY);
-        list.set(0, fuel.getItem(0));
-        var fuelNbt = nbt.child("Fuel");
-        ContainerHelper.saveAllItems(fuelNbt, list);
+        BeIo.write(nbt, w -> {
+            w.putInt("BurnTicks", burnTicks);
+            w.putInt("BurnTotal", burnTotal);
+            w.putInt("FuelType", fuelType);
+            w.putBoolean("IdleFlame", idleFlame);
+            // 灶膛燃料单独存进 "Fuel" 子标签，避开父类 81 格用的 "Items" 键。
+            NonNullList<ItemStack> list = NonNullList.withSize(FUEL_SLOTS, ItemStack.EMPTY);
+            list.set(0, fuel.getItem(0));
+            w.child("Fuel").putItems(list);
+        });
     }
 
     @Override
     protected void loadAdditional(net.minecraft.world.level.storage.ValueInput nbt) {
         super.loadAdditional(nbt);
-        burnTicks = nbt.getIntOr("BurnTicks", 0);
-        burnTotal = nbt.getIntOr("BurnTotal", 0);
-        fuelType = nbt.getIntOr("FuelType", -1);
-        idleFlame = nbt.getBooleanOr("IdleFlame", false);
-        fuel.clearContent();
-        if (nbt.child("Fuel").isPresent()) {
-            NonNullList<ItemStack> list = NonNullList.withSize(FUEL_SLOTS, ItemStack.EMPTY);
-            ContainerHelper.loadAllItems(nbt.childOrEmpty("Fuel"), list);
-            fuel.setItem(0, list.get(0));
-        }
+        BeIo.read(nbt, r -> {
+            burnTicks = r.getInt("BurnTicks", 0);
+            burnTotal = r.getInt("BurnTotal", 0);
+            fuelType = r.getInt("FuelType", -1);
+            idleFlame = r.getBoolean("IdleFlame", false);
+            fuel.clearContent();
+            if (r.hasCompound("Fuel")) {
+                NonNullList<ItemStack> list = NonNullList.withSize(FUEL_SLOTS, ItemStack.EMPTY);
+                r.child("Fuel").loadItems(list);
+                fuel.setItem(0, list.get(0));
+            }
+        });
     }
 
     @Override

@@ -1,0 +1,4 @@
+# 1.20.1 保留清单（作者：mryt233）
+# 一行一个目标相对路径（相对 common/src/main/resources），路径后两个空格 + "# " 写原因。
+# 通配符用 fnmatch 语义；空行和整行以 # 开头的是注释。只匹配文件。
+orients_hotpot_chronicles.mixins.json  # 加载器配置而非资源：Forge 1.20.1 要 refmap、compatibilityLevel 是 JAVA_17，mixin 条目要跟 1.20.1 的 mixin 类走（没有 LootTableAccessor、多 HandledScreenMixin），不能照 1.21.1 覆盖

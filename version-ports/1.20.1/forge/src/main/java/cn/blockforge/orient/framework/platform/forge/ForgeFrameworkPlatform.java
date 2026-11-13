@@ -1,5 +1,7 @@
 package cn.blockforge.orient.framework.platform.forge;
 
+// mryt233 改（2026-11-10）：第三批 3C 平台接线。
+
 import cn.blockforge.orient.framework.loader.Framework;
 import cn.blockforge.orient.framework.loader.LootEventBridge;
 import cn.blockforge.orient.framework.loader.MenuOpener;
@@ -7,6 +9,7 @@ import cn.blockforge.orient.framework.loader.MenuProviderLike;
 import cn.blockforge.orient.framework.loader.NetworkApi;
 import cn.blockforge.orient.framework.loader.Platform;
 import cn.blockforge.orient.framework.loader.RegistrationApi;
+import cn.blockforge.orient.framework.loader.RuntimeEvents;
 import cn.blockforge.orient.framework.loader.RuntimeStats;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -14,13 +17,14 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +39,7 @@ public final class ForgeFrameworkPlatform implements Platform {
     private static final Logger LOGGER = LoggerFactory.getLogger("orient-framework");
     private static ForgeFrameworkPlatform installed;
 
+    private final ForgeRuntimeEvents events = new ForgeRuntimeEvents();
     private final ForgeRegistrationApi registration = new ForgeRegistrationApi();
     private final ForgeNetworkApi network = new ForgeNetworkApi();
 
@@ -54,13 +59,17 @@ public final class ForgeFrameworkPlatform implements Platform {
                 Framework.install(platform);
             }
             installed = platform;
+            ForgeLootEvents.install();
             cn.blockforge.orient.framework.compat.RecipeRegistrations.install(platform.registration::queueRecipeSerializer);
             RuntimeStats.get().runtimeInit();
             modBus.addListener(platform.registration::onRegisterEvent);
-            modBus.addListener((net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent event) -> platform.network.finishRegistration());
+            modBus.addListener((FMLCommonSetupEvent event) -> {
+                platform.network.finishRegistration();
+                platform.registration.closeNonRegistryWindows();
+            });
 
             if (FMLEnvironment.dist.isClient()) {
-                ForgeClientEvents.installLifecycle();
+                ForgeClientEvents.installLifecycle(modBus);
             }
             MinecraftForge.EVENT_BUS.addListener((ServerStartedEvent event) -> RuntimeStats.get().logSummary("server-started"));
             MinecraftForge.EVENT_BUS.addListener((ServerStoppingEvent event) -> RuntimeStats.get().logSummary("server-stopped"));
@@ -68,6 +77,11 @@ public final class ForgeFrameworkPlatform implements Platform {
                 RuntimeStats.get().process(), platform.getClass().getSimpleName(),
                 RuntimeStats.get().initCount(), RuntimeStats.get().installCount());
         }
+    }
+
+    @Override
+    public RuntimeEvents events() {
+        return events;
     }
 
     @Override
@@ -103,6 +117,11 @@ public final class ForgeFrameworkPlatform implements Platform {
     @Override
     public boolean isDevelopmentEnvironment() {
         return !FMLEnvironment.production;
+    }
+
+    @Override
+    public boolean isDedicatedServer() {
+        return FMLEnvironment.dist.isDedicatedServer();
     }
 
     private record Provider(MenuProviderLike menu) implements MenuProvider {

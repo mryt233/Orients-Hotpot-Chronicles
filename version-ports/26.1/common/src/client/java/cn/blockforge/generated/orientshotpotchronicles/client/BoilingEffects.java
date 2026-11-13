@@ -1,7 +1,14 @@
 // mryt233 改：26.1 原版标识符类型。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.function.BiPredicate;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupVisual;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -33,27 +40,46 @@ public final class BoilingEffects {
 
     /** 清水锅的气泡配色（子模组画水锅时用）。 */
     private static final Palette WATER = new Palette(0x5A8FD8, 0xC8E2FF);
+    /** 未知汤底（如卸载数据包/子模组后的残余汤面）使用的中性气泡配色。 */
+    private static final Palette UNKNOWN = new Palette(0xFFB8AEC8, 0xFFEAE4F2);
 
-    // 配色做成常量，不再每帧 new（代码检查 W5，mryt233 2026-11-01）
-    private static final Palette PAL_CLEAR = new Palette(0xC6CCCA, 0xF4F4EC);   // 2026-10-23 清汤换成清亮的银灰（用户参考图），调整
-    private static final Palette PAL_RICH_STOCK = new Palette(0xF2E7D2, 0xFFFFFF);
-    private static final Palette PAL_MUSHROOM = new Palette(0x9A7048, 0xE8C88A);
-    private static final Palette PAL_TOMATO = new Palette(0xE2563A, 0xFF9A6A);       // 2026-10-25 番茄锅底
-    private static final Palette PAL_THREE_FRESH = new Palette(0xE6D8B0, 0xFFF6DC);  // 2026-10-25 三鲜锅底
-    private static final Palette PAL_SPICY = new Palette(0xBE3325, 0xD8553A); // 红汤：比汤底 #B82F23 稍亮，顶面带红油光泽
+    private static final Map<SoupVisual, Palette> PALETTES = buildPalettes();
+
+    private static Map<SoupVisual, Palette> buildPalettes() {
+        EnumMap<SoupVisual, Palette> map = new EnumMap<>(SoupVisual.class);
+        for (SoupDef def : Soups.builtins()) {
+            map.put(def.visual(), new Palette(def.bubbleBody(), def.bubbleHi()));
+        }
+        return Collections.unmodifiableMap(map);
+    }
 
     private static Palette palette(SoupVisual soup) {
-        return switch (soup) {
-            case CLEAR -> PAL_CLEAR;
-            case RICH_STOCK -> PAL_RICH_STOCK;
-            case MUSHROOM -> PAL_MUSHROOM;
-            case TOMATO -> PAL_TOMATO;
-            case THREE_FRESH -> PAL_THREE_FRESH;
-            default -> PAL_SPICY;
-        };
+        if (soup == SoupVisual.OTHER) {
+            return UNKNOWN;
+        }
+        Palette palette = PALETTES.get(soup);
+        if (palette == null) {
+            throw new IllegalStateException("汤面 " + soup + " 没有气泡配色；加汤底时要在汤底定义（SoupBase 构造参数 / SoupDef）上补气泡配色。");
+        }
+        return palette;
     }
 
     private BoilingEffects() {
+    }
+
+    /** 按汤底定义直接渲染气泡（4F-3：支持非内置 SoupVisual.OTHER 汤底及未知汤底兜底）。 */
+    static void render(SoupDef soup, float surfaceY, float innerMin, float innerSize, float heat,
+                       double seconds, int salt, PoseStack matrices, RenderFrame consumers, int light) {
+        render(soup, surfaceY, innerMin, innerSize, heat, seconds, salt, matrices, consumers, light, null);
+    }
+
+    /** 按汤底定义与区域过滤渲染气泡。 */
+    static void render(SoupDef soup, float surfaceY, float innerMin, float innerSize, float heat,
+                       double seconds, int salt, PoseStack matrices, RenderFrame consumers, int light,
+                       BiPredicate<Double, Double> keepAt) {
+        Palette pal = soup == null ? UNKNOWN : new Palette(soup.bubbleBody(), soup.bubbleHi());
+        renderWithPalette(pal, surfaceY, innerMin, innerSize, heat, seconds, salt,
+            matrices, consumers, light, keepAt);
     }
 
     /**
@@ -73,7 +99,7 @@ public final class BoilingEffects {
      */
     static void render(SoupVisual soup, float surfaceY, float innerMin, float innerSize, float heat,
                        double seconds, int salt, PoseStack matrices, RenderFrame consumers, int light,
-                       java.util.function.BiPredicate<Double, Double> keepAt) {
+                       BiPredicate<Double, Double> keepAt) {
         if (!soup.hasSoup()) {
             return;
         }
@@ -96,7 +122,7 @@ public final class BoilingEffects {
     private static void renderWithPalette(Palette pal, float surfaceY, float innerMin, float innerSize, float heat,
                                           double seconds, int salt, PoseStack matrices,
                                           RenderFrame consumers, int light,
-                                          java.util.function.BiPredicate<Double, Double> keepAt) {
+                                          BiPredicate<Double, Double> keepAt) {
         if (heat < 0.05F) {
             return;
         }

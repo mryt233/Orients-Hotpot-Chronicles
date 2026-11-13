@@ -6,7 +6,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,6 +21,7 @@ import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.EquipmentAssets;
 
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -30,15 +30,16 @@ import java.util.function.Consumer;
  *
  * <p>26.x 没有 {@code ArmorItem} 类了，护甲改成「物品属性上挂装备信息 + 自带护甲材质」：
  * {@code properties.humanoidArmor(ArmorMaterial, ArmorType)} 一次给齐装备槽、装备音、耐久与护甲属性，
- * 所以本类直接继承 {@link Item}，自己造一份「轻质布料」材质——防御照皮革（3 点）、耐久 80、
+ * 所以本类直接继承 {@link Item}，自己造「轻质布料」材质——防御照皮革（3 点）、耐久 80、
  * 附魔性 15、皮革装备音，护甲层贴图指向本模组的
- * {@code assets/orients_hotpot_chronicles/equipment/cloth_apron.json} →
- * {@code textures/entity/equipment/humanoid/cloth_apron.png}（浅亚麻布 + 白色挂脖绳），
- * 穿起来是布围裙的样子。</p>
+ * {@code assets/orients_hotpot_chronicles/equipment/<款式>.json} →
+ * {@code textures/entity/equipment/humanoid/<款式>.png}，穿起来是布围裙的样子。</p>
  *
- * <p>mryt233 改（2026-11-08）：26.x 的 {@link ArmorMaterial} 是纯 record（不再进注册表，直接当参数传），
- * 护甲层贴图从 {@code textures/models/armor/<名字>_layer_N.png} 挪到装备资产
- * {@code assets/<命名空间>/equipment/<名字>.json} 指向的 {@code textures/entity/equipment/<类型>/<贴图>.png}。</p>
+ * <p>mryt233 改（2026-11-09，r146b）：分成三款——米白粗布、蓝印花、棕边带兜。
+ * 三款的数值、耐久、附魔性、修复材料、防护效果完全一样，只有装备资产和名字不同；
+ * 用工作台加染料可以互相换款（配方见 {@link ApronRecolorRecipe}），换款保留耐久 / 附魔 / 自定义名字。
+ * 判断「穿的是不是布围裙」统一用物品标签 {@code orients_hotpot_chronicles:cloth_aprons}，
+ * 不要直接比 {@code HotPotContent.CLOTH_APRON} 这一个常量。</p>
  *
  * <p>防护特性（用户要的两条）：</p>
  * <ol>
@@ -48,11 +49,15 @@ import java.util.function.Consumer;
  *       见 {@link ClothApronProtection#tickOne}。</li>
  * </ol>
  *
- * <p>修复：白色羊毛或线（{@link #isValidRepairItem}），和工作台配方一致。
+ * <p>修复：白色羊毛或线（材质里的修复标签），和工作台配方一致。
  * 作者：mryt233 */
 public class ClothApronItem extends Item {
-    /** 布围裙材质 / 装备资产的注册 ID。 */
+    /** 米白款装备资产的注册 ID（其余两款的 ID 是 {@code <款式 ID>}，见 {@link Style}）。 */
     public static final Identifier MATERIAL_ID = HotPot.id("cloth_apron");
+    /** 三款布围裙共用的物品标签：所有「穿没穿围裙」的判断都认它（r146b）。 */
+    public static final net.minecraft.tags.TagKey<Item> APRON_TAG =
+        net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM,
+            HotPot.id("cloth_aprons"));
     /** 胸部防御点数（和原版皮革胸甲一致：3 点）。 */
     public static final int DEFENSE = 3;
     /** 耐久（和原版皮革胸甲一致：80）。 */
@@ -64,22 +69,65 @@ public class ClothApronItem extends Item {
     private static final net.minecraft.tags.TagKey<Item> REPAIR_TAG =
         net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, HotPot.id("cloth_apron_repair"));
 
-    /** 轻质布料材质（纯 record，构造一次留着复用）。 */
-    private static final ArmorMaterial MATERIAL = new ArmorMaterial(
-        DURABILITY,
-        Map.of(ArmorType.CHESTPLATE, DEFENSE),
-        ENCHANTMENT_VALUE,
-        SoundEvents.ARMOR_EQUIP_LEATHER,
-        0.0F,   // 韧性：布做的没有
-        0.0F,   // 击退抗性：同上
-        REPAIR_TAG,   // 修复材料：白色羊毛或线（见 data/orients_hotpot_chronicles/tags/item/cloth_apron_repair.json）
-        ResourceKey.create(EquipmentAssets.ROOT_ID, MATERIAL_ID));
+    /** 三款各一份轻质布料材质（纯 record，构造一次留着复用），key 是款式。 */
+    private static final Map<Style, ArmorMaterial> MATERIALS = new EnumMap<>(Style.class);
 
-    public ClothApronItem(Item.Properties properties) {
+    /**
+     * 三款布围裙（r146b，2026-11-09 用户定）。顺序 = 工作台里换款的颜色顺序（米白 → 蓝印花 → 棕边带兜）。
+     * <p>{@code id} 既是物品注册名，也是装备资产的名字
+     * （{@code assets/<命名空间>/equipment/<id>.json} 指向 {@code textures/entity/equipment/humanoid/<id>.png}）。
+     */
+    public enum Style {
+        /** 米白粗布：默认款，沿用原来的 ID。 */
+        LINEN("cloth_apron"),
+        /** 蓝印花：靛蓝底、白色十字小花。 */
+        BLUE_PRINT("blue_print_cloth_apron"),
+        /** 棕边带兜：米白底、深棕滚边、下面一个方框口袋。 */
+        BROWN_TRIM("brown_trim_cloth_apron");
+
+        private final String id;
+
+        Style(String id) {
+            this.id = id;
+        }
+
+        public String id() {
+            return id;
+        }
+    }
+
+    /** 这一件是哪款（认不出来时按米白款算）。 */
+    public Style style() {
+        return style;
+    }
+
+    private final Style style;
+
+    /** 按款式取材质：第一次用到时造一份，之后复用。 */
+    private static synchronized ArmorMaterial material(Style style) {
+        ArmorMaterial cached = MATERIALS.get(style);
+        if (cached == null) {
+            cached = new ArmorMaterial(
+                DURABILITY,
+                Map.of(ArmorType.CHESTPLATE, DEFENSE),
+                ENCHANTMENT_VALUE,
+                SoundEvents.ARMOR_EQUIP_LEATHER,
+                0.0F,   // 韧性：布做的没有
+                0.0F,   // 击退抗性：同上
+                REPAIR_TAG,   // 修复材料：白色羊毛或线
+                ResourceKey.create(EquipmentAssets.ROOT_ID, HotPot.id(style.id())));
+            MATERIALS.put(style, cached);
+        }
+        return cached;
+    }
+
+    /** 26.x 的注册走框架给的带注册键 Properties，构造器收 Properties（r146b 加款式参数）。 */
+    public ClothApronItem(Style style, Item.Properties properties) {
         super(properties
             .durability(DURABILITY)
             .component(DataComponents.ATTRIBUTE_MODIFIERS, modifiers())
-            .humanoidArmor(MATERIAL, ArmorType.CHESTPLATE));
+            .humanoidArmor(material(style), ArmorType.CHESTPLATE));
+        this.style = style;
     }
 
     /** 胸甲属性：护甲 +3、无韧性无击退抗性（布做的，和皮革一样）。 */
@@ -105,15 +153,27 @@ public class ClothApronItem extends Item {
         super.appendHoverText(stack, context, display, tooltip, flag);
         tooltip.accept(Component.translatable(HotPotBlockEntity.key("tooltip.cloth_apron"))
             .withStyle(ChatFormatting.GRAY));
+        // mryt233 改（2026-11-09，r146b）：三款都能用染料换色，说明里写清怎么换
+        tooltip.accept(Component.translatable(HotPotBlockEntity.key("tooltip.cloth_apron_style"))
+            .withStyle(ChatFormatting.DARK_GRAY));
     }
 
-    /** 穿着布围裙（胸甲槽是它）就返回 true；别的部位 / 没穿返回 false。 */
+    /**
+     * 穿着布围裙（胸甲槽里是任意一款）就返回 true；别的部位 / 没穿返回 false。
+     * mryt233 改（2026-11-09，r146b）：认物品标签 {@code orients_hotpot_chronicles:cloth_aprons}，
+     * 三款都在标签里，以后再加款也只改标签，不用回来改这段判断。
+     */
     public static boolean wornBy(LivingEntity entity) {
         if (entity == null) {
             return false;
         }
         ItemStack chest = entity.getItemBySlot(EquipmentSlot.CHEST);
-        return chest.getItem() instanceof ClothApronItem;
+        return isApron(chest);
+    }
+
+    /** 这一叠东西是不是布围裙（任意一款）：认 {@code cloth_aprons} 标签。 */
+    public static boolean isApron(ItemStack stack) {
+        return !stack.isEmpty() && stack.is(APRON_TAG);
     }
 
     /** 这个玩家穿着布围裙。 */

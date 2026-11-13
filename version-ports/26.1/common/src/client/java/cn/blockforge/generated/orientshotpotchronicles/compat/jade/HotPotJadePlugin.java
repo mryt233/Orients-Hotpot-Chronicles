@@ -1,6 +1,13 @@
 /** 作者：mryt233。灶台、锅与桌面餐具按准星部位提供 Jade 视图。 */
 package cn.blockforge.generated.orientshotpotchronicles.compat.jade;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.ChopstickRestBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceBottleBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceIds;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SeasoningDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasonings;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
@@ -107,7 +114,7 @@ public final class HotPotJadePlugin implements IWailaPlugin {
                     ? new ItemStack(HotPotContent.itemFor(stove.potMaterial())) : ItemStack.EMPTY);
             // 原始上格 accessor 只持有数据副本；数据中心此时仍校验上一帧的下格目标。
             CompoundTag data = registration.getServerData();
-            // mryt233 改（26.1）：NBT 取值改成返回 Optional 的写法（getInt 不再直接给 int）。
+            // mryt233 改（2026-11-08，26.x）：26.x 的 CompoundTag.getInt 返回 Optional<Integer>，取值要 getIntOr。
             if (data != null && data.getIntOr("x", Integer.MIN_VALUE) == pos.getX()
                     && data.getIntOr("y", Integer.MIN_VALUE) == pos.getY()
                     && data.getIntOr("z", Integer.MIN_VALUE) == pos.getZ()) {
@@ -200,9 +207,9 @@ public final class HotPotJadePlugin implements IWailaPlugin {
         List<ItemStack> merged = new ArrayList<>();
         if (plate.self.getItem() instanceof DippingSauceItem) {
             SauceContents contents = DippingSauceItem.contents(plate.self);
-            if (contents.bites() > 0 && contents.mask() != 0) {
-                for (Seasoning seasoning : Seasoning.ALL) {
-                    if ((contents.mask() & seasoning.bit()) != 0 && !seasoning.raws().isEmpty()) {
+            if (contents.bites() > 0 && !contents.isEmpty()) {
+                for (SeasoningDef seasoning : SauceIds.defs(contents.ids())) {
+                    if (!seasoning.raws().isEmpty()) {
                         appendMerged(merged, new ItemStack(seasoning.raw()));
                     }
                 }
@@ -212,7 +219,7 @@ public final class HotPotJadePlugin implements IWailaPlugin {
                 appendMerged(merged, stack);
             }
         }
-        if (plate.self.is(HotPotContent.CHOPSTICKS)) {
+        if (plate.plate instanceof ChopstickRestBlock) {
             appendMerged(merged, Chopsticks.held(plate.self));
         }
         if (!plate.chopsticks.isEmpty()) {
@@ -300,10 +307,16 @@ public final class HotPotJadePlugin implements IWailaPlugin {
             if (plate.self.getItem() instanceof DippingSauceItem) {
                 SauceContents contents = DippingSauceItem.contents(plate.self);
                 if (contents.bites() > 0) {
-                    Seasoning.appendEffects(contents.mask(), lines);
+                    Seasoning.appendEffects(contents.ids(), lines);
                     lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.sauce.bites"), contents.bites())
                         .withStyle(ChatFormatting.GRAY));
                 }
+            } else if (plate.plate instanceof SauceBottleBlock) {
+                // mryt233 改（2026-11-09，r146c）：桌上的芝麻酱 / 蚝油瓶现在只是摆设——Jade 只显示名称
+                //（Jade 默认取方块名，PlateHolderBlock#getName 返回的就是这瓶的名字）+ 一行「怎么摆、怎么拿」；
+                // 效果说明和剩余次数两行随「桌上加料 / 每瓶次数」一起去掉了。
+                lines.add(Component.translatable(HotPotBlockEntity.key("tooltip.sauce_bottle.hint"))
+                    .withStyle(ChatFormatting.DARK_GRAY));
             } else if (plate.holdsFood()) {
                 List<ItemStack> kinds = new ArrayList<>();
                 for (ItemStack food : plate.items) {
@@ -323,7 +336,7 @@ public final class HotPotJadePlugin implements IWailaPlugin {
                         lines.addAll(extra);
                     }
                 }
-            } else if (plate.self.is(HotPotContent.CHOPSTICKS)) {
+            } else if (plate.plate instanceof ChopstickRestBlock) {
                 SharedClientSetup.appendPlateTooltip(plate.self, lines);
             }
             if (!plate.chopsticks.isEmpty()) {

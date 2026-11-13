@@ -1,35 +1,8 @@
 {
-  "parent": "minecraft:block/block",
+  "parent": "orients_hotpot_chronicles:block/template/bench_middle",
   "textures": {
     "planks": "minecraft:block/acacia_planks",
     "particle": "minecraft:block/acacia_planks"
   },
-  "elements": [
-    {
-      "from": [
-        0,
-        14,
-        5
-      ],
-      "to": [
-        16,
-        16,
-        11
-      ],
-      "faces": {
-        "north": {
-          "texture": "#planks"
-        },
-        "south": {
-          "texture": "#planks"
-        },
-        "up": {
-          "texture": "#planks"
-        },
-        "down": {
-          "texture": "#planks"
-        }
-      }
-    }
-  ]
+  "_说明": "斜腿由 BenchLegsRenderer 在游戏里绘制，模型文件里没有；完整造型见 preview_models/assets/orients_hotpot_chronicles/models/block/acacia_bench_middle.json。作者：mryt233"
 }

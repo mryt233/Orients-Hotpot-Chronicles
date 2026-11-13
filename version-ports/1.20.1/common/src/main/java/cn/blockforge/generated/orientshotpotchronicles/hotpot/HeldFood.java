@@ -1,8 +1,10 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import com.mojang.serialization.Codec;
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
 import cn.blockforge.orient.framework.compat.RegistryFriendlyByteBuf;
 import cn.blockforge.orient.framework.compat.StreamCodec;
+import com.mojang.serialization.Codec;
+import java.util.Objects;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -12,9 +14,10 @@ import net.minecraft.world.item.ItemStack;
  * NeoForge 的 {@code CommonHooks.validateComponent} 要求组件值实现 equals/hashCode 且不可变
  * （ItemStack 不满足），一夹菜就抛 {@code IllegalArgumentException}。照原版
  * {@code ChargedProjectiles} 的做法包一层：存单份拷贝、读取时再拷一份出去，
- * equals/hashCode 走 {@code ItemStack.matches/hashStackList}，持久化编码仍是原来的
+ * equals/hashCode 走内容等价与 NBT 哈希，持久化编码仍是原来的
  * ItemStack JSON，旧存档不受影响。</p>
- * 作者：mryt233 */
+ * 作者：mryt233
+ */
 public final class HeldFood {
     public static final HeldFood EMPTY = new HeldFood(ItemStack.EMPTY);
     public static final Codec<HeldFood> CODEC = ItemStack.CODEC.xmap(HeldFood::new, HeldFood::stack);
@@ -48,7 +51,7 @@ public final class HeldFood {
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(stack.getItem(), stack.getCount(), stack.getTag());
+        return Objects.hash(stack.getItem(), stack.getCount(), stack.getTag());
     }
 
     @Override

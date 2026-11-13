@@ -1,10 +1,12 @@
-// mryt233 改：26.1 原版标识符类型。
+// mryt233 改：26.1 原版标识符与 Trigger 类型。
 package cn.blockforge.orient.framework.loader;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Inventory;
@@ -16,16 +18,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.function.Supplier;
 import java.util.function.Function;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.world.level.block.state.BlockBehaviour;
+import java.util.function.Supplier;
 
 /** 分域注册能力：每个 registrar 只在其注册表窗口内生效；平台负责窗口与去重预检。作者：mryt233 */
 public interface RegistrationApi {
@@ -103,5 +100,46 @@ public interface RegistrationApi {
 
     interface EntityRegistrar {
         <T extends Entity> EntityType<T> register(Identifier id, EntityType<T> type);
+    }
+
+    // mryt233 改（2026-11-10）：补充配方、条件触发、声音与粒子注册表域；旧实现保留默认抛出。
+    default RecipeSerializerRegistrar recipeSerializers() {
+        throw new UnsupportedOperationException("recipeSerializers requires Runtime 0.1.5");
+    }
+
+    interface RecipeSerializerRegistrar {
+        <T extends net.minecraft.world.item.crafting.RecipeSerializer<?>> T register(Identifier id, T value);
+    }
+
+    default RecipeTypeRegistrar recipeTypes() {
+        throw new UnsupportedOperationException("recipeTypes requires Runtime 0.1.5");
+    }
+
+    interface RecipeTypeRegistrar {
+        <T extends net.minecraft.world.item.crafting.RecipeType<?>> T register(Identifier id, T value);
+    }
+
+    default CriterionRegistrar criteria() {
+        throw new UnsupportedOperationException("criteria requires Runtime 0.1.5");
+    }
+
+    interface CriterionRegistrar {
+        <T extends net.minecraft.advancements.CriterionTrigger<?>> T register(Identifier id, T value);
+    }
+
+    default SoundRegistrar sounds() {
+        throw new UnsupportedOperationException("sounds requires Runtime 0.1.5");
+    }
+
+    interface SoundRegistrar {
+        net.minecraft.sounds.SoundEvent register(Identifier id, net.minecraft.sounds.SoundEvent value);
+    }
+
+    default ParticleRegistrar particles() {
+        throw new UnsupportedOperationException("particles requires Runtime 0.1.5");
+    }
+
+    interface ParticleRegistrar {
+        <T extends net.minecraft.core.particles.ParticleType<?>> T register(Identifier id, T value);
     }
 }

@@ -1,10 +1,11 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+import static cn.blockforge.generated.orientshotpotchronicles.client.RenderSprites.sprite;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceStationBlockEntity;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning;
-import net.minecraft.client.Minecraft;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SeasoningDef;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -49,7 +50,7 @@ public class SauceStationRenderer extends cn.blockforge.orient.framework.client.
         matrices.translate(-0.5, 0, -0.5);
         PoseStack.Pose e = matrices.last();
         for (int i = 0; i < SauceStationBlockEntity.BOWLS; i++) {
-            Seasoning s = be.kind(i);
+            SeasoningDef s = be.kindDef(i);
             if (s == null || be.available(i) == 0) {
                 continue;
             }
@@ -57,7 +58,7 @@ public class SauceStationRenderer extends cn.blockforge.orient.framework.client.
             float cx = 16 - 16F / 3 * (col + 0.5F), cz = 16F / 3 * (tier + 0.5F);
             float rim = (float) (SauceStationBlock.TIER_TOPS[tier] + SauceStationBlock.BOWL_H);
             float half = (float) (SauceStationBlock.BOWL / 2 - SauceStationBlock.WALL);
-            boolean garnish = s == Seasoning.CHOPPED_SCALLION || s == Seasoning.MINCED_CILANTRO;
+            boolean garnish = s.garnish();
             // null = 这张贴图不在图集里（新调料忘了生成 sauce_<id>）：退回白贴图 + 顶点色，别露出粉黑格子
             TextureAtlasSprite sprite = surfaceSprite(s, garnish);
             if (sprite == null && white == null) {
@@ -98,8 +99,12 @@ public class SauceStationRenderer extends cn.blockforge.orient.framework.client.
      * mryt233 改：r137 / r139 的新调料当初就没有 sauce_&lt;id&gt;，台上 5 个碗是粉黑格子。
      * 原版图集对缺图统一返回同一个缺失精灵实例（{@code getOrDefault(id, missingSprite)}），用它来判定。
      */
-    private static TextureAtlasSprite surfaceSprite(Seasoning s, boolean garnish) {
-        TextureAtlasSprite sp = sprite(HotPot.id(garnish ? "block/" + s.id() : "block/sauce_" + s.id()));
+    private static TextureAtlasSprite surfaceSprite(SeasoningDef s, boolean garnish) {
+        Identifier texId = sauceTextureId(s.id(), garnish);
+        if (texId == null) {
+            return null;
+        }
+        TextureAtlasSprite sp = sprite(texId);
         TextureAtlasSprite missing = sprite(MissingTextureAtlasSprite.getLocation());
         if (sp.contents() == missing.contents()) {
             if (WARNED.add(s.id())) {
@@ -110,10 +115,14 @@ public class SauceStationRenderer extends cn.blockforge.orient.framework.client.
         return sp;
     }
 
-    private static TextureAtlasSprite sprite(Identifier id) {
-        return Minecraft.getInstance().getAtlasManager()
-            .get(new net.minecraft.client.resources.model.sprite.SpriteId(
-                net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS, id));
+    private static Identifier sauceTextureId(String id, boolean garnish) {
+        if (id == null || id.isEmpty()) {
+            return null;
+        }
+        int colon = id.indexOf(':');
+        String namespace = colon > 0 ? id.substring(0, colon) : HotPot.MOD_ID;
+        String path = colon >= 0 ? id.substring(colon + 1) : id;
+        return Identifier.tryBuild(namespace, garnish ? "block/" + path : "block/sauce_" + path);
     }
 
     /**

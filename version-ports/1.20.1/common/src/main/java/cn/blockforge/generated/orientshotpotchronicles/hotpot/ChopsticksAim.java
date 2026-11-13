@@ -35,15 +35,32 @@ public final class ChopsticksAim {
         PENDING.put(player.getUUID(), new Aim(pos, slot, now));
     }
 
-    /** 记录多久算过时（刻）：take 只认 10 刻内的，这里放宽些再清。 */
+    /** 记录多久内有效（刻）：客户端报「这一格浮上来的是第几样」到服务端处理之间要容得下网络抖动。
+     *  mryt233 改（2026-11-07）：从 10 刻放宽到 20 刻，网络抖动 / 主线程忙时会误判成没报过。 */
+    private static final long AIM_TTL = 20L;
+    /** 这么久没被用掉的记录算垃圾，清掉（remember 里顺手清理用）。 */
     private static final long STALE_TICKS = 200L;
 
-    /** 这名玩家刚刚对这口锅报的小格；没报、报的是别的锅或者过时了（超过 10 刻）返回 -1。用一次就清掉。 */
+    /**
+     * 这名玩家刚刚对这口锅报的小格；没报、报的是别的锅或者过时了返回 -1。
+     * mryt233 改（2026-11-07）：只有「正好是这口锅」才消费掉记录；别的锅的记录留着，下一口锅还要用
+     * （以前先 remove 再比对，会把上一口锅的记录一起删掉，两端对不齐）。作者：mryt233
+     */
     public static int take(Player player, BlockPos pos) {
-        Aim aim = PENDING.remove(player.getUUID());
-        if (aim == null || !aim.pos().equals(pos) || player.level().getGameTime() - aim.time() > 10) {
+        UUID id = player.getUUID();
+        Aim aim = PENDING.get(id);
+        if (aim == null) {
             return -1;
         }
+        long now = player.level().getGameTime();
+        if (now - aim.time() > AIM_TTL || aim.time() > now) {
+            PENDING.remove(id, aim);   // 过时的清掉
+            return -1;
+        }
+        if (!aim.pos().equals(pos)) {
+            return -1;                 // 报的是别的锅：留着，下一口锅还要用
+        }
+        PENDING.remove(id, aim);
         return aim.slot();
     }
 }

@@ -16,9 +16,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.function.Supplier;
@@ -103,5 +100,46 @@ public interface RegistrationApi {
 
     interface EntityRegistrar {
         <T extends Entity> EntityType<T> register(Identifier id, EntityType<T> type);
+    }
+
+    // mryt233 改（2026-11-10）：补充配方、条件触发、声音与粒子注册表域；旧实现保留默认抛出。
+    default RecipeSerializerRegistrar recipeSerializers() {
+        throw new UnsupportedOperationException("recipeSerializers requires Runtime 0.1.5");
+    }
+
+    interface RecipeSerializerRegistrar {
+        <T extends net.minecraft.world.item.crafting.RecipeSerializer<?>> T register(Identifier id, T value);
+    }
+
+    default RecipeTypeRegistrar recipeTypes() {
+        throw new UnsupportedOperationException("recipeTypes requires Runtime 0.1.5");
+    }
+
+    interface RecipeTypeRegistrar {
+        <T extends net.minecraft.world.item.crafting.RecipeType<?>> T register(Identifier id, T value);
+    }
+
+    default CriterionRegistrar criteria() {
+        throw new UnsupportedOperationException("criteria requires Runtime 0.1.5");
+    }
+
+    interface CriterionRegistrar {
+        <T extends net.minecraft.advancements.triggers.CriterionTrigger<?>> T register(Identifier id, T value);
+    }
+
+    default SoundRegistrar sounds() {
+        throw new UnsupportedOperationException("sounds requires Runtime 0.1.5");
+    }
+
+    interface SoundRegistrar {
+        net.minecraft.sounds.SoundEvent register(Identifier id, net.minecraft.sounds.SoundEvent value);
+    }
+
+    default ParticleRegistrar particles() {
+        throw new UnsupportedOperationException("particles requires Runtime 0.1.5");
+    }
+
+    interface ParticleRegistrar {
+        <T extends net.minecraft.core.particles.ParticleType<?>> T register(Identifier id, T value);
     }
 }

@@ -1,17 +1,14 @@
+// mryt233 改（2026-11-11）：第三方燃料改为 FrozenRegistry，适配 26.2 fuelValues。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import java.util.Locale;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 /**
- * 燃料档位：只决定灶火强度（影响烹饪速度），燃烧时长则完全沿用
- * 原版熔炉的燃料数据（{@link AbstractFurnaceBlockEntity#getFuel()}；1.21.1 里这张表由原版自己
- * 缓存并在数据包重载时由 {@link AbstractFurnaceBlockEntity#invalidateCache()} 重建）。
- * 木材 &lt; 煤炭/木炭 &lt; 岩浆桶。
- *
- * <p>同一个档位里所有燃料的燃烧时长各不相同，比如木板 300 tick、原木 300 tick、
- * 煤炭 1600 tick、岩浆桶 20000 tick，全部直接取原版数值。</p>
+ * 燃料档位：只决定灶火强度（影响烹饪速度），燃烧时长直接取当前世界的原版燃料表。
+ * 木材 < 煤炭/木炭 < 岩浆桶。
  */
 public enum HotPotFuel {
     WOOD("fuel.wood", 0.65F, 300),
@@ -20,8 +17,8 @@ public enum HotPotFuel {
 
     private static final HotPotFuel[] BY_ID = values();
 
-    /** 第三方燃料映射到哪一档（兼容层注册进来）。 */
-    private static final java.util.Map<Item, HotPotFuel> CUSTOM_SOURCES = new java.util.HashMap<>();
+    private static final FrozenRegistry<Item, HotPotFuel> CUSTOM_SOURCES = new FrozenRegistry<>(
+        "第三方燃料表", "燃料档要在启动期登记（子模组在自己的兼容模块里调 registerCustomSource），冻结后不再接受登记。");
 
     /** 注册「某种第三方燃料算哪一档」。 */
     public static void registerCustomSource(Item item, HotPotFuel fuel) {
@@ -33,6 +30,16 @@ public enum HotPotFuel {
         return stack.isEmpty() ? null : CUSTOM_SOURCES.get(stack.getItem());
     }
 
+    /** 冻结第三方燃料表（服务端启动时由 HotPotHooks 统一调，幂等）。 */
+    static void freezeSources() {
+        CUSTOM_SOURCES.freeze();
+    }
+
+    /** 诊断：第三方燃料表冻了没有。 */
+    public static boolean sourcesFrozen() {
+        return CUSTOM_SOURCES.isFrozen();
+    }
+
     private final String nameKey;
     private final float power;
     private final int defaultTicks;
@@ -41,17 +48,15 @@ public enum HotPotFuel {
         this.nameKey = nameKey;
         this.power = power;
         this.defaultTicks = defaultTicks;
-        // 默认值记进配置模板，配置文件里同名项可以覆盖
         Config.rememberFuel(configKey(), power, defaultTicks);
     }
 
-    /** 配置文件里用的键，和枚举名一致的小写形式。 */
     public String configKey() {
-        return name().toLowerCase(java.util.Locale.ROOT);
+        return name().toLowerCase(Locale.ROOT);
     }
 
     public String nameKey() {
-        return "text." + cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot.MOD_ID + "." + nameKey;
+        return "text." + HotPot.MOD_ID + "." + nameKey;
     }
 
     public float power() {
@@ -67,13 +72,8 @@ public enum HotPotFuel {
         return id >= 0 && id < BY_ID.length ? BY_ID[id] : null;
     }
 
-    /**
-     * 该物品在原版熔炉里的燃烧时长（tick）；不能当燃料时返回 0。
-     * <p>mryt233 改（2026-11-07）：不再自己缓存一份燃料表。26.x 的 fuelValues() 本身就是
-     * 数据包重载时会重建的那一份，直接把世界传进来查；以前在这里再存一层 Map 引用会永远拿
-     * 第一次的旧表，导致 reload 后新增 / 移除的燃料不生效。</p>
-     */
-    public static int burnTicksOf(net.minecraft.world.level.Level world, ItemStack stack) {
+    /** 该物品在原版熔炉里的燃烧时长（tick）；不能当燃料时返回 0。 */
+    public static int burnTicksOf(Level world, ItemStack stack) {
         if (stack.isEmpty()) {
             return 0;
         }
@@ -85,7 +85,7 @@ public enum HotPotFuel {
     }
 
     /** 物品能否塞进灶膛当燃料。 */
-    public static boolean isFuel(net.minecraft.world.level.Level world, ItemStack stack) {
+    public static boolean isFuel(Level world, ItemStack stack) {
         return burnTicksOf(world, stack) > 0;
     }
 
@@ -99,5 +99,4 @@ public enum HotPotFuel {
         }
         return WOOD;
     }
-
 }

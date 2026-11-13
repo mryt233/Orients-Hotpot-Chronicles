@@ -2,7 +2,9 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupIds;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperty;
@@ -15,7 +17,7 @@ public record SoupItemProperty() implements RangeSelectItemModelProperty {
     @Override public MapCodec<SoupItemProperty> type() { return CODEC; }
     @Override public float get(ItemStack stack, ClientLevel level, ItemOwner owner, int seed) {
         var data = stack.get(HotPotContent.POT_CONTENTS);
-        SoupBase soup = data == null ? null : SoupBase.byId(data.copyTag().getIntOr("Base", -1));
-        return soup == null ? 0F : (soup.ordinal() + 1) / 10F;
+        SoupDef soup = data == null ? null : Soups.get(SoupIds.fromPotTag(data.copyTag(), 0));
+        return soup == null ? 0F : (Soups.indexOf(soup) + 1) / 10F;
     }
 }

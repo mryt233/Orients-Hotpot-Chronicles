@@ -1,0 +1,595 @@
+{
+  "client": {
+    "particle_intensity": 100
+  },
+  "drink": {
+    "orange_drink": {
+      "duration": 300,
+      "amplifier": 0
+    },
+    "orient_cola": {
+      "duration": 300,
+      "amplifier": 0
+    },
+    "sip": {
+      "hunger": 2,
+      "saturation": 0.3
+    }
+  },
+  "food": {
+    "tripe": {
+      "hunger": 2,
+      "saturation": 0.3
+    },
+    "cooked_tripe": {
+      "hunger": 5,
+      "saturation": 0.6
+    },
+    "fatty_beef_roll": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "cooked_fatty_beef_roll": {
+      "hunger": 3,
+      "saturation": 0.6
+    },
+    "mutton_roll": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "cooked_mutton_roll": {
+      "hunger": 3,
+      "saturation": 0.6
+    },
+    "beef_loin": {
+      "hunger": 3,
+      "saturation": 0.3
+    },
+    "cooked_beef_loin": {
+      "hunger": 9,
+      "saturation": 0.8
+    },
+    "beef_loin_slice": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "cooked_beef_loin_slice": {
+      "hunger": 3,
+      "saturation": 0.6
+    },
+    "potato_slice": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "cooked_potato_slice": {
+      "hunger": 2,
+      "saturation": 0.6
+    },
+    "soybean": {
+      "hunger": 1,
+      "saturation": 0.1
+    },
+    "cold_tofu": {
+      "hunger": 2,
+      "saturation": 0.4
+    },
+    "hot_tofu": {
+      "hunger": 2,
+      "saturation": 0.4
+    },
+    "cold_tofu_cube": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "orange": {
+      "hunger": 4,
+      "saturation": 0.3
+    },
+    "garlic": {
+      "hunger": 1,
+      "saturation": 0.1
+    },
+    "garlic_paste": {
+      "hunger": 1,
+      "saturation": 0.1
+    },
+    "shrimp": {
+      "hunger": 1,
+      "saturation": 0.2
+    },
+    "cooked_shrimp": {
+      "hunger": 3,
+      "saturation": 0.5
+    },
+    "peeled_shrimp": {
+      "hunger": 1,
+      "saturation": 0.2
+    },
+    "cooked_peeled_shrimp": {
+      "hunger": 3,
+      "saturation": 0.6
+    },
+    "shrimp_paste": {
+      "hunger": 1,
+      "saturation": 0.2
+    },
+    "cooked_shrimp_paste": {
+      "hunger": 4,
+      "saturation": 0.6
+    },
+    "raw_ham_sausage": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "ham_sausage": {
+      "hunger": 3,
+      "saturation": 0.6
+    },
+    "ham_sausage_slice": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "cooked_ham_sausage_slice": {
+      "hunger": 2,
+      "saturation": 0.5
+    },
+    "oyster_sauce": {
+      "hunger": 1,
+      "saturation": 0.2
+    },
+    "sesame_paste": {
+      "hunger": 2,
+      "saturation": 0.3
+    },
+    "peanut": {
+      "hunger": 1,
+      "saturation": 0.2
+    },
+    "crushed_peanuts": {
+      "hunger": 1,
+      "saturation": 0.2
+    },
+    "millet_chili": {
+      "hunger": 1,
+      "saturation": 0.1
+    },
+    "raw_crispy_pork": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "crispy_pork": {
+      "hunger": 4,
+      "saturation": 0.6
+    },
+    "boiled_crispy_pork": {
+      "hunger": 6,
+      "saturation": 0.8
+    },
+    "dried_tofu": {
+      "hunger": 2,
+      "saturation": 0.3
+    },
+    "cooked_dried_tofu": {
+      "hunger": 4,
+      "saturation": 0.6
+    },
+    "tofu_skin": {
+      "hunger": 2,
+      "saturation": 0.3
+    },
+    "cooked_tofu_skin": {
+      "hunger": 4,
+      "saturation": 0.6
+    },
+    "wide_noodles": {
+      "hunger": 1,
+      "saturation": 0.2
+    },
+    "cooked_wide_noodles": {
+      "hunger": 4,
+      "saturation": 0.6
+    },
+    "sweet_potato_skin": {
+      "hunger": 1,
+      "saturation": 0.2
+    },
+    "cooked_sweet_potato_skin": {
+      "hunger": 4,
+      "saturation": 0.6
+    },
+    "enoki_mushroom": {
+      "hunger": 1,
+      "saturation": 0.2
+    },
+    "cooked_enoki_mushroom": {
+      "hunger": 3,
+      "saturation": 0.5
+    },
+    "greens": {
+      "hunger": 1,
+      "saturation": 0.2
+    },
+    "cooked_greens": {
+      "hunger": 3,
+      "saturation": 0.5
+    },
+    "lotus_root": {
+      "hunger": 2,
+      "saturation": 0.3
+    },
+    "lotus_root_slice": {
+      "hunger": 1,
+      "saturation": 0.2
+    },
+    "cooked_lotus_root_slice": {
+      "hunger": 3,
+      "saturation": 0.6
+    },
+    "raw_squid": {
+      "hunger": 2,
+      "saturation": 0.2
+    },
+    "squid_roll": {
+      "hunger": 1,
+      "saturation": 0.2
+    },
+    "cooked_squid_roll": {
+      "hunger": 4,
+      "saturation": 0.6
+    },
+    "egg_fried_rice": {
+      "hunger": 7,
+      "saturation": 0.8
+    },
+    "zhe_er_gen": {
+      "hunger": 1,
+      "saturation": 0.15
+    },
+    "zhe_er_gen_slice": {
+      "hunger": 1,
+      "saturation": 0.15
+    },
+    "cooked_zhe_er_gen_slice": {
+      "hunger": 3,
+      "saturation": 0.5
+    },
+    "minced_zhe_er_gen": {
+      "hunger": 1,
+      "saturation": 0.1
+    },
+    "tomato": {
+      "hunger": 2,
+      "saturation": 0.3
+    },
+    "chili_pepper": {
+      "hunger": 1,
+      "saturation": 0.1
+    },
+    "cooked_kelp": {
+      "hunger": 2,
+      "saturation": 0.3
+    },
+    "hot_tofu_cube": {
+      "hunger": 2,
+      "saturation": 0.6
+    },
+    "beef_meatball": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "pork_meatball": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "mutton_meatball": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "fish_ball": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "cilantro_beef_meatball": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "cilantro_pork_meatball": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "cilantro_mutton_meatball": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "cilantro_fish_ball": {
+      "hunger": 1,
+      "saturation": 0.3
+    },
+    "cooked_beef_meatball": {
+      "hunger": 3,
+      "saturation": 0.6
+    },
+    "cooked_pork_meatball": {
+      "hunger": 3,
+      "saturation": 0.6
+    },
+    "cooked_mutton_meatball": {
+      "hunger": 3,
+      "saturation": 0.6
+    },
+    "cooked_fish_ball": {
+      "hunger": 3,
+      "saturation": 0.6
+    },
+    "cooked_cilantro_beef_meatball": {
+      "hunger": 4,
+      "saturation": 0.6
+    },
+    "cooked_cilantro_pork_meatball": {
+      "hunger": 4,
+      "saturation": 0.6
+    },
+    "cooked_cilantro_mutton_meatball": {
+      "hunger": 4,
+      "saturation": 0.6
+    },
+    "cooked_cilantro_fish_ball": {
+      "hunger": 4,
+      "saturation": 0.6
+    },
+    "scallion": {
+      "hunger": 1,
+      "saturation": 0.1
+    },
+    "cilantro": {
+      "hunger": 1,
+      "saturation": 0.1
+    }
+  },
+  "soup_speed": {
+    "clear": 1.0,
+    "rich_stock": 0.85,
+    "mushroom": 1.15,
+    "spicy": 1.5,
+    "tomato": 1.1,
+    "three_fresh": 1.0
+  },
+  "soup_bowl": {
+    "clear": {
+      "hunger": 6,
+      "saturation": 0.6,
+      "duration": 300,
+      "amplifier": 0,
+      "second_duration": 1,
+      "second_amplifier": 0,
+      "fire_duration": 0,
+      "fire_amplifier": 0,
+      "hunger_duration": 0,
+      "hunger_amplifier": 0
+    },
+    "rich_stock": {
+      "hunger": 4,
+      "saturation": 0.9,
+      "duration": 300,
+      "amplifier": 0,
+      "second_duration": 600,
+      "second_amplifier": 0,
+      "fire_duration": 0,
+      "fire_amplifier": 0,
+      "hunger_duration": 0,
+      "hunger_amplifier": 0
+    },
+    "mushroom": {
+      "hunger": 4,
+      "saturation": 0.6,
+      "duration": 200,
+      "amplifier": 0,
+      "second_duration": 0,
+      "second_amplifier": 0,
+      "fire_duration": 0,
+      "fire_amplifier": 0,
+      "hunger_duration": 0,
+      "hunger_amplifier": 0
+    },
+    "spicy": {
+      "hunger": 4,
+      "saturation": 0.6,
+      "duration": 240,
+      "amplifier": 0,
+      "second_duration": 120,
+      "second_amplifier": 0,
+      "fire_duration": 300,
+      "fire_amplifier": 0,
+      "hunger_duration": 120,
+      "hunger_amplifier": 0
+    },
+    "tomato": {
+      "hunger": 4,
+      "saturation": 0.6,
+      "duration": 300,
+      "amplifier": 0,
+      "second_duration": 0,
+      "second_amplifier": 0,
+      "fire_duration": 0,
+      "fire_amplifier": 0,
+      "hunger_duration": 0,
+      "hunger_amplifier": 0
+    },
+    "three_fresh": {
+      "hunger": 4,
+      "saturation": 0.9,
+      "duration": 400,
+      "amplifier": 0,
+      "second_duration": 900,
+      "second_amplifier": 0,
+      "fire_duration": 0,
+      "fire_amplifier": 0,
+      "hunger_duration": 0,
+      "hunger_amplifier": 0
+    }
+  },
+  "cooking": {
+    "fallback_ticks": 200,
+    "fallback_xp": 0.15,
+    "xp_per_item": 0.7,
+    "items": {
+      "beef_loin_slice": 50,
+      "tripe": 50,
+      "enoki_mushroom": 50,
+      "greens": 50,
+      "fatty_beef_roll": 100,
+      "mutton_roll": 100,
+      "potato_slice": 120,
+      "cold_tofu_cube": 100,
+      "ham_sausage_slice": 100,
+      "peeled_shrimp": 100,
+      "lotus_root_slice": 100,
+      "squid_roll": 100,
+      "tofu_skin": 100,
+      "sweet_potato_skin": 100,
+      "shrimp": 150,
+      "shrimp_paste": 150,
+      "raw_ham_sausage": 150,
+      "dried_tofu": 150,
+      "wide_noodles": 150,
+      "raw_crispy_pork": 150,
+      "crispy_pork": 150,
+      "beef_loin": 200,
+      "beef_meatball": 200,
+      "pork_meatball": 200,
+      "mutton_meatball": 200,
+      "fish_ball": 200,
+      "cilantro_beef_meatball": 200,
+      "cilantro_pork_meatball": 200,
+      "cilantro_mutton_meatball": 200,
+      "cilantro_fish_ball": 200,
+      "zhe_er_gen_slice": 200
+    },
+    "tofu_cook_ticks": 200,
+    "tofu_overcook_ticks": 600
+  },
+  "fuel": {
+    "wood": {
+      "power": 0.7,
+      "burn_ticks": 300
+    },
+    "coal": {
+      "power": 1.0,
+      "burn_ticks": 1600
+    },
+    "lava": {
+      "power": 1.6,
+      "burn_ticks": 20000
+    }
+  },
+  "seasoning": {
+    "msg": {
+      "duration": 0,
+      "amplifier": 0,
+      "hunger": 3
+    },
+    "chili_oil": {
+      "duration": 400,
+      "amplifier": 0,
+      "hunger": 0
+    },
+    "sweet_sour_sauce": {
+      "duration": 200,
+      "amplifier": 0,
+      "hunger": 0
+    },
+    "honey": {
+      "duration": 100,
+      "amplifier": 0,
+      "hunger": 0
+    },
+    "sesame_oil": {
+      "duration": 100,
+      "amplifier": 0,
+      "hunger": 0
+    },
+    "vinegar": {
+      "duration": 0,
+      "amplifier": 0,
+      "hunger": 0
+    },
+    "sugar": {
+      "duration": 200,
+      "amplifier": 0,
+      "hunger": 0
+    },
+    "chopped_scallion": {
+      "duration": 0,
+      "amplifier": 0,
+      "hunger": 0
+    },
+    "minced_cilantro": {
+      "duration": 0,
+      "amplifier": 0,
+      "hunger": 0
+    },
+    "garlic_paste": {
+      "duration": 160,
+      "amplifier": 0,
+      "hunger": 0
+    },
+    "oyster_sauce": {
+      "duration": 200,
+      "amplifier": 0,
+      "hunger": 0
+    },
+    "sesame_paste": {
+      "duration": 200,
+      "amplifier": 0,
+      "hunger": 0
+    },
+    "crushed_peanuts": {
+      "duration": 200,
+      "amplifier": 0,
+      "hunger": 0
+    },
+    "millet_chili": {
+      "duration": 160,
+      "amplifier": 0,
+      "hunger": 0
+    },
+    "minced_zhe_er_gen": {
+      "duration": 200,
+      "amplifier": 0,
+      "hunger": 0
+    }
+  },
+  "_format": 1,
+  "_说明": "之晗的火锅物语 · 数值配置\n修改后执行 /orientshotpot reload，食物营养、汤底、燃料、蘸料和烹饪参数立即生效。\n配方数值在数据包 recipe 里，使用原版 /reload。\n缺项使用默认值；写错一项仅回退该项并警告；坏文件原样保留。联机只改服务端，数值自动同步。",
+  "_字段说明": {
+    "food.<物品>.hunger": "饥饿点数 0～100 整数；2点为一个完整图标",
+    "food.<物品>.saturation": "饱和度系数 0～10；不是饱和点数",
+    "soup_bowl.<汤底>.hunger": "一碗汤回多少饥饿点数 0～100 整数",
+    "soup_bowl.<汤底>.saturation": "一碗汤的饱和度系数 0～10，不是饱和点数",
+    "soup_bowl.<汤底>.duration": "主效果持续 0～100000 tick，0=不加；20tick=1秒（高汤抗性、红汤力量、清汤/番茄速度与急迫、三鲜水下呼吸、菌汤生命恢复）",
+    "soup_bowl.<汤底>.amplifier": "主效果等级 0～9 整数，0=I级",
+    "soup_bowl.<汤底>.second_duration": "副效果持续 0～100000 tick，0=不加；20tick=1秒（高汤伤害吸收、红汤速度、三鲜幸运、清汤饱和）",
+    "soup_bowl.<汤底>.second_amplifier": "副效果等级 0～9 整数，0=I级",
+    "soup_bowl.<汤底>.fire_duration": "红汤「抗火」持续 0～100000 tick，0=不加（只有红汤用，特辣起生效；变态辣自动翻倍）；20tick=1秒",
+    "soup_bowl.<汤底>.fire_amplifier": "红汤「抗火」等级 0～9 整数（只有红汤用）",
+    "soup_bowl.<汤底>.hunger_duration": "红汤负面「饥饿」持续 0～100000 tick，0=不加（只有红汤用，特辣起生效）；20tick=1秒",
+    "soup_bowl.<汤底>.hunger_amplifier": "红汤负面「饥饿」等级 0～9 整数（只有红汤用）",
+    "soup_speed.<汤底>": "加热倍率 0.1～10",
+    "fuel.<燃料>.power": "加热倍率 0.1～10",
+    "fuel.<燃料>.burn_ticks": "联动燃料的默认时长 0～100000 tick；原版燃料表仍优先",
+    "seasoning.<蘸料>.duration": "持续 0～100000 tick，0禁用；20tick=1秒",
+    "seasoning.<蘸料>.amplifier": "等级 0～9 整数；0=I级",
+    "seasoning.msg.hunger": "味精额外饥饿点数 0～100 整数，其他蘸料不读取此字段",
+    "drink.sip.hunger": "饮料瓶 / 一杯饮料每口回的饥饿点数 0～100 整数（水、牛奶不回）",
+    "drink.sip.saturation": "饮料每口的饱和度系数 0～10",
+    "drink.<饮料>.duration": "这种饮料每口的正面效果持续 0～100000 tick，0=不加；20tick=1秒",
+    "drink.<饮料>.amplifier": "这种饮料每口正面效果等级 0～9 整数，0=I级",
+    "cooking.fallback_ticks": "兜底时间 1～100000 tick",
+    "cooking.fallback_xp": "无配方出锅经验 0～100",
+    "cooking.xp_per_item": "有配方出锅经验下限 0～100",
+    "cooking.tofu_cook_ticks": "整块冷豆腐在锅里煮成热豆腐的刻数 1～100000；20tick=1秒",
+    "cooking.tofu_overcook_ticks": "豆腐从下锅到煮过头的总刻数 1～100000（含煮熟那段），要大于 tofu_cook_ticks；20tick=1秒",
+    "cooking.items.<食材>": "这种生食材在锅里煮熟的刻数 1～100000，20tick=1秒；写进这里就不用去改数据包熔炉配方",
+    "client.particle_intensity": "火锅热气与火星粒子强度百分比 0～100 整数；0=关闭粒子，100=标准强度（仅客户端本地生效）"
+  }
+}

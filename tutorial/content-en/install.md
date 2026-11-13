@@ -4,24 +4,25 @@
 
 ## Supported versions {#versions}
 
-The latest release, **0.2.2-alpha**, simultaneously supports **Minecraft 1.21.1, 1.20.1, 26.1.x, and 26.2**. Every jar **bundles the required `orient_framework` library**, so just put one in your `mods` folder:
+The latest build, **0.3.0-alpha**, simultaneously supports **Minecraft 1.21.1, 1.20.1, 26.1.x, and 26.2**. Every jar **bundles the required `orient_framework 0.2.0` library**, so just put one in your `mods` folder:
 
 | Minecraft | Loader | Java | Also required |
 | --- | --- | --- | --- |
-| **1.21.1** | **Fabric** (used in this guide, **0.2.2-alpha**) | 21 or later | Fabric Loader 0.15.11+ and **Fabric API** (0.116.14+1.21.1) |
-| **1.21.1** | **NeoForge** (**0.2.2-alpha**) | 21 or later | NeoForge 21.1.186 or later (**no** Fabric API required) |
-| **1.20.1** | **Fabric** (**0.2.2-alpha**) | 17 or later | Fabric Loader 0.15.11+ and **Fabric API** (0.92.12+1.20.1) |
-| **1.20.1** | **Forge** (**0.2.2-alpha**) | 17 or later | Forge 47.1+ (tested with 47.4.28; **no** Fabric API required) |
-| **26.1.x** | **Fabric / NeoForge** (**0.2.2-alpha**) | 25 or later | Matching Fabric Loader + Fabric API, or NeoForge |
-| **26.2** | **Fabric / NeoForge** (**0.2.2-alpha**) | 25 or later | Matching Fabric Loader + Fabric API, or NeoForge |
+| **1.21.1** | **Fabric** (used in this guide, **0.3.0-alpha**) | 21 or later | Fabric Loader 0.15.11+ and **Fabric API** (0.116.14+1.21.1) |
+| **1.21.1** | **NeoForge** (**0.3.0-alpha**) | 21 or later | NeoForge 21.1.186 or later (**no** Fabric API required) |
+| **1.20.1** | **Fabric** (**0.3.0-alpha**) | 17 or later | Fabric Loader 0.14.21+ and **Fabric API** (0.83.0+1.20.1+, tested up to 0.92.12) |
+| **1.20.1** | **Forge** (**0.3.0-alpha**) | 17 or later | Forge 47.0.0+ (tested with 47.0.0 and 47.4.28; **no** Fabric API required) |
+| **26.1 / 26.1.1 / 26.1.2** | **Fabric** (**0.3.0-alpha**) | 25 or later | Fabric Loader 0.18.4+ and **Fabric API** (0.143.12+ for your 26.1.x) |
+| **26.1.2** | **NeoForge** (**0.3.0-alpha**) | 25 or later | NeoForge 26.1.2.71+ (**no** Fabric API required) |
+| **26.2** | **Fabric / NeoForge** (**0.3.0-alpha**) | 25 or later | Fabric Loader 0.18.4+ + **Fabric API** (0.148.3+), or NeoForge 26.2.0.57+ |
 
 :::tip
-**This guide demonstrates 1.21.1 Fabric.** In 0.2.2-alpha, all supported versions share the same gameplay, ingredients, seasonings, furniture, and configuration features; minor engine differences are listed under [How the ports differ](#ports).
+**This guide demonstrates 1.21.1 Fabric.** In 0.3.0-alpha, all supported versions share the same gameplay, ingredients, seasonings, furniture, open registration, and configuration features; minor engine differences are listed under [How the ports differ](#ports).
 :::
 
-- **World & config compatibility:** 0.2.2-alpha splits legacy `tofu` into `cold_tofu` and `hot_tofu`. Legacy `tofu` entries in `config/orients_hotpot_chronicles.json` migrate automatically, though backing up your world before upgrading is still recommended.
+- **World & config compatibility:** 0.3.0-alpha stores full string IDs for broths and seasonings and automatically upgrades `0.2.2-alpha` saves and configs (`tofu` and legacy bitmasks), while keeping unknown add-on IDs intact if packs are removed; backing up your world before upgrading is still recommended.
 - 1.20.4 Fabric remains on the old 0.1.1-alpha build and is no longer maintained.
-- For multiplayer, install the matching 0.2.2-alpha jar on both the client and server.
+- **Multiplayer requirement:** because broth and seasoning sync packets now carry full ID lists, **clients and servers must both run `0.3.0-alpha`**.
 
 ## Where to download {#download}
 
@@ -32,7 +33,7 @@ The latest release, **0.2.2-alpha**, simultaneously supports **Minecraft 1.21.1,
 | **MC百科** | <https://www.mcmod.cn/class/32185.html> | Chinese mod encyclopedia: overview and discussion |
 | **GitHub Releases** | <https://github.com/mryt233/Orients-Hotpot-Chronicles/releases> | One page per mod release, with jars for the supported loaders |
 
-**Check both the Minecraft version and the loader before downloading.** They appear in the filename, for example `orients_hotpot_chronicles-1.21.1-fabric-0.2.2-alpha.jar` or `orients_hotpot_chronicles-1.21.1-neoforge-0.2.2-alpha.jar`. Choosing the wrong version or loader will stop the game from launching.
+**Check both the Minecraft version and the loader before downloading.** They appear in the filename, for example `orients_hotpot_chronicles-1.21.1-fabric-0.3.0-alpha.jar` or `orients_hotpot_chronicles-1.21.1-neoforge-0.3.0-alpha.jar`. Choosing the wrong version or loader will stop the game from launching.
 
 ## Installation {#install}
 
@@ -49,7 +50,7 @@ The latest release, **0.2.2-alpha**, simultaneously supports **Minecraft 1.21.1,
 
 ### Forge (1.20.1)
 
-1. Install [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) for 1.20.1 (47.1+; tested with 47.4.28).
+1. Install [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) for 1.20.1 (47.0.0+; tested with 47.0.0 and 47.4.28).
 2. Put this mod's Forge jar in `mods` and launch. **Fabric API is not required.**
 
 In Creative mode, look for the **Orient's Hotpot Chronicles** tab. The smaller tabs on the left sort items into All, Kitchenware, Tableware, Furniture, and Food.
@@ -61,7 +62,7 @@ Worlds from 0.1.0-alpha.1 may lose modded items or show changed appearances afte
 
 ## How the ports differ {#ports}
 
-In 0.2.2-alpha, **1.21.1, 1.20.1, 26.1.x, and 26.2** all include the same gameplay and content, with only tiny vanilla-engine differences on 1.20.1:
+In 0.3.0-alpha, **1.21.1, 1.20.1, 26.1.x, and 26.2** all include the same gameplay and content, with only tiny vanilla-engine differences on 1.20.1:
 
 | Feature | 1.21.1 / 26.1.x / 26.2 | 1.20.1 (Fabric / Forge) |
 | --- | --- | --- |

@@ -1,120 +1,89 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.orient.framework.compat.CustomModelData;
+import cn.blockforge.orient.framework.compat.DataComponents;
+import cn.blockforge.orient.framework.compat.ItemData;
+import java.util.List;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-
-import java.util.Map;
+import net.minecraft.world.level.Level;
 
 /**
  * 用擀面杖（原叫木棒，2026-10-23 用户改）在砧板上捣丸子（2026-10-23 用户定，方案 A）：生牛肉 / 生猪排 / 生羊肉 / 生鳕鱼 / 生鲑鱼放砧板上，擀面杖捣三下：
  * 第 1 下捶碎、第 2 下成肉浆（砧板上的样子跟着变，用户要求），第 3 下掉出 3 个生丸子。
- * 进度记在 CuttingBoardBlockEntity 的 cuts 里（捣过的不能再用菜刀切）。阶段贴图 textures/block/pounding/&lt;meat&gt;_&lt;minced|paste&gt;。
- * 作者：mryt233 */
+ * 进度记在 CuttingBoardBlockEntity 的 pounds 里（mryt233 改（2026-11-07）：和「切了几刀」分开记账，
+ * 折耳根这类既能切又能捣的食材敲一下之后照样能切）。阶段贴图 textures/block/pounding/&lt;meat&gt;_&lt;minced|paste&gt;。
+ * mryt233 改（2026-11-06，r137）：大蒜之后又加了花生，擀面杖敲三下出 2 份花生碎（蘸料原料，不用生肉贴图的中间阶段）。
+ * mryt233 改（2026-11-11）：原 SPECS 表迁到数据包 pounding 配方。
+ * 作者：mryt233
+ */
 public final class Pounding {
     public static final int HITS = 3;
     public static final int RESULT_COUNT = 3;
 
-    /** 生肉 → 阶段贴图用的名字（beef / pork / mutton / fish）。 */
-    private static final Map<Item, String> MEAT = Map.of(
-        Items.BEEF, "beef", Items.PORKCHOP, "pork", Items.MUTTON, "mutton", Items.COD, "fish", Items.SALMON, "fish");
+    private Pounding() { }
 
-    private Pounding() {
+    /** mryt233 改（2026-11-11）：原料、产物、数量和中间样子统一读当前世界配方。 */
+    public static PoundingRecipe recipe(Level level, ItemStack stack) {
+        return HotPotRecipes.pounding(level, stack);
     }
 
+    /** 旧入口保留；新调用方应显式传世界。mryt233 改（2026-11-11）。 */
+    @Deprecated
     public static String meatOf(ItemStack stack) {
-        return MEAT.get(stack.getItem());
+        PoundingRecipe recipe = recipe(HotPotRecipes.currentLevel(), stack);
+        if (recipe == null) return null;
+        int model = ItemData.getOrDefault(recipe.stage1(), DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(0)).value();
+        return model >= 1 && model <= 8 ? List.of("beef", "pork", "mutton", "fish").get((model - 1) / 2) : null;
     }
 
-    /** 大蒜也能敲：敲三下出 2 份蒜泥（用户 2026-10-25：大蒜 + 蒜泥，用擀面杖敲；新增）。 */
+    /** 大蒜也能敲：敲三下出 2 份蒜泥（用户 2026-10-25：大蒜 + 蒜泥，用擀面杖敲）。 */
+    // mryt233 改（2026-11-10）：内部已无调用，公开入口保留兼容。
+    @Deprecated
     public static boolean isGarlic(ItemStack stack) {
         return stack.is(HotPotContent.GARLIC);
     }
 
-    /** 虾仁拍三下成一颗虾滑（用户 2026-10-26：虾滑用擀面杖拍出来；新增）。 */
+    /** 虾仁拍三下成一颗虾滑（用户 2026-10-26：虾滑用擀面杖拍出来）。 */
+    // mryt233 改（2026-11-10）：内部已无调用，公开入口保留兼容。
+    @Deprecated
     public static boolean isPeeledShrimp(ItemStack stack) {
         return stack.is(HotPotContent.PEELED_SHRIMP);
     }
 
-    /** mryt233 改（2026-11-06，清单 #123）：花生也能敲，敲三下出 2 份花生碎（蘸料台「花生碎」的原料）。 */
+    /** mryt233 改（2026-11-06，r137）：花生也能敲，敲三下出 2 份花生碎（蘸料台「花生碎」的原料）。 */
+    // mryt233 改（2026-11-10）：内部已无调用，公开入口保留兼容。
+    @Deprecated
     public static boolean isPeanut(ItemStack stack) {
         return stack.is(HotPotContent.PEANUT);
     }
 
-    /** mryt233 改（2026-11-06，清单 #127）：折耳根也能敲，敲三下出 2 份折耳根碎（蘸料台第 15 种调料的原料）。 */
+    /** mryt233 改（2026-11-06，r139）：折耳根也能敲，敲三下出 2 份折耳根碎（蘸料台第 15 种调料的原料）。 */
+    // mryt233 改（2026-11-10）：内部已无调用，公开入口保留兼容。
+    @Deprecated
     public static boolean isZheErGen(ItemStack stack) {
         return stack.is(HotPotContent.ZHE_ER_GEN);
     }
 
-    public static boolean poundable(ItemStack stack) {
-        return meatOf(stack) != null || isGarlic(stack) || isPeeledShrimp(stack)
-            || isPeanut(stack) || isZheErGen(stack);
+    /** 兼容旧无世界参数入口，当前环境配方为空时返回不能捣。 */
+    public static boolean poundable(ItemStack stack) { return poundable(HotPotRecipes.currentLevel(), stack); }
+    public static boolean poundable(Level level, ItemStack stack) {
+        return recipe(level, stack) != null;
     }
-
-    /** 敲完掉几个：丸子 3 个，蒜泥 2 份，花生碎 2 份，折耳根碎 2 份，虾滑 1 颗；不能捣返回 0。 */
     public static int resultCount(ItemStack stack) {
-        if (!poundable(stack)) {
-            return 0;
-        }
-        return isGarlic(stack) ? 2 : isPeeledShrimp(stack) ? 1 : isPeanut(stack) ? 2 : isZheErGen(stack) ? 2 : RESULT_COUNT;
+        PoundingRecipe recipe = recipe(HotPotRecipes.currentLevel(), stack);
+        return recipe == null ? 0 : recipe.result().getCount();
     }
-
-    private static final java.util.List<String> MEAT_ORDER = java.util.List.of("beef", "pork", "mutton", "fish");
-
-    /**
-     * 砧板上捣了 hits 下的样子：隐藏物品 pounded_meat + 自定义模型数据（1..8 = 牛 / 猪 / 羊 / 鱼 × 捶碎 / 肉浆，
-     * 同 tools/gen_meatballs.py），按普通物品画就有厚度（2026-10-23 用户：要和原版食材放上去一样是立体的）。
-     */
-    public static ItemStack display(ItemStack meat, int hits) {
-        if (isGarlic(meat)) {
-            // 大蒜：敲一下还是蒜头，第二下起已经是一摊蒜泥
-            return hits >= 2 ? new ItemStack(HotPotContent.GARLIC_PASTE) : meat;
-        }
-        if (isPeeledShrimp(meat)) {
-            // 虾仁：拍一下还是虾仁，第二下起已经是一团虾滑
-            return hits >= 2 ? new ItemStack(HotPotContent.SHRIMP_PASTE) : meat;
-        }
-        if (isPeanut(meat)) {
-            // mryt233 改（2026-11-06，清单 #123）：花生敲一下还是花生，第二下起是一小堆花生碎
-            return hits >= 2 ? new ItemStack(HotPotContent.CRUSHED_PEANUTS) : meat;
-        }
-        if (isZheErGen(meat)) {
-            // mryt233 改（2026-11-06，清单 #127）：折耳根敲一下还是根，第二下起是一小撮碎末
-            return hits >= 2 ? new ItemStack(HotPotContent.MINCED_ZHE_ER_GEN) : meat;
-        }
-        String m = meatOf(meat);
-        if (m == null || hits <= 0) {
-            return meat;
-        }
-        ItemStack out = new ItemStack(HotPotContent.POUNDED_MEAT);
-        cn.blockforge.orient.framework.compat.ItemData.set(out, cn.blockforge.orient.framework.compat.DataComponents.CUSTOM_MODEL_DATA,
-            new cn.blockforge.orient.framework.compat.CustomModelData(MEAT_ORDER.indexOf(m) * 2 + (hits == 1 ? 1 : 2)));
-        return out;
-    }
-
-    /** 这块肉捣出来的生丸子。 */
     public static Item result(ItemStack stack) {
-        if (isGarlic(stack)) {
-            return HotPotContent.GARLIC_PASTE;
-        }
-        if (isPeeledShrimp(stack)) {
-            return HotPotContent.SHRIMP_PASTE;
-        }
-        if (isPeanut(stack)) {
-            return HotPotContent.CRUSHED_PEANUTS;
-        }
-        if (isZheErGen(stack)) {
-            return HotPotContent.MINCED_ZHE_ER_GEN;
-        }
-        String meat = meatOf(stack);
-        if (meat == null) {
-            return null;
-        }
-        return switch (meat) {
-            case "beef" -> HotPotContent.BEEF_MEATBALL;
-            case "pork" -> HotPotContent.PORK_MEATBALL;
-            case "mutton" -> HotPotContent.MUTTON_MEATBALL;
-            default -> HotPotContent.FISH_BALL;
-        };
+        PoundingRecipe recipe = recipe(HotPotRecipes.currentLevel(), stack);
+        return recipe == null ? null : recipe.result().getItem();
+    }
+    public static ItemStack display(ItemStack stack, int hits) {
+        return display(HotPotRecipes.currentLevel(), stack, hits);
+    }
+    public static ItemStack display(Level level, ItemStack stack, int hits) {
+        PoundingRecipe recipe = recipe(level, stack);
+        return recipe == null ? stack : recipe.display(stack, hits);
     }
 }

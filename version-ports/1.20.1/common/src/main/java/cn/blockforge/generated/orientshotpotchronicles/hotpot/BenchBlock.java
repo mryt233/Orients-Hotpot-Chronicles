@@ -1,37 +1,47 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+// mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
+import cn.blockforge.orient.framework.compat.ItemInteractionBlock;
 import cn.blockforge.orient.framework.compat.ItemInteractionResult;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.core.Direction;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * 条凳：每种原版木板一种，一格长，有朝向（坐上去面朝 facing，放的时候就是玩家面朝的方向）。
@@ -43,7 +53,7 @@ import java.util.Map;
  *
  * <p>模型由 tools/gen_benches.py 生成，形状常量必须与它一致（朝北时长边沿 x，left = 西 / right = 东）。</p>
  */
-public class BenchBlock extends Block implements net.minecraft.world.level.block.EntityBlock , cn.blockforge.orient.framework.compat.ItemInteractionBlock {
+public class BenchBlock extends Block implements EntityBlock, ItemInteractionBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     /** 坐着的人的左手边 / 右手边是否接着另一张同朝向的条凳。 */
     public static final BooleanProperty LEFT = BooleanProperty.create("left");
@@ -158,12 +168,12 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
 
     /** 条凳有方块实体（用来画斜腿）；板凳没有。 */
     @Override
-    public net.minecraft.world.level.block.entity.BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return tall ? new BenchBlockEntity(pos, state) : null;
     }
 
     @Override
-    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, LEFT, RIGHT);
     }
 
@@ -190,6 +200,8 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
      * 单张放在火锅桌边的条凳不触发爬梯子，免得围桌走动时不小心蹭上去；
      * 一旦上下搭了 2 层及以上，就能当梯子攀爬（清单 #120）。
      */
+    // mryt233 改（2026-11-10）：内部已无调用，公开入口保留兼容。
+    @Deprecated
     public static boolean isStackedTallBench(BlockGetter world, BlockPos pos) {
         if (!isTallBench(world.getBlockState(pos))) {
             return false;
@@ -205,7 +217,7 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
      * <p>① 站在凳面上（脚踩在条凳上）不算攀爬，免得单张凳旁边的叠塔把人黏住；
      * ② 用复用的 MutableBlockPos 探测，先单格判一次「是不是条凳」就跳过绝大多数空气格，命中后再查上下。</p>
      */
-    public static BlockPos findClimbableStackedBench(net.minecraft.world.entity.LivingEntity entity) {
+    public static BlockPos findClimbableStackedBench(LivingEntity entity) {
         Level world = entity.level();
         AABB box = entity.getBoundingBox();
         // 站在凳面上（脚底下那格是条凳）时不算在爬
@@ -214,12 +226,12 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
             return null;
         }
         AABB probeBox = box.inflate(0.06, 0.0, 0.06);
-        int y0 = net.minecraft.util.Mth.floor(probeBox.minY + 1.0E-3);
-        int y1 = net.minecraft.util.Mth.floor(probeBox.maxY - 1.0E-3);
+        int y0 = Mth.floor(probeBox.minY + 1.0E-3);
+        int y1 = Mth.floor(probeBox.maxY - 1.0E-3);
         BlockPos.MutableBlockPos probe = new BlockPos.MutableBlockPos();
         for (int y = y0; y <= y1; y++) {
-            for (int x = net.minecraft.util.Mth.floor(probeBox.minX); x <= net.minecraft.util.Mth.floor(probeBox.maxX); x++) {
-                for (int z = net.minecraft.util.Mth.floor(probeBox.minZ); z <= net.minecraft.util.Mth.floor(probeBox.maxZ); z++) {
+            for (int x = Mth.floor(probeBox.minX); x <= Mth.floor(probeBox.maxX); x++) {
+                for (int z = Mth.floor(probeBox.minZ); z <= Mth.floor(probeBox.maxZ); z++) {
                     probe.set(x, y, z);
                     if (!isTallBench(world.getBlockState(probe))) {
                         continue;                        // 一次查询跳过绝大多数空气格
@@ -271,7 +283,7 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
      */
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state,
-                            net.minecraft.world.entity.LivingEntity placer, ItemStack stack) {
+                            LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(world, pos, state, placer, stack);
         if (!world.isClientSide && this.tall && placer instanceof Player player
                 && isTallBench(world.getBlockState(pos.below()))) {
@@ -282,7 +294,7 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
     /** 邻居变了：一边还连着，要那一边的凳子也说连着我才算（谁连谁在放下时就定了）；那边没凳子了就断开。 */
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
-                                     LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+                                  LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
         Direction facing = state.getValue(FACING);
         Direction left = leftOf(facing);
         return state
@@ -353,7 +365,7 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
      */
     @Override
     public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
-                                              Player player, InteractionHand hand, BlockHitResult hit) {
+                                           Player player, InteractionHand hand, BlockHitResult hit) {
         if (this.tall && !player.isShiftKeyDown()
                 && stack.getItem() instanceof BlockItem held
                 && held.getBlock() instanceof BenchBlock heldBench && heldBench.tall) {
@@ -364,24 +376,24 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
                     if (!stackSpotFree(world, target, player)) {
                         player.displayClientMessage(
                             Component.translatable(HotPotBlockEntity.key("msg.seat_taken")), true);
-                        return ItemInteractionResult.FAIL;
+                        return Use.blockItem(UseOutcome.FAIL, world.isClientSide);
                     }
                     BlockState placed = heldBench.placementStateAt(world, target, player.getDirection());
                     world.setBlock(target, placed, Block.UPDATE_ALL);
                     world.playSound(null, target,
                         heldBench.planks().defaultBlockState().getSoundType().getPlaceSound(),
-                        net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                        SoundSource.BLOCKS, 1.0F, 1.0F);
                     if (!player.getAbilities().instabuild) {
                         stack.shrink(1);   // mryt233 改（1.20.1 适配）：1.20.1 没有 ItemStack.consume
                     }
                     HotPotCriterion.fire(player, "tall_stool");
                 }
-                return ItemInteractionResult.sidedSuccess(world.isClientSide);
+                return Use.blockItem(UseOutcome.SUCCESS_SOFT, world.isClientSide);
             }
         }
-        return stack.getItem() instanceof BlockItem
-            ? ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
-            : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return Use.blockItem(stack.getItem() instanceof BlockItem
+            ? UseOutcome.SKIPPED
+            : UseOutcome.PASS_TO_EMPTY, world.isClientSide);
     }
 
     /**
@@ -420,13 +432,13 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
     public static boolean stackSpotFree(Level world, BlockPos target, Player placer) {
         AABB area = new AABB(target).inflate(0.05);
         // 目标格里已经站了别的生物（放凳子的人自己不算，座位实体本身也不算——它们由下面那条判）
-        if (!world.getEntitiesOfClass(net.minecraft.world.entity.Entity.class, area,
+        if (!world.getEntitiesOfClass(Entity.class, area,
                 e -> e != placer && e.isAlive() && !(e instanceof SeatEntity)).isEmpty()) {
             return false;
         }
         Vec3 top = Vec3.atBottomCenterOf(target);
         for (SeatEntity seat : world.getEntitiesOfClass(SeatEntity.class,
-                new AABB(top, top).inflate(1.0, 2.0, 1.0), net.minecraft.world.entity.Entity::isAlive)) {
+                new AABB(top, top).inflate(1.0, 2.0, 1.0), Entity::isAlive)) {
             if (seat.isVehicle()) {
                 return false;                            // 有人正坐在这摞最上面那张，别往人家头上压凳子
             }
@@ -451,8 +463,7 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
     public static void clearSeatsAt(Level world, BlockPos pos) {
         Vec3 center = Vec3.atBottomCenterOf(pos);
         AABB area = new AABB(center, center).inflate(1.5, 2.0, 1.5);
-        for (SeatEntity seat : world.getEntitiesOfClass(SeatEntity.class, area,
-                net.minecraft.world.entity.Entity::isAlive)) {
+        for (SeatEntity seat : world.getEntitiesOfClass(SeatEntity.class, area, Entity::isAlive)) {
             if (seat.sitsOn(pos)) {
                 seat.discard();
             }
@@ -461,16 +472,16 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
 
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player,
-                                               BlockHitResult hit) {
+                                            BlockHitResult hit) {
         if (player.isShiftKeyDown() || player.isPassenger()) {
-            return InteractionResult.PASS;
+            return Use.blockEmpty(UseOutcome.PASS, world.isClientSide);
         }
         // mryt233 改（2026-11-05，清单 #120）：凳塔中间那几层（头顶还叠着另一张条凳）不坐人，只坐最顶上或单张条凳
         if (this.tall && isTallBench(world.getBlockState(pos.above()))) {
-            return InteractionResult.PASS;
+            return Use.blockEmpty(UseOutcome.PASS, world.isClientSide);
         }
         if (world.isClientSide) {
-            return InteractionResult.SUCCESS;
+            return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide);
         }
         Direction facing = state.getValue(FACING);
         Direction right = leftOf(facing).getOpposite();
@@ -490,11 +501,11 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
             Vec3 at = seatPos(seat);
             if (!occupied(world, at)) {
                 sit(world, player, seat, at, facing);
-                return InteractionResult.SUCCESS;
+                return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide);
             }
         }
         player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.seat_taken")), true);
-        return InteractionResult.SUCCESS;
+        return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide);
     }
 
     /** 座位点：一格中间，或两格中心的中点（交界处），高度在凳面上。 */
@@ -519,16 +530,24 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
 
     /** mryt233 改：1.20.1 的单回调交互入口。 */
     @Override
-    public net.minecraft.world.InteractionResult use(BlockState state, Level world, BlockPos pos,
-            Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level world, BlockPos pos,
+                                 Player player, InteractionHand hand, BlockHitResult hit) {
         return dispatchUse(state, world, pos, player, hand, hit);
     }
 
     /** mryt233 改：旧版 Forge 读取方块扩展；数值与底本的原版火表一致。 */
-    public boolean isFlammable(BlockState state, net.minecraft.world.level.BlockGetter world,
-            BlockPos pos, net.minecraft.core.Direction face) { return cn.blockforge.generated.orientshotpotchronicles.hotpot.FireRules.flammable(this); }
-    public int getFlammability(BlockState state, net.minecraft.world.level.BlockGetter world,
-            BlockPos pos, net.minecraft.core.Direction face) { return isFlammable(state, world, pos, face) ? 20 : 0; }
-    public int getFireSpreadSpeed(BlockState state, net.minecraft.world.level.BlockGetter world,
-            BlockPos pos, net.minecraft.core.Direction face) { return isFlammable(state, world, pos, face) ? 5 : 0; }
+    public boolean isFlammable(BlockState state, BlockGetter world,
+                               BlockPos pos, Direction face) {
+        return FireRules.flammable(this);
+    }
+
+    public int getFlammability(BlockState state, BlockGetter world,
+                               BlockPos pos, Direction face) {
+        return isFlammable(state, world, pos, face) ? 20 : 0;
+    }
+
+    public int getFireSpreadSpeed(BlockState state, BlockGetter world,
+                                   BlockPos pos, Direction face) {
+        return isFlammable(state, world, pos, face) ? 5 : 0;
+    }
 }

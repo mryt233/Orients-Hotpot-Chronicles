@@ -1,24 +1,22 @@
+// mryt233 改：26.2 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.inventory.SimpleContainerData;
-import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.core.BlockPos;
 
 /**
- * 蘸料台的补货界面（r103，用户：保留一个补货界面，只用来放原料、看还剩多少）。
- * 上面 9 个原料格 = 台上 9 个小碗（2026-10-23 起碗不固定：空碗放什么原料都行，有东西的只收同一种；调整），
- * 下面玩家背包。同步给客户端的数：前 9 个是每个碗已化开的份数，后 9 个是每个碗装的调料（序号 + 1，0 = 空碗）。
- * 网页预览 viewer/screens.js 的 sauceStation 与 client/SauceStationScreen 一一对应。
- * 作者：mryt233 */
-public class SauceStationScreenHandler extends AbstractContainerMenu {
-    /** 9 个原料格排成 3×3，和台上的碗一一对应（第一行 = 最上层，从左到右；2026-10-23 用户要求）。 */
+ * 蘸料台的补货界面：上面 9 个原料格 = 台上 9 个小碗，下面玩家背包。
+ * 作者：mryt233
+ */
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+public class SauceStationScreenHandler extends PlayerInventoryMenu {
     public static final int GRID_X = 44;
     public static final int GRID_Y = 18;
     public static final int STEP_X = 30;
@@ -33,11 +31,11 @@ public class SauceStationScreenHandler extends AbstractContainerMenu {
     public static int slotY(int i) {
         return GRID_Y + (i / 3) * STEP_Y;
     }
+
     private static final int N = SauceStationBlockEntity.BOWLS;
 
     private final Container raw;
     private final ContainerData data;
-    /** 服务端的蘸料台（客户端为 null）：判断界面是否还有效用。 */
     private SauceStationBlockEntity station;
 
     // 服务端
@@ -48,8 +46,8 @@ public class SauceStationScreenHandler extends AbstractContainerMenu {
                 if (index < N) {
                     return be.portions(index);
                 }
-                Seasoning s = be.kind(index - N);
-                return s == null ? 0 : s.ordinal() + 1;
+                int kind = be.kindIndex(index - N);
+                return kind == -2 ? -1 : kind + 1;
             }
 
             @Override
@@ -82,62 +80,46 @@ public class SauceStationScreenHandler extends AbstractContainerMenu {
         for (int i = 0; i < N; i++) {
             addSlot(new RawSlot(raw, i, slotX(i), slotY(i)));
         }
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(playerInventory, col + row * 9 + 9, 8 + col * 18, INV_Y + row * 18));
-            }
-        }
-        for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(playerInventory, col, 8 + col * 18, HOTBAR_Y));
-        }
+        addPlayerInventory(playerInventory, 8, INV_Y, HOTBAR_Y);
         addDataSlots(data);
     }
 
-    /** 第 i 个碗还能打几次（客户端画份数条用）。 */
     public int available(int i) {
         return data.get(i) + raw.getItem(i).getCount() * SauceStationBlockEntity.PORTIONS_PER_RAW;
     }
 
-    /** 第 i 个碗装的调料；空碗返回 null。 */
     public Seasoning kind(int i) {
-        ItemStack stack = raw.getItem(i);
-        if (!stack.isEmpty()) {
-            return Seasoning.ofRaw(stack);
+        SeasoningDef def = kindDef(i);
+        return def == null ? null : def.legacy();
+    }
+
+    public boolean unknownKind(int i) {
+        return data.get(N + i) == -1;
+    }
+
+    public SeasoningDef kindDef(int i) {
+        if (station != null) {
+            return station.kindDef(i);
+        }
+        if (unknownKind(i)) {
+            return null;
         }
         int k = data.get(N + i);
-        return k > 0 && data.get(i) > 0 ? Seasoning.ALL[k - 1] : null;
+        if (data.get(i) > 0 && k > 0) {
+            return Seasonings.byIndex(k - 1);
+        }
+        ItemStack stack = raw.getItem(i);
+        return !stack.isEmpty() ? Seasonings.ofRaw(stack) : null;
     }
 
     @Override
     public boolean stillValid(Player player) {
-        // 同灶台界面（代码检查 B2，mryt233 2026-11-01）：以前恒为 true
         return station == null || Container.stillValidBlockEntity(station, player);
     }
 
     @Override
     public ItemStack quickMoveStack(Player player, int slotId) {
-        Slot slot = slots.get(slotId);
-        if (!slot.hasItem()) {
-            return ItemStack.EMPTY;
-        }
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        if (slotId < N) {
-            if (!moveItemStackTo(stack, N, slots.size(), true)) {
-                return ItemStack.EMPTY;
-            }
-        } else {
-            // 先补装着同一种的碗，再放进空碗（insertItem 第二轮只放 canInsert 的格子）
-            if (Seasoning.ofRaw(stack) == null || !moveItemStackTo(stack, 0, N, false)) {
-                return ItemStack.EMPTY;
-            }
-        }
-        if (stack.isEmpty()) {
-            slot.set(ItemStack.EMPTY);
-        } else {
-            slot.setChanged();
-        }
-        return original;
+        return super.quickMoveStack(player, slotId);
     }
 
     @Override
@@ -146,7 +128,6 @@ public class SauceStationScreenHandler extends AbstractContainerMenu {
         raw.stopOpen(player);
     }
 
-    /** 原料格：空碗什么原料都收，有东西的碗只收同一种调料的原料；最多 16 个（= 64 份）。 */
     private final class RawSlot extends Slot {
         RawSlot(Container inventory, int index, int x, int y) {
             super(inventory, index, x, y);
@@ -154,14 +135,24 @@ public class SauceStationScreenHandler extends AbstractContainerMenu {
 
         @Override
         public boolean mayPlace(ItemStack stack) {
-            Seasoning s = Seasoning.ofRaw(stack);
-            Seasoning k = kind(getContainerSlot());
-            return s != null && (k == null || k == s);
+            SeasoningDef s = Seasonings.ofRaw(stack);
+            SeasoningDef k = kindDef(getContainerSlot());
+            return s != null && !unknownKind(getContainerSlot()) && (k == null || k == s);
         }
 
         @Override
         public int getMaxStackSize() {
             return SauceStationBlockEntity.MAX_RAW;
         }
+    }
+
+    @Override
+    protected int containerSlots() {
+        return N;
+    }
+
+    @Override
+    protected boolean acceptsQuickMove(ItemStack stack) {
+        return Seasonings.ofRaw(stack) != null;
     }
 }

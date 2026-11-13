@@ -2,24 +2,25 @@
 
 ## 支持的版本 {#versions}
 
-最新版 **0.2.2-alpha** 同步支持 **Minecraft 1.21.1、1.20.1、26.1.x 和 26.2** 的主流加载器，所有 jar 都**内嵌了前置框架 `orient_framework`**，下载一个直接放进 `mods` 就行：
+最新版 **0.3.0-alpha** 同步支持 **Minecraft 1.21.1、1.20.1、26.1.x 和 26.2** 的主流加载器，所有 jar 都**内嵌了前置框架 `orient_framework 0.2.0`**，下载一个直接放进 `mods` 就行：
 
 | Minecraft | 加载器 | Java | 还需要装 |
 | --- | --- | --- | --- |
-| **1.21.1** | **Fabric**（教程用它演示，**0.2.2-alpha**） | 21 或更高 | Fabric Loader 0.15.11+、**Fabric API**（0.116.14+1.21.1） |
-| **1.21.1** | **NeoForge**（**0.2.2-alpha**） | 21 或更高 | NeoForge 21.1.186 或更高 |
-| **1.20.1** | **Fabric**（**0.2.2-alpha**） | 17 或更高 | Fabric Loader 0.15.11+、**Fabric API**（0.92.12+1.20.1） |
-| **1.20.1** | **Forge**（**0.2.2-alpha**） | 17 或更高 | Forge 47.1 以上（测试用 47.4.28） |
-| **26.1.x** | **Fabric / NeoForge**（**0.2.2-alpha**） | 25 或更高 | 对应 26.1.x 的 Fabric Loader + Fabric API，或 NeoForge |
-| **26.2** | **Fabric / NeoForge**（**0.2.2-alpha**） | 25 或更高 | 对应 26.2 的 Fabric Loader + Fabric API，或 NeoForge |
+| **1.21.1** | **Fabric**（教程用它演示，**0.3.0-alpha**） | 21 或更高 | Fabric Loader 0.15.11+、**Fabric API**（0.116.14+1.21.1） |
+| **1.21.1** | **NeoForge**（**0.3.0-alpha**） | 21 或更高 | NeoForge 21.1.186 或更高 |
+| **1.20.1** | **Fabric**（**0.3.0-alpha**） | 17 或更高 | Fabric Loader 0.14.21+、**Fabric API**（0.83.0+1.20.1 起，实测至 0.92.12） |
+| **1.20.1** | **Forge**（**0.3.0-alpha**） | 17 或更高 | Forge 47.0.0 以上（实测 47.0.0 与 47.4.28） |
+| **26.1 / 26.1.1 / 26.1.2** | **Fabric**（**0.3.0-alpha**） | 25 或更高 | 对应 26.1.x 的 Fabric Loader 0.18.4+ 与 **Fabric API**（0.143.12+ 起） |
+| **26.1.2** | **NeoForge**（**0.3.0-alpha**） | 25 或更高 | NeoForge 26.1.2.71 或更高 |
+| **26.2** | **Fabric / NeoForge**（**0.3.0-alpha**） | 25 或更高 | 对应 26.2 的 Fabric Loader 0.18.4+ 与 **Fabric API**（0.148.3+），或 NeoForge 26.2.0.57+ |
 
 :::tip
-**本教程用 1.21.1 Fabric 演示。** 0.2.2-alpha 起上述所有版本的玩法、食材、小料、家具和配置功能完全同步；细微底层差异见下面「[各版本有什么不一样](#ports)」。
+**本教程用 1.21.1 Fabric 演示。** 0.3.0-alpha 起上述所有版本的玩法、食材、小料、家具、开放扩展和配置功能完全同步；细微底层差异见下面「[各版本有什么不一样](#ports)」。
 :::
 
-- **旧版存档与配置兼容**：0.2.2-alpha 将旧版 `tofu` 拆分为 `cold_tofu`（冷豆腐）和 `hot_tofu`（热豆腐），旧存档里的 `config/orients_hotpot_chronicles.json` 中的 `tofu` 配置键会自动无损迁移，升级前仍建议备份存档。
+- **旧版存档与配置兼容**：0.3.0-alpha 将汤底与蘸料存档升级为完整字符串 ID，可自动兼容升级 `0.2.2-alpha` 旧存档与旧配置（如 `tofu` 与旧位掩码），卸载第三方拓展时也会保留原始 ID 不覆盖；升级前仍建议备份存档。
 - 1.20.4 Fabric 仍停在旧版 0.1.1-alpha，不再维护。
-- 多人联机时，客户端和服务端都要装对应加载器的同版本 jar。
+- **多人联机要求**：0.3.0-alpha 因汤底 / 蘸料网络同步升级为字符串 ID 列表，**客户端和服务端必须使用同版本 `0.3.0-alpha` jar**，不可与旧版混连。
 
 ## 去哪里下载 {#download}
 
@@ -30,7 +31,7 @@
 | **MC 百科** | <https://www.mcmod.cn/class/32185.html> | 中文模组百科：看介绍、留言讨论 |
 | **GitHub Releases** | <https://github.com/mryt233/Orients-Hotpot-Chronicles/releases> | 每个版本一页，里面放各加载器的 jar |
 
-**下载认准两点：Minecraft 版本、加载器。** 文件名里写着，比如 `orients_hotpot_chronicles-1.21.1-fabric-0.2.2-alpha.jar`、`orients_hotpot_chronicles-1.21.1-neoforge-0.2.2-alpha.jar`，选错版本进不去游戏。
+**下载认准两点：Minecraft 版本、加载器。** 文件名里写着，比如 `orients_hotpot_chronicles-1.21.1-fabric-0.3.0-alpha.jar`、`orients_hotpot_chronicles-1.21.1-neoforge-0.3.0-alpha.jar`，选错版本进不去游戏。
 
 ## 怎么装 {#install}
 
@@ -47,7 +48,7 @@
 
 ### Forge（1.20.1）
 
-1. 装好 [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) 1.20.1（47.1 以上，测试用 47.4.28）。
+1. 装好 [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) 1.20.1（47.0.0 及以上，实测 47.0.0 与 47.4.28）。
 2. 把模组 Forge jar 放进 `mods` 文件夹，启动游戏。**不需要 Fabric API。**
 
 装好进创造模式物品栏，有「**之晗的火锅物语**」一页，左边有「全部 / 厨具 / 餐具 / 桌凳 / 食物」小标签帮你分类。
@@ -58,7 +59,7 @@
 
 ## 各版本有什么不一样 {#ports}
 
-0.2.2-alpha 的 **1.21.1、1.20.1、26.1.x、26.2** 全部对齐了同一套玩法与新内容，只有极少数受原版底层限制的细微差别：
+0.3.0-alpha 的 **1.21.1、1.20.1、26.1.x、26.2** 全部对齐了同一套玩法与新内容，只有极少数受原版底层限制的细微差别：
 
 | 项目 | 1.21.1 / 26.1.x / 26.2 | 1.20.1（Fabric / Forge） |
 | --- | --- | --- |

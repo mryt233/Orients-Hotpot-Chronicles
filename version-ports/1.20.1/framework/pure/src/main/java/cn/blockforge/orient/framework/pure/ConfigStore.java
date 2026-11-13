@@ -29,6 +29,12 @@ import java.util.function.Supplier;
  * 所以单人游戏里集成服线程与渲染线程并发读取也不会读到「新树配旧表」的中间态。
  */
 public final class ConfigStore {
+    /** mryt233 改（2026-11-10）：明确区分持久化、仅内存生效与未应用。 */
+    public enum SaveStatus { WRITTEN, MEMORY_ONLY, FAILED }
+
+    public record Saved(Loaded loaded, SaveStatus status, String reason, Path backup) {
+    }
+
     /**
      * 一次读取的结果；{@code data} 是独立副本，只读。{@code details} 是带语言键的警告（新代码用它按玩家语言显示）；
      * {@link #warnings()} 是英文文本，保留给 Runtime 0.1.1 时编译的旧内容包（二进制兼容，0.2.0 再收紧）。
@@ -225,10 +231,87 @@ public final class ConfigStore {
         client = snapshotOf(defaults.deepCopy());
     }
 
+    /** mryt233 改（2026-11-10）：设置保存复用原子写入；坏文档必须先完整备份。 */
+    public synchronized Saved saveEdited(JsonObject edited) {
+        Path backup = null;
+        JsonObject existing = new JsonObject();
+        try {
+            if (path != null && Files.exists(path)) {
+                if (!Files.isRegularFile(path)) {
+                    throw new IOException("Config path is not a regular file: " + path);
+                }
+                if (Files.size(path) > maxBytes) {
+                    backup = backupBrokenDocument();
+                } else {
+                    String text = Files.readString(path, StandardCharsets.UTF_8);
+                    if (isValidDocument(text)) {
+                        existing = JsonParser.parseString(text).getAsJsonObject();
+                    } else {
+                        backup = backupBrokenDocument();
+                    }
+                }
+            }
+        } catch (IOException | RuntimeException error) {
+            warn.accept("Could not preserve original config: " + error.getMessage());
+            return new Saved(new Loaded(serverData().deepCopy(), List.of()), SaveStatus.FAILED,
+                error.toString(), backup);
+        }
+        JsonObject out = merge(merge(defaults, existing), edited == null ? new JsonObject() : edited);
+        out.addProperty("_format", format);
+        out.addProperty("_说明", note);
+        out.add("_字段说明", fieldHelp.get());
+        Loaded loaded = parse(out.toString());
+        SaveStatus status = SaveStatus.MEMORY_ONLY;
+        String reason = "Config directory is not initialized";
+        if (path != null) {
+            try {
+                writeAtomically(path, gson.toJson(out) + "\n");
+                status = SaveStatus.WRITTEN;
+                reason = "";
+            } catch (IOException | RuntimeException error) {
+                reason = error.toString();
+                warn.accept("Could not write config (" + reason + "); changes applied in memory only");
+            }
+        }
+        server = snapshotOf(loaded.data());
+        loaded.details().forEach(warning -> warn.accept(warning.text()));
+        return new Saved(loaded, status, reason, backup);
+    }
+
+    private Path backupBrokenDocument() throws IOException {
+        String stamp = java.time.LocalDateTime.now().format(
+            java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-SSS"));
+        Path backup = path.resolveSibling(path.getFileName() + ".broken-" + stamp);
+        for (int suffix = 1; Files.exists(backup); suffix++) {
+            backup = path.resolveSibling(path.getFileName() + ".broken-" + stamp + "-" + suffix);
+        }
+        Files.copy(path, backup);
+        warn.accept("Invalid config backed up to " + backup);
+        return backup;
+    }
+
+    /** mryt233 改（2026-11-10）：模板补全和主动保存共用一套安全替换规则。 */
+    private static void writeAtomically(Path file, String text) throws IOException {
+        Path temp = null;
+        try {
+            Files.createDirectories(file.toAbsolutePath().getParent());
+            temp = Files.createTempFile(file.toAbsolutePath().getParent(), "config-", ".tmp");
+            Files.writeString(temp, text, StandardCharsets.UTF_8);
+            try {
+                Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException unsupported) {
+                Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            if (temp != null) {
+                try { Files.deleteIfExists(temp); } catch (IOException ignored) { }
+            }
+        }
+    }
+
     /** 补全有效文件，保留用户值/未知键；无效文档不重写。写入失败不破坏旧文件。 */
     public synchronized void saveDefaultsIfNeeded() {
         Path file = path;
-        Path temp = null;
         try {
             JsonObject existing = new JsonObject();
             if (Files.exists(file)) {
@@ -243,21 +326,10 @@ public final class ConfigStore {
             out.add("_字段说明", fieldHelp.get());
             String text = gson.toJson(out) + "\n";
             if (Files.exists(file) && Files.readString(file, StandardCharsets.UTF_8).equals(text)) return;
-            Files.createDirectories(file.getParent());
-            temp = Files.createTempFile(file.getParent(), "config-", ".tmp");
-            Files.writeString(temp, text, StandardCharsets.UTF_8);
-            try {
-                Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException unsupported) {
-                Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING);
-            }
+            writeAtomically(file, text);
         } catch (IOException error) {
             warn.accept(ConfigWarning.of("write_failed", "Could not write config (%s); original file kept",
                 error.getMessage()).text());
-        } finally {
-            if (temp != null) {
-                try { Files.deleteIfExists(temp); } catch (IOException ignored) { }
-            }
         }
     }
 

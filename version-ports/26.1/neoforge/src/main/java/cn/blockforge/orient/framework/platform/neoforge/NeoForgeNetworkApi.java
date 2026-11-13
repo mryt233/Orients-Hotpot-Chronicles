@@ -31,7 +31,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public final class NeoForgeNetworkApi implements NetworkApi {
     private static final Logger LOGGER = LoggerFactory.getLogger("orient-framework");
-    private static final int PROTOCOL_VERSION = 1;
 
     private record Channel<T extends CustomPacketPayload>(CustomPacketPayload.Type<T> type,
                                                            StreamCodec<? super RegistryFriendlyByteBuf, T> codec,

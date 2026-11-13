@@ -7,6 +7,7 @@ import cn.blockforge.orient.framework.loader.MenuProviderLike;
 import cn.blockforge.orient.framework.loader.NetworkApi;
 import cn.blockforge.orient.framework.loader.Platform;
 import cn.blockforge.orient.framework.loader.RegistrationApi;
+import cn.blockforge.orient.framework.loader.RuntimeEvents;
 import cn.blockforge.orient.framework.loader.RuntimeStats;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -32,6 +33,7 @@ public final class FabricFrameworkPlatform implements Platform {
     private static final Logger LOGGER = LoggerFactory.getLogger("orient-framework");
     private static FabricFrameworkPlatform installed;
 
+    private final FabricRuntimeEvents events = new FabricRuntimeEvents();
     private final FabricRegistrationApi registration = new FabricRegistrationApi();
     private final FabricNetworkApi network = new FabricNetworkApi();
 
@@ -52,6 +54,8 @@ public final class FabricFrameworkPlatform implements Platform {
                 Framework.install(platform);
             }
             installed = platform;
+            FabricLootEvents.install();
+            ServerLifecycleEvents.SERVER_STARTING.register(server -> platform.registration.closeRegistration());
             RuntimeStats.get().runtimeInit();
             if (isClient) {
                 FabricClientNetworkHandlers.installLifecycle();
@@ -62,6 +66,11 @@ public final class FabricFrameworkPlatform implements Platform {
             ServerLifecycleEvents.SERVER_STARTED.register(server -> RuntimeStats.get().logSummary("server-started"));
             ServerLifecycleEvents.SERVER_STOPPED.register(server -> RuntimeStats.get().logSummary("server-stopped"));
         }
+    }
+
+    @Override
+    public RuntimeEvents events() {
+        return events;
     }
 
     @Override
@@ -97,6 +106,11 @@ public final class FabricFrameworkPlatform implements Platform {
     @Override
     public boolean isDevelopmentEnvironment() {
         return FabricLoader.getInstance().isDevelopmentEnvironment();
+    }
+
+    @Override
+    public boolean isDedicatedServer() {
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
     }
 
     private record Factory(MenuProviderLike menu, BlockPos data) implements ExtendedScreenHandlerFactory {

@@ -1,6 +1,16 @@
 package cn.blockforge.generated.orientshotpotchronicles.client.compat.jei;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.List;
+import net.minecraft.client.renderer.Rect2i;
+
+import static cn.blockforge.generated.orientshotpotchronicles.compat.HotPotRecipeViewerData.*;
+
 import cn.blockforge.generated.orientshotpotchronicles.compat.HotPotRecipeViewerData;
+import cn.blockforge.generated.orientshotpotchronicles.compat.HotPotCompat;
+import cn.blockforge.generated.orientshotpotchronicles.client.SauceStationScreen;
+import mezz.jei.api.registration.IGuiHandlerRegistration;
+import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import mezz.jei.api.IModPlugin;
@@ -22,7 +32,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.Locale;
 
 /**
  * JEI 插件：把火锅涮煮、砧板切配、擀面杖拍打三类玩法配方交给 JEI 展示。
@@ -32,6 +41,7 @@ import java.util.Locale;
  * 模组照常运行、也不会因为缺少 JEI 报错。
  * 作者：mryt233 */
 @JeiPlugin
+// mryt233 改（2026-11-11）：共享配方文字和颜色。
 public final class HotPotJeiPlugin implements IModPlugin {
     /** 火锅涮煮分类。 */
     public static final RecipeType<HotPotRecipeViewerData.CookingEntry> COOKING =
@@ -42,13 +52,6 @@ public final class HotPotJeiPlugin implements IModPlugin {
     /** 擀面杖拍打分类。 */
     public static final RecipeType<HotPotRecipeViewerData.PoundingEntry> POUNDING =
         RecipeType.create(HotPot.MOD_ID, "pounding", HotPotRecipeViewerData.PoundingEntry.class);
-
-    /** 正文颜色（深灰）。 */
-    private static final int TEXT = 0xFF404040;
-    /** 提示颜色（偏暖的深棕，和火锅锅体配色一致）。 */
-    private static final int HINT = 0xFF8A5524;
-    /** 「久煮会煮老」提示色（醒目一点）。 */
-    private static final int WARN = 0xFFA63D2A;
 
     @Override
     public Identifier getPluginUid() {
@@ -66,10 +69,10 @@ public final class HotPotJeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        // 每次触发都重新枚举，刻数 / 经验是现读配置的，reload 后重新打开 JEI 就是新数值
-        registration.addRecipes(COOKING, HotPotRecipeViewerData.cookingRecipes());
+        // mryt233 改（2026-11-11）：枚举当前客户端配方与配置，实际界面重建由查看器生命周期负责。
+        registration.addRecipes(COOKING, HotPotRecipeViewerData.cookingRecipes(Minecraft.getInstance().level));
         registration.addRecipes(CUTTING, HotPotRecipeViewerData.cuttingRecipes());
-        registration.addRecipes(POUNDING, HotPotRecipeViewerData.poundingRecipes());
+        registration.addRecipes(POUNDING, HotPotRecipeViewerData.poundingRecipes(Minecraft.getInstance().level));
     }
 
     @Override
@@ -85,9 +88,16 @@ public final class HotPotJeiPlugin implements IModPlugin {
         }
     }
 
-    /** 把刻数换算成「秒」的显示文本（一位小数，固定用点号）。 */
-    private static String seconds(int ticks) {
-        return String.format(Locale.ROOT, "%.1f", ticks / 20F);
+    // mryt233 改（r146f）：实时读取面板边界，关闭原料表后返回空区域。
+    @Override
+    public void registerGuiHandlers(IGuiHandlerRegistration registration) {
+        if (!HotPotCompat.isModLoaded("jei")) return;
+        registration.addGuiContainerHandler(SauceStationScreen.class, new IGuiContainerHandler<SauceStationScreen>() {
+            @Override
+            public List<Rect2i> getGuiExtraAreas(SauceStationScreen screen) {
+                return screen.guideAreas();
+            }
+        });
     }
 
     /** 在配方区域里画一行文字；超出可用宽度时按宽度截断，避免串到相邻槽位。 */
@@ -114,7 +124,7 @@ public final class HotPotJeiPlugin implements IModPlugin {
 
         @Override
         public Component getTitle() {
-            return Component.translatable("text.orients_hotpot_chronicles.recipe.cooking");
+            return recipeText("cooking");
         }
 
         @Override
@@ -144,14 +154,11 @@ public final class HotPotJeiPlugin implements IModPlugin {
         @Override
         public void draw(HotPotRecipeViewerData.CookingEntry recipe, IRecipeSlotsView recipeSlotsView,
                          GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
-            Component time = Component.translatable("text.orients_hotpot_chronicles.recipe.cooking.time",
-                seconds(recipe.cookTicks()), String.valueOf(recipe.cookTicks()));
+            Component time = cookingTime(recipe);
             drawLine(guiGraphics, time, 8, 4, TEXT, 134);
             if (!recipe.overcookOutput().isEmpty()) {
                 // 「久煮」指煮熟之后再继续煮的时间：总刻数减去煮熟那一段
-                int extra = Math.max(0, recipe.overcookTotalTicks() - recipe.cookTicks());
-                Component overcook = Component.translatable("text.orients_hotpot_chronicles.recipe.cooking.overcook",
-                    seconds(extra), recipe.overcookOutput().getHoverName());
+                Component overcook = overcookHint(recipe);
                 drawLine(guiGraphics, overcook, 8, 40, WARN, 134);
             }
         }
@@ -174,7 +181,7 @@ public final class HotPotJeiPlugin implements IModPlugin {
 
         @Override
         public Component getTitle() {
-            return Component.translatable("text.orients_hotpot_chronicles.recipe.cutting");
+            return recipeText("cutting");
         }
 
         @Override
@@ -202,10 +209,7 @@ public final class HotPotJeiPlugin implements IModPlugin {
         @Override
         public void draw(HotPotRecipeViewerData.CuttingEntry recipe, IRecipeSlotsView recipeSlotsView,
                          GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
-            Component hint = recipe.pieceByPiece()
-                ? Component.translatable("text.orients_hotpot_chronicles.recipe.cutting.multi",
-                    String.valueOf(recipe.output().getCount()))
-                : Component.translatable("text.orients_hotpot_chronicles.recipe.cutting.single");
+            Component hint = cuttingHint(recipe);
             drawLine(guiGraphics, hint, 8, 4, HINT, 134);
         }
     }
@@ -227,7 +231,7 @@ public final class HotPotJeiPlugin implements IModPlugin {
 
         @Override
         public Component getTitle() {
-            return Component.translatable("text.orients_hotpot_chronicles.recipe.pounding");
+            return recipeText("pounding");
         }
 
         @Override
@@ -258,8 +262,7 @@ public final class HotPotJeiPlugin implements IModPlugin {
         @Override
         public void draw(HotPotRecipeViewerData.PoundingEntry recipe, IRecipeSlotsView recipeSlotsView,
                          GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
-            Component hits = Component.translatable("text.orients_hotpot_chronicles.recipe.pounding.hits",
-                String.valueOf(recipe.hits()));
+            Component hits = poundingHint(recipe);
             drawLine(guiGraphics, hits, 8, 4, HINT, 134);
         }
     }

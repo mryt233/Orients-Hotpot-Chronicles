@@ -17,7 +17,7 @@ import net.minecraft.core.Direction;
  * AXIS 只是给渲染选模型方向（长边沿 x 或 z）。
  * 2026-10-30 Mojang 映射迁移。
  */
-public class PlateBlock extends Block {
+public class PlateBlock extends Block implements TableBlock {
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
 
     private final String material;
@@ -41,6 +41,10 @@ public class PlateBlock extends Block {
     public PlateSize size() {
         return size;
     }
+
+    // mryt233 改（r146e）：内部摆件可独立覆盖占地，不增加盘子枚举和物品。
+    public double footprintLength() { return size.length(); }
+    public double footprintWidth() { return size.width(); }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {

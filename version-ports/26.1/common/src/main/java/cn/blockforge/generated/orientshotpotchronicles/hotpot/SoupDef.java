@@ -1,0 +1,292 @@
+package cn.blockforge.generated.orientshotpotchronicles.hotpot;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
+import net.minecraft.core.Holder;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+
+/**
+ * 一种汤底的全部「定义」：它是谁、倒进去的是什么、喝下去有什么效果、界面和气泡长什么色；
+ * 以及由这些定义算出来的玩法（加热速度、一碗汤的营养、风味加成效果）。
+ *
+ * <p>第四批 4B-1 / 4B-2（mryt233，2026-11-11）；26.1 改（mryt233）：标识符改用 {@link Identifier}。</p>
+ * 作者：mryt233
+ */
+public record SoupDef(
+    Identifier id, String langKey, String bowlId, float defaultSpeedMul,
+    Supplier<Item> sourceItem, Item remainderItem, Supplier<Item> additive,
+    int defaultBowlHunger, float defaultBowlSaturation,
+    Holder<MobEffect> mainEffect, int defaultDuration,
+    Holder<MobEffect> secondEffect, int defaultSecondDuration,
+    Holder<MobEffect> fireEffect, int defaultFireDuration,
+    Holder<MobEffect> hungerEffect, int defaultHungerDuration,
+    boolean clearsNausea, boolean spicy,
+    int screenBase, int screenHi, int screenLo, int[] screenBits,
+    int bubbleBody, int bubbleHi) {
+
+    public SoupDef {
+        Objects.requireNonNull(id, "id");
+        Objects.requireNonNull(langKey, "langKey");
+        Objects.requireNonNull(bowlId, "bowlId");
+        Objects.requireNonNull(sourceItem, "sourceItem");
+        Objects.requireNonNull(remainderItem, "remainderItem");
+        Objects.requireNonNull(screenBits, "screenBits");
+        screenBits = screenBits.clone();
+    }
+
+    /** 食材小点颜色（返回拷贝）。 */
+    @Override
+    public int[] screenBits() {
+        return screenBits.clone();
+    }
+
+    /** 配置键 / 汤面贴图名。 */
+    public String key() {
+        return HotPot.MOD_ID.equals(id.getNamespace()) ? id.getPath() : id.toString();
+    }
+
+    /** 完整语言键；若 {@code langKey} 已带 {@code text.} 前缀则直接返回，否则拼 {@code text.<modid>.<langKey>}。 */
+    public String nameKey() {
+        return (langKey.startsWith("text.") || (langKey.contains(".") && !langKey.startsWith("soup.")))
+            ? langKey : "text." + HotPot.MOD_ID + "." + langKey;
+    }
+
+    /** 方块状态里的汤面值。内置项按名字对应 {@link SoupVisual}；其他汤底映射为 {@link SoupVisual#OTHER}。 */
+    public SoupVisual visual() {
+        for (SoupVisual candidate : SoupVisual.values()) {
+            if (candidate != SoupVisual.NONE && candidate != SoupVisual.OTHER
+                && candidate.getSerializedName().equals(key())) {
+                return candidate;
+            }
+        }
+        return SoupVisual.OTHER;
+    }
+
+    /** 倒进锅里的原料。 */
+    public Item source() {
+        return sourceItem.get();
+    }
+
+    public Item remainder() {
+        return remainderItem;
+    }
+
+    /** 手里这件是不是这种汤的原料（直接倒的汤桶，或加进清汤的锅底料）。 */
+    public boolean matchesSource(ItemStack stack) {
+        return stack.is(sourceItem.get()) || (additive != null && stack.is(additive.get()));
+    }
+
+    /** 手里这件是不是「加进清汤里」的锅底料。 */
+    public boolean isAdditive(ItemStack stack) {
+        return additive != null && !stack.is(sourceItem.get());
+    }
+
+    /** 加热速度倍率。 */
+    public float speedMul() {
+        return Soups.isBuiltin(id) ? Config.overriddenSoupSpeed(key(), defaultSpeedMul) : defaultSpeedMul;
+    }
+
+    /** 一碗汤回多少饥饿点数。 */
+    public int bowlHunger() {
+        return Soups.isBuiltin(id) ? Config.overriddenSoupBowlInt(key(), "hunger", defaultBowlHunger) : defaultBowlHunger;
+    }
+
+    /** 一碗汤的饱和度系数。 */
+    public float bowlSaturation() {
+        return Soups.isBuiltin(id)
+            ? Config.overriddenSoupBowlFloat(key(), "saturation", defaultBowlSaturation) : defaultBowlSaturation;
+    }
+
+    /** 煮熟食物被吃下 / 一碗汤喝下时附加的效果（不带辣度）。 */
+    public List<MobEffectInstance> dishBonusEffects() {
+        return dishBonusEffects(0);
+    }
+
+    /** 汤底给菜品 / 汤碗的风味加成。 */
+    public List<MobEffectInstance> dishBonusEffects(int spicyLevel) {
+        if (spicy) {
+            return spicyBonusEffects(spicyLevel);
+        }
+        List<MobEffectInstance> list = new ArrayList<>();
+        boolean builtin = Soups.isBuiltin(id);
+        String name = key();
+        int amplifier = builtin ? Config.overriddenSoupBowlInt(name, "amplifier", 0) : 0;
+        addEffect(list, mainEffect,
+            builtin ? Config.overriddenSoupBowlInt(name, "duration", defaultDuration) : defaultDuration, amplifier);
+        addEffect(list, secondEffect,
+            builtin ? Config.overriddenSoupBowlInt(name, "second_duration", defaultSecondDuration) : defaultSecondDuration,
+            builtin ? Config.overriddenSoupBowlInt(name, "second_amplifier", 0) : 0);
+        return list;
+    }
+
+    List<MobEffectInstance> spicyBonusEffects(int spicyLevel) {
+        List<MobEffectInstance> list = new ArrayList<>();
+        boolean builtin = Soups.isBuiltin(id);
+        String name = key();
+        int ticks = builtin ? Config.overriddenSoupBowlInt(name, "duration", defaultDuration) : defaultDuration;
+        int amplifier = builtin ? Config.overriddenSoupBowlInt(name, "amplifier", 0) : 0;
+        int secondTicks = builtin
+            ? Config.overriddenSoupBowlInt(name, "second_duration", defaultSecondDuration) : defaultSecondDuration;
+        int secondAmp = builtin ? Config.overriddenSoupBowlInt(name, "second_amplifier", 0) : 0;
+        int level = Math.max(0, Math.min(HotPotBlockEntity.SPICY_MAX, spicyLevel));
+        if (ticks > 0) {
+            ticks += level * Config.spicyLevelDurationStep();
+            amplifier += level >= Config.spicyLevelAmplifierFrom() ? 1 : 0;
+        }
+        addEffect(list, mainEffect, ticks, amplifier);
+        int speedAdd = level == 1 ? Config.spicySecondBonusL1()
+            : (level == 2 ? Config.spicySecondBonusL2()
+            : (level >= HotPotBlockEntity.SPICY_MAX ? Config.spicySecondBonusL3() : 0));
+        addEffect(list, secondEffect, secondTicks > 0 ? secondTicks + speedAdd : 0, secondAmp);
+        if (level >= Config.spicyFireFromLevel()) {
+            int fireTicks = builtin
+                ? Config.overriddenSoupBowlInt(name, "fire_duration", defaultFireDuration) : defaultFireDuration;
+            addEffect(list, fireEffect,
+                level >= HotPotBlockEntity.SPICY_MAX ? fireTicks * Config.spicyFireTopMultiplier() : fireTicks,
+                builtin ? Config.overriddenSoupBowlInt(name, "fire_amplifier", 0) : 0);
+            int hungerTicks = builtin
+                ? Config.overriddenSoupBowlInt(name, "hunger_duration", defaultHungerDuration) : defaultHungerDuration;
+            if (hungerTicks > 0 && level >= HotPotBlockEntity.SPICY_MAX) {
+                hungerTicks += Config.spicyHungerTopBonus();
+            }
+            addEffect(list, hungerEffect, hungerTicks,
+                builtin ? Config.overriddenSoupBowlInt(name, "hunger_amplifier", 0) : 0);
+        }
+        return list;
+    }
+
+    private static void addEffect(List<MobEffectInstance> list, Holder<MobEffect> effect, int ticks, int amplifier) {
+        if (effect == null || ticks <= 0) {
+            return;
+        }
+        list.add(new MobEffectInstance(effect, ticks, amplifier, false, true));
+    }
+
+    /** 4F-1（mryt233）：构造自定义汤底定义。 */
+    public static Builder builder(Identifier id) {
+        return new Builder(id);
+    }
+
+    /** 4F-2（mryt233）：基于当前定义创建可修改副本。 */
+    public Builder toBuilder() {
+        return new Builder(this);
+    }
+
+    public static final class Builder {
+        private final Identifier id;
+        private String langKey;
+        private String bowlId;
+        private float defaultSpeedMul = 1.0F;
+        private Supplier<Item> sourceItem;
+        private Item remainderItem = Items.AIR;
+        private Supplier<Item> additive;
+        private int defaultBowlHunger = SoupBase.DEFAULT_BOWL_HUNGER;
+        private float defaultBowlSaturation = 0.6F;
+        private Holder<MobEffect> mainEffect;
+        private int defaultDuration;
+        private Holder<MobEffect> secondEffect;
+        private int defaultSecondDuration;
+        private Holder<MobEffect> fireEffect;
+        private int defaultFireDuration;
+        private Holder<MobEffect> hungerEffect;
+        private int defaultHungerDuration;
+        private boolean clearsNausea;
+        private boolean spicy;
+        private int screenBase = 0xFFD9C7A3;
+        private int screenHi = 0xFFF1E5C9;
+        private int screenLo = 0xFFB8A37D;
+        private int[] screenBits = {0xFF8C7A5B, 0xFFE6D6B8};
+        private int bubbleBody = 0xFFF3EAD6;
+        private int bubbleHi = 0xFFFFFFFF;
+
+        private Builder(Identifier id) {
+            this.id = Objects.requireNonNull(id, "id");
+            this.langKey = "text." + id.getNamespace() + ".soup." + id.getPath();
+            this.bowlId = id.getPath() + "_bowl";
+        }
+
+        private Builder(SoupDef base) {
+            this.id = base.id;
+            this.langKey = base.langKey;
+            this.bowlId = base.bowlId;
+            this.defaultSpeedMul = base.defaultSpeedMul;
+            this.sourceItem = base.sourceItem;
+            this.remainderItem = base.remainderItem;
+            this.additive = base.additive;
+            this.defaultBowlHunger = base.defaultBowlHunger;
+            this.defaultBowlSaturation = base.defaultBowlSaturation;
+            this.mainEffect = base.mainEffect;
+            this.defaultDuration = base.defaultDuration;
+            this.secondEffect = base.secondEffect;
+            this.defaultSecondDuration = base.defaultSecondDuration;
+            this.fireEffect = base.fireEffect;
+            this.defaultFireDuration = base.defaultFireDuration;
+            this.hungerEffect = base.hungerEffect;
+            this.defaultHungerDuration = base.defaultHungerDuration;
+            this.clearsNausea = base.clearsNausea;
+            this.spicy = base.spicy;
+            this.screenBase = base.screenBase;
+            this.screenHi = base.screenHi;
+            this.screenLo = base.screenLo;
+            this.screenBits = base.screenBits.clone();
+            this.bubbleBody = base.bubbleBody;
+            this.bubbleHi = base.bubbleHi;
+        }
+
+        public Builder langKey(String langKey) { this.langKey = Objects.requireNonNull(langKey, "langKey"); return this; }
+        public Builder bowlId(String bowlId) { this.bowlId = Objects.requireNonNull(bowlId, "bowlId"); return this; }
+        public Builder speed(float speedMul) { this.defaultSpeedMul = speedMul; return this; }
+        public Builder source(Supplier<Item> sourceItem) { return source(sourceItem, Items.AIR); }
+        public Builder source(Supplier<Item> sourceItem, Item remainderItem) {
+            this.sourceItem = Objects.requireNonNull(sourceItem, "sourceItem");
+            this.remainderItem = Objects.requireNonNull(remainderItem, "remainderItem");
+            return this;
+        }
+        public Builder additive(Supplier<Item> additive) { this.additive = Objects.requireNonNull(additive, "additive"); return this; }
+        public Builder bowlFood(int hunger, float saturation) {
+            this.defaultBowlHunger = hunger;
+            this.defaultBowlSaturation = saturation;
+            return this;
+        }
+        public Builder mainEffect(Holder<MobEffect> effect, int durationTicks) {
+            this.mainEffect = effect; this.defaultDuration = durationTicks; return this;
+        }
+        public Builder secondEffect(Holder<MobEffect> effect, int durationTicks) {
+            this.secondEffect = effect; this.defaultSecondDuration = durationTicks; return this;
+        }
+        public Builder fireEffect(Holder<MobEffect> effect, int durationTicks) {
+            this.fireEffect = effect; this.defaultFireDuration = durationTicks; return this;
+        }
+        public Builder hungerEffect(Holder<MobEffect> effect, int durationTicks) {
+            this.hungerEffect = effect; this.defaultHungerDuration = durationTicks; return this;
+        }
+        public Builder clearsNausea(boolean clearsNausea) { this.clearsNausea = clearsNausea; return this; }
+        public Builder spicy(boolean spicy) { this.spicy = spicy; return this; }
+        public Builder screenColors(int base, int hi, int lo, int... bits) {
+            this.screenBase = base; this.screenHi = hi; this.screenLo = lo;
+            if (bits != null && bits.length > 0) this.screenBits = bits.clone();
+            return this;
+        }
+        public Builder bubbleColors(int body, int hi) {
+            this.bubbleBody = body; this.bubbleHi = hi; return this;
+        }
+
+        public SoupDef build() {
+            if (sourceItem == null && additive == null) {
+                throw new IllegalStateException("汤底 " + id + " 必须设置倒入原料 source 或锅底料 additive");
+            }
+            Supplier<Item> resolvedSource = sourceItem != null ? sourceItem : () -> Items.AIR;
+            return new SoupDef(id, langKey, bowlId, defaultSpeedMul, resolvedSource, remainderItem, additive,
+                defaultBowlHunger, defaultBowlSaturation, mainEffect, defaultDuration, secondEffect, defaultSecondDuration,
+                fireEffect, defaultFireDuration, hungerEffect, defaultHungerDuration, clearsNausea, spicy,
+                screenBase, screenHi, screenLo, screenBits, bubbleBody, bubbleHi);
+        }
+    }
+}

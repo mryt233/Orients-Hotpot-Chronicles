@@ -1,32 +1,24 @@
-// mryt233 改：26.1 原版 API。
+// mryt233 改：26.2 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import cn.blockforge.orient.framework.game.PartOutline;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.phys.BlockHitResult;
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * 高灶台的「上半截」：看不见，占住高灶台上面那一格。
@@ -37,7 +29,8 @@ import net.minecraft.world.level.material.PushReaction;
  * 挖它就是挖灶台（对着锅挖则只挖锅，见 HotPotContent 的破坏事件）。下面不是高灶台了它自己消失。</p>
  *
  * 作者：mryt233 */
-public class StoveTopBlock extends Block implements PartOutline {
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+public class StoveTopBlock extends TopProxyBlock<StoveTopBlock.Below> {
     /**
      * 下面那台高灶台的形状类别，记在自己的方块状态里（mryt233 2026-11-01）。
      * <p>以前形状是现读下面方块算的，还开了 dynamicShape：光照线程算挡光时会调 getShape，
@@ -86,7 +79,7 @@ public class StoveTopBlock extends Block implements PartOutline {
      * 挖掘工具见 data/minecraft/tags/block/mineable/pickaxe.json，上半截自己的条目就是为它加的：
      * 玩家对着上半截举镐时，挖快了还是慢由这个方块自己所在的标签决定。
      */
-    public StoveTopBlock(net.minecraft.world.level.block.state.BlockBehaviour.Properties properties) {
+    public StoveTopBlock(BlockBehaviour.Properties properties) {
         super(properties
             .mapColor(MapColor.COLOR_RED)
             .strength(2.0F, 6.0F)
@@ -97,84 +90,9 @@ public class StoveTopBlock extends Block implements PartOutline {
         registerDefaultState(stateDefinition.any().setValue(BELOW, Below.EMPTY));
     }
 
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(BELOW);
-    }
-
     /** 给这台灶台配的上半截状态。 */
     public static BlockState mirroring(BlockState stove) {
         return HotPotContent.STOVE_TOP.defaultBlockState().setValue(BELOW, Below.of(stove));
-    }
-
-    private static boolean tallStoveBelow(BlockGetter world, BlockPos pos) {
-        return world.getBlockState(pos.below()).getBlock() instanceof StoveBlock stove && stove.lift() > 0;
-    }
-
-    @Override
-    protected RenderShape getRenderShape(BlockState state) {
-        return RenderShape.INVISIBLE;
-    }
-
-    /** 形状只看自己的状态，绝不读世界（见 {@link Below}）。 */
-    @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        return SHAPES[state.getValue(BELOW).ordinal()];
-    }
-
-    @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        return SHAPES[state.getValue(BELOW).ordinal()];
-    }
-
-    /** 选中框：照下面灶台的规则（锅 / 灶身分开框），挪到这一格的坐标。 */
-    @Override
-    public VoxelShape aimedPart(BlockState state, BlockGetter world, BlockPos pos, Player player) {
-        BlockState below = world.getBlockState(pos.below());
-        if (below.getBlock() instanceof StoveBlock stove) {
-            VoxelShape part = stove.aimedPart(below, world, pos.below(), player);
-            return part == null ? null : part.move(0, -1, 0);
-        }
-        return null;
-    }
-
-    @Override
-    protected boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
-        return tallStoveBelow(world, pos);
-    }
-
-    @Override
-    protected BlockState updateShape(BlockState state, net.minecraft.world.level.LevelReader world, net.minecraft.world.level.ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, net.minecraft.util.RandomSource random) {
-        if (direction != Direction.DOWN) {
-            return state;
-        }
-        // 下面变了：不是高灶台就消失，否则照新的锅状态更新形状（用传进来的 neighborState，不再读世界）
-        Below below = Below.of(neighborState);
-        return below == Below.NONE ? net.minecraft.world.level.block.Blocks.AIR.defaultBlockState() : state.setValue(BELOW, below);
-    }
-
-    /** 准星位置不变，只把"点到的方块"换成下面的灶台。 */
-    private static BlockHitResult toStove(BlockPos pos, BlockHitResult hit) {
-        return new BlockHitResult(hit.getLocation(), hit.getDirection(), pos.below(), hit.isInside());
-    }
-
-    @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
-                                              Player player, InteractionHand hand, BlockHitResult hit) {
-        BlockState below = world.getBlockState(pos.below());
-        if (!(below.getBlock() instanceof StoveBlock)) {
-            return InteractionResult.TRY_WITH_EMPTY_HAND;
-        }
-        return below.useItemOn(stack, world, player, hand, toStove(pos, hit));
-    }
-
-    @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
-        BlockState below = world.getBlockState(pos.below());
-        if (!(below.getBlock() instanceof StoveBlock)) {
-            return InteractionResult.PASS;
-        }
-        return below.useWithoutItem(world, player, toStove(pos, hit));
     }
 
     /** 挖的快慢：对着锅按锅算，否则按灶台算。 */
@@ -191,24 +109,10 @@ public class StoveTopBlock extends Block implements PartOutline {
         return below.getDestroyProgress(player, world, pos.below());
     }
 
-    /** 挖上半截 = 挖整个高灶台（工具对才掉灶台本身；锅、汤、燃料照灶台自己的规则掉）。 */
-    @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        BlockState below = world.getBlockState(pos.below());
-        if (!world.isClientSide() && below.getBlock() instanceof StoveBlock) {
-            boolean drop = !player.isCreative() && player.hasCorrectToolForDrops(below);
-            if (player.isCreative()) {
-                below.getBlock().playerWillDestroy(world, pos.below(), below, player);
-            }
-            world.destroyBlock(pos.below(), drop, player);
-        }
-        return super.playerWillDestroy(world, pos, state, player);
-    }
-
     /** mryt233 改：上半截也显示准星所指的锅名或下方高灶台本名。 */
     @Override
-    public net.minecraft.network.chat.MutableComponent getName() {
-        net.minecraft.network.chat.MutableComponent name = StoveBlock.aimedName(PlateHolderBlock.pickPlayer.get());
+    public MutableComponent getName() {
+        MutableComponent name = StoveBlock.aimedName(PlateHolderBlock.pickPlayer.get());
         return name == null ? super.getName() : name;
     }
 
@@ -216,5 +120,33 @@ public class StoveTopBlock extends Block implements PartOutline {
     public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
         BlockState below = world.getBlockState(pos.below());
         return below.getCloneItemStack(world, pos.below(), includeData);   // 对着锅复制锅（同 StoveBlock）
+    }
+
+    @Override
+    protected EnumProperty<Below> belowProperty() { return BELOW; }
+
+    @Override
+    protected Below belowOf(BlockState state) { return Below.of(state); }
+
+    @Override
+    protected boolean accepts(BlockState state) { return state.getBlock() instanceof StoveBlock; }
+
+    @Override
+    protected VoxelShape[] outlines() { return SHAPES; }
+
+    @Override
+    protected void beforeDestroyBelow(Level world, BlockPos pos, BlockState below, Player player) {
+        if (player.isCreative()) below.getBlock().playerWillDestroy(world, pos, below, player);
+    }
+
+    /** 保留原有公开入口，供外部调用。 */
+    @Override
+    public VoxelShape aimedPart(BlockState state, BlockGetter world, BlockPos pos, Player player) {
+        return super.aimedPart(state, world, pos, player);
+    }
+
+    @Override
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+        return super.playerWillDestroy(world, pos, state, player);
     }
 }

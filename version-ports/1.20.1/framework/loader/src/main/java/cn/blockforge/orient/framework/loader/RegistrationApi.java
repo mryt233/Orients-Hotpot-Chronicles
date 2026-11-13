@@ -1,9 +1,14 @@
 package cn.blockforge.orient.framework.loader;
 
-import net.minecraft.core.BlockPos;
+// mryt233 改（2026-11-10）：第三批 3C 补充平台能力。
+
 import cn.blockforge.orient.framework.compat.ItemDataKey;
+import net.minecraft.advancements.CriterionTrigger;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Inventory;
@@ -12,10 +17,9 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -83,5 +87,46 @@ public interface RegistrationApi {
 
     interface EntityRegistrar {
         <T extends Entity> EntityType<T> register(ResourceLocation id, EntityType<T> type);
+    }
+
+    // 新方法保留默认实现，旧平台实现的二进制契约保持不变。
+    default RecipeSerializerRegistrar recipeSerializers() {
+        throw new UnsupportedOperationException("recipeSerializers requires Runtime 0.1.5");
+    }
+
+    interface RecipeSerializerRegistrar {
+        <T extends RecipeSerializer<?>> T register(ResourceLocation id, T value);
+    }
+
+    default RecipeTypeRegistrar recipeTypes() {
+        throw new UnsupportedOperationException("recipeTypes requires Runtime 0.1.5");
+    }
+
+    interface RecipeTypeRegistrar {
+        <T extends RecipeType<?>> T register(ResourceLocation id, T value);
+    }
+
+    default CriterionRegistrar criteria() {
+        throw new UnsupportedOperationException("criteria requires Runtime 0.1.5");
+    }
+
+    interface CriterionRegistrar {
+        <T extends CriterionTrigger<?>> T register(ResourceLocation id, T value);
+    }
+
+    default SoundRegistrar sounds() {
+        throw new UnsupportedOperationException("sounds requires Runtime 0.1.5");
+    }
+
+    interface SoundRegistrar {
+        SoundEvent register(ResourceLocation id, SoundEvent value);
+    }
+
+    default ParticleRegistrar particles() {
+        throw new UnsupportedOperationException("particles requires Runtime 0.1.5");
+    }
+
+    interface ParticleRegistrar {
+        <T extends ParticleType<?>> T register(ResourceLocation id, T value);
     }
 }

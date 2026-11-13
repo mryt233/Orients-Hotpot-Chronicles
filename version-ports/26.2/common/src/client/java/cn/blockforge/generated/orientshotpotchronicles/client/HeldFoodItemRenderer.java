@@ -1,5 +1,10 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateSize;
+import com.mojang.math.Axis;
+import net.minecraft.world.item.Items;
+
 import cn.blockforge.orient.framework.client.ClientItemRenderers;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Chopsticks;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
@@ -44,7 +49,7 @@ public final class HeldFoodItemRenderer {
             ClientItemRenderers.register(item, HeldFoodItemRenderer::renderPlate);
         }
         // 装着菜的原版碗（r99）：资源包里给 minecraft:item/bowl 加了自定义模型数据 1 → builtin/entity
-        ClientItemRenderers.register(net.minecraft.world.item.Items.BOWL, HeldFoodItemRenderer::renderBowl);
+        ClientItemRenderers.register(Items.BOWL, HeldFoodItemRenderer::renderBowl);
     }
 
     /** 去掉自定义模型数据的复制品 = 原来的模型。 */
@@ -90,7 +95,7 @@ public final class HeldFoodItemRenderer {
             matrices.translate(0.5F, 0.5F, 0.5F);
             items.getModel(base, null, null, 0).getTransforms().getTransform(mode).apply(false, matrices);
             matrices.pushPose();
-            matrices.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(180F));
+            matrices.mulPose(Axis.ZP.rotationDegrees(180F));
             items.renderStatic(base, ItemDisplayContext.NONE, light, overlay, matrices, consumers, null, 0);
             matrices.popPose();
             matrices.translate(HAND_TIP_X - 0.5F, HAND_TIP_Y - 0.5F, 0.03F);
@@ -115,11 +120,11 @@ public final class HeldFoodItemRenderer {
     private static void renderBowl(ItemStack stack, ItemDisplayContext mode, PoseStack matrices,
                                    RenderFrame consumers, int light, int overlay) {
         NonNullList<ItemStack> foods = NonNullList.withSize(
-            cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateSize.BOWL.capacity(), ItemStack.EMPTY);
+            PlateSize.BOWL.capacity(), ItemStack.EMPTY);
         stack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(foods);
         RenderItems.INSTANCE.renderSingleBlock(
             HotPotContent.BOWL_BLOCK.defaultBlockState(), matrices, consumers, light, overlay);
-        PlateFoodRenderer.render(cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateSize.BOWL,
+        PlateFoodRenderer.render(PlateSize.BOWL,
             Direction.Axis.X, foods, matrices, consumers, light, null, 0, RenderItems.INSTANCE);
     }
 

@@ -1,35 +1,33 @@
-// mryt233 改：26.1 原版 API。
+// mryt233 改：26.2 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemUtils;
-import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.stats.Stats;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionResult;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.ItemUtils;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.Consumable;
 import net.minecraft.world.item.component.Consumables;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-
-import java.util.List;
 
 /**
  * 一瓶饮料（r99 橙子饮料；r101 改成通用，加维二，种类见 {@link DrinkKind}）。
  * 一瓶喝 4 口（用耐久条显示还剩多少），每口回 2 点饥饿值 + 种类自己的效果；喝完剩一个空瓶。
  * 点在方块顶面是摆上去（和盘子一样），对着空气右键是喝。配方先不做（用户）。
  * 作者：mryt233 */
-public class DrinkItem extends Item {
+public class DrinkItem extends Item implements TableItem {
     public static final int SIPS = 4;
     /** 每口的默认营养；实际值喝的时候读配置文件 drink.sip（代码检查 W7，mryt233 2026-11-01）。 */
     private static final int SIP_HUNGER = 2;
@@ -61,12 +59,22 @@ public class DrinkItem extends Item {
     }
 
     @Override
+    public PlateBlock tableBlock(ItemStack stack) {
+        return HotPotContent.DRINK_BLOCK;
+    }
+
+    @Override
+    public void playPlaceSound(Level world, BlockPos pos, ItemStack stack) {
+        DrinkBlock.playPlaceSound(world, pos, stack);
+    }
+
+    @Override
     public InteractionResult useOn(UseOnContext context) {
         InteractionResult poured = DrinkCauldronBlock.pourIntoEmpty(context);
         if (poured != InteractionResult.PASS) {
             return poured;
         }
-        return PlateItem.placeOn(context, HotPotContent.DRINK_BLOCK, true);
+        return Use.item(TableObjects.placeOn(context, this), context.getLevel().isClientSide());
     }
 
     @Override
@@ -84,7 +92,6 @@ public class DrinkItem extends Item {
         return 32;
     }
 
-    // mryt233 改：26.x 进食过程的声音和碎渣只认物品自带的 CONSUMABLE
     @Override
     public void onUseTick(Level level, LivingEntity user, ItemStack stack, int ticksRemaining) {
         // 喝一口是 32 刻，和原版 DEFAULT_DRINK 的 consumeTicks 一致，直接用原版那套。
@@ -96,27 +103,8 @@ public class DrinkItem extends Item {
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity user) {
-        world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.GENERIC_DRINK,
-            SoundSource.PLAYERS, 0.5F, world.getRandom().nextFloat() * 0.1F + 0.9F);
-        if (world.isClientSide()) {
-            return stack;
-        }
-        if (user instanceof Player player) {
-            player.getFoodData().eat(sipFood());
-            player.awardStat(Stats.ITEM_USED.get(this));
-            // mryt233 改（2026-11-06，r139）：喝下作者推荐的饮料触发成就 authors_pick。
-            // 这里走模组自己的 HotPotCriterion，不依赖原版 consume_item 判定（自定义结算不一定会触发它）。
-            HotPotCriterion.fire(player, "drink_author");
-        }
-        kind.applySip(user);
-        if (user instanceof Player player && player.getAbilities().instabuild) {
-            return stack;
-        }
-        if (stack.getDamageValue() + 1 >= SIPS) {
-            return new ItemStack(HotPotContent.emptyBottle(kind));
-        }
-        stack.setDamageValue(stack.getDamageValue() + 1);
-        return stack;
+        // mryt233 改（2026-11-11）：共用一口结算，保留瓶杯差异。
+        return DrinkSip.finish(stack, world, user, kind, this, true);
     }
 
     /** 倒出一口（倒进杯子，2026-10-25）：返回倒完剩下的瓶子，最后一口倒完是空瓶。创造模式也照样少一口。 */
@@ -132,7 +120,8 @@ public class DrinkItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display, java.util.function.Consumer<Component> tooltip, TooltipFlag type) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context,
+                                TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag type) {
         tooltip.accept(Component.translatable(HotPotBlockEntity.key("tooltip.drink.sips"), sipsLeft(stack), SIPS)
             .withStyle(ChatFormatting.GRAY));
     }

@@ -11,8 +11,10 @@ public final class ApiVersion {
     /**
      * 前置 Runtime 版本：递增数字，不用 hotfix（用户 2026-11-01 定）。0.1.x 之内只加不删（向后兼容），
      * 破坏性变更进 0.2.0。内容包要求的范围由打包脚本按此算出：[本版本, 下一个次版本)。
+     *
+     * <p>mryt233 改（2026-11-11）：0.2.0 删去已弃用的公开旧入口，其余平台能力保持不变。</p>
      */
-    public static final String RUNTIME = "0.1.3";
+    public static final String RUNTIME = "0.2.0";
 
     private ApiVersion() {
     }

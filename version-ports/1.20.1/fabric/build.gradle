@@ -9,6 +9,8 @@ plugins {
 // 资源（assets / data）统一放在 common，这里把它的资源目录并入 fabric 的资源集：
 // 合成一个模组打包，Fabric 才会去扫描这些配方和贴图（mryt233 2026-10-29）。
 sourceSets.main.resources.srcDirs += project(':common').file('src/main/resources')
+// mryt233 改（2026-11-10）：开发与生产均加载前置自带语言。
+sourceSets.main.resources.srcDirs += project(':framework:loader').file('src/main/resources')
 // mryt233 改：同一份原版客户端绘制在两个加载器各自编译，不混入 common 核心。
 sourceSets.main.java.srcDir project(':common').file('src/client/java')
 sourceSets.main.java.srcDir project(':common').file('src/mixin/java')
@@ -110,7 +112,7 @@ tasks.named('jar', Jar) {
 def frameworkJar = tasks.register('frameworkJar', Jar) {
     dependsOn ':framework:pure:classes', ':framework:loader:classes', ':framework:game:classes', ':framework:client:classes', 'classes'
     archiveBaseName = 'orient_framework-1.20.1-fabric'
-    archiveVersion = '0.1.3'
+    archiveVersion = project.framework_version
     archiveClassifier = 'dev'
     from(sourceSets.main.output.classesDirs) { include 'cn/blockforge/orient/framework/**' }
     for (module in ['pure', 'loader', 'game', 'client']) {
@@ -125,7 +127,7 @@ def remapFrameworkJar = tasks.register('remapFrameworkJar', net.fabricmc.loom.ta
     dependsOn frameworkJar
     inputFile = frameworkJar.flatMap { it.archiveFile }
     archiveBaseName = 'orient_framework-1.20.1-fabric'
-    archiveVersion = '0.1.3'
+    archiveVersion = project.framework_version
     archiveClassifier = ''
     addNestedDependencies = false
     nestedJars.setFrom([])
@@ -139,3 +141,11 @@ tasks.named('remapJar') {
     archiveBaseName = 'orients_hotpot_chronicles-1.20.1-fabric'
 }
 tasks.named('remapSourcesJar') { archiveBaseName = 'orients_hotpot_chronicles-1.20.1-fabric' }
+
+// mryt233 改（2026-11-11）：仅测试网络平台实现，不改变前置运行代码。
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+tasks.named('test') { useJUnitPlatform() }

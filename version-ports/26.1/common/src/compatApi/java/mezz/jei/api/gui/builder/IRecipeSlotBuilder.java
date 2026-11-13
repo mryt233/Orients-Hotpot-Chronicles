@@ -1,9 +1,6 @@
 package mezz.jei.api.gui.builder;
 
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 
-import java.util.List;
 
 /**
  * 槽位构造器：往一个槽里填要展示的物品。
@@ -12,10 +9,6 @@ import java.util.List;
  * 让插件源码可以零联网编译；成品 jar 会排除整个 {@code mezz/jei} 目录，运行时用的是玩家真正安装的那份。
  * 作者：mryt233 */
 
-public interface IRecipeSlotBuilder {
-    IRecipeSlotBuilder addItemStack(ItemStack stack);
-
-    IRecipeSlotBuilder addItemStacks(List<ItemStack> stacks);
-
-    IRecipeSlotBuilder addIngredients(Ingredient ingredient);
+// mryt233 改（r146f）：继承真实泛型父接口，保留方法擦除后的 IIngredientAcceptor 返回描述符。
+public interface IRecipeSlotBuilder extends IIngredientAcceptor<IRecipeSlotBuilder> {
 }

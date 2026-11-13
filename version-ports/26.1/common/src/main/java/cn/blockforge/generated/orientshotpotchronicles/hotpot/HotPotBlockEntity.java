@@ -1,40 +1,29 @@
 // mryt233 改：26.1 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.api.HotpotScreens;
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.function.IntPredicate;
+import java.util.function.IntUnaryOperator;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.item.Items;
+
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.world.item.component.CustomData;
-import net.minecraft.world.entity.ExperienceOrb;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.core.NonNullList;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 
 /**
@@ -45,7 +34,8 @@ import net.minecraft.world.level.Level;
  * 食材、汤底、烹饪进度和经验逻辑。81 格怎么分边、每边一种汤由锅的 {@link PotLayout} 决定
  * （九宫格锅一边；鸳鸯锅两边；田字锅四边，2026-10-23 起）。</p>
  */
-public class HotPotBlockEntity extends BlockEntity
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+public class HotPotBlockEntity extends SyncedBlockEntity
     implements Container {
     /** 9x9 = 81 个食材槽，每 3x3 为一个大格。 */
     public static final int SLOTS = 81;
@@ -56,23 +46,13 @@ public class HotPotBlockEntity extends BlockEntity
     public static final int PROP_EXTRA_BASES = 4 + SLOTS + COOKED_WORDS;
     public static final int PROP_COUNT = PROP_EXTRA_BASES + PotLayout.MAX_SIDES - 1;
 
-    final SimpleContainer ingredients = new SimpleContainer(SLOTS);
-    final int[] doneness = new int[SLOTS];
-    final int[] cookDur = new int[SLOTS];
-    final float[] xpValue = new float[SLOTS];
-    final boolean[] cooked = new boolean[SLOTS];
+    // mryt233 改（2026-11-11）：81 格并行状态由同一个部件持有。
+    final HotPotSlots slots = new HotPotSlots(this);
     /**
-     * mryt233 改（2026-11-04）：熟了以后还在锅里继续煮的刻数（豆腐煮过头碎成豆腐块用）。
-     * 只对登记过 `HotPotCooking.overcook` 的熟食累加；煮熟那一刻清 0，取走 / 换掉时一起重置。存档里是 Overcook 数组。
-     */
-    final int[] overcook = new int[SLOTS];
-    final ItemStack[] tracked = new ItemStack[SLOTS];
-    float pendingXp = 0F;
-    /**
-     * 每边一种汤底（-1 = 没汤）：九宫格锅只用第 0 边；鸳鸯锅 0、1；田字锅 0..3（PotLayout）。
+     * 每边一种汤底（空字符串 = 没汤，未知 ID 原样保留）：九宫格锅只用第 0 边；鸳鸯锅 0、1；田字锅 0..3（PotLayout）。
      * 汤底不和格局绑定，任何汤底（包括以后新加的）都能倒进任何一边。调整（原来是单个 base）。
      */
-    final int[] bases = {-1, -1, -1, -1};
+    final String[] bases = {"", "", "", ""};   // mryt233：持久化 ID，不在读档时解析。
     /**
      * mryt233 改（2026-11-05）：每边的红汤辣度档位（r136a），和 {@link #bases} 一一对应：
      * 0 = 微辣（刚倒进红汤的档位）、1 = 中辣、2 = 特辣、3 = 3 级特辣。
@@ -95,11 +75,6 @@ public class HotPotBlockEntity extends BlockEntity
     boolean needsVisualRepair = true;
     /** 玩家破坏回调与状态替换回调之间的一次性防重复标记。 */
     private boolean breakHandled = false;
-    /**
-     * 格子可能被外部动过（界面、漏斗、其他模组走 Container 接口，或原地改了物品数量后 setChanged）。
-     * 只有它为 true 时服务端 tick 才逐格比较找变化，不再每刻扫 81 格（mryt233 2026-11-01，代码检查 W4）。
-     */
-    boolean slotsTouched = true;
     /** 这一刻里有改动要同步给客户端：一刻结束时只发一次，不再每熟一样菜就发一次整锅（代码检查 W3）。 */
     boolean syncPending = false;
 
@@ -111,7 +86,6 @@ public class HotPotBlockEntity extends BlockEntity
     /** 供组合灶台子类使用的构造器。 */
     protected HotPotBlockEntity(BlockEntityType<?> type, BlockPos blockPos, BlockState state) {
         super(type, blockPos, state);
-        java.util.Arrays.fill(tracked, ItemStack.EMPTY);
     }
 
     // ------------------------------------------------------------------ tick
@@ -149,7 +123,7 @@ public class HotPotBlockEntity extends BlockEntity
 
     /** 这一边轮换相位每刻走多少：那边有汤且锅是冷的走慢档，否则快档（同渲染器原来的判断）。 */
     private float cycleRate(int side) {
-        return baseOfSide(side) >= 0 && clientHeat < 0.5F ? BOB_COLD_OMEGA : BOB_OMEGA;
+        return baseOfSide(side) != SoupIds.EMPTY && clientHeat < 0.5F ? BOB_COLD_OMEGA : BOB_OMEGA;
     }
 
     /** 某一边轮换相位，partial = 这一刻已经过去的比例（渲染插值用）。 */
@@ -203,6 +177,8 @@ public class HotPotBlockEntity extends BlockEntity
         if (StoveBlock.isStove(state)) {
             StovePot pot = state.getValue(StoveBlock.POT);
             if (!pot.hasPot()) {
+                // 未知 ID 必须保留，避免视觉修复写掉未来版本的数据。
+                for (String id : bases) if (SoupIds.index(id) == SoupIds.UNKNOWN) return;
                 // 旧版灶台没有锅库存，不能凭空猜材质；清理无法显示的幽灵内容与汤底。
                 if (filledSlots() > 0) {
                     clearContent();
@@ -262,30 +238,12 @@ public class HotPotBlockEntity extends BlockEntity
 
     /** 清空汤底并同步空锅外观，拆锅或重新安装时使用。 */
     protected void clearSoupState() {
-        java.util.Arrays.fill(bases, -1);
-        java.util.Arrays.fill(spicyLevels, 0);   // mryt233 改（2026-11-05）：汤底没了，辣度一起归零（r136a）
-        updateSoupVisual();
-        markDirtyAndSync();
+        HotPotSoupOps.clearSoupState(this);
     }
 
     /** 让锅的外观状态与汤底种类保持一致。 */
     protected void updateSoupVisual() {
-        if (level == null) {
-            return;
-        }
-        SoupVisual visual = blockSoupVisual();
-        BlockState state = level.getBlockState(worldPosition);
-        if (StoveBlock.isStove(state)) {
-            StovePot pot = state.getValue(StoveBlock.POT);
-            BlockState updated = state.setValue(StoveBlock.POT, pot.withSoup(hasSoup()))
-                .setValue(StoveBlock.SOUP, visual);
-            level.setBlock(worldPosition, updated, Block.UPDATE_CLIENTS);
-        } else if (state.getBlock() instanceof HotPotBlock) {
-            BlockState updated = state.setValue(HotPotBlock.HAS_SOUP, hasSoup())
-                .setValue(HotPotBlock.SOUP, visual)
-                .setValue(HotPotBlock.BOILING, hasFire() && hasSoup());
-            level.setBlock(worldPosition, updated, Block.UPDATE_CLIENTS);
-        }
+        HotPotSoupOps.updateSoupVisual(this);
     }
 
     void updateStandaloneBoilingVisual(boolean boiling) {
@@ -296,12 +254,7 @@ public class HotPotBlockEntity extends BlockEntity
 
     /** 筷子任何时候都能打开当前锅的面板。 */
     public void useWithChopsticks(Player player) {
-        if (level == null || level.isClientSide() || !hasPot()) {
-            return;
-        }
-        if (player instanceof ServerPlayer sp) {
-            HotpotScreens.openPot(sp, this);
-        }
+        HotPotSoupOps.useWithChopsticks(this, player);
     }
 
     /**
@@ -310,7 +263,7 @@ public class HotPotBlockEntity extends BlockEntity
      * 每边一种汤（九宫格锅一边；鸳鸯 / 田字锅按准星那边，见 scoopSoup），食材可以先放，汤底只决定那边煮不煮。
      */
     public boolean canScoopWith(ItemStack stack) {
-        return stack.is(net.minecraft.world.item.Items.BUCKET);
+        return HotPotSoupOps.canScoopWith(this, stack);
     }
 
     /**
@@ -318,43 +271,12 @@ public class HotPotBlockEntity extends BlockEntity
      * 锅里还有食物的话，先全部掉到地上，再清空汤底。
      */
     public boolean scoopSoup(Player player, InteractionHand hand) {
-        return scoopSoup(player, hand, PotLayout.SIDE_A);
+        return HotPotSoupOps.scoopSoup(this, player, hand);
     }
 
     /** 鸳鸯锅只舀准星那一边的汤（那边的食材掉出来），另一边不动。 */
     public boolean scoopSoup(Player player, InteractionHand hand, int side) {
-        if (level == null || level.isClientSide() || !hasPot()) {
-            return false;
-        }
-        if (!layout().multiSoup()) {
-            side = PotLayout.SIDE_A;
-        }
-        ItemStack stack = player.getItemInHand(hand);
-        SoupBase soup = SoupBase.byId(baseOfSide(side));
-        if (soup == null) {
-            player.sendOverlayMessage(Component.translatable(key("msg.no_soup_to_scoop")));
-            return false;
-        }
-        if (!stack.is(soup.remainder())) {
-            // 菌汤：桶装不了蘑菇煲，就是把汤倒掉，桶还是空桶（r99）
-            dropContents(side);
-            setBaseOfSide(side, -1);
-            setSpicyOfSide(side, 0);   // mryt233 改（2026-11-05）：倒掉汤底，辣度归零（r136a）
-            updateSoupVisual();
-            level.playSound(null, worldPosition, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.6F, 1.0F);
-            markDirtyAndSync();
-            return true;
-        }
-        dropContents(side);
-        setBaseOfSide(side, -1);
-        setSpicyOfSide(side, 0);   // mryt233 改（2026-11-05）：舀走汤底，辣度归零（r136a）
-        updateSoupVisual();
-        player.setItemInHand(hand, net.minecraft.world.item.ItemUtils.createFilledResult(stack, player, new ItemStack(soup.source())));
-        net.minecraft.sounds.SoundEvent sound = soup == SoupBase.SPICY ? SoundEvents.BUCKET_FILL_LAVA
-            : soup.remainder() == net.minecraft.world.item.Items.BOWL ? SoundEvents.BOTTLE_FILL : SoundEvents.BUCKET_FILL;
-        level.playSound(null, worldPosition, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
-        markDirtyAndSync();
-        return true;
+        return HotPotSoupOps.scoopSoup(this, player, hand, side);
     }
 
     /**
@@ -362,160 +284,36 @@ public class HotPotBlockEntity extends BlockEntity
      * 没熟菜但有汤，就盛一碗汤（锅里的汤不会少，用户定的「盛不完」）。
      */
     public boolean serveWithBowl(Player player, InteractionHand hand, int bigCell) {
-        if (level == null || level.isClientSide() || !hasPot()) {
-            return false;
-        }
-        ItemStack held = player.getItemInHand(hand);
-        java.util.List<ItemStack> scooped = new java.util.ArrayList<>();
-        float xp = 0;
-        java.util.List<Integer> order = new java.util.ArrayList<>();
-        // 鸳鸯 / 田字锅只盛和准星那一边同一种汤底里的菜（两边汤底一样就都能盛；用户定）
-        int soup = baseOfSide(layout().sideOfCell(Math.max(0, bigCell)));
-        for (int i = 0; i < 9; i++) {
-            int cell = (Math.max(0, bigCell) + i) % 9;
-            if (layout().usesCell(cell) && (!layout().multiSoup() || baseOfSide(layout().sideOfCell(cell)) == soup)) {
-                order.add(cell);
-            }
-        }
-        // 先盛你看到浮在准星那格上的那一样（用户 2026-10-26：和筷子一样；它还生着就跳过），再照原来的顺序盛
-        int shown = shownIn(player, bigCell);
-        if (shown >= 0 && cooked[shown]) {
-            ItemStack food = ingredients.getItem(shown).copy();
-            xp += xpValue[shown] * food.getCount();
-            ingredients.setItem(shown, ItemStack.EMPTY);
-            resetSlot(shown, ItemStack.EMPTY);
-            scooped.add(food.copyWithCount(1));
-            if (food.getCount() > 1) {
-                ingredients.setItem(shown, food.copyWithCount(food.getCount() - 1));
-            }
-        }
-        outer:
-        for (int cell : order) {
-            int slot;
-            while (scooped.size() < 3 && (slot = firstCookedSlotInCell(cell)) >= 0) {
-                ItemStack food = ingredients.getItem(slot).copy();
-                xp += xpValue[slot] * food.getCount();
-                ingredients.setItem(slot, ItemStack.EMPTY);
-                resetSlot(slot, ItemStack.EMPTY);
-                // 一格里只有 1 个；万一有多个，多出来的放回去
-                scooped.add(food.copyWithCount(1));
-                if (food.getCount() > 1) {
-                    ingredients.setItem(slot, food.copyWithCount(food.getCount() - 1));
-                }
-                if (scooped.size() >= 3) {
-                    break outer;
-                }
-            }
-        }
-        ItemStack result;
-        if (!scooped.isEmpty()) {
-            HotPotCriterion.fire(player, "pot_cooked");
-            // mryt233 改（2026-11-05，r136a）：碗里盛到的熟虾也算「煮虾」成就。
-            // pot_cooked 之外再记一次；豆腐块是煮过头的，盛到碗里不再另记（免得重复触发）
-            for (ItemStack food : scooped) {
-                if (food.is(HotPotContent.COOKED_SHRIMP) || food.is(HotPotContent.COOKED_PEELED_SHRIMP)
-                    || food.is(HotPotContent.COOKED_SHRIMP_PASTE)) {
-                    HotPotCriterion.fire(player, "cook_shrimp");
-                }
-            }
-            result = new ItemStack(net.minecraft.world.item.Items.BOWL);
-            result.set(net.minecraft.core.component.DataComponents.CONTAINER,
-                net.minecraft.world.item.component.ItemContainerContents.fromItems(scooped));
-            PlateItem.syncPlateModel(result);
-            if (xp > 0) {
-                net.minecraft.world.entity.ExperienceOrb.award((net.minecraft.server.level.ServerLevel) level,
-                    Vec3.atCenterOf(worldPosition).add(0, 0.6, 0), Math.max(1, Math.round(xp)));
-            }
-            level.playSound(null, worldPosition, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.35F, 1.2F);
-        } else if (SoupBase.byId(bowlSoup(bigCell)) != null) {
-            result = new ItemStack(HotPotContent.SOUP_BOWLS.get(bowlSoup(bigCell)));
-            // mryt233 改（2026-11-05）：盛出来的红汤碗带着这一边的辣度档位，喝的时候按它给效果（r136a）
-            if (bowlSoup(bigCell) == SoupBase.SPICY.ordinal()) {
-                int spicy = spicyOfSide(soupSideOf(bigCell, bowlSoup(bigCell)));
-                if (spicy > 0) {
-                    result.set(HotPotContent.SPICY_LEVEL, spicy);
-                }
-            }
-            level.playSound(null, worldPosition, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
-        } else {
-            player.sendOverlayMessage(Component.translatable(key("msg.bowl_nothing")));
-            return false;
-        }
-        player.setItemInHand(hand, net.minecraft.world.item.ItemUtils.createFilledResult(held, player, result));
-        markDirtyAndSync();
-        return true;
+        return HotPotSoupOps.serveWithBowl(this, player, hand, bigCell);
     }
 
     public boolean pourSoup(Player player, InteractionHand hand) {
-        return pourSoup(player, hand, PotLayout.SIDE_A);
+        return HotPotSoupOps.pourSoup(this, player, hand);
     }
 
     /** 鸳鸯锅倒进准星那一边；两边可以是任意两种汤底（也可以一样），以后加的新汤底也一样能倒。 */
     public boolean pourSoup(Player player, InteractionHand hand, int side) {
-        if (level == null || level.isClientSide() || !hasPot()) {
-            return false;
-        }
-        if (!layout().multiSoup()) {
-            side = PotLayout.SIDE_A;
-        }
-        ItemStack stack = player.getItemInHand(hand);
-        SoupBase soup = SoupBase.fromStack(stack);
-        if (soup == null) {
-            return false;
-        }
-        if (soup.isAdditive(stack)) {
-            // 锅底料（番茄 / 三鲜）：只能加进清汤里，把这边的清汤变成这种汤；没汤先倒清汤，别的汤（含已经加过的）不能再加（用户 2026-10-26）
-            int current = baseOfSide(side);
-            if (current < 0) {
-                player.sendOverlayMessage(Component.translatable(key("msg.base_needs_clear")));
-                return false;
-            }
-            if (current != SoupBase.CLEAR.ordinal()) {
-                player.sendOverlayMessage(Component.translatable(key("msg.base_only_clear")));
-                return false;
-            }
-            setBaseOfSide(side, soup.ordinal());
-            setSpicyOfSide(side, 0);   // mryt233 改（2026-11-05）：换汤底，辣度回到 0 档（r136a）
-            consumeHand(player, hand, net.minecraft.world.item.Items.AIR);
-            updateSoupVisual();
-            level.playSound(null, worldPosition, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.5F, 1.3F);
-            markDirtyAndSync();
-            return true;
-        }
-        if (baseOfSide(side) >= 0) {
-            player.sendOverlayMessage(Component.translatable(key("msg.already_soup")));
-            return false;
-        }
-        setBaseOfSide(side, soup.ordinal());
-        setSpicyOfSide(side, 0);   // mryt233 改（2026-11-05）：倒新汤，辣度回到 0 档（微辣）（r136a）
-        consumeHand(player, hand, soup.remainder());
-        updateSoupVisual();
-        level.playSound(null, worldPosition, SoundEvents.BUCKET_EMPTY,
-            SoundSource.BLOCKS, 1.0F, 1.15F);
-        markDirtyAndSync();
-        return true;
+        return HotPotSoupOps.pourSoup(this, player, hand, side);
     }
 
     // ------------------------------------------------------------------ 红汤辣度（r136a，mryt233 2026-11-05）
 
     /** 辣度最高档：3 = 3 级特辣。 */
-    public static final int SPICY_MAX = 3;
+    public static final int SPICY_MAX = HotPotSpice.SPICY_MAX;
 
     /** 某一边的辣度档位（0 = 微辣）；不用 / 越界的边按 0 算。 */
     public int spicyOfSide(int side) {
-        return side >= 0 && side < spicyLevels.length ? spicyLevels[side] : 0;
+        return HotPotSpice.spicyOfSide(this, side);
     }
 
     /** 把某一边的辣度档位夹到 0..3 后写进去（客户端只读快照，不调用）。 */
     public void setSpicyOfSide(int side, int level) {
-        if (side >= 0 && side < spicyLevels.length) {
-            spicyLevels[side] = Math.max(0, Math.min(SPICY_MAX, level));
-        }
+        HotPotSpice.setSpicyOfSide(this, side, level);
     }
 
     /** 这档辣度的名字（0 微辣、1 中辣、2 特辣、3 级特辣），语言键由语言文件提供。 */
     public static Component spicyLevelText(int level) {
-        return Component.translatable(key("spicy." + Math.max(0, Math.min(SPICY_MAX, level))));
+        return HotPotSpice.spicyLevelText(level);
     }
 
     /**
@@ -523,19 +321,12 @@ public class HotPotBlockEntity extends BlockEntity
      * HotPotBlock / StoveBlock 用它决定要不要先试调辣度，再考虑下锅当食材。
      */
     public static boolean isSpicyModifier(ItemStack stack) {
-        return stack.is(HotPotContent.CHILI_PEPPER) || stack.is(net.minecraft.world.item.Items.ICE)
-            || stack.is(net.minecraft.world.item.Items.PACKED_ICE) || stack.is(net.minecraft.world.item.Items.BLUE_ICE);
+        return HotPotSpice.isSpicyModifier(stack);
     }
 
     /** 冰块降辣几档：普通冰 1 档、浮冰 2 档、蓝冰直接压到 0 档（用户定的，见任务单）。 */
     private static int iceDrop(ItemStack stack) {
-        if (stack.is(net.minecraft.world.item.Items.BLUE_ICE)) {
-            return SPICY_MAX;
-        }
-        if (stack.is(net.minecraft.world.item.Items.PACKED_ICE)) {
-            return 2;
-        }
-        return 1;
+        return HotPotSpice.iceDrop(stack);
     }
 
     /**
@@ -544,121 +335,30 @@ public class HotPotBlockEntity extends BlockEntity
      * 返回 true = 这次点击已经处理掉了（调用方直接算成功，不要再当食材下锅）。
      */
     public boolean adjustSpiciness(Player player, InteractionHand hand, int side) {
-        if (level == null || level.isClientSide() || !hasPot()) {
-            return false;
-        }
-        if (!layout().multiSoup()) {
-            side = PotLayout.SIDE_A;
-        }
-        ItemStack stack = player.getItemInHand(hand);
-        boolean chili = stack.is(HotPotContent.CHILI_PEPPER);
-        boolean ice = stack.is(net.minecraft.world.item.Items.ICE)
-            || stack.is(net.minecraft.world.item.Items.PACKED_ICE)
-            || stack.is(net.minecraft.world.item.Items.BLUE_ICE);
-        if (!chili && !ice) {
-            return false;
-        }
-        // 不是红汤（含这一边还没倒汤）：提示一句就吃掉这次点击，别让辣椒 / 冰块被当成食材塞进锅槽
-        if (SoupBase.byId(baseOfSide(side)) != SoupBase.SPICY) {
-            player.sendOverlayMessage(Component.translatable(key("msg.spicy_need_red_broth")));
-            return true;
-        }
-        int spicy = spicyOfSide(side);
-        if (chili) {
-            if (spicy >= SPICY_MAX) {
-                player.sendOverlayMessage(Component.translatable(key("msg.spicy_max")));
-                return true;
-            }
-            setSpicyOfSide(side, spicy + 1);
-            consumeHand(player, hand, net.minecraft.world.item.Items.AIR);
-            level.playSound(null, worldPosition, SoundEvents.BLAZE_SHOOT, SoundSource.BLOCKS, 0.5F, 1.2F);
-            spawnSpicyParticles(true);
-            player.sendOverlayMessage(Component.translatable(key("msg.spicy_up"), spicyLevelText(spicy + 1)));
-            if (spicy + 1 >= SPICY_MAX) {
-                HotPotCriterion.fire(player, "max_spicy");   // 成就：吃辣吃到 3 级特辣（r136d 里配进度）
-            }
-        } else {
-            if (spicy <= 0) {
-                player.sendOverlayMessage(Component.translatable(key("msg.spicy_min")));
-                return true;
-            }
-            int next = Math.max(0, spicy - iceDrop(stack));
-            setSpicyOfSide(side, next);
-            consumeHand(player, hand, net.minecraft.world.item.Items.AIR);
-            level.playSound(null, worldPosition, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 1.3F);
-            spawnSpicyParticles(false);
-            player.sendOverlayMessage(Component.translatable(key("msg.spicy_down"), spicyLevelText(next)));
-        }
-        markDirtyAndSync();
-        return true;
+        return HotPotSpice.adjustSpiciness(this, player, hand, side);
     }
 
     /** 加辣 / 降辣时锅面上的那几颗粒子：加辣火苗 + 岩浆，降辣白云 + 水花。 */
-    private void spawnSpicyParticles(boolean up) {
-        if (!(level instanceof ServerLevel server)) {
-            return;
-        }
-        Vec3 at = Vec3.atCenterOf(worldPosition).add(0, 0.95, 0);
-        if (up) {
-            server.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME,
-                at.x, at.y, at.z, 14, 0.38, 0.12, 0.38, 0.02);
-            server.sendParticles(net.minecraft.core.particles.ParticleTypes.LAVA,
-                at.x, at.y, at.z, 3, 0.3, 0.1, 0.3, 0.0);
-        } else {
-            server.sendParticles(net.minecraft.core.particles.ParticleTypes.CLOUD,
-                at.x, at.y, at.z, 14, 0.38, 0.12, 0.38, 0.02);
-            server.sendParticles(net.minecraft.core.particles.ParticleTypes.SPLASH,
-                at.x, at.y, at.z, 8, 0.3, 0.1, 0.3, 0.0);
-        }
+    void spawnSpicyParticles(boolean up) {
+        HotPotSpice.spawnSpicyParticles(this, up);
     }
 
     /**
      * 用碗盛的这一碗汤实际来自哪一边：准星那格那一边有这种汤就取那边，没有就取第一处有这种汤的边。
      * （{@link HotPotSoup#bowlSoup} 的逻辑，这里要的是「哪一边」而不是「哪种汤」。）
      */
-    private int soupSideOf(int bigCell, int soupId) {
-        PotLayout layout = layout();
-        int aimed = layout.sideOfCell(Math.max(0, bigCell));
-        if (aimed != PotLayout.NONE && baseOfSide(aimed) == soupId) {
-            return aimed;
-        }
-        for (int side = 0; side < layout.sides(); side++) {
-            if (baseOfSide(side) == soupId) {
-                return side;
-            }
-        }
-        return aimed;
+    int soupSideOf(int bigCell, int soupId) {
+        return HotPotSoupOps.soupSideOf(this, bigCell, soupId);
     }
 
     /** 这一格所在那一边的辣度（九宫格锅就是唯一那一边）。 */
     public int spicyOfSlot(int slot) {
-        int side = layout().sideOfSlot(slot);
-        return side == PotLayout.NONE ? 0 : spicyOfSide(side);
+        return HotPotSpice.spicyOfSlot(this, slot);
     }
 
     /** 筷子上夹着的食物放进锅里指定的小格（熟食、汤底原料放不进）。 */
     public boolean insertHeld(Player player, ItemStack chopsticks, int slot) {
-        if (level == null || level.isClientSide() || !hasPot()) {
-            return false;
-        }
-        ItemStack food = Chopsticks.held(chopsticks);
-        if (!HotPotCooking.acceptable(level, food)) {
-            player.sendOverlayMessage(Component.translatable(key("msg.cannot_cook")));
-            return false;
-        }
-        if (slot < 0 || slot >= SLOTS) {
-            player.sendOverlayMessage(Component.translatable(key("msg.cell_full")));
-            return false;
-        }
-        if (!ingredients.getItem(slot).isEmpty()) {
-            player.sendOverlayMessage(Component.translatable(key("msg.slot_occupied")));
-            return false;
-        }
-        ingredients.setItem(slot, food.copyWithCount(1));
-        Chopsticks.hold(chopsticks, ItemStack.EMPTY);
-        onSlotStackChanged(slot);
-        level.playSound(null, worldPosition, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.35F, 1.35F);
-        return true;
+        return HotPotFoodOps.insertHeld(this, player, chopsticks, slot);
     }
 
     /**
@@ -666,84 +366,16 @@ public class HotPotBlockEntity extends BlockEntity
      * 一叠盘子只倒最上面那一个。
      */
     public boolean pourPlate(Player player, InteractionHand hand) {
-        if (level == null || level.isClientSide() || !hasPot()) {
-            return false;
-        }
-        ItemStack held = player.getItemInHand(hand);
-        PlateBlock plateBlock = PlateItem.placedFor(held);
-        if (plateBlock == null || PlateItem.keepsSelf(held)) {
-            return false;
-        }
-        net.minecraft.world.item.component.ItemContainerContents contents = held.getOrDefault(
-            net.minecraft.core.component.DataComponents.CONTAINER, net.minecraft.world.item.component.ItemContainerContents.EMPTY);
-        NonNullList<ItemStack> foods = NonNullList.withSize(plateBlock.size().capacity(), ItemStack.EMPTY);
-        contents.copyInto(foods);
-        if (foods.stream().allMatch(ItemStack::isEmpty)) {
-            player.sendOverlayMessage(Component.translatable(key("msg.plate_empty")));
-            return false;
-        }
-        int moved = 0;
-        for (int i = 0; i < foods.size(); i++) {
-            ItemStack food = foods.get(i);
-            if (food.isEmpty() || !HotPotCooking.acceptable(level, food)) {
-                continue;
-            }
-            int slot = randomEmptySlot();
-            if (slot < 0) {
-                break;
-            }
-            ingredients.setItem(slot, food.copyWithCount(1));
-            onSlotStackChanged(slot);
-            foods.set(i, ItemStack.EMPTY);
-            moved++;
-        }
-        if (moved == 0) {
-            player.sendOverlayMessage(Component.translatable(key("msg.plate_nothing_to_pour")));
-            return false;
-        }
-        ItemStack plate = held.getCount() > 1 ? held.split(1) : held;
-        plate.set(net.minecraft.core.component.DataComponents.CONTAINER,
-            net.minecraft.world.item.component.ItemContainerContents.fromItems(foods));
-        PlateItem.syncPlateModel(plate);
-        if (plate != held && !player.getInventory().add(plate)) {
-            player.drop(plate, false);
-        }
-        level.playSound(null, worldPosition, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.4F, 1.4F);
-        return true;
+        return HotPotFoodOps.pourPlate(this, player, hand);
     }
 
     public boolean insertIngredient(Player player, InteractionHand hand) {
-        int slot = firstEmptySlot();
-        if (slot < 0) {
-            player.sendOverlayMessage(Component.translatable(key("msg.pot_full")));
-            return false;
-        }
-        return insertIngredient(player, hand, slot);
+        return HotPotFoodOps.insertIngredient(this, player, hand);
     }
 
     /** 将一份食材放入准星对应槽位；占用时不挪动旧物品。 */
     public boolean insertIngredient(Player player, InteractionHand hand, int slot) {
-        if (level == null || level.isClientSide() || !hasPot()) {
-            return false;
-        }
-        ItemStack handStack = player.getItemInHand(hand);
-        if (!HotPotCooking.acceptable(level, handStack)) {
-            return false;
-        }
-        if (slot < 0 || slot >= SLOTS) {
-            player.sendOverlayMessage(Component.translatable(key("msg.cell_full")));
-            return false;
-        }
-        if (!ingredients.getItem(slot).isEmpty()) {
-            player.sendOverlayMessage(Component.translatable(key("msg.slot_occupied")));
-            return false;
-        }
-        ingredients.setItem(slot, handStack.copyWithCount(1));
-        consumeHand(player, hand, net.minecraft.world.item.Items.AIR);
-        onSlotStackChanged(slot);
-        level.playSound(null, worldPosition, SoundEvents.ITEM_PICKUP,
-            SoundSource.BLOCKS, 0.35F, 1.35F);
-        return true;
+        return HotPotFoodOps.insertIngredient(this, player, hand, slot);
     }
 
     /**
@@ -751,15 +383,7 @@ public class HotPotBlockEntity extends BlockEntity
      * 只有实际移出的数量会结算经验，调用者重复发包也不会复制物品。
      */
     public boolean collectCookedSlot(Player player, int slot) {
-        // mryt233 改（2026-11-05，r136a）：捞起来的是熟虾 / 热豆腐块，记一条对应的成就
-        ItemStack taking = slot >= 0 && slot < SLOTS ? ingredients.getItem(slot) : ItemStack.EMPTY;
-        int delivered = transferCookedSlot(player, slot);
-        if (delivered > 0) {
-            HotPotCriterion.fire(player, "pot_cooked");
-            HotPotCookingRun.fireTakeCriteria(player, taking);
-            finishCollection();
-        }
-        return delivered > 0;
+        return HotPotFoodOps.collectCookedSlot(this, player, slot);
     }
 
     /**
@@ -767,30 +391,7 @@ public class HotPotBlockEntity extends BlockEntity
      * 照常结算出锅经验。夹着的菜之后按住右键吃、或放进碗盘 / 另一格，见 ChopsticksItem。
      */
     public boolean pickWithChopsticks(Player player, ItemStack chopsticks, int slot) {
-        if (level == null || level.isClientSide() || slot < 0 || slot >= SLOTS || !cooked[slot]
-            || !Chopsticks.held(chopsticks).isEmpty()) {
-            return false;
-        }
-        ItemStack stored = ingredients.getItem(slot);
-        if (stored.isEmpty()) {
-            return false;
-        }
-        float slotXp = xpValue[slot];
-        // mryt233 改（2026-11-05，r136a）：夹起来的是熟虾 / 热豆腐块，记一条对应的成就
-        HotPotCookingRun.fireTakeCriteria(player, stored);
-        Chopsticks.hold(chopsticks, stored.copyWithCount(1));
-        if (stored.getCount() > 1) {
-            ItemStack rest = stored.copyWithCount(stored.getCount() - 1);
-            ingredients.setItem(slot, rest);
-            tracked[slot] = rest.copy();
-        } else {
-            ingredients.setItem(slot, ItemStack.EMPTY);
-            resetSlot(slot, ItemStack.EMPTY);
-        }
-        HotPotCookingRun.grantExperience(this, slotXp, 1);
-        HotPotCriterion.fire(player, "pot_cooked");
-        finishCollection();
-        return true;
+        return HotPotFoodOps.pickWithChopsticks(this, player, chopsticks, slot);
     }
 
     /**
@@ -798,22 +399,12 @@ public class HotPotBlockEntity extends BlockEntity
      * 没报（或报的不在这格）就夹这格第一样熟的。返回 false = 这格没有能夹的熟食。新增（2026-10-25）。
      */
     public boolean pickShown(Player player, ItemStack chopsticks, int bigCell) {
-        int shown = shownIn(player, bigCell);
-        if (shown >= 0) {
-            if (!cooked[shown]) {
-                player.sendOverlayMessage(Component.translatable(key("msg.not_cooked_yet")));
-                return true;
-            }
-            return pickWithChopsticks(player, chopsticks, shown);
-        }
-        return pickWithChopsticks(player, chopsticks, firstCookedSlotInCell(bigCell));
+        return HotPotFoodOps.pickShown(this, player, chopsticks, bigCell);
     }
 
     /** 客户端报来的「这一刻浮在这格上的那一小格」（ChopsticksAimPayload）：在这格里、有东西才算，否则 -1。用一次就清掉。 */
-    private int shownIn(Player player, int bigCell) {
-        int shown = ChopsticksAim.take(player, worldPosition);
-        return shown >= 0 && shown < SLOTS && firstSlotInCell(bigCell, slot -> slot == shown) == shown
-            && !ingredients.getItem(shown).isEmpty() ? shown : -1;
+    int shownIn(Player player, int bigCell) {
+        return HotPotFoodOps.shownIn(this, player, bigCell);
     }
 
     /**
@@ -821,128 +412,50 @@ public class HotPotBlockEntity extends BlockEntity
      * 没报就捞这格第一样熟的。返回 false = 这格没有能捞的熟食。新增
      */
     public boolean collectShown(Player player, int bigCell) {
-        int shown = shownIn(player, bigCell);
-        if (shown >= 0) {
-            if (!cooked[shown]) {
-                player.sendOverlayMessage(Component.translatable(key("msg.not_cooked_yet")));
-                return true;
-            }
-            return collectCookedSlot(player, shown);
-        }
-        return collectCookedSlot(player, firstCookedSlotInCell(bigCell));
+        return HotPotFoodOps.collectShown(this, player, bigCell);
     }
 
-    private int transferCookedSlot(Player player, int slot) {
-        if (level == null || level.isClientSide() || slot < 0 || slot >= SLOTS || !cooked[slot]) {
-            return 0;
-        }
-        ItemStack stored = ingredients.getItem(slot);
-        if (stored.isEmpty()) {
-            resetSlot(slot, ItemStack.EMPTY);
-            return 0;
-        }
-
-        float slotXp = xpValue[slot];
-        // 不用 copyAndEmpty()：它会把库存里那个 ItemStack 对象自己清成 0 个。
-        // 只要该对象被别处共享（旧存档、第三方配方缓存等），就会连带抹掉其它槽位。
-        // 这里只接管一份拷贝，再显式把锅格置空。
-        ItemStack moved = stored.copy();
-        ingredients.setItem(slot, ItemStack.EMPTY);
-        resetSlot(slot, ItemStack.EMPTY);
-
-        int total = moved.getCount();
-        ItemStack remainder = moved.copy();
-        player.getInventory().add(remainder);
-        int delivered = total - remainder.getCount();
-        if (!remainder.isEmpty()) {
-            ItemEntity dropped = new ItemEntity(level,
-                worldPosition.getX() + 0.5, worldPosition.getY() + 1.15, worldPosition.getZ() + 0.5,
-                remainder.copy(), 0.0, 0.16, 0.0);
-            dropped.setDefaultPickUpDelay();
-            dropped.setThrower(player);
-            if (level.addFreshEntity(dropped)) {
-                delivered += remainder.getCount();
-            } else {
-                ingredients.setItem(slot, remainder.copy());
-                tracked[slot] = remainder.copy();
-                cooked[slot] = true;
-                doneness[slot] = HotPotCooking.FULL_DONE;
-                xpValue[slot] = slotXp;
-                cookDur[slot] = HotPotCooking.cookTicks(level, remainder);
-            }
-        }
-        if (delivered > 0) {
-            HotPotCookingRun.grantExperience(this, slotXp, delivered);
-        }
-        return delivered;
+    int transferCookedSlot(Player player, int slot) {
+        return HotPotFoodOps.transferCookedSlot(this, player, slot);
     }
 
-    private void finishCollection() {
-        level.playSound(null, worldPosition, SoundEvents.ITEM_PICKUP,
-            SoundSource.BLOCKS, 0.35F, 1.2F);
-        markDirtyAndSync();
+    void finishCollection() {
+        HotPotFoodOps.finishCollection(this);
     }
 
     /** 取出成品时结算经验，经验球在锅的位置生成。逻辑在 {@link HotPotCookingRun}。 */
     public void grantTakeXp(Player player, int slot, int count) {
-        HotPotCookingRun.grantTakeXp(this, player, slot, count);
+        HotPotFoodOps.grantTakeXp(this, player, slot, count);
     }
 
     // ------------------------------------------------------------------ 槽位管理
 
     void trackSlotChanges() {
-        if (!slotsTouched) {
-            return;
-        }
-        slotsTouched = false;
-        for (int i = 0; i < SLOTS; i++) {
-            ItemStack stack = ingredients.getItem(i);
-            ItemStack snapshot = tracked[i];
-            if (snapshot == null || !ItemStack.isSameItemSameComponents(snapshot, stack)) {
-                resetSlot(i, stack);
-                syncPending = true;
-            }
-        }
+        slots.trackSlotChanges();
     }
 
     /** 读档时 level 还没设好，查不到配方，烹饪时间只能用兜底值：第一次服务端 tick 时按配方重算（代码检查 B3）。 */
     void recomputeCookTimes() {
-        for (int i = 0; i < SLOTS; i++) {
-            ItemStack stack = ingredients.getItem(i);
-            if (!stack.isEmpty() && !cooked[i]) {
-                cookDur[i] = HotPotCooking.cookTicks(level, stack);
-            }
-        }
+        slots.recomputeCookTimes();
     }
 
     @Override
     public void setChanged() {
-        slotsTouched = true;
+        slots.touch();
         super.setChanged();
     }
 
-    private void resetSlot(int slot, ItemStack stack) {
-        tracked[slot] = stack.copy();
-        doneness[slot] = 0;
-        cooked[slot] = false;
-        overcook[slot] = 0;
-        xpValue[slot] = 0F;
-        cookDur[slot] = stack.isEmpty() ? 0 : HotPotCooking.cookTicks(level, stack);
+    void resetSlot(int slot, ItemStack stack) {
+        slots.resetSlot(slot, stack);
     }
 
     public void onSlotStackChanged(int slot) {
-        if (slot >= 0 && slot < SLOTS) {
-            resetSlot(slot, ingredients.getItem(slot));
-            markDirtyAndSync();
-        }
+        slots.onSlotStackChanged(slot);
     }
 
     /** 成品被取空后立即重置该槽，允许下一次放入食材。 */
     public void onSlotEmptied(int slot) {
-        if (slot >= 0 && slot < SLOTS && ingredients.getItem(slot).isEmpty()) {
-            resetSlot(slot, ItemStack.EMPTY);
-            markDirtyAndSync();
-        }
+        slots.onSlotEmptied(slot);
     }
 
     // ------------------------------------------------------------------ 查询
@@ -952,7 +465,7 @@ public class HotPotBlockEntity extends BlockEntity
     }
 
     public SoupVisual soupVisual() {
-        return HotPotSoup.visual(this);
+        return HotPotSoupOps.soupVisual(this);
     }
 
     public float clientHeat() {
@@ -977,115 +490,73 @@ public class HotPotBlockEntity extends BlockEntity
 
     /** 某一边的汤底编号（-1 = 没汤）。逻辑在 {@link HotPotSoup}。 */
     public int baseOfSide(int side) {
-        return HotPotSoup.baseOfSide(this, side);
+        return HotPotSoupOps.baseOfSide(this, side);
     }
 
-    private void setBaseOfSide(int side, int id) {
-        HotPotSoup.setBaseOfSide(this, side, id);
+    void setBaseOfSide(int side, int id) {
+        HotPotSoupOps.setBaseOfSide(this, side, id);
     }
 
     /** 这一格泡在哪种汤里（不用的格子 / 那边没汤 = null）。 */
-    public SoupBase soupForSlot(int slot) {
-        return HotPotSoup.forSlot(this, slot);
+    public SoupBase soupForSlot(int slot) {   // mryt233 改：保留旧公开签名，仅内置汤底有枚举值
+        SoupDef soup = soupDefForSlot(slot);
+        return soup == null ? null : SoupBase.byId(Soups.indexOf(soup));
     }
 
-    private int bowlSoup(int bigCell) {
-        return HotPotSoup.bowlSoup(this, bigCell);
+    public SoupDef soupDefForSlot(int slot) {
+        return HotPotSoupOps.soupForSlot(this, slot);
     }
 
-    private SoupVisual blockSoupVisual() {
-        return HotPotSoup.blockVisual(this);
+    int bowlSoup(int bigCell) {
+        return HotPotSoupOps.bowlSoup(this, bigCell);
+    }
+
+    SoupVisual blockSoupVisual() {
+        return HotPotSoupOps.blockSoupVisual(this);
     }
 
     public int filledSlots() {
-        int n = 0;
-        for (int i = 0; i < SLOTS; i++) {
-            if (!ingredients.getItem(i).isEmpty()) {
-                n++;
-            }
-        }
-        return n;
+        return slots.filledSlots();
     }
 
     public int firstEmptySlot() {
-        PotLayout layout = layout();
-        for (int slot = 0; slot < SLOTS; slot++) {
-            if (ingredients.getItem(slot).isEmpty() && layout.sideOfSlot(slot) != PotLayout.NONE) {
-                return slot;
-            }
-        }
-        return -1;
+        return slots.firstEmptySlot();
     }
 
     /** 锅里是否还有没煮熟的食材，供灶台判断要不要继续添燃料。 */
     public boolean hasRawIngredient() {
-        for (int i = 0; i < SLOTS; i++) {
-            if (!cooked[i] && !ingredients.getItem(i).isEmpty()) {
-                return true;
-            }
-        }
-        return false;
+        return slots.hasRawIngredient();
     }
 
     /**
      * 整盘倒菜用：每一样随机挑一个还有空位的大格（九宫格之一），放进那格的第一个空小格，
      * 所以每个大格分到几样是随机的（r97，用户要求）。锅满了返回 -1。
      */
-    private int randomEmptySlot() {
-        int[] open = new int[9];
-        int n = 0;
-        for (int cell = 0; cell < 9; cell++) {
-            if (firstEmptySlotInCell(cell) >= 0) {
-                open[n++] = cell;
-            }
-        }
-        return n == 0 ? -1 : firstEmptySlotInCell(open[level.getRandom().nextInt(n)]);
+    int randomEmptySlot() {
+        return slots.randomEmptySlot();
     }
 
     public int firstEmptySlotInCell(int bigCell) {
-        return firstSlotInCell(bigCell, slot -> ingredients.getItem(slot).isEmpty());
+        return slots.firstEmptySlotInCell(bigCell);
     }
 
     public int firstCookedSlotInCell(int bigCell) {
-        return firstSlotInCell(bigCell, slot -> cooked[slot] && !ingredients.getItem(slot).isEmpty());
+        return slots.firstCookedSlotInCell(bigCell);
     }
 
-    private int firstSlotInCell(int bigCell, java.util.function.IntPredicate matches) {
-        PotLayout layout = layout();
-        if (bigCell < 0 || bigCell > 8 || !layout.usesCell(bigCell)) {
-            return -1;
-        }
-        if (layout.multiSoup()) {
-            // 鸳鸯 / 田字锅：锅里这个位置轮流显示的是归到它的那些小格（PotLayout.spotOfSlot）
-            for (int slot = 0; slot < SLOTS; slot++) {
-                if (layout.spotOfSlot(slot) == bigCell && matches.test(slot)) {
-                    return slot;
-                }
-            }
-            return -1;
-        }
-        int baseRow = (bigCell / 3) * 3;
-        int baseCol = (bigCell % 3) * 3;
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-                int slot = (baseRow + row) * 9 + baseCol + col;
-                if (matches.test(slot)) {
-                    return slot;
-                }
-            }
-        }
-        return -1;
+    int firstSlotInCell(int bigCell, IntPredicate matches) {
+        return slots.firstSlotInCell(bigCell, matches);
     }
 
     public int propertyAt(int index) {
         if (index == 0) {
-            return bases[0];
+            return SoupIds.index(bases[0]);
         }
         if (index >= PROP_EXTRA_BASES && index < PROP_COUNT) {
-            return bases[index - PROP_EXTRA_BASES + 1];
+            return SoupIds.index(bases[index - PROP_EXTRA_BASES + 1]);
         }
         if (index >= 4 && index < 4 + SLOTS) {
-            return doneness[index - 4];
+            return slots.doneness()[index - 4];
         }
         int cookedStart = 4 + SLOTS;
         if (index >= cookedStart && index < PROP_COUNT) {
@@ -1093,7 +564,7 @@ public class HotPotBlockEntity extends BlockEntity
             int bits = 0;
             for (int b = 0; b < COOKED_WORD_BITS; b++) {
                 int slot = word * COOKED_WORD_BITS + b;
-                if (slot < SLOTS && cooked[slot]) {
+                if (slot < SLOTS && slots.cooked()[slot]) {
                     bits |= 1 << b;
                 }
             }
@@ -1115,7 +586,7 @@ public class HotPotBlockEntity extends BlockEntity
     public int comparatorLevel() {
         int total = 0;
         for (int i = 0; i < SLOTS; i++) {
-            if (!ingredients.getItem(i).isEmpty()) {
+            if (!slots.ingredients().getItem(i).isEmpty()) {
                 total++;
             }
         }
@@ -1124,8 +595,8 @@ public class HotPotBlockEntity extends BlockEntity
 
     /** 一边汤底的名字（没汤 = 「无汤底」）。 */
     public static Component soupName(int id) {
-        SoupBase soup = SoupBase.byId(id);
-        return soup == null ? Component.translatable(key("soup.none")) : Component.translatable(soup.nameKey());
+        SoupDef soup = Soups.byIndex(id);
+        return soup == null ? Component.translatable(key(id == SoupIds.UNKNOWN ? "soup.unknown" : "soup.none")) : Component.translatable(soup.nameKey());
     }
 
     /**
@@ -1134,7 +605,9 @@ public class HotPotBlockEntity extends BlockEntity
      */
     public static Component soupNameWithSpicy(int id, int spicy) {
         Component name = soupName(id);
-        if (SoupBase.byId(id) != SoupBase.SPICY || spicy < 0) {
+        // mryt233 改（2026-11-10）：红汤判定改走 isSpicy() 属性
+        SoupDef base = Soups.byIndex(id);
+        if (base == null || !base.spicy() || spicy < 0) {
             return name;   // 不是红汤，或者调用方不知道辣度（<0）就不带后缀
         }
         // 照任务单的样子写「红汤锅底（特辣）」；这里只包中文全角括号，汤底名和辣度名都还能各自翻译
@@ -1147,14 +620,14 @@ public class HotPotBlockEntity extends BlockEntity
      * mryt233 改（2026-11-05）：多了辣度版重载 {@link #soupText(PotLayout, java.util.function.IntUnaryOperator, java.util.function.IntUnaryOperator)}，
      * 红汤边会在名字后面带档位；不知道辣度的地方（旧的两参版本）照旧只写汤底名。
      */
-    public static Component soupText(PotLayout layout, java.util.function.IntUnaryOperator baseOfSide) {
+    public static Component soupText(PotLayout layout, IntUnaryOperator baseOfSide) {
         return soupText(layout, baseOfSide, side -> -1);
     }
 
     /** 带辣度档位的汤底那一栏（见 {@link #soupNameWithSpicy}）。 */
-    public static Component soupText(PotLayout layout, java.util.function.IntUnaryOperator baseOfSide,
-                                     java.util.function.IntUnaryOperator spicyOfSide) {
-        net.minecraft.network.chat.MutableComponent text = Component.empty();
+    public static Component soupText(PotLayout layout, IntUnaryOperator baseOfSide,
+                                     IntUnaryOperator spicyOfSide) {
+        MutableComponent text = Component.empty();
         for (int side = 0; side < layout.sides(); side++) {
             if (side > 0) {
                 text.append(Component.literal(" / "));
@@ -1212,10 +685,10 @@ public class HotPotBlockEntity extends BlockEntity
             if (!all && layout.sideOfSlot(i) != side) {
                 continue;
             }
-            ItemStack stack = ingredients.getItem(i);
+            ItemStack stack = slots.ingredients().getItem(i);
             if (!stack.isEmpty()) {
                 Block.popResource(level, worldPosition, stack);
-                ingredients.setItem(i, ItemStack.EMPTY);
+                slots.ingredients().setItem(i, ItemStack.EMPTY);
                 resetSlot(i, ItemStack.EMPTY);
             }
         }
@@ -1225,47 +698,28 @@ public class HotPotBlockEntity extends BlockEntity
     // ------------------------------------------------------------------ 整锅打包 / 冷热
 
     /** 存进锅物品里的字段名，复制方块（Ctrl+中键）时要从方块实体数据里去掉，免得重复。 */
-    private static final String[] POT_DATA_KEYS = {"Base", "BaseB", "BaseC", "BaseD",
+    private static final String[] POT_DATA_KEYS = {"Soup", "SoupB", "SoupC", "SoupD", "Base", "BaseB", "BaseC", "BaseD",
         "Spicy", "SpicyB", "SpicyC", "SpicyD",   // mryt233 改（2026-11-05）：每边辣度档位也由 pot_contents 打包（r136a）
         "Doneness", "Cooked", "Overcook", "SlotXp", "PendingXp", "Items"};
 
     /** 锅里有没有东西（汤底或食材）。 */
     public boolean hasPotContents() {
-        return hasSoup() || !ingredients.isEmpty();
+        return HotPotPack.hasPotContents(this);
     }
 
     /** 把整锅（汤底 + 食材 + 熟度）打包成一个锅物品；空锅就是普通锅物品。 */
     public ItemStack toPotItem(HotPotMaterial material) {
-        ItemStack stack = new ItemStack(HotPotContent.itemFor(material));
-        if (level != null && hasPotContents()) {
-            CompoundTag data = new CompoundTag();
-            HotPotStorage.write(this, data, level.registryAccess());
-            stack.set(HotPotContent.POT_CONTENTS, CustomData.of(data));
-        }
-        return stack;
+        return HotPotPack.toPotItem(this, material);
     }
 
     /** 摆出装着东西的锅时，把物品里打包的汤底和食材原样放回来。 */
     public void loadPotContents(ItemStack stack) {
-        CustomData data = stack.get(HotPotContent.POT_CONTENTS);
-        if (data == null || level == null || level.isClientSide()) {
-            return;
-        }
-        HotPotStorage.read(this, data.copyTag(), level.registryAccess());
-        updateSoupVisual();
-        markDirtyAndSync();
+        HotPotPack.loadPotContents(this, stack);
     }
 
     /** 清空锅里的数据（已经打包进物品之后调用），不碰方块状态。 */
     public void clearPotContents() {
-        ingredients.clearContent();
-        for (int i = 0; i < SLOTS; i++) {
-            resetSlot(i, ItemStack.EMPTY);
-        }
-        pendingXp = 0F;
-        java.util.Arrays.fill(bases, -1);
-        java.util.Arrays.fill(spicyLevels, 0);   // mryt233 改（2026-11-05）：整锅打包后清空，辣度也清掉（r136a）
-        setChanged();
+        HotPotPack.clearPotContents(this);
     }
 
     /**
@@ -1273,55 +727,39 @@ public class HotPotBlockEntity extends BlockEntity
      * 能加热的方块由 {@link HotPotHeat} 决定（标签 + 联动注册），以后农夫乐事的炉灶从那里接入。
      */
     public boolean isHeated() {
-        if (level == null || !hasPot()) {
-            return false;
-        }
-        StoveBlockEntity stove = stoveBelow();
-        if (stove != null && stove.burning()) {
-            return true;
-        }
-        return !(this instanceof StoveBlockEntity) && HotPotHeat.isHeatSource(level, worldPosition.below());
+        return HotPotPack.isHeated(this);
     }
 
     /** 方块被破坏掉落时（战利品表 copy_components），锅里的东西跟着锅物品走。 */
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder builder) {
         super.collectImplicitComponents(builder);
-        if (!(this instanceof StoveBlockEntity) && level != null && hasPotContents()) {
-            CompoundTag data = new CompoundTag();
-            HotPotStorage.write(this, data, level.registryAccess());
-            builder.set(HotPotContent.POT_CONTENTS, CustomData.of(data));
-        }
+        HotPotPack.collectImplicitComponents(this, builder);
     }
 
     /** 直接摆出独立锅时，原版 BlockItem 会调用这里读物品组件。 */
     @Override
     protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter components) {
         super.applyImplicitComponents(components);
-        CustomData data = components.get(HotPotContent.POT_CONTENTS);
-        if (data != null && level != null && !(this instanceof StoveBlockEntity)) {
-            HotPotStorage.read(this, data.copyTag(), level.registryAccess());
-            markDirtyAndSync();
-        }
+        // mryt233 改（2026-11-11）：原版输入类型为 protected，取值仍位于 super 之后。
+        HotPotPack.applyImplicitComponents(this, components.get(HotPotContent.POT_CONTENTS));
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public void removeComponentsFromTag(net.minecraft.world.level.storage.ValueOutput nbt) {
         super.removeComponentsFromTag(nbt);
-        for (String key : POT_DATA_KEYS) {
-            nbt.discard(key);
-        }
+        HotPotPack.removeComponentsFromTag(nbt, POT_DATA_KEYS);
     }
 
-    private static void consumeHand(Player player, InteractionHand hand, Item remainder) {
+    static void consumeHand(Player player, InteractionHand hand, Item remainder) {
         ItemStack stack = player.getItemInHand(hand);
         if (player.getAbilities().instabuild) {
             return;
         }
         if (stack.getCount() > 1) {
             stack.shrink(1);
-            if (remainder != net.minecraft.world.item.Items.AIR) {
+            if (remainder != Items.AIR) {
                 ItemStack back = new ItemStack(remainder);
                 if (!player.getInventory().add(back)) {
                     player.drop(back, false);
@@ -1329,7 +767,7 @@ public class HotPotBlockEntity extends BlockEntity
             }
         } else {
             player.setItemInHand(hand,
-                remainder == net.minecraft.world.item.Items.AIR ? ItemStack.EMPTY : new ItemStack(remainder));
+                remainder == Items.AIR ? ItemStack.EMPTY : new ItemStack(remainder));
         }
     }
 
@@ -1341,52 +779,37 @@ public class HotPotBlockEntity extends BlockEntity
 
     @Override
     public int getContainerSize() {
-        return SLOTS;
+        return slots.getContainerSize();
     }
 
     @Override
     public boolean isEmpty() {
-        return ingredients.isEmpty();
+        return slots.isEmpty();
     }
 
     @Override
     public ItemStack getItem(int slot) {
-        return ingredients.getItem(slot);
+        return slots.getItem(slot);
     }
 
     @Override
     public ItemStack removeItem(int slot, int amount) {
-        ItemStack result = ingredients.removeItem(slot, amount);
-        if (!result.isEmpty()) {
-            markDirtyAndSync();
-        }
-        return result;
+        return slots.removeItem(slot, amount);
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int slot) {
-        ItemStack result = ingredients.removeItemNoUpdate(slot);
-        if (!result.isEmpty()) {
-            markDirtyAndSync();
-        }
-        return result;
+        return slots.removeItemNoUpdate(slot);
     }
 
     @Override
     public void setItem(int slot, ItemStack stack) {
-        if (slot < 0 || slot >= SLOTS) {
-            return;
-        }
-        // 面板的每个格子代表一份食材。无论调用方是普通点击、Shift
-        // 快速移动还是旧存档恢复，都不允许把多份物品压进同一个物理槽。
-        ItemStack single = stack.isEmpty() ? ItemStack.EMPTY : stack.copyWithCount(1);
-        ingredients.setItem(slot, single);
-        onSlotStackChanged(slot);
+        slots.setItem(slot, stack);
     }
 
     @Override
     public boolean stillValid(Player player) {
-        return !isRemoved() && player.isWithinBlockInteractionRange(worldPosition, 5.0);
+        return slots.stillValid(player);
     }
 
     // 漏斗 / 其他模组走 Container 接口时的限制（用户 2026-11-01：漏斗接上，只收能煮的、只抽熟了的）。
@@ -1395,31 +818,24 @@ public class HotPotBlockEntity extends BlockEntity
     /** 一格只放一份：告诉往里塞东西的一方，免得它一次塞一整组、多出来的被 setItem 截掉吞没。 */
     @Override
     public int getMaxStackSize() {
-        return 1;
+        return slots.getMaxStackSize();
     }
 
     /** 只收能下锅的生食材，只进锅里在用、空着、还没煮好的格子；灶上没锅不收。 */
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
-        return level != null && slot >= 0 && slot < SLOTS && hasPot()
-            && ingredients.getItem(slot).isEmpty() && !cooked[slot]
-            && layout().sideOfSlot(slot) != PotLayout.NONE
-            && HotPotCooking.acceptable(level, stack);
+        return slots.canPlaceItem(slot, stack);
     }
 
     /** 只能抽走煮熟的。 */
     @Override
     public boolean canTakeItem(Container target, int slot, ItemStack stack) {
-        return slot >= 0 && slot < SLOTS && cooked[slot];
+        return slots.canTakeItem(target, slot, stack);
     }
 
     @Override
     public void clearContent() {
-        ingredients.clearContent();
-        for (int i = 0; i < SLOTS; i++) {
-            resetSlot(i, ItemStack.EMPTY);
-        }
-        markDirtyAndSync();
+        slots.clearContent();
     }
 
     // ------------------------------------------------------------------ 屏幕工厂
@@ -1439,7 +855,7 @@ public class HotPotBlockEntity extends BlockEntity
 
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
+        return super.getUpdatePacket();
     }
 
     @Override

@@ -1,15 +1,28 @@
+// mryt233 改：26.1 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+// mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
+import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
 
 /** 准星与 3x3 九宫格之间的共享空间映射。 */
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
 public final class HotPotInteraction {
     /** 独立摆放的锅：锅腔 1.5..14.5（对应 iron/copper_hot_pot_shell 模型）。 */
     public static final double STANDALONE_INNER_MIN = 1.5 / 16.0;
@@ -98,15 +111,15 @@ public final class HotPotInteraction {
     }
 
     /** 锅模型有没有绕 y 转 90°（耳朵朝南北摆：独立锅 axis=z、灶上锅 pot_axis=z）。 */
-    public static boolean rotated(net.minecraft.world.level.block.state.BlockState state) {
+    public static boolean rotated(BlockState state) {
         if (StoveBlock.isStove(state)) {
-            return state.getValue(StoveBlock.POT_AXIS) == net.minecraft.core.Direction.Axis.Z;
+            return state.getValue(StoveBlock.POT_AXIS) == Direction.Axis.Z;
         }
-        return state.getBlock() instanceof HotPotBlock && state.getValue(HotPotBlock.AXIS) == net.minecraft.core.Direction.Axis.Z;
+        return state.getBlock() instanceof HotPotBlock && state.getValue(HotPotBlock.AXIS) == Direction.Axis.Z;
     }
 
     /** 命中点在锅腔里的模型坐标比例（0..1）。 */
-    private static double[] modelUv(net.minecraft.world.level.block.state.BlockState state, BlockPos pos, BlockHitResult hit,
+    private static double[] modelUv(BlockState state, BlockPos pos, BlockHitResult hit,
                                     double innerMin, double innerSize) {
         double u = Mth.clamp((hit.getLocation().x - pos.getX() - innerMin) / innerSize, 0, 1);
         double v = Mth.clamp((hit.getLocation().z - pos.getZ() - innerMin) / innerSize, 0, 1);
@@ -163,10 +176,98 @@ public final class HotPotInteraction {
      * 客户端钩子：空筷子 / 空手 / 碗右键锅时，报告这一刻浮在准星那一格上的是哪一小格（HotPotClient 里设成发
      * ChopsticksAimPayload）。服务端什么都不做。新增（2026-10-25）。
      */
-    public static java.util.function.BiConsumer<HotPotBlockEntity, Integer> clientChopsticksAim = (be, cell) -> { };
+    public static BiConsumer<HotPotBlockEntity, Integer> clientChopsticksAim = (be, cell) -> { };
 
     /** 筷子用于开面板，碗用于直接捞取；空手由方块的 onUse 路径处理。 */
     public static boolean isServingTool(ItemStack stack) {
         return stack.is(HotPotContent.CHOPSTICKS) || stack.is(Items.BOWL);
+    }
+
+    /** 已通过入口筛选后的锅操作；钩子只由方块入口调用一次。 */
+    public static InteractionResult useItem(HotPotBlockEntity be, ItemStack stack,
+            Level world, BlockPos pos, Player player,
+            InteractionHand hand, BlockHitResult hit, double innerMin, double innerSize) {
+        return useItem(be, stack, world, pos, player, hand, hit, innerMin, innerSize, null);
+    }
+
+    static InteractionResult useItem(HotPotBlockEntity be, ItemStack stack,
+            Level world, BlockPos pos, Player player,
+            InteractionHand hand, BlockHitResult hit, double innerMin, double innerSize,
+            boolean[] checks) {
+        int bigCell = HotPotInteraction.cellFromHit(be, player, pos, hit, innerMin, innerSize);
+        int cookedSlot = be.firstCookedSlotInCell(bigCell);
+
+        if (checks == null ? HotPotBlock.isPlate(stack) : checks[0]) {
+            if (!world.isClientSide()) {
+                be.pourPlate(player, hand);
+            }
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
+        }
+        if (checks == null ? be.canScoopWith(stack) : checks[1]) {
+            if (!world.isClientSide()) {
+                be.scoopSoup(player, hand, HotPotInteraction.sideFromHit(be, player, pos, hit, innerMin, innerSize));
+            }
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
+        }
+        if (stack.is(Items.BOWL)) {
+            if (world.isClientSide()) {
+                HotPotInteraction.clientChopsticksAim.accept(be, bigCell);   // 碗先盛看到的那样（2026-10-26）
+            }
+            if (!world.isClientSide()) {
+                be.serveWithBowl(player, hand, bigCell);
+            }
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
+        }
+        if (checks == null ? isServingTool(stack) : checks[2]) {
+            if (stack.is(HotPotContent.CHOPSTICKS)) {
+                // 夹着的是熟菜（下不了锅）：不管锅，交给筷子吃（按住右键吃）。以前会提示「煮不了」，
+                // 刚从锅里夹起来、右键还按着时就吃不上（用户报：筷子夹起来的菜吃不了。调整）
+                ItemStack held = Chopsticks.held(stack);
+                if (!held.isEmpty() && !HotPotCooking.acceptable(world, held)) {
+                    return Use.blockItem(UseOutcome.SKIPPED, world.isClientSide());
+                }
+                // 筷子上夹着菜：放进准星对着的那一格；空筷子：夹起这一格的一样熟食
+                // （2026-10-25 用户定的新交互；开锅界面改成拿筷子 Shift+右键，见 ChopsticksItem.useOnBlock。调整）
+                if (world.isClientSide() && Chopsticks.held(stack).isEmpty()) {
+                    // 告诉服务端这一刻浮在这格上的是哪样，夹的就是看到的那样（用户 2026-10-25）
+                    HotPotInteraction.clientChopsticksAim.accept(be, bigCell);
+                }
+                if (!world.isClientSide()) {
+                    if (!Chopsticks.held(stack).isEmpty()) {
+                        be.insertHeld(player, stack, be.firstEmptySlotInCell(bigCell));
+                    } else if (!be.pickShown(player, stack, bigCell)) {
+                        player.sendOverlayMessage(Component.translatable(HotPotBlockEntity.key("msg.no_cooked_here")));
+                    }
+                }
+                return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
+            }
+            if (!world.isClientSide() && !be.collectCookedSlot(player, cookedSlot)) {
+                player.sendOverlayMessage(Component.translatable(
+                    HotPotBlockEntity.key("msg.no_cooked_here")));
+            }
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
+        }
+        if (checks == null ? Soups.fromStack(stack) != null : checks[3]) {
+            if (!world.isClientSide() && !be.pourSoup(player, hand, HotPotInteraction.sideFromHit(be, player, pos, hit, innerMin, innerSize))) {
+                return Use.blockItem(UseOutcome.FAIL, world.isClientSide());
+            }
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
+        }
+        // mryt233 改（2026-11-05，r136a）：辣椒加辣、冰块降辣——排在倒汤底之后、下锅食材之前，
+        // 免得辣椒被当成生食材塞进锅槽里（HotPotCooking.acceptable 里也明确拒收辣椒）。
+        if (checks == null ? HotPotBlockEntity.isSpicyModifier(stack) : checks[4]) {
+            if (!world.isClientSide()) {
+                be.adjustSpiciness(player, hand,
+                    HotPotInteraction.sideFromHit(be, player, pos, hit, innerMin, innerSize));
+            }
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
+        }
+        if (checks == null ? HotPotCooking.acceptable(world, stack) : checks[5]) {
+            if (!world.isClientSide() && !be.insertIngredient(player, hand, be.firstEmptySlotInCell(bigCell))) {
+                return Use.blockItem(UseOutcome.FAIL, world.isClientSide());
+            }
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
+        }
+        return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide());
     }
 }

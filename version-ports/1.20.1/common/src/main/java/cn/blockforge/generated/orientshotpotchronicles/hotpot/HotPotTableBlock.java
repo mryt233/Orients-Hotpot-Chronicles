@@ -1,21 +1,20 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * 火锅桌：每种原版木板一种，围着灶台拼成 3x3 的大桌。
@@ -52,7 +51,7 @@ public class HotPotTableBlock extends Block {
     }
 
     /** 一个轴上桌身的范围：接邻一侧到边，朝外一侧收进去 RECESS。 */
-    public static double[] span(int mask, int lowBit, int highBit) {
+    protected static double[] span(int mask, int lowBit, int highBit) {
         boolean low = (mask & lowBit) != 0;
         boolean high = (mask & highBit) != 0;
         double lo = low ? 0 : RECESS;
@@ -61,11 +60,15 @@ public class HotPotTableBlock extends Block {
     }
 
     public HotPotTableBlock(Block planks) {
+        this(planks, false);
+    }
+
+    public HotPotTableBlock(Block like, boolean hardSurface) {
         super(BlockBehaviour.Properties.of()
-            .mapColor(planks.defaultMapColor())
+            .mapColor(like.defaultMapColor())
             .instrument(NoteBlockInstrument.BASS)
-            .strength(2.0F, 3.0F)
-            .sound(planks.defaultBlockState().getSoundType())
+            .strength(2.0F, hardSurface ? 6.0F : 3.0F)
+            .sound(like.defaultBlockState().getSoundType())
             .noOcclusion());
         registerDefaultState(defaultBlockState()
             .setValue(NORTH, false)
@@ -75,7 +78,7 @@ public class HotPotTableBlock extends Block {
     }
 
     @Override
-    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(NORTH, EAST, SOUTH, WEST);
     }
 
@@ -86,11 +89,11 @@ public class HotPotTableBlock extends Block {
 
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
-                                     LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+                                  LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
         return refreshConnections(state, world, pos);
     }
 
-    public BlockState refreshConnections(BlockState state, BlockGetter world, BlockPos pos) {
+    protected BlockState refreshConnections(BlockState state, BlockGetter world, BlockPos pos) {
         return state
             .setValue(NORTH, linksTo(world.getBlockState(pos.north())))
             .setValue(EAST, linksTo(world.getBlockState(pos.east())))
@@ -99,36 +102,41 @@ public class HotPotTableBlock extends Block {
     }
 
     /** 任意木头的火锅桌和灶台都算同一张桌子；接上的一侧桌身铺到边，不收进去。 */
-    public static boolean linksTo(BlockState neighbor) {
+    protected static boolean linksTo(BlockState neighbor) {
         return neighbor.getBlock() instanceof HotPotTableBlock || StoveBlock.isStove(neighbor);
     }
 
-    public static int mask(BlockState state) {
+    protected static int mask(BlockState state) {
         return (state.getValue(NORTH) ? 1 : 0) | (state.getValue(EAST) ? 2 : 0)
             | (state.getValue(SOUTH) ? 4 : 0) | (state.getValue(WEST) ? 8 : 0);
     }
 
-    public VoxelShape shapeOf(BlockState state) {
+    protected VoxelShape shapeOf(BlockState state) {
         return SHAPES[mask(state)];
     }
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos,
-                                  CollisionContext context) {
+                               CollisionContext context) {
         return shapeOf(state);
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos,
-                                           CollisionContext context) {
+                                        CollisionContext context) {
         return shapeOf(state);
     }
 
     /** mryt233 改：旧版 Forge 读取方块扩展；数值与底本的原版火表一致。 */
-    public boolean isFlammable(BlockState state, net.minecraft.world.level.BlockGetter world,
-            BlockPos pos, net.minecraft.core.Direction face) { return cn.blockforge.generated.orientshotpotchronicles.hotpot.FireRules.flammable(this); }
-    public int getFlammability(BlockState state, net.minecraft.world.level.BlockGetter world,
-            BlockPos pos, net.minecraft.core.Direction face) { return isFlammable(state, world, pos, face) ? 20 : 0; }
-    public int getFireSpreadSpeed(BlockState state, net.minecraft.world.level.BlockGetter world,
-            BlockPos pos, net.minecraft.core.Direction face) { return isFlammable(state, world, pos, face) ? 5 : 0; }
+    public boolean isFlammable(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
+        return FireRules.flammable(this);
+    }
+
+    public int getFlammability(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
+        return isFlammable(state, world, pos, face) ? 20 : 0;
+    }
+
+    public int getFireSpreadSpeed(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
+        return isFlammable(state, world, pos, face) ? 5 : 0;
+    }
 }

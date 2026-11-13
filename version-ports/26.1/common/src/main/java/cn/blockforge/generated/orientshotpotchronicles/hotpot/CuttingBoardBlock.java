@@ -1,6 +1,8 @@
-// mryt233 改：26.1 原版 API。
+// mryt233 改：26.1 原版 API；合入 PoundingRecipe 与 Use 适配。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
 import cn.blockforge.orient.framework.game.PartOutline;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.Block;
@@ -202,6 +204,10 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
 
     private static final java.util.Map<CutKey, ItemStack> CUT_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
 
+    public static void clearCache() {
+        CUT_CACHE.clear();
+    }
+
     /** 这件东西在砧板上切出什么（照切石机配方，数据包里没有就用内置表）；不能切返回空。 */
     public static ItemStack cutResult(Level world, ItemStack stack) {
         if (stack.isEmpty() || !stack.is(CUTTABLE)) {
@@ -223,41 +229,34 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
                                               Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(world.getBlockEntity(pos) instanceof CuttingBoardBlockEntity board)) {
-            return InteractionResult.TRY_WITH_EMPTY_HAND;
+            return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide());
         }
         if (stack.is(HotPotContent.ROLLING_PIN)) {
             return pound(stack, world, pos, player, hand, board);
         }
         if (stack.is(HotPotContent.KITCHEN_KNIFE)) {
-            // mryt233 改（2026-11-07）：捣的进度和切的进度分开记账以后，这里看的是「捣了几下」：
-            // 敲一下（pounds = 1）只是捶了一下，折耳根这类还能正常切；捣到第二下起已经捶碎 / 成浆，
-            // 就不再当食材切了。以前共用 cuts，敲一下就被当成「切过」，菜刀永远切不动，也不给提示。
-            if (Pounding.poundable(board.item()) && board.pounds() >= 2) {
+            if (Pounding.poundable(world, board.item()) && board.pounds() >= 2) {
                 if (!world.isClientSide()) {
-                    // 带兜底文案：万一语言文件还没补这个键，玩家看到的也是人话而不是键名
                     player.sendOverlayMessage(
                         Component.translatableWithFallback(HotPotBlockEntity.key("msg.board_pounded"),
                             "这摊东西已经捶成浆了，切不动，换擀面杖把它捶成丸子吧"));
                 }
-                return InteractionResult.SUCCESS;
+                return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
             }
             ItemStack result = cutResult(world, board.item());
             if (result.isEmpty()) {
-                // mryt233 改（2026-11-07）：切不动时回 SUCCESS 而不是 PASS——PASS 会让原版接着调手里菜刀的
-                // useOn，刀照样掉耐久却没有产物，玩家只会觉得「点了没反应、刀还坏了」。
                 if (!board.item().isEmpty() && !world.isClientSide()) {
                     player.sendOverlayMessage(
                         Component.translatableWithFallback(HotPotBlockEntity.key("msg.board_not_cuttable"),
                             "这样东西在砧板上切不出东西"));
                 }
-                return board.item().isEmpty()
-                    ? InteractionResult.PASS
-                    : InteractionResult.SUCCESS;
+                return Use.blockItem(board.item().isEmpty()
+                    ? UseOutcome.PASS_TO_EMPTY
+                    : UseOutcome.SUCCESS, world.isClientSide());
             }
             if (!world.isClientSide()) {
                 ItemStack cut = board.item();
                 if (cut.is(CUT_PIECE_BY_PIECE) && result.getCount() > 1) {
-                    // 一刀一刀切的东西只按纯切刀数记账（不含捣的下数）
                     int done = board.cutCount() + 1;
                     if (done >= result.getCount()) {
                         board.setItem(ItemStack.EMPTY);
@@ -274,35 +273,35 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
                 ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, net.minecraft.world.item.ItemStackTemplate.fromNonEmptyStack(cut)),
                     pos.getX() + 0.5, pos.getY() + TOP + 0.05, pos.getZ() + 0.5, 8, 0.15, 0.05, 0.15, 0.05);
             }
-            return InteractionResult.SUCCESS;
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
         }
-        if (board.item().isEmpty() && (stack.is(CUTTABLE) || Pounding.poundable(stack))) {
+        if (board.item().isEmpty() && (stack.is(CUTTABLE) || Pounding.poundable(world, stack))) {
             if (!world.isClientSide()) {
                 // 食物朝向单独记：放的人站在哪边，食物就朝哪边（和砧板自己的朝向无关，用户要分开）
                 board.setItem(stack.copyWithCount(1), player.getDirection().getOpposite());
                 stack.consume(1, player);
                 world.playSound((Player) null, pos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS, 0.6F, 1.2F);
             }
-            return InteractionResult.SUCCESS;
+            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
         }
-        return InteractionResult.TRY_WITH_EMPTY_HAND;
+        return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide());
     }
 
     /** 擀面杖捣一下（Pounding）：前两下砧板上的肉变样（捶碎 → 肉浆），第三下掉出 3 个生丸子；擀面杖掉 1 点耐久。 */
     private static InteractionResult pound(ItemStack stack, Level world, BlockPos pos, Player player, InteractionHand hand,
                                           CuttingBoardBlockEntity board) {
         ItemStack meat = board.item();
-        Item ball = Pounding.result(meat);
-        if (ball == null) {
-            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        PoundingRecipe recipe = Pounding.recipe(world, meat);
+        if (recipe == null) {
+            return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide());
         }
         if (!world.isClientSide()) {
             // mryt233 改（2026-11-07）：捣的进度用 pounds 单独记，不再借用 cuts（切 / 捣分开记账）
             int hits = board.pounds() + 1;
-            if (hits >= Pounding.HITS) {
+            if (hits >= recipe.hits()) {
                 board.setItem(ItemStack.EMPTY);
                 Containers.dropItemStack(world, pos.getX() + 0.5, pos.getY() + TOP + 0.1, pos.getZ() + 0.5,
-                    new ItemStack(ball, Pounding.resultCount(meat)));
+                    recipe.result());
             } else {
                 board.setPounds(hits);
             }
@@ -312,7 +311,7 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
             ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, net.minecraft.world.item.ItemStackTemplate.fromNonEmptyStack(meat)),
                 pos.getX() + 0.5, pos.getY() + TOP + 0.05, pos.getZ() + 0.5, 6, 0.15, 0.05, 0.15, 0.04);
         }
-        return InteractionResult.SUCCESS;
+        return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
     }
 
     /** 对着板上的东西挖：一下就挖掉（只挖东西，砧板留着，见 HotPotContent 的破坏事件）；否则按砧板自己的硬度。 */
@@ -341,13 +340,13 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         if (!(world.getBlockEntity(pos) instanceof CuttingBoardBlockEntity board) || board.item().isEmpty()) {
-            return InteractionResult.PASS;
+            return Use.blockEmpty(UseOutcome.PASS, world.isClientSide());
         }
         if (!world.isClientSide()) {
             player.getInventory().placeItemBackInInventory(board.item());
             board.setItem(ItemStack.EMPTY);
         }
-        return InteractionResult.SUCCESS;
+        return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide());
     }
 
     /** 挖掉时板上的东西掉出来。 */

@@ -1,13 +1,19 @@
 // mryt233 改：26.1 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.ArrayList;
+import java.util.function.BiPredicate;
+
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCooking;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotScreenHandler;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupBase;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupIds;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.entity.player.Inventory;
@@ -56,21 +62,17 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
 
     private static final Soup NO_SOUP = new Soup(0xFF1B1C20, 0xFFFFFFFF, 0xFF808080, new int[]{0xFF808080});
 
+    /**
+     * mryt233 改（2026-11-10，r147）：配色不再是一个按汤底写的 switch，直接读汤底定义上的颜色
+     * （{@link SoupDef#screenBase()} 等）。加汤底时颜色写在 {@code SoupBase} 的构造参数里，
+     * 枚举构造漏写就编译不过，不会悄悄退化成红汤的配色。
+     */
     private static Soup soup(int baseId) {
-        SoupBase soup = SoupBase.byId(baseId);
+        SoupDef soup = Soups.byIndex(baseId);
         if (soup == null) {
             return NO_SOUP;
         }
-        return switch (soup) {
-            case CLEAR -> new Soup(0xFFB4BCBC, 0xFFF4F4EC, 0xFFC6CCCA,   // 清汤配色同锅里的新贴图（2026-10-23，调整）
-                new int[]{0xFF6FAF3A, 0xFF8FCF52, 0xFFD04A2A});
-            case RICH_STOCK -> new Soup(0xFFE3D7BF, 0xFFFFFFFF, 0xFFF2E7D2, new int[]{0xFFFFF8EA, 0xFF6FAF3A, 0xFFD9C9A8});
-            case MUSHROOM -> new Soup(0xFF7C5836, 0xFFE8C88A, 0xFF9A7048, new int[]{0xFF4A3220, 0xFFC9A16A, 0xFF5E4026});
-            case SPICY -> new Soup(0xFFB32A1E, 0xFFFFB070, 0xFFD94A2E, new int[]{0xFFE8862A, 0xFF7A1408, 0xFF3A1208});
-            // 2026-10-25 新汤底：番茄 = 橙红汤面 + 蛋花黄 / 番茄块 / 葱绿；三鲜 = 淡金汤面 + 蘑菇 / 胡萝卜 / 海带
-            case TOMATO -> new Soup(0xFFD8482A, 0xFFFF9A6A, 0xFFE86040, new int[]{0xFFF2C14A, 0xFFB82818, 0xFF6FAF3A});
-            case THREE_FRESH -> new Soup(0xFFD8C79A, 0xFFFFF6DC, 0xFFE6D8B0, new int[]{0xFF8A5A34, 0xFFF08A30, 0xFF3E7A3A});
-        };
+        return new Soup(soup.screenBase(), soup.screenHi(), soup.screenLo(), soup.screenBits());
     }
 
     /** 锅身金属配色：取自锅贴图（铜锅 = 原版铜块色系，铁锅 = 铁灰），锅沿、隔条、铆钉都用它，不再是金色。 */
@@ -194,7 +196,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
 
     /** @param keep 鸳鸯 / 田字锅：只画落在这一边的高光、配料、气泡（界面坐标）；null = 整锅（同时铺底色）。 */
     private void drawSoup(GuiGraphicsExtractor c, int gx, int gy, double t, int soupId,
-                          java.util.function.BiPredicate<Double, Double> keep) {
+                          BiPredicate<Double, Double> keep) {
         Soup soup = soup(soupId);
         if (keep == null) {
             c.fill(gx, gy, gx + GW, gy + GW, soup.base());
@@ -398,7 +400,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
     protected void extractLabels(GuiGraphicsExtractor context, int mouseX, int mouseY) {
         double t = Util.getMillis() / 1000.0;
         Soup soup = soup(menu.baseId());
-        SoupBase soupBase = SoupBase.byId(menu.baseId());
+        SoupDef soupBase = Soups.byIndex(menu.baseId());
 
         // 铭牌：小铜锅图标 + 标题
         int ix = 9;
@@ -430,7 +432,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
         Component name = layout.multiSoup()
             ? HotPotBlockEntity.soupText(layout, menu::baseOfSide).copy().withStyle(menu.hasSoup() ? ChatFormatting.GOLD : ChatFormatting.GRAY)
             : soupBase == null
-                ? Component.translatable(HotPotBlockEntity.key("soup.none")).withStyle(ChatFormatting.GRAY)
+                ? HotPotBlockEntity.soupName(menu.baseId()).copy().withStyle(ChatFormatting.GRAY)
                 : Component.translatable(soupBase.nameKey()).withStyle(ChatFormatting.GOLD);
         int nameX = swatchX + 4;
         int room = right - nameX;
@@ -589,7 +591,9 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
             ? HotPotBlockEntity.soupName(menu.soupOfSlot(index))
             : Component.translatable(HotPotBlockEntity.key("ui.cell"), cell / 3 + 1, cell % 3 + 1);
         Component status;
-        if (menu.soupOfSlot(index) < 0) {
+        if (menu.soupOfSlot(index) == SoupIds.UNKNOWN) {
+            status = HotPotBlockEntity.soupName(SoupIds.UNKNOWN).copy().withStyle(ChatFormatting.GRAY);
+        } else if (menu.soupOfSlot(index) == SoupIds.EMPTY) {
             status = Component.translatable(HotPotBlockEntity.key("ui.no_soup_yet")).withStyle(ChatFormatting.GRAY);
         } else if (menu.isCooked(index)) {
             status = Component.translatable(HotPotBlockEntity.key("ui.cooked")).withStyle(ChatFormatting.GREEN);
@@ -602,7 +606,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
                     String.format(Locale.ROOT, "%.1f", seconds)).withStyle(ChatFormatting.YELLOW);
             }
         }
-        List<Component> lines = new java.util.ArrayList<>(List.of(
+        List<Component> lines = new ArrayList<>(List.of(
             stack.getItem().getName(stack).copy().withStyle(ChatFormatting.WHITE),
             location.copy().withStyle(ChatFormatting.GRAY),
             status));

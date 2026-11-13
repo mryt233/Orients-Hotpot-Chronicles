@@ -7,6 +7,9 @@ import net.minecraft.server.level.ServerPlayer;
 
 /** 网络契约：C2S/S2C 统一 ProtocolPolicy；协商不等于授权。作者：mryt233 */
 public interface NetworkApi {
+    /** 跨端共享的框架握手协议版本（避免依赖具体平台实现类）。 */
+    int PROTOCOL_VERSION = 1;
+
     <T extends CustomPacketPayload> void registerS2C(CustomPacketPayload.Type<T> type,
                                                      StreamCodec<? super RegistryFriendlyByteBuf, T> codec,
                                                      PayloadHandler<T> clientHandler, ProtocolPolicy policy);

@@ -1,37 +1,46 @@
-// mryt233 改：26.1 原版 API。
+// mryt233 改：26.2 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import net.minecraft.world.level.block.state.properties.EnumProperty;
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+// mryt233 改（2026-11-11）：第三批 3G 右键结果改走适配小包（意图 → 原版常量），逻辑不变。
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
 import cn.blockforge.orient.framework.game.PartOutline;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.Containers;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.network.chat.Component;
+import java.util.function.BiConsumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 蘸料台（r103，用户定：11 种原版木头各一个 + 铁的）：台面上 3×3 九个白瓷小碗，一个碗一种调料。
@@ -42,7 +51,7 @@ import net.minecraft.world.level.LevelReader;
  * 方块状态只剩朝向，碗里的调料面由 client/SauceStationRenderer 按方块实体画（原来的 FILLED 属性去掉了）。
  * 作者：mryt233 */
 public class SauceStationBlock extends Block implements PartOutline, EntityBlock {
-    public static final EnumProperty<net.minecraft.core.Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     /** 三层台面高度（像素，前 → 后），同 gen_sauce_station.py 的 TIER_TOPS。 */
     public static final double[] TIER_TOPS = {11, 15, 19};   // 0.1.2-alpha 后用户：整体降 3 像素（一个活板门高），调整
     public static final double BOWL = 5, BOWL_H = 2.5, WALL = 0.75;   // 小碗（a 款直壁碗缩小版），同 gen_sauce_station.py；SauceStationRenderer 也用
@@ -98,13 +107,13 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
      *
      * <p>现在木头照木板（2.0 / 3.0，木头声音），铁的照石头类（2.0 / 6.0，金属声音），都保留那种材质的
      * 地图颜色和踩上去的声音，也都不强制工具——蘸料台里有玩家存的原料，空手挖也要正常掉出来
-     * （掉落见 {@link #onRemove}）。</p>
+     * （掉落见 {@link SauceStationBlockEntity#preRemoveSideEffects}）。</p>
      */
     public static BlockBehaviour.Properties settingsFor(Block like, boolean iron) {
         return BlockBehaviour.Properties.of()
             .mapColor(like.defaultMapColor())
-            .instrument(iron ? net.minecraft.world.level.block.state.properties.NoteBlockInstrument.IRON_XYLOPHONE
-                : net.minecraft.world.level.block.state.properties.NoteBlockInstrument.BASS)
+            .instrument(iron ? NoteBlockInstrument.IRON_XYLOPHONE
+                : NoteBlockInstrument.BASS)
             .strength(2.0F, iron ? 6.0F : 3.0F)
             .sound(like.defaultBlockState().getSoundType())
             .noOcclusion();
@@ -135,8 +144,8 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
     }
 
     @Override
-    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @org.jetbrains.annotations.Nullable net.minecraft.world.entity.LivingEntity placer,
-                         ItemStack stack) {
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer,
+                            ItemStack stack) {
         super.setPlacedBy(world, pos, state, placer, stack);
         placeTop(world, pos);
     }
@@ -159,8 +168,8 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
 
     /** 服务端每秒检查一次上半截（同高灶台的补顶），旧存档里的上半截靠这里补上朝向。 */
     @Override
-    public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(
-            Level world, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            Level world, BlockState state, BlockEntityType<T> type) {
         if (world.isClientSide() || type != HotPotContent.SAUCE_STATION_BE) {
             return null;
         }
@@ -204,8 +213,8 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
      */
     @Override
     public VoxelShape aimedPart(BlockState state, BlockGetter world, BlockPos pos, Player player) {
-        net.minecraft.world.phys.HitResult hit = player.pick(player.blockInteractionRange(), 1.0F, false);
-        if (!(hit instanceof BlockHitResult b) || hit.getType() != net.minecraft.world.phys.HitResult.Type.BLOCK) {
+        HitResult hit = player.pick(player.blockInteractionRange(), 1.0F, false);
+        if (!(hit instanceof BlockHitResult b) || hit.getType() != HitResult.Type.BLOCK) {
             return null;
         }
         int bowl = aimed(state, pos, b);
@@ -234,16 +243,16 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
     }
 
     /** mryt233 改：名称与图标只显示所瞄小碗中仍有存货的调料。 */
-    private static Seasoning aimedSeasoning(BlockState state, LevelReader world, BlockPos pos, BlockHitResult hit) {
+    private static SeasoningDef aimedSeasoning(BlockState state, LevelReader world, BlockPos pos, BlockHitResult hit) {
         int bowl = aimed(state, pos, hit);
         if (bowl >= 0 && world.getBlockEntity(pos) instanceof SauceStationBlockEntity be
             && be.available(bowl) > 0) {
-            return be.kind(bowl);
+            return be.kindDef(bowl);
         }
         return null;
     }
 
-    static net.minecraft.network.chat.MutableComponent aimedName(Player player) {
+    static MutableComponent aimedName(Player player) {
         if (player != null && player.level() != null) {
             HitResult hit = player.pick(player.blockInteractionRange(), 1.0F, false);
             if (hit instanceof BlockHitResult blockHit && hit.getType() == HitResult.Type.BLOCK) {
@@ -252,9 +261,9 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
                     ? hitPos.below() : hitPos;
                 BlockState stationState = player.level().getBlockState(stationPos);
                 if (stationState.getBlock() instanceof SauceStationBlock) {
-                    net.minecraft.network.chat.MutableComponent name =
+                    MutableComponent name =
                         Component.translatable(stationState.getBlock().getDescriptionId());
-                    Seasoning seasoning = aimedSeasoning(stationState, player.level(), stationPos, blockHit);
+                    SeasoningDef seasoning = aimedSeasoning(stationState, player.level(), stationPos, blockHit);
                     return seasoning == null ? name
                         : name.append(" · ").append(Component.translatable(seasoning.nameKey()));
                 }
@@ -264,8 +273,8 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
     }
 
     @Override
-    public net.minecraft.network.chat.MutableComponent getName() {
-        net.minecraft.network.chat.MutableComponent name = aimedName(PlateHolderBlock.pickPlayer.get());
+    public MutableComponent getName() {
+        MutableComponent name = aimedName(PlateHolderBlock.pickPlayer.get());
         return name == null ? super.getName() : name;
     }
 
@@ -278,7 +287,7 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
                 BlockPos hitPos = blockHit.getBlockPos();
                 if (hitPos.equals(pos)
                     || (hitPos.equals(pos.above()) && world.getBlockState(hitPos).is(HotPotContent.SAUCE_STATION_TOP))) {
-                    Seasoning seasoning = aimedSeasoning(state, world, pos, blockHit);
+                    SeasoningDef seasoning = aimedSeasoning(state, world, pos, blockHit);
                     if (seasoning != null && !seasoning.raws().isEmpty()) {
                         return new ItemStack(seasoning.raw());
                     }
@@ -290,18 +299,18 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
-                                             Player player, InteractionHand hand, BlockHitResult hit) {
+                                          Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(stack.is(Items.BOWL) || stack.getItem() instanceof DippingSauceItem)) {
-            return InteractionResult.TRY_WITH_EMPTY_HAND;
+            return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide());
         }
         int bowl = aimed(state, pos, hit);
         if (bowl < 0 || !(world.getBlockEntity(pos) instanceof SauceStationBlockEntity be)) {
-            return InteractionResult.TRY_WITH_EMPTY_HAND;
+            return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide());
         }
         if (!world.isClientSide()) {
             be.serve(player, hand, bowl);
         }
-        return InteractionResult.SUCCESS;
+        return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
     }
 
     @Override
@@ -311,13 +320,10 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
             // mryt233 改（2026-11-07，#129）：总览标题固定用台名（描述键），不跟着准星上的调料名变
             openOverview.accept(pos, Component.translatable(this.getDescriptionId()));
         }
-        return InteractionResult.SUCCESS;
+        return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide());
     }
 
     /** 客户端打开总览界面（HotPotClient 填上；服务端什么也不做）。 */
-    public static java.util.function.BiConsumer<BlockPos, net.minecraft.network.chat.Component> openOverview = (pos, name) -> {
+    public static BiConsumer<BlockPos, Component> openOverview = (pos, name) -> {
     };
-
-    /** 挖掉时格子里的原料掉出来（已经化开的份数就没了）。 */
-
 }

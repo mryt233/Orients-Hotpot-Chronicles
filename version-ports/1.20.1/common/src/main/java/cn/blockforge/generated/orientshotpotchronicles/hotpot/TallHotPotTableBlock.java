@@ -39,18 +39,23 @@ public class TallHotPotTableBlock extends HotPotTableBlock {
     }
 
     public TallHotPotTableBlock(Block planks) {
-        super(planks);
+        this(planks, false);
+    }
+
+    /** mryt233 改（2026-11-05）：石料 / 金属桌面的高桌同矮桌，硬度 2.0、抗性 6.0（见 {@link HotPotTableBlock}）。 */
+    public TallHotPotTableBlock(Block like, boolean hardSurface) {
+        super(like, hardSurface);
         registerDefaultState(defaultBlockState().setValue(OPEN, false));
     }
 
     @Override
-    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(OPEN);
     }
 
     @Override
-    public BlockState refreshConnections(BlockState state, BlockGetter world, BlockPos pos) {
+    protected BlockState refreshConnections(BlockState state, BlockGetter world, BlockPos pos) {
         boolean open = false;
         for (Direction d : Direction.Plane.HORIZONTAL) {
             BlockState neighbor = world.getBlockState(pos.relative(d));
@@ -63,7 +68,7 @@ public class TallHotPotTableBlock extends HotPotTableBlock {
     }
 
     @Override
-    public VoxelShape shapeOf(BlockState state) {
+    protected VoxelShape shapeOf(BlockState state) {
         return (state.getValue(OPEN) ? OPEN_SHAPES : SHAPES)[mask(state)];
     }
 }

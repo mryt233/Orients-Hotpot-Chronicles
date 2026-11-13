@@ -30,7 +30,7 @@ Each recipe makes one station. Replace planks with iron ingots for iron, or use 
 - Stocked bowls visibly show their seasoning on the station.
 
 :::tip
-**Development preview: the ingredient list now uses a single paginated column.** Clicking **?** opens a narrow panel matching the main interface width, displaying names and effects in full with text wrapping; turn pages using the bottom arrows or the mouse wheel over the panel, and reopening it remembers your last page. The main interface and ingredient list are centered together, and installed JEI / REI will avoid this area.<!--清单#140-->
+**{{since:0.3.0-alpha}}The ingredient list uses a single paginated column.** Clicking **?** opens a narrow panel matching the main interface width, displaying names and effects in full with text wrapping; turn pages using the bottom arrows or the mouse wheel over the panel, and reopening it remembers your last page. The main interface and ingredient list are centered together, and installed JEI / REI will avoid this area.<!--清单#140-->
 :::
 
 ## 15 seasonings {#seasoning}

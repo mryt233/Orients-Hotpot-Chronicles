@@ -1,6 +1,11 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -11,10 +16,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 布围裙的防溅油 / 防烫保护（清单 #127）。
@@ -43,7 +44,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>mryt233 改（0.2.2-alpha，1.20.1 适配）：{@code DamageTypes} / {@code MobEffects} 常量名与本文件里的
  * {@code player.level()}、{@code tickCount}、{@code clearFire()} 在 1.20.1 上同名可用，逻辑原样保留。</p>
  *
- * 作者：mryt233 */
+ * 作者：mryt233
+ */
 public final class ClothApronProtection {
     /** 挡溅射的范围（格）：布围裙挡的是近处的油花。 */
     public static final int RANGE = 4;
@@ -51,20 +53,20 @@ public final class ClothApronProtection {
     /** 热源判定的缓存时长（刻）：同一处、两刻内的重复判定只扫一次 729 格。 */
     private static final long HEAT_CACHE_TICKS = 2L;
 
-    /** 一次热源判定的结果（哪一刻、哪个方块位置、热不热）。 */
-    private static final class HeatStamp {
-        private final long gameTime;
-        private final BlockPos pos;
-        private final boolean hot;
-
-        private HeatStamp(long gameTime, BlockPos pos, boolean hot) {
-            this.gameTime = gameTime;
-            this.pos = pos;
-            this.hot = hot;
-        }
+    /** 一次热源判定的结果（哪一刻、哪个维度、哪个方块位置、热不热）。 */
+    private record HeatStamp(long gameTime, ResourceKey<Level> dimension, BlockPos pos, boolean hot) {
     }
 
     private static final Map<UUID, HeatStamp> HEAT_CACHE = new ConcurrentHashMap<>();
+
+    /** mryt233 改（2026-11-10）：玩家下线、客户端退服和服务端停止时释放缓存。 */
+    public static void removePlayer(UUID player) {
+        HEAT_CACHE.remove(player);
+    }
+
+    public static void clearCache() {
+        HEAT_CACHE.clear();
+    }
 
     /** 成就「整装掌勺」的检查间隔（刻）：以前每 tick 都查一次成就表。 */
     private static final int CRITERION_INTERVAL = 20;
@@ -146,11 +148,14 @@ public final class ClothApronProtection {
         long now = world.getGameTime();
         BlockPos pos = player.blockPosition();
         HeatStamp stamp = HEAT_CACHE.get(player.getUUID());
-        if (stamp != null && now - stamp.gameTime <= HEAT_CACHE_TICKS && stamp.pos.equals(pos)) {
-            return stamp.hot;
+        // mryt233 改（2026-11-10）：跨维度和时间回退都必须重新检查。
+        long elapsed = stamp == null ? -1 : now - stamp.gameTime();
+        if (stamp != null && elapsed >= 0 && elapsed <= HEAT_CACHE_TICKS
+            && stamp.dimension().equals(world.dimension()) && stamp.pos().equals(pos)) {
+            return stamp.hot();
         }
         boolean hot = nearHeat(world, pos);
-        HEAT_CACHE.put(player.getUUID(), new HeatStamp(now, pos.immutable(), hot));
+        HEAT_CACHE.put(player.getUUID(), new HeatStamp(now, world.dimension(), pos.immutable(), hot));
         return hot;
     }
 
@@ -194,7 +199,8 @@ public final class ClothApronProtection {
     /** 护甲槽里的布围裙掉一点耐久（穿久了总会沾油；挡下烫伤、灭火苗时都会磨损）。 */
     public static void wear(Player player, int amount) {
         ItemStack chest = player.getItemBySlot(EquipmentSlot.CHEST);
-        if (chest.getItem() instanceof ClothApronItem) {
+        // mryt233 改（2026-11-09，r146b）：三款都认（标签判断）
+        if (ClothApronItem.isApron(chest)) {
             chest.hurtAndBreak(amount, player, p -> p.broadcastBreakEvent(EquipmentSlot.CHEST));
         }
     }

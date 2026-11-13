@@ -1,59 +1,8 @@
 {
-  "parent": "minecraft:block/block",
+  "parent": "orients_hotpot_chronicles:block/template/hotpot_table_nw",
   "textures": {
-    "planks": "minecraft:block/spruce_planks",
-    "particle": "minecraft:block/spruce_planks"
-  },
-  "elements": [
-    {
-      "from": [
-        0,
-        7,
-        0
-      ],
-      "to": [
-        16,
-        11,
-        16
-      ],
-      "faces": {
-        "east": {
-          "texture": "#planks"
-        },
-        "south": {
-          "texture": "#planks"
-        },
-        "up": {
-          "texture": "#planks"
-        },
-        "down": {
-          "texture": "#planks"
-        }
-      }
-    },
-    {
-      "from": [
-        0,
-        0,
-        0
-      ],
-      "to": [
-        12,
-        7,
-        12
-      ],
-      "faces": {
-        "east": {
-          "texture": "#planks"
-        },
-        "south": {
-          "texture": "#planks"
-        },
-        "down": {
-          "texture": "#planks",
-          "cullface": "down"
-        }
-      }
-    }
-  ]
+    "particle": "minecraft:block/spruce_planks",
+    "top": "minecraft:block/spruce_planks",
+    "base": "minecraft:block/spruce_planks"
+  }
 }

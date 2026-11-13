@@ -109,7 +109,9 @@ public final class ModuleHost {
     public void registerAll() {
         for (ContentModule module : ordered) {
             RuntimeStats.get().modulePhase(declarationByModule.get(module).modId(), "register");
-            module.register(Framework.platform().registration());
+            cn.blockforge.orient.framework.pure.RegistrationGuard.withOwner(
+                declarationByModule.get(module).modId(),
+                () -> module.register(Framework.platform().registration()));
         }
     }
 

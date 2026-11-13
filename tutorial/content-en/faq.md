@@ -67,7 +67,7 @@ Upgrading a 0.1.0-alpha.1 world can lose or change some items (there was a major
 An integration hook exists: blocks in the `orients_hotpot_chronicles:heat_sources` block tag can act as heat sources for pots. Suggestions for other integrations are welcome on GitHub.
 
 **Q: How do 1.20.1, 26.1.x, and 26.2 differ from 1.21.1?**
-In 0.2.2-alpha, **1.21.1 (Fabric / NeoForge), 1.20.1 (Fabric / Forge), 26.1.x (Fabric / NeoForge), and 26.2 (Fabric / NeoForge)** are all updated simultaneously with the same gameplay and content. See [Downloads, Installation & Feedback](install.html#ports).
+Since 0.2.2-alpha (synced through 0.3.0-alpha), **1.21.1 (Fabric / NeoForge), 1.20.1 (Fabric / Forge), 26.1.x (Fabric / NeoForge), and 26.2 (Fabric / NeoForge)** all share the same gameplay and content. See [Downloads, Installation & Feedback](install.html#ports).
 
 **Q: Where should I report a bug?**
 Visit the GitHub repository: <https://github.com/mryt233/Orients-Hotpot-Chronicles> and describe it clearly in Issues (or join **QQ group 248314791**; contact info is in [Downloads, Installation & Feedback](install.html#feedback)). Please specify: Minecraft version, mod version, how to reproduce it, and preferably screenshots.
@@ -81,10 +81,10 @@ Yes. Starting in 0.2.2-alpha, you can select this mod in the **Mods menu** (inst
 - On **multiplayer servers**, edit only the server file; players receive it when joining and after each reload.
 - A bad entry (not a number, out of range, or a misspelled key) falls back to its default with a warning; if the whole file is broken, all defaults are used and **the broken file is kept as-is** so you can fix it.
 - Change recipes with a data pack, then run vanilla `/reload`.
-- {{dev}}Pot-only cooking and rolling-pin pounding can also be changed with data packs (recipe types `pot_boiling` and `pounding`); add items to the item tag `orients_hotpot_chronicles:not_pot_ingredient` to keep them out of the pot.<!-- mryt233 改（2026-11-11） -->
-- {{dev}}After a reload, **ingredients already in the pot keep their cooking progress** and the remaining time is recalculated.
-- {{dev}}`cooking.items.<item>` only applies to this mod's own ingredients; vanilla and other mods' ingredients cook by their own recipes.
-- {{dev}}New configurable groups: **Pot Warmth** (`warmth.*`), **Cold-Pot Nausea** (`cold_pot.*`), **Cheers** (`cheers.*`), **Spicy Broth** (`spicy.*`), and **Loot Drop Chances** (`loot.*`). The first four take effect right after `/orientshotpot reload` (or saving in the settings screen); **after changing `loot.*`, you also need to run vanilla `/reload` (or restart the world/server)** so loot pools rebuild with the new chances.
+- {{since:0.3.0-alpha}}Pot-only cooking and rolling-pin pounding can also be changed with data packs (recipe types `pot_boiling` and `pounding`); add items to the item tag `orients_hotpot_chronicles:not_pot_ingredient` to keep them out of the pot.<!-- mryt233 改（2026-11-11） -->
+- {{since:0.3.0-alpha}}After a reload, **ingredients already in the pot keep their cooking progress** and the remaining time is recalculated.
+- {{since:0.3.0-alpha}}`cooking.items.<item>` only applies to this mod's own ingredients; vanilla and other mods' ingredients cook by their own recipes.
+- {{since:0.3.0-alpha}}New configurable groups: **Pot Warmth** (`warmth.*`), **Cold-Pot Nausea** (`cold_pot.*`), **Cheers** (`cheers.*`), **Spicy Broth** (`spicy.*`), and **Loot Drop Chances** (`loot.*`). The first four take effect right after `/orientshotpot reload` (or saving in the settings screen); **after changing `loot.*`, you also need to run vanilla `/reload` (or restart the world/server)** so loot pools rebuild with the new chances.
 - Numbers in this guide are defaults; if a server changed its config, the server's values apply.
 
 ### Using the settings screen {#screen}
@@ -92,19 +92,19 @@ Yes. Starting in 0.2.2-alpha, you can select this mod in the **Mods menu** (inst
 {{since:0.2.2-alpha}}The screen has two tabs, **Common** and **Advanced**, and opens on **Common**:
 
 - **Common** holds only the few things players change most — the **particle intensity** slider at the top (plus 0% / 50% / 100% shortcuts), then **coal-grade stove heat** (the master knob for how fast everything cooks), **fallback cook time**, and the **heat multiplier of spicy / clear / rich-stock broth**.
-- **Advanced** moves everything else into collapsible groups by category: cooking times, per-ingredient cooking times, broth heat speed, fuel grades, soup bowls, seasonings, drinks, and food nutrition{{dev}}, plus pot warmth, cold-pot nausea, cheers, spicy broth, and loot drop chances. Groups start collapsed; click a group title to expand it.
+- **Advanced** moves everything else into collapsible groups by category: cooking times, per-ingredient cooking times, broth heat speed, fuel grades, soup bowls, seasonings, drinks, and food nutrition{{since:0.3.0-alpha}}, plus pot warmth, cold-pot nausea, cheers, spicy broth, and loot drop chances. Groups start collapsed; click a group title to expand it.
 - **Changing values**: each row is `- value unit +`. One click steps once; **hold Shift to step by 10**. **Click the value box to type a number directly**; typing something that is not a number or out of range turns it **red and blocks saving**.
-- **Units**: time is shown in ticks (20 ticks = 1 second, with the seconds also shown when there is room), multipliers as ×, hunger and XP as points, effect levels as levels, {{dev}}and radius distance in blocks.
+- **Units**: time is shown in ticks (20 ticks = 1 second, with the seconds also shown when there is room), multipliers as ×, hunger and XP as points, effect levels as levels, {{since:0.3.0-alpha}}and radius distance in blocks.
 - **Per-row reset**: a **↺** appears on rows you changed, and resets only that entry. Unchanged rows do not show it.
 - **Reset everything**: the bottom Reset button turns into **click again to confirm**; a second click within 4 seconds really resets everything (and sets particle intensity back to 100%).
 - **Hints**: hover any row to see a plain-language explanation plus “range x–y, default z”.
 - Scroll with the **mouse wheel** or the scrollbar when the list is long. **Save & Apply** writes the config file and hot-reloads; ESC or Cancel discards every change (particle intensity goes back to its pre-screen value).
-- {{dev}}**Save failures**: if the config file cannot be written, the screen stays open and explains why — the changes apply only to this session, or were not applied and the original file was kept. If the original file is broken, it is backed up as `orients_hotpot_chronicles.json.broken-<time>` before saving and the backup name is shown; review it before closing.
+- {{since:0.3.0-alpha}}**Save failures**: if the config file cannot be written, the screen stays open and explains why — the changes apply only to this session, or were not applied and the original file was kept. If the original file is broken, it is backed up as `orients_hotpot_chronicles.json.broken-<time>` before saving and the backup name is shown; review it before closing.
 
 <!-- mryt233 改（2026-11-13，r148 第四批 4F-1～4F-3） -->
-## Adding broths and seasonings via data packs / add-on mods {{dev}} {#custom_soup_sauce}<!--清单#154-->
+## Adding broths and seasonings via data packs / add-on mods {{since:0.3.0-alpha}} {#custom_soup_sauce}<!--清单#154-->
 
-Starting in the unreleased dev build (0.3.0+), in addition to tweaking built-in config values and pot recipes, broths and seasonings can also be added or overridden via data packs or Java add-on mods:
+Starting in **0.3.0-alpha**, in addition to tweaking built-in config values and pot recipes, broths and seasonings can also be added or overridden via data packs or Java add-on mods:
 
 - **Data pack recipe paths and reload**: place `data/<namespace>/recipe/soup/<name>.json` (recipe type `orients_hotpot_chronicles:soup_base`) to add or override a broth, and `data/<namespace>/recipe/seasoning/<name>.json` (recipe type `orients_hotpot_chronicles:seasoning`) to add or override a seasoning; the registered ID strips the `soup/` or `seasoning/` prefix (e.g., `<namespace>:<name>`). Run `/reload` to hot-reload, and servers automatically sync these to multiplayer clients (hidden from the vanilla recipe book).
 - **Override priority**: data packs only need to specify the fields they want to adjust to override a built-in broth or seasoning; however, **built-in values explicitly modified by the player** in `config/orients_hotpot_chronicles.json` or the settings screen have the highest priority and are not overwritten by data packs (`config > data pack > code defaults`). Third-party namespace entries are defined solely by data packs or add-ons and do not read/write this mod's built-in config file.

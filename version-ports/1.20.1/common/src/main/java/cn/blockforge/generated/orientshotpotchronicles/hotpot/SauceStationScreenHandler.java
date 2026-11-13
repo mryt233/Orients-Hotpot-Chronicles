@@ -7,7 +7,6 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.core.BlockPos;
 
@@ -17,7 +16,8 @@ import net.minecraft.core.BlockPos;
  * 下面玩家背包。同步给客户端的数：前 9 个是每个碗已化开的份数，后 9 个是每个碗装的调料（序号 + 1，0 = 空碗）。
  * 网页预览 viewer/screens.js 的 sauceStation 与 client/SauceStationScreen 一一对应。
  * 作者：mryt233 */
-public class SauceStationScreenHandler extends AbstractContainerMenu {
+// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+public class SauceStationScreenHandler extends PlayerInventoryMenu {
     /** 9 个原料格排成 3×3，和台上的碗一一对应（第一行 = 最上层，从左到右；2026-10-23 用户要求）。 */
     public static final int GRID_X = 44;
     public static final int GRID_Y = 18;
@@ -48,8 +48,8 @@ public class SauceStationScreenHandler extends AbstractContainerMenu {
                 if (index < N) {
                     return be.portions(index);
                 }
-                Seasoning s = be.kind(index - N);
-                return s == null ? 0 : s.ordinal() + 1;
+                int kind = be.kindIndex(index - N);
+                return kind == -2 ? -1 : kind + 1;
             }
 
             @Override
@@ -82,14 +82,7 @@ public class SauceStationScreenHandler extends AbstractContainerMenu {
         for (int i = 0; i < N; i++) {
             addSlot(new RawSlot(raw, i, slotX(i), slotY(i)));
         }
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(playerInventory, col + row * 9 + 9, 8 + col * 18, INV_Y + row * 18));
-            }
-        }
-        for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(playerInventory, col, 8 + col * 18, HOTBAR_Y));
-        }
+        addPlayerInventory(playerInventory, 8, INV_Y, HOTBAR_Y);
         addDataSlots(data);
     }
 
@@ -100,12 +93,23 @@ public class SauceStationScreenHandler extends AbstractContainerMenu {
 
     /** 第 i 个碗装的调料；空碗返回 null。 */
     public Seasoning kind(int i) {
-        ItemStack stack = raw.getItem(i);
-        if (!stack.isEmpty()) {
-            return Seasoning.ofRaw(stack);
+        SeasoningDef def = kindDef(i);
+        return def == null ? null : def.legacy();
+    }
+
+    public boolean unknownKind(int i) { return data.get(N + i) == -1; }
+
+    public SeasoningDef kindDef(int i) {  // mryt233 改：兼容原有菜单公开签名；服务端委托给方块实体，客户端优先读已化开份数的同步索引。
+        if (station != null) {
+            return station.kindDef(i);
         }
+        if (unknownKind(i)) return null;
         int k = data.get(N + i);
-        return k > 0 && data.get(i) > 0 ? Seasoning.ALL[k - 1] : null;
+        if (data.get(i) > 0 && k > 0) {
+            return Seasonings.byIndex(k - 1);
+        }
+        ItemStack stack = raw.getItem(i);
+        return !stack.isEmpty() ? Seasonings.ofRaw(stack) : null;
     }
 
     @Override
@@ -116,28 +120,7 @@ public class SauceStationScreenHandler extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int slotId) {
-        Slot slot = slots.get(slotId);
-        if (!slot.hasItem()) {
-            return ItemStack.EMPTY;
-        }
-        ItemStack stack = slot.getItem();
-        ItemStack original = stack.copy();
-        if (slotId < N) {
-            if (!moveItemStackTo(stack, N, slots.size(), true)) {
-                return ItemStack.EMPTY;
-            }
-        } else {
-            // 先补装着同一种的碗，再放进空碗（insertItem 第二轮只放 canInsert 的格子）
-            if (Seasoning.ofRaw(stack) == null || !moveItemStackTo(stack, 0, N, false)) {
-                return ItemStack.EMPTY;
-            }
-        }
-        if (stack.isEmpty()) {
-            slot.set(ItemStack.EMPTY);
-        } else {
-            slot.setChanged();
-        }
-        return original;
+        return super.quickMoveStack(player, slotId);
     }
 
     @Override
@@ -154,9 +137,9 @@ public class SauceStationScreenHandler extends AbstractContainerMenu {
 
         @Override
         public boolean mayPlace(ItemStack stack) {
-            Seasoning s = Seasoning.ofRaw(stack);
-            Seasoning k = kind(getContainerSlot());
-            return s != null && (k == null || k == s);
+            SeasoningDef s = Seasonings.ofRaw(stack);
+            SeasoningDef k = kindDef(getContainerSlot());
+            return s != null && !unknownKind(getContainerSlot()) && (k == null || k == s);
         }
 
         @Override
@@ -164,4 +147,10 @@ public class SauceStationScreenHandler extends AbstractContainerMenu {
             return SauceStationBlockEntity.MAX_RAW;
         }
     }
+
+    @Override
+    protected int containerSlots() { return N; }
+
+    @Override
+    protected boolean acceptsQuickMove(ItemStack stack) { return Seasonings.ofRaw(stack) != null; }
 }

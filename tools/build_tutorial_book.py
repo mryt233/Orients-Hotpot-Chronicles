@@ -122,7 +122,12 @@ BOOK_UI = {   # 书本样式自己的界面文字（分类名、合成表分组�
         "入门": "Getting Started", "火锅": "Hotpot", "食材": "Ingredients", "蘸料": "Dipping Sauces", "餐具": "Tableware",
         "桌凳": "Tables & Seating", "查阅": "Reference", "开发版预览": "Development Preview", "关于": "About", "欢迎": "Welcome",
         "灶台与锅": "Stoves & Pots", "盘子": "Plates", "蘸料台": "Sauce Stations", "厨具与食材": "Kitchenware & Ingredients",
-        "切石机": "Stonecutter", "烹饪": "Cooking", "鸳鸯锅 / 田字锅": "Yuanyang / Four-Grid Pots", "香菜丸子": "Cilantro Meatballs",
+        "切石机": "Stonecutter", "切石机 / 砧板": "Stonecutter / Cutting Board", "切石机或砧板（铁菜刀）": "Stonecutter or board + iron knife",
+        "切石机 1 次／砧板 3 刀": "1× stonecutter / 3 cuts on board",
+        "擀面杖捣制": "Rolling Pin Pounding", "砧板上用擀面杖捣 %d 下": "Pound %d× on board with rolling pin",
+        "锅中专煮": "Pot-Only Boiling", "仅锅中涮煮": "Hotpot only", "仅锅中涮煮 · %s %s": "Hotpot only · %s %s",
+        "仅锅中 · 再煮 %s %s碎裂": "Hotpot only · +%s %s overcooks", "仅锅中 · 久煮碎裂": "Hotpot only · breaks if overcooked",
+        "烹饪": "Cooking", "鸳鸯锅 / 田字锅": "Yuanyang / Four-Grid Pots", "香菜丸子": "Cilantro Meatballs",
         "熔炉": "Furnace", "烟熏炉": "Smoker", "营火": "Campfire", "秒": "s", "生 → 熟": "Raw → Cooked", "种": "types",
         "物品图鉴": "Item Catalog", "更新日志": "Changelog", "本章目录": "In this chapter",
         "点下面的条目直接翻过去；也可以点书顶的书签，或者点右下角的三角一页页往后翻。":
@@ -148,7 +153,12 @@ BOOK_UI = {   # 书本样式自己的界面文字（分类名、合成表分组�
         "入门": "入門", "火锅": "火鍋", "食材": "食材", "蘸料": "沾醬", "餐具": "餐具", "桌凳": "桌凳", "查阅": "查閱",
         "开发版预览": "開發版預覽", "关于": "關於", "欢迎": "歡迎",
         "灶台与锅": "灶台與鍋具", "盘子": "盤子", "蘸料台": "醬料台", "厨具与食材": "廚具與食材",
-        "切石机": "切石機", "烹饪": "烹調", "鸳鸯锅 / 田字锅": "鴛鴦鍋／田字鍋", "香菜丸子": "香菜丸子",
+        "切石机": "切石機", "切石机 / 砧板": "切石機／砧板", "切石机或砧板（铁菜刀）": "切石機或砧板（鐵菜刀）",
+        "切石机 1 次／砧板 3 刀": "切石機 1 次／砧板 3 刀",
+        "擀面杖捣制": "擀麵棍搗製", "砧板上用擀面杖捣 %d 下": "砧板上用擀麵棍搗 %d 下",
+        "锅中专煮": "鍋中專煮", "仅锅中涮煮": "僅鍋中涮煮", "仅锅中涮煮 · %s %s": "僅鍋中涮煮 · %s %s",
+        "仅锅中 · 再煮 %s %s碎裂": "僅鍋中 · 再煮 %s %s碎裂", "仅锅中 · 久煮碎裂": "僅鍋中 · 久煮碎裂",
+        "烹饪": "烹調", "鸳鸯锅 / 田字锅": "鴛鴦鍋／田字鍋", "香菜丸子": "香菜丸子",
         "熔炉": "熔爐", "烟熏炉": "煙燻爐", "营火": "營火", "秒": "秒", "生 → 熟": "生 → 熟", "种": "種",
         "物品图鉴": "物品圖鑑", "更新日志": "更新日誌", "本章目录": "本章目錄",
         "点下面的条目直接翻过去；也可以点书顶的书签，或者点右下角的三角一页页往后翻。":
@@ -239,7 +249,9 @@ def set_lang(lang):
                 if k.startswith(("item." + bt.MOD + ".", "block." + bt.MOD + ".")) and "." not in k.split(".", 2)[2]}
     if lang == "en":
         bt.VZ = {k: k.split(":")[1].replace("_", " ").title() for k in _ORIG["VZ"]}
-        bt.VZ.update({"minecraft:beef": "Raw Beef", "minecraft:mutton": "Raw Mutton", "minecraft:quartz": "Nether Quartz"})
+        bt.VZ.update({"minecraft:beef": "Raw Beef", "minecraft:mutton": "Raw Mutton",
+                      "minecraft:porkchop": "Raw Porkchop", "minecraft:cod": "Raw Cod",
+                      "minecraft:salmon": "Raw Salmon", "minecraft:quartz": "Nether Quartz"})
         bt.TAG_ICON["minecraft:logs"] = ("minecraft:oak_log", "Any Log")
     else:
         bt.VZ = json.load(open(os.path.join(TUT, "data", "vanilla_zh_tw.json"), encoding="utf-8"))
@@ -356,8 +368,8 @@ def embed_imgs(body):
 
 
 # ---------------- 合成表大全（同一类的配方合成一张卡，材料自动轮换，点材料看做出来的东西） ----------------
-BASE_RES = bt.RES   # mryt233 改，2026-11-08：0.2.2-alpha 正式版 = 当前主工程
-BASE_VERSION = "0.2.2-alpha"
+BASE_RES = bt.RES   # mryt233 改，2026-11-13：0.3.0-alpha 正式版 = 当前主工程
+BASE_VERSION = "0.3.0-alpha"
 VARIANT_PREFIXES = sorted(bt.WOODS + ["quartz", "bamboo", "terracotta", "copper", "iron", "cut_copper", "smooth_stone",
                                       "polished_andesite", "polished_blackstone", "polished_deepslate", "polished_diorite", "polished_granite"],
                           key=len, reverse=True)
@@ -380,20 +392,33 @@ def nm(i):
     return NAMES_EXTRA.get(fid, n) if n == fid.split(":")[1] else n
 
 
+# mryt233 改（2026-11-13）：合成表同时扫描捣制（pounding）与锅中专煮（pot_boiling）子目录配方。
+RECIPE_SUBDIRS = ("", "pounding", "pot_boiling")
+
+
+def _scan_recipes(root):
+    out = {}
+    for sub in RECIPE_SUBDIRS:
+        folder = os.path.join(root, sub) if sub else root
+        for f in sorted(glob.glob(os.path.join(folder, "*.json"))):
+            name = os.path.basename(f)[:-5]
+            key = "%s/%s" % (sub, name) if sub else name
+            out[key] = json.load(open(f, encoding="utf-8"))
+    return out
+
+
 def load_recipes_all():
     """配方 = 已发布版的全部配方 + 开发版新加的（标「开发版预览」）；0.2.0-alpha 起已发布版就是主工程。"""
     out = []
     base_dir = os.path.join(BASE_RES, "data", bt.MOD, "recipe")
-    base = {os.path.basename(f)[:-5]: json.load(open(f, encoding="utf-8")) for f in sorted(glob.glob(os.path.join(base_dir, "*.json")))}
+    base = _scan_recipes(base_dir)
     if not base:
         bt.warnings.append("找不到已发布版的配方（%s），全部按开发版算" % base_dir)
     for k, r in base.items():
         out.append((k, r, False))
-    cur_dir = bt.RECIPES
-    for f in sorted(glob.glob(os.path.join(cur_dir, "*.json"))):
-        k = os.path.basename(f)[:-5]
+    for k, r in _scan_recipes(bt.RECIPES).items():
         if k not in base:
-            out.append((k, json.load(open(f, encoding="utf-8")), bool(base)))
+            out.append((k, r, bool(base)))
     return out
 
 
@@ -476,7 +501,8 @@ def recipe_book_entries():
     """合成表大全的条目：每段几张轮换卡片，返回 [(标题, 图标, html)]。"""
     load_base_names()
     groups = {}
-    cooking, cutting = [], []
+    cooking, cutting, pounding, boiling = [], [], [], []
+    multi_cut = {"%s:potato_slice" % bt.MOD, "%s:lotus_root_slice" % bt.MOD}
     for k, r, dev in load_recipes_all():
         t = r["type"].split(":")[1]
         if t in ("smelting", "smoking", "campfire_cooking"):
@@ -485,7 +511,28 @@ def recipe_book_entries():
         rid = bt.result_id(r)
         if t == "stonecutting":
             src = ref_key(bt.ing_ref(r["ingredient"]))
-            cutting.append({"cells": [src], "out": ikey(rid) + [bt.result_count(r)], "dev": dev, "mat": src})
+            note = L("切石机 1 次／砧板 3 刀") if rid in multi_cut else L("切石机或砧板（铁菜刀）")
+            cutting.append({"cells": [src], "out": ikey(rid) + [bt.result_count(r)], "dev": dev, "mat": src, "note": note})
+            continue
+        if t == "pounding":
+            src = ref_key(bt.ing_ref(r["ingredient"]))
+            hits = r.get("hits", 3)
+            pounding.append({"cells": [src], "out": ikey(rid) + [bt.result_count(r)], "dev": dev, "mat": src,
+                             "note": L("砧板上用擀面杖捣 %d 下") % hits})
+            continue
+        if t == "pot_boiling":
+            src = ref_key(bt.ing_ref(r["ingredient"]))
+            ticks = r.get("cook_ticks")
+            note = L("仅锅中涮煮 · %s %s") % ("%g" % round(ticks / 20, 2), L("秒")) if ticks else L("仅锅中涮煮")
+            boiling.append({"cells": [src], "out": ikey(rid) + [bt.result_count(r)], "dev": dev, "mat": src, "note": note})
+            over = r.get("overcook_result")
+            if isinstance(over, dict) and (over.get("id") or over.get("item")):
+                oid = bt.full_id(over.get("id") or over.get("item"))
+                extra = max(0, r.get("overcook_ticks", 0) - (ticks or 0))
+                onote = (L("仅锅中 · 再煮 %s %s碎裂") % ("%g" % round(extra / 20, 2), L("秒"))) if extra else L("仅锅中 · 久煮碎裂")
+                cooked_in = ikey(rid)
+                boiling.append({"cells": [cooked_in], "out": ikey(oid) + [over.get("count", 1)], "dev": dev,
+                                "mat": cooked_in, "note": onote})
             continue
         # mryt233 改（2026-11-09，r146b）：布围裙换款配方（apron_recolor）字段是 apron / dye，
         # 当成「两格无序」进合成表大全的「厨具与食材」段。
@@ -528,7 +575,14 @@ def recipe_book_entries():
         if cards:
             sections.append((L(title), icon, cards))
     if cutting:
-        sections.append((L("切石机"), "minecraft:stonecutter", [{"title": count_title(L("切石机"), len(cutting)), "kind": "cut", "v": cutting}]))
+        sections.append((L("切石机 / 砧板"), "minecraft:stonecutter",
+                         [{"title": count_title(L("切石机 / 砧板"), len(cutting)), "kind": "cut", "v": cutting}]))
+    if pounding:
+        sections.append((L("擀面杖捣制"), "rolling_pin",
+                         [{"title": count_title(L("擀面杖捣制"), len(pounding)), "kind": "cut", "v": pounding}]))
+    if boiling:
+        sections.append((L("锅中专煮"), "iron_nine_grid_hotpot",
+                         [{"title": count_title(L("锅中专煮"), len(boiling)), "kind": "cut", "v": boiling}]))
     cook = {}
     for k, r, dev in cooking:
         raw = bt.ing_ref(r["ingredient"])[0]

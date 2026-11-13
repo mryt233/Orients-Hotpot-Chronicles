@@ -1,0 +1,16 @@
+{
+  "orient_framework.config.json_invalid": "設定檔不是有效的 JSON，全部使用預設值；原檔案保留",
+  "orient_framework.config.root_not_object": "設定檔最外層必須是物件，全部使用預設值；原檔案保留",
+  "orient_framework.config.format_unsupported": "不支援的設定格式版本，全部使用預設值；原檔案保留",
+  "orient_framework.config.format_invalid": "設定格式版本無效，全部使用預設值；原檔案保留",
+  "orient_framework.config.unknown_key": "無法辨識的設定項目 %s，已忽略",
+  "orient_framework.config.not_object": "%s 必須是物件，已保留預設值",
+  "orient_framework.config.not_number": "%s 必須是數字，已改回預設值",
+  "orient_framework.config.not_integer": "%s 必須是整數，已改回預設值",
+  "orient_framework.config.out_of_range": "%s 必須介於 %s～%s 之間，已改回預設值",
+  "orient_framework.config.too_large": "設定檔太大，全部使用預設值；原檔案保留",
+  "orient_framework.config.read_failed": "讀取設定失敗（%s），全部使用預設值；原檔案保留",
+  "orient_framework.config.write_failed": "寫入設定失敗（%s），原檔案保留",
+  "orient_framework.disconnect.protocol": "Orient 框架網路協定不一致（伺服器 %s，用戶端 %s）。請安裝與伺服器相同版本的模組。",
+  "orient_framework.disconnect.missing_channels": "伺服器需要的網路通道你的用戶端沒有：%s。請安裝與伺服器相同版本的模組。"
+}

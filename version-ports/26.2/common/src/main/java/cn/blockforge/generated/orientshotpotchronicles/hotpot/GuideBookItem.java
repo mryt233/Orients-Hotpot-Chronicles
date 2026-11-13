@@ -1,11 +1,12 @@
-// mryt233 改：26.1 原版 API。
+// mryt233 改：26.2 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 
 /**
@@ -25,6 +26,6 @@ public class GuideBookItem extends Item {
         if (world.isClientSide()) {
             clientOpen.run();
         }
-        return InteractionResult.SUCCESS;
+        return Use.itemUse(UseOutcome.SUCCESS_SOFT, user.getItemInHand(hand), world.isClientSide());
     }
 }

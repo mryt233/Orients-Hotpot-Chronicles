@@ -7,7 +7,7 @@ package cn.blockforge.generated.orientshotpotchronicles.hotpot;
  * <p>
  * <b>不要往这里再加枚举常量</b>（mryt233，2026-11-05）：{@link HotPotContent} 用 {@code PlateSize.values()} 循环
  * 给每种材质注册一盘一盘，枚举里多一个值就会多注册一件本不该存在的盘子。桌面上那双垫着迷你筷架的竹筷
- * （{@link ChopstickRestBlock}）因此直接复用 {@link #S1X1} 的 5×5 占地，不占用枚举。
+ * （{@link ChopstickRestBlock}）只借 {@link #S1X1} 容量；mryt233 改（r146e）：占地独立覆盖，不增加枚举。
  */
 public enum PlateSize {
     S1X1("1x1", "small_dish", 1, 1, 5, 5),

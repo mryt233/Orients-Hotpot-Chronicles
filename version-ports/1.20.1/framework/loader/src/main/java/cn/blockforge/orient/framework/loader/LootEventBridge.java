@@ -1,7 +1,8 @@
 package cn.blockforge.orient.framework.loader;
 
-import net.minecraft.core.HolderLookup;
-import net.minecraft.resources.ResourceKey;
+// mryt233 改（2026-11-10）：第三批 3C 补充平台能力。
+
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.List;
@@ -15,7 +16,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public final class LootEventBridge {
     @FunctionalInterface
     public interface Modification {
-        void apply(net.minecraft.resources.ResourceLocation key, LootTable.Builder builder, boolean builtin);
+        void apply(ResourceLocation key, LootTable.Builder builder, boolean builtin);
+    }
+
+    private volatile boolean platformManaged;
+
+    /** 平台安装加载器事件后标记；旧内容侧接线据此跳过通用消费段。 */
+    public boolean isPlatformManaged() {
+        return platformManaged;
+    }
+
+    public void markPlatformManaged() {
+        platformManaged = true;
     }
 
     private final List<Modification> modifications = new CopyOnWriteArrayList<>();

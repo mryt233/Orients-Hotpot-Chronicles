@@ -13,6 +13,12 @@ public final class NeoForgeRegProbe {
     private NeoForgeRegProbe() {
     }
 
+    /** mryt233 改（2026-11-10）：入口只反射调用这一处，生产代码不直接引用探针类型。 */
+    public static void register(net.neoforged.bus.api.IEventBus bus) {
+        constructorProbe();
+        bus.addListener(NeoForgeRegProbe::onRegisterEvent);
+    }
+
     /** 构造期（注册表冻结窗口之前）尝试注册：预期抛异常。 */
     public static void constructorProbe() {
         RegProbe.log("neoforge phase=constructor");
@@ -43,8 +49,7 @@ public final class NeoForgeRegProbe {
         }
         if (event.getRegistryKey().equals(Registries.BLOCK_ENTITY_TYPE)) {
             RegProbe.beType = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, RegProbe.BE_ID,
-                net.minecraft.world.level.block.entity.BlockEntityType.Builder
-                    .of(RegProbe.ProbeBE::new, RegProbe.block).build(null));
+                new net.minecraft.world.level.block.entity.BlockEntityType<>(RegProbe.ProbeBE::new, RegProbe.block));
             RegProbe.log("neoforge be registered in BLOCK_ENTITY_TYPE window");
         }
         if (event.getRegistryKey().equals(Registries.ITEM)) {

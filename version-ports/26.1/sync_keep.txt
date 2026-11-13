@@ -1,0 +1,65 @@
+# 26.1 / 26.2 保留清单：主工程有、但移植版特意改过、同步时不能覆盖的文件。
+# 格式：目标相对路径（相对 common/src/main/resources）两个空格 # 原因。作者：mryt233
+
+# ---- 长凳：主工程用 builtin/entity 由 BEWLR 画桌腿，26.x 没有 builtin/entity，
+# 移植版另写了方块几何补桌腿，模型内容与主工程不同（3 个部位 x 11 种木头 = 33 个文件）。
+# 长凳中段（<木头>_bench_middle.json）主工程与移植版内容一致、只差换行，不在清单里：
+# 同步时会按移植版原来的换行写，不会被改动。
+assets/orients_hotpot_chronicles/models/block/oak_bench.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/oak_bench_left.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/oak_bench_right.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/spruce_bench.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/spruce_bench_left.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/spruce_bench_right.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/birch_bench.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/birch_bench_left.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/birch_bench_right.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/jungle_bench.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/jungle_bench_left.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/jungle_bench_right.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/acacia_bench.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/acacia_bench_left.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/acacia_bench_right.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/dark_oak_bench.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/dark_oak_bench_left.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/dark_oak_bench_right.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/mangrove_bench.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/mangrove_bench_left.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/mangrove_bench_right.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/cherry_bench.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/cherry_bench_left.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/cherry_bench_right.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/bamboo_bench.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/bamboo_bench_left.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/bamboo_bench_right.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/crimson_bench.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/crimson_bench_left.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/crimson_bench_right.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/warped_bench.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/warped_bench_left.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+assets/orients_hotpot_chronicles/models/block/warped_bench_right.json  # 移植版特意补的长凳桌腿几何，主工程靠 builtin/entity 渲染、26.x 没这条路
+
+# ---- 长凳物品模型：移植版把 parent 从 minecraft:builtin/entity 改成自己的方块模型，
+# 物品定义才能用普通 minecraft:model。
+assets/orients_hotpot_chronicles/models/item/oak_bench.json  # 移植版把长凳物品模型改挂同族方块模型，不再走 builtin/entity
+assets/orients_hotpot_chronicles/models/item/spruce_bench.json  # 移植版把长凳物品模型改挂同族方块模型，不再走 builtin/entity
+assets/orients_hotpot_chronicles/models/item/birch_bench.json  # 移植版把长凳物品模型改挂同族方块模型，不再走 builtin/entity
+assets/orients_hotpot_chronicles/models/item/jungle_bench.json  # 移植版把长凳物品模型改挂同族方块模型，不再走 builtin/entity
+assets/orients_hotpot_chronicles/models/item/acacia_bench.json  # 移植版把长凳物品模型改挂同族方块模型，不再走 builtin/entity
+assets/orients_hotpot_chronicles/models/item/dark_oak_bench.json  # 移植版把长凳物品模型改挂同族方块模型，不再走 builtin/entity
+assets/orients_hotpot_chronicles/models/item/mangrove_bench.json  # 移植版把长凳物品模型改挂同族方块模型，不再走 builtin/entity
+assets/orients_hotpot_chronicles/models/item/cherry_bench.json  # 移植版把长凳物品模型改挂同族方块模型，不再走 builtin/entity
+assets/orients_hotpot_chronicles/models/item/bamboo_bench.json  # 移植版把长凳物品模型改挂同族方块模型，不再走 builtin/entity
+assets/orients_hotpot_chronicles/models/item/crimson_bench.json  # 移植版把长凳物品模型改挂同族方块模型，不再走 builtin/entity
+assets/orients_hotpot_chronicles/models/item/warped_bench.json  # 移植版把长凳物品模型改挂同族方块模型，不再走 builtin/entity
+
+# ---- 铁菜刀：主工程在 0.2.2-alpha 之后又改过朝向和贴图，移植版跟的是主工程工作树，
+# 拿标签当底本会把它改回旧版。
+
+# ---- mixin 配置：26.x 的 mixin 条目（FoodConsumeMixin、TableDecorModelOffsetMixin）和
+# 主工程对不上，属于各版本自己的适配，不是资源转换规则能处理的。
+orients_hotpot_chronicles.mixins.json  # 26.x 的 mixin 条目与主工程不同，不能照主工程覆盖
+
+# ---- 26.x 独有的围裙修补标签：主工程没有这个文件（主工程走附魔 / 配方），
+# 属于 26.x 自己加的 data，清单里列出来是为了验收时不被当成「多出」。
+data/orients_hotpot_chronicles/tags/item/cloth_apron_repair.json  # 26.x 独有的围裙修补标签，主工程没有对应文件

@@ -1,5 +1,8 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+// mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import net.minecraft.resources.ResourceKey;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -49,10 +52,19 @@ public final class ClothApronProtection {
     private static final long HEAT_CACHE_TICKS = 2L;
 
     /** 一次热源判定的结果（哪一刻、哪个方块位置、热不热）。 */
-    private record HeatStamp(long gameTime, BlockPos pos, boolean hot) {
+    private record HeatStamp(long gameTime, ResourceKey<Level> dimension, BlockPos pos, boolean hot) {
     }
 
     private static final Map<UUID, HeatStamp> HEAT_CACHE = new ConcurrentHashMap<>();
+
+    /** mryt233 改（2026-11-10）：玩家下线、客户端退服和服务端停止时释放缓存。 */
+    public static void removePlayer(UUID player) {
+        HEAT_CACHE.remove(player);
+    }
+
+    public static void clearCache() {
+        HEAT_CACHE.clear();
+    }
 
     /** 成就「整装掌勺」的检查间隔（刻）：以前每 tick 都查一次成就表。 */
     private static final int CRITERION_INTERVAL = 20;
@@ -135,11 +147,14 @@ public final class ClothApronProtection {
         long now = world.getGameTime();
         BlockPos pos = player.blockPosition();
         HeatStamp stamp = HEAT_CACHE.get(player.getUUID());
-        if (stamp != null && now - stamp.gameTime() <= HEAT_CACHE_TICKS && stamp.pos().equals(pos)) {
+        // mryt233 改（2026-11-10）：跨维度和时间回退都必须重新检查。
+        long elapsed = stamp == null ? -1 : now - stamp.gameTime();
+        if (stamp != null && elapsed >= 0 && elapsed <= HEAT_CACHE_TICKS
+            && stamp.dimension().equals(world.dimension()) && stamp.pos().equals(pos)) {
             return stamp.hot();
         }
         boolean hot = nearHeat(world, pos);
-        HEAT_CACHE.put(player.getUUID(), new HeatStamp(now, pos.immutable(), hot));
+        HEAT_CACHE.put(player.getUUID(), new HeatStamp(now, world.dimension(), pos.immutable(), hot));
         return hot;
     }
 
@@ -185,7 +200,8 @@ public final class ClothApronProtection {
     /** 护甲槽里的布围裙掉一点耐久（穿久了总会沾油；挡下烫伤、灭火苗时都会磨损）。 */
     public static void wear(Player player, int amount) {
         ItemStack chest = player.getItemBySlot(EquipmentSlot.CHEST);
-        if (chest.getItem() instanceof ClothApronItem) {
+        // mryt233 改（2026-11-09，r146b）：三款都认（标签判断）
+        if (ClothApronItem.isApron(chest)) {
             chest.hurtAndBreak(amount, player, EquipmentSlot.CHEST);
         }
     }

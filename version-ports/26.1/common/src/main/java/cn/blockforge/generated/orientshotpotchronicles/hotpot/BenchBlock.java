@@ -1,6 +1,8 @@
-// mryt233 改：26.1 原版 API。
+// mryt233 改：26.1 原版 API；合入 Use 适配。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -378,7 +380,7 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
                     if (!stackSpotFree(world, target, player)) {
                         player.sendOverlayMessage(
                             Component.translatable(HotPotBlockEntity.key("msg.seat_taken")));
-                        return InteractionResult.FAIL;
+                        return Use.blockItem(UseOutcome.FAIL, world.isClientSide());
                     }
                     BlockState placed = heldBench.placementStateAt(world, target, player.getDirection());
                     world.setBlock(target, placed, Block.UPDATE_ALL);
@@ -390,12 +392,12 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
                     }
                     HotPotCriterion.fire(player, "tall_stool");
                 }
-                return InteractionResult.SUCCESS;
+                return Use.blockItem(UseOutcome.SUCCESS_SOFT, world.isClientSide());
             }
         }
-        return stack.getItem() instanceof BlockItem
-            ? InteractionResult.PASS
-            : InteractionResult.TRY_WITH_EMPTY_HAND;
+        return Use.blockItem(stack.getItem() instanceof BlockItem
+            ? UseOutcome.SKIPPED
+            : UseOutcome.PASS_TO_EMPTY, world.isClientSide());
     }
 
     /**
@@ -454,14 +456,14 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
     protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player,
                                                BlockHitResult hit) {
         if (player.isShiftKeyDown() || player.isPassenger()) {
-            return InteractionResult.PASS;
+            return Use.blockEmpty(UseOutcome.PASS, world.isClientSide());
         }
         // 凳塔中间那几层（头顶还叠着另一张条凳）不坐人，只坐最顶上或单张条凳
         if (this.tall && isTallBench(world.getBlockState(pos.above()))) {
-            return InteractionResult.PASS;
+            return Use.blockEmpty(UseOutcome.PASS, world.isClientSide());
         }
         if (world.isClientSide()) {
-            return InteractionResult.SUCCESS;
+            return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide());
         }
         Direction facing = state.getValue(FACING);
         Direction right = leftOf(facing).getOpposite();
@@ -481,11 +483,11 @@ public class BenchBlock extends Block implements net.minecraft.world.level.block
             Vec3 at = seatPos(seat);
             if (!occupied(world, at)) {
                 sit(world, player, seat, at, facing);
-                return InteractionResult.SUCCESS;
+                return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide());
             }
         }
         player.sendOverlayMessage(Component.translatable(HotPotBlockEntity.key("msg.seat_taken")));
-        return InteractionResult.SUCCESS;
+        return Use.blockEmpty(UseOutcome.SUCCESS, world.isClientSide());
     }
 
     /** 座位点：一格中间，或两格中心的中点（交界处），高度在凳面上。 */

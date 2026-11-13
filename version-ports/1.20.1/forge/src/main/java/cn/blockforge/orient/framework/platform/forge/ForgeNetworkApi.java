@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 
 /** 每个原有包 ID 使用独立 SimpleChannel，协议不匹配拒绝连接。作者：mryt233 */
 public final class ForgeNetworkApi implements NetworkApi {
-    private static final int VERSION = 1;
+    private static final int VERSION = PROTOCOL_VERSION;
     private record Registration<T extends CustomPacketPayload>(CustomPacketPayload.Type<T> type,
             StreamCodec<? super RegistryFriendlyByteBuf, T> codec, PayloadHandler<T> handler,
             boolean toClient, ProtocolPolicy policy) { }
