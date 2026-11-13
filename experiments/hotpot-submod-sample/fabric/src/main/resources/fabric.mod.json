@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "hotpotsubmod",
+  "version": "${version}",
+  "name": "Hotpot Submod Sample",
+  "authors": ["mryt233"],
+  "description": "Minimal Java submod demonstrating Soups, Seasonings, SoupBowlItem, and TableItem/TableBlock registration.",
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "cn.blockforge.sample.hotpotsubmod.fabric.FabricSubmod"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "1.21.1",
+    "java": ">=21",
+    "fabric-api": "*",
+    "orients_hotpot_chronicles": ">=1.0.0-r148",
+    "orient_framework": ">=0.2.0 <0.3.0"
+  }
+}

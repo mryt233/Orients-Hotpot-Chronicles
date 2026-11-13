@@ -107,7 +107,7 @@
 
 - **数据包配方路径与重载**：在数据包中放置 `data/<命名空间>/recipe/soup/<名称>.json`（配方类型 `orients_hotpot_chronicles:soup_base`）可新增或覆盖汤底，放置 `data/<命名空间>/recipe/seasoning/<名称>.json`（配方类型 `orients_hotpot_chronicles:seasoning`）可新增或覆盖蘸料；最终登记 ID 会自动剥去 `soup/` 或 `seasoning/` 目录前缀（例如 `<命名空间>:<名称>`）。保存后执行 `/reload` 即可热重载，联机时服务端会自动同步到客户端（不列入原版配方书）。
 - **覆盖优先级**：数据包只需填写要调整的部分字段就能覆盖内置汤底或蘸料；但玩家在 `config/orients_hotpot_chronicles.json` 或设置界面中**显式修改过的内置数值**优先级最高，不会被数据包覆盖（配置 > 数据包 > 代码默认）。第三方命名空间条目只由数据包或子模组定义，不读写本模组内置配置文件。
-- **通用汤碗与外观着色**：子模组可为新增汤底提供专属碗物品与汤面贴图（`assets/<ns>/textures/block/hot_pot_top_<path>[_boiling].png`）；没有专属碗物品的汤底盛出时会装入通用汤碗 `orients_hotpot_chronicles:soup_bowl`，通过 `orients_hotpot_chronicles:soup` 数据组件记录汤底 ID 并继承对应效果。纯 JSON 数据包无需额外贴图，锅面会按 `screen_colors.base`、沸腾气泡按 `bubble_colors.body` 着色渲染清汤基底；若之后移除数据包或子模组，已有方块和碗中的原始 ID 数据会保留，界面与汤面显示为未知占位。
+- **通用汤碗与外观着色**：子模组可为新增汤底提供专属碗物品与汤面贴图（`assets/<ns>/textures/block/hot_pot_top_<path>[_boiling].png`）；没有专属碗物品的汤底盛出时会装入{{i:soup_bowl}}通用汤碗 `orients_hotpot_chronicles:soup_bowl`，通过 `orients_hotpot_chronicles:soup` 数据组件记录汤底 ID 并继承对应效果。纯 JSON 数据包无需额外贴图，锅面会按 `screen_colors.base`、沸腾气泡按 `bubble_colors.body` 着色渲染清汤基底；若之后移除数据包或子模组，已有方块和碗中的原始 ID 数据会保留，界面与汤面显示为未知占位。
 - **子模组 Java 登记**：附属模组可在启动注册冻结前调用 `Soups.register(...)` 与 `Seasonings.register(...)` 注册条目，详细字段与格式见仓库内的 `mod/docs/开放登记说明.md`（`mod/content/materials.json` 仅作本模组内置材质与内置汤底静态生成器的唯一事实来源，无需修改）。
 
 ## 实用指令

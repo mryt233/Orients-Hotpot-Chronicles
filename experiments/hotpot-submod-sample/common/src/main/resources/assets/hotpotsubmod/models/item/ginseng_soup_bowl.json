@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "hotpotsubmod:item/ginseng_soup_bowl"
+  }
+}

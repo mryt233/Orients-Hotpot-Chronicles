@@ -82,6 +82,12 @@ experiments/*
 !experiments/runtime-src/
 !experiments/server-fabric/
 !experiments/server-neoforge/
+!experiments/hotpot-submod-sample/
+experiments/hotpot-submod-sample/fabric/run*/
+experiments/hotpot-submod-sample/neoforge/run*/
+experiments/hotpot-submod-sample/fabric/.fabric/
+experiments/hotpot-submod-sample/**/build/
+experiments/hotpot-submod-sample/.gradle/
 experiments/harness-*/*
 !experiments/harness-*/build.gradle
 !experiments/harness-*/settings.gradle

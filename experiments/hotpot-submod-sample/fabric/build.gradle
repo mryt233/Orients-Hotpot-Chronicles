@@ -1,0 +1,44 @@
+// 作者：mryt233：第四批 4L-1 最小 Java 测试子模组（Fabric 入口）。
+plugins {
+    id 'dev.architectury.loom' version '1.10.455'
+}
+
+version = '1.0.0'
+group = 'cn.blockforge.sample'
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+base {
+    archivesName = 'hotpot-submod-sample-fabric'
+}
+
+sourceSets {
+    main {
+        java.srcDir '../common/src/main/java'
+        resources.srcDir '../common/src/main/resources'
+    }
+}
+
+dependencies {
+    minecraft 'com.mojang:minecraft:1.21.1'
+    mappings loom.officialMojangMappings()
+    modImplementation 'net.fabricmc:fabric-loader:0.19.3'
+    modImplementation 'net.fabricmc.fabric-api:fabric-api:0.116.14+1.21.1'
+
+    compileOnly files(
+        '../../../common/build/classes/java/main',
+        '../../../common/build/classes/java/client',
+        '../../../fabric/build/classes/java/main',
+        '../../../framework/pure/build/classes/java/main',
+        '../../../framework/loader/build/classes/java/main',
+        '../../../framework/game/build/classes/java/main',
+        '../../../framework/client/build/classes/java/main'
+    )
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') {
+        expand version: project.version
+    }
+}

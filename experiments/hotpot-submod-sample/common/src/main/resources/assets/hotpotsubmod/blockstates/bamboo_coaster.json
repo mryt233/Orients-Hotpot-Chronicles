@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "axis=x": { "model": "hotpotsubmod:block/bamboo_coaster" },
+    "axis=z": { "model": "hotpotsubmod:block/bamboo_coaster", "y": 90 }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "itemGroup.hotpotsubmod": "火锅子模组示例",
+  "block.hotpotsubmod.bamboo_coaster": "竹编茶垫",
+  "item.hotpotsubmod.bamboo_coaster": "竹编茶垫",
+  "item.hotpotsubmod.ginseng_soup_bowl": "人参汤碗",
+  "text.hotpotsubmod.soup.ginseng_broth": "人参清炖汤底",
+  "text.hotpotsubmod.seasoning.yuzu_dip": "柚子醋蘸料",
+  "text.hotpotsubmod.seasoning.yuzu_dip.effect": "迅捷 10 秒，额外回 1 鸡腿，解除缓慢",
+  "text.packtest.soup.corn_broth": "甜玉米汤底",
+  "text.packtest.seasoning.plum_sauce": "酸梅蘸料",
+  "text.packtest.seasoning.plum_sauce.effect": "跳跃提升 II 12 秒，额外回半个鸡腿"
+}

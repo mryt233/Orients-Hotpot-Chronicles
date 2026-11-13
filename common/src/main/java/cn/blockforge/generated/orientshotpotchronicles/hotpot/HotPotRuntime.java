@@ -50,6 +50,8 @@ public final class HotPotRuntime {
         Config.rememberGarnishLoot("greens", 0.15F);
         Config.rememberGarnishLoot("zhe_er_gen", 0.15F);
         var platform = Framework.platform();
+        // mryt233 改（2026-11-13）：客户端联机不触发 onServerStarting，须在安装期注入模组加载判定，否则 JEI/REI 避让区域判断失效。
+        HotPotCompat.install(platform::isModLoaded);
         Config.init(platform.configDir(), platform.isDedicatedServer());
         Config.saveDefaultsIfNeeded();
         HotPotNetwork.register();
@@ -57,7 +59,6 @@ public final class HotPotRuntime {
         // 兼容模块按 ID 查询第三方物品：统一等到全部注册完成、冻结之前，只初始化一次。
         events.onServerStarting(server -> {
             if (!compatInitialized) {
-                HotPotCompat.install(platform::isModLoaded);
                 CompatRegistry.init();
                 compatInitialized = true;
             }

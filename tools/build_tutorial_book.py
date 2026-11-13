@@ -234,8 +234,9 @@ def set_lang(lang):
     T.update(BOOK_UI[lang])
     bt.CONTENT = os.path.join(TUT, folder)
     names = json.load(open(os.path.join(bt.RES, "assets", bt.MOD, "lang", lang_file), encoding="utf-8"))
+    # mryt233 改：忽略物品语言子键（如 soup_bowl.named / soup_bowl.unknown）
     bt.NAMES = {bt.MOD + ":" + k.split(".", 2)[2]: v for k, v in names.items()
-                if k.startswith(("item." + bt.MOD + ".", "block." + bt.MOD + "."))}
+                if k.startswith(("item." + bt.MOD + ".", "block." + bt.MOD + ".")) and "." not in k.split(".", 2)[2]}
     if lang == "en":
         bt.VZ = {k: k.split(":")[1].replace("_", " ").title() for k in _ORIG["VZ"]}
         bt.VZ.update({"minecraft:beef": "Raw Beef", "minecraft:mutton": "Raw Mutton", "minecraft:quartz": "Nether Quartz"})
@@ -368,7 +369,8 @@ def load_base_names():
     if os.path.exists(p):
         for k, v in json.load(open(p, encoding="utf-8")).items():
             m = re.match(r"(item|block)\.%s\.(.+)" % bt.MOD, k)
-            if m:
+            # mryt233 改：忽略物品语言子键
+            if m and "." not in m.group(2):
                 NAMES_EXTRA.setdefault("%s:%s" % (bt.MOD, m.group(2)), v)
 
 

@@ -5,6 +5,21 @@
 Development Preview (not released yet; names and values may change). Everything added after 0.2.2-alpha is listed here.
 :::
 
+<!-- mryt233 改（2026-11-13，r148 第四批 4I～4K-2） -->
+## More gameplay values and loot chances in config {#r148config}
+
+- **Pot warmth, cold-pot nausea, and cheers are configurable**: Added 13 settings under "Pot Warmth", "Cold-Pot Nausea", and "Cheers" in the **Advanced** settings tab and `orients_hotpot_chronicles.json` (including the "blocks" unit for warmth range). Setting `warmth.duration` or `cheers.*_duration` to `0` disables that effect; changes apply right away with `/orientshotpot reload` (see [Settings & Config](faq.html#config)).<!--清单#156-->
+- **Spicy broth levels are configurable**: Added 10 settings under "Spicy Broth" in the **Advanced** settings tab covering per-level duration steps, upgrade threshold, secondary bonus ticks, Fire Resistance start level and multiplier, extreme-spice Hunger bonus, and mouth-flame duration/level; default values preserve exact original behavior and sync tooltips in multiplayer.<!--清单#157-->
+- **Loot drop chances and shrimp fishing weight are configurable (separate `tomato` key)**: Added 14 settings under "Loot Drop Chances" in the **Advanced** settings tab (9 grass-drop garnishes with a separate `tomato` chance, lily-pad lotus root, mushroom enoki, cow beef loin + looting bonus, and `loot.shrimp_fishing.weight`). **Run vanilla `/reload` (or restart) after editing loot chances or weight** to rebuild loot pools.<!--清单#158-->
+
+<!-- mryt233 改（2026-11-13，r148 第四批 4D～4H） -->
+## Open registration & internal refactoring: custom broths and seasonings {#r148open}
+
+- **0.3.0 open registration summary**: Supports adding or overriding broths and seasonings via data packs (`recipe/soup/` and `recipe/seasoning/`, hot-reloaded with `/reload` and synced to multiplayer clients, with explicit config overrides taking priority) and Java add-on mods; broths without a custom bowl fill the generic {{i:soup_bowl}}`soup_bowl`, pure JSON packs tint the clear-broth base by configured soup/bubble colors, and missing entries preserve saved data as unknown placeholders (see [Adding broths and seasonings](faq.html#custom_soup_sauce)).<!--清单#154-->
+- **Open-registration sample add-on & docs wrap-up (no in-game changes)**: Added a runnable multi-loader sample add-on project, documented add-on dependency ranges and tabletop renderer hooks, added the {{i:soup_bowl}} guide icon, and completed all 15 built-in sauces in the 3D viewer.<!--清单#159-->
+- **Internal cleanup (no visible change)**: Broth and seasoning saves now store full IDs (e.g., `orients_hotpot_chronicles:clear`), automatically migrating legacy saves and preserving unknown extension IDs without overwriting, alongside an updated multiplayer sync format (client and server versions must match).<!--清单#153-->
+- **Internal cleanup (no visible change)**: Tabletop objects (bowls, plates, drinks, bottles, chopstick rests) were unified behind open `TableItem` / `TableBlock` interfaces and client renderer callbacks so add-ons can register items without touching core placement branches; gameplay and visuals are unchanged.<!--清单#155-->
+
 <!-- mryt233 改（2026-11-10，r146 优化第一批） -->
 ## Optimization pass 1: more reliable reloads and settings saves {#r146opt1}
 

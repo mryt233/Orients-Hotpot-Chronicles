@@ -1,0 +1,12 @@
+{
+  "itemGroup.hotpotsubmod": "Hotpot Submod Sample",
+  "block.hotpotsubmod.bamboo_coaster": "Bamboo Coaster",
+  "item.hotpotsubmod.bamboo_coaster": "Bamboo Coaster",
+  "item.hotpotsubmod.ginseng_soup_bowl": "Bowl of Ginseng Broth",
+  "text.hotpotsubmod.soup.ginseng_broth": "Ginseng Broth",
+  "text.hotpotsubmod.seasoning.yuzu_dip": "Yuzu Dip",
+  "text.hotpotsubmod.seasoning.yuzu_dip.effect": "Speed 10s, +1 drumstick, clears Slowness",
+  "text.packtest.soup.corn_broth": "Corn Broth",
+  "text.packtest.seasoning.plum_sauce": "Plum Sauce",
+  "text.packtest.seasoning.plum_sauce.effect": "Jump Boost II 12s, +0.5 drumstick"
+}

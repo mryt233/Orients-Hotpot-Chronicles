@@ -73,7 +73,8 @@ def load_names():
     lang = json.load(open(os.path.join(RES, "assets", MOD, "lang", "zh_cn.json"), encoding="utf-8"))
     for k, v in lang.items():
         m = re.match(r"(item|block)\.%s\.(.+)" % MOD, k)
-        if m:
+        # mryt233 改：忽略物品语言子键（如 soup_bowl.named / soup_bowl.unknown），避免误判为独立物品 ID
+        if m and "." not in m.group(2):
             names.setdefault("%s:%s" % (MOD, m.group(2)), v)
     # 原版中文名：存一份裁剪过的在 tutorial/data，缺了再从 Loom 缓存里取
     vz_path = os.path.join(TUT, "data", "vanilla_zh.json")

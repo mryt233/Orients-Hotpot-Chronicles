@@ -11,6 +11,16 @@ This page is updated with each release, **newest first**. The Development Previe
 <!-- mryt233 改，2026-11-08：0.2.2-alpha 发布，开发版预览改名为版本号，再开一段空的预览。 -->
 ## Development Preview {{dev}} {#unreleased}
 
+<!-- mryt233 改（2026-11-13，r148 第四批 4I～4K-2） -->
+- **Pot warmth, cold-pot nausea, and cheers values in config**: Added 3 groups (13 keys, including the "blocks" distance unit) in the **Advanced** settings tab; setting `warmth.duration` or `cheers.*_duration` to `0` skips that effect, and `/orientshotpot reload` applies immediately (see [Settings & Config](faq.html#config)).<!--清单#156-->
+- **Spicy broth level mechanics in config**: Added the "Spicy Broth" group (10 keys) in the **Advanced** settings tab covering duration steps, upgrade threshold, Fire Resistance start level/multiplier, Hunger bonus, and mouth-flame duration/level; defaults keep original behavior unchanged.<!--清单#157-->
+- **Loot drop chances and fishing weight in config (separate `tomato` key)**: Added the "Loot Drop Chances" group (14 keys: 9 grass-drop garnishes with an independent `tomato` key, lily-pad lotus root, mushroom enoki, cow beef loin + looting bonus, and shrimp fishing weight); run `/reload` (or restart) after changes to rebuild loot pools.<!--清单#158-->
+<!-- mryt233 改（2026-11-13，r148 第四批 4D～4H） -->
+- **0.3.0 open registration (custom broths and seasonings via data packs / add-ons)**: Supports adding or overriding broths and seasonings via data packs (`recipe/soup/` and `recipe/seasoning/`, hot-reloaded with `/reload` and synced to multiplayer clients, with explicit config values taking priority) and Java add-on mods; broths without a dedicated bowl fill the generic {{i:soup_bowl}}`soup_bowl`, pure JSON packs tint the clear-broth base, and removing packs later preserves saved IDs as unknown placeholders (see [Adding broths and seasonings](faq.html#custom_soup_sauce)).<!--清单#154-->
+- **Sample add-on, docs & viewer wrap-up (no in-game changes)**: Added the runnable multi-loader sample add-on project and dependency/renderer documentation, plus the {{i:soup_bowl}} guide icon and all 15 built-in sauces in the 3D viewer.<!--清单#159-->
+- **Internal cleanup (no visible change)**: Broth and seasoning saves now store full IDs, migrating legacy saves seamlessly and keeping unknown extension IDs intact (client and server versions must match).<!--清单#153-->
+- **Internal cleanup (no visible change)**: Tabletop objects were refactored onto unified open interfaces (`TableItem` / `TableBlock`) and renderer callbacks (`TableBlockRenderers`), keeping gameplay, visuals, and save formats unchanged.<!--清单#155-->
+
 <!-- mryt233 改（2026-11-10，r146 优化第一批）。 -->
 - **Food already in the pot follows new cooking times after a reload**: After changing a cooking time and running `/orientshotpot reload` (or changing a cooking recipe in a data pack and running `/reload`), ingredients already in the pot **keep their cooking progress** and the remaining time is recalculated from the new value.<!--清单#142-->
 - **Settings save failures are reported honestly**: If the config file cannot be written, the screen **stays open** and says why (the changes only apply to this session, or were not applied). If the original config file is broken, it is first backed up as `orients_hotpot_chronicles.json.broken-<time>` and the backup name is shown.<!--清单#143-->

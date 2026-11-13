@@ -742,18 +742,43 @@ async function buildDrink(ctx, s) {
 // stand + empty bowls and the sauce surfaces are drawn by client/SauceStationRenderer — ported here 1:1:
 // liquids = one face 0.5 px under the rim, chopped scallion / minced cilantro = four offset layers.
 // One per vanilla wood (planks + quartz top) plus iron, 4 × 3. Models from tools/gen_sauce_station.py.
-const SAUCE_IDS = ["msg", "chili_oil", "sweet_sour_sauce", "honey", "sesame_oil", "vinegar", "sugar", "chopped_scallion", "minced_cilantro", "garlic_paste"];
+// 15 种内置蘸料（与 Seasoning.java 顺序一致）及缺贴图兜底颜色；mryt233 改
+const SAUCE_IDS = [
+  "msg", "chili_oil", "sweet_sour_sauce", "honey", "sesame_oil",
+  "vinegar", "sugar", "chopped_scallion", "minced_cilantro", "garlic_paste",
+  "oyster_sauce", "sesame_paste", "crushed_peanuts", "millet_chili", "minced_zhe_er_gen",
+];
+const SAUCE_COLORS = {
+  msg: 0xececf0, chili_oil: 0xc42816, sweet_sour_sauce: 0xc85a3c, honey: 0xeca826, sesame_oil: 0xcc8a28,
+  vinegar: 0x462418, sugar: 0xf0eee8, chopped_scallion: 0x6cb03a, minced_cilantro: 0x4e9a2c, garlic_paste: 0xe8d696,
+  oyster_sauce: 0x5a321e, sesame_paste: 0xc89e64, crushed_peanuts: 0xdab46e, millet_chili: 0xe2281c, minced_zhe_er_gen: 0xd8d2bc,
+};
 const SAUCE_TIER_TOPS = [11, 15, 19], SAUCE_BOWL = 5, SAUCE_BOWL_H = 2.5, SAUCE_WALL = 0.75;
 // garnish layers: depth under the rim, texture rect (0..16), quarter turns — same as SauceStationRenderer.GARNISH_LAYERS
 const SAUCE_GARNISH = [[1.3, 2, 2, 14, 14, 0], [0.95, 0, 4, 12, 16, 1], [0.6, 4, 0, 16, 12, 2], [0.25, 3, 3, 13, 13, 3]];
 const SAUCE_FILLS = {
   each: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+  extra: [9, 10, 11, 12, 13, 14, 7, 8, -1],
   mixed: [1, 1, 5, -1, 3, 1, 0, 7, -1],
   empty: [-1, -1, -1, -1, -1, -1, -1, -1, -1],
 };
 
+// 检测 viewer missingCanvas() 紫黑棋盘占位贴图，与 SauceStationRenderer 的 missing sprite 兜底对齐
+function isMissingTex(tex) {
+  const img = tex && tex.image;
+  if (!img || typeof img.getContext !== "function") return false;
+  const ctx2d = img.getContext("2d");
+  if (!ctx2d) return false;
+  const p0 = ctx2d.getImageData(0, 0, 1, 1).data;
+  const p1 = ctx2d.getImageData(8, 0, 1, 1).data;
+  const p2 = ctx2d.getImageData(8, 8, 1, 1).data;
+  return p0[0] === 0xf8 && p0[1] === 0 && p0[2] === 0xf8
+    && p1[0] === 0 && p1[1] === 0 && p1[2] === 0
+    && p2[0] === 0xf8 && p2[1] === 0 && p2[2] === 0xf8;
+}
+
 // one up-facing quad in model pixels, texture rect [u0,v0,u1,v1] (0..16) turned `rot` quarter turns
-function sauceQuad(tex, x0, y, z0, x1, z1, u0, v0, u1, v1, rot) {
+function sauceQuad(tex, x0, y, z0, x1, z1, u0, v0, u1, v1, rot, color = 0xffffff) {
   const p = (v) => mc(v / 16);
   const pos = [[x0, z0], [x1, z0], [x1, z1], [x0, z1]];
   const uv = [[u0, v0], [u1, v0], [u1, v1], [u0, v1]];
@@ -767,22 +792,27 @@ function sauceQuad(tex, x0, y, z0, x1, z1, u0, v0, u1, v1, rot) {
   geo.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3));
   geo.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
   geo.setIndex([0, 3, 2, 0, 2, 1]);
-  return new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, alphaTest: 0.5, side: THREE.DoubleSide }));
+  return new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, color, alphaTest: 0.5, side: THREE.DoubleSide }));
 }
 
 async function sauceSurfaces(ctx, fill) {
   const group = new THREE.Group();
   for (const [i, k] of fill.entries()) {
-    if (k < 0) continue;
+    if (k < 0 || !SAUCE_IDS[k]) continue;
     const id = SAUCE_IDS[k];
     const garnish = id === "chopped_scallion" || id === "minced_cilantro";
-    const tex = await ctx.texture(`${ctx.modid}:block/${garnish ? id : "sauce_" + id}`);
+    let tex = await ctx.texture(`${ctx.modid}:block/${garnish ? id : "sauce_" + id}`);
+    let color = 0xffffff;
+    if (isMissingTex(tex)) {
+      tex = await ctx.texture(`${ctx.modid}:misc/white`);
+      color = SAUCE_COLORS[id] ?? 0xd4a054;
+    }
     const tier = 2 - Math.floor(i / 3), col = i % 3;
     const cx = 16 - (16 / 3) * (col + 0.5), cz = (16 / 3) * (tier + 0.5);
     const rim = SAUCE_TIER_TOPS[tier] + SAUCE_BOWL_H, half = SAUCE_BOWL / 2 - SAUCE_WALL;
     const layers = garnish ? SAUCE_GARNISH : [[0.5, 2, 2, 14, 14, 0]];
     for (const [depth, u0, v0, u1, v1, rot] of layers) {
-      group.add(sauceQuad(tex, cx - half, rim - depth, cz - half, cx + half, cz + half, u0, v0, u1, v1, rot));
+      group.add(sauceQuad(tex, cx - half, rim - depth, cz - half, cx + half, cz + half, u0, v0, u1, v1, rot, color));
     }
   }
   return group;
@@ -793,10 +823,11 @@ async function buildSauceStation(ctx, s) {
   const ns = ctx.modid;
   // 11 woods + iron, 4 × 3 like a shop counter row
   const bodies = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped", "iron"];
+  const fill = SAUCE_FILLS[s.fill] || SAUCE_FILLS.each;
   for (const [i, body] of bodies.entries()) {
     const o = new THREE.Group();
     o.add(await ctx.buildModel(`${ns}:block/${body}_sauce_station_empty`));
-    o.add(await sauceSurfaces(ctx, SAUCE_FILLS[s.fill]));
+    o.add(await sauceSurfaces(ctx, fill));
     o.position.set((i % 4) * 1.15 - 1.725, 0, Math.floor(i / 4) * 1.4 - 1.4);
     root.add(o);
   }
@@ -995,8 +1026,8 @@ export default [
   {
     id: "sauce_station",
     name: "蘸料台",
-    desc: "阶梯式（2026-10-23 改）：1.5 格高，三层台阶前低后高，每层一横排 3 个小木碗；碗不固定，空碗放什么原料就装什么（「随便放」看重复和空碗）。11 种原版木头各一个（台身该木头的木板 + 白色石英台面）+ 铁台（原版铁块），4 × 3 排开，正面朝镜头。「九种各一碗」从最上层到最下层、从左到右：味精 辣油 酸甜酱 / 蜂蜜 香油 醋 / 白糖 葱花 香菜碎末",
-    params: [{ key: "fill", label: "碗里", options: [["each", "九种各一碗"], ["mixed", "随便放（有重复、有空碗）"], ["empty", "空碗"]], default: "each" }],
+    desc: "阶梯式（2026-10-23 改）：1.5 格高，三层台阶前低后高，每层一横排 3 个小木碗；碗不固定，空碗放什么原料就装什么（「随便放」看重复和空碗）。11 种原版木头各一个（台身该木头的木板 + 白色石英台面）+ 铁台（原版铁块），4 × 3 排开，正面朝镜头。「九种各一碗」：味精 辣油 酸甜酱 / 蜂蜜 香油 醋 / 白糖 葱花 香菜碎末；「后六种 + 葱花香菜」：蒜泥 蚝油 芝麻酱 / 花生碎 小米辣 折耳根碎 / 葱花 香菜碎末 空",
+    params: [{ key: "fill", label: "碗里", options: [["each", "九种各一碗"], ["extra", "后六种 + 葱花香菜"], ["mixed", "随便放（有重复、有空碗）"], ["empty", "空碗"]], default: "each" }],
     build: buildSauceStation,
   },
   {

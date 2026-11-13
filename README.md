@@ -459,9 +459,9 @@ Use **JDK 21** and run from the repository root:
 ./gradlew :fabric:build :neoforge:build
 ```
 
-多模块结构：`framework/` 为前置框架，`common/` 为共享火锅内容，`fabric/` 与 `neoforge/` 为对应加载器入口。
+多模块结构：`framework/` 为前置框架，`common/` 为共享火锅内容，`fabric/` 与 `neoforge/` 为对应加载器入口；子模组 / 数据包扩展接入详见 [docs/开放登记说明.md](docs/开放登记说明.md) 与可运行示例工程 [experiments/hotpot-submod-sample/](experiments/hotpot-submod-sample/)。
 
-The multi-module project contains the prerequisite framework in `framework/`, shared hotpot content in `common/`, and loader entry points in `fabric/` and `neoforge/`.
+The multi-module project contains the prerequisite framework in `framework/`, shared hotpot content in `common/`, and loader entry points in `fabric/` and `neoforge/`. For add-on / data pack registration details, see [docs/开放登记说明.md](docs/开放登记说明.md) and the sample add-on project in [experiments/hotpot-submod-sample/](experiments/hotpot-submod-sample/).
 
 ## 许可证 · License
 
