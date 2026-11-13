@@ -383,6 +383,13 @@ public final class ClientProbe {
                 var field = HotPotConfigScreen.class.getDeclaredField("edited"); field.setAccessible(true);
                 report.add("config_edited", ((com.google.gson.JsonObject)field.get(config)).deepCopy());
                 report.add("config_current", Config.editableCopy());
+                var active = new com.google.gson.JsonObject();
+                active.addProperty("warmth_range", Config.warmthRange());
+                active.addProperty("cold_pot_nausea_duration", Config.coldPotNauseaDuration());
+                active.addProperty("cheers_bonus_hunger", Config.cheersBonusHunger());
+                active.addProperty("spicy_mouth_fire_ticks", Config.spicyMouthFireTicks());
+                active.addProperty("loot_shrimp_fishing_weight", Config.lootShrimpFishingWeight());
+                report.add("config_active", active);
             } catch (ReflectiveOperationException e) { throw new IllegalStateException(e); }
         }
         if (mc.screen instanceof SauceStationScreen sauce) {

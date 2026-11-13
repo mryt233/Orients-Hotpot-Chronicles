@@ -5421,7 +5421,7 @@
       },
       {
        "k": "sub",
-       "t": "Ingredients (100 types)",
+       "t": "Ingredients (103 types)",
        "l": 2
       },
       {
@@ -5853,6 +5853,21 @@
        "k": "tr",
        "icon": "orients_hotpot_chronicles:shrimp_paste",
        "t": "Shrimp Paste　shrimp_paste"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:soup_bowl",
+       "t": "Soup Bowl　soup_bowl"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:soup_bowl.named",
+       "t": "%s Bowl　soup_bowl.named"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:soup_bowl.unknown",
+       "t": "Unknown Soup Bowl (%s)　soup_bowl.unknown"
       },
       {
        "k": "tr",

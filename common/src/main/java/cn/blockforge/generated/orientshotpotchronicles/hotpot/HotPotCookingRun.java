@@ -50,8 +50,9 @@ final class HotPotCookingRun {
         if (!be.hasPot() || !(stoveHeat || openFire) || !be.hasSoup()) {
             return;
         }
-        if (openFire && world.getGameTime() % StoveBlockEntity.WARMTH_INTERVAL == 0L) {
-            StoveBlockEntity.giveWarmth(world, be.getBlockPos());   // 围锅回血，同灶台（用户要）
+        int warmthDuration = Config.warmthDuration();
+        if (openFire && warmthDuration > 0 && world.getGameTime() % Math.max(1, Config.warmthIntervalTicks()) == 0L) {
+            StoveBlockEntity.giveWarmth(world, be.getBlockPos(), warmthDuration);   // 围锅回血，同灶台（用户要）
         }
         float power = stoveHeat ? stove.power() : HotPotBlockEntity.OPEN_FIRE_POWER;
         PotLayout layout = be.layout();   // 这一刻的格局只取一次（代码检查 W2）

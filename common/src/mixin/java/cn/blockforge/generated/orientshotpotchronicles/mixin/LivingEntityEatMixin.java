@@ -5,6 +5,7 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.BenchBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Chopsticks;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronItem;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.ClothApronProtection;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Config;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCriterion;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SeatEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
@@ -125,13 +126,15 @@ abstract class LivingEntityEatMixin {
                     }
                     self.addEffect(effect);
                 }
-                // 变态辣且没解辣：嘴上 2 秒火苗，纯节目效果（前面刚给了抗火，不扣血）
+                // 变态辣且没解辣：嘴上冒火苗，纯节目效果（前面刚给了抗火，不扣血）
                 // mryt233 改（2026-11-06，r139）：穿着布围裙就不点嘴上这簇火——布围裙挡的是溅起来的滚油与明火。
-                // mryt233 改（2026-11-10）：红汤判断改成 isSpicy() 属性
+                // mryt233 改（2026-11-10）：红汤判断改成 isSpicy() 属性；mryt233 改（第四批 4J）：改读 Config.spicyMouthFire*
+                int mouthFireTicks = Config.spicyMouthFireTicks();
                 if (soup.spicy()
-                    && spicy >= 3 && !calmSpicy
+                    && mouthFireTicks > 0 && spicy >= Config.spicyMouthFireFromLevel()
+                    && !calmSpicy
                     && !ClothApronItem.wornBy(self)) {
-                    self.setRemainingFireTicks(Math.max(self.getRemainingFireTicks(), 40));
+                    self.setRemainingFireTicks(Math.max(self.getRemainingFireTicks(), mouthFireTicks));
                 }
             }
         }

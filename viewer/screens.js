@@ -1515,7 +1515,7 @@ const CF_COL = { text: 0xffe8c88a, muted: 0xffa88c5c, hover: 0xff6a4418, stripe:
   typedBg: 0xff3a2410 };
 const CF_KEY = (s) => "text." + NS + ".config." + s;
 const CF_UNIT = { tick: "config.unit.tick", multiplier: "config.unit.multiplier", point: "config.unit.point",
-  level: "config.unit.level", "": "" };
+  level: "config.unit.level", block: "config.unit.block", "": "" };
 // 悬停那句白话（= Config.fieldHelp 的补句；游戏里走 config.help.<键>，预览里先用这几句兜底）
 const CF_HELP = {
   power: "灶火有多旺：越大，同一份菜涮熟得越快。1 = 和现在一样快，2 = 快一倍。",
@@ -1539,6 +1539,29 @@ const CF_HELP = {
   hunger_amplifier: "红汤负面「饥饿」的等级。",
   sip_hunger: "饮料每口回多少饥饿点数。",
   sip_saturation: "饮料每口的饱和度系数。",
+  warmth_interval_ticks: "点着火的锅每隔多少 tick 给周围玩家续一次生命恢复（20 tick = 1 秒）。",
+  warmth_range: "围锅回血的作用半径（格）。",
+  warmth_duration: "每次围锅回血给多少 tick 生命恢复，0 = 关闭围锅回血。",
+  cold_pot_nausea_chance: "在没点着火的冷锅里吃东西时触发反胃的概率（0 = 不反胃，1 = 必反胃）。",
+  cold_pot_nausea_duration: "冷锅触发反胃效果的持续时间（tick，20 tick = 1 秒）。",
+  cheers_cooldown_ticks: "两次碰杯干杯之间的最短冷却时间（20 tick = 1 秒）。",
+  cheers_luck_duration: "干杯后获得的幸运效果持续多少 tick，0 = 不加幸运。",
+  cheers_regen_duration: "干杯后获得的生命恢复效果持续多少 tick，0 = 不加生命恢复。",
+  cheers_bonus_hunger: "干杯后的杯子第一口额外多回多少饥饿点数。",
+  cheers_bonus_saturation: "干杯后的杯子第一口额外增加的饱和度系数。",
+  spicy_level_duration_step: "红汤辣度每升 1 档，主效果（力量）追加多少 tick 时长。",
+  spicy_level_amplifier_from: "红汤几档辣度起主效果等级 +1（0=微辣起，1=中辣起，4=不升级）。",
+  spicy_second_bonus: "中辣 / 特辣 / 变态辣分别在微辣基础上为副效果（速度）追加多少 tick。",
+  spicy_fire_from_level: "红汤从第几档辣度开始给抗火（1=中辣，2=特辣，3=变态辣，4=不给）。",
+  spicy_fire_top_multiplier: "变态辣（最高档）下，抗火持续时间在基础值上的倍数。",
+  spicy_hunger_top_bonus: "变态辣（最高档）下，负面饥饿效果在基础值上额外延长的 tick 数。",
+  spicy_mouth_fire_ticks: "吃到嘴上冒火档位时着火动画持续多少 tick，0 = 不冒火（穿围裙可免）。",
+  spicy_mouth_fire_from_level: "红汤从第几档辣度开始吃完嘴上冒火（3=变态辣，4=不冒火）。",
+  loot_garnish_chance: "打短草或高草掉落这种配菜的基础概率（0 = 不掉，修改后需 /reload 生效）。",
+  loot_chance: "采集对应原版方块掉落该食材的概率（0 = 不掉，修改后需 /reload 生效）。",
+  loot_cow_chance: "击杀牛或哞菇额外掉落牛脊肉的基础概率（修改后需 /reload 生效）。",
+  loot_looting_bonus: "击杀牛或哞菇时，抢夺附魔每级追加多少牛脊肉掉落概率（需 /reload 生效）。",
+  loot_shrimp_fishing_weight: "钓鱼获得带壳虾的权重，0 = 钓不到（修改后需 /reload 生效）。",
 };
 // 常用页：粒子强度（滑块）+ 这几项（= Java commonFields()）
 // help = 悬停那句白话的键（= 游戏里 config.help.<key>，主会话补进语言文件与 Config.fieldHelp）
@@ -1690,6 +1713,23 @@ const CF_BOWLS = [
 ];
 const CF_DRINKS = [["orange_drink", "橙子饮料", 300, 0], ["plant_protein_drink", "植物蛋白饮料", 300, 0],
   ["orient_cola", "之晗可乐", 300, 0]];
+// 战利品掉落概率与钓鱼权重默认项（mryt233 改，4K-2：[路径数组, 物品 ID, 展示名, 默认值, 帮助键, 上限, 步长]）
+const CF_LOOTS = [
+  [["loot", "garnish", "scallion", "chance"], "scallion", "小葱 · 打草掉落概率", 0.25, "loot_garnish_chance"],
+  [["loot", "garnish", "cilantro", "chance"], "cilantro", "香菜 · 打草掉落概率", 0.25, "loot_garnish_chance"],
+  [["loot", "garnish", "soybean", "chance"], "soybean", "黄豆 · 打草掉落概率", 0.15, "loot_garnish_chance"],
+  [["loot", "garnish", "garlic", "chance"], "garlic", "大蒜 · 打草掉落概率", 0.15, "loot_garnish_chance"],
+  [["loot", "garnish", "tomato", "chance"], "tomato", "番茄 · 打草掉落概率", 0.15, "loot_garnish_chance"],
+  [["loot", "garnish", "chili_pepper", "chance"], "chili_pepper", "辣椒 · 打草掉落概率", 0.15, "loot_garnish_chance"],
+  [["loot", "garnish", "peanut", "chance"], "peanut", "花生 · 打草掉落概率", 0.15, "loot_garnish_chance"],
+  [["loot", "garnish", "greens", "chance"], "greens", "青菜 · 打草掉落概率", 0.15, "loot_garnish_chance"],
+  [["loot", "garnish", "zhe_er_gen", "chance"], "zhe_er_gen", "折耳根 · 打草掉落概率", 0.15, "loot_garnish_chance"],
+  [["loot", "lily_pad", "lotus_root", "chance"], "lotus_root", "莲藕 · 打睡莲掉落概率", 0.5, "loot_chance"],
+  [["loot", "mushroom", "enoki", "chance"], "enoki_mushroom", "金针菇 · 采蘑菇掉落概率", 0.5, "loot_chance"],
+  [["loot", "cow", "beef_loin", "chance"], "beef_loin", "牛脊肉 · 杀牛基础掉落概率", 0.25, "loot_cow_chance"],
+  [["loot", "cow", "beef_loin", "looting_bonus"], "beef_loin", "牛脊肉 · 抢夺每级额外概率", 0.1, "loot_looting_bonus"],
+  [["loot", "shrimp_fishing", "weight"], "shrimp", "带壳虾 · 钓鱼权重", 20, "loot_shrimp_fishing_weight", 1000, 5],
+];
 // 高级页的分组（= Java sections()）
 function cfGroupDefs() {
   const unitOf = (k2) => k2 === "saturation" ? "" : k2.endsWith("amplifier") ? "level" : k2 === "hunger" ? "point" : "tick";
@@ -1733,6 +1773,39 @@ function cfGroupDefs() {
       { path: ["food", id, "hunger"], name: id + " · 饥饿点数", def: hunger, min: 0, max: 100, step: 1, unit: "point", item: NS + ":" + id, help: "hunger" },
       { path: ["food", id, "saturation"], name: id + " · 饱和系数", def: sat, min: 0, max: 10, step: 0.05, unit: "", item: NS + ":" + id, help: "saturation" },
     ]) },
+    { id: "warmth", title: "围锅回血", fields: [
+      { path: ["warmth", "interval_ticks"], name: "围锅回血间隔", def: 80, min: 1, max: 1200, step: 10, unit: "tick", help: "warmth_interval_ticks" },
+      { path: ["warmth", "range"], name: "围锅回血范围", def: 6, min: 1, max: 32, step: 1, unit: "block", help: "warmth_range" },
+      { path: ["warmth", "duration"], name: "围锅恢复时长", def: 200, min: 0, max: 100000, step: 20, unit: "tick", help: "warmth_duration" },
+      { path: ["warmth", "amplifier"], name: "围锅恢复等级", def: 0, min: 0, max: 9, step: 1, unit: "level", help: "amplifier" },
+    ] },
+    { id: "cold_pot", title: "冷锅反胃", fields: [
+      { path: ["cold_pot", "nausea_chance"], name: "冷锅反胃概率", def: 0.3, min: 0, max: 1, step: 0.05, unit: "", help: "cold_pot_nausea_chance" },
+      { path: ["cold_pot", "nausea_duration"], name: "冷锅反胃时长", def: 300, min: 0, max: 100000, step: 20, unit: "tick", help: "cold_pot_nausea_duration" },
+    ] },
+    { id: "cheers", title: "碰杯干杯", fields: [
+      { path: ["cheers", "cooldown_ticks"], name: "干杯冷却时间", def: 20, min: 1, max: 1200, step: 5, unit: "tick", help: "cheers_cooldown_ticks" },
+      { path: ["cheers", "luck_duration"], name: "干杯幸运时长", def: 600, min: 0, max: 100000, step: 20, unit: "tick", help: "cheers_luck_duration" },
+      { path: ["cheers", "luck_amplifier"], name: "干杯幸运等级", def: 0, min: 0, max: 9, step: 1, unit: "level", help: "amplifier" },
+      { path: ["cheers", "regen_duration"], name: "干杯恢复时长", def: 100, min: 0, max: 100000, step: 20, unit: "tick", help: "cheers_regen_duration" },
+      { path: ["cheers", "regen_amplifier"], name: "干杯恢复等级", def: 0, min: 0, max: 9, step: 1, unit: "level", help: "amplifier" },
+      { path: ["cheers", "bonus", "hunger"], name: "干杯首口额外饥饿", def: 1, min: 0, max: 100, step: 1, unit: "point", help: "cheers_bonus_hunger" },
+      { path: ["cheers", "bonus", "saturation"], name: "干杯首口额外饱和", def: 0.4, min: 0, max: 10, step: 0.05, unit: "", help: "cheers_bonus_saturation" },
+    ] },
+    { id: "spicy", title: "红汤辣度", fields: [
+      { path: ["spicy", "level_duration_step"], name: "每档主效果递增", def: 60, min: 0, max: 10000, step: 20, unit: "tick", help: "spicy_level_duration_step" },
+      { path: ["spicy", "level_amplifier_from"], name: "主效果升档起点", def: 1, min: 0, max: 4, step: 1, unit: "level", help: "spicy_level_amplifier_from" },
+      { path: ["spicy", "second_bonus_l1"], name: "中辣副效果加时", def: 60, min: 0, max: 10000, step: 20, unit: "tick", help: "spicy_second_bonus" },
+      { path: ["spicy", "second_bonus_l2"], name: "特辣副效果加时", def: 80, min: 0, max: 10000, step: 20, unit: "tick", help: "spicy_second_bonus" },
+      { path: ["spicy", "second_bonus_l3"], name: "变态辣副效果加时", def: 120, min: 0, max: 10000, step: 20, unit: "tick", help: "spicy_second_bonus" },
+      { path: ["spicy", "fire_from_level"], name: "抗火生效档位", def: 2, min: 1, max: 4, step: 1, unit: "level", help: "spicy_fire_from_level" },
+      { path: ["spicy", "fire_top_multiplier"], name: "变态辣抗火倍率", def: 2, min: 1, max: 10, step: 1, unit: "multiplier", help: "spicy_fire_top_multiplier" },
+      { path: ["spicy", "hunger_top_bonus"], name: "变态辣饥饿加时", def: 40, min: 0, max: 10000, step: 20, unit: "tick", help: "spicy_hunger_top_bonus" },
+      { path: ["spicy", "mouth_fire_ticks"], name: "嘴上冒火时长", def: 40, min: 0, max: 1200, step: 10, unit: "tick", help: "spicy_mouth_fire_ticks" },
+      { path: ["spicy", "mouth_fire_from_level"], name: "嘴上冒火档位", def: 3, min: 1, max: 4, step: 1, unit: "level", help: "spicy_mouth_fire_from_level" },
+    ] },
+    { id: "loot", title: "战利品掉率", fields: CF_LOOTS.map(([path, itemId, name, def, help, max = 1, step = 0.05]) => ({
+      path, name, def, min: 0, max, step, unit: "", item: NS + ":" + itemId, help })) },
   ];
 }
 const cfFieldKey = (f) => f.path.join(".");
@@ -1946,6 +2019,7 @@ const configScreen = {
     const ids = new Set();
     for (const [id] of CF_FOODS) ids.add(NS + ":" + id);
     for (const [id] of CF_ITEMS) ids.add(NS + ":" + id);
+    for (const [, itemId] of CF_LOOTS) ids.add(NS + ":" + itemId);
     return [...ids];
   },
   slots() { return []; },

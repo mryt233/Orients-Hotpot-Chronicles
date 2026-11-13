@@ -188,27 +188,31 @@ public record SoupDef(
         int secondTicks = builtin
             ? Config.overriddenSoupBowlInt(name, "second_duration", defaultSecondDuration) : defaultSecondDuration;
         int secondAmp = builtin ? Config.overriddenSoupBowlInt(name, "second_amplifier", 0) : 0;
-        int level = Math.max(0, Math.min(3, spicyLevel));
+        int level = Math.max(0, Math.min(HotPotBlockEntity.SPICY_MAX, spicyLevel));
         // 越辣越上头：力量与速度的时长随档位递加，中辣起力量再升一级。
         // 配成 0 的那一项保持关闭（不加辣度带来的时长），和别的汤底一样「0 = 不加」。
+        // mryt233 改（第四批 4J）：辣度递增系数改读 Config.spicy*()。
         if (ticks > 0) {
-            ticks += level * 60;
-            amplifier += level >= 1 ? 1 : 0;
+            ticks += level * Config.spicyLevelDurationStep();
+            amplifier += level >= Config.spicyLevelAmplifierFrom() ? 1 : 0;
         }
         addEffect(list, mainEffect, ticks, amplifier);
-        int speedAdd = level == 1 ? 60 : (level == 2 ? 80 : (level >= 3 ? 120 : 0));
+        int speedAdd = level == 1 ? Config.spicySecondBonusL1()
+            : (level == 2 ? Config.spicySecondBonusL2()
+            : (level >= HotPotBlockEntity.SPICY_MAX ? Config.spicySecondBonusL3() : 0));
         addEffect(list, secondEffect, secondTicks > 0 ? secondTicks + speedAdd : 0, secondAmp);
-        if (level >= 2) {
+        if (level >= Config.spicyFireFromLevel()) {
             // 特辣 / 变态辣：发汗驱寒（抗火，变态辣加倍）+ 开胃易饿（饥饿，越辣越饿）
             int fireTicks = builtin
                 ? Config.overriddenSoupBowlInt(name, "fire_duration", defaultFireDuration) : defaultFireDuration;
-            addEffect(list, fireEffect, level >= 3 ? fireTicks * 2 : fireTicks,
+            addEffect(list, fireEffect,
+                level >= HotPotBlockEntity.SPICY_MAX ? fireTicks * Config.spicyFireTopMultiplier() : fireTicks,
                 builtin ? Config.overriddenSoupBowlInt(name, "fire_amplifier", 0) : 0);
             int hungerTicks = builtin
                 ? Config.overriddenSoupBowlInt(name, "hunger_duration", defaultHungerDuration) : defaultHungerDuration;
             // 配成 0 表示「红汤不加饥饿」：这时不再按辣度往上加，玩家的配置说了算
-            if (hungerTicks > 0 && level >= 3) {
-                hungerTicks += 40;
+            if (hungerTicks > 0 && level >= HotPotBlockEntity.SPICY_MAX) {
+                hungerTicks += Config.spicyHungerTopBonus();
             }
             addEffect(list, hungerEffect, hungerTicks,
                 builtin ? Config.overriddenSoupBowlInt(name, "hunger_amplifier", 0) : 0);

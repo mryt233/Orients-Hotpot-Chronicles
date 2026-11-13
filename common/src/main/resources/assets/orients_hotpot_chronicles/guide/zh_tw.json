@@ -5398,7 +5398,7 @@
       },
       {
        "k": "sub",
-       "t": "食材（100 種）",
+       "t": "食材（103 種）",
        "l": 2
       },
       {
@@ -5830,6 +5830,21 @@
        "k": "tr",
        "icon": "orients_hotpot_chronicles:shrimp_paste",
        "t": "蝦滑　shrimp_paste"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:soup_bowl",
+       "t": "一碗湯　soup_bowl"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:soup_bowl.named",
+       "t": "一碗%s　soup_bowl.named"
+      },
+      {
+       "k": "tr",
+       "icon": "orients_hotpot_chronicles:soup_bowl.unknown",
+       "t": "未知湯碗（%s）　soup_bowl.unknown"
       },
       {
        "k": "tr",

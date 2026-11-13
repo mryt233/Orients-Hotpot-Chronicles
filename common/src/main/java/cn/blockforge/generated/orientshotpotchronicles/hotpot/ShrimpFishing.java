@@ -9,7 +9,9 @@ public final class ShrimpFishing {
     public static final int WEIGHT = 20;
     public static final ResourceLocation FISHING_FISH = ResourceLocation.withDefaultNamespace("gameplay/fishing/fish");
     private ShrimpFishing() { }
+    // mryt233 改（2026-11-13，4K）：改读配置中的钓鱼出虾权重；权重为 0 时仍保留条目，仅权重为 0 不会被抽中。
     public static LootItem.Builder<?> entry() {
-        return LootItem.lootTableItem(HotPotContent.SHRIMP).setWeight(WEIGHT);
+        return LootItem.lootTableItem(HotPotContent.SHRIMP)
+            .setWeight(Math.max(0, Config.lootShrimpFishingWeight()));
     }
 }

@@ -246,7 +246,7 @@ public class SoupBowlItem extends Item implements TableItem {
         // mryt233 改（2026-11-07）：先把汤底定义与辣度取成快照，再交给原版结算
         SoupDef def = soupDef(stack);
         int spicy = HotPotContent.SPICY_LEVEL != null
-            ? Math.max(0, Math.min(3, stack.getOrDefault(HotPotContent.SPICY_LEVEL, 0)))
+            ? Math.max(0, Math.min(HotPotBlockEntity.SPICY_MAX, stack.getOrDefault(HotPotContent.SPICY_LEVEL, 0)))
             : 0;
         // mryt233 改（2026-11-05）：营养按配置现算再吃；和 ConfiguredFoodItem 一样用 user.eat 结算
         ItemStack result = user.eat(world, stack, eating(def));
@@ -260,11 +260,13 @@ public class SoupBowlItem extends Item implements TableItem {
             for (MobEffectInstance effect : def.dishBonusEffects(spicy)) {
                 user.addEffect(effect);
             }
-            // 3 级特辣：嘴上冒 2 秒火苗，纯节目效果（前面刚加的抗火罩着，不会扣血）
+            // 3 级特辣：嘴上冒火苗，纯节目效果（前面刚加的抗火罩着，不会扣血）
             // mryt233 改（2026-11-06，r139）：穿着布围裙时不再点火苗（防溅油装备挡滚油与明火）。
-            // mryt233 改（2026-11-10）：红汤判断改成 isSpicy() 属性；特辣冒火苗属于红汤独有的玩法，保留特判
-            if (def.spicy() && spicy >= 3 && !ClothApronItem.wornBy(user)) {
-                user.setRemainingFireTicks(Math.max(user.getRemainingFireTicks(), 40));
+            // mryt233 改（2026-11-10）：红汤判断改成 isSpicy() 属性；mryt233 改（第四批 4J）：改读 Config.spicyMouthFire*
+            int mouthFireTicks = Config.spicyMouthFireTicks();
+            if (def.spicy() && mouthFireTicks > 0 && spicy >= Config.spicyMouthFireFromLevel()
+                && !ClothApronItem.wornBy(user)) {
+                user.setRemainingFireTicks(Math.max(user.getRemainingFireTicks(), mouthFireTicks));
             }
         }
         return result;

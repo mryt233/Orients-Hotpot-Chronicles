@@ -200,16 +200,12 @@ public class CupItem extends Item implements TableItem {
         return new Vec3((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
     }
 
-    /** 碰杯冷却（tick）：三个入口（潜行对空气、右键玩家、右键桌上的杯子）共用一份，mryt233 改。 */
-    private static final int CHEER_COOLDOWN = 20;
-
     /**
      * 碰杯（干杯）：清脆的双层碰杯声 + 一小捧粒子，两支杯子都记上 CHEERED 组件，
-     * 双方各得 30 秒幸运 I、5 秒生命恢复 I，ActionBar 报「干杯！」，并触发 cheers 进度。
+     * 双方各得幸运与生命恢复（时长与等级由 Config.cheers* 控制），ActionBar 报「干杯！」，并触发 cheers 进度。
      * partner / partnerCup 为 null 表示一个人举杯（对空气干杯）或者跟桌上摆着的那杯相碰时由调用方传进来。
      * 只在服务端调用：声音、粒子、组件、效果都由服务端决定（r136b，2026-11-05 用户，新增）。
-     * mryt233 改（2026-11-07）：加 1 秒冷却。以前连点右键能无限续幸运 / 生命恢复，
-     * 每一下还给附近客户端刷 18 个粒子。
+     * mryt233 改（2026-11-07）：加冷却，冷却与加成参数读取 Config.cheers*()。
      */
     public static void cheers(Level world, Player player, ItemStack cupStack,
                               @Nullable Player partner, @Nullable ItemStack partnerCup, Vec3 effectPos) {
@@ -217,7 +213,7 @@ public class CupItem extends Item implements TableItem {
         if (player.getCooldowns().isOnCooldown(cupStack.getItem())) {
             return;
         }
-        player.getCooldowns().addCooldown(cupStack.getItem(), CHEER_COOLDOWN);
+        player.getCooldowns().addCooldown(cupStack.getItem(), Math.max(1, Config.cheersCooldownTicks()));
         world.playSound(null, effectPos.x, effectPos.y, effectPos.z, SoundEvents.AMETHYST_BLOCK_CHIME,
             SoundSource.PLAYERS, 1.0F, 1.5F);
         world.playSound(null, effectPos.x, effectPos.y, effectPos.z, SoundEvents.GLASS_PLACE,
@@ -242,10 +238,16 @@ public class CupItem extends Item implements TableItem {
         player.swing(InteractionHand.MAIN_HAND);
     }
 
-    /** 干杯的加成：30 秒幸运 I + 5 秒生命恢复 I。 */
+    /** 干杯的加成：默认 30 秒幸运 I + 5 秒生命恢复 I，duration <= 0 时跳过对应效果（mryt233 改）。 */
     private static void applyCheerBuff(Player player) {
-        player.addEffect(new MobEffectInstance(MobEffects.LUCK, 600, 0));
-        player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 0));
+        int luckDuration = Config.cheersLuckDuration();
+        if (luckDuration > 0) {
+            player.addEffect(new MobEffectInstance(MobEffects.LUCK, luckDuration, Math.max(0, Config.cheersLuckAmplifier())));
+        }
+        int regenDuration = Config.cheersRegenDuration();
+        if (regenDuration > 0) {
+            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, regenDuration, Math.max(0, Config.cheersRegenAmplifier())));
+        }
     }
 
     @Override

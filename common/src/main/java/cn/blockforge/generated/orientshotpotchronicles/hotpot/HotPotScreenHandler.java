@@ -237,10 +237,6 @@ public class HotPotScreenHandler extends PlayerInventoryMenu {
     private boolean collecting = false;
     private int collectSoup = -1;
 
-    /** 冷锅吃东西反胃的概率和时长（时长同原版河豚的反胃 15 秒）。 */
-    private static final float COLD_NAUSEA_CHANCE = 0.3F;
-    private static final int COLD_NAUSEA_TICKS = 300;
-
     /** 光标拿着筷子、左键点锅里的熟食：直接夹起来一口吃掉（只认熟食，其它情况照原版处理）。 */
     @Override
     public void clicked(int slotId, int button, ClickType actionType, Player player) {
@@ -295,9 +291,10 @@ public class HotPotScreenHandler extends PlayerInventoryMenu {
         DippingSauceItem.dipFromHands(player, eaten);
         HotPotHooks.onEating(world, player, eaten);
         player.eat(world, eaten.copy(), ConfiguredFoodItem.food(eaten));
-        // 冷锅：没坐在烧着的灶台（或其他热源）上，吃了有概率反胃
-        if (!serverBe.isHeated() && world.random.nextFloat() < COLD_NAUSEA_CHANCE) {
-            player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, COLD_NAUSEA_TICKS, 0));
+        // 冷锅：没坐在烧着的灶台（或其他热源）上，吃了有概率反胃（mryt233 改：读取 Config.coldPot*，duration <= 0 时跳过）
+        int nauseaDuration = Config.coldPotNauseaDuration();
+        if (!serverBe.isHeated() && nauseaDuration > 0 && world.random.nextFloat() < Config.coldPotNauseaChance()) {
+            player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, nauseaDuration, 0));
             player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.cold_pot")), true);
         }
         if (!player.hasInfiniteMaterials()) {

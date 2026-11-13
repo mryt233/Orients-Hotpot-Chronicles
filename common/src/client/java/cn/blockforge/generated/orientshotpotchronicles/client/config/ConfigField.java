@@ -15,9 +15,10 @@ import java.util.List;
 /** 作者：mryt233；2026-11-11：设置字段规格及文案。 */
 public final class ConfigField {
     private ConfigField() { }
-    /** 数值单位：决定数值后面的单位字（秒 / 倍 / 点 / 级 / tick）。 */
+    /** 数值单位：决定数值后面的单位字（秒 / 倍 / 点 / 级 / 格 / tick）。 */
+    // mryt233 改：新增 BLOCK("block") 单位。
     public enum Unit {
-        TICK("tick"), MULTIPLIER("multiplier"), POINTS("point"), LEVEL("level"), PLAIN("");
+        TICK("tick"), MULTIPLIER("multiplier"), POINTS("point"), LEVEL("level"), BLOCK("block"), PLAIN("");
 
         private final String key;
 

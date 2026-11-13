@@ -20,8 +20,35 @@ public final class HotPotRuntime {
         // mryt233 改（2026-11-11，第四批 4B-1）：强制初始化 SoupBase，让六个内置汤底定义在读配置（Config.init）之前
         // 登记进汤底登记表（Soups）并把默认值记进配置模板。以前靠别的类碰巧先加载它。
         SoupBase.values();
+        // mryt233 改（2026-11-13，第四批 4I）：强制初始化 HotPotCooking，避免仅引用编译期常量导致 cooking.items.* 晚于 Config.init() 才登记。
+        HotPotCooking.cookRevision();
         Config.rememberCooking(HotPotCooking.DEFAULT_FALLBACK_TICKS,
             HotPotCooking.DEFAULT_FALLBACK_XP, HotPotCooking.DEFAULT_XP_PER_ITEM);
+        // mryt233 改（第四批 4I / 4J / 4K）：在 Config.init 之前登记围锅回血、冷锅反胃、干杯、辣度递增与战利品默认键
+        Config.rememberWarmth(Config.DEFAULT_WARMTH_INTERVAL_TICKS, Config.DEFAULT_WARMTH_RANGE,
+            Config.DEFAULT_WARMTH_DURATION, Config.DEFAULT_WARMTH_AMPLIFIER);
+        Config.rememberColdPot(Config.DEFAULT_COLD_POT_NAUSEA_CHANCE, Config.DEFAULT_COLD_POT_NAUSEA_DURATION);
+        Config.rememberCheers(Config.DEFAULT_CHEERS_COOLDOWN_TICKS,
+            Config.DEFAULT_CHEERS_LUCK_DURATION, Config.DEFAULT_CHEERS_LUCK_AMPLIFIER,
+            Config.DEFAULT_CHEERS_REGEN_DURATION, Config.DEFAULT_CHEERS_REGEN_AMPLIFIER,
+            Config.DEFAULT_CHEERS_BONUS_HUNGER, Config.DEFAULT_CHEERS_BONUS_SATURATION);
+        Config.rememberSpicy(Config.DEFAULT_SPICY_LEVEL_DURATION_STEP, Config.DEFAULT_SPICY_LEVEL_AMPLIFIER_FROM,
+            Config.DEFAULT_SPICY_SECOND_BONUS_L1, Config.DEFAULT_SPICY_SECOND_BONUS_L2,
+            Config.DEFAULT_SPICY_SECOND_BONUS_L3, Config.DEFAULT_SPICY_FIRE_FROM_LEVEL,
+            Config.DEFAULT_SPICY_FIRE_TOP_MULTIPLIER, Config.DEFAULT_SPICY_HUNGER_TOP_BONUS,
+            Config.DEFAULT_SPICY_MOUTH_FIRE_FROM_LEVEL, Config.DEFAULT_SPICY_MOUTH_FIRE_TICKS);
+        Config.rememberLoot(Config.DEFAULT_LOOT_SHRIMP_FISHING_WEIGHT, Config.DEFAULT_LOOT_LILY_PAD_LOTUS_ROOT_CHANCE,
+            Config.DEFAULT_LOOT_MUSHROOM_ENOKI_CHANCE, Config.DEFAULT_LOOT_COW_BEEF_LOIN_CHANCE,
+            Config.DEFAULT_LOOT_COW_BEEF_LOIN_LOOTING_BONUS);
+        Config.rememberGarnishLoot("scallion", 0.25F);
+        Config.rememberGarnishLoot("cilantro", 0.25F);
+        Config.rememberGarnishLoot("soybean", 0.15F);
+        Config.rememberGarnishLoot("garlic", 0.15F);
+        Config.rememberGarnishLoot("tomato", 0.15F);
+        Config.rememberGarnishLoot("chili_pepper", 0.15F);
+        Config.rememberGarnishLoot("peanut", 0.15F);
+        Config.rememberGarnishLoot("greens", 0.15F);
+        Config.rememberGarnishLoot("zhe_er_gen", 0.15F);
         var platform = Framework.platform();
         Config.init(platform.configDir(), platform.isDedicatedServer());
         Config.saveDefaultsIfNeeded();

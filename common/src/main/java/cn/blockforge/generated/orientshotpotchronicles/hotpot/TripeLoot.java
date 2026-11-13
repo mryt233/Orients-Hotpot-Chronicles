@@ -39,18 +39,21 @@ public final class TripeLoot {
                         .apply(EnchantedCountIncreaseFunction.lootingMultiplier(registries, UniformGenerator.between(0, 1)))));
                 return;
             }
+            // mryt233 改（2026-11-13，4K）：莲藕、金针菇、牛脊肉概率改读配置；概率为 0 时仍保留池子仅条件不中，确保重载恢复稳定。
             if (key.equals(Blocks.LILY_PAD.getLootTable())) {
+                float chance = clampChance(Config.lootLilyPadLotusRootChance());
                 tableBuilder.withPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1))
                     .when(HotPotLoot.withoutShears())
-                    .when(LootItemRandomChanceCondition.randomChance(0.5F))
+                    .when(LootItemRandomChanceCondition.randomChance(chance))
                     .add(LootItem.lootTableItem(HotPotContent.LOTUS_ROOT)));
                 return;
             }
             if (key.equals(Blocks.BROWN_MUSHROOM.getLootTable()) || key.equals(Blocks.RED_MUSHROOM.getLootTable())) {
+                float chance = clampChance(Config.lootMushroomEnokiChance());
                 tableBuilder.withPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1))
-                    .when(LootItemRandomChanceCondition.randomChance(0.5F))
+                    .when(LootItemRandomChanceCondition.randomChance(chance))
                     .add(LootItem.lootTableItem(HotPotContent.ENOKI_MUSHROOM)));
                 return;
             }
@@ -63,11 +66,18 @@ public final class TripeLoot {
                     .apply(SetItemCountFunction.setCount(UniformGenerator.between(1, 3)))
                     .apply(HotPotLoot.smeltWhenBurning())
                     .apply(EnchantedCountIncreaseFunction.lootingMultiplier(registries, UniformGenerator.between(0, 1)))));
+            float beefLoinChance = clampChance(Config.lootCowBeefLoinChance());
+            float beefLoinLootingBonus = clampChance(Config.lootCowBeefLoinLootingBonus());
             tableBuilder.withPool(LootPool.lootPool()
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(HotPotContent.BEEF_LOIN)
-                    .when(LootItemRandomChanceWithEnchantedBonusCondition.randomChanceAndLootingBoost(registries, 0.25F, 0.1F))
+                    .when(LootItemRandomChanceWithEnchantedBonusCondition.randomChanceAndLootingBoost(
+                        registries, beefLoinChance, beefLoinLootingBonus))
                     .apply(HotPotLoot.smeltWhenBurning())));
         });
+    }
+
+    private static float clampChance(float chance) {
+        return Math.max(0F, Math.min(1F, chance));
     }
 }

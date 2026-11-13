@@ -97,6 +97,15 @@ public final class DevTestCommands {
                             report(ctx, Opt4gProbe.run(player(ctx),
                                 com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "action"),
                                 BlockPosArgument.getBlockPos(ctx, "pos")))))))
+                .then(Commands.literal("opt4i")
+                    .then(Commands.argument("action", com.mojang.brigadier.arguments.StringArgumentType.word())
+                        .executes(ctx -> report(ctx, Opt4iProbe.run(player(ctx),
+                            com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "action"),
+                            BlockPos.ZERO)))
+                        .then(Commands.argument("pos", BlockPosArgument.blockPos()).executes(ctx ->
+                            report(ctx, Opt4iProbe.run(player(ctx),
+                                com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "action"),
+                                BlockPosArgument.getBlockPos(ctx, "pos")))))))
                 .then(Commands.literal("facing")
                     .then(Commands.argument("yaw", com.mojang.brigadier.arguments.FloatArgumentType.floatArg())
                         .executes(ctx -> {

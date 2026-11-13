@@ -28,7 +28,7 @@ public final class DrinkSip {
                 if (bottle) player.awardStat(Stats.ITEM_USED.get(item));
                 if (kind == DrinkKind.PLANT_PROTEIN_DRINK) HotPotCriterion.fire(player, "drink_author");
             }
-            if (cheered) player.getFoodData().eat(1, 0.4F);
+            if (cheered) player.getFoodData().eat(Config.cheersBonusHunger(), Config.cheersBonusSaturation());
             if (!bottle) player.awardStat(Stats.ITEM_USED.get(item));
         }
         if (bottle) kind.applySip(user);
