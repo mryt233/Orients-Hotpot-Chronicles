@@ -261,6 +261,7 @@ Enoki mushrooms and bok choy are in the **fastest** tier (as quick as beef loin 
 
 - Grass also drops **tomatoes** for hotpot base, **garlic** for garlic paste, and **soybeans** for tofu.
 - **Cooked Kelp:** cook vanilla kelp in a hotpot to restore 2 hunger points. Furnaces, smokers, and campfires still produce dried kelp.
+- {{dev}}Default drop chances for grass, lily pads, mushrooms, and beef loin can all be adjusted in [Numeric Config](faq.html#config) or under "Loot Drops" in the settings screen (tomatoes now have their own separate entry; changes require `/reload` to take effect).
 
 ## Hunger reference
 

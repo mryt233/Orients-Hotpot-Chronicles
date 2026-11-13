@@ -769,7 +769,7 @@
        "k": "note",
        "t": "Tip",
        "b": [
-        "Play the heat levels against chili oil, honey and vinegar: chili oil adds Fire Resistance, while honey and vinegar clear the Hunger that spicy broth brings. Food dipped in honey or vinegar will not leave you hungry from the heat, and your mouth will not catch fire."
+        "Play the heat levels against chili oil, honey and vinegar: chili oil adds Fire Resistance, while honey and vinegar clear the Hunger that spicy broth brings. Food dipped in honey or vinegar will not leave you hungry from the heat, and your mouth will not catch fire. （Development Preview）You can also adjust spicy level duration steps, Fire Resistance, and mouth-fire thresholds under the \"Spicy Broth Levels\" group in Numeric Config."
        ],
        "s": "tip"
       },
@@ -971,7 +971,7 @@
       },
       {
        "k": "p",
-       "t": "A pot is cold when it is not on a burning stove or lit campfire. The broth is still and ingredients float in it. Eating from a cold pot with chopsticks has a 30% chance of causing Nausea for 15 seconds—avoid cold food to keep from upsetting your stomach. Drinking a Plant Protein Drink, a bowl of clear broth, or dipping with vinegar clears it."
+       "t": "A pot is cold when it is not on a burning stove or lit campfire. The broth is still and ingredients float in it. Eating from a cold pot with chopsticks has a 30% chance of causing Nausea for 15 seconds—avoid cold food to keep from upsetting your stomach (（Development Preview）chance and duration can be adjusted under the \"Cold Pot Nausea\" group in Numeric Config). Drinking a Plant Protein Drink, a bowl of clear broth, or dipping with vinegar clears it."
       }
      ]
     },
@@ -1011,7 +1011,7 @@
      "blocks": [
       {
        "k": "p",
-       "t": "A heated pot refreshes Regeneration I for 10 seconds every four seconds on players within six blocks, like a beacon's area effect. Staying beside a pot keeps restoring health, and sharing a table makes it even livelier."
+       "t": "A heated pot refreshes Regeneration I for 10 seconds every four seconds on players within six blocks, like a beacon's area effect. Staying beside a pot keeps restoring health, and sharing a table makes it even livelier. （Development Preview）(Interval, radius, duration, and level can be adjusted under the \"Pot Warmth Healing\" group in Numeric Config; set duration to 0 to disable.)"
       }
      ]
     },
@@ -2147,6 +2147,11 @@
        "k": "bul",
        "t": "Cooked Kelp: cook vanilla kelp in a hotpot to restore 2 hunger points. Furnaces, smokers, and campfires still produce dried kelp.",
        "d": 0
+      },
+      {
+       "k": "bul",
+       "t": "（Development Preview）Default drop chances for grass, lily pads, mushrooms, and beef loin can all be adjusted in Numeric Config or under \"Loot Drops\" in the settings screen (tomatoes now have their own separate entry; changes require /reload to take effect).",
+       "d": 0
       }
      ]
     },
@@ -3219,7 +3224,7 @@
       },
       {
        "k": "p",
-       "t": "Drinking the cup turns it back into an empty cup and uses up the bonus, so toast again for more. Toasting unlocks the \"Cheers!\" advancement."
+       "t": "Drinking the cup turns it back into an empty cup and uses up the bonus, so toast again for more. Toasting unlocks the \"Cheers!\" advancement. （Development Preview）(Cooldown, Luck/Regeneration duration and level, and first-sip bonus hunger/saturation can be adjusted under the \"Cheers Toast\" group in Numeric Config.)"
       },
       {
        "k": "note",
@@ -5421,7 +5426,7 @@
       },
       {
        "k": "sub",
-       "t": "Ingredients (103 types)",
+       "t": "Ingredients (101 types)",
        "l": 2
       },
       {
@@ -5858,16 +5863,6 @@
        "k": "tr",
        "icon": "orients_hotpot_chronicles:soup_bowl",
        "t": "Soup Bowl　soup_bowl"
-      },
-      {
-       "k": "tr",
-       "icon": "orients_hotpot_chronicles:soup_bowl.named",
-       "t": "%s Bowl　soup_bowl.named"
-      },
-      {
-       "k": "tr",
-       "icon": "orients_hotpot_chronicles:soup_bowl.unknown",
-       "t": "Unknown Soup Bowl (%s)　soup_bowl.unknown"
       },
       {
        "k": "tr",

@@ -127,7 +127,7 @@ Hold a **filled cup with a drink in it** (orange drink, plant protein drink, Ori
 
 The moment you toast: a crisp double chime (a light glass note plus a high ding), a little ring of splashes at the rim, and a few cheerful music notes. Both players get **Luck I for 30 seconds + Regeneration I for 5 seconds**, and the cup is marked — **the next sip restores 1 extra hunger point** (the tooltip reads "Toasted · Restores +1 bonus Hunger when drunk").
 
-Drinking the cup turns it back into an empty cup and uses up the bonus, so toast again for more. Toasting unlocks the "**Cheers!**" advancement.
+Drinking the cup turns it back into an empty cup and uses up the bonus, so toast again for more. Toasting unlocks the "**Cheers!**" advancement. {{dev}}(Cooldown, Luck/Regeneration duration and level, and first-sip bonus hunger/saturation can be adjusted under the "Cheers Toast" group in [Numeric Config](faq.html#config).)
 
 :::tip
 Best to start a hotpot meal with a round of toasts: Luck up, and your aim at the meatballs is steadier. Playing alone is fine too — Shift + right-click the air raises your cup just the same.
