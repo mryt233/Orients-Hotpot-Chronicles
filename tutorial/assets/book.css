@@ -191,8 +191,9 @@ mark.hit{animation:hitPulse 1.6s var(--out)}
 /* ---------- 正文 ---------- */
 .flow img.ic{image-rendering:pixelated}
 .flow>*{break-inside:avoid-column}
-.flow p,.flow ul,.flow ol{break-inside:auto}
-.flow li{break-inside:avoid}
+.flow p,.flow ul,.flow ol,.flow table,.flow .callout,.flow .toc{break-inside:auto}
+.flow tr,.flow li,.flow .callout>p,.flow .callout li{break-inside:avoid}
+.flow thead{display:table-header-group}
 .ehead{display:flex;align-items:center;gap:10px;padding-bottom:8px;margin-bottom:14px;border-bottom:2px solid var(--rule);break-after:avoid}
 .ehead .eic{width:32px;height:32px;flex:none}
 .ehead h1,.ehead h2{margin:0;color:var(--heading);font-size:22px;line-height:1.35}
@@ -210,20 +211,22 @@ mark.hit{animation:hitPulse 1.6s var(--out)}
 .flow pre{white-space:pre-wrap;font-size:13px;background:rgba(96,56,32,.08);padding:8px 10px}
 .flow blockquote{margin:.6em 0;padding:6px 12px;background:rgba(96,56,32,.06);border-left:3px solid var(--number);color:var(--text)}
 .flow blockquote p{margin:.2em 0}
-.flow table{border-collapse:collapse;margin:.65em 0;font-size:13.5px;line-height:1.45;width:100%;word-break:break-word}
+.flow table{border-collapse:collapse;margin:.65em 0;font-size:13.5px;line-height:1.45;width:100%;overflow-wrap:break-word;word-break:normal}
 .flow th,.flow td{border-bottom:1px solid var(--rule);padding:4px 6px;text-align:left;vertical-align:middle}
 .flow th{color:var(--heading);border-bottom:2px solid var(--rule);background:rgba(96,56,32,.04);font-weight:700}
+.flow td a[href^="http"],.flow td code{overflow-wrap:anywhere;word-break:break-all}
 .flow hr{border:0;border-top:2px dashed var(--rule)}
 .muted{color:var(--muted)}
 figure{margin:.8em 0}figure img{width:100%;border:3px solid var(--outline);display:block}figcaption{color:var(--muted);font-size:13px}
 .callout{margin:.7em 0;padding:5px 10px 5px 12px;border-left:3px solid var(--tip);background:rgba(46,94,30,.05);color:var(--tip)}
-.callout .ct{font-weight:700}.callout p{margin:.25em 0}.callout b,.callout strong{color:inherit}
+.callout .ct{font-weight:700;break-after:avoid}.callout .chips{break-after:avoid}.callout p{margin:.25em 0}.callout b,.callout strong{color:inherit}
 .callout.warn{border-color:var(--warn);background:rgba(138,34,26,.05);color:#6a1812}
 .callout.dev{border-color:var(--gold);background:rgba(154,106,16,.06);color:#6a4a08}
 .tag{display:inline-block;font-size:11.5px;line-height:1;padding:3px 6px;margin-left:6px;vertical-align:3px;font-weight:600;border:2px solid}
 .tag.since{color:var(--tip);border-color:var(--tip)}.tag.dev{color:#fff;background:var(--gold);border-color:var(--gold)}
-.it{display:inline-flex;align-items:center;gap:3px;vertical-align:middle;margin:0 1px;white-space:nowrap;color:var(--heading)}
-.it .ic{width:22px;height:22px}
+.it{display:inline-flex;align-items:center;gap:3px;vertical-align:middle;margin:0 1px;white-space:nowrap;color:var(--heading);max-width:100%}
+.it .ic{width:22px;height:22px;flex:none}
+.flow table .it,.chips .it{white-space:normal}
 .chips{display:flex;flex-wrap:wrap;gap:6px 10px;margin:.6em 0}
 .ic.missing{display:inline-grid;place-items:center;width:32px;height:32px;background:#a33;color:#fff}
 
@@ -318,7 +321,8 @@ figure{margin:.8em 0}figure img{width:100%;border:3px solid var(--outline);displ
   .mfind.on{background-position:-572px -44px;transform:translateY(-8px)}
   .mfind .cmp{position:absolute;left:7px;top:7px;width:30px;height:30px;image-rendering:pixelated}
   .findbox{top:12px}
-  .bar{font-size:14px}
+  .bar{flex-wrap:wrap;gap:6px 10px;padding:10px 12px 0;font-size:13px}
+  .bar .name{flex:1 1 100%;text-align:center}
   /* 书顶一排：最左「三横线」书签固定不动（点了滑出菜单），右边是这个分类的条目小书签，左右滑动 */
   .mtop{display:flex;align-items:flex-end;gap:4px;position:absolute;z-index:1;left:12px;right:12px;top:-46px;height:48px}
   .menu-btn{flex:none;display:flex;align-items:center;gap:6px;height:42px;margin-bottom:-2px;padding:0 10px 0 9px;border:0;cursor:pointer;

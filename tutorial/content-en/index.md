@@ -8,7 +8,7 @@
 
 {{icons:brick_stove,iron_nine_grid_hotpot,bamboo_chopsticks,oak_hotpot_table,oak_stool,quartz_eight_slot_platter,oak_sauce_station,cutting_board}}
 
-Welcome to **Orient's Hotpot Chronicles**, a Fabric mod that brings **sharing a hotpot meal** into Minecraft. Build a stove, set a copper or iron pot on top, pour in broth, add tripe and fatty beef rolls, then pick up a bite with chopsticks, dip it in your own sauce, and enjoy.
+Welcome to **Orient's Hotpot Chronicles**, a Fabric mod that brings **sharing a hotpot meal** into Minecraft. Build a stove, set up a pot, pour in broth, simmer tripe and fatty beef rolls, then pick up a bite with chopsticks and dip it in seasonings.
 
 This guide has two parts: **learning to play** and **looking things up**.
 
@@ -49,7 +49,7 @@ Shapelessly craft an **Iron Kitchen Knife + book** into a Hotpot Guide (the knif
 
 ## Supported versions and downloads
 
-0.3.0-alpha simultaneously supports **Minecraft 1.21.1 (Fabric, NeoForge)**, **1.20.1 (Fabric, Forge)**, **26.1.x (Fabric, NeoForge)**, and **26.2 (Fabric, NeoForge)**. **This guide demonstrates 1.21.1 Fabric.** Download links (CurseForge, Modrinth, GitHub), installation steps, and feedback channels (GitHub and QQ) are on [Downloads, Installation & Feedback](install.html).
+0.3.0-alpha simultaneously supports **Minecraft 1.21.1 (Fabric, NeoForge)**, **1.20.1 (Fabric, Forge)**, **26.1.x (Fabric, NeoForge)**, and **26.2 (Fabric, NeoForge)**. **This guide demonstrates 1.21.1 Fabric.** Download links (CurseForge, Modrinth, MC百科 (MCMod), GitHub), installation steps, and feedback channels (GitHub and QQ) are on [Downloads, Installation & Feedback](install.html).
 
 :::warn
 The mod is still in **alpha** and has only had preliminary testing. When upgrading worlds from 0.1.0-alpha.1, modded items may disappear or change. **Back up your world first**; a new world is recommended.

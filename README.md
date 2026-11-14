@@ -17,7 +17,7 @@ Have a hotpot dinner in Minecraft: build a stove, seat a pot on it, pour in a br
 
 <p><sub>源代码 / Source code：<a href="LICENSE">MIT</a> · 原创贴图、模型、音效等 / Original creative assets：<a href="ASSETS_LICENSE">CC BY-NC-SA 4.0</a></sub></p>
 
-[简中书本教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/?lang=zh_cn&v=book-20261113-94ca9e05) / [繁中書本教學](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-tw/?lang=zh_tw&v=book-20261113-94ca9e05) / [English Book Guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/?lang=en&v=book-20261113-94ca9e05) · [下载测试版 · Download Alpha](#downloads) · [更新日志 · Changelog](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) · [反馈问题 · Report an Issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
+[简中书本教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/?lang=zh_cn&v=book-20261115-944bbb50) / [繁中書本教學](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-tw/?lang=zh_tw&v=book-20261115-944bbb50) / [English Book Guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/?lang=en&v=book-20261115-944bbb50) · [下载测试版 · Download Alpha](#downloads) · [更新日志 · Changelog](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) · [反馈问题 · Report an Issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
 
 </div>
 
@@ -349,7 +349,7 @@ Use **Java 25+ for Minecraft 26.x**, **Java 21+ for 1.21.1**, or **Java 17+ for 
 
 ## 怎么玩 · How to play
 
-更详细的图文说明见[简中书本教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/?lang=zh_cn&v=book-20261108-7d1fc48e)。 / See the [online book guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/?lang=en&v=book-20261108-7d1fc48e) for more pictures and details.
+更详细的图文说明见[简中书本教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/?lang=zh_cn&v=book-20261115-944bbb50)。 / See the [online book guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/?lang=en&v=book-20261115-944bbb50) for more pictures and details.
 
 <details>
 <summary><b>展开中文玩法</b></summary>

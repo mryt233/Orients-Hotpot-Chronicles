@@ -28,7 +28,7 @@ Want one spicy half and one mild half? Add a copper or iron ingot to convert a n
 | --- | --- |
 | {{i:minecraft:water_bucket}} | **Clear Broth:** standard speed, suitable for any ingredient |
 | {{i:minecraft:milk_bucket}} | **Rich Stock:** slowest (×0.85), milky white |
-| {{i:minecraft:mushroom_stew}} | **Mushroom Broth:** a little faster (×1.15) |
+| {{i:minecraft:mushroom_stew}} | **Mushroom Broth:** a little faster (×1.15); returns the empty bowl |
 | {{i:minecraft:lava_bucket}} | **Spicy Red Broth:** fastest (×1.3), bright red |
 
 Once broth is added, a pot on the stove gives off steam. **An empty pot will not light the stove.**
@@ -40,7 +40,7 @@ With broth in the pot, hold a **raw ingredient** and right-click to add it. The 
 Start simply: vanilla raw beef, porkchops, mutton, and fish all work. For a more typical hotpot, try {{i:tripe}} (dropped by cows) or {{i:fatty_beef_roll}} (cut with a kitchen knife). See [Ingredients & Food Preparation](ingredients.html).
 
 :::warn
-**Put food in the pot.** In 0.1.2-alpha, wood and iron items could also go in and get “cooked” into charcoal or iron nuggets. Avoid doing this (from 0.1.3-alpha-hotfix1 onward, pots only accept food).
+**Only put food in the pot.** In 0.1.2-alpha, wood and iron items could also go in and get cooked into charcoal or iron nuggets; from 0.1.3-alpha-hotfix1 onward, pots only accept food, and cooked food cannot be added again.
 :::
 
 ## Step 5: Craft chopsticks
@@ -52,7 +52,7 @@ Start simply: vanilla raw beef, porkchops, mutton, and fish all work. For a more
 ## Step 6: Eat!
 
 - **In the hotpot screen:** with chopsticks on your cursor, **left-click cooked food** to eat it in one bite (complete with chewing sounds and a burp).
-- **Pick up directly with chopsticks without opening the screen:** hold bamboo chopsticks and **right-click the pot directly** to pick up a cooked portion from the targeted cell (it will notify you if there is no cooked food in that cell), then **hold right-click** to eat it.
+- **Pick up directly with chopsticks without opening the screen:** hold bamboo chopsticks and **right-click the pot directly** to pick up a cooked portion from the targeted cell, then **hold right-click** to eat it.
 - **Empty hands work too:** right-click the pot with an empty hand (or holding a bowl) to scoop out cooked food directly from the targeted cell.
 - **Watch out for cold pots:** food will not cook without heat—eating from an unheated “cold pot” has a 30% chance of causing Nausea for 15 seconds.
 

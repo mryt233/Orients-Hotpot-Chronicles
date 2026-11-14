@@ -91,8 +91,6 @@ To empty the pot and change its broth, **scoop it out with an empty bucket**, re
 
 ## Drinks {#drink}
 
-What's hotpot without something to drink?
-
 {{icons:orange_drink,plant_protein_drink,orient_cola,glass_cup}}
 
 | Drink | Effect per sip |
@@ -127,7 +125,7 @@ Hold a **filled cup with a drink in it** (orange drink, plant protein drink, Ori
 
 The moment you toast: a crisp double chime (a light glass note plus a high ding), a little ring of splashes at the rim, and a few cheerful music notes. Both players get **Luck I for 30 seconds + Regeneration I for 5 seconds**, and the cup is marked — **the next sip restores 1 extra hunger point** (the tooltip reads "Toasted · Restores +1 bonus Hunger when drunk").
 
-Drinking the cup turns it back into an empty cup and uses up the bonus, so toast again for more. Toasting unlocks the "**Cheers!**" advancement. {{dev}}(Cooldown, Luck/Regeneration duration and level, and first-sip bonus hunger/saturation can be adjusted under the "Cheers Toast" group in [Numeric Config](faq.html#config).)
+Drinking the cup turns it back into an empty cup and uses up the bonus, so toast again for more. Toasting unlocks the "**Cheers!**" advancement. {{dev}}(Cooldown, Luck/Regeneration duration and level, and first-sip bonus hunger/saturation can be adjusted under the "Cheers Toast" group in [Configurable values](faq.html#config).)
 
 :::tip
 Best to start a hotpot meal with a round of toasts: Luck up, and your aim at the meatballs is steadier. Playing alone is fine too — Shift + right-click the air raises your cup just the same.
@@ -143,7 +141,7 @@ Best to start a hotpot meal with a round of toasts: Luck up, and your aim at the
 
 {{icons:cloth_apron}}
 
-What people fear most at a hotpot is hot oil and boiling broth splashing up — and a mouthful of insane heat setting your lips on fire. The **cloth apron** is made for exactly these two things.
+What people fear most at a hotpot is hot oil and boiling broth splashing up — and a mouthful of Extreme Spicy heat setting your lips on fire. The **cloth apron** is made for exactly these two things.
 
 - **Where it goes**: the chestplate slot. On the inside it is invisible but it is real armor (3 armor points, 80 durability, the same tier as a vanilla leather chestplate); it wears down and can be enchanted normally.
 - **Crafting**: in the 3×3 grid, **one piece of string on top** makes the neck cord, and **six white wool** in the middle and bottom rows form the apron body.
@@ -151,7 +149,7 @@ What people fear most at a hotpot is hot oil and boiling broth splashing up — 
 
 {{recipe:cloth_apron}}
 
-### Three styles and recolouring {#apron_styles}{{since:0.2.2-alpha}}
+### Three styles and recoloring {#apron_styles}{{since:0.2.2-alpha}}
 
 {{icons:cloth_apron,blue_print_cloth_apron,brown_trim_cloth_apron}}
 
@@ -159,17 +157,17 @@ There are **three styles** of cloth apron. Their effect, durability, enchantabil
 
 || Style | Look |
 || --- | --- |
-|| {{i:cloth_apron}} Linen Cloth Apron | **Plain linen**, the default |
-|| {{i:blue_print_cloth_apron}} Blue Print Cloth Apron | Indigo with tiny single-pixel white flowers |
-|| {{i:brown_trim_cloth_apron}} Brown Trim Cloth Apron | Linen with dark brown trim all round and a small pocket on the hem |
+|| {{i:cloth_apron}} | **Plain linen**, the default |
+|| {{i:blue_print_cloth_apron}} | Indigo with tiny single-pixel white flowers |
+|| {{i:brown_trim_cloth_apron}} | Linen with dark brown trim all round and a small pocket on the hem |
 
-**Recolouring**: in a crafting grid, **any style + a dye** (shapeless) turns it into another style —
+**Recoloring**: in a crafting grid, **any style + a dye** (shapeless) turns it into another style —
 
 - any style + **white dye** → **linen**
 - any style + **blue dye** → **blue print**
 - any style + **brown dye** → **brown trim**
 
-Recolouring is the **same apron with a new look**: **durability, enchantments and any custom name are all kept**, and it only costs one dye. Adding the dye of the style it already is changes nothing (you get the apron back).
+Recoloring is the **same apron with a new look**: **durability, enchantments and any custom name are all kept**, and it only costs one dye. Adding the dye of the style it already is changes nothing (you get the apron back).
 
 {{recipe:cloth_apron,blue_print_cloth_apron,brown_trim_cloth_apron}}
 
@@ -190,11 +188,9 @@ Once you wear it:
 
 {{recipe:bamboo_chopsticks}}
 
-Chopsticks are the most commonly used tool in this mod:
-
 <!-- mryt233 改（r146e）：立体竹条、四向、沿口点击与中心放菜。清单#139 -->
 - **Open the hotpot screen:** hold bamboo chopsticks and **Shift + right-click the pot**.
-- **Pick up cooked food from the pot:** **right-click the pot directly** to pick up a cooked portion from the targeted cell (it will notify you if there is no cooked food in that cell).
+- **Pick up cooked food from the pot:** **right-click the pot directly** to pick up a cooked portion from the targeted cell (notifies you if none is cooked).
 - **Pick up food from bowls and plates:** right-click a bowl or plate to pick up the last-added portion.
 - **Add food to the pot:** right-click the pot while holding a **raw** ingredient to place it in the pot.
 - **Eat:** while holding cooked food, **hold right-click** to eat it. **You can eat even when full** (the hunger bar stays put, saturation is still added). Any dipping-sauce effects apply too.

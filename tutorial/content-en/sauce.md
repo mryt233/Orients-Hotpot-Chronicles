@@ -57,13 +57,13 @@ Each recipe makes one station. Replace planks with iron ingots for iron, or use 
 
 Since 0.1.4-alpha, garlic drops from grass. Pound it on a cutting board with a rolling pin 3 times to make 2 portions of garlic paste.
 
-Each of the new ingredients has its own little story:
+Each of the last five ingredients has its own little story:
 
 - **Oyster Sauce**: shapelessly craft vanilla **kelp + sugar + glass bottle** for 2 bottles. The kelp you pick up by the sea finally has a purpose — dip in it and you can stay underwater without holding your breath.
 - **Sesame Paste**: **peanut + wheat seeds + bowl** makes 2 bowls. One rich spoonful takes the edge off the heat.
 - **Crushed Peanuts**: breaking grass has a **15%** chance to drop a **peanut**. Put the peanut on the [cutting board](ingredients.html#board) and **pound it 3 times with a rolling pin** for 2 portions of crushed peanuts (from the second hit the board already shows crumbs).
-- **Chopped Millet Chili**: one **chili pepper** cut once on the cutting board (or in a stonecutter) makes 2 portions. Chili peppers drop from grass. See [Ingredients](ingredients.html#chili_pepper).
-- **Minced Houttuynia**: breaking grass has a **15%** chance to drop a **houttuynia root**. Put the whole root on the [cutting board](ingredients.html#board) and **pound it 3 times with a rolling pin** for 2 portions of mince. Houttuynia cools and detoxifies, so this dip cures poison and adds some resistance. See [Ingredients](ingredients.html#zhe_er_gen).
+- **Chopped Millet Chili**: one **chili pepper** cut once on the cutting board (or in a stonecutter) makes 2 portions. Chili peppers drop from grass. See [Ingredients & Food Preparation](ingredients.html#chili_pepper).
+- **Minced Houttuynia**: breaking grass has a **15%** chance to drop a **houttuynia root**. Put the whole root on the [cutting board](ingredients.html#board) and **pound it 3 times with a rolling pin** for 2 portions of mince. Houttuynia cools and detoxifies, so this dip cures poison and adds some resistance. See [Ingredients & Food Preparation](ingredients.html#zhe_er_gen).
 
 {{recipe:oyster_sauce,sesame_paste}}
 
@@ -75,7 +75,7 @@ Each of the new ingredients has its own little story:
 
 Besides being used to mix sauces at the station, sesame paste and oyster sauce can also be **placed on the table as a decoration**.
 
-1. **Place it**: hold sesame paste or oyster sauce and **Shift + right-click** an empty spot on a hotpot table or tall hotpot table. Like chopsticks and sauce bowls it takes one plate slot, and several things can share that slot. It appears as a small 3D bottle matching its icon: **sesame paste** is a short labelled glass jar, **oyster sauce** a slim dark bottle.
+1. **Place it**: hold sesame paste or oyster sauce and **Shift + right-click** an empty spot on a hotpot table or tall hotpot table. Like chopsticks and sauce bowls it takes one plate slot, and several things can share that slot. It appears as a small 3D bottle matching its icon: **sesame paste** is a short labeled glass jar, **oyster sauce** a slim dark bottle.
 2. **Pick it back up**: **right-click it empty-handed** to put it back in your inventory; mining the bottle takes only that bottle. Mining the table drops every piece of tableware in that slot.
 3. **Decoration only**: a bottle on the table **cannot be dipped into and cannot season food**. To add this seasoning to a dish, go to the [sauce station](sauce.html#make) and mix a bowl as before (or dip at a sauce bowl on the table with chopsticks).
 4. The bottle can still be eaten as before (same hunger value); placing it is just for looks.

@@ -9,11 +9,11 @@ The latest build, **0.3.0-alpha**, simultaneously supports **Minecraft 1.21.1, 1
 | Minecraft | Loader | Java | Also required |
 | --- | --- | --- | --- |
 | **1.21.1** | **Fabric** (used in this guide, **0.3.0-alpha**) | 21 or later | Fabric Loader 0.15.11+ and **Fabric API** (0.116.14+1.21.1) |
-| **1.21.1** | **NeoForge** (**0.3.0-alpha**) | 21 or later | NeoForge 21.1.186 or later (**no** Fabric API required) |
+| **1.21.1** | **NeoForge** (**0.3.0-alpha**) | 21 or later | NeoForge 21.1.186 or later |
 | **1.20.1** | **Fabric** (**0.3.0-alpha**) | 17 or later | Fabric Loader 0.14.21+ and **Fabric API** (0.83.0+1.20.1+, tested up to 0.92.12) |
-| **1.20.1** | **Forge** (**0.3.0-alpha**) | 17 or later | Forge 47.0.0+ (tested with 47.0.0 and 47.4.28; **no** Fabric API required) |
+| **1.20.1** | **Forge** (**0.3.0-alpha**) | 17 or later | Forge 47.0.0+ (tested with 47.0.0 and 47.4.28) |
 | **26.1 / 26.1.1 / 26.1.2** | **Fabric** (**0.3.0-alpha**) | 25 or later | Fabric Loader 0.18.4+ and **Fabric API** (0.143.12+ for your 26.1.x) |
-| **26.1.2** | **NeoForge** (**0.3.0-alpha**) | 25 or later | NeoForge 26.1.2.71+ (**no** Fabric API required) |
+| **26.1.2** | **NeoForge** (**0.3.0-alpha**) | 25 or later | NeoForge 26.1.2.71+ |
 | **26.2** | **Fabric / NeoForge** (**0.3.0-alpha**) | 25 or later | Fabric Loader 0.18.4+ + **Fabric API** (0.148.3+), or NeoForge 26.2.0.57+ |
 
 :::tip
@@ -30,7 +30,7 @@ The latest build, **0.3.0-alpha**, simultaneously supports **Minecraft 1.21.1, 1
 | --- | --- | --- |
 | **CurseForge** | <https://www.curseforge.com/minecraft/mc-mods/orients-hotpot-chronicles> | Available normally |
 | **Modrinth** | <https://modrinth.com/mod/orients-hotpot-chronicles> | **If the page does not open, it is still awaiting approval.** Use another source for now. |
-| **MC百科** | <https://www.mcmod.cn/class/32185.html> | Chinese mod encyclopedia: overview and discussion |
+| **MC百科 (MCMod)** | <https://www.mcmod.cn/class/32185.html> | Chinese mod encyclopedia: overview and discussion |
 | **GitHub Releases** | <https://github.com/mryt233/Orients-Hotpot-Chronicles/releases> | One page per mod release, with jars for the supported loaders |
 
 **Check both the Minecraft version and the loader before downloading.** They appear in the filename, for example `orients_hotpot_chronicles-1.21.1-fabric-0.3.0-alpha.jar` or `orients_hotpot_chronicles-1.21.1-neoforge-0.3.0-alpha.jar`. Choosing the wrong version or loader will stop the game from launching.
@@ -56,8 +56,7 @@ The latest build, **0.3.0-alpha**, simultaneously supports **Minecraft 1.21.1, 1
 In Creative mode, look for the **Orient's Hotpot Chronicles** tab. The smaller tabs on the left sort items into All, Kitchenware, Tableware, Furniture, and Food.
 
 :::warn
-The mod is still in **alpha** and has **only had preliminary testing**. Compatibility with other mods, multiplayer, and unusual interactions may have bugs.
-Worlds from 0.1.0-alpha.1 may lose modded items or show changed appearances after upgrading. **Back up your world first; a new world is recommended.**
+The mod is still in **alpha** and has **only had preliminary testing**. Worlds from 0.1.0-alpha.1 may lose modded items or show changed appearances after upgrading. **Back up your world first; a new world is recommended.**
 :::
 
 ## How the ports differ {#ports}
@@ -77,14 +76,13 @@ Found a bug, have a question, or want to suggest something? Contact the author:
 | --- | --- |
 | **GitHub Issues** | [Send feedback](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose) (forms for bug reports, suggestions, and questions) |
 | **QQ group** | **248314791** (if the author does not reply, they are probably asleep) |
-| **Bilibili** | 蘧白川 |
+| **Bilibili** | 蘧白川 (Orient) |
 | **Email** | orientcheung233@gmail.com |
 | Project homepage | <https://github.com/mryt233/Orients-Hotpot-Chronicles> |
 
 **When reporting a bug, include:**
-
 1. Your Minecraft version, loader (Fabric / Forge / NeoForge), and mod version.
 2. What you did and exactly where the problem occurred.
 3. A screenshot if possible; for crashes, attach `latest.log` or the crash report.
 
-Mod author: **蘧白川 / Orient** (Zhihan and Orient are the same person's Chinese and English names). Code is licensed under MIT; original textures, models, and other assets are licensed under CC BY-NC-SA 4.0.
+Mod author: **Orient** (蘧白川 / 之晗; these all refer to the same person). Code is licensed under MIT; original textures, models, and other assets are licensed under CC BY-NC-SA 4.0.

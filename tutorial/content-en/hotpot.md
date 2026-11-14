@@ -25,7 +25,7 @@ Right-click the stove's brick body (or the stove itself when no pot is attached)
 
 | Fuel | Heat | Burn time (same as a furnace) |
 | --- | --- | --- |
-| Wood items (planks, logs, sticks, wooden items, etc.) | ×0.65 | For example, planks: 15 seconds |
+| Wood items (planks, logs, sticks, etc.) | ×0.65 | For example, planks: 15 seconds |
 | Coal or charcoal | ×1.0 | 80 seconds |
 | Lava bucket | ×1.6 | 1000 seconds |
 
@@ -68,7 +68,7 @@ A nine-grid pot has nine large cells, each containing a 3×3 set of smaller slot
 | {{i:tomato_soup_bucket}} | Tomato Broth | ×1.10 | Craft a broth bucket from hotpot base + water bucket, or add base to Clear Broth |
 | {{i:three_fresh_soup_bucket}} | Three Delicacies Broth | ×1.00 | Same method with Three Delicacies Hotpot Base |
 
-**Hotpot bases:** {{i:tomato_hotpot_base}} uses tomatoes; {{i:three_fresh_hotpot_base}} uses fish, mushroom, carrot, and kelp (see the [Recipe Collection](recipes.html)). Add base to Clear Broth in the pot, or pour in a prepared broth bucket. Added in 0.1.4-alpha.
+**Hotpot bases:** {{i:tomato_hotpot_base}} uses tomatoes, and {{i:three_fresh_hotpot_base}} uses Three Delicacies ingredients (see the [Recipe Collection](recipes.html)). Add base to Clear Broth in the pot, or pour in a prepared broth bucket. Added in 0.1.4-alpha.
 
 - Add broth: **hold the bucket or mushroom stew and right-click the pot**. A regular pot holds only one broth at a time; divided pots are different.
 - **Remove broth:** **right-click with an empty bucket** to recover its original contents (water returns as a water bucket). Mushroom broth requires a **bowl** and **no food remaining in the pot**; take all food out first.
@@ -87,7 +87,7 @@ Spicy Red Broth can be "turned up" — not with chili powder, but by **actually 
 
 How to adjust it:
 
-1. **Hold a {{i:chili_pepper}} chili pepper and right-click the red broth area**: the heat goes up one level, a burst of flame rises from the pot, and the action bar reports something like "Broth spiciness increased to: Extra Spicy". At Insane Spicy it only shows a hint and the pepper is not used up.
+1. **Hold a {{i:chili_pepper}} chili pepper and right-click the red broth area**: the heat goes up one level, a burst of flame rises from the pot, and the action bar reports something like "Broth spiciness increased to: Extra Spicy". At Extreme Spicy it only shows a hint and the pepper is not used up.
 2. **Ice to the rescue**: plain **Ice** lowers the heat by 1 level, **Packed Ice** by 2, and **Blue Ice** drops it straight back to Mild. White steam and splashes rise from the pot.
 3. Clicking **a different broth** with chili or ice shows "Only spicy red broth can be adjusted with chili or ice" and nothing is put into the pot.
 4. Yuanyang and four-grid pots **track each side separately**: only the side you click changes. Pouring broth, scooping it, swapping broths or emptying the pot all reset the heat to Mild.
@@ -95,20 +95,20 @@ How to adjust it:
 A bowl of {{i:spicy_red_broth_bowl}} scooped from the pot also keeps **the heat level at the moment it was scooped** and gives the matching effects when drunk. Cooked food from the pot shows a line like "Broth: Spicy Red Broth · Extra Spicy" in its tooltip.
 
 :::tip
-Play the heat levels against **chili oil**, **honey** and **vinegar**: chili oil adds Fire Resistance, while honey and vinegar clear the Hunger that spicy broth brings. Food dipped in honey or vinegar will not leave you hungry from the heat, and your mouth will not catch fire. {{dev}}You can also adjust spicy level duration steps, Fire Resistance, and mouth-fire thresholds under the "Spicy Broth Levels" group in [Numeric Config](faq.html#config).
+Play the heat levels against **chili oil**, **honey** and **vinegar**: chili oil adds Fire Resistance, while honey and vinegar clear the Hunger that spicy broth brings. Food dipped in honey or vinegar will not leave you hungry from the heat, and your mouth will not catch fire. {{dev}}You can also adjust spicy level duration steps, Fire Resistance, and mouth-fire thresholds under the "Spicy Broth Levels" group in [Configurable values](faq.html#config).
 :::
 
 ### What the broth adds to your food {#dish_flavor}{{since:0.2.2-alpha}}
 
-Food cooked in a pot **carries the flavour of that broth** — hover over it and the tooltip adds a line like "**Broth: Mushroom Broth**" (spicy red broth also shows the heat level). Eating it grants an extra effect:
+Food cooked in a pot **carries the flavor of that broth** — hover over it and the tooltip adds a line like "**Broth: Mushroom Broth**" (spicy red broth also shows the heat level). Eating it grants an extra effect:
 
 | Broth | Extra effect from food cooked in it |
 | --- | --- |
-| **Clear broth** | Speed I for 15 s (clean and light on your feet) plus 1 tick of Saturation |
-| **Rich stock** | Resistance I for 15 s plus Absorption I for 30 s (beef bones and old hen, sturdy and nourishing — **no more Slowness**) |
-| **Mushroom broth** | Regeneration I for 10 s (mountain mushrooms, gets the blood moving) |
-| **Spicy red broth** | Strength plus Speed by the heat level of that side; Extra Spicy and above add Fire Resistance and Hunger, see the table above |
-| **Tomato broth** | Haste I for 15 s (sweet and tart, keeps you sharp), and clears Nausea |
+| **Clear Broth** | Speed I for 15 s (clean and light on your feet) plus 1 tick of Saturation |
+| **Rich Stock** | Resistance I for 15 s plus Absorption I for 30 s (beef bones and old hen, sturdy and nourishing — **no more Slowness**) |
+| **Mushroom Broth** | Regeneration I for 10 s (mountain mushrooms, gets the blood moving) |
+| **Spicy Red Broth** | Strength plus Speed by the heat level of that side; Extra Spicy and above add Fire Resistance and Hunger, see the table above |
+| **Tomato Broth** | Haste I for 15 s (sweet and tart, keeps you sharp), and clears Nausea |
 | **Three Delicacies Broth** | Water Breathing for 20 s plus Luck I for 30 s (dried scallops and shrimp, fortune smiles) |
 
 It works the same whether you pick it up by hand, eat it with chopsticks, or put it in a bowl first. Simmer a batch in mushroom broth to keep healing, or cook a pot of Three Delicacies Broth and take it diving.
@@ -168,7 +168,7 @@ See the cooking section of the [Recipe Collection](recipes.html) for each ingred
 
 ### Cold pots
 
-A pot is **cold** when it is **not on a burning stove or lit campfire**. The broth is still and ingredients float in it. Eating from a cold pot with chopsticks has a 30% chance of causing **Nausea for 15 seconds**—avoid cold food to keep from upsetting your stomach ({{dev}}chance and duration can be adjusted under the "Cold Pot Nausea" group in [Numeric Config](faq.html#config)). Drinking a [Plant Protein Drink](tableware.html#drink), a bowl of clear broth, or dipping with vinegar clears it.
+A pot is **cold** when it is **not on a burning stove or lit campfire**. The broth is still and ingredients float in it. Eating from a cold pot has a 30% chance of causing **Nausea for 15 seconds** ({{dev}}chance and duration can be adjusted under the "Cold Pot Nausea" group in [Configurable values](faq.html#config)). Drinking a [Plant Protein Drink](tableware.html#drink), a bowl of clear broth, or dipping with vinegar clears it.
 
 ## Cooking on a campfire {#campfire}{{since:0.1.1-alpha}}
 
@@ -181,7 +181,7 @@ You can cook without a stove by placing the pot **on a lit campfire or soul camp
 
 ## Benefits of eating together {#heal}
 
-A **heated pot** refreshes **Regeneration I** for **10 seconds** every **four seconds** on players **within six blocks**, like a beacon's area effect. Staying beside a pot keeps restoring health, and sharing a table makes it even livelier. {{dev}}(Interval, radius, duration, and level can be adjusted under the "Pot Warmth Healing" group in [Numeric Config](faq.html#config); set duration to `0` to disable.)
+A **heated pot** refreshes **Regeneration I** for **10 seconds** every **four seconds** on players **within six blocks**, like a beacon's area effect. Staying beside a pot keeps restoring health, and sharing a table makes it even livelier. {{dev}}(Interval, radius, duration, and level can be adjusted under the "Pot Warmth Healing" group in [Configurable values](faq.html#config); set duration to `0` to disable.)
 
 ## Yuanyang and four-grid pots {#yuanyang}{{since:0.1.3-alpha-hotfix1}}
 

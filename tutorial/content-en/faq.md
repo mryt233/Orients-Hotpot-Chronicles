@@ -28,7 +28,7 @@ You ate from a **cold pot**, which has a 30% chance of causing Nausea for 15 sec
 A tall stove occupies the block above it too. Clear the space above it.
 
 **Q: How do I pick up a pot?**
-For a stove-mounted pot: **Shift + right-click with an empty hand**. The whole pot goes into your inventory with broth and food, and is restored when placed (standalone / campfire pots gain this action from 0.1.3-alpha-hotfix1 onward). You can also mine it directly (the pot has its own hardness, separate from the stove).
+For a stove-mounted pot: **Shift + right-click with an empty hand**. The whole pot goes into your inventory with broth and food, and is restored when placed (standalone / campfire pots gain this action from 0.1.3-alpha-hotfix1 onward). You can also mine it directly.
 
 ## Tables, seating, and tableware
 
@@ -109,7 +109,7 @@ Starting in **0.3.0-alpha**, in addition to tweaking built-in config values and 
 - **Data pack recipe paths and reload**: place `data/<namespace>/recipe/soup/<name>.json` (recipe type `orients_hotpot_chronicles:soup_base`) to add or override a broth, and `data/<namespace>/recipe/seasoning/<name>.json` (recipe type `orients_hotpot_chronicles:seasoning`) to add or override a seasoning; the registered ID strips the `soup/` or `seasoning/` prefix (e.g., `<namespace>:<name>`). Run `/reload` to hot-reload, and servers automatically sync these to multiplayer clients (hidden from the vanilla recipe book).
 - **Override priority**: data packs only need to specify the fields they want to adjust to override a built-in broth or seasoning; however, **built-in values explicitly modified by the player** in `config/orients_hotpot_chronicles.json` or the settings screen have the highest priority and are not overwritten by data packs (`config > data pack > code defaults`). Third-party namespace entries are defined solely by data packs or add-ons and do not read/write this mod's built-in config file.
 - **Generic soup bowl and tinting**: add-on mods may supply a dedicated bowl item and broth surface textures (`assets/<ns>/textures/block/hot_pot_top_<path>[_boiling].png`); broths without a dedicated bowl item fill the generic {{i:soup_bowl}}`orients_hotpot_chronicles:soup_bowl`, storing the broth ID in the `orients_hotpot_chronicles:soup` data component and inheriting its effects. Pure JSON data packs need no extra textures — the pot surface is tinted by `screen_colors.base` and boiling bubbles by `bubble_colors.body` over the clear-broth base. If a data pack or add-on is later removed, existing blocks and bowls preserve their raw ID data and display an unknown placeholder.
-- **Java add-on registration**: add-ons may call `Soups.register(...)` and `Seasonings.register(...)` before registry freeze at startup; see `mod/docs/开放登记说明.md` in the repository for detailed schemas (`mod/content/materials.json` remains solely the single source of truth for built-in textures and static built-in broth generators).
+- **Java add-on registration**: add-ons may call `Soups.register(...)` and `Seasonings.register(...)` before registry freeze at startup; see `mod/docs/开放登记说明.md` (the open-registration guide in the repository) for detailed schemas (`mod/content/materials.json` remains solely the single source of truth for built-in textures and static built-in broth generators).
 
 ## Useful commands
 

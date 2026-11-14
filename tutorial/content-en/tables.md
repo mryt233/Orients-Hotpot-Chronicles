@@ -27,7 +27,7 @@ Oak, spruce, birch, jungle, acacia, dark oak, mangrove, cherry, bamboo, crimson,
 
 {{recipe:oak_tall_hotpot_table}}
 
-- **1.5 blocks high**, with an overhanging tabletop. The legs occupy pixels 0–19 and are recessed four pixels on the outside too.
+- **1.5 blocks high**, with an overhanging tabletop, legs underneath, and four pixels recessed on the outside for legroom.
 - The lower block is **vanilla bricks**, with wooden planks above it; this is why the recipe uses three brick blocks.
 - Pair them with a **tall stove**. When the stove opening faces a table, the table **removes the bricks on that side and keeps the wooden part**, leaving the firebox visible.
 - They also connect automatically to low tables and stoves.
@@ -61,8 +61,8 @@ Both come in 11 wood types. Use the corresponding planks in the recipes.
 ### Placement
 
 - **Facing:** seating and seated players face the direction you were looking when placing it.
-- **Connecting:** adjacent seats in a straight line connect automatically when they are the same height, even with different woods. Middle legs disappear and end legs move inward. Perpendicular seats do not connect. **Each connected run is limited to 3 blocks**; a further seat starts a separate run. In 0.1.2-alpha, seats must **face the same direction**; placing from the opposite side leaves them offset. From 0.1.3-alpha-hotfix1, they connect along the same line regardless of which side you stand on.
-- Tall benches have angled A-frame legs, drawn by code because vanilla models cannot rotate at such small angles; their collision and selection width matches the seat top so walking alongside benches stays smooth.
+- **Connecting:** two adjacent seats in a straight line of the same height **connect automatically**, removing middle legs and pulling end legs inward; perpendicular seats do not connect. **Each connected run is limited to 3 blocks**; placing beyond that starts a new run. In 0.1.2-alpha, seats only connected when facing the same direction; from 0.1.3-alpha-hotfix1 onward, they connect regardless of which side you stand on.
+- Benches have angled A-frame legs drawn by code; their collision and selection width matches the seat top so walking alongside benches stays smooth.
 
 ### Stacking benches into a ladder {#climb}{{since:0.2.2-alpha}}
 

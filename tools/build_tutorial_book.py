@@ -142,6 +142,7 @@ BOOK_UI = {   # 书本样式自己的界面文字（分类名、合成表分组�
         "搜索：物品、玩法、配方……": "Search: items, gameplay, recipes…",
         "目录：": "Contents: ", "点一下换个角度": "Click to switch the view angle", "铜制": "Copper ", "铁制": "Iron ",
         "做法：": "How to make: ", "铜锅": "Copper", "铁锅": "Iron",
+        "合成（无序：任意一款围裙 + 染料，耐久和附魔保留）": "Crafting (shapeless: any cloth apron + dye; keeps durability & enchantments)",
         "翻页音效：开（点一下关掉）": "Page-turn sound: on (click to turn off)", "翻页音效：关（点一下打开）": "Page-turn sound: off (click to turn on)",
         "输入想找的东西，比如「毛肚」「鸳鸯锅」「蘸料」「配方」。": "Type what you are looking for, e.g. “tripe”, “yuanyang”, “sauce”, or “recipe”.",
         "没有找到「": "Nothing found for “", "」。": "”.",
@@ -152,7 +153,7 @@ BOOK_UI = {   # 书本样式自己的界面文字（分类名、合成表分组�
             "模組內的所有物品與方塊（自動產生）。<code>ID</code> 是指令使用的識別名稱，例如 ",   # 不写 zh_tw 字样（用户 2026-11-02）
         "入门": "入門", "火锅": "火鍋", "食材": "食材", "蘸料": "沾醬", "餐具": "餐具", "桌凳": "桌凳", "查阅": "查閱",
         "开发版预览": "開發版預覽", "关于": "關於", "欢迎": "歡迎",
-        "灶台与锅": "灶台與鍋具", "盘子": "盤子", "蘸料台": "醬料台", "厨具与食材": "廚具與食材",
+        "灶台与锅": "灶台與鍋具", "盘子": "盤子", "蘸料台": "沾醬台", "厨具与食材": "廚具與食材",
         "切石机": "切石機", "切石机 / 砧板": "切石機／砧板", "切石机或砧板（铁菜刀）": "切石機或砧板（鐵菜刀）",
         "切石机 1 次／砧板 3 刀": "切石機 1 次／砧板 3 刀",
         "擀面杖捣制": "擀麵棍搗製", "砧板上用擀面杖捣 %d 下": "砧板上用擀麵棍搗 %d 下",
@@ -173,6 +174,7 @@ BOOK_UI = {   # 书本样式自己的界面文字（分类名、合成表分组�
         "搜索：物品、玩法、配方……": "搜尋：物品、玩法、配方……",
         "目录：": "目錄：", "点一下换个角度": "點一下換個角度", "铜制": "銅製", "铁制": "鐵製",
         "做法：": "做法：", "铜锅": "銅鍋", "铁锅": "鐵鍋",
+        "合成（无序：任意一款围裙 + 染料，耐久和附魔保留）": "合成（不定形：任意一款圍裙 + 染料，保留耐久與附魔）",
         "翻页音效：开（点一下关掉）": "翻頁音效：開（點一下關掉）", "翻页音效：关（点一下打开）": "翻頁音效：關（點一下打開）",
         "输入想找的东西，比如「毛肚」「鸳鸯锅」「蘸料」「配方」。": "輸入想找的東西，比如「毛肚」「鴛鴦鍋」「沾醬」「配方」。",
         "没有找到「": "沒有找到「", "」。": "」。",
@@ -225,10 +227,13 @@ def set_lang(lang):
     global LANG, T
     if not _ORIG:
         _ORIG.update(CONTENT=bt.CONTENT, NAMES=dict(bt.NAMES), VZ=dict(bt.VZ), TAG=bt.TAG_ICON["minecraft:logs"],
+                     APRON_TAG=bt.TAG_ICON["orients_hotpot_chronicles:cloth_aprons"],
                      BADGE=bt.BADGE, POTS=[dict(p) for p in bt.POTS])
     LANG = lang
     bt.CONTENT, bt.NAMES, bt.VZ = _ORIG["CONTENT"], dict(_ORIG["NAMES"]), dict(_ORIG["VZ"])
-    bt.TAG_ICON["minecraft:logs"], bt.BADGE, bt.POTS = _ORIG["TAG"], _ORIG["BADGE"], [dict(p) for p in _ORIG["POTS"]]
+    bt.TAG_ICON["minecraft:logs"] = _ORIG["TAG"]
+    bt.TAG_ICON["orients_hotpot_chronicles:cloth_aprons"] = _ORIG["APRON_TAG"]
+    bt.BADGE, bt.POTS = _ORIG["BADGE"], [dict(p) for p in _ORIG["POTS"]]
     NAMES_EXTRA.clear()
     if lang == "zh_cn":
         T = {}
@@ -238,6 +243,7 @@ def set_lang(lang):
     mod, lang_file, folder = (en, "en_us.json", "content-en") if lang == "en" else (tw, "zh_tw.json", "content-zh-tw")
     T = dict(mod.UI)
     T.pop("注意", None)   # 只换提示框标题，别把 zh_tw 正文里的「注意」也换掉
+    T.pop("<h2>蘸料台</h2>", None)
     T['<div class="ct">注意</div>'] = '<div class="ct">%s</div>' % mod.UI["注意"]
     T['<div class="ct">小提示</div>'] = '<div class="ct">%s</div>' % mod.UI["小提示"]
     T.pop("小提示", None)
@@ -251,10 +257,13 @@ def set_lang(lang):
         bt.VZ = {k: k.split(":")[1].replace("_", " ").title() for k in _ORIG["VZ"]}
         bt.VZ.update({"minecraft:beef": "Raw Beef", "minecraft:mutton": "Raw Mutton",
                       "minecraft:porkchop": "Raw Porkchop", "minecraft:cod": "Raw Cod",
-                      "minecraft:salmon": "Raw Salmon", "minecraft:quartz": "Nether Quartz"})
+                      "minecraft:salmon": "Raw Salmon", "minecraft:quartz": "Nether Quartz",
+                      "minecraft:quartz_block": "Block of Quartz"})
         bt.TAG_ICON["minecraft:logs"] = ("minecraft:oak_log", "Any Log")
+        bt.TAG_ICON["orients_hotpot_chronicles:cloth_aprons"] = ("orients_hotpot_chronicles:cloth_apron", "Any Cloth Apron")
     else:
         bt.VZ = json.load(open(os.path.join(TUT, "data", "vanilla_zh_tw.json"), encoding="utf-8"))
+        bt.TAG_ICON["orients_hotpot_chronicles:cloth_aprons"] = ("orients_hotpot_chronicles:cloth_apron", "任意一款布圍裙")
     bt.BADGE = loc(bt.BADGE)
     for p in bt.POTS:
         p["n"], p["d"], p["r"] = POTS_L[lang][p["k"]]
@@ -272,11 +281,12 @@ def check_lang():
             bt.warnings.append("[%s] %s" % (LANG, e))
         if LANG == "zh_tw":
             src = open(os.path.join(_ORIG["CONTENT"], slug + ".md"), encoding="utf-8").read()
+            body_text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
             num = lambda v: Counter(re.findall(r"\d+(?:\.\d+)*", re.sub(r"<!--.*?-->", "", v, flags=re.S)))  # noqa: E731
             if num(src) != num(text):
                 bt.warnings.append("[zh_tw] %s.md 的数字和简体不一致" % slug)
-            if any(w in text for w in ("台灣", "台湾")):   # mryt233 改，2026-11-02：用户定写「繁体中文」，不写地区名、不写 zh_tw
-                bt.warnings.append("[zh_tw] %s.md 出现了地区名，语言一律写「繁体中文」" % slug)
+            if any(w in body_text for w in ("台灣", "台湾", "zh_tw")):   # mryt233 改，2026-11-02：用户定写「繁体中文」，不写地区名、不写 zh_tw
+                bt.warnings.append("[zh_tw] %s.md 出现了地区名或 zh_tw 字样，语言一律写「繁體中文」" % slug)
 
 CSS_PATH = os.path.join(TUT, "assets", "book.css")
 IMG = {}   # 页面里用到的图片：相对路径 → data URI（同一张只嵌一次）
@@ -344,7 +354,10 @@ def split_sections(md, by_h2):
 
 
 def render_section(md):
-    return embed_imgs(bt.render_md(md))
+    # mryt233 改：渲染前剥掉维护/清单注释，避免注释挡在标题前导致译文页漏掉 ehead 图标标题框，也不将内部注释带进成书 HTML
+    clean = re.sub(r"(?ms)^[ \t]*<!--.*?-->[ \t]*\r?\n?", "", md)
+    clean = re.sub(r"<!--.*?-->", "", clean)
+    return embed_imgs(bt.render_md(clean))
 
 
 def embed_imgs(body):

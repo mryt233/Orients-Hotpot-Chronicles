@@ -70,12 +70,12 @@ Place an ingredient on the board, then **right-click with the Iron Kitchen Knife
 
 | On the board | Cuts needed | Output | Hunger per cooked portion |
 | --- | --- | --- | --- |
-| {{i:minecraft:beef}} Raw Beef | 1 | 3 {{i:fatty_beef_roll}} | 3 |
-| {{i:minecraft:mutton}} Raw Mutton | 1 | 3 {{i:mutton_roll}} | 3 |
+| {{i:minecraft:beef}} | 1 | 3 {{i:fatty_beef_roll}} | 3 |
+| {{i:minecraft:mutton}} | 1 | 3 {{i:mutton_roll}} | 3 |
 | {{i:beef_loin}} | 1 | 3 {{i:beef_loin_slice}} | 3 |
-| {{i:minecraft:potato}} Potato | 3 cuts, 1 portion per cut | 3 portions of {{i:potato_slice}} (three slices in each portion) | 2 |
-| {{i:cold_tofu}} Tofu (Cold) | 1 | 3 portions of {{i:cold_tofu_cube}} | 2 |
-| {{i:hot_tofu}} Tofu (Hot) | 1 | 3 portions of {{i:hot_tofu_cube}} (already cooked) | 2 |
+| {{i:minecraft:potato}} | 3 cuts, 1 portion per cut | 3 portions of {{i:potato_slice}} (3 slices each) | 2 |
+| {{i:cold_tofu}} | 1 | 3 portions of {{i:cold_tofu_cube}} | 2 |
+| {{i:hot_tofu}} | 1 | 3 portions of {{i:hot_tofu_cube}} (already cooked) | 2 |
 
 **Shortcut:** use a **stonecutter** to prepare the whole batch at once.
 
@@ -186,7 +186,7 @@ Cold tofu and potato slices are good for more than the pot — press them and cu
 | {{i:wide_noodles}} | 2 **potato slices** side by side **in a row** | 3 | 1 | 4 |
 | {{i:sweet_potato_skin}} | 2 **potato slices** stacked **in a column** | 3 | 1 | 4 |
 
-- **Dried Tofu** is pressed firm and gets more bean flavour the longer you chew; **Tofu Skin** is dry and softens in seconds, so every fold soaks up broth.
+- **Dried Tofu** is pressed firm and gets more bean flavor the longer you chew; **Tofu Skin** is dry and softens in seconds, so every fold soaks up broth.
 - **Wide Potato Noodles** are slippery — hold them with chopsticks carefully or they slide back into the pot; **Sweet Potato Skin** carries a hint of sweetness.
 - All four can be simmered in the pot or baked in a furnace, smoker or campfire. In the pot they take about **5–7.5 seconds**: tofu skin and sweet potato skin 5 s, dried tofu and wide potato noodles 7.5 s.
 
@@ -258,10 +258,9 @@ Enoki mushrooms and bok choy are in the **fastest** tier (as quick as beef loin 
 
 - Break **short grass or the lower half of tall grass** without shears. Scallions and cilantro each have a **25%** drop chance.
 - Both **can be eaten raw** for one hunger point. They are also [dipping sauce](sauce.html) ingredients, and cilantro can make cilantro meatballs.
-
 - Grass also drops **tomatoes** for hotpot base, **garlic** for garlic paste, and **soybeans** for tofu.
+- {{dev}}Default drop chances for grass, lily pads, mushrooms, and beef loin can all be adjusted in [Configurable values](faq.html#config) or under "Loot Drops" in the settings screen (tomatoes now have their own separate entry; changes require `/reload` to take effect).
 - **Cooked Kelp:** cook vanilla kelp in a hotpot to restore 2 hunger points. Furnaces, smokers, and campfires still produce dried kelp.
-- {{dev}}Default drop chances for grass, lily pads, mushrooms, and beef loin can all be adjusted in [Numeric Config](faq.html#config) or under "Loot Drops" in the settings screen (tomatoes now have their own separate entry; changes require `/reload` to take effect).
 
 ## Hunger reference
 
@@ -298,5 +297,5 @@ Enoki mushrooms and bok choy are in the **fastest** tier (as quick as beef loin 
 | Minced Houttuynia | 1 | — |
 
 :::tip
-Not sure how long to simmer something? Four tiers cover it: **beef loin slices, tripe, enoki mushrooms and bok choy** cook fastest; **fatty beef rolls, mutton rolls, potato slices, tofu cubes, ham sausage slices, peeled shrimp, lotus root slices, squid rolls, tofu skin and sweet potato skin** are quick; **dried tofu, wide potato noodles, meatballs and crispy pork** are medium; **whole beef loin and houttuynia root slices** are slowest. See the "Cooking" table in [Recipes](recipes.html) for exact times — or tweak them in the config file.
+Not sure how long to simmer something? Four tiers cover it: **beef loin slices, tripe, enoki mushrooms and bok choy** cook fastest; **fatty beef rolls, mutton rolls, potato slices, tofu cubes, ham sausage slices, peeled shrimp, lotus root slices, squid rolls, tofu skin and sweet potato skin** are quick; **dried tofu, wide potato noodles, meatballs and crispy pork** are medium; **whole beef loin and houttuynia root slices** are slowest. See the "Cooking" table in [Recipe Collection](recipes.html) for exact times — or tweak them in the config file.
 :::
