@@ -531,7 +531,3 @@ Found a bug, or have a question or an idea? Let me know:
 ## 作者 · Credits
 
 蘧白川 / Orient · GitHub：[@mryt233](https://github.com/mryt233)
-
-### 贡献者 · Contributors
-
-- **Gemini / 反重力** · 翻译与发布文案协助 / Translation and release notes assistance
