@@ -1,0 +1,8 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/tall_hotpot_table_open_e",
+  "textures": {
+    "particle": "minecraft:block/crimson_planks",
+    "top": "minecraft:block/crimson_planks",
+    "base": "minecraft:block/crimson_planks"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smoking",
+  "category": "food",
+  "ingredient": "orients_hotpot_chronicles:enoki_mushroom",
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_enoki_mushroom"
+  },
+  "experience": 0.35,
+  "cookingtime": 100
+}

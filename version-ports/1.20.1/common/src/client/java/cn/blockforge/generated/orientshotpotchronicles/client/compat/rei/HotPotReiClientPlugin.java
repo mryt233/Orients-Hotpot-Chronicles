@@ -18,7 +18,8 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
-import me.shedaniel.rei.api.client.registry.category.DisplayCategory;
+// mryt233 改（2026-11-22）：修正 DisplayCategory 包路径对齐 REI 12（.registry.display.DisplayCategory）。
+import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
@@ -56,6 +57,10 @@ public final class HotPotReiClientPlugin implements REIClientPlugin {
     public static final CategoryIdentifier<CuttingDisplay> CUTTING = CategoryIdentifier.of(HotPot.id("cutting_board"));
     /** 擀面杖拍打类别。 */
     public static final CategoryIdentifier<PoundingDisplay> POUNDING = CategoryIdentifier.of(HotPot.id("pounding"));
+    /** 小石磨研磨类别（0.3.1 Phase 3.1）。 */
+    public static final CategoryIdentifier<StoneMillDisplay> STONE_MILL = CategoryIdentifier.of(HotPot.id("stone_mill"));
+    /** 开口大木桶压制与泡发类别（0.3.1 Phase 3.2）。 */
+    public static final CategoryIdentifier<WoodenVatDisplay> WOODEN_VAT = CategoryIdentifier.of(HotPot.id("wooden_vat"));
 
 
 
@@ -64,7 +69,8 @@ public final class HotPotReiClientPlugin implements REIClientPlugin {
 
     @Override
     public void registerCategories(CategoryRegistry registry) {
-        registry.add(new CookingCategory(), new CuttingCategory(), new PoundingCategory());
+        registry.add(new CookingCategory(), new CuttingCategory(), new PoundingCategory(),
+            new StoneMillCategory(), new WoodenVatCategory());
         for (ItemStack catalyst : HotPotRecipeViewerData.cookingCatalysts()) {
             registry.addWorkstations(COOKING, EntryStacks.of(catalyst));
         }
@@ -74,19 +80,32 @@ public final class HotPotReiClientPlugin implements REIClientPlugin {
         for (ItemStack catalyst : HotPotRecipeViewerData.poundingCatalysts()) {
             registry.addWorkstations(POUNDING, EntryStacks.of(catalyst));
         }
+        for (ItemStack catalyst : HotPotRecipeViewerData.stoneMillCatalysts()) {
+            registry.addWorkstations(STONE_MILL, EntryStacks.of(catalyst));
+        }
+        for (ItemStack catalyst : HotPotRecipeViewerData.woodenVatCatalysts()) {
+            registry.addWorkstations(WOODEN_VAT, EntryStacks.of(catalyst));
+        }
     }
 
     @Override
     public void registerDisplays(DisplayRegistry registry) {
         // mryt233 改（2026-11-11）：枚举当前客户端配方与配置，实际界面重建由查看器生命周期负责。
-        for (HotPotRecipeViewerData.CookingEntry recipe : HotPotRecipeViewerData.cookingRecipes(Minecraft.getInstance().level)) {
+        var level = Minecraft.getInstance().level;
+        for (HotPotRecipeViewerData.CookingEntry recipe : HotPotRecipeViewerData.cookingRecipes(level)) {
             registry.add(new CookingDisplay(recipe));
         }
         for (HotPotRecipeViewerData.CuttingEntry recipe : HotPotRecipeViewerData.cuttingRecipes()) {
             registry.add(new CuttingDisplay(recipe));
         }
-        for (HotPotRecipeViewerData.PoundingEntry recipe : HotPotRecipeViewerData.poundingRecipes(Minecraft.getInstance().level)) {
+        for (HotPotRecipeViewerData.PoundingEntry recipe : HotPotRecipeViewerData.poundingRecipes(level)) {
             registry.add(new PoundingDisplay(recipe));
+        }
+        for (HotPotRecipeViewerData.StoneMillEntry recipe : HotPotRecipeViewerData.stoneMillRecipes(level)) {
+            registry.add(new StoneMillDisplay(recipe));
+        }
+        for (HotPotRecipeViewerData.WoodenVatEntry recipe : HotPotRecipeViewerData.woodenVatRecipes(level)) {
+            registry.add(new WoodenVatDisplay(recipe));
         }
     }
 
@@ -290,6 +309,90 @@ public final class HotPotReiClientPlugin implements REIClientPlugin {
                 .markInput());
             Component hits = poundingHint(recipe);
             widgets.add(Widgets.createLabel(new Point(bounds.getX() + 32, bounds.getY() + 48), hits)
+                .leftAligned().noShadow().color(HINT, HINT_DARK));
+            return widgets;
+        }
+    }
+
+    public record StoneMillDisplay(HotPotRecipeViewerData.StoneMillEntry recipe) implements Display {
+        @Override
+        public List<EntryIngredient> getInputEntries() {
+            List<EntryIngredient> list = new ArrayList<>();
+            list.add(EntryIngredients.of(recipe.input()));
+            if (!recipe.fluidHint().isEmpty()) list.add(EntryIngredients.of(recipe.fluidHint()));
+            if (!recipe.containerHint().isEmpty()) list.add(EntryIngredients.of(recipe.containerHint()));
+            return list;
+        }
+        @Override public List<EntryIngredient> getOutputEntries() { return List.of(EntryIngredients.of(recipe.output())); }
+        @Override public CategoryIdentifier<?> getCategoryIdentifier() { return STONE_MILL; }
+    }
+
+    private static final class StoneMillCategory implements DisplayCategory<StoneMillDisplay> {
+        @Override public CategoryIdentifier<? extends StoneMillDisplay> getCategoryIdentifier() { return STONE_MILL; }
+        @Override public Component getTitle() { return recipeText("stone_mill"); }
+        @Override public Renderer getIcon() { return EntryStacks.of(new ItemStack(HotPotContent.STONE_MILL_ITEM)); }
+
+        @Override
+        public List<Widget> setupDisplay(StoneMillDisplay display, Rectangle bounds) {
+            HotPotRecipeViewerData.StoneMillEntry recipe = display.recipe();
+            List<Widget> widgets = new ArrayList<>();
+            widgets.add(Widgets.createRecipeBase(bounds));
+            widgets.add(Widgets.createSlot(new Point(bounds.getX() + 8, bounds.getY() + 22))
+                .entries(EntryIngredients.of(recipe.input())).markInput());
+            if (!recipe.fluidHint().isEmpty()) {
+                widgets.add(Widgets.createSlot(new Point(bounds.getX() + 30, bounds.getY() + 22))
+                    .entries(EntryIngredients.of(recipe.fluidHint())).markInput());
+            }
+            if (!recipe.containerHint().isEmpty()) {
+                widgets.add(Widgets.createSlot(new Point(bounds.getX() + 52, bounds.getY() + 22))
+                    .entries(EntryIngredients.of(recipe.containerHint())).markInput());
+            }
+            widgets.add(Widgets.createArrow(new Point(bounds.getX() + 76, bounds.getY() + 23)));
+            widgets.add(Widgets.createSlot(new Point(bounds.getX() + 104, bounds.getY() + 22))
+                .entries(EntryIngredients.of(recipe.output())).markOutput());
+            widgets.add(Widgets.createLabel(new Point(bounds.getX() + 8, bounds.getY() + 5), stoneMillHint(recipe))
+                .leftAligned().noShadow().color(HINT, HINT_DARK));
+            return widgets;
+        }
+    }
+
+    public record WoodenVatDisplay(HotPotRecipeViewerData.WoodenVatEntry recipe) implements Display {
+        @Override
+        public List<EntryIngredient> getInputEntries() {
+            List<EntryIngredient> list = new ArrayList<>();
+            list.add(EntryIngredients.of(recipe.fluidInput()));
+            if (!recipe.input().isEmpty()) list.add(EntryIngredients.of(recipe.input()));
+            if (!recipe.lidHint().isEmpty()) list.add(EntryIngredients.of(recipe.lidHint()));
+            return list;
+        }
+        @Override public List<EntryIngredient> getOutputEntries() { return List.of(EntryIngredients.of(recipe.output())); }
+        @Override public CategoryIdentifier<?> getCategoryIdentifier() { return WOODEN_VAT; }
+    }
+
+    private static final class WoodenVatCategory implements DisplayCategory<WoodenVatDisplay> {
+        @Override public CategoryIdentifier<? extends WoodenVatDisplay> getCategoryIdentifier() { return WOODEN_VAT; }
+        @Override public Component getTitle() { return recipeText("wooden_vat"); }
+        @Override public Renderer getIcon() { return EntryStacks.of(new ItemStack(HotPotContent.WOODEN_VAT_ITEM)); }
+
+        @Override
+        public List<Widget> setupDisplay(WoodenVatDisplay display, Rectangle bounds) {
+            HotPotRecipeViewerData.WoodenVatEntry recipe = display.recipe();
+            List<Widget> widgets = new ArrayList<>();
+            widgets.add(Widgets.createRecipeBase(bounds));
+            widgets.add(Widgets.createSlot(new Point(bounds.getX() + 8, bounds.getY() + 22))
+                .entries(EntryIngredients.of(recipe.fluidInput())).markInput());
+            if (!recipe.input().isEmpty()) {
+                widgets.add(Widgets.createSlot(new Point(bounds.getX() + 30, bounds.getY() + 22))
+                    .entries(EntryIngredients.of(recipe.input())).markInput());
+            }
+            if (!recipe.lidHint().isEmpty()) {
+                widgets.add(Widgets.createSlot(new Point(bounds.getX() + 52, bounds.getY() + 22))
+                    .entries(EntryIngredients.of(recipe.lidHint())).markInput());
+            }
+            widgets.add(Widgets.createArrow(new Point(bounds.getX() + 76, bounds.getY() + 23)));
+            widgets.add(Widgets.createSlot(new Point(bounds.getX() + 104, bounds.getY() + 22))
+                .entries(EntryIngredients.of(recipe.output())).markOutput());
+            widgets.add(Widgets.createLabel(new Point(bounds.getX() + 8, bounds.getY() + 5), woodenVatHint(recipe))
                 .leftAligned().noShadow().color(HINT, HINT_DARK));
             return widgets;
         }

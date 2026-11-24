@@ -14,7 +14,7 @@ import net.minecraft.world.level.Level;
  * 注册时写进物品组件的数值只作为默认值和客户端显示用；其他字段（能不能随时吃、吃多快、
  * 吃完留下什么、附加效果）本模组的食物都没用到，这里只重建营养和饱和度两项。
  * 作者：mryt233 */
-public class ConfiguredFoodItem extends Item {
+public class ConfiguredFoodItem extends Item implements ConfigurableFood {
     private final String foodId;
 
     public ConfiguredFoodItem(String foodId, Item.Properties settings) {
@@ -22,10 +22,15 @@ public class ConfiguredFoodItem extends Item {
         this.foodId = foodId;
     }
 
+    @Override
+    public String foodId() {
+        return foodId;
+    }
+
     /** 配置里的营养值；物品注册的组件保持默认值，客户端与服务端显示一致。 */
     public static FoodProperties food(ItemStack stack) {
         FoodProperties original = stack.get(DataComponents.FOOD);
-        if (original == null || !(stack.getItem() instanceof ConfiguredFoodItem item)) {
+        if (original == null || !(stack.getItem() instanceof ConfigurableFood item)) {
             return original;
         }
         // 自定义栈组件优先，不覆盖数据包/其他模组单独设置的效果和营养。
@@ -33,10 +38,9 @@ public class ConfiguredFoodItem extends Item {
         if (!original.equals(base)) {
             return original;
         }
-        // Yarn 1.21.1 的 saturation 是实际饱和点数（构建器内部乘了 2×营养），不是系数。
-        int nutrition = Config.foodHunger(item.foodId, original.nutrition());
+        int nutrition = Config.foodHunger(item.foodId(), original.nutrition());
         float defaultModifier = original.nutrition() == 0 ? 0 : original.saturation() / (2F * original.nutrition());
-        float modifier = Config.foodSaturation(item.foodId, defaultModifier);
+        float modifier = Config.foodSaturation(item.foodId(), defaultModifier);
         return new FoodProperties(nutrition, 2F * nutrition * modifier, original.canAlwaysEat());
     }
 

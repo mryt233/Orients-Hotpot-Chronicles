@@ -34,6 +34,8 @@ public final class ClientProbe {
         }
         Minecraft mc = Minecraft.getInstance();
         ticks++;
+        // mryt233 改（2026-11-19）：首帧记录只在开发探针开启时执行，不进入发布包。
+        PartEffectsProbe.tick();
         // 截图用：每 tick 把朝向按回去，否则玩家转身会被位置同步覆盖
         if (holdYaw != null && mc.player != null) {
             mc.player.setYRot(holdYaw);
@@ -74,6 +76,10 @@ public final class ClientProbe {
                 case "opt3c" -> Opt3cClientProbe.action(request);
                 // mryt233 改（2026-11-10）：3D 只取证真实火锅内容，不登记假物品。
                 case "opt3d" -> Opt3dClientProbe.action(request);
+                case "partfx" -> PartEffectsProbe.action(request);
+                case "fullcheck" -> FullCheckProbe.action(mc, request);
+                // mryt233 改（2026-11-20）：只用于本轮隔离光照取证。
+                case "lighting" -> LightingProbe.action(mc, request);
                 case "snapshot" -> { }
                 case "observe" -> {
                     if (mc.player == null) throw new IllegalStateException("Observer requires player");
@@ -178,6 +184,25 @@ public final class ClientProbe {
                 case "opt3h2" -> ConfigAt.run(mc, request.getAsJsonArray("extra"));
                 case "guideat" -> GuideAt.run(mc, request.getAsJsonArray("extra"));
                 case "guide" -> mc.setScreen(new GuideBookScreen());
+                case "minigamelobby" -> {
+                    BlockPos pos = HotPotMinigameClient.findTargetOrNearbyPot(mc);
+                    if (pos == null && request.has("x")) {
+                        pos = new BlockPos(request.get("x").getAsInt(), request.get("y").getAsInt(), request.get("z").getAsInt());
+                    }
+                    mc.setScreen(new MinigameLobbyScreen(pos == null ? BlockPos.ZERO : pos));
+                }
+                case "minigamepress" -> {
+                    var extra = request.getAsJsonArray("extra");
+                    String mode = extra != null && !extra.isEmpty() ? extra.get(0).getAsString() : "rush";
+                    int count = extra != null && extra.size() > 1 ? extra.get(1).getAsInt() : 1;
+                    if ("rush".equals(mode)) {
+                        for (int i = 0; i < count; i++) {
+                            HotPotMinigameClient.handleRushTap();
+                        }
+                    } else {
+                        HotPotMinigameClient.handleRhythmLaneTap(Math.max(0, Math.min(3, count)));
+                    }
+                }
                 // mryt233 改（2026-11-09，r146a）：截图用——打开游戏内设置界面
                 case "config" -> mc.setScreen(new HotPotConfigScreen(mc.screen));
                 // 在设置界面里切页签 / 展开分组：extra = 参数（"advanced" / "expand:0" / "shift"）
@@ -238,8 +263,13 @@ public final class ClientProbe {
                     holdPitch = args.get(1).getAsFloat();
                     mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
                     mc.options.fov().set(Math.max(30, Math.min(110, args.size() > 2 ? args.get(2).getAsInt() : 30)));
-                    mc.options.hideGui = true;
+                    boolean showHud = args.size() > 3 && "hud".equals(args.get(3).getAsString());
+                    mc.options.hideGui = !showHud;
                     mc.setScreen(null);
+                }
+                case "camera_clear" -> {
+                    holdYaw = null; holdBody = null; holdPitch = null;
+                    mc.options.hideGui = false;
                 }
                 case "view" -> {
                     mc.setCameraEntity(mc.player); holdPitch = 0F;
@@ -292,7 +322,11 @@ public final class ClientProbe {
                 default -> throw new IllegalArgumentException("Unsupported probe action");
             }
             pending = id;
-            if (!action.equals("walk")) readyAt = ticks + (Boolean.getBoolean("hotpot.opt3c") ? 6 : 40);
+            if (!action.equals("walk")) {
+                int delay = action.equals("partfx") || Boolean.getBoolean("hotpot.opt3c") ? 6
+                    : action.equals("fullcheck") ? 10 : 40;
+                readyAt = ticks + delay;
+            }
         } catch (Exception e) {
             HotPot.LOGGER.error("[hotpot-probe] 请求处理失败", e);
         }
@@ -308,6 +342,9 @@ public final class ClientProbe {
         if (Boolean.getBoolean("hotpot.opt3c")) report.add("opt3c", Opt3cClientProbe.status());
         report.addProperty("screen", mc.screen == null ? "none" : mc.screen.getClass().getName());
         report.add("opt3d", Opt3dClientProbe.status());
+        report.add("partfx", PartEffectsProbe.status());
+        report.add("lighting", LightingProbe.result());
+        report.add("fullcheck", FullCheckProbe.status(mc));
         report.add("guideat", GuideAt.result());
         report.add("opt3h2", ConfigAt.result());
         report.addProperty("window_width", mc.getWindow().getWidth());
@@ -389,6 +426,11 @@ public final class ClientProbe {
                 active.addProperty("cheers_bonus_hunger", Config.cheersBonusHunger());
                 active.addProperty("spicy_mouth_fire_ticks", Config.spicyMouthFireTicks());
                 active.addProperty("loot_shrimp_fishing_weight", Config.lootShrimpFishingWeight());
+                active.addProperty("mode_preset", Config.modePreset());
+                active.addProperty("mode_detailed_tofu", Config.detailedTofuProcessing());
+                active.addProperty("mode_penalties_enabled", Config.penaltiesEnabled());
+                active.addProperty("mode_simple_ui_collapse", Config.simpleUiCollapse());
+                active.addProperty("loot_chicken_feet_chance", Config.lootChickenFeetChance());
                 report.add("config_active", active);
             } catch (ReflectiveOperationException e) { throw new IllegalStateException(e); }
         }

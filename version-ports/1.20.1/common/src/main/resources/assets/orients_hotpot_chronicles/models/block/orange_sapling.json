@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "orients_hotpot_chronicles:block/orange_sapling"
+  }
+}

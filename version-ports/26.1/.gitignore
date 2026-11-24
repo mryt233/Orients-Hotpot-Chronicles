@@ -1,11 +1,6 @@
-build/
+# 作者：mryt233
 .gradle/
-run/
-runs/
-review/
-evidence/
+build/
+run*/
+logs/
 *.log
-__pycache__/
-.idea/
-out/
-bin/

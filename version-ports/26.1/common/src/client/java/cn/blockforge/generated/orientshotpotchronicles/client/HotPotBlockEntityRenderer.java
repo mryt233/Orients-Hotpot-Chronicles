@@ -1,4 +1,4 @@
-// mryt233 改：26.1 RenderFrame / RenderItems / Identifier API。
+// mryt233 改：26.2 RenderFrame / RenderItems / Identifier API。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import static cn.blockforge.generated.orientshotpotchronicles.client.RenderSprites.sprite;
@@ -41,9 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
     extends FrameBlockEntityRenderer<T> {
-    private static final float OMEGA = HotPotBlockEntity.BOB_OMEGA;
     private static final float AMPLITUDE = 0.022F;
-    private static final float COLD_OMEGA = HotPotBlockEntity.BOB_COLD_OMEGA;
     private static final float COLD_AMPLITUDE = 0.004F;
     private static final float COLD_FLOAT = 0.009F;
     private static final float STANDALONE_SURFACE = (float) HotPotInteraction.STANDALONE_SURFACE;
@@ -135,8 +133,7 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
         float soupY = lift + (onStove ? STOVE_SURFACE : STANDALONE_SURFACE);
         float floorY = lift + (onStove ? STOVE_FLOOR : STANDALONE_FLOOR);
         float surfaceY = be.hasSoup() ? soupY : floorY;
-        float heat = be.clientHeat();
-        double ticks = be.getLevel().getGameTime() + (double) tickDelta;
+        float heat = be.clientHeat(tickDelta);
 
         PotLayout layout = be.layout();
         boolean rotated = HotPotInteraction.rotated(be.getBlockState());
@@ -183,13 +180,14 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
             double[] cc = layout.cellCenter(bigCell);
             double[] center = PotLayout.toWorld(cc[0], cc[1], rotated && layout.multiSoup());
             float phase = bigCell * 1.37F;
-            double angle = OMEGA * ticks + phase;
-            double coldAngle = COLD_OMEGA * ticks + phase;
+            double angle = be.cycleAngle(side, tickDelta) + phase;
             float cold = cellSoup ? 1F - heat : 0F;
 
+            // 一格里有几样食材就轮流显示：每个浮动周期在最低点（sin = -1）换下一样
             double cycle = displayCycle(be, side, bigCell, tickDelta);
             int slot = cellSlots[bigCell][Math.floorMod((int) Math.floor(cycle), n)];
             ItemStack stack = be.getItem(slot);
+            // 换的前后一小段：当前这样沉进汤里，下一样再浮上来（大小不变）
             float dip = 0F;
             if (n > 1) {
                 double f = cycle - Math.floor(cycle);
@@ -199,11 +197,10 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
                 }
             }
 
-            float yOffset = AMPLITUDE * heat * (float) Math.sin(angle)
-                + COLD_AMPLITUDE * cold * (float) Math.sin(coldAngle);
-            float drift = 0.006F * heat * (float) Math.cos(OMEGA * 0.7F * ticks + phase);
-            float tilt = 3.5F * heat * (float) Math.sin(OMEGA * 0.55F * ticks + phase)
-                + 1.0F * cold * (float) Math.sin(COLD_OMEGA * 0.6F * ticks + phase);
+            float amp = cellSoup ? COLD_AMPLITUDE * cold + AMPLITUDE * heat : 0F;
+            float yOffset = amp * (float) Math.sin(angle);
+            float drift = 0.006F * heat * (float) Math.cos(angle * 0.7);
+            float tilt = (cellSoup ? 1.0F * cold + 3.5F * heat : 0F) * (float) Math.sin(angle * 0.55);
             float x = innerMin + innerSize * (float) center[0] + drift;
             float z = innerMin + innerSize * (float) center[1] - drift;
             float submerged = (cellSoup ? 0.007F * (1F - cold) - COLD_FLOAT * cold : -0.003F) + 0.03F * dip;

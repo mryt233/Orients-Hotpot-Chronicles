@@ -142,4 +142,15 @@ public interface RegistrationApi {
     interface ParticleRegistrar {
         <T extends net.minecraft.core.particles.ParticleType<?>> T register(Identifier id, T value);
     }
+
+    // mryt233 改（2026-11-23）：0.2.2 新增树冠生成器注册域；旧实现保留默认抛出。
+    default FoliagePlacerRegistrar foliagePlacers() {
+        throw new UnsupportedOperationException("foliagePlacers requires Runtime 0.2.2");
+    }
+
+    interface FoliagePlacerRegistrar {
+        <P extends net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer>
+        net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType<P> register(
+            Identifier id, com.mojang.serialization.MapCodec<P> codec);
+    }
 }

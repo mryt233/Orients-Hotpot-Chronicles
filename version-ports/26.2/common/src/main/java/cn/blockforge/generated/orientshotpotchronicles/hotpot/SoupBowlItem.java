@@ -274,7 +274,10 @@ public class SoupBowlItem extends Item implements TableItem {
             for (MobEffectInstance effect : def.dishBonusEffects(spicy)) {
                 user.addEffect(effect);
             }
-            int mouthFireTicks = Config.spicyMouthFireTicks();
+            // 3 级特辣：嘴上冒火苗，纯节目效果（前面刚加的抗火罩着，不会扣血）
+            // mryt233 改（2026-11-06，r139）：穿着布围裙时不再点火苗（防溅油装备挡滚油与明火）。
+            // mryt233 改（2026-11-10）：红汤判断改成 isSpicy() 属性；mryt233 改（第四批 4J）：改读 Config.spicyMouthFire* 与惩罚开关
+            int mouthFireTicks = Config.penaltiesEnabled() ? Config.spicyMouthFireTicks() : 0;
             if (def.spicy() && mouthFireTicks > 0 && spicy >= Config.spicyMouthFireFromLevel()
                 && !ClothApronItem.wornBy(user)) {
                 user.setRemainingFireTicks(Math.max(user.getRemainingFireTicks(), mouthFireTicks));

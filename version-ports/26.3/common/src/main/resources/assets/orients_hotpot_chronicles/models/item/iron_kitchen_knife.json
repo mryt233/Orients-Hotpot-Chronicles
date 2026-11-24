@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "orients_hotpot_chronicles:item/iron_kitchen_knife"
+  }
+}

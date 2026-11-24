@@ -216,6 +216,9 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
      */
     @Override
     public VoxelShape aimedPart(BlockState state, BlockGetter world, BlockPos pos, Player player) {
+        if (state == null || !state.hasProperty(FACING) || player == null) {
+            return null;
+        }
         HitResult hit = player.pick(PlayerCompat.blockInteractionRange(player), 1.0F, false);
         if (!(hit instanceof BlockHitResult b) || hit.getType() != HitResult.Type.BLOCK) {
             return null;
@@ -228,6 +231,9 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
     /** 点到的是第几个小碗（0..8，从最上层到最下层、每层从左到右）：先把点往方块里推一点（点在台阶立面上算后面那层），转回模型坐标，按进深分层、按左右分列；
      * 点在某层台面以下（台身立面）返回 -1。 */
     public static int aimed(BlockState state, BlockPos pos, BlockHitResult hit) {
+        if (state == null || pos == null || hit == null || !state.hasProperty(FACING)) {
+            return -1;
+        }
         Vec3 n = Vec3.atLowerCornerOf(hit.getDirection().getNormal());
         Vec3 p = hit.getLocation().subtract(n.scale(0.001)).subtract(Vec3.atLowerCornerOf(pos));
         double wx = p.x, wz = p.z, lx, lz;
@@ -305,8 +311,8 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
     }
 
     @Override
-    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
-                                           Player player, InteractionHand hand, BlockHitResult hit) {
+    public ItemInteractionResult compatUseItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
+                                                 Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(stack.is(Items.BOWL) || stack.getItem() instanceof DippingSauceItem)) {
             return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
         }
@@ -321,7 +327,7 @@ public class SauceStationBlock extends Block implements PartOutline, EntityBlock
     }
 
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult compatUseWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         // 2026-10-23 用户：右键先看总览（client/SauceOverviewScreen，3×3 和台上的碗一一对应），点「补充蘸料台」再进补货界面
         if (world.isClientSide && world.getBlockEntity(pos) instanceof SauceStationBlockEntity) {
             openOverview.accept(pos, getName());

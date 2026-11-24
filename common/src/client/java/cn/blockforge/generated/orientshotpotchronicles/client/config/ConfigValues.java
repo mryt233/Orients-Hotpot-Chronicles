@@ -19,10 +19,91 @@ public final class ConfigValues {
     public ConfigValues(java.util.function.Supplier<JsonObject> edited, java.util.function.Supplier<JsonObject> defaults) {
         this.edited = edited; this.defaults = defaults;
     }
-    public void clearDefaults() { defaultValueCache.clear(); }
+    public void clearDefaults() {
+        defaultValueCache.clear();
+        defaultsCache = null;
+    }
+
     public void nudge(Field f, int dir, boolean shift) {
-        double step = f.step() * (shift ? 10 : 1) * dir;
-        setValue(f, value(f) + step);
+        switch (f.kind()) {
+            case BOOLEAN -> setBoolValue(f, !boolValue(f));
+            case CHOICE -> {
+                String[] opts = f.options();
+                if (opts == null || opts.length == 0) {
+                    return;
+                }
+                String cur = choiceValue(f);
+                int idx = 0;
+                for (int i = 0; i < opts.length; i++) {
+                    if (opts[i].equals(cur)) {
+                        idx = i;
+                        break;
+                    }
+                }
+                int next = Math.floorMod(idx + (dir >= 0 ? 1 : -1), opts.length);
+                setChoiceValue(f, opts[next]);
+            }
+            case NUMBER -> {
+                double step = f.step() * (shift ? 10 : 1) * dir;
+                setValue(f, value(f) + step);
+            }
+        }
+    }
+
+    public boolean boolValue(Field f) {
+        JsonObject parentNode = node(edited.get(), f.path(), f.path().length - 1);
+        JsonElement el = parentNode.get(f.path()[f.path().length - 1]);
+        return el != null && el.isJsonPrimitive() && el.getAsJsonPrimitive().isBoolean()
+            ? el.getAsBoolean() : boolDefaultValue(f);
+    }
+
+    public void setBoolValue(Field f, boolean v) {
+        JsonObject parentNode = node(edited.get(), f.path(), f.path().length - 1);
+        parentNode.addProperty(f.path()[f.path().length - 1], v);
+    }
+
+    public boolean boolDefaultValue(Field f) {
+        ensureDefaultsLoaded();
+        JsonObject parentNode = node(defaultsCache, f.path(), f.path().length - 1);
+        JsonElement el = parentNode.get(f.path()[f.path().length - 1]);
+        return el != null && el.isJsonPrimitive() && el.getAsJsonPrimitive().isBoolean() && el.getAsBoolean();
+    }
+
+    public String choiceValue(Field f) {
+        JsonObject parentNode = node(edited.get(), f.path(), f.path().length - 1);
+        JsonElement el = parentNode.get(f.path()[f.path().length - 1]);
+        if (el != null && el.isJsonPrimitive() && el.getAsJsonPrimitive().isString()) {
+            String value = el.getAsString();
+            if (f.options() != null) {
+                for (String opt : f.options()) {
+                    if (opt.equals(value)) {
+                        return value;
+                    }
+                }
+            }
+        }
+        return choiceDefaultValue(f);
+    }
+
+    public void setChoiceValue(Field f, String v) {
+        JsonObject parentNode = node(edited.get(), f.path(), f.path().length - 1);
+        parentNode.addProperty(f.path()[f.path().length - 1], v);
+    }
+
+    public String choiceDefaultValue(Field f) {
+        ensureDefaultsLoaded();
+        JsonObject parentNode = node(defaultsCache, f.path(), f.path().length - 1);
+        JsonElement el = parentNode.get(f.path()[f.path().length - 1]);
+        if (el != null && el.isJsonPrimitive() && el.getAsJsonPrimitive().isString()) {
+            return el.getAsString();
+        }
+        return f.options() != null && f.options().length > 0 ? f.options()[0] : "";
+    }
+
+    private void ensureDefaultsLoaded() {
+        if (defaultsCache == null) {
+            defaultsCache = defaults.get();
+        }
     }
     public double value(Field f) {
         JsonObject parentNode = node(edited.get(), f.path(), f.path().length - 1);
@@ -48,9 +129,7 @@ public final class ConfigValues {
         if (cached != null) {
             return cached;
         }
-        if (defaultsCache == null) {
-            defaultsCache = defaults.get();
-        }
+        ensureDefaultsLoaded();
         JsonObject parentNode = node(defaultsCache, f.path(), f.path().length - 1);
         JsonElement el = parentNode.get(f.path()[f.path().length - 1]);
         double v = el != null && el.isJsonPrimitive() && el.getAsJsonPrimitive().isNumber()
@@ -60,7 +139,19 @@ public final class ConfigValues {
     }
 
     public boolean isDefault(Field f) {
-        return Math.abs(value(f) - defaultValue(f)) < 0.0005;
+        return switch (f.kind()) {
+            case BOOLEAN -> boolValue(f) == boolDefaultValue(f);
+            case CHOICE -> choiceValue(f).equals(choiceDefaultValue(f));
+            case NUMBER -> Math.abs(value(f) - defaultValue(f)) < 0.0005;
+        };
+    }
+
+    public void resetField(Field f) {
+        switch (f.kind()) {
+            case BOOLEAN -> setBoolValue(f, boolDefaultValue(f));
+            case CHOICE -> setChoiceValue(f, choiceDefaultValue(f));
+            case NUMBER -> setValue(f, defaultValue(f));
+        }
     }
 
     /** 取出（必要时创建）配置路径的前 upto 段对象。 */

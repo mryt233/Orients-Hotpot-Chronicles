@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "orients_hotpot_chronicles:scallion_crop",
+    "orients_hotpot_chronicles:cilantro_crop",
+    "orients_hotpot_chronicles:soybean_crop",
+    "orients_hotpot_chronicles:garlic_crop",
+    "orients_hotpot_chronicles:tomato_crop",
+    "orients_hotpot_chronicles:chili_pepper_crop",
+    "orients_hotpot_chronicles:peanut_crop",
+    "orients_hotpot_chronicles:greens_crop",
+    "orients_hotpot_chronicles:zhe_er_gen_crop"
+  ]
+}

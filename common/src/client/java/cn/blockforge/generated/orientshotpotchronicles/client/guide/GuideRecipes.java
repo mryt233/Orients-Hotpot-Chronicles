@@ -3,7 +3,12 @@ package cn.blockforge.generated.orientshotpotchronicles.client.guide;
 
 // mryt233 改（2026-11-11）：图标和排版职责迁出。
 
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.ConditionalCraftingRecipe;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Config;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoneMillRecipe;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.WoodenVatRecipe;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import net.minecraft.client.Minecraft;
@@ -48,6 +53,7 @@ public final class GuideRecipes {
      * values（每次重建配方表都是新 map、新 view 实例），用它当「配方表换代了」的 O(1) 判据。
      */
     private Object recipeCacheKey;
+    private long recipeCacheConfigRevision = -1L;
     private Map<Item, RecipeHolder<? extends Recipe<?>>> recipeCache;
 
     @FunctionalInterface
@@ -73,7 +79,8 @@ public final class GuideRecipes {
         int idx = (int) ((now / 2000) % ids.size());
         Item item = BuiltInRegistries.ITEM.getOptional(ids.get(idx)).orElse(Items.BARRIER);
         RecipeHolder<? extends Recipe<?>> holder = findRecipe(minecraft, item);
-        Recipe<?> recipe = holder == null ? null : holder.value();
+        Recipe<?> rawRecipe = holder == null ? null : holder.value();
+        Recipe<?> recipe = rawRecipe instanceof ConditionalCraftingRecipe cond ? cond.inner() : rawRecipe;
         boolean grid = recipe == null || recipe instanceof CraftingRecipe;
         int gx = x + 10, gy = y + 1;
         ItemStack out = recipe != null ? recipe.getResultItem(minecraft.level.registryAccess()) : new ItemStack(item);
@@ -107,11 +114,19 @@ public final class GuideRecipes {
             int sx = gx + 12, sy = gy + 4;
             g.blit(TEX, sx, sy, 340, 0, 18, 18, TEX_W, TEX_H);
             List<Ingredient> ings = recipe.getIngredients();
-            if (!ings.isEmpty()) {
+            if (recipe instanceof WoodenVatRecipe vat && WoodenVatRecipe.FLUID_SOYMILK.equals(vat.fluid())) {
+                ItemStack in = new ItemStack(HotPotContent.SOYMILK_BUCKET);
+                g.renderItem(in, sx + 1, sy + 1);
+                sink.track(sx + 1, sy + 1, 16, 16, in);
+            } else if (!ings.isEmpty()) {
                 ItemStack[] stacks = ings.get(0).getItems();
                 if (stacks.length > 0) {
-                    ItemStack in = stacks[(int) ((now / 1000) % stacks.length)];
+                    ItemStack in = stacks[(int) ((now / 1000) % stacks.length)].copy();
+                    if (recipe instanceof StoneMillRecipe mill) {
+                        in.setCount(mill.ingredientCount());
+                    }
                     g.renderItem(in, sx + 1, sy + 1);
+                    g.renderItemDecorations(font, in, sx + 1, sy + 1);
                     sink.track(sx + 1, sy + 1, 16, 16, in);
                 }
             }
@@ -121,8 +136,16 @@ public final class GuideRecipes {
             g.renderItem(out, ox + 1, oy + 1);
             g.renderItemDecorations(font, out, ox + 1, oy + 1);
             sink.track(ox + 1, oy + 1, 16, 16, out);
-            Component how = holder != null && holder.value().getType() == RecipeType.STONECUTTING
-                ? Blocks.STONECUTTER.getName() : Blocks.FURNACE.getName();
+            Component how;
+            if (holder != null && holder.value().getType() == StoneMillRecipe.TYPE) {
+                how = HotPotContent.STONE_MILL.getName();
+            } else if (holder != null && holder.value().getType() == WoodenVatRecipe.TYPE) {
+                how = HotPotContent.WOODEN_VAT.getName();
+            } else if (holder != null && holder.value().getType() == RecipeType.STONECUTTING) {
+                how = Blocks.STONECUTTER.getName();
+            } else {
+                how = Blocks.FURNACE.getName();
+            }
             String label = how.getString();
             g.drawString(font, label, x + (COL_W - font.width(label)) / 2, gy + 28, MUTED, false);
         }
@@ -148,11 +171,14 @@ public final class GuideRecipes {
         }
         RecipeManager rm = minecraft.level.getRecipeManager();
         Object key = rm.getRecipes();
-        if (recipeCache == null || recipeCacheOwner != rm || recipeCacheKey != key) {
+        long rev = Config.revision();
+        if (recipeCache == null || recipeCacheOwner != rm || recipeCacheKey != key || recipeCacheConfigRevision != rev) {
             Map<Item, RecipeHolder<? extends Recipe<?>>> cache = new HashMap<>();
             HolderLookup.Provider registries = minecraft.level.registryAccess();
-            // putIfAbsent = 先找到的那一类优先，和原来 5 个循环的先后顺序一致
+            // putIfAbsent = 先找到的那一类优先；工作台条件配方生效时优先于默认配方
             index(cache, rm, RecipeType.CRAFTING, registries);
+            index(cache, rm, StoneMillRecipe.TYPE, registries);
+            index(cache, rm, WoodenVatRecipe.TYPE, registries);
             index(cache, rm, RecipeType.STONECUTTING, registries);
             index(cache, rm, RecipeType.SMELTING, registries);
             index(cache, rm, RecipeType.SMOKING, registries);
@@ -160,6 +186,7 @@ public final class GuideRecipes {
             recipeCache = cache;
             recipeCacheOwner = rm;
             recipeCacheKey = key;
+            recipeCacheConfigRevision = rev;
         }
         return recipeCache.get(item);
     }
@@ -171,6 +198,20 @@ public final class GuideRecipes {
         List<RecipeHolder<? extends Recipe<?>>> all =
             (List<RecipeHolder<? extends Recipe<?>>>) (List) rm.getAllRecipesFor((RecipeType) type);
         for (RecipeHolder<? extends Recipe<?>> holder : all) {
+            if (holder.value() instanceof ConditionalCraftingRecipe cond) {
+                if (!cond.isConditionMet()) {
+                    continue;
+                }
+                ItemStack result = cond.getResultItem(registries);
+                if (!result.isEmpty()) {
+                    cache.putIfAbsent(result.getItem(), holder);
+                }
+            }
+        }
+        for (RecipeHolder<? extends Recipe<?>> holder : all) {
+            if (holder.value() instanceof ConditionalCraftingRecipe) {
+                continue;
+            }
             ItemStack result = holder.value().getResultItem(registries);
             if (!result.isEmpty()) {
                 cache.putIfAbsent(result.getItem(), holder);

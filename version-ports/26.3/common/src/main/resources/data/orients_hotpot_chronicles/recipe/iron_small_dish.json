@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "orients_hotpot_chronicles:small_dish",
+  "pattern": [
+    "MBM"
+  ],
+  "key": {
+    "M": "minecraft:iron_ingot",
+    "B": "minecraft:bowl"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:iron_small_dish",
+    "count": 2
+  }
+}

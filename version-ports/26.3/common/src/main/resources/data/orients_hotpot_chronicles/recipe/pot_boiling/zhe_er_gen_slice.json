@@ -1,0 +1,8 @@
+{
+  "_说明": "作者：mryt233",
+  "type": "orients_hotpot_chronicles:pot_boiling",
+  "ingredient": "orients_hotpot_chronicles:zhe_er_gen_slice",
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_zhe_er_gen_slice"
+  }
+}

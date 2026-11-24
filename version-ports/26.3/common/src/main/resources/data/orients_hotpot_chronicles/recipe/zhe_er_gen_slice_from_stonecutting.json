@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "orients_hotpot_chronicles:zhe_er_gen",
+  "result": {
+    "id": "orients_hotpot_chronicles:zhe_er_gen_slice",
+    "count": 3
+  }
+}

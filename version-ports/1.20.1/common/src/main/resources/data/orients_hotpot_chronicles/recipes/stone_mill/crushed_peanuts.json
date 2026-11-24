@@ -1,0 +1,14 @@
+{
+  "type": "orients_hotpot_chronicles:stone_mill",
+  "ingredient": {
+    "item": "orients_hotpot_chronicles:peanut"
+  },
+  "ingredient_count": 1,
+  "requires_water": false,
+  "result": {
+    "item": "orients_hotpot_chronicles:crushed_peanuts",
+    "count": 2
+  },
+  "turns": 3,
+  "color": "#D8B26E"
+}

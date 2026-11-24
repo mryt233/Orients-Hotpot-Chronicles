@@ -1,0 +1,7 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/stool_right",
+  "textures": {
+    "planks": "minecraft:block/cherry_planks",
+    "particle": "minecraft:block/cherry_planks"
+  }
+}

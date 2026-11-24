@@ -16,6 +16,8 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCooking;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotRecipes;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PoundingRecipe;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoneMillRecipe;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.WoodenVatRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -102,6 +104,29 @@ public final class HotPotRecipeViewerData {
     ) {
     }
 
+    /** 一条小石磨配方（0.3.1 Phase 3.1）。 */
+    public record StoneMillEntry(
+        ResourceLocation id,
+        ItemStack input,
+        ItemStack fluidHint,
+        ItemStack containerHint,
+        ItemStack output,
+        int turns
+    ) {
+    }
+
+    /** 一条开口大木桶配方（0.3.1 Phase 3.2）：豆腐点卤压制与干货清水泡发。 */
+    public record WoodenVatEntry(
+        ResourceLocation id,
+        ItemStack fluidInput,
+        ItemStack input,
+        ItemStack lidHint,
+        ItemStack output,
+        String mode,
+        int ticks
+    ) {
+    }
+
     // ------------------------------------------------------------------ 火锅涮煮
 
     /** 旧无参数入口保留；客户端插件与开发导出显式传当前世界。 */
@@ -132,9 +157,9 @@ public final class HotPotRecipeViewerData {
 
     // ------------------------------------------------------------------ 砧板切配
 
-    /** 全部 13 条砧板切配配方（r137 前 9 条 + mryt233 改 2026-11-06 追加的 3 条 + r139 折耳根 1 条）；工具统一是铁菜刀。 */
+    /** 全部 14 条砧板切配配方；工具统一是铁菜刀。 */
     public static List<CuttingEntry> cuttingRecipes() {
-        List<CuttingEntry> recipes = new ArrayList<>(13);
+        List<CuttingEntry> recipes = new ArrayList<>(14);
         recipes.add(cutting("beef", Items.BEEF, HotPotContent.FATTY_BEEF_ROLL, 3, false));
         recipes.add(cutting("mutton", Items.MUTTON, HotPotContent.MUTTON_ROLL, 3, false));
         // 土豆一刀掉 1 份，切三刀才切完（物品标签 cut_piece_by_piece）
@@ -151,6 +176,8 @@ public final class HotPotRecipeViewerData {
         recipes.add(cutting("raw_squid", HotPotContent.RAW_SQUID, HotPotContent.SQUID_ROLL, 3, false));
         // r139：折耳根整根一刀切成 3 段。
         recipes.add(cutting("zhe_er_gen", HotPotContent.ZHE_ER_GEN, HotPotContent.ZHE_ER_GEN_SLICE, 3, false));
+        // 0.3.1-alpha：生鸡爪剔骨切成无骨鸡爪。
+        recipes.add(cutting("chicken_feet", HotPotContent.CHICKEN_FEET, HotPotContent.BONELESS_CHICKEN_FEET, 1, false));
         return List.copyOf(recipes);
     }
 
@@ -209,6 +236,45 @@ public final class HotPotRecipeViewerData {
         return List.of(new ItemStack(HotPotContent.CUTTING_BOARD_ITEM), new ItemStack(HotPotContent.ROLLING_PIN));
     }
 
+    public static List<StoneMillEntry> stoneMillRecipes(Level level) {
+        if (level == null) return List.of();
+        List<StoneMillEntry> entries = new ArrayList<>();
+        for (var holder : HotPotRecipes.all(level, StoneMillRecipe.TYPE)) {
+            var recipe = holder.value();
+            ItemStack[] items = recipe.ingredient().getItems();
+            if (items.length == 0) continue;
+            ItemStack in = items[0].copyWithCount(recipe.ingredientCount());
+            ItemStack fluid = recipe.requiresWater() ? new ItemStack(Items.WATER_BUCKET) : ItemStack.EMPTY;
+            ItemStack cont = recipe.container().map(ItemStack::new).orElse(ItemStack.EMPTY);
+            entries.add(new StoneMillEntry(holder.id(), in, fluid, cont, recipe.result(), recipe.effectiveTurns()));
+        }
+        return List.copyOf(entries);
+    }
+
+    public static List<WoodenVatEntry> woodenVatRecipes(Level level) {
+        if (level == null) return List.of();
+        List<WoodenVatEntry> entries = new ArrayList<>();
+        for (var holder : HotPotRecipes.all(level, WoodenVatRecipe.TYPE)) {
+            var recipe = holder.value();
+            ItemStack fluid = new ItemStack(HotPotContent.SOYMILK_BUCKET);
+            ItemStack in = recipe.ingredient().map(ing -> {
+                ItemStack[] arr = ing.getItems();
+                return arr.length == 0 ? ItemStack.EMPTY : arr[0].copyWithCount(recipe.ingredientCount());
+            }).orElse(ItemStack.EMPTY);
+            ItemStack lid = recipe.needsLid() ? new ItemStack(HotPotContent.WOODEN_PRESS_LID) : ItemStack.EMPTY;
+            entries.add(new WoodenVatEntry(holder.id(), fluid, in, lid, recipe.result(), recipe.mode(), recipe.effectiveTicks()));
+        }
+        return List.copyOf(entries);
+    }
+
+    public static List<ItemStack> stoneMillCatalysts() {
+        return List.of(new ItemStack(HotPotContent.STONE_MILL_ITEM));
+    }
+
+    public static List<ItemStack> woodenVatCatalysts() {
+        return List.of(new ItemStack(HotPotContent.WOODEN_VAT_ITEM), new ItemStack(HotPotContent.WOODEN_PRESS_LID));
+    }
+
     // mryt233 改（2026-11-11）：两种查看器只共享文案与配色，布局仍各自负责。
     public static final int TEXT = 0xFF404040;
     public static final int TEXT_DARK = 0xFF303030;
@@ -241,5 +307,14 @@ public final class HotPotRecipeViewerData {
 
     public static Component poundingHint(PoundingEntry recipe) {
         return recipeText("pounding.hits", String.valueOf(recipe.hits()));
+    }
+
+    public static Component stoneMillHint(StoneMillEntry recipe) {
+        return recipeText(recipe.fluidHint().isEmpty() ? "stone_mill.dry" : "stone_mill.wet",
+            String.valueOf(recipe.turns()));
+    }
+
+    public static Component woodenVatHint(WoodenVatEntry recipe) {
+        return recipeText("wooden_vat.coagulate", seconds(recipe.ticks()));
     }
 }

@@ -38,14 +38,63 @@ SKIP_DIRS = ("gui/", "misc/")
 CODE_DIRS = [MOD / "common/src", MOD / "fabric/src", MOD / "neoforge/src", MOD / "framework"]
 
 ERR, WARN = "错误", "警告"
+PBR_SUFFIXES = ("_n", "_s")
 LABEL = {"size": "尺寸", "anim": "动画", "anim_meta": "动画", "semi": "半透明", "center": "居中", "gui_center": "居中",
-         "colors": "风格", "contrast": "风格", "outline": "描边", "missing_tex": "引用", "unused": "引用"}
+         "colors": "风格", "contrast": "风格", "outline": "描边", "missing_tex": "引用", "unused": "引用",
+         "pbr_mode": "PBR", "pbr_orphan": "PBR", "pbr_pair": "PBR", "pbr_size": "PBR", "pbr_meta": "PBR",
+         "pbr_alpha": "PBR", "pbr_normal": "PBR", "pbr_f0": "PBR"}
 
 
-def check_image(im, rel, mcmeta=None):
+def split_pbr_rel(rel: str):
+    """若 rel 以 _n / _s 结尾，返回 (base_rel, suffix)，否则返回 (rel, None)。"""
+    for suf in PBR_SUFFIXES:
+        if rel.endswith(suf) and len(rel) > len(suf):
+            return rel[:-len(suf)], suf
+    return rel, None
+
+
+def check_pbr_channels(im, suffix, base_im=None, mcmeta=None, base_meta=None):
+    """LabPBR 1.3 副图规范检查（尺寸/动画一致、Alpha 全零、XY 法线长度、F0 保留段）。"""
+    out = []
+    if base_im is not None and im.size != base_im.size:
+        out.append((ERR, "pbr_size", f"尺寸 {im.size[0]}×{im.size[1]} 与基础贴图 {base_im.size[0]}×{base_im.size[1]} 不一致"))
+    if base_im is not None and ((mcmeta is not None) != (base_meta is not None) or (mcmeta is not None and mcmeta != base_meta)):
+        out.append((ERR, "pbr_meta", ".mcmeta 存在或动画参数与基础贴图不一致"))
+    data = list(im.get_flattened_data()) if hasattr(im, "get_flattened_data") else list(im.getdata())
+    if all(px[3] == 0 for px in data):
+        out.append((ERR, "pbr_alpha", "Alpha 通道全为 0（法线高度全塌陷或高光自发光字段异常）"))
+    base_data = None
+    if base_im is not None and base_im.size == im.size:
+        b = base_im.convert("RGBA")
+        base_data = list(b.get_flattened_data()) if hasattr(b, "get_flattened_data") else list(b.getdata())
+    if suffix == "_n":
+        bad_xy = 0
+        for idx, (r, g, _b, _a) in enumerate(data):
+            if base_data is not None and base_data[idx][3] == 0:
+                continue
+            nx = (r / 255.0) * 2.0 - 1.0
+            ny = (g / 255.0) * 2.0 - 1.0
+            if nx * nx + ny * ny >= 1.015:
+                bad_xy += 1
+        if bad_xy:
+            out.append((ERR, "pbr_normal", f"{bad_xy} 个像素 XY 法线向量长度超限（>=1 会导致着色器 Z=NaN）"))
+    elif suffix == "_s":
+        reserved_f0 = 0
+        for idx, (_r, g, _b, _a) in enumerate(data):
+            if base_data is not None and base_data[idx][3] == 0:
+                continue
+            if 238 <= g <= 254:
+                reserved_f0 += 1
+        if reserved_f0:
+            out.append((ERR, "pbr_f0", f"{reserved_f0} 个像素高光 G 通道落入 LabPBR 未定义保留段 238..254"))
+    return out
+
+
+def check_image(im, rel, mcmeta=None, base_im=None, base_meta=None):
     """查一张图。rel 形如 "item/duck_blood"（决定按物品还是方块的规矩查、归哪一类原版）。
     mcmeta：对应的 .mcmeta 字典（没有就 None）。返回 [(等级, 代号, 说明)]。"""
     out = []
+    _base_rel, pbr_suffix = split_pbr_rel(rel)
     folder, name = rel.split("/", 1) if "/" in rel else ("item", rel)
     w, h = im.size
     if w % 16:
@@ -65,6 +114,9 @@ def check_image(im, rel, mcmeta=None):
             if not 0 <= idx < n:
                 out.append((ERR, "anim", f".mcmeta 帧号 {idx} 越界（只有 {n} 帧）"))
                 break
+    if pbr_suffix is not None:
+        out.extend(check_pbr_channels(im, pbr_suffix, base_im=base_im, mcmeta=mcmeta, base_meta=base_meta))
+        return out
     s = stats(im)
     if folder == "item" and s["opaque"]:
         if s["semi"]:
@@ -170,12 +222,34 @@ def scan():
         meta = _load_json(meta_p) if meta_p.exists() else None
         if meta_p.exists() and meta is None:
             found.append((rel, ERR, "anim", ".mcmeta 不是合法 JSON"))
-        for lvl, code_, msg in check_image(Image.open(p).convert("RGBA"), rel, meta):
+        raw_im = Image.open(p)
+        base_rel, pbr_suffix = split_pbr_rel(rel)
+        base_im = None
+        base_meta = None
+        if pbr_suffix is not None:
+            if raw_im.mode != "RGBA":
+                found.append((rel, ERR, "pbr_mode", f"LabPBR 副图必须使用 RGBA 格式保留 Alpha 通道（当前 {raw_im.mode}）"))
+            base_p = TEX / f"{base_rel}.png"
+            partner_suffix = "_s" if pbr_suffix == "_n" else "_n"
+            partner_p = TEX / f"{base_rel}{partner_suffix}.png"
+            if not base_p.is_file():
+                found.append((rel, ERR, "pbr_orphan", f"找不到对应的基础贴图 {base_rel}.png"))
+            else:
+                base_im = Image.open(base_p).convert("RGBA")
+                base_meta_p = base_p.with_name(base_p.name + ".mcmeta")
+                base_meta = _load_json(base_meta_p) if base_meta_p.exists() else None
+            if not partner_p.is_file():
+                found.append((rel, ERR, "pbr_pair", f"缺少配对贴图 {base_rel}{partner_suffix}.png"))
+        for lvl, code_, msg in check_image(raw_im.convert("RGBA"), rel, meta, base_im=base_im, base_meta=base_meta):
             found.append((rel, lvl, code_, msg))
-        name = rel.split("/", 1)[1]
-        if rel not in used and not any(rel.startswith(x) for x in prefixes) and not re.search(r"[\"/:]" + re.escape(name) + r"[\"/.]", code) \
-                and not re.search(re.escape(rel), code):
-            found.append((rel, WARN, "unused", "没有模型、方块状态或代码用到这张贴图"))
+        usage_rel = base_rel if pbr_suffix is not None else rel
+        name = usage_rel.split("/", 1)[1]
+        if pbr_suffix is not None and not (TEX / f"{base_rel}.png").is_file():
+            continue
+        if usage_rel not in used and not any(usage_rel.startswith(x) for x in prefixes) and not re.search(r"[\"/:]" + re.escape(name) + r"[\"/.]", code) \
+                and not re.search(re.escape(usage_rel), code):
+            if pbr_suffix is None:
+                found.append((rel, WARN, "unused", "没有模型、方块状态或代码用到这张贴图"))
     for item, (cx, cy) in gui_centers().items():
         if abs(cx) > 0.5 or abs(cy) > 0.5:
             found.append((f"models/item/{item}", WARN, "gui_center",

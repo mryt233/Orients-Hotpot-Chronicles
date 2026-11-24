@@ -1,9 +1,12 @@
+// mryt233 改：26.2 移植同步。
 package me.shedaniel.rei.api.common.display;
 
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 
 import java.util.List;
+import java.util.Optional;
+import net.minecraft.resources.Identifier;
 
 /**
  * 一条配方在 REI 里的展示数据：输入、输出与所属类别。
@@ -18,4 +21,8 @@ public interface Display {
     List<EntryIngredient> getOutputEntries();
 
     CategoryIdentifier<?> getCategoryIdentifier();
+
+    Optional<Identifier> getDisplayLocation();
+
+    DisplaySerializer<? extends Display> getSerializer();
 }

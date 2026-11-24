@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P P",
+    "IPI",
+    "PPP"
+  ],
+  "key": {
+    "P": "#minecraft:planks",
+    "I": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:wooden_vat",
+    "count": 1
+  }
+}

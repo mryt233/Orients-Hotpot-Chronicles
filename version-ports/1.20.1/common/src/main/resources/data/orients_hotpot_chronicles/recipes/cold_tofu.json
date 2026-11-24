@@ -1,21 +1,26 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "category": "misc",
-  "ingredients": [
-    {
-      "item": "orients_hotpot_chronicles:soybean"
-    },
-    {
-      "item": "orients_hotpot_chronicles:soybean"
-    },
-    {
-      "item": "orients_hotpot_chronicles:soybean"
-    },
-    {
-      "item": "minecraft:water_bucket"
+  "type": "orients_hotpot_chronicles:conditional_crafting",
+  "flag": "mode.detailed_tofu_processing",
+  "expected": false,
+  "recipe": {
+    "type": "minecraft:crafting_shapeless",
+    "category": "misc",
+    "ingredients": [
+      {
+        "item": "orients_hotpot_chronicles:soybean"
+      },
+      {
+        "item": "orients_hotpot_chronicles:soybean"
+      },
+      {
+        "item": "orients_hotpot_chronicles:soybean"
+      },
+      {
+        "item": "minecraft:water_bucket"
+      }
+    ],
+    "result": {
+      "item": "orients_hotpot_chronicles:cold_tofu"
     }
-  ],
-  "result": {
-    "item": "orients_hotpot_chronicles:cold_tofu"
   }
 }

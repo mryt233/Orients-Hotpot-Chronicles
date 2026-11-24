@@ -2,7 +2,6 @@
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Optional;
@@ -29,11 +28,9 @@ public record PoundingRecipe(Ingredient ingredient, ItemStackTemplate resultTemp
         @Override public String toString() { return HotPot.MOD_ID + ":pounding"; }
     };
 
-    private static final Codec<Ingredient> NON_EMPTY_INGREDIENT = Ingredient.CODEC.validate(
-        in -> in.isEmpty() ? DataResult.error(() -> "捣制原料不能为空") : DataResult.success(in));
-
+    // mryt233 改：配方解码阶段尚未绑定标签；使用原版配方原料编码，不提前展开标签成员。
     private static final MapCodec<PoundingRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-        NON_EMPTY_INGREDIENT.fieldOf("ingredient").forGetter(PoundingRecipe::ingredient),
+        Ingredient.CODEC.fieldOf("ingredient").forGetter(PoundingRecipe::ingredient),
         ItemStackTemplate.CODEC.fieldOf("result").forGetter(PoundingRecipe::resultTemplate),
         Codec.intRange(1, 100000).optionalFieldOf("hits", Pounding.HITS).forGetter(PoundingRecipe::hits),
         ItemStackTemplate.CODEC.optionalFieldOf("stage1").forGetter(PoundingRecipe::stage1Template),
@@ -68,7 +65,7 @@ public record PoundingRecipe(Ingredient ingredient, ItemStackTemplate resultTemp
     }
 
     public PoundingRecipe {
-        if (ingredient.isEmpty() || resultTemplate == null || hits < 1 || hits > 100000) {
+        if (ingredient == null || resultTemplate == null || hits < 1 || hits > 100000) {
             throw new IllegalArgumentException("捣制原料和产物不能为空，次数必须为 1～100000");
         }
     }

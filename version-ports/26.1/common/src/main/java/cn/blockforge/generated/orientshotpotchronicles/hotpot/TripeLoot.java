@@ -62,6 +62,18 @@ public final class TripeLoot {
                 return;
             }
             // mryt233 改（26.1）：getDefaultLootTable() 返回 Optional 了，直接 equals 永远不相等（掉落会悄悄失效）
+            if (matches(key, EntityType.CHICKEN.getDefaultLootTable())) {
+                float chance = clampChance(Config.lootChickenFeetChance());
+                float bonus = clampChance(Config.lootChickenFeetLootingBonus());
+                tableBuilder.withPool(LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(1))
+                    .add(LootItem.lootTableItem(HotPotContent.CHICKEN_FEET)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1, 2)))
+                        .when(LootItemRandomChanceWithEnchantedBonusCondition.randomChanceAndLootingBoost(
+                            registries, chance, bonus))
+                        .apply(HotPotLoot.smeltWhenBurning())));
+                return;
+            }
             if (!matches(key, EntityType.COW.getDefaultLootTable()) && !matches(key, EntityType.MOOSHROOM.getDefaultLootTable())) {
                 return;
             }

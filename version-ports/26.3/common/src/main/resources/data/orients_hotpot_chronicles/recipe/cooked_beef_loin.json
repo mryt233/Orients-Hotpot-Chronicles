@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": "orients_hotpot_chronicles:beef_loin",
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_beef_loin"
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

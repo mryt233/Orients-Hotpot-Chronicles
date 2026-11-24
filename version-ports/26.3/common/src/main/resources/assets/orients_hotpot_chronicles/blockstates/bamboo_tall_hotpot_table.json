@@ -1,0 +1,100 @@
+{
+  "variants": {
+    "north=false,east=false,south=false,west=false,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table"
+    },
+    "north=true,east=false,south=false,west=false,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_n"
+    },
+    "north=false,east=true,south=false,west=false,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_e"
+    },
+    "north=true,east=true,south=false,west=false,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_ne"
+    },
+    "north=false,east=false,south=true,west=false,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_s"
+    },
+    "north=true,east=false,south=true,west=false,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_ns"
+    },
+    "north=false,east=true,south=true,west=false,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_es"
+    },
+    "north=true,east=true,south=true,west=false,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_nes"
+    },
+    "north=false,east=false,south=false,west=true,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_w"
+    },
+    "north=true,east=false,south=false,west=true,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_nw"
+    },
+    "north=false,east=true,south=false,west=true,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_ew"
+    },
+    "north=true,east=true,south=false,west=true,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_new"
+    },
+    "north=false,east=false,south=true,west=true,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_sw"
+    },
+    "north=true,east=false,south=true,west=true,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_nsw"
+    },
+    "north=false,east=true,south=true,west=true,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_esw"
+    },
+    "north=true,east=true,south=true,west=true,open=false": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_nesw"
+    },
+    "north=false,east=false,south=false,west=false,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open"
+    },
+    "north=true,east=false,south=false,west=false,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open_n"
+    },
+    "north=false,east=true,south=false,west=false,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open_e"
+    },
+    "north=true,east=true,south=false,west=false,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open_ne"
+    },
+    "north=false,east=false,south=true,west=false,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open_s"
+    },
+    "north=true,east=false,south=true,west=false,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open_ns"
+    },
+    "north=false,east=true,south=true,west=false,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open_es"
+    },
+    "north=true,east=true,south=true,west=false,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open_nes"
+    },
+    "north=false,east=false,south=false,west=true,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open_w"
+    },
+    "north=true,east=false,south=false,west=true,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open_nw"
+    },
+    "north=false,east=true,south=false,west=true,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open_ew"
+    },
+    "north=true,east=true,south=false,west=true,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open_new"
+    },
+    "north=false,east=false,south=true,west=true,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open_sw"
+    },
+    "north=true,east=false,south=true,west=true,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open_nsw"
+    },
+    "north=false,east=true,south=true,west=true,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open_esw"
+    },
+    "north=true,east=true,south=true,west=true,open=true": {
+      "model": "orients_hotpot_chronicles:block/bamboo_tall_hotpot_table_open_nesw"
+    }
+  }
+}

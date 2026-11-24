@@ -91,6 +91,31 @@ class ConfigRulesTest {
         assertTrue(leaves.containsKey("loot.mushroom.enoki.chance"));
         assertTrue(leaves.containsKey("loot.cow.beef_loin.chance"));
         assertTrue(leaves.containsKey("loot.cow.beef_loin.looting_bonus"));
+        assertTrue(leaves.containsKey("loot.chicken.chicken_feet.chance"));
+        assertTrue(leaves.containsKey("loot.chicken.chicken_feet.looting_bonus"));
+        assertTrue(leaves.containsKey("mode.preset"));
+        assertTrue(leaves.containsKey("mode.detailed_tofu_processing"));
+        assertTrue(leaves.containsKey("mode.penalties_enabled"));
+        assertTrue(leaves.containsKey("mode.crops_replace_grass"));
+        assertTrue(leaves.containsKey("mode.minigames_enabled"));
+        assertTrue(leaves.containsKey("mode.rack_swap_materials"));
+        assertTrue(leaves.containsKey("mode.simple_ui_collapse"));
+        assertTrue(leaves.containsKey("crops.growth_rate"));
+        assertTrue(leaves.containsKey("crops.bonemeal_enabled"));
+        assertTrue(leaves.containsKey("processing.mill_turns_multiplier"));
+        assertTrue(leaves.containsKey("processing.vat_time_multiplier"));
+        assertTrue(leaves.containsKey("processing.mill_water_uses"));
+        assertTrue(leaves.containsKey("table_materials.mode"));
+        assertTrue(leaves.containsKey("minigame.allow_virtual_plate"));
+        assertTrue(leaves.containsKey("minigame.invite_timeout_ticks"));
+        assertTrue(leaves.containsKey("minigame.invite_range"));
+        assertTrue(leaves.containsKey("minigame.rush_duration_ticks"));
+        assertTrue(leaves.containsKey("minigame.rush_max_cps"));
+        assertTrue(leaves.containsKey("minigame.rush_hits_per_bite"));
+        assertTrue(leaves.containsKey("minigame.rhythm_perfect_ms"));
+        assertTrue(leaves.containsKey("minigame.rhythm_good_ms"));
+        assertTrue(leaves.containsKey("minigame.rhythm_miss_ms"));
+        assertTrue(leaves.containsKey("minigame.rhythm_combo_multiplier"));
         for (String garnishId : GARNISH_IDS) {
             assertTrue(leaves.containsKey("loot.garnish." + garnishId + ".chance"),
                 "缺少配菜掉率默认键: " + garnishId);
@@ -98,6 +123,11 @@ class ConfigRulesTest {
 
         for (Map.Entry<String, JsonElement> entry : leaves.entrySet()) {
             String path = entry.getKey();
+            NumericConfig.ValueValidator validator = Config.typedRule(path);
+            if (validator != null) {
+                assertNull(validator.validate(entry.getValue()), "类型默认键校验失败: " + path);
+                continue;
+            }
             NumericConfig.Rule rule = Config.rule(path);
             assertNotNull(rule, "默认键缺少校验规则: " + path);
             BigDecimal number = entry.getValue().getAsBigDecimal();
@@ -110,7 +140,7 @@ class ConfigRulesTest {
                 "默认键值超出规则范围: " + path + "=" + value + " not in [" + rule.min() + ", " + rule.max() + "]");
         }
 
-        NumericConfig.Result direct = NumericConfig.parse(defaults.toString(), defaults, Config::rule, 1);
+        NumericConfig.Result direct = NumericConfig.parse(defaults.toString(), defaults, Config::rule, Config::typedRule, 1);
         assertTrue(direct.validDocument());
         assertEquals(0, direct.warnings().size(), "全量默认键直解析应 0 告警: " + direct.warnings());
 
@@ -193,7 +223,7 @@ class ConfigRulesTest {
             assertEquals(Config.DEFAULT_CHEERS_COOLDOWN_TICKS, Config.cheersCooldownTicks());
             assertEquals(Config.DEFAULT_SPICY_LEVEL_DURATION_STEP, Config.spicyLevelDurationStep());
             assertEquals(Config.DEFAULT_LOOT_SHRIMP_FISHING_WEIGHT, Config.lootShrimpFishingWeight());
-            assertEquals(0.15F, Config.lootGarnishChance("tomato", 0F), 1e-6F);
+            assertEquals(GarnishLoot.DEFAULT_CHANCE, Config.lootGarnishChance("tomato", 0F), 1e-6F);
 
             Config.saveDefaultsIfNeeded();
             JsonObject savedRoot = JsonParser.parseString(Files.readString(cfgFile, StandardCharsets.UTF_8)).getAsJsonObject();
@@ -306,8 +336,8 @@ class ConfigRulesTest {
             Config.Loaded badLoaded = Config.reload();
             assertEquals(7, badLoaded.warnings().size(), "7 个越界项应各产出 1 条告警: " + badLoaded.warnings());
             assertEquals(Config.DEFAULT_LOOT_SHRIMP_FISHING_WEIGHT, Config.lootShrimpFishingWeight());
-            assertEquals(0.15F, Config.lootGarnishChance("tomato", 0.15F), 1e-6F);
-            assertEquals(0.25F, Config.lootGarnishChance("scallion", 0.25F), 1e-6F);
+            assertEquals(GarnishLoot.DEFAULT_CHANCE, Config.lootGarnishChance("tomato", 0.15F), 1e-6F);
+            assertEquals(GarnishLoot.DEFAULT_CHANCE, Config.lootGarnishChance("scallion", 0.25F), 1e-6F);
             assertEquals(Config.DEFAULT_LOOT_LILY_PAD_LOTUS_ROOT_CHANCE, Config.lootLilyPadLotusRootChance(), 1e-6F);
             assertEquals(Config.DEFAULT_LOOT_MUSHROOM_ENOKI_CHANCE, Config.lootMushroomEnokiChance(), 1e-6F);
             assertEquals(Config.DEFAULT_LOOT_COW_BEEF_LOIN_CHANCE, Config.lootCowBeefLoinChance(), 1e-6F);
@@ -518,6 +548,74 @@ class ConfigRulesTest {
         }
     }
 
+    // ------------------------------------------------------------------ 6. Phase 4：table_materials.mode 与 rack_swap_materials 规则（mryt233 改）
+
+    @Test
+    void tableMaterialsModeAndRackSwapConfigRules(@TempDir Path dir) throws Exception {
+        Path testDir = dir.resolve("table-materials");
+        Files.createDirectories(testDir);
+        try {
+            Config.init(testDir, true);
+            Config.saveDefaultsIfNeeded();
+            Config.Loaded initial = Config.reload();
+            assertEquals(0, initial.warnings().size());
+            assertEquals(Config.TABLE_MAT_ANY_SOLID, Config.tableMaterialsMode());
+            assertEquals("any_solid", Config.tableMaterialsMode());
+            assertTrue(Config.rackSwapMaterials());
+
+            Path cfgFile = testDir.resolve(CONFIG_FILE);
+
+            // 合法枚举（any_solid / tag_only / off）与 rack_swap_materials=false 均应 0 告警生效
+            for (String mode : List.of(Config.TABLE_MAT_TAG_ONLY, Config.TABLE_MAT_OFF, Config.TABLE_MAT_ANY_SOLID)) {
+                JsonObject root = Config.defaultsCopy();
+                root.addProperty("_format", 1);
+                root.getAsJsonObject("table_materials").addProperty("mode", mode);
+                root.getAsJsonObject("mode").addProperty("rack_swap_materials", false);
+                Files.writeString(cfgFile, root.toString(), StandardCharsets.UTF_8);
+
+                Config.Loaded loaded = Config.reload();
+                assertEquals(0, loaded.warnings().size(), "合法枚举 " + mode + " 不应告警: " + loaded.warnings());
+                assertEquals(mode, Config.tableMaterialsMode());
+                assertFalse(Config.rackSwapMaterials());
+            }
+
+            // 大小写不匹配（"TAG_ONLY"）与未知值（"invalid"）均触发 invalid_choice 并回落默认值 "any_solid"
+            for (String badMode : List.of("TAG_ONLY", "invalid")) {
+                JsonObject root = Config.defaultsCopy();
+                root.addProperty("_format", 1);
+                root.getAsJsonObject("table_materials").addProperty("mode", badMode);
+                Files.writeString(cfgFile, root.toString(), StandardCharsets.UTF_8);
+
+                Config.Loaded loaded = Config.reload();
+                assertEquals(1, loaded.warnings().size(), "非法枚举 " + badMode + " 应产出 1 条告警: " + loaded.warnings());
+                ConfigWarning warning = loaded.warnings().get(0);
+                assertEquals(ConfigWarning.PREFIX + "invalid_choice", warning.key());
+                assertTrue(warning.args().contains("table_materials.mode"));
+                assertEquals(Config.TABLE_MAT_ANY_SOLID, Config.tableMaterialsMode());
+            }
+
+            // 非字符串 table_materials.mode 与非布尔 mode.rack_swap_materials 触发类型告警并各自回落默认值
+            JsonObject badTypes = Config.defaultsCopy();
+            badTypes.addProperty("_format", 1);
+            badTypes.getAsJsonObject("table_materials").addProperty("mode", 123);
+            badTypes.getAsJsonObject("mode").addProperty("rack_swap_materials", "not_a_bool");
+            Files.writeString(cfgFile, badTypes.toString(), StandardCharsets.UTF_8);
+
+            Config.Loaded badLoaded = Config.reload();
+            assertEquals(2, badLoaded.warnings().size(), "2 项非法类型应各产出 1 条告警: " + badLoaded.warnings());
+            assertTrue(badLoaded.warnings().stream()
+                .anyMatch(w -> w.key().equals(ConfigWarning.PREFIX + "not_string")
+                    && w.args().contains("table_materials.mode")));
+            assertTrue(badLoaded.warnings().stream()
+                .anyMatch(w -> w.key().equals(ConfigWarning.PREFIX + "not_boolean")
+                    && w.args().contains("mode.rack_swap_materials")));
+            assertEquals(Config.TABLE_MAT_ANY_SOLID, Config.tableMaterialsMode());
+            assertTrue(Config.rackSwapMaterials());
+        } finally {
+            resetConfig(dir);
+        }
+    }
+
     // ------------------------------------------------------------------ 辅助方法
 
     private static List<MobEffectInstance> expectedLegacyBonusEffects(SoupBase base, int spicyLevel) {
@@ -591,6 +689,11 @@ class ConfigRulesTest {
         assertFalse(leaves.isEmpty(), label + " 不应为空");
         for (Map.Entry<String, JsonElement> entry : leaves.entrySet()) {
             String path = entry.getKey();
+            NumericConfig.ValueValidator validator = Config.typedRule(path);
+            if (validator != null) {
+                assertNull(validator.validate(entry.getValue()), label + " 类型键校验失败: " + path);
+                continue;
+            }
             NumericConfig.Rule rule = Config.rule(path);
             assertNotNull(rule, label + " 存在无规则键: " + path);
             BigDecimal number = entry.getValue().getAsBigDecimal();

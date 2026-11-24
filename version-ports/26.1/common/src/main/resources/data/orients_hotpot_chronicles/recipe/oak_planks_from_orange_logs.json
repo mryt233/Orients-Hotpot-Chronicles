@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "group": "planks",
+  "ingredients": [
+    "#orients_hotpot_chronicles:orange_logs"
+  ],
+  "result": {
+    "id": "minecraft:oak_planks",
+    "count": 4
+  }
+}

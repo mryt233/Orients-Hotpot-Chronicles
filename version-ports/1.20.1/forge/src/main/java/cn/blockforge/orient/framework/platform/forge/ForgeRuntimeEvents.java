@@ -3,17 +3,25 @@ package cn.blockforge.orient.framework.platform.forge;
 
 import cn.blockforge.orient.framework.loader.RuntimeEvents;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import java.util.Objects;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /** Forge 游戏事件适配。 */
@@ -39,6 +47,37 @@ final class ForgeRuntimeEvents implements RuntimeEvents {
                 e.setCanceled(true);
             }
         });
+    }
+
+    @Override
+    public void onChunkLoad(BiConsumer<ServerLevel, LevelChunk> callback) {
+        Objects.requireNonNull(callback);
+        record Pending(ServerLevel level, ChunkPos pos) {
+        }
+        Queue<Pending> pending = new ConcurrentLinkedQueue<>();
+        MinecraftForge.EVENT_BUS.addListener((ChunkEvent.Load e) -> {
+            if (e.getLevel() instanceof ServerLevel serverLevel && e.getChunk() instanceof LevelChunk chunk) {
+                pending.add(new Pending(serverLevel, chunk.getPos()));
+            }
+        });
+        MinecraftForge.EVENT_BUS.addListener((TickEvent.ServerTickEvent e) -> {
+            if (e.phase != TickEvent.Phase.END) {
+                return;
+            }
+            MinecraftServer server = e.getServer();
+            Pending entry;
+            while ((entry = pending.poll()) != null) {
+                if (entry.level().getServer() != server) {
+                    continue;
+                }
+                LevelChunk loaded = entry.level().getChunkSource().getChunkNow(entry.pos().x, entry.pos().z);
+                if (loaded != null) {
+                    callback.accept(entry.level(), loaded);
+                }
+            }
+        });
+        MinecraftForge.EVENT_BUS.addListener((ServerStoppingEvent e) ->
+            pending.removeIf(entry -> entry.level().getServer() == e.getServer()));
     }
 
     @Override
@@ -68,6 +107,16 @@ final class ForgeRuntimeEvents implements RuntimeEvents {
     public void onServerStopping(Consumer<MinecraftServer> callback) {
         Objects.requireNonNull(callback);
         MinecraftForge.EVENT_BUS.addListener((ServerStoppingEvent e) -> callback.accept(e.getServer()));
+    }
+
+    @Override
+    public void onServerTick(Consumer<MinecraftServer> callback) {
+        Objects.requireNonNull(callback);
+        MinecraftForge.EVENT_BUS.addListener((TickEvent.ServerTickEvent e) -> {
+            if (e.phase == TickEvent.Phase.END) {
+                callback.accept(e.getServer());
+            }
+        });
     }
 
     @Override

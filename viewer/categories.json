@@ -144,6 +144,25 @@
         "shrimp",
         "sausage",
         "minced_pork",
+        "chicken_feet",
+        "鸡爪",
+        "orange_log",
+        "orange_wood",
+        "orange_leaves",
+        "orange_sapling",
+        "wild_",
+        "橙木",
+        "橙树",
+        "野生",
+        "soymilk",
+        "brine_bottle",
+        "stone_mill",
+        "wooden_vat",
+        "wooden_press_lid",
+        "石磨",
+        "木桶",
+        "豆浆",
+        "卤水",
         "火腿肠",
         "猪肉末",
         "虾",
@@ -159,6 +178,7 @@
           "id": "tall",
           "name": "高",
           "match": [
+            "tall_hotpot_table",
             "*_tall_hotpot_table"
           ],
           "keywords": [
@@ -170,10 +190,25 @@
           "id": "low",
           "name": "低",
           "match": [
+            "hotpot_table",
             "*_hotpot_table"
           ],
           "exclude": [
+            "tall_hotpot_table",
             "*_tall_hotpot_table"
+          ]
+        },
+        {
+          "id": "prep_racks",
+          "name": "备菜架",
+          "match": [
+            "*_prep_rack"
+          ],
+          "keywords": [
+            "prep_rack",
+            "rack",
+            "菜架",
+            "挂架"
           ]
         }
       ],

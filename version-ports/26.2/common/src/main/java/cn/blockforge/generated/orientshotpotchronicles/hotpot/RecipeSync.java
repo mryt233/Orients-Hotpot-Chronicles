@@ -35,7 +35,9 @@ public final class RecipeSync {
                     || recipe instanceof PotBoilingRecipe
                     || recipe instanceof PoundingRecipe
                     || recipe instanceof SoupBaseRecipe
-                    || recipe instanceof SeasoningRecipe;
+                    || recipe instanceof SeasoningRecipe
+                    || recipe instanceof StoneMillRecipe
+                    || recipe instanceof WoodenVatRecipe;
             })
             .toList();
     }

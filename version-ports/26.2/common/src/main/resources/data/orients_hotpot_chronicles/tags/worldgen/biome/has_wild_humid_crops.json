@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:forest",
+    "minecraft:dark_forest",
+    "minecraft:birch_forest",
+    "minecraft:river",
+    "minecraft:swamp",
+    "minecraft:bamboo_jungle"
+  ]
+}

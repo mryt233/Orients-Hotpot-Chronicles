@@ -2,19 +2,50 @@
 package cn.blockforge.orient.framework.platform.neoforge;
 
 // mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
+import cn.blockforge.orient.framework.client.BakedQuadRemap;
 import cn.blockforge.orient.framework.client.ClientItemRenderers;
+import cn.blockforge.orient.framework.client.SwappableModelRule;
+import cn.blockforge.orient.framework.game.MaterialRenderHost;
 import com.mojang.blaze3d.vertex.PoseStack;
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
+import net.neoforged.neoforge.common.util.TriState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.client.event.RenderHighlightEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.client.model.BakedModelWrapper;
+import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.ModelProperty;
 
 import cn.blockforge.orient.framework.client.ClientContent;
 import cn.blockforge.orient.framework.pure.DeferredRegistrations;
@@ -49,12 +80,16 @@ final class NeoForgeClientContent implements ClientContent {
     private final DeferredRegistrations<RegisterMenuScreensEvent> menus = new DeferredRegistrations<>();
     private final DeferredRegistrations<EntityRenderersEvent.RegisterRenderers> renderers = new DeferredRegistrations<>();
     private final DeferredRegistrations<RegisterClientExtensionsEvent> extensions = new DeferredRegistrations<>();
+    private final DeferredRegistrations<RegisterKeyMappingsEvent> keyMappings = new DeferredRegistrations<>();
+    private final List<SwappableModelRule> modelRules = new CopyOnWriteArrayList<>();
 
     static void install(IEventBus bus) {
         NeoForgeClientContent content = new NeoForgeClientContent();
         bus.addListener((RegisterMenuScreensEvent e) -> content.menus.bind(e));
         bus.addListener((EntityRenderersEvent.RegisterRenderers e) -> content.renderers.bind(e));
         bus.addListener((RegisterClientExtensionsEvent e) -> content.extensions.bind(e));
+        bus.addListener((RegisterKeyMappingsEvent e) -> content.keyMappings.bind(e));
+        bus.addListener((ModelEvent.ModifyBakingResult e) -> content.onModifyBakingResult(e));
         ClientContent.install(content);
         // mryt233 改（2026-11-10）：复用扩展事件队列，公共登记不依赖原生事件先后。
         ClientItemRenderers.install((item, renderer) ->
@@ -166,5 +201,217 @@ final class NeoForgeClientContent implements ClientContent {
             if (callback.render(mc.level.getBlockState(pos), pos, camera.x, camera.y, camera.z, e.getPoseStack(),
                     e.getMultiBufferSource().getBuffer(RenderType.lines()))) e.setCanceled(true);
         });
+    }
+
+    @Override
+    public void wrappedModels(SwappableModelRule rule) {
+        modelRules.add(Objects.requireNonNull(rule));
+    }
+
+    @Override
+    public void refreshBlockModel(Level level, BlockPos pos) {
+        if (level != null && level.isClientSide && pos != null) {
+            var be = level.getBlockEntity(pos);
+            if (be != null) {
+                be.requestModelDataUpdate();
+            }
+            BlockState state = level.getBlockState(pos);
+            level.sendBlockUpdated(pos, state, state, Block.UPDATE_IMMEDIATE | Block.UPDATE_CLIENTS);
+            Minecraft.getInstance().levelRenderer.setBlocksDirty(
+                pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
+        }
+    }
+
+    @Override
+    public void clientTick(Runnable callback) {
+        Objects.requireNonNull(callback);
+        NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post e) -> callback.run());
+    }
+
+    @Override
+    public void hudRender(HudRender callback) {
+        Objects.requireNonNull(callback);
+        NeoForge.EVENT_BUS.addListener((RenderGuiEvent.Post e) ->
+            callback.render(e.getGuiGraphics(), e.getPartialTick().getGameTimeDeltaPartialTick(true)));
+    }
+
+    @Override
+    public void keyMappings(net.minecraft.client.KeyMapping... mappings) {
+        Objects.requireNonNull(mappings);
+        net.minecraft.client.KeyMapping[] copy = mappings.clone();
+        keyMappings.add(e -> {
+            for (net.minecraft.client.KeyMapping mapping : copy) {
+                if (mapping != null) {
+                    e.register(mapping);
+                }
+            }
+        });
+    }
+
+    private void onModifyBakingResult(ModelEvent.ModifyBakingResult event) {
+        if (modelRules.isEmpty()) {
+            return;
+        }
+        Function<ResourceLocation, TextureAtlasSprite> blockAtlas = tex ->
+            event.getTextureGetter().apply(new Material(TextureAtlas.LOCATION_BLOCKS, tex));
+        for (Map.Entry<ModelResourceLocation, BakedModel> entry : event.getModels().entrySet()) {
+            ResourceLocation id = entry.getKey().id();
+            BakedModel current = entry.getValue();
+            if (current == null) {
+                continue;
+            }
+            for (SwappableModelRule rule : modelRules) {
+                if (rule.matches(id)) {
+                    current = new NeoForgeSwappableModel(current, rule, blockAtlas);
+                    entry.setValue(current);
+                }
+            }
+        }
+    }
+
+    // mryt233 改（2026-11-19）：扩展属性只在平台侧复制，共享框架仍只依赖原版类型。
+    static BakedQuad copyRemappedQuad(BakedQuad original, int[] vertices, TextureAtlasSprite target) {
+        return new BakedQuad(vertices, -1, original.getDirection(), target, original.isShade(),
+            original.hasAmbientOcclusion());
+    }
+
+    /** 仅调整 NeoForge 四边形的 AO 开关，保留顶点、颜色索引与其余属性；一致时复用原实例。 */
+    static BakedQuad copyWithAo(BakedQuad original, boolean ao) {
+        if (original.hasAmbientOcclusion() == ao) {
+            return original;
+        }
+        return new BakedQuad(original.getVertices(), original.getTintIndex(), original.getDirection(),
+            original.getSprite(), original.isShade(), ao);
+    }
+
+    // mryt233 改：只提升默认 AO，保留底层模型对当前状态和渲染层的明确决定。
+    static TriState resolveModelAo(TriState original, boolean force) {
+        return force && original == TriState.DEFAULT ? TriState.TRUE : original;
+    }
+
+    private static final BakedQuadRemap.QuadFactory QUAD_FACTORY = NeoForgeClientContent::copyRemappedQuad;
+    private static final ModelProperty<Object> SNAPSHOT_PROP = new ModelProperty<>();
+
+    private static final class NeoForgeSwappableModel extends BakedModelWrapper<BakedModel> {
+        private final SwappableModelRule rule;
+        private final Function<ResourceLocation, TextureAtlasSprite> blockAtlas;
+        private final Map<Map<TextureAtlasSprite, TextureAtlasSprite>, BakedModel> itemCache = new ConcurrentHashMap<>();
+        private final ItemOverrides itemOverrides;
+
+        private NeoForgeSwappableModel(BakedModel originalModel, SwappableModelRule rule,
+                                       Function<ResourceLocation, TextureAtlasSprite> blockAtlas) {
+            super(originalModel);
+            this.rule = rule;
+            this.blockAtlas = blockAtlas;
+            this.itemOverrides = new ItemOverrides() {
+                @Override
+                public BakedModel resolve(BakedModel model, ItemStack stack, ClientLevel world,
+                                          LivingEntity entity, int seed) {
+                    Map<TextureAtlasSprite, TextureAtlasSprite> swaps = rule.resolveSwaps(null, stack, null, blockAtlas);
+                    if (swaps == null || swaps.isEmpty()) {
+                        return originalModel;
+                    }
+                    return itemCache.computeIfAbsent(swaps, key -> new NeoForgeSwappableItemModel(originalModel, key));
+                }
+            };
+        }
+
+        @Override
+        public TriState useAmbientOcclusion(BlockState state, ModelData data, RenderType renderType) {
+            return resolveModelAo(super.useAmbientOcclusion(state, data, renderType), rule.forceAmbientOcclusion(state));
+        }
+
+        @Override
+        public ModelData getModelData(BlockAndTintGetter level, BlockPos pos, BlockState state, ModelData tileData) {
+            if (level.getBlockEntity(pos) instanceof MaterialRenderHost host) {
+                Object snap = host.materialRenderData();
+                if (snap != null) {
+                    return ModelData.of(SNAPSHOT_PROP, snap);
+                }
+            }
+            return tileData;
+        }
+
+        @Override
+        public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource rand) {
+            List<BakedQuad> remapped = BakedQuadRemap.remapQuads(originalModel.getQuads(state, side, rand),
+                rule.resolveSwaps(null, null, state, blockAtlas), QUAD_FACTORY);
+            return applyKeepUnoccluded(remapped, state);
+        }
+
+        @Override
+        public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource rand,
+                                        ModelData data, RenderType renderType) {
+            Object snap = data.get(SNAPSHOT_PROP);
+            Map<TextureAtlasSprite, TextureAtlasSprite> swaps = rule.resolveSwaps(snap, null, state, blockAtlas);
+            List<BakedQuad> remapped = BakedQuadRemap.remapQuads(
+                originalModel.getQuads(state, side, rand, data, renderType), swaps, QUAD_FACTORY);
+            return applyKeepUnoccluded(remapped, state);
+        }
+
+        private List<BakedQuad> applyKeepUnoccluded(List<BakedQuad> quads, BlockState state) {
+            if (quads.isEmpty() || !rule.forceAmbientOcclusion(state)) {
+                return quads;
+            }
+            List<BakedQuad> out = null;
+            for (int i = 0; i < quads.size(); i++) {
+                BakedQuad q = quads.get(i);
+                if (q.hasAmbientOcclusion() && rule.keepUnoccludedSprite(q.getSprite().contents().name())) {
+                    if (out == null) {
+                        out = new ArrayList<>(quads.size());
+                        for (int j = 0; j < i; j++) {
+                            out.add(quads.get(j));
+                        }
+                    }
+                    out.add(copyWithAo(q, false));
+                } else if (out != null) {
+                    out.add(q);
+                }
+            }
+            return out != null ? out : quads;
+        }
+
+        @Override
+        public TextureAtlasSprite getParticleIcon(ModelData data) {
+            TextureAtlasSprite s = rule.particleSprite(data.get(SNAPSHOT_PROP), null, blockAtlas);
+            return s != null ? s : super.getParticleIcon(data);
+        }
+
+        @Override
+        public ItemOverrides getOverrides() {
+            return itemOverrides;
+        }
+    }
+
+    private static final class NeoForgeSwappableItemModel extends BakedModelWrapper<BakedModel> {
+        private final Map<TextureAtlasSprite, TextureAtlasSprite> swaps;
+
+        private NeoForgeSwappableItemModel(BakedModel originalModel,
+                                           Map<TextureAtlasSprite, TextureAtlasSprite> swaps) {
+            super(originalModel);
+            this.swaps = swaps;
+        }
+
+        @Override
+        public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource rand) {
+            return BakedQuadRemap.remapQuads(originalModel.getQuads(state, side, rand), swaps, QUAD_FACTORY);
+        }
+
+        @Override
+        public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource rand,
+                                        ModelData data, RenderType renderType) {
+            return BakedQuadRemap.remapQuads(originalModel.getQuads(state, side, rand, data, renderType), swaps, QUAD_FACTORY);
+        }
+
+        @Override
+        public BakedModel applyTransform(ItemDisplayContext context, PoseStack poseStack, boolean applyLeftHandTransform) {
+            originalModel.applyTransform(context, poseStack, applyLeftHandTransform);
+            return this;
+        }
+
+        @Override
+        public List<BakedModel> getRenderPasses(ItemStack stack, boolean fabulous) {
+            return List.of(this);
+        }
     }
 }

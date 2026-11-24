@@ -8,6 +8,7 @@ import cn.blockforge.orient.framework.compat.mixin.CriteriaTriggersAccessor;
 import cn.blockforge.orient.framework.loader.RegistrationApi;
 import cn.blockforge.orient.framework.pure.RegistrationGuard;
 import cn.blockforge.orient.framework.pure.RegistrationWindow;
+import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
@@ -22,13 +23,17 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
 
+import java.lang.reflect.Constructor;
 import java.util.Objects;
 
 /**
@@ -60,7 +65,11 @@ public final class FabricRegistrationApi implements RegistrationApi {
         return new ItemRegistrar() {
             @Override
             public <T extends Item> T register(ResourceLocation id, T item) {
-                return put(BuiltInRegistries.ITEM, id, item);
+                T registered = put(BuiltInRegistries.ITEM, id, item);
+                if (registered instanceof BlockItem blockItem) {
+                    blockItem.registerBlocks(Item.BY_BLOCK, blockItem);
+                }
+                return registered;
             }
         };
     }
@@ -182,6 +191,24 @@ public final class FabricRegistrationApi implements RegistrationApi {
             @Override
             public <T extends ParticleType<?>> T register(ResourceLocation id, T value) {
                 return put(BuiltInRegistries.PARTICLE_TYPE, id, value);
+            }
+        };
+    }
+
+    @Override
+    public FoliagePlacerRegistrar foliagePlacers() {
+        return new FoliagePlacerRegistrar() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public <P extends FoliagePlacer> FoliagePlacerType<P> register(ResourceLocation id, Codec<P> codec) {
+                try {
+                    Constructor<FoliagePlacerType> ctor = FoliagePlacerType.class.getDeclaredConstructor(Codec.class);
+                    ctor.setAccessible(true);
+                    return put(BuiltInRegistries.FOLIAGE_PLACER_TYPE, id,
+                        ctor.newInstance(Objects.requireNonNull(codec, "codec")));
+                } catch (ReflectiveOperationException e) {
+                    throw new IllegalStateException("Unable to instantiate FoliagePlacerType for " + id, e);
+                }
             }
         };
     }

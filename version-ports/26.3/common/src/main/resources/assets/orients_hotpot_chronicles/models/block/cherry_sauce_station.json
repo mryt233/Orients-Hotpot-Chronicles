@@ -1,0 +1,19 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/sauce_station_full",
+  "textures": {
+    "side": "minecraft:block/cherry_planks",
+    "top": "minecraft:block/quartz_block_top",
+    "bowl": "orients_hotpot_chronicles:block/bowl_wood",
+    "inner": "orients_hotpot_chronicles:block/bowl_wood_inner",
+    "particle": "minecraft:block/cherry_planks",
+    "s0": "orients_hotpot_chronicles:block/sauce_msg",
+    "s1": "orients_hotpot_chronicles:block/sauce_chili_oil",
+    "s2": "orients_hotpot_chronicles:block/sauce_sweet_sour_sauce",
+    "s3": "orients_hotpot_chronicles:block/sauce_honey",
+    "s4": "orients_hotpot_chronicles:block/sauce_sesame_oil",
+    "s5": "orients_hotpot_chronicles:block/sauce_vinegar",
+    "s6": "orients_hotpot_chronicles:block/sauce_sugar",
+    "s7": "orients_hotpot_chronicles:block/chopped_scallion",
+    "s8": "orients_hotpot_chronicles:block/minced_cilantro"
+  }
+}

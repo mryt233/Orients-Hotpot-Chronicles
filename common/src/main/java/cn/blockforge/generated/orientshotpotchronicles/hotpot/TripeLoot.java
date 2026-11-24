@@ -57,6 +57,18 @@ public final class TripeLoot {
                     .add(LootItem.lootTableItem(HotPotContent.ENOKI_MUSHROOM)));
                 return;
             }
+            if (key.equals(EntityType.CHICKEN.getDefaultLootTable())) {
+                float chance = clampChance(Config.lootChickenFeetChance());
+                float bonus = clampChance(Config.lootChickenFeetLootingBonus());
+                tableBuilder.withPool(LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(1))
+                    .add(LootItem.lootTableItem(HotPotContent.CHICKEN_FEET)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1, 2)))
+                        .when(LootItemRandomChanceWithEnchantedBonusCondition.randomChanceAndLootingBoost(
+                            registries, chance, bonus))
+                        .apply(HotPotLoot.smeltWhenBurning())));
+                return;
+            }
             if (!key.equals(EntityType.COW.getDefaultLootTable()) && !key.equals(EntityType.MOOSHROOM.getDefaultLootTable())) {
                 return;
             }

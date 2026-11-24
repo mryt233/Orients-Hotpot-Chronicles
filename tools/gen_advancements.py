@@ -118,6 +118,16 @@ ADVANCEMENTS = [
     # 和「坐着吃」（seated，骑任何座位都算）错开：这条只认一格高条凳（<wood>_bench）。
     ("warm_gathering", "seated", "oak_bench", "goal", False,
      {"bench": event("eat_seated_bench")}),
+    # ---------- Phase 5 即时小游戏成就（mryt233 改） ----------
+    # 大胃狂飙：完成一局连打吃菜火锅挑战
+    ("minigame_rush", "first_cooked", "bamboo_chopsticks", "goal", False,
+     {"rush": event("minigame_rush")}),
+    # 沸腾节拍：完成一首 4 轨火锅音游曲目
+    ("minigame_rhythm", "minigame_rush", "copper_nine_grid_hotpot", "challenge", False,
+     {"rhythm": event("minigame_rhythm")}),
+    # 围桌聚餐：与同桌好友一起完成多人火锅小游戏对决
+    ("table_feast", "warm_gathering", "tall_hotpot_table", "challenge", False,
+     {"feast": event("minigame_table_feast")}),
 ]
 
 

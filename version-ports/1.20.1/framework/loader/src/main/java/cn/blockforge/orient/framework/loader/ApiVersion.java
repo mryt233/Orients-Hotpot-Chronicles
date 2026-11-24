@@ -14,7 +14,8 @@ public final class ApiVersion {
      *
      * <p>mryt233 改（2026-11-11）：0.2.0 删去已弃用的公开旧入口，其余平台能力保持不变。</p>
      */
-    public static final String RUNTIME = "0.2.0";
+    // mryt233 改（2026-11-16）：Phase 4 新增区块加载事件与跨端烘焙模型包装接口，保持 0.2.x 向后兼容。
+    public static final String RUNTIME = "0.2.2";
 
     private ApiVersion() {
     }

@@ -208,14 +208,16 @@ public record SoupDef(
             addEffect(list, fireEffect,
                 level >= HotPotBlockEntity.SPICY_MAX ? fireTicks * Config.spicyFireTopMultiplier() : fireTicks,
                 builtin ? Config.overriddenSoupBowlInt(name, "fire_amplifier", 0) : 0);
-            int hungerTicks = builtin
-                ? Config.overriddenSoupBowlInt(name, "hunger_duration", defaultHungerDuration) : defaultHungerDuration;
-            // 配成 0 表示「红汤不加饥饿」：这时不再按辣度往上加，玩家的配置说了算
-            if (hungerTicks > 0 && level >= HotPotBlockEntity.SPICY_MAX) {
-                hungerTicks += Config.spicyHungerTopBonus();
+            if (Config.penaltiesEnabled()) {
+                int hungerTicks = builtin
+                    ? Config.overriddenSoupBowlInt(name, "hunger_duration", defaultHungerDuration) : defaultHungerDuration;
+                // 配成 0 表示「红汤不加饥饿」：这时不再按辣度往上加，玩家的配置说了算
+                if (hungerTicks > 0 && level >= HotPotBlockEntity.SPICY_MAX) {
+                    hungerTicks += Config.spicyHungerTopBonus();
+                }
+                addEffect(list, hungerEffect, hungerTicks,
+                    builtin ? Config.overriddenSoupBowlInt(name, "hunger_amplifier", 0) : 0);
             }
-            addEffect(list, hungerEffect, hungerTicks,
-                builtin ? Config.overriddenSoupBowlInt(name, "hunger_amplifier", 0) : 0);
         }
         return list;
     }

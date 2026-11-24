@@ -165,10 +165,18 @@ def data_files():
     for kind, time, suffix in [("smelting", 100, ""), ("smoking", 50, "_from_smoking"), ("campfire_cooking", 300, "_from_campfire_cooking")]:
         write(rec / f"hot_tofu_cube{suffix}.json", {"type": f"minecraft:{kind}", "category": "food", "ingredient": {"item": f"{MODID}:cold_tofu_cube"},
                                                     "result": {"id": f"{MODID}:hot_tofu_cube"}, "experience": 0.35, "cookingtime": time})
-    # 3 黄豆 + 水桶 → 1 块冷豆腐（水桶合成后自动还回空桶）
-    write(rec / "cold_tofu.json", {"type": "minecraft:crafting_shapeless", "category": "misc",
-                                   "ingredients": [{"item": f"{MODID}:soybean"}] * 3 + [{"item": "minecraft:water_bucket"}],
-                                   "result": {"id": f"{MODID}:cold_tofu", "count": 1}})
+    # 仅在关闭详细豆腐工序 / 精简模式下启用工作台直合冷豆腐（0.3.1 Phase 3）
+    write(rec / "cold_tofu.json", {
+        "type": f"{MODID}:conditional_crafting",
+        "flag": "mode.detailed_tofu_processing",
+        "expected": False,
+        "recipe": {
+            "type": "minecraft:crafting_shapeless",
+            "category": "misc",
+            "ingredients": [{"item": f"{MODID}:soybean"}] * 3 + [{"item": "minecraft:water_bucket"}],
+            "result": {"id": f"{MODID}:cold_tofu", "count": 1},
+        },
+    })
     for tag, add in [("cuttable", ["minecraft:potato", f"{MODID}:cold_tofu", f"{MODID}:hot_tofu"]),
                      ("cut_piece_by_piece", ["minecraft:potato"])]:
         f = DATA / MODID / f"tags/item/{tag}.json"

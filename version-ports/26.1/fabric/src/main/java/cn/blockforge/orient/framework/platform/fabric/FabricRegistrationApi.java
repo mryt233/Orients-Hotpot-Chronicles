@@ -173,4 +173,28 @@ public final class FabricRegistrationApi implements RegistrationApi {
             }
         };
     }
+
+    // mryt233 改（2026-11-23）：0.2.2 注册自定义树冠生成器；兼容非公开构造器。
+    @Override
+    public FoliagePlacerRegistrar foliagePlacers() {
+        return new FoliagePlacerRegistrar() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public <P extends net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer>
+            net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType<P> register(
+                Identifier id, com.mojang.serialization.MapCodec<P> codec) {
+                Objects.requireNonNull(codec, "codec");
+                try {
+                    var ctor = net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType.class
+                        .getDeclaredConstructor(com.mojang.serialization.MapCodec.class);
+                    ctor.setAccessible(true);
+                    var type = (net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType<P>)
+                        ctor.newInstance(codec);
+                    return put(BuiltInRegistries.FOLIAGE_PLACER_TYPE, id, type);
+                } catch (ReflectiveOperationException e) {
+                    throw new IllegalStateException("Failed to construct FoliagePlacerType for " + id, e);
+                }
+            }
+        };
+    }
 }

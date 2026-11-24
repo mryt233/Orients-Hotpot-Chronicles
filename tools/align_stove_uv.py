@@ -9,6 +9,13 @@
 """
 import json
 from pathlib import Path
+import sys
+
+TOOLS = Path(__file__).resolve().parent
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
+
+from pixkit.model import apply_outer_cullface  # noqa: E402
 
 RES = Path(__file__).resolve().parent.parent / "common/src/main/resources"
 ROOTS = [RES / "assets/orients_hotpot_chronicles"]
@@ -30,5 +37,6 @@ for root in ROOTS:
             for d, f in e["faces"].items():
                 if d in ("north", "east", "south", "west") and f["texture"] in ("#front", "#side"):
                     f["uv"] = aligned_uv(d, e["from"], e["to"])
+                apply_outer_cullface(d, e["from"], e["to"], f)
         p.write_text(json.dumps(m, indent=2) + "\n", encoding="utf-8")
 print("ok")

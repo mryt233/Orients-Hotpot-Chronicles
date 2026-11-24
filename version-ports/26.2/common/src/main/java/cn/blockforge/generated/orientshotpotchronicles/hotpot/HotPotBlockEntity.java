@@ -42,10 +42,13 @@ public class HotPotBlockEntity extends SyncedBlockEntity implements Container {
     final int[] spicyLevels = {0, 0, 0, 0};
 
     private float clientHeat = 0F;
+    private float prevClientHeat;
     private double bubbleSeconds;
+    private double prevBubbleSeconds;
     public static final float BOB_OMEGA = 0.22F;
     public static final float BOB_COLD_OMEGA = 0.05F;
     private final double[] cycleAngle = new double[PotLayout.MAX_SIDES];
+    private final double[] prevCycleAngle = new double[PotLayout.MAX_SIDES];
     boolean needsVisualRepair = true;
     private boolean breakHandled = false;
     boolean syncPending = false;
@@ -75,23 +78,43 @@ public class HotPotBlockEntity extends SyncedBlockEntity implements Container {
     }
 
     protected void clientTick(Level level, BlockPos blockPos, BlockState state) {
+        prevClientHeat = clientHeat;
+        prevBubbleSeconds = bubbleSeconds;
+        System.arraycopy(cycleAngle, 0, prevCycleAngle, 0, cycleAngle.length);
+
         clientHeat = HotPotEffects.tick(this, level, blockPos, state, clientHeat);
+        // 相位按「原始瞬时速度」积分：每 tick 增量 = (0.7 + 0.5*heat)/20；
+        // 渲染端周期已去掉热度分母（见 BoilingEffects），两者相乘正好还原原来的速度，且连续不跳变
         bubbleSeconds += (1.0 / 20.0) * (0.7 + 0.5 * clientHeat);
         for (int side = 0; side < cycleAngle.length; side++) {
             cycleAngle[side] += cycleRate(side);
         }
     }
 
+    /** 连续食材角速度：按热度在冷/沸之间线性插值，取消 heat==0.5 处的硬跳变（mryt233 改，r153）。 */
+    public static float cycleRateFor(boolean hasSoup, float heat) {
+        if (!hasSoup) {
+            return BOB_OMEGA;
+        }
+        float clamped = Math.max(0F, Math.min(1F, heat));
+        return BOB_COLD_OMEGA + (BOB_OMEGA - BOB_COLD_OMEGA) * clamped;
+    }
+
     private float cycleRate(int side) {
-        return baseOfSide(side) != SoupIds.EMPTY && clientHeat < 0.5F ? BOB_COLD_OMEGA : BOB_OMEGA;
+        return cycleRateFor(baseOfSide(side) != SoupIds.EMPTY, clientHeat);
     }
 
+    /** 某一边轮换相位，partial = 这一刻已经过去的比例（渲染插值用）。 */
     public double cycleAngle(int side, float partial) {
-        return side < 0 || side >= cycleAngle.length ? 0 : cycleAngle[side] + partial * cycleRate(side);
+        if (side < 0 || side >= cycleAngle.length) {
+            return 0;
+        }
+        return prevCycleAngle[side] + partial * (cycleAngle[side] - prevCycleAngle[side]);
     }
 
+    /** 世界气泡用的累计时间（秒），带这一刻内的帧间插值。 */
     public double bubbleSeconds(float partial) {
-        return bubbleSeconds + partial * (0.7 + 0.5 * clientHeat) / 20.0;
+        return prevBubbleSeconds + partial * (bubbleSeconds - prevBubbleSeconds);
     }
 
     public StoveBlockEntity stoveBelow() {
@@ -306,6 +329,15 @@ public class HotPotBlockEntity extends SyncedBlockEntity implements Container {
         HotPotFoodOps.grantTakeXp(this, player, slot, count);
     }
 
+    public int countCookedForMinigame() {
+        return HotPotFoodOps.countCooked(this);
+    }
+
+    public ItemStack consumeOneCookedForMinigame(Player player) {
+        return HotPotFoodOps.consumeOneCooked(this, player);
+    }
+
+    // ------------------------------------------------------------------ 槽位管理
     void trackSlotChanges() {
         slots.trackSlotChanges();
     }
@@ -342,6 +374,10 @@ public class HotPotBlockEntity extends SyncedBlockEntity implements Container {
 
     public float clientHeat() {
         return clientHeat;
+    }
+
+    public float clientHeat(float partial) {
+        return prevClientHeat + partial * (clientHeat - prevClientHeat);
     }
 
     public double bubbleSeconds() {
@@ -515,6 +551,11 @@ public class HotPotBlockEntity extends SyncedBlockEntity implements Container {
         return handled;
     }
 
+    // mryt233 改：灶上锅可以覆盖食材的掉落坐标。
+    protected void dropPotResource(ItemStack stack) {
+        Block.popResource(level, worldPosition, stack);
+    }
+
     public void dropContents() {
         dropContents(PotLayout.NONE);
     }
@@ -531,7 +572,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity implements Container {
             }
             ItemStack stack = slots.ingredients().getItem(i);
             if (!stack.isEmpty()) {
-                Block.popResource(level, worldPosition, stack);
+                dropPotResource(stack);
                 slots.ingredients().setItem(i, ItemStack.EMPTY);
                 resetSlot(i, ItemStack.EMPTY);
             }

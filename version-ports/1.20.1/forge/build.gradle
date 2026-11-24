@@ -25,6 +25,7 @@ java.registerFeature('frameworkRuntime') { usingSourceSet(sourceSets.frameworkRu
 legacyForge {
     version = "${project.minecraft_version}-${project.forge_version}"
     addModdingDependenciesTo(sourceSets.frameworkRuntime)
+    addModdingDependenciesTo(sourceSets.test)
     runs {
         client {
             client()
@@ -93,3 +94,12 @@ tasks.named('sourcesJar', Jar) {
     from project(':common').sourceSets.main.allJava
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
+// mryt233 改（2026-11-22）：启用 Forge 平台单元测试（BakedQuadRemapTest）。
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation sourceSets.frameworkRuntime.output
+}
+tasks.named('test') { useJUnitPlatform() }

@@ -3,6 +3,7 @@ package cn.blockforge.generated.orientshotpotchronicles.forge;
 
 import cn.blockforge.generated.orientshotpotchronicles.HotpotContentModule;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTracks;
 import cn.blockforge.orient.framework.loader.ClientHooks;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
@@ -57,6 +58,7 @@ public final class HotPotForge {
 
                 @Override
                 protected void apply(Void unused, ResourceManager manager, ProfilerFiller profiler) {
+                    HotPotTracks.reload(manager);
                     HotpotContentModule.HOST.reload();
                 }
             }));

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "orients_hotpot_chronicles:block/orange_log_horizontal",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "orients_hotpot_chronicles:block/orange_log"
+    },
+    "axis=z": {
+      "model": "orients_hotpot_chronicles:block/orange_log_horizontal",
+      "x": 90
+    }
+  }
+}

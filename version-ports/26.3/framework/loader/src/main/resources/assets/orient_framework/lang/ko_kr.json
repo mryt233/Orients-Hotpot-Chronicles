@@ -1,0 +1,16 @@
+{
+  "orient_framework.config.json_invalid": "설정 파일이 올바른 JSON이 아닙니다. 기본값을 사용하며 원본 파일은 보존합니다",
+  "orient_framework.config.root_not_object": "설정 파일의 최상위는 객체여야 합니다. 기본값을 사용하며 원본 파일은 보존합니다",
+  "orient_framework.config.format_unsupported": "지원하지 않는 설정 형식 버전입니다. 기본값을 사용하며 원본 파일은 보존합니다",
+  "orient_framework.config.format_invalid": "설정 형식 버전이 잘못되었습니다. 기본값을 사용하며 원본 파일은 보존합니다",
+  "orient_framework.config.unknown_key": "알 수 없는 설정 항목 %s, 무시했습니다",
+  "orient_framework.config.not_object": "%s 항목은 객체여야 합니다. 기본값을 유지했습니다",
+  "orient_framework.config.not_number": "%s 항목은 숫자여야 합니다. 기본값으로 되돌렸습니다",
+  "orient_framework.config.not_integer": "%s 항목은 정수여야 합니다. 기본값으로 되돌렸습니다",
+  "orient_framework.config.out_of_range": "%s 항목은 %s~%s 사이여야 합니다. 기본값으로 되돌렸습니다",
+  "orient_framework.config.too_large": "설정 파일이 너무 큽니다. 기본값을 사용하며 원본 파일은 보존합니다",
+  "orient_framework.config.read_failed": "설정을 읽지 못했습니다(%s). 기본값을 사용하며 원본 파일은 보존합니다",
+  "orient_framework.config.write_failed": "설정을 쓰지 못했습니다(%s). 원본 파일은 보존합니다",
+  "orient_framework.disconnect.protocol": "Orient Framework 네트워크 프로토콜이 일치하지 않습니다(서버 %s, 클라이언트 %s). 서버와 같은 버전의 모드를 설치하세요.",
+  "orient_framework.disconnect.missing_channels": "이 서버에 필요한 네트워크 채널이 클라이언트에 없습니다: %s. 서버와 같은 버전의 모드를 설치하세요."
+}

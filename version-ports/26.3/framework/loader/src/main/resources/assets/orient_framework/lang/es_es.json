@@ -1,0 +1,16 @@
+{
+  "orient_framework.config.json_invalid": "La configuración no es un JSON válido; se usan los valores predeterminados y se conserva el archivo original",
+  "orient_framework.config.root_not_object": "La raíz de la configuración debe ser un objeto; se usan los valores predeterminados y se conserva el archivo original",
+  "orient_framework.config.format_unsupported": "Versión de formato de configuración no compatible; se usan los valores predeterminados y se conserva el archivo original",
+  "orient_framework.config.format_invalid": "Versión de formato de configuración no válida; se usan los valores predeterminados y se conserva el archivo original",
+  "orient_framework.config.unknown_key": "Entrada de configuración desconocida %s, ignorada",
+  "orient_framework.config.not_object": "%s debe ser un objeto; se mantiene el valor predeterminado",
+  "orient_framework.config.not_number": "%s debe ser un número; se usa el valor predeterminado",
+  "orient_framework.config.not_integer": "%s debe ser un número entero; se usa el valor predeterminado",
+  "orient_framework.config.out_of_range": "%s debe estar entre %s y %s; se usa el valor predeterminado",
+  "orient_framework.config.too_large": "El archivo de configuración es demasiado grande; se usan los valores predeterminados y se conserva el archivo original",
+  "orient_framework.config.read_failed": "No se pudo leer la configuración (%s); se usan los valores predeterminados y se conserva el archivo original",
+  "orient_framework.config.write_failed": "No se pudo escribir la configuración (%s); se conserva el archivo original",
+  "orient_framework.disconnect.protocol": "El protocolo de red de Orient Framework no coincide (servidor %s, cliente %s). Instala las mismas versiones de mods que el servidor.",
+  "orient_framework.disconnect.missing_channels": "Este servidor requiere canales de red que tu cliente no tiene: %s. Instala las mismas versiones de mods que el servidor."
+}

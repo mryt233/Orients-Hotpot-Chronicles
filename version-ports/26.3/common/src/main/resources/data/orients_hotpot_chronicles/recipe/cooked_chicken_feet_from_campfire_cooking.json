@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "ingredient": "orients_hotpot_chronicles:chicken_feet",
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_chicken_feet"
+  },
+  "experience": 0.35,
+  "cookingtime": 600
+}

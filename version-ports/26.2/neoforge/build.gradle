@@ -36,7 +36,7 @@ dependencies { frameworkRuntimeCompileOnly sourceSets.main.output }
 def frameworkRuntimeJar = tasks.register('frameworkRuntimeJar', Jar) {
     dependsOn ':framework:pure:classes', ':framework:loader:classes', ':framework:loader:processResources', ':framework:game:classes', ':framework:client:classes',
         'classes', 'frameworkRuntimeClasses'
-    archiveFileName = 'orient_framework-26.2-neoforge-0.2.0.jar'
+    archiveFileName = "orient_framework-26.2-neoforge-${framework_version}.jar"
     manifest.attributes 'Automatic-Module-Name': 'cn.blockforge.orient.framework'
     destinationDirectory = layout.buildDirectory.dir('framework')
     from(sourceSets.main.output.classesDirs) { include 'cn/blockforge/orient/framework/**' }

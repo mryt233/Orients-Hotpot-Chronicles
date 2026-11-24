@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "cn.blockforge.orient.framework.client.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "ItemStackRenderStateAccessor",
+    "ItemStackRenderStateAccessor$LayerAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

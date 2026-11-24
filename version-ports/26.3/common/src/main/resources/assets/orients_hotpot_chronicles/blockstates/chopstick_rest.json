@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "orients_hotpot_chronicles:block/plates"
+    },
+    "axis=z": {
+      "model": "orients_hotpot_chronicles:block/plates",
+      "y": 90
+    }
+  }
+}

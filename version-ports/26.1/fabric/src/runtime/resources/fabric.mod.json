@@ -1,22 +1,25 @@
 {
   "schemaVersion": 1,
   "id": "orient_framework",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "name": "Orient Framework",
   "authors": [
     "mryt233"
   ],
   "license": "MIT",
   "environment": "*",
+  "mixins": [
+    "orient_framework.mixins.json"
+  ],
   "entrypoints": {
     "main": [
       "cn.blockforge.orient.framework.platform.fabric.FabricFrameworkRuntime"
     ]
   },
   "depends": {
-    "fabricloader": ">=0.18.4",
+    "fabricloader": ">=0.19.5",
     "minecraft": ">=26.1 <26.2",
     "java": ">=25",
-    "fabric-api": ">=0.143.12"
+    "fabric-api": ">=0.145.0"
   }
 }

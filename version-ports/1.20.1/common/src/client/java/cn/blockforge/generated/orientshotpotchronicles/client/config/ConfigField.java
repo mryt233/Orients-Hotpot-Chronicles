@@ -31,11 +31,25 @@ public final class ConfigField {
         }
     }
 
-    /** 一个可调的数值项：配置路径、整数与否、范围、单步、单位、行名、悬停说明的文案键、行图标。 */
-    public record Field(String[] path, boolean integer, double min, double max, double step, Unit unit,
-                         Component label, String helpKey, ItemStack icon) {
+    /** 字段控件类型：数值、布尔开关、枚举选择。 */
+    public enum Kind {
+        NUMBER, BOOLEAN, CHOICE
+    }
+
+    /** 一个可调的配置项：路径、控件类型、范围/选项、单位、行名、悬停说明键、行图标。 */
+    public record Field(String[] path, Kind kind, boolean integer, double min, double max, double step, Unit unit,
+                        String[] options, Component label, String helpKey, ItemStack icon) {
+        public Field(String[] path, boolean integer, double min, double max, double step, Unit unit,
+                     Component label, String helpKey, ItemStack icon) {
+            this(path, Kind.NUMBER, integer, min, max, step, unit, null, label, helpKey, icon);
+        }
+
         public String key() {
             return String.join(".", path);
+        }
+
+        public boolean isNumeric() {
+            return kind == Kind.NUMBER;
         }
     }
 
@@ -88,7 +102,16 @@ public final class ConfigField {
 
     public static Field field(String path, boolean integer, double min, double max, double step, Unit unit,
                         Component label, String helpProp, ItemStack icon) {
-        return new Field(path.split("\\."), integer, min, max, step, unit, label, k("help." + helpProp), icon);
+        return new Field(path.split("\\."), Kind.NUMBER, integer, min, max, step, unit, null, label, k("help." + helpProp), icon);
+    }
+
+    public static Field toggle(String path, Component label, String helpProp) {
+        return new Field(path.split("\\."), Kind.BOOLEAN, true, 0, 1, 1, Unit.PLAIN, null, label, k("help." + helpProp), ItemStack.EMPTY);
+    }
+
+    public static Field choice(String path, String[] options, Component label, String helpProp) {
+        return new Field(path.split("\\."), Kind.CHOICE, true, 0, Math.max(0, options.length - 1), 1, Unit.PLAIN,
+            options, label, k("help." + helpProp), ItemStack.EMPTY);
     }
 
 }

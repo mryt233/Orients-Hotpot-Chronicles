@@ -1,0 +1,9 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/stone_hotpot_table_nesw",
+  "textures": {
+    "planks": "minecraft:block/polished_blackstone",
+    "particle": "minecraft:block/polished_blackstone",
+    "top": "minecraft:block/polished_blackstone",
+    "bricks": "minecraft:block/bricks"
+  }
+}

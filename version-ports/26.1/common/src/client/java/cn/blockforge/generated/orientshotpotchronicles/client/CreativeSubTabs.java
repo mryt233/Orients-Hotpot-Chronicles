@@ -3,6 +3,8 @@ package cn.blockforge.generated.orientshotpotchronicles.client;
 
 // mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.ChopstickRestBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Config;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.ConfigurableFood;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.CupBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkBlock;
@@ -14,6 +16,7 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.BenchBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTableBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PrepRackBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlock;
 import cn.blockforge.generated.orientshotpotchronicles.mixin.CreativeInventoryScreenAccessor;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -86,7 +89,9 @@ public final class CreativeSubTabs {
             return Sub.TABLEWARE;   // 玻璃杯（空的、装满的）算餐具（2026-10-26 用户报有的没分类，新增）
         }
         if (stack.is(HotPotContent.KITCHEN_KNIFE) || stack.is(HotPotContent.CUTTING_BOARD_ITEM)
-            || stack.is(HotPotContent.ROLLING_PIN) || stack.is(HotPotContent.HOTPOT_GUIDE)) {
+            || stack.is(HotPotContent.ROLLING_PIN) || stack.is(HotPotContent.HOTPOT_GUIDE)
+            || stack.is(HotPotContent.STONE_MILL_ITEM) || stack.is(HotPotContent.WOODEN_VAT_ITEM)
+            || stack.is(HotPotContent.WOODEN_PRESS_LID)) {
             return Sub.COOKWARE;   // 菜刀、砧板算厨具（2026-10-23）；火锅指南（菜刀合成）也放这里（2026-10-26）
         }
         if (stack.is(HotPotContent.TOMATO_HOTPOT_BASE) || stack.is(HotPotContent.THREE_FRESH_HOTPOT_BASE)
@@ -99,7 +104,8 @@ public final class CreativeSubTabs {
             || stack.is(HotPotContent.MINCED_PORK)
             || (stack.getItem() instanceof TableItem tableItem && tableItem.tableBlock(stack) instanceof DrinkBlock)
             || stack.getItem() instanceof DippingSauceItem
-            || (!(stack.getItem() instanceof BlockItem) && stack.has(DataComponents.FOOD))) {
+            || ((!(stack.getItem() instanceof BlockItem) || stack.getItem() instanceof ConfigurableFood)
+                && stack.has(DataComponents.FOOD))) {
             return Sub.FOOD;
         }
         if (stack.getItem() instanceof BlockItem item) {
@@ -107,17 +113,20 @@ public final class CreativeSubTabs {
                 || item.getBlock() instanceof SauceStationBlock) {   // 蘸料台算厨具（r103）
                 return Sub.COOKWARE;
             }
-            if (item.getBlock() instanceof HotPotTableBlock) {
-                return Sub.FURNITURE;
-            }
-            if (item.getBlock() instanceof BenchBlock) {
+            if (item.getBlock() instanceof HotPotTableBlock
+                || item.getBlock() instanceof BenchBlock
+                || item.getBlock() instanceof PrepRackBlock) {
                 return Sub.FURNITURE;
             }
         }
         return Sub.ALL;
     }
 
-    /** 按当前子类筛一遍物品列表（只在本模组分类页时调用）。 */
+    /** 精简界面折叠开关：保留全部永久注册物品不断档，同时向子类页签与提示暴露当前模式。 */
+    public static boolean simpleUiActive() {
+        return Config.simpleUiCollapse();
+    }
+
     public static void filter(List<ItemStack> items) {
         if (current != Sub.ALL) {
             items.removeIf(stack -> categoryOf(stack) != current);
@@ -134,7 +143,7 @@ public final class CreativeSubTabs {
             case ALL -> HotPotContent.ITEM_GROUP.getIconItem();
             case COOKWARE -> new ItemStack(HotPotContent.KITCHEN_KNIFE);   // 菜刀（2026-10-25 用户要求；r91 起是空铁锅，再之前是灶台）
             case TABLEWARE -> new ItemStack(HotPotContent.CHOPSTICKS);
-            case FURNITURE -> new ItemStack(HotPotContent.TALL_TABLE_ITEMS.get(0));   // 高的橡木火锅桌（r90 用户要求，桌子那一类的图标）
+            case FURNITURE -> new ItemStack(HotPotContent.TALL_HOTPOT_TABLE_ITEM);
             case FOOD -> new ItemStack(HotPotContent.RAW_TRIPE);   // 生毛肚（r98 用户要求）
         };
     }
@@ -223,19 +232,73 @@ public final class CreativeSubTabs {
                 offset = Math.min(Math.max(offset + (vertical > 0 ? -1 : 1), 0), maxOffset);
                 return false;
             };
-            // 只在选中本模组分类页时显示；每帧按翻到的位置摆标签
+            // 只在选中本模组分类页时显示；每帧按翻到的位置摆标签，并避让左侧其他模组按钮（如 Axiom）
+            // mryt233 改（2026-11-15）：固定同在 leftPos-32 时，先入队的左侧按钮（如 Axiom 调色盘）会拦走子页签点击；
+            // 选中本页签时把重合物移至子页签外侧（left-TAB_W-4-width），切回其他页签时原位还原，零破坏共存。
+            List<AbstractWidget> own = new ArrayList<>(tabs);
+            own.add(up);
+            own.add(down);
+            java.util.Map<AbstractWidget, Integer> displacedOriginals = new java.util.IdentityHashMap<>();
             Runnable render = () -> {
                 boolean show = ourTabSelected();
                 for (SubTab t : tabs) {
                     int row = t.sub.ordinal() - offset;
                     t.visible = show && row >= 0 && row < VISIBLE;
                     t.setY(top + row * STEP);
+                    if (t.sub == Sub.ALL) {
+                        Component baseMsg = t.getMessage();
+                        t.setTooltip(Tooltip.create(simpleUiActive()
+                            ? baseMsg.copy().append(" (").append(Component.translatable("text.orients_hotpot_chronicles.config.mode.simple")).append(")")
+                            : baseMsg));
+                    }
                 }
                 up.visible = show && maxOffset > 0;
                 down.visible = show && maxOffset > 0;
                 up.active = offset > 0;
                 down.active = offset < maxOffset;
+                relocateLeftConflicts(creative, own, displacedOriginals, show,
+                    left - TAB_W, left, top - ARROW_H - 2, top + VISIBLE * STEP + ARROW_H + 2);
             };
+        render.run();
         return new Hooks(render, scroll);
+    }
+
+    private static void relocateLeftConflicts(CreativeModeInventoryScreen creative,
+                                              List<AbstractWidget> own,
+                                              java.util.Map<AbstractWidget, Integer> displacedOriginals,
+                                              boolean show,
+                                              int stripLeft, int stripRight, int stripTop, int stripBottom) {
+        if (!show) {
+            if (!displacedOriginals.isEmpty()) {
+                for (var entry : displacedOriginals.entrySet()) {
+                    entry.getKey().setX(entry.getValue());
+                }
+                displacedOriginals.clear();
+            }
+            return;
+        }
+        var it = displacedOriginals.entrySet().iterator();
+        while (it.hasNext()) {
+            var entry = it.next();
+            AbstractWidget w = entry.getKey();
+            if (!w.visible) {
+                w.setX(entry.getValue());
+                it.remove();
+            }
+        }
+        for (var child : creative.children()) {
+            if (!(child instanceof AbstractWidget w) || !w.visible || own.contains(w)) {
+                continue;
+            }
+            int origX = displacedOriginals.getOrDefault(w, w.getX());
+            boolean overlapsX = origX < stripRight && origX + w.getWidth() > stripLeft - 2;
+            boolean overlapsY = w.getY() < stripBottom && w.getY() + w.getHeight() > stripTop;
+            if (overlapsX && overlapsY) {
+                displacedOriginals.putIfAbsent(w, origX);
+                w.setX(Math.max(2, stripLeft - 4 - w.getWidth()));
+            } else if (displacedOriginals.containsKey(w)) {
+                w.setX(displacedOriginals.remove(w));
+            }
+        }
     }
 }

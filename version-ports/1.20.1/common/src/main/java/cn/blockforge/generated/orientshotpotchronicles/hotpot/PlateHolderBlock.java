@@ -285,8 +285,8 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline,
 
     /** mryt233 改（1.20.1 适配）：来自 {@link ItemInteractionBlock} 的接口默认方法。 */
     @Override
-    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
-                                           Player player, InteractionHand hand, BlockHitResult hit) {
+    public ItemInteractionResult compatUseItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
+                                                 Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(world.getBlockEntity(pos) instanceof PlateHolderBlockEntity be)) {
             return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
         }
@@ -375,7 +375,7 @@ public class PlateHolderBlock extends Block implements EntityBlock, PartOutline,
     /** 空手右键：把点到的那个盘子连菜拿起来；潜行时改成取出最后放的那样菜。 */
     /** mryt233 改（1.20.1 适配）：来自 {@link ItemInteractionBlock} 的接口默认方法。 */
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult compatUseWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         if (!player.getMainHandItem().isEmpty() || !(world.getBlockEntity(pos) instanceof PlateHolderBlockEntity be)) {
             return Use.blockEmpty(UseOutcome.PASS, world.isClientSide);
         }

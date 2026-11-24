@@ -1,0 +1,9 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/stone_tall_hotpot_table_new",
+  "textures": {
+    "planks": "minecraft:block/quartz_block_side",
+    "bricks": "minecraft:block/bricks",
+    "particle": "minecraft:block/quartz_block_side",
+    "top": "minecraft:block/quartz_block_top"
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "orients_hotpot_chronicles:soup",
+    "entries": [
+      {
+        "threshold": 0.1,
+        "model": {
+          "type": "minecraft:model",
+          "model": "orients_hotpot_chronicles:item/copper_hot_pot_clear"
+        }
+      },
+      {
+        "threshold": 0.2,
+        "model": {
+          "type": "minecraft:model",
+          "model": "orients_hotpot_chronicles:item/copper_hot_pot_rich_stock"
+        }
+      },
+      {
+        "threshold": 0.3,
+        "model": {
+          "type": "minecraft:model",
+          "model": "orients_hotpot_chronicles:item/copper_hot_pot_mushroom"
+        }
+      },
+      {
+        "threshold": 0.4,
+        "model": {
+          "type": "minecraft:model",
+          "model": "orients_hotpot_chronicles:item/copper_hot_pot_spicy"
+        }
+      },
+      {
+        "threshold": 0.5,
+        "model": {
+          "type": "minecraft:model",
+          "model": "orients_hotpot_chronicles:item/copper_hot_pot_tomato"
+        }
+      },
+      {
+        "threshold": 0.6,
+        "model": {
+          "type": "minecraft:model",
+          "model": "orients_hotpot_chronicles:item/copper_hot_pot_three_fresh"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "orients_hotpot_chronicles:item/copper_nine_grid_hotpot"
+    }
+  }
+}

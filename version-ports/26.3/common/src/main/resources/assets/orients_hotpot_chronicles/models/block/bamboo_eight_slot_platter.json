@@ -1,0 +1,8 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/plate_eight_slot_platter",
+  "textures": {
+    "plate": "minecraft:block/bamboo_mosaic",
+    "rim": "minecraft:block/bamboo_mosaic",
+    "particle": "minecraft:block/bamboo_mosaic"
+  }
+}

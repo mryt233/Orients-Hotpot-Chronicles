@@ -67,10 +67,10 @@ public final class HotpotContentModule implements ContentModule {
         });
     }
 
-    /** mryt233 改（2026-11-10）：数据包重载使已下锅的食材时长失效。 */
+    /** mryt233 改（2026-11-10）：数据包重载使已下锅的食材时长失效并同步音游谱面。 */
     @Override
     public void onReload() {
-        HotPotCooking.reviseCookTimes();
+        HotPotRuntime.onDataReloaded();
     }
 
     public static int declarationCalls() {

@@ -141,6 +141,18 @@ public class StoveBlockEntity extends HotPotBlockEntity {
         return true;
     }
 
+    // mryt233 改：委托平台已装配的原版掉落桥，保留游戏规则与回滚语义。
+    public interface DropSpawner {
+        void spawn(net.minecraft.world.level.Level world,
+                   java.util.function.Supplier<net.minecraft.world.entity.item.ItemEntity> factory, ItemStack stack);
+    }
+    private static DropSpawner dropSpawner = (world, factory, stack) -> {
+        throw new IllegalStateException("方块掉落调用桥未安装");
+    };
+    public static void installDropSpawner(DropSpawner spawner) {
+        dropSpawner = java.util.Objects.requireNonNull(spawner);
+    }
+
     public boolean attachPot(HotPotMaterial material, Direction.Axis handleAxis) {
         if (level == null || level.isClientSide() || material == null) {
             return false;
@@ -152,6 +164,7 @@ public class StoveBlockEntity extends HotPotBlockEntity {
         level.setBlock(worldPosition, state.setValue(StoveBlock.POT, StovePot.of(material))
             .setValue(StoveBlock.SOUP, SoupVisual.NONE)
             .setValue(StoveBlock.POT_AXIS, handleAxis), Block.UPDATE_CLIENTS);
+        syncTallTop(state);
         markDirtyAndSync();
         return true;
     }
@@ -181,7 +194,15 @@ public class StoveBlockEntity extends HotPotBlockEntity {
         BlockState state = level.getBlockState(worldPosition);
         level.setBlock(worldPosition, state.setValue(StoveBlock.POT, StovePot.NONE)
             .setValue(StoveBlock.SOUP, SoupVisual.NONE), Block.UPDATE_CLIENTS);
+        syncTallTop(state);
         markDirtyAndSync();
+    }
+
+    /** mryt233 改（2026-11-20）：装锅、拆锅、挖锅后立即同步高灶台上半截状态，不等 20 tick 周期补顶。 */
+    private void syncTallTop(BlockState state) {
+        if (level != null && state.getBlock() instanceof StoveBlock stove && stove.lift() > 0) {
+            stove.placeTop(level, worldPosition);
+        }
     }
 
     public void breakPot(Player player) {
@@ -193,11 +214,16 @@ public class StoveBlockEntity extends HotPotBlockEntity {
             return;
         }
         HotPotBlock potBlock = HotPotContent.blockFor(material);
-        BlockState potState = potBlock.defaultBlockState();
-        level.levelEvent(null, LevelEvent.PARTICLES_DESTROY_BLOCK, worldPosition, Block.getId(potState));
+        BlockState potState = potBlock.defaultBlockState()
+            .setValue(HotPotBlock.AXIS, getBlockState().getValue(StoveBlock.POT_AXIS));
+        // mryt233 改（2026-11-19）：快照独立于随后移除的锅状态，客户端按真实锅形状生成效果。
+        if (level instanceof net.minecraft.server.level.ServerLevel server) {
+            cn.blockforge.generated.orientshotpotchronicles.network.HotPotNetwork.potBroken(
+                server, worldPosition, getBlockState(), potState);
+        }
         if (!player.isCreative()) {
             if (player.hasCorrectToolForDrops(potState)) {
-                Block.popResource(level, worldPosition, toPotItem(material));
+                dropPotResource(toPotItem(material));
             } else {
                 dropContents();
             }
@@ -208,13 +234,29 @@ public class StoveBlockEntity extends HotPotBlockEntity {
         removePot();
     }
 
+    /** mryt233 改（2026-11-19）：从锅沿掉落；原版仍负责掉落开关、拾取延迟与平台捕获。 */
+    @Override
+    protected void dropPotResource(ItemStack stack) {
+        if (level == null || level.isClientSide() || stack.isEmpty()) return;
+        BlockState state = getBlockState();
+        if (!StoveBlock.isStove(state)) {
+            super.dropPotResource(stack);
+            return;
+        }
+        var point = StoveBlock.potDropPoint(worldPosition, state);
+        dropSpawner.spawn(level,
+            () -> new net.minecraft.world.entity.item.ItemEntity(level,
+                point.x + (level.getRandom().nextDouble() - .5) * .25,
+                point.y, point.z + (level.getRandom().nextDouble() - .5) * .25, stack), stack);
+    }
+
     public void dropAttachedPot(HotPotMaterial material) {
         if (attachedPotDropped || level == null || level.isClientSide()) {
             return;
         }
         attachedPotDropped = true;
         if (material != null) {
-            Block.popResource(level, worldPosition, toPotItem(material));
+            dropPotResource(toPotItem(material));
             clearPotContents();
         }
     }

@@ -1,0 +1,44 @@
+{
+  "display": {
+    "icon": {
+      "id": "orients_hotpot_chronicles:hot_tofu_cube"
+    },
+    "title": {
+      "translate": "advancements.orients_hotpot_chronicles.tofu_overcook.title"
+    },
+    "description": {
+      "translate": "advancements.orients_hotpot_chronicles.tofu_overcook.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "overcook": {
+      "trigger": "orients_hotpot_chronicles:hotpot",
+      "conditions": {
+        "event": "tofu_overcook"
+      }
+    },
+    "item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "orients_hotpot_chronicles:hot_tofu_cube"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "overcook",
+      "item"
+    ]
+  ],
+  "parent": "orients_hotpot_chronicles:first_cooked"
+}

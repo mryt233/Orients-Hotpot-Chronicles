@@ -1,0 +1,12 @@
+{
+  "type": "orients_hotpot_chronicles:stone_mill",
+  "ingredient": "orients_hotpot_chronicles:chili_pepper",
+  "ingredient_count": 1,
+  "requires_water": false,
+  "result": {
+    "id": "orients_hotpot_chronicles:millet_chili",
+    "count": 2
+  },
+  "turns": 2,
+  "color": "#C42818"
+}

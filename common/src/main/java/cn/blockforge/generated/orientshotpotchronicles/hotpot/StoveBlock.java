@@ -144,6 +144,24 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
         return Shapes.or(base, (axis == Direction.Axis.Z ? POT_SHAPE_Z : POT_SHAPE).move(0, lift / 16.0, 0)).optimize();
     }
 
+    /** mryt233 改（2026-11-19）：效果与掉落共用真实锅形状，不包含灶身。lift 单位仍为像素。 */
+    public static VoxelShape potShapeFor(double lift, Direction.Axis axis) {
+        return (axis == Direction.Axis.Z ? POT_SHAPE_Z : POT_SHAPE).move(0, lift / 16.0, 0);
+    }
+
+    public static VoxelShape potShape(BlockState state) {
+        return potShapeFor(((StoveBlock) state.getBlock()).lift(), state.getValue(POT_AXIS));
+    }
+
+    public static VoxelShape baseShape(BlockState state) {
+        return ((StoveBlock) state.getBlock()).baseShape;
+    }
+
+    /** 掉落点位于锅沿上方，避免生成在仍然存在的灶体/锅体碰撞中。 */
+    public static net.minecraft.world.phys.Vec3 potDropPoint(BlockPos pos, BlockState state) {
+        return BlockBreakSamples.dropPoint(pos, potShape(state));
+    }
+
     /** 灶台整体抬高的像素（矮灶台 0）。 */
     public double lift() {
         return lift;
@@ -352,7 +370,8 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
         // 只有“确实点在锅体上、灶上确实有锅、而且手里拿的是跟锅有关的物品”才走锅交互。
         // 其余情况一律放行给 onUse 打开灶膛界面：以前这里对食材/工具直接 FAIL，
         // 锅装上后又几乎盖满台面，结果就是拿着东西右键打不开灶台、也加不进燃料。
-        if (!potHit || !hasPot || !(plate || scoop || servingTool || soupSource || ingredient || spicyModifier)) {
+        if (!potHit || !hasPot || !(plate || scoop || servingTool || soupSource || ingredient
+            || spicyModifier)) {
             return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
         }
 
@@ -380,10 +399,14 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock {
             return false;
         }
         double localX = hit.getLocation().x - pos.getX();
+        double localY = hit.getLocation().y - pos.getY();
         double localZ = hit.getLocation().z - pos.getZ();
+        double lift = liftOf(state);
         boolean inFootprint = localX >= POT_FOOTPRINT_MIN && localX <= POT_FOOTPRINT_MAX
             && localZ >= POT_FOOTPRINT_MIN && localZ <= POT_FOOTPRINT_MAX;
-        return inFootprint || hit.getLocation().y - pos.getY() >= POT_HIT_MIN_Y + liftOf(state);
+        // mryt233 改（2026-11-15）：阴影范围还必须不低于锅槽底，防止点击灶底或高灶台下方砖体被误判成点中锅
+        return (inFootprint && localY >= (7.5 / 16.0) + lift)
+            || localY >= POT_HIT_MIN_Y + lift;
     }
 
     /**

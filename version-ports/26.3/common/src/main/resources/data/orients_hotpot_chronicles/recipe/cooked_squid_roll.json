@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": "orients_hotpot_chronicles:squid_roll",
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_squid_roll"
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

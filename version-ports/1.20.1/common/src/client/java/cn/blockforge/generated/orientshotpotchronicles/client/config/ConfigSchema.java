@@ -1,6 +1,7 @@
 // 作者：mryt233
 package cn.blockforge.generated.orientshotpotchronicles.client.config;
 
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Config;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.DrinkKind;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotFuel;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Seasoning;
@@ -24,6 +25,19 @@ public final class ConfigSchema {
     private JsonObject sectionsDoc;
     public ConfigSchema(java.util.function.Function<String, ItemStack> items) { this.items = items; }
     public void invalidate() { sectionsCache = null; }
+
+    /** 模式条「自定义细项」抽屉里的 7 个细分开关。 */
+    public List<Field> modeFields() {
+        return List.of(
+            toggle("mode.detailed_tofu_processing", prop("mode_detailed_tofu"), "mode_detailed_tofu_processing"),
+            toggle("mode.penalties_enabled", prop("mode_penalties_enabled"), "mode_penalties_enabled"),
+            toggle("mode.crops_replace_grass", prop("mode_crops_replace_grass"), "mode_crops_replace_grass"),
+            toggle("mode.minigames_enabled", prop("mode_minigames_enabled"), "mode_minigames_enabled"),
+            toggle("mode.rack_swap_materials", prop("mode_rack_swap_materials"), "mode_rack_swap_materials"),
+            toggle("mode.simple_ui_collapse", prop("mode_simple_ui_collapse"), "mode_simple_ui_collapse")
+        );
+    }
+
     /** 常用页：除粒子强度（上面的滑块）以外的几项最常改的数值。 */
     public List<Field> commonFields(JsonObject edited) {
         List<Field> out = new ArrayList<>();
@@ -43,12 +57,61 @@ public final class ConfigSchema {
         return out;
     }
 
-    /** 高级页的全部分组：涮煮时间 / 食材 / 汤底 / 燃料 / 汤碗 / 蘸料 / 饮料 / 食物营养 / 围锅回血 / 冷锅反胃 / 干杯 / 辣度 / 战利品。 */
+    /** 高级页的全部分组：模式与机制 / 涮煮时间 / 食材 / 汤底 / 燃料 / 汤碗 / 蘸料 / 饮料 / 食物营养 / 围锅回血 / 冷锅反胃 / 干杯 / 辣度 / 战利品。 */
     public List<Section> sections(JsonObject edited) {
         if (sectionsCache != null && sectionsDoc == edited) {
             return sectionsCache;
         }
         List<Section> out = new ArrayList<>();
+
+        List<Field> mode = new ArrayList<>();
+        mode.add(choice("mode.preset", new String[]{Config.MODE_FULL, Config.MODE_SIMPLE},
+            prop("mode_preset"), "mode_preset"));
+        mode.addAll(modeFields());
+        out.add(new Section(k("group.mode"), mode));
+
+        List<Field> crops = new ArrayList<>();
+        crops.add(field("crops.growth_rate", false, 0, 10, 0.1, Unit.MULTIPLIER,
+            prop("crops_growth_rate"), "crops_growth_rate"));
+        crops.add(toggle("crops.bonemeal_enabled", prop("crops_bonemeal_enabled"), "crops_bonemeal_enabled"));
+        out.add(new Section(k("group.crops"), crops));
+
+        List<Field> processing = new ArrayList<>();
+        processing.add(field("processing.mill_turns_multiplier", false, 0.25, 5, 0.25, Unit.MULTIPLIER,
+            prop("processing_mill_turns"), "processing_mill_turns"));
+        processing.add(field("processing.vat_time_multiplier", false, 0.1, 5, 0.1, Unit.MULTIPLIER,
+            prop("processing_vat_time"), "processing_vat_time"));
+        processing.add(field("processing.mill_water_uses", true, 1, 16, 1, Unit.PLAIN,
+            prop("processing_mill_water_uses"), "processing_mill_water_uses"));
+        out.add(new Section(k("group.processing"), processing));
+
+        List<Field> tableMat = new ArrayList<>();
+        tableMat.add(choice("table_materials.mode",
+            new String[]{Config.TABLE_MAT_ANY_SOLID, Config.TABLE_MAT_TAG_ONLY, Config.TABLE_MAT_OFF},
+            prop("table_materials_mode"), "table_materials_mode"));
+        out.add(new Section(k("group.table_materials"), tableMat));
+
+        List<Field> minigame = new ArrayList<>();
+        minigame.add(toggle("minigame.allow_virtual_plate", prop("minigame_allow_virtual_plate"), "minigame_allow_virtual_plate"));
+        minigame.add(field("minigame.invite_timeout_ticks", true, 60, 1200, 20, Unit.TICK,
+            prop("minigame_invite_timeout"), "minigame_invite_timeout_ticks"));
+        minigame.add(field("minigame.invite_range", true, 2, 32, 1, Unit.BLOCK,
+            prop("minigame_invite_range"), "minigame_invite_range"));
+        minigame.add(field("minigame.rush_duration_ticks", true, 60, 1200, 20, Unit.TICK,
+            prop("minigame_rush_duration"), "minigame_rush_duration_ticks"));
+        minigame.add(field("minigame.rush_max_cps", true, 4, 40, 1, Unit.PLAIN,
+            prop("minigame_rush_max_cps"), "minigame_rush_max_cps"));
+        minigame.add(field("minigame.rush_hits_per_bite", true, 1, 30, 1, Unit.PLAIN,
+            prop("minigame_rush_hits_per_bite"), "minigame_rush_hits_per_bite"));
+        minigame.add(field("minigame.rhythm_perfect_ms", true, 15, 150, 5, Unit.PLAIN,
+            prop("minigame_rhythm_perfect"), "minigame_rhythm_perfect_ms"));
+        minigame.add(field("minigame.rhythm_good_ms", true, 30, 300, 10, Unit.PLAIN,
+            prop("minigame_rhythm_good"), "minigame_rhythm_good_ms"));
+        minigame.add(field("minigame.rhythm_miss_ms", true, 80, 500, 10, Unit.PLAIN,
+            prop("minigame_rhythm_miss"), "minigame_rhythm_miss_ms"));
+        minigame.add(field("minigame.rhythm_combo_multiplier", false, 0, 5, 0.1, Unit.MULTIPLIER,
+            prop("minigame_rhythm_combo_mult"), "minigame_rhythm_combo_multiplier"));
+        out.add(new Section(k("group.minigame"), minigame));
 
         List<Field> cooking = new ArrayList<>();
         cooking.add(field("cooking.fallback_ticks", true, 1, 100000, 10, Unit.TICK,
@@ -224,6 +287,10 @@ public final class ConfigSchema {
             false, 1, 0.05, "loot_cow_chance", "loot_cow_chance"));
         loot.add(lootField("loot.cow.beef_loin.looting_bonus", "beef_loin",
             false, 1, 0.05, "loot_looting_bonus", "loot_looting_bonus"));
+        loot.add(lootField("loot.chicken.chicken_feet.chance", "chicken_feet",
+            false, 1, 0.05, "loot_chicken_chance", "loot_chicken_chance"));
+        loot.add(lootField("loot.chicken.chicken_feet.looting_bonus", "chicken_feet",
+            false, 1, 0.05, "loot_looting_bonus", "loot_chicken_looting_bonus"));
         loot.add(lootField("loot.shrimp_fishing.weight", "shrimp",
             true, 1000, 5, "loot_shrimp_fishing_weight", "loot_shrimp_fishing_weight"));
         out.add(new Section(k("group.loot"), loot));

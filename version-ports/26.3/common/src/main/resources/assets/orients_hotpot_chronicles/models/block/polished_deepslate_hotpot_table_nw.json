@@ -1,0 +1,9 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/stone_hotpot_table_nw",
+  "textures": {
+    "planks": "minecraft:block/polished_deepslate",
+    "particle": "minecraft:block/polished_deepslate",
+    "top": "minecraft:block/polished_deepslate",
+    "bricks": "minecraft:block/bricks"
+  }
+}

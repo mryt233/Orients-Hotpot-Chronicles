@@ -19,6 +19,9 @@ pour in a broth, drop ingredients into the 9x9 grid and pick them out cooked (wi
 [[mixins]]
 config="orients_hotpot_chronicles.mixins.json"
 
+[[mixins]]
+config="orients_hotpot_chronicles.neoforge.mixins.json"
+
 # 依赖：Minecraft 26.1.2 与 NeoForge 26.1.2.x，两边都是必需项
 [[dependencies.orients_hotpot_chronicles]]
 modId="neoforge"
@@ -42,7 +45,7 @@ file = "META-INF/accesstransformer.cfg"
 [[dependencies.orients_hotpot_chronicles]]
 modId="orient_framework"
 type="required"
-versionRange="[0.2.0,0.3.0)"
+versionRange="[0.2.2,0.3.0)"
 ordering="AFTER"
 side="BOTH"
 

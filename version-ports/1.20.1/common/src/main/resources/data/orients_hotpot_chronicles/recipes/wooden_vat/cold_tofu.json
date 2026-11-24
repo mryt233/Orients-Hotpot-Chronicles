@@ -1,0 +1,16 @@
+{
+  "type": "orients_hotpot_chronicles:wooden_vat",
+  "mode": "coagulate",
+  "fluid": "soymilk",
+  "ingredient": {
+    "tag": "orients_hotpot_chronicles:tofu_coagulants"
+  },
+  "ingredient_count": 1,
+  "needs_lid": true,
+  "ticks": 80,
+  "result": {
+    "item": "orients_hotpot_chronicles:cold_tofu",
+    "count": 2
+  },
+  "color": "#FAF3DF"
+}

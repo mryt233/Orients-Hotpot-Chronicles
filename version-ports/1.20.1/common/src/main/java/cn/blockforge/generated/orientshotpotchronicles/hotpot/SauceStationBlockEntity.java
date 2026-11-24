@@ -90,6 +90,9 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
     }
 
     public SeasoningDef kindDef(int i) {  // mryt233 改：旧公开入口保留枚举签名。
+        if (i < 0 || i >= BOWLS) {
+            return null;
+        }
         ItemStack stack = raw.getItem(i);
         SeasoningDef saved = kindIds[i].isEmpty() ? null : SauceIds.def(kindIds[i]);
         if (!kindIds[i].isEmpty() && saved == null && available(i) > 0) return null;
@@ -148,6 +151,9 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
      * 已经有这种的不重复加（用户：同一种一碗只能加一次）；加到吃了一半的碗里，剩余口数不变。
      */
     public void serve(Player player, InteractionHand hand, int i) {
+        if (player == null || hand == null || i < 0 || i >= BOWLS) {
+            return;
+        }
         SeasoningDef s = kindDef(i);
         if (s == null || available(i) == 0) {
             player.displayClientMessage(Component.translatable(HotPotBlockEntity.key(
@@ -155,6 +161,9 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
             return;
         }
         ItemStack held = player.getItemInHand(hand);
+        if (held == null || held.isEmpty()) {
+            return;
+        }
         boolean sauce = held.getItem() instanceof DippingSauceItem;
         if (sauce && DippingSauceItem.contents(held).has(SauceIds.fullId(s))) {
             player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.sauce_has"), Component.translatable(s.nameKey())), true);
@@ -171,7 +180,9 @@ public class SauceStationBlockEntity extends SyncedBlockEntity {
         } else {
             player.setItemInHand(hand, ItemUtils.createFilledResult(held, player, DippingSauceItem.createWithId(SauceIds.fullId(s))));
         }
-        level.playSound(null, worldPosition, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 0.6F, 1.4F);
+        if (level != null) {
+            level.playSound(null, worldPosition, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 0.6F, 1.4F);
+        }
     }
 
     /** 存货变了：记下每个碗是哪种、存档、同步给客户端（台上的小碗跟着显示）。 */

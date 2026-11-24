@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "#orients_hotpot_chronicles:cloth_aprons",
+    "orients_hotpot_chronicles:iron_kitchen_knife",
+    "orients_hotpot_chronicles:rolling_pin",
+    "orients_hotpot_chronicles:bamboo_chopsticks",
+    "orients_hotpot_chronicles:wooden_press_lid",
+    "minecraft:shears",
+    "minecraft:bucket"
+  ]
+}

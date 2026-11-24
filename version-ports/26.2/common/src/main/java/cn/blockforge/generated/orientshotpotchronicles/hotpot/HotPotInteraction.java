@@ -1,3 +1,4 @@
+// mryt233 改：26.2 移植同步。
 // mryt233 改（2026-11-11）：第三批 3F/3G 合并重复实现，适配 26.2 InteractionResult 与 API。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 

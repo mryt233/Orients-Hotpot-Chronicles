@@ -1,5 +1,5 @@
 {
-  "_说明": "内容清单（mryt233 建，gen_content_manifest.py 生成）：118 个物品。每条记录描述一个物品，check_content.py 用它核对贴图 / 模型 / 配方 / 语言 / 指南是否齐全，并核对 hunger / saturation 与代码是否一致。改数值可以直接改这里的 hunger / saturation，再跑 gen_food_numbers.py --apply 写回代码。",
+  "_说明": "内容清单（mryt233 建，gen_content_manifest.py 生成）：147 个物品。每条记录描述一个物品，check_content.py 用它核对贴图 / 模型 / 配方 / 语言 / 指南是否齐全，并核对 hunger / saturation 与代码是否一致。改数值可以直接改这里的 hunger / saturation，再跑 gen_food_numbers.py --apply 写回代码。",
   "_字段": {
     "id": "物品 ID（不含命名空间）",
     "block": "是不是方块物品（有 block 模型）",
@@ -56,7 +56,7 @@
       "recipes": [
         "apron_blue_print_cloth_apron_recolor"
       ],
-      "guide": false
+      "guide": true
     },
     {
       "id": "boiled_crispy_pork",
@@ -68,11 +68,32 @@
       "guide": false
     },
     {
+      "id": "boneless_chicken_feet",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.2,
+      "recipes": [
+        "boneless_chicken_feet_from_stonecutting"
+      ],
+      "guide": true
+    },
+    {
       "id": "brick_stove",
       "block": false,
       "food": false,
       "recipes": [
         "brick_stove"
+      ],
+      "guide": true
+    },
+    {
+      "id": "brine_bottle",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "brine_bottle",
+        "brine_bottle_from_dried_kelp"
       ],
       "guide": true
     },
@@ -83,7 +104,16 @@
       "recipes": [
         "apron_brown_trim_cloth_apron_recolor"
       ],
-      "guide": false
+      "guide": true
+    },
+    {
+      "id": "chicken_feet",
+      "block": false,
+      "food": true,
+      "hunger": 1,
+      "saturation": 0.2,
+      "recipes": [],
+      "guide": true
     },
     {
       "id": "chili_pepper",
@@ -92,7 +122,7 @@
       "hunger": 1,
       "saturation": 0.1,
       "recipes": [],
-      "guide": false
+      "guide": true
     },
     {
       "id": "cilantro",
@@ -162,7 +192,7 @@
         "apron_cloth_apron_recolor",
         "cloth_apron"
       ],
-      "guide": false
+      "guide": true
     },
     {
       "id": "cold_tofu",
@@ -171,7 +201,8 @@
       "hunger": 2,
       "saturation": 0.4,
       "recipes": [
-        "cold_tofu"
+        "cold_tofu",
+        "cold_tofu_simple"
       ],
       "guide": true
     },
@@ -225,6 +256,34 @@
         "cooked_beef_meatball",
         "cooked_beef_meatball_from_campfire_cooking",
         "cooked_beef_meatball_from_smoking"
+      ],
+      "guide": true
+    },
+    {
+      "id": "cooked_boneless_chicken_feet",
+      "block": false,
+      "food": true,
+      "hunger": 4,
+      "saturation": 0.7,
+      "cook_ticks": 600,
+      "recipes": [
+        "cooked_boneless_chicken_feet",
+        "cooked_boneless_chicken_feet_from_campfire_cooking",
+        "cooked_boneless_chicken_feet_from_smoking"
+      ],
+      "guide": true
+    },
+    {
+      "id": "cooked_chicken_feet",
+      "block": false,
+      "food": true,
+      "hunger": 3,
+      "saturation": 0.6,
+      "cook_ticks": 600,
+      "recipes": [
+        "cooked_chicken_feet",
+        "cooked_chicken_feet_from_campfire_cooking",
+        "cooked_chicken_feet_from_smoking"
       ],
       "guide": true
     },
@@ -585,7 +644,7 @@
         "crispy_pork_from_campfire_cooking",
         "crispy_pork_from_smoking"
       ],
-      "guide": false
+      "guide": true
     },
     {
       "id": "crushed_peanuts",
@@ -594,7 +653,7 @@
       "hunger": 1,
       "saturation": 0.2,
       "recipes": [],
-      "guide": false
+      "guide": true
     },
     {
       "id": "cutting_board",
@@ -602,6 +661,15 @@
       "food": false,
       "recipes": [
         "cutting_board"
+      ],
+      "guide": true
+    },
+    {
+      "id": "desktop_prep_rack",
+      "block": true,
+      "food": false,
+      "recipes": [
+        "desktop_prep_rack"
       ],
       "guide": true
     },
@@ -619,9 +687,10 @@
       "hunger": 2,
       "saturation": 0.3,
       "recipes": [
-        "dried_tofu"
+        "dried_tofu",
+        "dried_tofu_from_stonecutting"
       ],
-      "guide": false
+      "guide": true
     },
     {
       "id": "egg_fried_rice",
@@ -632,7 +701,7 @@
       "recipes": [
         "egg_fried_rice"
       ],
-      "guide": false
+      "guide": true
     },
     {
       "id": "empty_orange_drink_bottle",
@@ -664,7 +733,7 @@
       "recipes": [
         "enoki_mushroom"
       ],
-      "guide": false
+      "guide": true
     },
     {
       "id": "fatty_beef_roll",
@@ -752,6 +821,15 @@
       "guide": true
     },
     {
+      "id": "hanging_prep_rack",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "hanging_prep_rack"
+      ],
+      "guide": true
+    },
+    {
       "id": "hot_tofu",
       "block": false,
       "food": true,
@@ -781,6 +859,15 @@
       "food": false,
       "recipes": [
         "hotpot_guide"
+      ],
+      "guide": true
+    },
+    {
+      "id": "hotpot_table",
+      "block": true,
+      "food": false,
+      "recipes": [
+        "hotpot_table"
       ],
       "guide": true
     },
@@ -829,7 +916,7 @@
       "recipes": [
         "millet_chili_from_stonecutting"
       ],
-      "guide": false
+      "guide": true
     },
     {
       "id": "minced_pork",
@@ -847,7 +934,16 @@
       "hunger": 1,
       "saturation": 0.1,
       "recipes": [],
-      "guide": false
+      "guide": true
+    },
+    {
+      "id": "multi_tier_prep_rack",
+      "block": true,
+      "food": false,
+      "recipes": [
+        "multi_tier_prep_rack"
+      ],
+      "guide": true
     },
     {
       "id": "mushroom_broth_bowl",
@@ -883,7 +979,7 @@
       "hunger": 4,
       "saturation": 0.3,
       "recipes": [],
-      "guide": true
+      "guide": false
     },
     {
       "id": "orange_drink",
@@ -899,6 +995,36 @@
       "block": false,
       "food": false,
       "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "orange_leaves",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "orange_log",
+      "block": true,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "orange_sapling",
+      "block": true,
+      "food": false,
+      "recipes": [],
+      "guide": true
+    },
+    {
+      "id": "orange_wood",
+      "block": true,
+      "food": false,
+      "recipes": [
+        "orange_wood"
+      ],
       "guide": false
     },
     {
@@ -924,7 +1050,7 @@
       "recipes": [
         "oyster_sauce"
       ],
-      "guide": false,
+      "guide": true,
       "hunger": 1,
       "saturation": 0.2
     },
@@ -1000,7 +1126,7 @@
       "recipes": [
         "raw_crispy_pork"
       ],
-      "guide": false
+      "guide": true
     },
     {
       "id": "raw_ham_sausage",
@@ -1057,7 +1183,7 @@
       "recipes": [
         "sesame_paste"
       ],
-      "guide": false,
+      "guide": true,
       "hunger": 2,
       "saturation": 0.3
     },
@@ -1093,7 +1219,14 @@
       "hunger": 1,
       "saturation": 0.1,
       "recipes": [],
-      "guide": true
+      "guide": false
+    },
+    {
+      "id": "soymilk_bucket",
+      "block": false,
+      "food": false,
+      "recipes": [],
+      "guide": false
     },
     {
       "id": "spicy_red_broth_bowl",
@@ -1114,6 +1247,31 @@
       "guide": false
     },
     {
+      "id": "stone_mill",
+      "block": true,
+      "food": false,
+      "recipes": [
+        "stone_mill"
+      ],
+      "guide": true
+    },
+    {
+      "id": "stripped_orange_log",
+      "block": true,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "stripped_orange_wood",
+      "block": true,
+      "food": false,
+      "recipes": [
+        "stripped_orange_wood"
+      ],
+      "guide": false
+    },
+    {
       "id": "sweet_potato_skin",
       "block": true,
       "food": true,
@@ -1122,7 +1280,7 @@
       "recipes": [
         "sweet_potato_skin"
       ],
-      "guide": false
+      "guide": true
     },
     {
       "id": "tall_brick_stove",
@@ -1130,6 +1288,15 @@
       "food": false,
       "recipes": [
         "tall_brick_stove"
+      ],
+      "guide": true
+    },
+    {
+      "id": "tall_hotpot_table",
+      "block": true,
+      "food": false,
+      "recipes": [
+        "tall_hotpot_table"
       ],
       "guide": true
     },
@@ -1167,7 +1334,7 @@
       "recipes": [
         "tofu_skin"
       ],
-      "guide": false
+      "guide": true
     },
     {
       "id": "tomato",
@@ -1228,7 +1395,88 @@
       "recipes": [
         "wide_noodles"
       ],
+      "guide": true
+    },
+    {
+      "id": "wild_chili_pepper",
+      "block": true,
+      "food": false,
+      "recipes": [],
       "guide": false
+    },
+    {
+      "id": "wild_cilantro",
+      "block": true,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "wild_garlic",
+      "block": true,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "wild_greens",
+      "block": true,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "wild_peanut",
+      "block": true,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "wild_scallion",
+      "block": true,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "wild_soybean",
+      "block": true,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "wild_tomato",
+      "block": true,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "wild_zhe_er_gen",
+      "block": true,
+      "food": false,
+      "recipes": [],
+      "guide": false
+    },
+    {
+      "id": "wooden_press_lid",
+      "block": false,
+      "food": false,
+      "recipes": [
+        "wooden_press_lid"
+      ],
+      "guide": true
+    },
+    {
+      "id": "wooden_vat",
+      "block": true,
+      "food": false,
+      "recipes": [
+        "wooden_vat"
+      ],
+      "guide": true
     },
     {
       "id": "zhe_er_gen",

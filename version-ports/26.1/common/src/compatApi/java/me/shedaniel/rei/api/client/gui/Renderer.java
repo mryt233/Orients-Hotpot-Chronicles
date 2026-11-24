@@ -1,6 +1,7 @@
+// mryt233 改：26.1 同代移植同步。
 package me.shedaniel.rei.api.client.gui;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import me.shedaniel.rei.api.client.gui.compat.GuiGraphics;
 import me.shedaniel.math.Rectangle;
 
 /**
@@ -11,5 +12,5 @@ import me.shedaniel.math.Rectangle;
  * 作者：mryt233 */
 
 public interface Renderer {
-    void render(GuiGraphicsExtractor graphics, Rectangle bounds, int mouseX, int mouseY, float delta);
+    void render(GuiGraphics graphics, Rectangle bounds, int mouseX, int mouseY, float delta);
 }

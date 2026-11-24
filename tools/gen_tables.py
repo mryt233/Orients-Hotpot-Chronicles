@@ -52,15 +52,14 @@ def faces(skip, cull_down=False):
 
 
 def model(mask, planks):
-    connected = {d for d, b in zip(["north", "east", "south", "west"], [1, 2, 4, 8]) if mask & b}
+    # mryt233 改（2026-11-20）：保留底座与桌面板水平侧面，避免转角内侧漏面。
     x0, x1, z0, z1 = base_box(mask)
-    base_skip = set(connected) | {"up"}
     return {
         "parent": "minecraft:block/block",
         "textures": {"planks": planks, "particle": planks},
         "elements": [
-            {"from": [0, TOP_Y0, 0], "to": [16, TOP_Y1, 16], "faces": faces(connected)},
-            {"from": [x0, 0, z0], "to": [x1, BASE_Y1, z1], "faces": faces(base_skip, cull_down=True)},
+            {"from": [0, TOP_Y0, 0], "to": [16, TOP_Y1, 16], "faces": faces(set())},
+            {"from": [x0, 0, z0], "to": [x1, BASE_Y1, z1], "faces": faces({"up"}, cull_down=True)},
         ],
     }
 
@@ -68,12 +67,6 @@ def model(mask, planks):
 
 def main():
     for root in ASSET_ROOTS:
-        # 旧的单一火锅桌（自绘贴图）全部删掉
-        for f in list((root / "models/block").glob("hotpot_table*.json")) + \
-                 list((root / "textures/block").glob("hotpot_table_*.png")) + \
-                 [root / "blockstates/hotpot_table.json", root / "models/item/hotpot_table.json"]:
-            if f.exists():
-                f.unlink()
         for wood in WOODS:
             name = f"{wood}_hotpot_table"
             planks = f"minecraft:block/{wood}_planks"
@@ -90,18 +83,8 @@ def main():
                 el["faces"] = faces(set(), cull_down=False)
             write(root / f"models/item/{name}.json", item)
 
-    for f in [DATA / MODID / "recipe/hotpot_table.json", DATA / MODID / "loot_table/blocks/hotpot_table.json"]:
-        if f.exists():
-            f.unlink()
     for wood in WOODS:
         name = f"{wood}_hotpot_table"
-        write(DATA / MODID / f"recipe/{name}.json", {
-            "type": "minecraft:crafting_shaped",
-            "group": f"{MODID}:hotpot_table",
-            "pattern": ["PPP", "PBP", "PPP"],
-            "key": {"P": {"item": f"minecraft:{wood}_planks"}, "B": {"item": "minecraft:brick"}},
-            "result": {"id": f"{MODID}:{name}", "count": 4},
-        })
         write(DATA / MODID / f"loot_table/blocks/{name}.json", {
             "type": "minecraft:block",
             "pools": [{"rolls": 1.0, "bonus_rolls": 0.0,

@@ -20,7 +20,10 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
 
 import java.util.function.Supplier;
 
@@ -133,6 +136,15 @@ public interface RegistrationApi {
 
     interface ParticleRegistrar {
         <T extends net.minecraft.core.particles.ParticleType<?>> T register(ResourceLocation id, T value);
+    }
+
+    // mryt233 加（0.3.1）：向后兼容树叶生成器类型登记，保持 Runtime 0.2.2 ABI 不破坏旧内容包。
+    default FoliagePlacerRegistrar foliagePlacers() {
+        throw new UnsupportedOperationException("foliagePlacers requires Runtime 0.2.2");
+    }
+
+    interface FoliagePlacerRegistrar {
+        <P extends FoliagePlacer> FoliagePlacerType<P> register(ResourceLocation id, MapCodec<P> codec);
     }
 
 }

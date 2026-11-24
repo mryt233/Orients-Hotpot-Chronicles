@@ -71,6 +71,8 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock, ItemI
     private static final VoxelShape POT_HANDLE_SOUTH = Block.box(6.591, 14.08, 15.337, 9.409, 15.28, 16);
     /** 台面顶面之上的最低命中高度：锅壁从台面往上这 1/4 像素算灶台，避免点槽口误判。 */
     private static final double POT_HIT_MIN_Y = 11.25 / 16.0;
+    /** 灶上锅槽最低高度（锅身 7.6 像素起）：低于此高度只可能是灶身底面/下壁，绝不判成点中锅体（mryt233 改）。 */
+    private static final double POT_CAVITY_MIN_Y = 7.5 / 16.0;
     private static final double POT_FOOTPRINT_MIN = 0.663 / 16.0;
     private static final double POT_FOOTPRINT_MAX = 15.337 / 16.0;
 
@@ -140,6 +142,24 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock, ItemI
             return base;
         }
         return Shapes.or(base, (axis == Direction.Axis.Z ? POT_SHAPE_Z : POT_SHAPE).move(0, lift / 16.0, 0)).optimize();
+    }
+
+    /** mryt233 改（2026-11-19）：效果与掉落共用真实锅形状，不包含灶身。lift 单位仍为像素。 */
+    public static VoxelShape potShapeFor(double lift, Direction.Axis axis) {
+        return (axis == Direction.Axis.Z ? POT_SHAPE_Z : POT_SHAPE).move(0, lift / 16.0, 0);
+    }
+
+    public static VoxelShape potShape(BlockState state) {
+        return potShapeFor(((StoveBlock) state.getBlock()).lift(), state.getValue(POT_AXIS));
+    }
+
+    public static VoxelShape baseShape(BlockState state) {
+        return ((StoveBlock) state.getBlock()).baseShape;
+    }
+
+    /** 掉落点位于锅沿上方，避免生成在仍然存在的灶体/锅体碰撞中。 */
+    public static net.minecraft.world.phys.Vec3 potDropPoint(BlockPos pos, BlockState state) {
+        return BlockBreakSamples.dropPoint(pos, potShape(state));
     }
 
     /** 灶台整体抬高的像素（矮灶台 0）。 */
@@ -239,8 +259,8 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock, ItemI
     }
 
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player,
-                                            BlockHitResult hit) {
+    public InteractionResult compatUseWithoutItem(BlockState state, Level world, BlockPos pos, Player player,
+                                                    BlockHitResult hit) {
         if (!(world.getBlockEntity(pos) instanceof StoveBlockEntity stove)) {
             return Use.blockEmpty(UseOutcome.PASS, world.isClientSide);
         }
@@ -286,8 +306,8 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock, ItemI
     }
 
     @Override
-    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
-                                           Player player, InteractionHand hand, BlockHitResult hit) {
+    public ItemInteractionResult compatUseItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
+                                                 Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(world.getBlockEntity(pos) instanceof StoveBlockEntity stove)) {
             return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
         }
@@ -350,7 +370,8 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock, ItemI
         // 只有“确实点在锅体上、灶上确实有锅、而且手里拿的是跟锅有关的物品”才走锅交互。
         // 其余情况一律放行给 onUse 打开灶膛界面：以前这里对食材/工具直接 FAIL，
         // 锅装上后又几乎盖满台面，结果就是拿着东西右键打不开灶台、也加不进燃料。
-        if (!potHit || !hasPot || !(plate || scoop || servingTool || soupSource || ingredient || spicyModifier)) {
+        if (!potHit || !hasPot || !(plate || scoop || servingTool || soupSource || ingredient
+            || spicyModifier)) {
             return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
         }
 
@@ -374,14 +395,22 @@ public class StoveBlock extends Block implements PartOutline, EntityBlock, ItemI
      * 所以先看命中点是否落在锅沿投影范围内，再看它是否高过台面。
      */
     public static boolean isPotHit(BlockState state, BlockPos pos, BlockHitResult hit) {
-        if (!state.getValue(POT).hasPot()) {
+        return isPotHitAt(state.getValue(POT).hasPot(), liftOf(state), pos, hit);
+    }
+
+    /** 按是否有锅与台面抬高高度（方块单位）判定点击落在锅体还是灶身上，供交互与单元测试复用。 */
+    static boolean isPotHitAt(boolean hasPot, double lift, BlockPos pos, BlockHitResult hit) {
+        if (!hasPot) {
             return false;
         }
         double localX = hit.getLocation().x - pos.getX();
+        double localY = hit.getLocation().y - pos.getY();
         double localZ = hit.getLocation().z - pos.getZ();
         boolean inFootprint = localX >= POT_FOOTPRINT_MIN && localX <= POT_FOOTPRINT_MAX
             && localZ >= POT_FOOTPRINT_MIN && localZ <= POT_FOOTPRINT_MAX;
-        return inFootprint || hit.getLocation().y - pos.getY() >= POT_HIT_MIN_Y + liftOf(state);
+        // mryt233 改（2026-11-15）：阴影范围还必须不低于锅槽底，防止点击灶底或高灶台下方砖体被误判成点中锅
+        return (inFootprint && localY >= POT_CAVITY_MIN_Y + lift)
+            || localY >= POT_HIT_MIN_Y + lift;
     }
 
     /**

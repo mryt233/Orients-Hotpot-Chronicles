@@ -1,3 +1,4 @@
+// mryt233 改：26.2 移植同步。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 // mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
@@ -49,7 +50,7 @@ public final class Config {
     private static final long MAX_BYTES = 65536;
 
     private static final ConfigStore STORE = new ConfigStore(
-        FILE_NAME, 1, MAX_BYTES, NOTE, Config::rule, Config::fieldHelp,
+        FILE_NAME, 1, MAX_BYTES, NOTE, Config::rule, Config::typedRule, Config::fieldHelp,
         message -> HotPot.LOGGER.warn("[hotpot] {}", message));
     private static final ConfigBase BASE = new ConfigBase(STORE);
 
@@ -58,6 +59,7 @@ public final class Config {
         // 否则 client.particle_intensity 会被判成 unknown_key。这里放在静态初始化块最稳妥：
         // SoupBase / Seasoning 的静态块虽然也会调 rememberXxx，但都晚于 Config 类自身的初始化。
         rememberClientDefaults();
+        rememberModeDefaults();
         // mryt233 改（第四批 4I / 4J / 4K）：围锅回血、冷锅反胃、干杯、辣度递增与战利品默认值一并进入模板，
         // 保证单测直接查 defaultsCopy() 或 load() 时不漏键；HotPotRuntime 启动期也会在 init 前再登记一次。
         rememberGameplayDefaults();
@@ -80,6 +82,16 @@ public final class Config {
 
     /** 模板默认数值扁平缓存（4F-2 区分「配置显式修改」与「自动补全的模板默认值」）。 */
     private static volatile java.util.Map<String, Double> defaultNumbers;
+    /** 快照代次：重载、保存、同步包或模式切换时递增，供指南等客户端缓存检测配置变化。 */
+    private static volatile long configRevision = 1L;
+
+    public static long revision() {
+        return configRevision;
+    }
+
+    private static void bumpRevision() {
+        configRevision++;
+    }
 
     private Config() {
     }
@@ -91,6 +103,7 @@ public final class Config {
         BASE.init(directory, dedicated);
         // mryt233 改（2026-11-05，r135e）：读完本地文件后把客户端粒子强度取回来
         readLocalParticleIntensity();
+        bumpRevision();
     }
 
     public static void load() {
@@ -99,6 +112,7 @@ public final class Config {
         BASE.load();
         // mryt233 改（2026-11-05，r135e）：同上，load 之后本地文件里的值才是准的
         readLocalParticleIntensity();
+        bumpRevision();
     }
 
     public static Loaded reload() {
@@ -108,6 +122,7 @@ public final class Config {
         // mryt233 改（2026-11-05，r135e）：热重载也要刷新本地粒子强度
         readLocalParticleIntensity();
         HotPotCooking.reviseCookTimes(); // mryt233 改（2026-11-10）：已下锅食材保留熟度并刷新时长。
+        bumpRevision();
         return new Loaded(loaded.data(), loaded.details());
     }
 
@@ -128,6 +143,7 @@ public final class Config {
             // 断线（value == null）时快照会退回默认值，此时不要去覆盖玩家本机的粒子强度
             readLocalParticleIntensity();
         }
+        bumpRevision();
     }
 
     /**
@@ -152,6 +168,7 @@ public final class Config {
 
     public static void acceptServer(JsonObject data) {
         BASE.acceptServer(data);
+        bumpRevision();
     }
 
     public static void clearClient() {
@@ -160,6 +177,7 @@ public final class Config {
         ClothApronProtection.clearCache();
         BASE.clearClient();
         RecipeSync.clearClient();
+        bumpRevision();
     }
 
     public static void saveDefaultsIfNeeded() {
@@ -234,6 +252,7 @@ public final class Config {
             if (activeServer != null && !activeServer.isDedicatedServer()) {
                 BASE.acceptServer(saved.loaded().data());
             }
+            bumpRevision();
         }
         return new Loaded(saved.loaded().data(), saved.loaded().details(),
             saved.status(), saved.reason(), saved.backup());
@@ -263,6 +282,16 @@ public final class Config {
     /** mryt233 改（2026-11-07）：这一条配置在不在（用来区分「没配」与「配成默认值」）。 */
     public static boolean has(String path) {
         return STORE.contains(snapshot(), path);
+    }
+
+    /** 读取布尔配置项（一次哈希查找）。 */
+    public static boolean flag(String path, boolean fallback) {
+        return STORE.flag(snapshot(), path, fallback);
+    }
+
+    /** 读取字符串配置项（一次哈希查找）。 */
+    public static String text(String path, String fallback) {
+        return STORE.text(snapshot(), path, fallback);
     }
 
     /**
@@ -487,6 +516,40 @@ public final class Config {
     static final float DEFAULT_LOOT_MUSHROOM_ENOKI_CHANCE = 0.5F;
     static final float DEFAULT_LOOT_COW_BEEF_LOIN_CHANCE = 0.25F;
     static final float DEFAULT_LOOT_COW_BEEF_LOIN_LOOTING_BONUS = 0.1F;
+    static final float DEFAULT_LOOT_CHICKEN_FEET_CHANCE = 0.5F;
+    static final float DEFAULT_LOOT_CHICKEN_FEET_LOOTING_BONUS = 0.1F;
+
+    public static final String MODE_FULL = "full";
+    public static final String MODE_SIMPLE = "simple";
+    static final String DEFAULT_MODE_PRESET = MODE_FULL;
+    static final boolean DEFAULT_MODE_DETAILED_TOFU_PROCESSING = true;
+    static final boolean DEFAULT_MODE_PENALTIES_ENABLED = true;
+    static final boolean DEFAULT_MODE_CROPS_REPLACE_GRASS = true;
+    static final boolean DEFAULT_MODE_MINIGAMES_ENABLED = true;
+    static final boolean DEFAULT_MODE_RACK_SWAP_MATERIALS = true;
+    static final boolean DEFAULT_MODE_SIMPLE_UI_COLLAPSE = false;
+
+    static final float DEFAULT_CROPS_GROWTH_RATE = 1.0F;
+    static final boolean DEFAULT_CROPS_BONEMEAL_ENABLED = true;
+
+    static final float DEFAULT_MILL_TURNS_MULTIPLIER = 1.0F;
+    static final float DEFAULT_VAT_TIME_MULTIPLIER = 1.0F;
+    static final int DEFAULT_MILL_WATER_USES = 3;
+    public static final String TABLE_MAT_ANY_SOLID = "any_solid";
+    public static final String TABLE_MAT_TAG_ONLY = "tag_only";
+    public static final String TABLE_MAT_OFF = "off";
+    public static final String DEFAULT_TABLE_MATERIALS_MODE = TABLE_MAT_ANY_SOLID;
+
+    static final boolean DEFAULT_MINIGAME_ALLOW_VIRTUAL_PLATE = true;
+    static final int DEFAULT_MINIGAME_INVITE_TIMEOUT_TICKS = 300;
+    static final int DEFAULT_MINIGAME_INVITE_RANGE = 8;
+    static final int DEFAULT_MINIGAME_RUSH_DURATION_TICKS = 200;
+    static final int DEFAULT_MINIGAME_RUSH_MAX_CPS = 16;
+    static final int DEFAULT_MINIGAME_RUSH_HITS_PER_BITE = 5;
+    static final int DEFAULT_MINIGAME_RHYTHM_PERFECT_MS = 60;
+    static final int DEFAULT_MINIGAME_RHYTHM_GOOD_MS = 130;
+    static final int DEFAULT_MINIGAME_RHYTHM_MISS_MS = 220;
+    static final float DEFAULT_MINIGAME_RHYTHM_COMBO_MULTIPLIER = 1.0F;
 
     public static int warmthIntervalTicks() {
         return integer("warmth.interval_ticks", DEFAULT_WARMTH_INTERVAL_TICKS);
@@ -602,6 +665,140 @@ public final class Config {
 
     public static float lootCowBeefLoinLootingBonus() {
         return (float) real("loot.cow.beef_loin.looting_bonus", DEFAULT_LOOT_COW_BEEF_LOIN_LOOTING_BONUS);
+    }
+
+    public static float lootChickenFeetChance() {
+        return (float) real("loot.chicken.chicken_feet.chance", DEFAULT_LOOT_CHICKEN_FEET_CHANCE);
+    }
+
+    public static float lootChickenFeetLootingBonus() {
+        return (float) real("loot.chicken.chicken_feet.looting_bonus", DEFAULT_LOOT_CHICKEN_FEET_LOOTING_BONUS);
+    }
+
+    // ------------------------------------------------------------------ 精简 / 完整模式开关组
+
+    public static String modePreset() {
+        return text("mode.preset", DEFAULT_MODE_PRESET);
+    }
+
+    public static boolean isSimpleMode() {
+        return MODE_SIMPLE.equals(modePreset());
+    }
+
+    public static boolean detailedTofuProcessing() {
+        return flag("mode.detailed_tofu_processing", DEFAULT_MODE_DETAILED_TOFU_PROCESSING);
+    }
+
+    public static boolean penaltiesEnabled() {
+        return flag("mode.penalties_enabled", DEFAULT_MODE_PENALTIES_ENABLED);
+    }
+
+    public static boolean cropsReplaceGrass() {
+        return flag("mode.crops_replace_grass", DEFAULT_MODE_CROPS_REPLACE_GRASS);
+    }
+
+    public static boolean minigamesEnabled() {
+        return flag("mode.minigames_enabled", DEFAULT_MODE_MINIGAMES_ENABLED);
+    }
+
+    public static boolean rackSwapMaterials() {
+        return flag("mode.rack_swap_materials", DEFAULT_MODE_RACK_SWAP_MATERIALS);
+    }
+
+    public static boolean simpleUiCollapse() {
+        return flag("mode.simple_ui_collapse", DEFAULT_MODE_SIMPLE_UI_COLLAPSE);
+    }
+
+    public static float cropsGrowthRate() {
+        return (float) real("crops.growth_rate", DEFAULT_CROPS_GROWTH_RATE);
+    }
+
+    public static boolean cropsBonemealEnabled() {
+        return flag("crops.bonemeal_enabled", DEFAULT_CROPS_BONEMEAL_ENABLED);
+    }
+
+    public static float millTurnsMultiplier() {
+        return (float) real("processing.mill_turns_multiplier", DEFAULT_MILL_TURNS_MULTIPLIER);
+    }
+
+    public static float vatTimeMultiplier() {
+        return (float) real("processing.vat_time_multiplier", DEFAULT_VAT_TIME_MULTIPLIER);
+    }
+
+    public static int millWaterUses() {
+        return Math.max(1, integer("processing.mill_water_uses", DEFAULT_MILL_WATER_USES));
+    }
+
+    /** 桌架可换材质判定模式：any_solid / tag_only / off。 */
+    public static String tableMaterialsMode() {
+        return text("table_materials.mode", DEFAULT_TABLE_MATERIALS_MODE);
+    }
+
+    public static boolean minigameAllowVirtualPlate() {
+        return flag("minigame.allow_virtual_plate", DEFAULT_MINIGAME_ALLOW_VIRTUAL_PLATE);
+    }
+
+    public static int minigameInviteTimeoutTicks() {
+        return integer("minigame.invite_timeout_ticks", DEFAULT_MINIGAME_INVITE_TIMEOUT_TICKS);
+    }
+
+    public static int minigameInviteRange() {
+        return integer("minigame.invite_range", DEFAULT_MINIGAME_INVITE_RANGE);
+    }
+
+    public static int minigameRushDurationTicks() {
+        return integer("minigame.rush_duration_ticks", DEFAULT_MINIGAME_RUSH_DURATION_TICKS);
+    }
+
+    public static int minigameRushMaxCps() {
+        return Math.max(1, integer("minigame.rush_max_cps", DEFAULT_MINIGAME_RUSH_MAX_CPS));
+    }
+
+    public static int minigameRushHitsPerBite() {
+        return Math.max(1, integer("minigame.rush_hits_per_bite", DEFAULT_MINIGAME_RUSH_HITS_PER_BITE));
+    }
+
+    public static int minigameRhythmPerfectMs() {
+        return integer("minigame.rhythm_perfect_ms", DEFAULT_MINIGAME_RHYTHM_PERFECT_MS);
+    }
+
+    public static int minigameRhythmGoodMs() {
+        return Math.max(minigameRhythmPerfectMs(), integer("minigame.rhythm_good_ms", DEFAULT_MINIGAME_RHYTHM_GOOD_MS));
+    }
+
+    public static int minigameRhythmMissMs() {
+        return Math.max(minigameRhythmGoodMs(), integer("minigame.rhythm_miss_ms", DEFAULT_MINIGAME_RHYTHM_MISS_MS));
+    }
+
+    public static float minigameRhythmComboMultiplier() {
+        return (float) real("minigame.rhythm_combo_multiplier", DEFAULT_MINIGAME_RHYTHM_COMBO_MULTIPLIER);
+    }
+
+    /** 供数据包条件配方等通用逻辑按路径读布尔开关；找不到默认键时退回 {@code false}。 */
+    public static boolean modeCondition(String path, boolean expected) {
+        boolean def = STORE.flag(STORE.defaults(), path, false);
+        return flag(path, def) == expected;
+    }
+
+    /** 将一套预设（full / simple）写入可编辑副本中的 {@code mode.*} 节点。 */
+    public static JsonObject applyModePreset(JsonObject root, String preset) {
+        boolean full = !MODE_SIMPLE.equals(preset);
+        JsonObject mode = ConfigStore.make(root, "mode");
+        mode.addProperty("preset", full ? MODE_FULL : MODE_SIMPLE);
+        mode.addProperty("detailed_tofu_processing", full);
+        mode.addProperty("penalties_enabled", full);
+        mode.addProperty("crops_replace_grass", full);
+        mode.addProperty("minigames_enabled", full);
+        mode.addProperty("rack_swap_materials", full);
+        mode.addProperty("simple_ui_collapse", !full);
+        return root;
+    }
+
+    /** 服务端命令或快捷切换使用：套用模式预设并立即持久化与热重载。 */
+    public static synchronized Loaded switchMode(String preset) {
+        JsonObject edited = BASE.serverSnapshot();
+        applyModePreset(edited, preset);
+        return saveAndReload(edited);
     }
 
     // ------------------------------------------------------------------ 默认值登记
@@ -771,7 +968,64 @@ public final class Config {
         ConfigStore.make(STORE.defaults(), "loot", "garnish", id).addProperty("chance", chance);
     }
 
+    /** 成年鸡掉落鸡爪的概率与抢夺加成默认值。 */
+    public static void rememberChickenLoot(float chance, float lootingBonus) {
+        defaultNumbers = null;
+        JsonObject chicken = ConfigStore.make(STORE.defaults(), "loot", "chicken", "chicken_feet");
+        chicken.addProperty("chance", chance);
+        chicken.addProperty("looting_bonus", lootingBonus);
+    }
+
+    /** 精简 / 完整模式总开关与细分项默认值。 */
+    public static void rememberModeDefaults() {
+        applyModePreset(STORE.defaults(), DEFAULT_MODE_PRESET);
+    }
+
+    /** 独立农作物与果树默认值。 */
+    public static void rememberCropsDefaults() {
+        defaultNumbers = null;
+        JsonObject crops = ConfigStore.make(STORE.defaults(), "crops");
+        crops.addProperty("growth_rate", DEFAULT_CROPS_GROWTH_RATE);
+        crops.addProperty("bonemeal_enabled", DEFAULT_CROPS_BONEMEAL_ENABLED);
+    }
+
+    /** 小石磨与开口大木桶食材加工倍率默认值。 */
+    public static void rememberProcessingDefaults() {
+        defaultNumbers = null;
+        JsonObject proc = ConfigStore.make(STORE.defaults(), "processing");
+        proc.addProperty("mill_turns_multiplier", DEFAULT_MILL_TURNS_MULTIPLIER);
+        proc.addProperty("vat_time_multiplier", DEFAULT_VAT_TIME_MULTIPLIER);
+        proc.addProperty("mill_water_uses", DEFAULT_MILL_WATER_USES);
+    }
+
+    /** 桌架可换材质开关默认值。 */
+    public static void rememberTableMaterialsDefaults() {
+        defaultNumbers = null;
+        ConfigStore.make(STORE.defaults(), "table_materials")
+            .addProperty("mode", DEFAULT_TABLE_MATERIALS_MODE);
+    }
+
+    /** 即时小游戏（连打吃菜 + 4 轨音游）默认值。 */
+    public static void rememberMinigameDefaults() {
+        defaultNumbers = null;
+        JsonObject mg = ConfigStore.make(STORE.defaults(), "minigame");
+        mg.addProperty("allow_virtual_plate", DEFAULT_MINIGAME_ALLOW_VIRTUAL_PLATE);
+        mg.addProperty("invite_timeout_ticks", DEFAULT_MINIGAME_INVITE_TIMEOUT_TICKS);
+        mg.addProperty("invite_range", DEFAULT_MINIGAME_INVITE_RANGE);
+        mg.addProperty("rush_duration_ticks", DEFAULT_MINIGAME_RUSH_DURATION_TICKS);
+        mg.addProperty("rush_max_cps", DEFAULT_MINIGAME_RUSH_MAX_CPS);
+        mg.addProperty("rush_hits_per_bite", DEFAULT_MINIGAME_RUSH_HITS_PER_BITE);
+        mg.addProperty("rhythm_perfect_ms", DEFAULT_MINIGAME_RHYTHM_PERFECT_MS);
+        mg.addProperty("rhythm_good_ms", DEFAULT_MINIGAME_RHYTHM_GOOD_MS);
+        mg.addProperty("rhythm_miss_ms", DEFAULT_MINIGAME_RHYTHM_MISS_MS);
+        mg.addProperty("rhythm_combo_multiplier", DEFAULT_MINIGAME_RHYTHM_COMBO_MULTIPLIER);
+    }
+
     private static void rememberGameplayDefaults() {
+        rememberCropsDefaults();
+        rememberProcessingDefaults();
+        rememberTableMaterialsDefaults();
+        rememberMinigameDefaults();
         rememberWarmth(DEFAULT_WARMTH_INTERVAL_TICKS, DEFAULT_WARMTH_RANGE,
             DEFAULT_WARMTH_DURATION, DEFAULT_WARMTH_AMPLIFIER);
         rememberColdPot(DEFAULT_COLD_POT_NAUSEA_CHANCE, DEFAULT_COLD_POT_NAUSEA_DURATION);
@@ -786,22 +1040,61 @@ public final class Config {
         rememberLoot(DEFAULT_LOOT_SHRIMP_FISHING_WEIGHT, DEFAULT_LOOT_LILY_PAD_LOTUS_ROOT_CHANCE,
             DEFAULT_LOOT_MUSHROOM_ENOKI_CHANCE, DEFAULT_LOOT_COW_BEEF_LOIN_CHANCE,
             DEFAULT_LOOT_COW_BEEF_LOIN_LOOTING_BONUS);
-        rememberGarnishLoot("scallion", 0.25F);
-        rememberGarnishLoot("cilantro", 0.25F);
-        rememberGarnishLoot("soybean", 0.15F);
-        rememberGarnishLoot("garlic", 0.15F);
-        rememberGarnishLoot("tomato", 0.15F);
-        rememberGarnishLoot("chili_pepper", 0.15F);
-        rememberGarnishLoot("peanut", 0.15F);
-        rememberGarnishLoot("greens", 0.15F);
-        rememberGarnishLoot("zhe_er_gen", 0.15F);
+        rememberChickenLoot(DEFAULT_LOOT_CHICKEN_FEET_CHANCE, DEFAULT_LOOT_CHICKEN_FEET_LOOTING_BONUS);
+        rememberGarnishLoot("scallion", GarnishLoot.DEFAULT_CHANCE);
+        rememberGarnishLoot("cilantro", GarnishLoot.DEFAULT_CHANCE);
+        rememberGarnishLoot("soybean", GarnishLoot.DEFAULT_CHANCE);
+        rememberGarnishLoot("garlic", GarnishLoot.DEFAULT_CHANCE);
+        rememberGarnishLoot("tomato", GarnishLoot.DEFAULT_CHANCE);
+        rememberGarnishLoot("chili_pepper", GarnishLoot.DEFAULT_CHANCE);
+        rememberGarnishLoot("peanut", GarnishLoot.DEFAULT_CHANCE);
+        rememberGarnishLoot("greens", GarnishLoot.DEFAULT_CHANCE);
+        rememberGarnishLoot("zhe_er_gen", GarnishLoot.DEFAULT_CHANCE);
     }
 
     // ------------------------------------------------------------------ 火锅规则
 
+    static NumericConfig.ValueValidator typedRule(String path) {
+        if ("mode.preset".equals(path)) {
+            return candidate -> NumericConfig.checkChoice(path, candidate, MODE_FULL, MODE_SIMPLE);
+        }
+        if ("table_materials.mode".equals(path)) {
+            return candidate -> NumericConfig.checkChoice(path, candidate,
+                TABLE_MAT_ANY_SOLID, TABLE_MAT_TAG_ONLY, TABLE_MAT_OFF);
+        }
+        if ("mode.detailed_tofu_processing".equals(path)
+            || "mode.penalties_enabled".equals(path)
+            || "mode.crops_replace_grass".equals(path)
+            || "mode.minigames_enabled".equals(path)
+            || "mode.rack_swap_materials".equals(path)
+            || "mode.simple_ui_collapse".equals(path)
+            || "crops.bonemeal_enabled".equals(path)
+            || "minigame.allow_virtual_plate".equals(path)) {
+            return candidate -> NumericConfig.checkBoolean(path, candidate);
+        }
+        return null;
+    }
+
     static NumericConfig.Rule rule(String path) {
         // mryt233 改（2026-11-05，r135e）：客户端粒子强度百分比 0～100 整数，0=关闭粒子
         if (path.equals("client.particle_intensity")) return new NumericConfig.Rule(0, 100, true);
+        if (path.equals("crops.growth_rate")) return new NumericConfig.Rule(0, 10, false);
+        if (path.equals("processing.mill_turns_multiplier")) return new NumericConfig.Rule(0.25, 5, false);
+        if (path.equals("processing.vat_time_multiplier")) return new NumericConfig.Rule(0.1, 5, false);
+        if (path.equals("processing.mill_water_uses")) return new NumericConfig.Rule(1, 16, true);
+        if (path.startsWith("minigame.")) {
+            if (path.equals("minigame.invite_timeout_ticks") || path.equals("minigame.rush_duration_ticks")) {
+                return new NumericConfig.Rule(60, 1200, true);
+            }
+            if (path.equals("minigame.invite_range")) return new NumericConfig.Rule(2, 32, true);
+            if (path.equals("minigame.rush_max_cps")) return new NumericConfig.Rule(4, 40, true);
+            if (path.equals("minigame.rush_hits_per_bite")) return new NumericConfig.Rule(1, 30, true);
+            if (path.equals("minigame.rhythm_perfect_ms")) return new NumericConfig.Rule(15, 150, true);
+            if (path.equals("minigame.rhythm_good_ms")) return new NumericConfig.Rule(30, 300, true);
+            if (path.equals("minigame.rhythm_miss_ms")) return new NumericConfig.Rule(80, 500, true);
+            if (path.equals("minigame.rhythm_combo_multiplier")) return new NumericConfig.Rule(0, 5, false);
+            return null;
+        }
         // mryt233 改（2026-11-05）：生食材涮煮刻数最先接住，路径 cooking.items.<物品注册路径>，值就是刻数本身。
         // 放在最前面是因为食材 ID 由玩家 / 数据包决定，万一有人登记了以 _duration 结尾的 ID 也不会被下面的后缀规则抢走。
         if (path.startsWith("cooking.items.")) return new NumericConfig.Rule(1, 100000, true);
@@ -907,6 +1200,32 @@ public final class Config {
         help.addProperty("loot.mushroom.enoki.chance", "破坏棕色 / 红色蘑菇掉落金针菇的概率（改后需 /reload 生效）。范围 0～1");
         help.addProperty("loot.cow.beef_loin.chance", "击杀牛 / 哞菇掉落牛脊肉的基础概率（改后需 /reload 生效）。范围 0～1");
         help.addProperty("loot.cow.beef_loin.looting_bonus", "抢夺附魔每级为牛脊肉追加的掉落概率（改后需 /reload 生效）。范围 0～1");
+        help.addProperty("loot.chicken.chicken_feet.chance", "击杀成年鸡掉落鸡爪的基础概率（改后需 /reload 生效）。范围 0～1");
+        help.addProperty("loot.chicken.chicken_feet.looting_bonus", "抢夺附魔每级为鸡爪追加的掉落概率（改后需 /reload 生效）。范围 0～1");
+        help.addProperty("mode.preset", "模组游玩模式预设：full = 完整模式（体验全部细化工序与机关），simple = 精简模式（直合、无惩罚、折叠复杂项）");
+        help.addProperty("mode.detailed_tofu_processing", "开启后豆腐走细化工序（关闭则开启快捷直合豆干/豆腐）；需配套模式开关与数据包条件配方生效");
+        help.addProperty("mode.penalties_enabled", "开启冷锅反胃、特辣饥饿与嘴上冒火等负面反馈；关闭后全部跳过");
+        help.addProperty("mode.crops_replace_grass", "开启后独立作物接管对应调料获取（打草退化为低概率找种兜底）；关闭后保持传统高概率打草获取");
+        help.addProperty("mode.minigames_enabled", "开启多人/单人火锅即时小游戏与加分增益；关闭后不触发小游戏");
+        help.addProperty("mode.rack_swap_materials", "开启火锅桌与备菜架换材质功能；关闭后保持默认木色外观");
+        help.addProperty("mode.simple_ui_collapse", "开启后在指南与配方查看中折叠复杂工序，优先展示常用基础用法");
+        help.addProperty("crops.growth_rate", "9 种独立作物、橙子树苗与橙叶挂果的自然生长速度倍率；0 = 暂停自然生长（仍可用骨粉）。范围 0～10");
+        help.addProperty("crops.bonemeal_enabled", "开启后允许对 9 种火锅作物、橙子树苗与橙叶使用骨粉催熟");
+        help.addProperty("processing.mill_turns_multiplier", "小石磨研磨所需推动圈数倍率；调高更偏写实，调低更省力。范围 0.25～5");
+        // mryt233 改：木桶现在仅用于豆腐压制。
+        help.addProperty("processing.vat_time_multiplier", "开口大木桶豆腐压制的耗时倍率；越小越快。范围 0.1～5");
+        help.addProperty("processing.mill_water_uses", "向小石磨倒入一桶水后可连续用于湿磨的次数（水瓶固定 +1 次）。范围 1～16");
+        help.addProperty("table_materials.mode", "火锅桌与备菜架换材质规则：any_solid = 任何完整不透明非容器固体方块（受黑/白名单标签控制），tag_only = 仅允许白名单标签，off = 关闭换材质");
+        help.addProperty("minigame.allow_virtual_plate", "开启后允许在开局面板切换「虚拟练习盘」不消耗锅内真实熟食，适合练习音游或空锅娱乐");
+        help.addProperty("minigame.invite_timeout_ticks", "多人火锅小游戏邀约弹窗等待应战的最长时长（20 tick = 1 秒，默认 300 = 15 秒）。范围 60～1200");
+        help.addProperty("minigame.invite_range", "发起火锅小游戏对战邀约时搜索同桌/近距离玩家的半径（格）。范围 2～32");
+        help.addProperty("minigame.rush_duration_ticks", "连打吃菜小游戏的单局总时长（20 tick = 1 秒，默认 200 = 10 秒）。范围 60～1200");
+        help.addProperty("minigame.rush_max_cps", "服务端对连打吃菜允许的每秒最高有效敲击次数（防宏/防连点器上限）。范围 4～40");
+        help.addProperty("minigame.rush_hits_per_bite", "连打吃菜中每累计多少次有效敲击吃下 1 份熟食并计分。范围 1～30");
+        help.addProperty("minigame.rhythm_perfect_ms", "4 轨音游 Perfect 判定的最大毫秒误差（前后各算）。范围 15～150");
+        help.addProperty("minigame.rhythm_good_ms", "4 轨音游 Good 判定的最大毫秒误差（前后各算）。范围 30～300");
+        help.addProperty("minigame.rhythm_miss_ms", "4 轨音游脱拍或错过音符归为 Miss 的毫秒窗口阈值。范围 80～500");
+        help.addProperty("minigame.rhythm_combo_multiplier", "音游连击加成倍率系数（1 = 标准连击得分递增，0 = 关闭连击加分）。范围 0～5");
         help.addProperty("client.particle_intensity", "灶口火苗、火星与汤面热气的浓淡（0 = 关掉粒子，100 = 标准）；只对本机生效。范围 0～100");
         return help;
     }

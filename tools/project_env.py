@@ -6,7 +6,8 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_JDK21 = "C:/Users/10536/.jdks/jdk-21.0.12.1+1"
+# mryt233 改：保留便携 JDK 的默认相对位置，不绑定任何账号或盘符。
+DEFAULT_JDK21 = str(Path.home() / ".jdks" / "jdk-21.0.12.1+1")
 
 
 def jdk21() -> Path:

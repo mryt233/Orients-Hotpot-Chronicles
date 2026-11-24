@@ -1,0 +1,7 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/stool_middle",
+  "textures": {
+    "planks": "minecraft:block/birch_planks",
+    "particle": "minecraft:block/birch_planks"
+  }
+}

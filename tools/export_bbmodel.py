@@ -71,11 +71,19 @@ def resolve(textures, ref):
 def default_uv(face, f, t):
     x0, y0, z0 = f
     x1, y1, z1 = t
+    if y1 > 16:
+        h = y1 - y0
+        vy0 = (16 - y1) % 16
+        if vy0 + h > 16:
+            vy0 = 16 - h
+        vy1 = vy0 + h
+    else:
+        vy0, vy1 = 16 - y1, 16 - y0
     return {
-        "north": [16 - x1, 16 - y1, 16 - x0, 16 - y0],
-        "south": [x0, 16 - y1, x1, 16 - y0],
-        "east": [16 - z1, 16 - y1, 16 - z0, 16 - y0],
-        "west": [z0, 16 - y1, z1, 16 - y0],
+        "north": [16 - x1, vy0, 16 - x0, vy1],
+        "south": [x0, vy0, x1, vy1],
+        "east": [16 - z1, vy0, 16 - z0, vy1],
+        "west": [z0, vy0, z1, vy1],
         "up": [x0, z0, x1, z1],
         "down": [x0, 16 - z1, x1, 16 - z0],
     }[face]

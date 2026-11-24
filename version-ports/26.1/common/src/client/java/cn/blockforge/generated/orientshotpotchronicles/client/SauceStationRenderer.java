@@ -1,3 +1,4 @@
+// mryt233 改：阶段二补齐 26.1 功能同步。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
 import static cn.blockforge.generated.orientshotpotchronicles.client.RenderSprites.sprite;
@@ -12,11 +13,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import cn.blockforge.orient.framework.client.RenderFrame;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.resources.Identifier;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 import com.mojang.math.Axis;
 
 import java.util.HashSet;
@@ -39,43 +42,70 @@ public class SauceStationRenderer extends cn.blockforge.orient.framework.client.
     @Override
     protected void extractFrame(SauceStationBlockEntity be, float tickDelta, PoseStack matrices, RenderFrame consumers,
                        int light, int overlay) {
-        Direction facing = be.getBlockState().getValue(SauceStationBlock.FACING);
-        VertexConsumer vc = consumers.getBuffer(RenderTypes.entityCutout(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS));
-        // 缺图兜底那条路用白色独立贴图（misc/white.png 不在方块图集里，得单开一个 RenderType）
-        VertexConsumer white = null;
+        BlockState state = be.getBlockState();
+        if (!(state.getBlock() instanceof SauceStationBlock) || !state.hasProperty(SauceStationBlock.FACING)) {
+            return;
+        }
+        Direction facing = state.getValue(SauceStationBlock.FACING);
+        SeasoningDef[] kinds = new SeasoningDef[SauceStationBlockEntity.BOWLS];
+        TextureAtlasSprite[] sprites = new TextureAtlasSprite[SauceStationBlockEntity.BOWLS];
+        boolean hasAtlas = false;
+        boolean hasFallback = false;
+        for (int i = 0; i < SauceStationBlockEntity.BOWLS; i++) {
+            SeasoningDef s = be.kindDef(i);
+            if (s == null || be.available(i) == 0) {
+                continue;
+            }
+            kinds[i] = s;
+            sprites[i] = surfaceSprite(s, s.garnish());
+            if (sprites[i] != null) {
+                hasAtlas = true;
+            } else {
+                hasFallback = true;
+            }
+        }
+        if (!hasAtlas && !hasFallback) {
+            return;
+        }
         matrices.pushPose();
         matrices.translate(0.5, 0, 0.5);
         // 和方块状态一样转：模型正面朝北，facing 东 / 南 / 西 = 绕 y 顺时针 90 / 180 / 270°
         matrices.mulPose(Axis.YP.rotationDegrees(-modelRotation(facing)));
         matrices.translate(-0.5, 0, -0.5);
         PoseStack.Pose e = matrices.last();
-        for (int i = 0; i < SauceStationBlockEntity.BOWLS; i++) {
-            SeasoningDef s = be.kindDef(i);
-            if (s == null || be.available(i) == 0) {
-                continue;
-            }
-            int tier = 2 - i / 3, col = i % 3;
-            float cx = 16 - 16F / 3 * (col + 0.5F), cz = 16F / 3 * (tier + 0.5F);
-            float rim = (float) (SauceStationBlock.TIER_TOPS[tier] + SauceStationBlock.BOWL_H);
-            float half = (float) (SauceStationBlock.BOWL / 2 - SauceStationBlock.WALL);
-            boolean garnish = s.garnish();
-            // null = 这张贴图不在图集里（新调料忘了生成 sauce_<id>）：退回白贴图 + 顶点色，别露出粉黑格子
-            TextureAtlasSprite sprite = surfaceSprite(s, garnish);
-            if (sprite == null && white == null) {
-                white = consumers.getBuffer(RenderTypes.entityCutout(WHITE));
-            }
-            VertexConsumer into = sprite == null ? white : vc;
-            // 顶点色只有 RGB，alpha 统一 255；白贴图那条路靠它才有调料色（正常贴图传纯白）
-            int rgb = sprite == null ? s.color() & 0xFFFFFF : 0xFFFFFF;
-            if (garnish) {
-                for (float[] l : GARNISH_LAYERS) {
-                    quad(into, e, light, sprite, cx - half, rim - l[0], cz - half, cx + half, cz + half, l[1], l[2], l[3], l[4], (int) l[5], rgb);
+        // mryt233 改（2026-11-15）：分两批获取缓冲，避免循环中混用图集与兜底贴图刷新共享 BufferBuilder。
+        if (hasAtlas) {
+            VertexConsumer atlasConsumer = consumers.getBuffer(RenderTypes.entityCutout(TextureAtlas.LOCATION_BLOCKS));
+            for (int i = 0; i < SauceStationBlockEntity.BOWLS; i++) {
+                if (kinds[i] != null && sprites[i] != null) {
+                    drawBowl(atlasConsumer, e, light, sprites[i], i, kinds[i], 0xFFFFFF);
                 }
-            } else {
-                quad(into, e, light, sprite, cx - half, rim - 0.5F, cz - half, cx + half, cz + half, 2, 2, 14, 14, 0, rgb);
+            }
+        }
+        if (hasFallback) {
+            VertexConsumer fallbackConsumer = consumers.getBuffer(RenderTypes.entityCutout(WHITE));
+            for (int i = 0; i < SauceStationBlockEntity.BOWLS; i++) {
+                if (kinds[i] != null && sprites[i] == null) {
+                    drawBowl(fallbackConsumer, e, light, null, i, kinds[i], kinds[i].color() & 0xFFFFFF);
+                }
             }
         }
         matrices.popPose();
+    }
+
+    private static void drawBowl(VertexConsumer into, PoseStack.Pose e, int light, TextureAtlasSprite sprite,
+                                 int bowlIndex, SeasoningDef s, int rgb) {
+        int tier = 2 - bowlIndex / 3, col = bowlIndex % 3;
+        float cx = 16 - 16F / 3 * (col + 0.5F), cz = 16F / 3 * (tier + 0.5F);
+        float rim = (float) (SauceStationBlock.TIER_TOPS[tier] + SauceStationBlock.BOWL_H);
+        float half = (float) (SauceStationBlock.BOWL / 2 - SauceStationBlock.WALL);
+        if (s.garnish()) {
+            for (float[] l : GARNISH_LAYERS) {
+                quad(into, e, light, sprite, cx - half, rim - l[0], cz - half, cx + half, cz + half, l[1], l[2], l[3], l[4], (int) l[5], rgb);
+            }
+        } else {
+            quad(into, e, light, sprite, cx - half, rim - 0.5F, cz - half, cx + half, cz + half, 2, 2, 14, 14, 0, rgb);
+        }
     }
 
     /** 方块状态里 facing 对应的模型 y 旋转（north 0 / east 90 / south 180 / west 270，同 gen_sauce_station.py 的 ROT）。 */
@@ -100,13 +130,19 @@ public class SauceStationRenderer extends cn.blockforge.orient.framework.client.
      * 原版图集对缺图统一返回同一个缺失精灵实例（{@code getOrDefault(id, missingSprite)}），用它来判定。
      */
     private static TextureAtlasSprite surfaceSprite(SeasoningDef s, boolean garnish) {
+        if (s == null) {
+            return null;
+        }
         Identifier texId = sauceTextureId(s.id(), garnish);
         if (texId == null) {
             return null;
         }
         TextureAtlasSprite sp = sprite(texId);
+        if (sp == null || sp.contents() == null) {
+            return null;
+        }
         TextureAtlasSprite missing = sprite(MissingTextureAtlasSprite.getLocation());
-        if (sp.contents() == missing.contents()) {
+        if (missing != null && sp.contents() == missing.contents()) {
             if (WARNED.add(s.id())) {
                 HotPot.LOGGER.warn("sauce station: no texture for seasoning {}（补跑 tools/gen_sauce_station.py）", s.id());
             }

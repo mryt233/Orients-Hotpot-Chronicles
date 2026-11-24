@@ -1,0 +1,16 @@
+{
+  "orient_framework.config.json_invalid": "設定ファイルが正しい JSON ではありません。既定値を使用し、元のファイルは残します",
+  "orient_framework.config.root_not_object": "設定ファイルの最上位はオブジェクトである必要があります。既定値を使用し、元のファイルは残します",
+  "orient_framework.config.format_unsupported": "対応していない設定形式のバージョンです。既定値を使用し、元のファイルは残します",
+  "orient_framework.config.format_invalid": "設定形式のバージョンが無効です。既定値を使用し、元のファイルは残します",
+  "orient_framework.config.unknown_key": "不明な設定項目 %s は無視しました",
+  "orient_framework.config.not_object": "%s はオブジェクトである必要があります。既定値のままにしました",
+  "orient_framework.config.not_number": "%s は数値である必要があります。既定値に戻しました",
+  "orient_framework.config.not_integer": "%s は整数である必要があります。既定値に戻しました",
+  "orient_framework.config.out_of_range": "%s は %s～%s の範囲である必要があります。既定値に戻しました",
+  "orient_framework.config.too_large": "設定ファイルが大きすぎます。既定値を使用し、元のファイルは残します",
+  "orient_framework.config.read_failed": "設定を読み込めませんでした（%s）。既定値を使用し、元のファイルは残します",
+  "orient_framework.config.write_failed": "設定を書き込めませんでした（%s）。元のファイルは残します",
+  "orient_framework.disconnect.protocol": "Orient Framework のネットワークプロトコルが一致しません（サーバー %s、クライアント %s）。サーバーと同じバージョンの MOD を導入してください。",
+  "orient_framework.disconnect.missing_channels": "このサーバーに必要なネットワークチャンネルがクライアントにありません：%s。サーバーと同じバージョンの MOD を導入してください。"
+}

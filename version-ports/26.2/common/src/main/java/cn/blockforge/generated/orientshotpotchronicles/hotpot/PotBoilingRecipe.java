@@ -29,13 +29,12 @@ public record PotBoilingRecipe(Ingredient ingredient, ItemStackTemplate resultTe
         @Override public String toString() { return HotPot.MOD_ID + ":pot_boiling"; }
     };
 
-    private static final Codec<Ingredient> NON_EMPTY_INGREDIENT = Ingredient.CODEC.validate(
-        in -> in.isEmpty() ? DataResult.error(() -> "锅配方原料不能为空") : DataResult.success(in));
     private static final Codec<ItemStackTemplate> SINGLE_TEMPLATE = ItemStackTemplate.CODEC.validate(
         t -> t.count() == 1 ? DataResult.success(t) : DataResult.error(() -> "锅配方产物每份必须为一个"));
 
+    // mryt233 改：配方解码阶段尚未绑定标签；使用原版配方原料编码，不提前展开标签成员。
     private static final MapCodec<PotBoilingRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-        NON_EMPTY_INGREDIENT.fieldOf("ingredient").forGetter(PotBoilingRecipe::ingredient),
+        Ingredient.CODEC.fieldOf("ingredient").forGetter(PotBoilingRecipe::ingredient),
         SINGLE_TEMPLATE.fieldOf("result").forGetter(PotBoilingRecipe::resultTemplate),
         Codec.intRange(1, 100000).optionalFieldOf("cook_ticks").forGetter(PotBoilingRecipe::cookTicks),
         Codec.floatRange(0, 100).optionalFieldOf("experience").forGetter(PotBoilingRecipe::experience),
@@ -79,7 +78,7 @@ public record PotBoilingRecipe(Ingredient ingredient, ItemStackTemplate resultTe
     }
 
     public PotBoilingRecipe {
-        if (ingredient.isEmpty() || resultTemplate == null || resultTemplate.count() != 1
+        if (ingredient == null || resultTemplate == null || resultTemplate.count() != 1
             || overcookTemplate.map(t -> t.count() != 1).orElse(false)) {
             throw new IllegalArgumentException("锅配方原料不能为空，产物每份必须为一个");
         }

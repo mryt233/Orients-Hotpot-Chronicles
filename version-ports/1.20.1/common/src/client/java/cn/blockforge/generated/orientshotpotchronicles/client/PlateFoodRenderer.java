@@ -1,5 +1,6 @@
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateFoodLayout;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateSize;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -51,14 +52,6 @@ public final class PlateFoodRenderer {
                               MultiBufferSource consumers, int light, Level world, int seed,
                               ItemRenderer itemRenderer) {
         int cells = size.cells();
-        double innerL = size.length() - 2 * PlateSize.RIM_T;
-        double x0 = 8 - innerL / 2;
-        double x1 = 8 + innerL / 2;
-        // 小碟（1x1）单独缩一号，碗和其他大盘子照旧（mryt233 改，2026-11-05）
-        boolean smallDish = size == PlateSize.S1X1;
-        float food = smallDish ? SMALL_DISH_FOOD : FOOD;
-        float scale = food / 16F;
-        float tilt = (float) Math.toDegrees(Math.atan2(RISE, FOOD / 2));
         matrices.pushPose();
         if (axis == Direction.Axis.Z) {
             matrices.translate(0.5, 0, 0.5);
@@ -71,37 +64,18 @@ public final class PlateFoodRenderer {
                 continue;
             }
             int cell = i % cells;
-            int layer = size.layer(i);
             int inCell = 0;
             for (int j = cell; j < items.size(); j += cells) {
                 if (!items.get(j).isEmpty()) {
                     inCell++;
                 }
             }
-            double[] c = size.cellCenter(i);
-            double cx = c[0];
-            double cz = c[1];
-            double y = PlateSize.FLOOR + 0.002;
-            float spin = 0F;
-            float slope = 0F;
-            if (smallDish) {   // 小碟：正叠、层间居中（mryt233 改，2026-11-05）
-                y += layer * RISE;
-                spin = SMALL_DISH_SPIN * layer;
-            } else if (size.piles()) {   // 碗：正叠
-                y += layer * RISE;
-                spin = -15F * layer;
-            } else {
-                cx += (layer - (inCell - 1) / 2.0) * (FOOD / 2);
-                cx = Math.min(x1 - FOOD / 2, Math.max(x0 + FOOD / 2, cx));
-                if (layer > 0) {
-                    slope = -tilt;
-                    y += layer * RISE - RISE / 2;
-                }
-            }
+            PlateFoodLayout.SlotPose pose = PlateFoodLayout.pose(size, i, inCell);
+            float scale = pose.foodPx() / 16F;
             matrices.pushPose();
-            matrices.translate(cx / 16.0, y / 16.0 + layer * 0.001, cz / 16.0);
-            matrices.mulPose(Axis.ZP.rotationDegrees(slope));
-            matrices.mulPose(Axis.YP.rotationDegrees(spin));
+            matrices.translate(pose.cx() / 16.0, pose.y() / 16.0, pose.cz() / 16.0);
+            matrices.mulPose(Axis.ZP.rotationDegrees(pose.slopeDeg()));
+            matrices.mulPose(Axis.YP.rotationDegrees(pose.spinDeg()));
             matrices.mulPose(Axis.XP.rotationDegrees(90F));
             matrices.scale(scale, scale, scale);
             itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, light, OverlayTexture.NO_OVERLAY,

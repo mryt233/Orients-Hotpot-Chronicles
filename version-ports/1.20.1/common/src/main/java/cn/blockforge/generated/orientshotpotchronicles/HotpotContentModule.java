@@ -3,7 +3,6 @@ package cn.blockforge.generated.orientshotpotchronicles;
 // mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
-import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCooking;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotRuntime;
 import cn.blockforge.orient.framework.loader.ClientHooks;
 import cn.blockforge.orient.framework.loader.ContentModule;
@@ -64,9 +63,10 @@ public final class HotpotContentModule implements ContentModule {
         });
     }
 
+    /** mryt233 改（2026-11-10）：数据包重载使已下锅的食材时长失效并同步音游谱面。 */
     @Override
     public void onReload() {
-        HotPotCooking.reviseCookTimes();
+        HotPotRuntime.onDataReloaded();
     }
 
     public static int declarationCalls() {

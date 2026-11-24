@@ -1,67 +1,69 @@
-<!-- 作者：mryt233；英文翻译，原文：mryt233。发布前由 mryt233 同步并审核。 -->
-# Your First Hotpot in Ten Minutes
+<!-- 作者：mryt233；英文翻译，原文：mryt233。 -->
+<!-- mryt233 改（2026-11-22）：同步 0.3.1-alpha 模式提示、即时小游戏与后续导览入口英文版。 -->
+# Hotpot in Ten Minutes
 
-Follow these six steps from scratch to your first bite of hotpot. Each step includes its recipe.
+Follow these six steps from scratch to eat your first hotpot meal. Every step includes a recipe.
 
-## Step 1: Craft a stove
+## Step 1: Make a stove
 
 {{recipe:brick_stove}}
 
-1. Place the stove on the ground. **Right-click its brick body with an empty hand** to open the firebox screen.
-2. Put fuel in the fuel slot. **Anything a vanilla furnace burns works:** planks, logs, charcoal, coal, lava buckets, and more. Stronger heat cooks faster (see [Stoves & Hotpots](hotpot.html)).
+1. Place the stove on the ground and **right-click its brick body with an empty hand** to open the firebox screen.
+2. Add fuel to the firebox slot — **any vanilla furnace fuel works**: planks, logs, sticks, charcoal, coal, lava buckets, and more. Stronger fuel cooks faster (see [Stoves & Hotpots](hotpot.html)).
 
-## Step 2: Craft a pot and set it on the stove
+## Step 2: Craft a pot and place it on the stove
 
 {{recipe:iron_nine_grid_hotpot}}
 
-Iron and copper pots work the same; only their appearance differs. **Hold the pot and right-click the stove** to place it. Its two handles automatically sit to your left and right.
+Iron and copper pots behave identically apart from looks. **Hold the pot and right-click the stove** to mount it; its handles automatically face your left and right sides.
 
 :::tip
-Want one spicy half and one mild half? Add a copper or iron ingot to convert a nine-grid pot into a **Yuanyang or four-grid pot**; see [Stoves & Hotpots](hotpot.html#yuanyang).
+Want half spicy and half mild? Add a copper or iron ingot to make **Yuanyang or four-grid divided pots** — see [Stoves & Hotpots](hotpot.html#yuanyang).
 :::
 
-## Step 3: Add broth
+## Step 3: Pour in broth
 
-**Hold a filled bucket and right-click the pot** to pour it in. Different containers make different broths:
+**Right-click the pot with a filled bucket or stew** to add broth:
 
 | Right-click the pot with | Resulting broth |
 | --- | --- |
-| {{i:minecraft:water_bucket}} | **Clear Broth:** standard speed, suitable for any ingredient |
-| {{i:minecraft:milk_bucket}} | **Rich Stock:** slowest (×0.85), milky white |
-| {{i:minecraft:mushroom_stew}} | **Mushroom Broth:** a little faster (×1.15); returns the empty bowl |
-| {{i:minecraft:lava_bucket}} | **Spicy Red Broth:** fastest (×1.3), bright red |
+| {{i:minecraft:water_bucket}} | **Clear Broth**: balanced speed, cooks anything (add hotpot bases for Tomato / Three Delicacies broth) |
+| {{i:minecraft:milk_bucket}} | **Rich Stock**: slowest (×0.85), milky white, filling and defensive |
+| {{i:minecraft:mushroom_stew}} | **Mushroom Broth**: brisk (×1.15), returns the empty bowl |
+| {{i:minecraft:lava_bucket}} | **Spicy Red Broth**: fastest (×1.3), fiery red, boost spiciness with chili peppers |
 
-Once broth is added, a pot on the stove gives off steam. **An empty pot will not light the stove.**
+Once broth is poured in, steam rises. **A pot without broth will not ignite the stove.**
 
-## Step 4: Add ingredients
+## Step 4: Add raw ingredients
 
-With broth in the pot, hold a **raw ingredient** and right-click to add it. The pot has nine large cells in a 3×3 grid. **Your crosshair determines which cell receives the food.**
+With broth inside, hold **raw ingredients** and right-click the pot. A pot has 3×3 (9) large cells; **food enters whichever cell you aim at**.
 
-Start simply: vanilla raw beef, porkchops, mutton, and fish all work. For a more typical hotpot, try {{i:tripe}} (dropped by cows) or {{i:fatty_beef_roll}} (cut with a kitchen knife). See [Ingredients & Food Preparation](ingredients.html).
+Keep it simple at first — vanilla raw beef, porkchop, mutton, and fish all work; mod items like {{i:tripe}} (from cows), {{i:fatty_beef_roll}} (sliced with a knife), and {{i:chicken_feet}} (from adult chickens) feel extra authentic. See [Ingredients & Cutting](ingredients.html) for processing and crops.
 
 :::warn
-**Only put food in the pot.** In 0.1.2-alpha, wood and iron items could also go in and get cooked into charcoal or iron nuggets; from 0.1.3-alpha-hotfix1 onward, pots only accept food, and cooked food cannot be added again.
+**Only put food in the pot.** It accepts raw cookable foods only; already-cooked food cannot go back in.
 :::
 
-## Step 5: Craft chopsticks
+## Step 5: Craft bamboo chopsticks
 
 {{recipe:bamboo_chopsticks}}
 
-**Hold bamboo chopsticks and Shift + right-click the pot** to open the hotpot screen: every ingredient in the pot is visible, and its appearance changes when cooked.
+**Hold bamboo chopsticks and Shift + right-click the pot** to open the Hotpot Screen: you can see every slot inside and tell raw from cooked food by sight; press **`G`** on a pot with cooked food (or click "Eat Challenge" top-right) for solo or multiplayer rush/rhythm minigames (disabled by default in Simple Mode).
 
 ## Step 6: Eat!
 
-- **In the hotpot screen:** with chopsticks on your cursor, **left-click cooked food** to eat it in one bite (complete with chewing sounds and a burp).
-- **Pick up directly with chopsticks without opening the screen:** hold bamboo chopsticks and **right-click the pot directly** to pick up a cooked portion from the targeted cell, then **hold right-click** to eat it.
-- **Empty hands work too:** right-click the pot with an empty hand (or holding a bowl) to scoop out cooked food directly from the targeted cell.
-- **Watch out for cold pots:** food will not cook without heat—eating from an unheated “cold pot” has a 30% chance of causing Nausea for 15 seconds.
+- **Eat inside the screen:** with chopsticks on your cursor, **left-click cooked food** to eat it in one bite (complete with crunch and burp).
+- **Pick up without the screen:** **right-click the pot directly** with bamboo chopsticks to pick up one cooked portion from the targeted cell, then **hold right-click** to eat it.
+- **Scoop by hand or bowl:** empty-handed (or holding a bowl) right-click picks up cooked food directly from that cell.
+- **Skip cold pots:** food never cooks in an unlit cold pot, and eating from one carries a 30% chance of 15 s Nausea (switch to **Simple Mode** or disable penalties in Mod Settings if preferred).
 
-After eating, don't forget: a heated pot keeps granting **Regeneration I to players within six blocks**, so invite your friends to share the meal.
+A lit pot also **continuously heals nearby players within 6 blocks (Regeneration I)** — gather friends around the stove!
 
 ---
 
-## Next steps
+## Next
 
-- Set up a table and sit down: [Tables & Seating](tables.html)
-- Serve food on plates and soup in bowls: [Tableware & Drinks](tableware.html)
-- Mix a dipping sauce: [Dipping Sauces](sauce.html)
+- Place tables, freely swap tabletop/base materials, and set up prep racks and benches: [Tables, Prep Racks & Seating](tables.html)
+- Serve on plates, ladle soup bowls, toast drinks, and wear cloth aprons: [Tableware & Drinks](tableware.html)
+- Grind soymilk on a Stone Mill, press tofu in a Wooden Vat, and grow orange trees & 9 crops: [Ingredients & Cutting](ingredients.html)
+- Mix 15 stackable seasonings at the Sauce Station: [Dipping Sauces](sauce.html)

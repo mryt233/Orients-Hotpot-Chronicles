@@ -11,7 +11,11 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import com.mojang.serialization.MapCodec;
+import java.lang.reflect.Constructor;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
 import cn.blockforge.orient.framework.pure.RegistrationWindow;
 
 import cn.blockforge.orient.framework.loader.RegistrationApi;
@@ -193,6 +197,29 @@ public final class FabricRegistrationApi implements RegistrationApi {
             @Override
             public <T extends ParticleType<?>> T register(ResourceLocation id, T value) {
                 return put(BuiltInRegistries.PARTICLE_TYPE, id, value);
+            }
+        };
+    }
+
+    @Override
+    public FoliagePlacerRegistrar foliagePlacers() {
+        return new FoliagePlacerRegistrar() {
+            @Override
+            public <P extends FoliagePlacer> FoliagePlacerType<P> register(ResourceLocation id, MapCodec<P> codec) {
+                if (codec == null) {
+                    throw new NullPointerException("codec");
+                }
+                try {
+                    // Fabric 映射下 FoliagePlacerType(MapCodec) 构造器为 private，且 MapCodec 为未重命名类型（mryt233 注）。
+                    @SuppressWarnings("unchecked")
+                    Constructor<FoliagePlacerType<P>> ctor =
+                        (Constructor<FoliagePlacerType<P>>) (Constructor<?>) FoliagePlacerType.class
+                            .getDeclaredConstructor(MapCodec.class);
+                    ctor.setAccessible(true);
+                    return put(BuiltInRegistries.FOLIAGE_PLACER_TYPE, id, ctor.newInstance(codec));
+                } catch (ReflectiveOperationException e) {
+                    throw new IllegalStateException("Failed to create FoliagePlacerType for " + id, e);
+                }
             }
         };
     }

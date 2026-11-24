@@ -1,0 +1,85 @@
+// mryt233 改：26.2 移植同步。
+// 作者：mryt233
+// mryt233 改：26.3 姿态旋转接口。
+package cn.blockforge.generated.orientshotpotchronicles.client;
+
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.WoodenVatBlockEntity;
+import cn.blockforge.orient.framework.client.FrameBlockEntityRenderer;
+import cn.blockforge.orient.framework.client.RenderFrame;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+
+/**
+ * 开口大木桶渲染器：按豆浆液量实时渲染桶内液面高度与着色、浮沉点卤物品与随压制进度下沉的 3D 木压板。
+ * 与 viewer/animations.js 中的 wooden_vat 场景一比一对应。
+ * 作者：mryt233
+ */
+public class WoodenVatRenderer extends FrameBlockEntityRenderer<WoodenVatBlockEntity> {
+    private static final Identifier TEX_LID = HotPot.id("block/wooden_vat_lid");
+    private static final Identifier TEX_WOOD = HotPot.id("block/wooden_vat_planks");
+    private static final Identifier TEX_HANDLE = HotPot.id("block/stone_mill_wood");
+    private static final Identifier TEX_SOYMILK = HotPot.id("block/soymilk_still");
+
+    public WoodenVatRenderer(BlockEntityRendererProvider.Context ctx) {
+    }
+
+    @Override
+    protected void extractFrame(WoodenVatBlockEntity be, float tickDelta, PoseStack matrices, RenderFrame consumers,
+                       int light, int overlay) {
+        float fill = be.fillFraction();
+        boolean hasOutput = !be.output().isEmpty();
+        float press = be.progressRatio(tickDelta);
+        float baseLidY = WoodenVatBlockEntity.lidBottomY(hasOutput, press);
+        boolean hasLiquid = ((!be.fluid().isEmpty() && be.fluidUses() > 0) || hasOutput) && fill > 0F;
+        float liquidY = WoodenVatBlockEntity.effectiveLiquidY(fill, be.hasLid(), hasOutput, press);
+
+        if (hasLiquid) {
+            TextureAtlasSprite liq = RenderSprites.sprite(TEX_SOYMILK);
+            int argb = be.color() | 0xFF000000;
+            VertexConsumer tvc = consumers.getBuffer(RenderTypes.entityCutout(TextureAtlas.LOCATION_BLOCKS));
+            RendererBoxes.topQuad(matrices, tvc, liq, light, 2.5F, liquidY, 2.5F, 13.5F, 13.5F, argb);
+        }
+
+        ItemStack shown = hasOutput ? be.output() : be.input();
+        if (!shown.isEmpty() && !be.hasLid()) {
+            double y = hasOutput
+                ? (hasLiquid ? (liquidY + 0.35) / 16.0 : 4.1 / 16.0)
+                : (hasLiquid ? (liquidY + 0.25) / 16.0 : 4.1 / 16.0);
+            matrices.pushPose();
+            matrices.translate(0.5, y, 0.5);
+            matrices.rotate(Axis.XP.rotationDegrees(90F));
+            matrices.scale(0.45F, 0.45F, 0.45F);
+            consumers.item(shown, ItemDisplayContext.FIXED, light,
+                OverlayTexture.NO_OVERLAY, matrices, be.getLevel(), 0);
+            matrices.popPose();
+        }
+
+        if (be.hasLid()) {
+            TextureAtlasSprite lidSprite = RenderSprites.sprite(TEX_LID);
+            TextureAtlasSprite woodSprite = RenderSprites.sprite(TEX_WOOD);
+            TextureAtlasSprite handleSprite = RenderSprites.sprite(TEX_HANDLE);
+            VertexConsumer vc = consumers.getBuffer(RenderTypes.entityCutout(TextureAtlas.LOCATION_BLOCKS));
+            matrices.pushPose();
+            matrices.translate(0.0, baseLidY / 16.0, 0.0);
+            RendererBoxes.modelBox(matrices, vc, lidSprite, light, 3.0F, 0.0F, 4.0F, 13.0F, 1.5F, 12.0F, 0xFFFFFFFF);
+            RendererBoxes.modelBox(matrices, vc, lidSprite, light, 4.0F, 0.0F, 3.0F, 12.0F, 1.5F, 4.0F, 0xFFFFFFFF);
+            RendererBoxes.modelBox(matrices, vc, lidSprite, light, 4.0F, 0.0F, 12.0F, 12.0F, 1.5F, 13.0F, 0xFFFFFFFF);
+            RendererBoxes.modelBox(matrices, vc, woodSprite, light, 3.5F, 1.5F, 4.75F, 12.5F, 2.5F, 6.25F, 0xFFFFFFFF);
+            RendererBoxes.modelBox(matrices, vc, woodSprite, light, 3.5F, 1.5F, 9.75F, 12.5F, 2.5F, 11.25F, 0xFFFFFFFF);
+            RendererBoxes.modelBox(matrices, vc, handleSprite, light, 7.25F, 2.5F, 4.9F, 8.75F, 3.5F, 6.1F, 0xFFFFFFFF);
+            RendererBoxes.modelBox(matrices, vc, handleSprite, light, 7.25F, 2.5F, 9.9F, 8.75F, 3.5F, 11.1F, 0xFFFFFFFF);
+            RendererBoxes.modelBox(matrices, vc, handleSprite, light, 7.0F, 3.5F, 4.75F, 9.0F, 4.5F, 11.25F, 0xFFFFFFFF);
+            matrices.popPose();
+        }
+    }
+}

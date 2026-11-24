@@ -2,16 +2,43 @@
 <!-- mryt233 改，2026-10-30：补齐 #30–#71 正式版记录；r130 单列开发版。 -->
 # Changelog
 
-This page is updated with each release, **newest first**. The Development Preview describes completed work that is not yet released. **Gameplay in this guide follows packaged 0.3.0-alpha.**
+This page is updated with each release, **newest first**. The Development Preview describes completed work that is not yet released. **Gameplay in this guide follows packaged 0.3.1-alpha.**
 
 :::tip
 **Maintenance note (players can skip this):** every game change gets a numbered entry in the unreleased section of `docs/移植同步清单.md`. The `<!--清单#N-->` markers in `preview.md` link to those entries. `python tools/build_tutorial.py` checks for omissions. At release time, move the preview into the release history and start a new preview.
 :::
 
-<!-- mryt233 改，2026-11-13：0.3.0-alpha 打包收口，开发版预览改名为 0.3.0-alpha，再开一段空的预览。 -->
+<!-- mryt233 改，2026-11-22：0.3.1-alpha 收口，开发版预览改名为 0.3.1-alpha，再开一段空的预览。 -->
 ## Development Preview {{dev}} {#unreleased}
 
-Content for the next cycle is in planning; **0.3.1** is planned to add interchangeable tabletop and base materials for hotpot tables.
+*No unreleased development entries yet (new changes after 0.3.1-alpha will appear here).*
+
+## 0.3.1-alpha{{since:0.3.1-alpha}} {#v031}
+
+Packaged on 2026-11-22 (checklist `#160–#183`). **Simultaneous 10-JAR release across 5 Minecraft version lines: 1.21.1 (Fabric, NeoForge), 1.20.1 (Fabric, Forge), 26.1.x (Fabric 26.1–26.1.2 / NeoForge 26.1.2), 26.2 (Fabric, NeoForge), and 26.3 (Fabric, NeoForge)** — every JAR bundles `orient_framework 0.2.2`. World chunks and player inventories seamlessly migrate the 40 legacy preset tables into universal hotpot tables, and deprecated dry-goods config keys clean up silently with zero warnings; because this update adds mode sync, datapack track sync, and full string IDs, clients and servers must both run `0.3.1-alpha`.
+
+### Gameplay modes, new ingredients & orchard crops
+
+- **One-click Simple / Full Mode preset & Custom Toggles**: added a top-level "Full Mode / Simple Mode" bar and collapsible "▸/▾ Custom Toggles" with 6 independent switches (Detailed Tofu Processing, Cold-Pot & Spice Penalties, Crops Replace Grass Drops, Real-Time Minigames, Prep Rack Material Swap, Collapse Secondary Guide Notes), `/orientshotpot mode [full|simple]`, and real-time S2C sync; recipes branch conditionally while all items remain registered without world corruption, and the in-game guidebook displays the current mode badge and folds blocks dynamically (see [FAQ](faq.html#config)).<!--清单#161-->
+- **Chicken feet & boneless chicken feet**: adult chickens can drop {{i:chicken_feet}}Raw Chicken Feet (cooked when killed by fire), sliceable on a cutting board or stonecutter into {{i:boneless_chicken_feet}}Raw Boneless Chicken Feet, featuring reworked golden-yellow 4-toed visuals, pot/furnace cooking, and configurable drop rates (see [Ingredients & Cutting](ingredients.html#chicken_feet)).<!--清单#162-->
+- **Standalone Orange Trees & pure vanilla Oak restoration**: added {{i:orange_log}}Orange Log, Stripped Log, Wood, 4-stage {{i:orange_leaves}}, and {{i:orange_sapling}} naturally generating in Forests/Orchards while vanilla Oak and Dark Oak leaves completely stop dropping oranges; trees adopt a compact `1` exposed trunk + `3×3×2` main crown (`+1` optional top leaf) reachable from the ground, azalea-style high-transparency {{i:orange_leaves}}orange leaves switching cleanly with Fast / Fancy graphics, gentle pass-through slowdown reduced to **1/5** of cobweb drag, and shader {{i:orange_sapling}}sapling & leaf wind waving (see [Ingredients & Cutting](ingredients.html#crops_trees)).<!--清单#163--><!--清单#180--><!--清单#181-->
+- **All 9 farmland crops & wild clusters implemented and harmonized to vanilla moss/olive palettes**: {{i:scallion}}, {{i:cilantro}}, {{i:soybean}}, {{i:garlic}}, {{i:tomato}}, {{i:chili_pepper}}, {{i:peanut}}, {{i:greens}}, and {{i:zhe_er_gen}} plant directly on farmland (8 stages dropping `2–4`, bonemeal supported) and spawn wild {{i:wild_scallion}} etc. in matching biomes with vanilla small-flower tags; all crops, wild plants, and {{i:orange_sapling}} were recolored for vanilla cohesion with clearer `stage 2 → stage 3` silhouettes, `loot.garnish.*` defaults down to 2% fallback (restored in Simple Mode), and Config gains a "Crops & Fruit Trees" group (see [Ingredients & Cutting](ingredients.html#crops_trees)).<!--清单#164--><!--清单#182-->
+
+### Traditional tofu processing (Stone Mill & Open Wooden Vat)
+
+- **Stone Mill ({{i:stone_mill}}) cobblestone rework, 1.5-block stand & auto-pour**: rebuilt using vanilla cobblestone, chamfered pixel-aligned upper stone, fixed shader top/side brightness parity, and a ~`1.5`-block wooden stand placing the spout flush with {{i:wooden_vat}}'s rim; loading `2×`{{i:soybean}} + water and turning 4 times yields {{i:soymilk_bucket}} (restyled vanilla iron bucket), automatically pouring directly over the rim into an adjacent empty wooden vat (standalone mills retain broth in the trough for bucket pickup, and emptying an adjacent vat triggers auto-pour); also dry-grinds crushed peanuts, chopped millet chili, and garlic paste, fixing final-turn disconnect packet errors (see [Ingredients & Cutting](ingredients.html#tofu)).<!--清单#165--><!--清单#176--><!--清单#177--><!--清单#179-->
+- **Open Wooden Vat ({{i:wooden_vat}}) & 3D Wooden Press Lid tofu pressing**: focuses solely on coagulating {{i:soymilk_bucket}} + {{i:brine_bottle}} under a chamfered 3D {{i:wooden_press_lid}} whose handle and liquid surface descend smoothly together without clipping into `2×`{{i:cold_tofu}}; removed dry-goods soaking (dried kelp, tofu skin, wide noodles, and sweet potato skin enter the hotpot directly), Simple Mode restores crafting-grid tofu, and legacy `soaked_*` / `dry_goods_soaking` config keys prune silently on load (see [Ingredients & Cutting](ingredients.html#tofu)).<!--清单#166--><!--清单#178--><!--清单#183-->
+
+### Universal swappable tables, three prep racks & minigames
+
+- **Hotpot Tables 40→2 consolidation, per-part swapping & lossless migration**: consolidated 40 legacy tables into {{i:hotpot_table}} and {{i:tall_hotpot_table}} (uniformly non-flammable) supporting lossless 1-in-1-out per-part swapping with any solid block (sneak + empty hand ejects), sealed 3×3/corner masonry, material-matched breaking particles and Sodium/Iris compatibility, plus automatic world/inventory migration (see [Tables, Prep Racks & Seating](tables.html)).<!--清单#167--><!--清单#171--><!--清单#176-->
+- **3 GUI-less material-swappable prep racks ({{i:multi_tier_prep_rack}} / {{i:desktop_prep_rack}} / {{i:hanging_prep_rack}})**: floor rack (6 slots), desktop rack (4 slots matching low/tall tabletop heights), and auto wall/ceiling hanging rack (4 hooks for kitchenware and all 3 cloth aprons), with slot-targeted click placement/pickup, material swapping, and Jade support (see [Tables, Prep Racks & Seating](tables.html#prep_racks)).<!--清单#168-->
+- **Real-time minigames: Speed Eating & 4-Track Rhythm Battle**: launch from the hotpot screen "Eat Challenge" button or `[G]` key for solo runs or `15s` tablemate duels (devouring cooked pot food or switching to Virtual Practice Platter), featuring server-side `max_cps` anti-macro limits, `D/F/J/K` 4-track falling notes with datapack `hotpot_tracks/*.json` hot-reloading (3 built-in tracks), advancements ("Hotpot Speed Eater", "Rhythm of the Broth", "Grand Table Feast"), and 10 `minigame` settings (see [Stoves & Hotpots](hotpot.html#minigames)).<!--清单#169-->
+
+### LabPBR shader maps, recipe viewer & visual polish fixes
+
+- **`LabPBR 1.3` shader maps for hard surfaces & tableware (`74` base texture sets)**: added `_n` normal and `_s` specular/metallic/SSS/emission maps for copper/iron pots, stoves, stone mill, wooden vat, table/rack materials, broths, drinks, porcelain/glass vessels, cleavers, and sauces while omitting flat food items for compact VRAM/size (see [FAQ](faq.html)).<!--清单#170-->
+- **REI 16, Sodium/Iris & stove/plate polish fixes**: aligned Fabric & NeoForge **REI 16** `compatApi` signatures for all 5 recipe categories and Sauce Station exclusion zones; improved tall-stove brick fallback targeting, sauce station batched rendering, Creative subtab dodging (incl. Axiom), stove uniform outer brick shading matching vanilla bricks, pot-height break particles & dropped items, tall-stove upper hitbox sync, steady non-drifting pot/broth boiling phase, and z-fighting-free plate/bowl food layering (see [Stoves & Hotpots](hotpot.html), [Tableware & Drinks](tableware.html#plate)).<!--清单#160--><!--清单#172--><!--清单#173--><!--清单#174--><!--清单#175--><!--清单#183-->
 
 ## 0.3.0-alpha{{since:0.3.0-alpha}} {#v030}
 
@@ -207,9 +234,7 @@ Released on 2026-10-29. **0.1.4-alpha currently covers 1.21.1 Fabric only**; 1.2
 
 {{icons:smooth_stone_hotpot_table,polished_granite_hotpot_table,polished_deepslate_hotpot_table,quartz_hotpot_table,cut_copper_hotpot_table,iron_hotpot_table}}
 
-9 tabletop materials: smooth stone, four polished stone types, polished blackstone, quartz, cut copper, and iron. Low and tall variants make 18 tables.<!--清单#51-->
-
-{{recipe:smooth_stone_hotpot_table}}
+9 tabletop materials: smooth stone, four polished stone types, polished blackstone, quartz, cut copper, and iron. Low and tall variants make 18 tables. (As of 0.3.1-alpha, all 40 legacy preset tables have been smoothly migrated and consolidated into the unified hotpot table and free material-swapping architecture.)<!--清单#51-->
 
 ## The in-game Hotpot Guide {#guide}
 

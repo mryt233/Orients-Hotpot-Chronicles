@@ -10,13 +10,14 @@ import net.minecraft.network.chat.Component;
  * <p>
  * 本文件是本工程「编译期签名」的一部分：只在编译时提供与官方二进制一致的包名 / 类名 / 方法描述符，
  * 让插件源码可以零联网编译；成品 jar 会排除整个 {@code me/shedaniel} 目录，运行时用的是玩家真正安装的那份。
+ * mryt233 改（2026-11-22）：对齐 REI 12 {@code createRecipeBase} 返回类型 Panel。
  * 作者：mryt233 */
 
 public final class Widgets {
     private Widgets() {
     }
 
-    public static Widget createRecipeBase(Rectangle bounds) {
+    public static Panel createRecipeBase(Rectangle bounds) {
         return null;
     }
 

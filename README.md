@@ -8,7 +8,7 @@
 
 Have a hotpot dinner in Minecraft: build a stove, seat a pot on it, pour in a broth, light the fire, prep your ingredients, cook them and eat them with chopsticks and dipping sauce.
 
-0.3.0-alpha：Minecraft 26.2 · 26.1.x · 1.21.1 · 1.20.1（Fabric / NeoForge / Forge）· 作者 / Author：蘧白川 / Orient（GitHub：[@mryt233](https://github.com/mryt233)）
+0.3.1-alpha：Minecraft 26.3 · 26.2 · 26.1.x · 1.21.1 · 1.20.1（Fabric / NeoForge / Forge）· 作者 / Author：蘧白川 / Orient（GitHub：[@mryt233](https://github.com/mryt233)）
 
 <p>
   <a href="LICENSE"><img src="https://img.shields.io/badge/Code-MIT-2ea44f?style=flat-square" alt="Source code license: MIT"></a>
@@ -17,16 +17,16 @@ Have a hotpot dinner in Minecraft: build a stove, seat a pot on it, pour in a br
 
 <p><sub>源代码 / Source code：<a href="LICENSE">MIT</a> · 原创贴图、模型、音效等 / Original creative assets：<a href="ASSETS_LICENSE">CC BY-NC-SA 4.0</a></sub></p>
 
-[简中书本教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/?lang=zh_cn&v=book-20261115-944bbb50) / [繁中書本教學](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-tw/?lang=zh_tw&v=book-20261115-944bbb50) / [English Book Guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/?lang=en&v=book-20261115-944bbb50) · [下载测试版 · Download Alpha](#downloads) · [更新日志 · Changelog](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) · [反馈问题 · Report an Issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
+[简中书本教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/?lang=zh_cn&v=book-20261124-7090a403) / [繁中書本教學](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-tw/?lang=zh_tw&v=book-20261124-7090a403) / [English Book Guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/?lang=en&v=book-20261124-7090a403) · [下载测试版 · Download Alpha](#downloads) · [更新日志 · Changelog](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) · [反馈问题 · Report an Issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
 
 </div>
 
 ![一桌火锅 · A full hotpot table](docs/images/full-table.jpg)
 
 > [!WARNING]
-> **测试版（alpha）**：升级前请先备份存档。这一版将汤底与蘸料存档升级为完整字符串 ID，可自动兼容升级 `0.2.2-alpha` 旧存档与旧配置；**多人联机时客户端和服务端必须使用同版本 `0.3.0-alpha`（不可与旧版混连）**。
+> **测试版（alpha）**：升级前请先备份存档。旧预设火锅桌会迁移并保留原材质，旧泡发配置键会自动清理。**联机时客户端和服务端必须都用 `0.3.1-alpha`，不要和旧版混连。**
 >
-> **Alpha**: back up your saves before updating. Broth and seasoning save data now uses full string IDs and automatically upgrades `0.2.2-alpha` saves and configs. **In multiplayer, both client and server must run `0.3.0-alpha` (older versions cannot mix).**
+> **Alpha**: back up your saves before updating. Legacy hotpot tables migrate with their materials intact, and obsolete soaking options are removed from the config. **Use `0.3.1-alpha` on both client and server; do not mix mod versions.**
 
 <a id="downloads"></a>
 
@@ -34,31 +34,48 @@ Have a hotpot dinner in Minecraft: build a stove, seat a pot on it, pour in a br
 
 请按 Minecraft 版本和加载器下载对应文件，客户端和服务端都要装。 / Choose the file matching your Minecraft version and loader, and install it on both client and server.
 
-| Minecraft | 加载器 / Loader | 要求 / Requirements | 模组版本 / Mod version | 下载 / Download |
+| Minecraft | 加载器 / Loader | 最低要求 / Minimum requirements | 模组版本 / Mod version | 下载 / Download |
 | --- | --- | --- | --- | --- |
-| 1.21.1 | Fabric | Fabric Loader 0.15.11+、[Fabric API](https://modrinth.com/mod/fabric-api)、Java 21 | 0.3.0-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.3.0-alpha) |
-| 1.21.1 | NeoForge | NeoForge 21.1.186+、Java 21 | 0.3.0-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.3.0-alpha) |
-| 26.2 | Fabric | Fabric Loader 0.18.4+、[Fabric API](https://modrinth.com/mod/fabric-api) 0.148.3+、Java 25 | 0.3.0-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.3.0-alpha) |
-| 26.2 | NeoForge | NeoForge 26.2.0.57+、Java 25 | 0.3.0-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.3.0-alpha) |
-| 26.1 / 26.1.1 / 26.1.2 | Fabric | Fabric Loader 0.18.4+、[Fabric API](https://modrinth.com/mod/fabric-api) 0.143.12+、Java 25 | 0.3.0-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.3.0-alpha) |
-| 26.1.2 | NeoForge | NeoForge 26.1.2.71+、Java 25（仅 26.1.2 / 26.1.2 only） | 0.3.0-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.3.0-alpha) |
-| 1.20.1 | Fabric | Fabric Loader 0.14.21+、[Fabric API](https://modrinth.com/mod/fabric-api) 0.83.0+、Java 17 | 0.3.0-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.3.0-alpha) |
-| 1.20.1 | Forge | Forge 47.0.0+、Java 17 | 0.3.0-alpha | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.3.0-alpha) |
-| 1.20.4 | Fabric | Fabric Loader 0.15.11+、Fabric API、Java 17 | 0.1.1-alpha（旧移植版，已停止维护 / legacy, discontinued） | [下载 / Download](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) |
+| 1.21.1（主版本 / main） | Fabric | Fabric Loader 0.15.11+、同版 [Fabric API](https://modrinth.com/mod/fabric-api)（最低实测 0.101.2+1.21.1 / lowest tested）、Java 21+ | 0.3.1-alpha | [发布页 / Release][release-031] |
+| 1.21.1（主版本 / main） | NeoForge | NeoForge 21.1.186+、Java 21+ | 0.3.1-alpha | [发布页 / Release][release-031] |
+| 26.3 | Fabric | Fabric Loader 0.19.5+、[Fabric API](https://modrinth.com/mod/fabric-api) 0.160.3+（MC 26.3）、Java 25+ | 0.3.1-alpha | [发布页 / Release][release-031] |
+| 26.3 | NeoForge | NeoForge 26.3.0.76+、Java 25+ | 0.3.1-alpha | [发布页 / Release][release-031] |
+| 26.2 | Fabric | Fabric Loader 0.19.5+、[Fabric API](https://modrinth.com/mod/fabric-api) 0.152.0+（MC 26.2）、Java 25+ | 0.3.1-alpha | [发布页 / Release][release-031] |
+| 26.2 | NeoForge | NeoForge 26.2.0.57+、Java 25+ | 0.3.1-alpha | [发布页 / Release][release-031] |
+| 26.1 / 26.1.1 / 26.1.2 | Fabric | Fabric Loader 0.19.5+、对应小版本的 [Fabric API](https://modrinth.com/mod/fabric-api) 0.145.0+、Java 25+ | 0.3.1-alpha | [发布页 / Release][release-031] |
+| 26.1.2 | NeoForge | NeoForge 26.1.2.71+、Java 25+（仅 26.1.2 / 26.1.2 only） | 0.3.1-alpha | [发布页 / Release][release-031] |
+| 1.20.1 | Fabric | Fabric Loader 0.14.21+、[Fabric API](https://modrinth.com/mod/fabric-api) 0.89.0+（MC 1.20.1）、Java 17+ | 0.3.1-alpha | [发布页 / Release][release-031] |
+| 1.20.1 | Forge | Forge 47.0.0+、Java 17+ | 0.3.1-alpha | [发布页 / Release][release-031] |
 
-0.3.0-alpha 同时提供 **Minecraft 1.21.1、26.2、26.1.x、1.20.1** 的版本。每个 Minecraft 版本和加载器下载对应的**单个 JAR**，已内嵌 **orient_framework 0.2.0**，直接放入客户端和服务端的 `mods` 文件夹，无需另装前置；Fabric 仍需安装同版本的 Fabric API。所有文件集中在[同一个发布页](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.3.0-alpha)。
+[release-031]: https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.3.1-alpha
 
-0.3.0-alpha is available for **Minecraft 1.21.1, 26.2, 26.1.x and 1.20.1** at the same time. Download the **single JAR** for your Minecraft version and loader; **orient_framework 0.2.0 is bundled**. Put it directly in `mods` on both client and server; no separate framework download is needed. Fabric still requires Fabric API for the same Minecraft version. All files share [one release page](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.3.0-alpha).
+五条 Minecraft 版本线共十个安装包，集中在[同一个发布页][release-031]。按版本和加载器选**一个 JAR** 放入客户端和服务端的 `mods`。每包已内嵌 **orient_framework 0.2.2**，不另装框架；Fabric 仍需同 Minecraft 版本的 Fabric API。
 
-**旧移植版已停止维护**：1.20.4 Fabric 停在 0.1.1-alpha；旧的单加载器 1.20.1（0.1.4-alpha）和 1.21.1 NeoForge（0.1.4-alpha）移植版已由上表的 0.3.0-alpha 取代。旧下载链接保留，不再提供更新或修复。
+All ten builds for the five Minecraft version lines share [one release page][release-031]. Put the **single JAR** matching your Minecraft version and loader into `mods` on both client and server. Each bundles **orient_framework 0.2.2**; Fabric still needs Fabric API for the same Minecraft version.
 
-**Legacy ports are discontinued**: 1.20.4 Fabric stays at 0.1.1-alpha; the old single-loader 1.20.1 (0.1.4-alpha) and 1.21.1 NeoForge (0.1.4-alpha) ports are replaced by the 0.3.0-alpha builds above. Old download links remain available, but receive no further updates or fixes.
+**已停止维护**：[1.20.4 Fabric 0.1.1-alpha](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) 和旧的 1.20.1／1.21.1 NeoForge 单加载器移植（`0.1.4-alpha`）。保留旧下载，不再更新。
 
-> 1.21.1 是主版本，各版本已完成编译、单元测试、双端服务端重启持久化和客户端冒烟；1.20.1 已实测最低声明加载器。REI 与 NeoForge 版 JEI / Jade 仅核对编译与接口，多真人长时联机及更多模组组合仍待测试。
+**Discontinued**: [1.20.4 Fabric 0.1.1-alpha](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.1.1-alpha-mc1.20.4-fabric) and the old standalone 1.20.1 / 1.21.1 NeoForge ports (`0.1.4-alpha`). Legacy downloads remain available but no longer receive updates.
+
+> 五条版本线均通过单测、独立服两启与存档持久化、静音单人冒烟。Fabric 最低组合实测了独立服和流畅客户端；Forge 系最低档通过官方运行库静态核验及独立服，未启动最低客户端。未测光影、REI／JEI／Jade／Axiom 实机联动及多真人长时间联机。
 >
-> 1.21.1 is the main build. All versions passed compilation, unit tests, server restart persistence and client smoke tests; minimum declared loaders were tested on 1.20.1. REI and NeoForge JEI / Jade received compilation and interface checks only; extended multiplayer and wider mod compatibility remain untested.
+> All five version lines passed unit tests, dedicated-server restart and save persistence checks, and muted single-player smoke runs. Minimum Fabric configurations were run on dedicated servers and Fast clients. Minimum Forge/NeoForge configurations were checked against official libraries and run on dedicated servers, but not started as clients. Shaders, live REI/JEI/Jade/Axiom integration, and extended multiplayer with several real players were not tested.
 
 [移植版源码与说明 · Port sources and notes](version-ports/README.md)
+
+## 0.3.1-alpha 更新 · What's new
+
+- **完整／精简模式**：设置中可切换预设并修改细项，指南随当前模式更新。
+- **食材与种植**：新增生熟鸡爪和无骨鸡爪、独立橙树、9 种作物及对应野植；橡树不再掉橙子。
+- **豆腐与家具**：小石磨可直接向相邻空大木桶流浆，点卤加木压板可压出两块冷豆腐。40 种旧桌归为两种通用桌，桌面和底座可各自换材质；新增三种备菜架，桌架均不可燃。干货无需泡发。
+- **小游戏与画面**：新增快手抢吃、四轨音游及三首数据包曲目。改善锅内动画、橙叶画质、调料台和拆锅粒子，新增 71 组 LabPBR 材质贴图。
+
+- **Full and Simple modes**: switch presets or customize individual options. The in-game guide updates with the active mode.
+- **Ingredients and growing**: raw and cooked chicken feet and boneless chicken feet, a dedicated orange tree, and nine crops with wild counterparts. Oak leaves no longer drop oranges.
+- **Tofu and furniture**: the stone mill drains into a neighboring empty wooden vat; add coagulant and a wooden press lid to make two cold tofu. Two base tables replace 40 old presets, with independently swappable tops and bases. Three new prep racks join the fireproof tables. Dried ingredients no longer need soaking.
+- **Minigames and visuals**: a fast-eating challenge and a four-lane rhythm game with three data-pack tracks. Improved pot animations, orange leaves, sauce stations and break particles, plus 71 LabPBR material sets.
+
+[完整发布说明 / Full release notes][release-031]
 
 ## 0.3.0-alpha 更新 · What's new
 
@@ -301,23 +318,21 @@ Changes since 0.1.3-alpha-hotfix1: shrimp, Orient Cola, glass cups, Tomato and T
 
 ## 版本支持 · Compatibility
 
-| 项目 · Item | 要求 · Required | 0.2.1-alpha 测试过的版本 · Tested with 0.2.1-alpha |
+运行下限见[下载表](#downloads)。下表记录最终安装包实际验证的加载器组合，不代表之间的所有版本均逐一测试。 / See the [download table](#downloads) for minimum requirements. The table below lists tested combinations, not every intermediate release.
+
+| Minecraft | Fabric Loader + Fabric API（最低 / 较新） | Forge / NeoForge（最低 / 较新） |
 | --- | --- | --- |
-| Minecraft / 加载器 · Loader | 按上方下载表选择对应文件 · choose the matching file above | Fabric 26.2 / 26.1.x / 1.21.1 / 1.20.1；NeoForge 26.2 / 26.1.2 / 1.21.1；Forge 1.20.1 |
-| Fabric Loader（仅 Fabric） | 26.2 / 26.1.x：**0.18.4+**；1.21.1：**0.15.11+**；1.20.1：**0.14.21+** | 0.18.4 / 0.15.11 / 0.14.21 / 0.20.1 |
-| Fabric API（仅 Fabric） | 对应 Minecraft 版本 · match your Minecraft version：26.2 **0.148.3+**；26.1.x **0.143.12+**；1.20.1 **0.83.0+** | 0.148.3 / 0.161.0（26.2）；0.143.12 / 0.155.3（26.1.x）；0.116.14（1.21.1）；0.83.0 / 0.92.12（1.20.1） |
-| Forge（仅 1.20.1） | **47.0.0+** | **47.0.0 / 47.4.28** |
-| NeoForge | 26.2：**26.2.0.57+**；26.1.2：**26.1.2.71+**；1.21.1：**21.1.186+** | 26.2.0.57 / 26.2.0.93；26.1.2.71 / 26.1.2.126；21.1.186 / 21.1.265 |
-| Java | Minecraft 26.x：**25+**；1.21.1：**21+**；1.20.1：**17+** | 25 / 21 / 17 |
-| 安装位置 · Side | **客户端和服务端都要装 · both client and server** | — |
+| 1.21.1 | `0.15.11` + `0.101.2+1.21.1` / `0.19.3` + `0.116.14+1.21.1` | NeoForge `21.1.186` / `21.1.265` |
+| 1.20.1 | `0.14.21` + `0.89.0+1.20.1` / `0.20.1` + `0.92.12+1.20.1` | Forge `47.0.0` / `47.4.28` |
+| 26.1.x | MC `26.1`：`0.19.5` + `0.145.0+26.1` / MC `26.1.2`：`0.20.1` + `0.155.3+26.1.2` | 仅 MC `26.1.2` / only: NeoForge `26.1.2.71` / `26.1.2.126` |
+| 26.2 | `0.19.5` + `0.152.0+26.2` / `0.20.1` + `0.161.0+26.2` | NeoForge `26.2.0.57` / `26.2.0.93` |
+| 26.3 | `0.19.5` + `0.160.3+26.3` / `0.20.1` + `0.167.0+26.3` | NeoForge `26.3.0.76` / `26.3.0.117` |
 
-Forge / NeoForge 版不需要 Fabric API。26.1 的 NeoForge 版只支持 Minecraft 26.1.2。
+Forge 系第一档为独立服实测及接口核验，第二档为双端实测。 / For Forge and NeoForge, the first version was run on a dedicated server and checked statically; the second was run on both sides.
 
-The Forge / NeoForge builds do not require Fabric API. The 26.1 NeoForge build supports Minecraft 26.1.2 only.
+**各版本的小差异**：1.20.1 的锅热气用原版烟粒子调色；界面背景、配方书、创造栏翻页按各 Minecraft 版本的原版样子显示。26.3 适配 SDL 键鼠输入和新版世界生成格式。
 
-**各版本的小差异**：0.2.2-alpha 的各个版本玩法、数值、配方一致；1.20.4 旧移植版停留在历史版本，不包含这些内容。1.20.1 没有白烟粒子，锅里的热气用原版烟粒子调成同样的颜色；界面背景、配方书、创造栏翻页按各 Minecraft 版本的原版样子显示。Forge / NeoForge 版在数据包整个替换了牛、哞菇或草的掉落时，仍会多掉毛肚、牛脊肉、小葱、香菜、黄豆。
-
-**Differences between builds**: all 0.2.2-alpha builds share gameplay, values and recipes. The legacy 1.20.4 port remains on an older version and does not include these additions. 1.20.1 has no white smoke particle, so pot steam uses the vanilla smoke particle tinted to the same color. Screens use each Minecraft version's own vanilla look (backgrounds, recipe book, creative-tab paging). On Forge / NeoForge, tripe, beef loin, scallions, cilantro and soybeans are still added even if a data pack replaces the cow, mooshroom or grass loot tables.
+**Differences between builds**: 1.20.1 uses a tinted vanilla smoke particle for pot steam. Screens follow each Minecraft version's vanilla layout. The 26.3 build uses SDL input and the updated world generation format.
 
 ### 和其他模组的兼容性 · Compatibility with other mods
 
@@ -337,10 +352,10 @@ The Forge / NeoForge builds do not require Fabric API. The 26.1 NeoForge build s
 
 ### Forge / NeoForge
 
-1. Minecraft **1.20.1** 使用 [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.0.0+**；Minecraft **1.21.1** 使用 [NeoForge](https://neoforged.net/) **21.1.186+**，**26.1.2** 使用 **26.1.2.71+**，**26.2** 使用 **26.2.0.57+**。
-2. 从[下载表](#downloads)选择匹配加载器与 MC 版本的 JAR，放入客户端和服务端的 `mods` 文件夹。**这两版不需要 Fabric API。**
+1. Minecraft **1.20.1** 使用 [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.0.0+**；Minecraft **1.21.1** 使用 [NeoForge](https://neoforged.net/) **21.1.186+**，**26.1.2** 使用 **26.1.2.71+**，**26.2** 使用 **26.2.0.57+**，**26.3** 使用 **26.3.0.76+**。
+2. 从[下载表](#downloads)选择匹配加载器与 MC 版本的 JAR，放入客户端和服务端的 `mods` 文件夹。**Forge 和 NeoForge 版不需要 Fabric API。**
 
-1. Use [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.0.0+** for Minecraft **1.20.1**, or [NeoForge](https://neoforged.net/) **21.1.186+** for **1.21.1**, **26.1.2.71+** for **26.1.2**, or **26.2.0.57+** for **26.2**.
+1. Use [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) **47.0.0+** for Minecraft **1.20.1**, or [NeoForge](https://neoforged.net/) **21.1.186+** for **1.21.1**, **26.1.2.71+** for **26.1.2**, **26.2.0.57+** for **26.2**, or **26.3.0.76+** for **26.3**.
 2. Select the matching JAR from the [download table](#downloads) and put it in the `mods` folder on both client and server. **These builds do not require Fabric API.**
 
 Minecraft **26.x 使用 Java 25+**，**1.21.1 使用 Java 21+**，**1.20.1 使用 Java 17+**。
@@ -349,7 +364,7 @@ Use **Java 25+ for Minecraft 26.x**, **Java 21+ for 1.21.1**, or **Java 17+ for 
 
 ## 怎么玩 · How to play
 
-更详细的图文说明见[简中书本教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/?lang=zh_cn&v=book-20261115-944bbb50)。 / See the [online book guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/?lang=en&v=book-20261115-944bbb50) for more pictures and details.
+更详细的图文说明见[简中书本教程](https://mryt233.github.io/Orients-Hotpot-Chronicles/zh-cn/?lang=zh_cn&v=book-20261124-7090a403)。 / See the [online book guide](https://mryt233.github.io/Orients-Hotpot-Chronicles/en/?lang=en&v=book-20261124-7090a403) for more pictures and details.
 
 <details>
 <summary><b>展开中文玩法</b></summary>

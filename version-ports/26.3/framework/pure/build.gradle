@@ -1,0 +1,19 @@
+// framework:pure —— 零 Minecraft、零加载器的公共逻辑（作者：mryt233，2026-10-30，P1 第一批）。
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    // 配置内核用 Gson；MC 运行时自带同库，这里只为独立编译
+    compileOnly 'com.google.code.gson:gson:2.10.1'
+
+    // mryt233 改：W8，纯配置测试独立于游戏运行时。
+    testImplementation platform('org.junit:junit-bom:5.10.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'com.google.code.gson:gson:2.10.1'
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "ingredient": "orients_hotpot_chronicles:ham_sausage_slice",
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_ham_sausage_slice"
+  },
+  "experience": 0.35,
+  "cookingtime": 300
+}

@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:glass_bottle",
+    "orients_hotpot_chronicles:orange",
+    "orients_hotpot_chronicles:orange",
+    "orients_hotpot_chronicles:orange",
+    "minecraft:sugar"
+  ],
+  "result": {
+    "id": "orients_hotpot_chronicles:orange_drink",
+    "count": 1
+  }
+}

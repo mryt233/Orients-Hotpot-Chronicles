@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "BlockStateTableDecorMixin",
+    "BlockDropInvoker",
     "BowlItemMixin",
     "EntityRaycastMixin",
     "LivingEntityEatMixin",
@@ -13,6 +14,7 @@
   ],
   "client": [
     "ClientPlayerInteractionManagerMixin",
+    "ParticleEnginePartMixin",
     "CreativeInventoryScreenAccessor",
     "CreativeInventoryScreenMixin",
     "SplashManagerMixin"

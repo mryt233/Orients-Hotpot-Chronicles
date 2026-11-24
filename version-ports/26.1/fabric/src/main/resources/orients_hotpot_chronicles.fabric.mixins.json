@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "cn.blockforge.generated.orientshotpotchronicles.fabric.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "SyncedBlockEntityRenderDataMixin"
+  ],
+  "client": [
+    "ParticleEnginePartMixin",
+    "TerrainParticleMaterialMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

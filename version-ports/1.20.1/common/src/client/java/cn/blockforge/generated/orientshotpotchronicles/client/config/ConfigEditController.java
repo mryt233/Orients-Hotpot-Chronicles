@@ -27,6 +27,9 @@ public final class ConfigEditController {
     }
 
     public void startEdit(Font font, Field f, int x, int y, int w, int h) {
+        if (!f.isNumeric()) {
+            return;
+        }
         commitEdit();
         editField = f;
         editX = x;

@@ -1,0 +1,174 @@
+{
+  "title": {
+    "translate": "track.orients_hotpot_chronicles.midnight_boil"
+  },
+  "author": "mryt233",
+  "bpm": 112,
+  "lead_in_ms": 1500,
+  "duration_ms": 15500,
+  "difficulty": "easy",
+  "notes": [
+    {
+      "beat": 0.0,
+      "lane": 0,
+      "sound": "boil",
+      "pitch": 1.0
+    },
+    {
+      "beat": 1.0,
+      "lane": 1,
+      "sound": "note_harp",
+      "pitch": 1.0
+    },
+    {
+      "beat": 2.0,
+      "lane": 2,
+      "sound": "note_harp",
+      "pitch": 1.122
+    },
+    {
+      "beat": 3.0,
+      "lane": 3,
+      "sound": "note_harp",
+      "pitch": 1.26
+    },
+    {
+      "beat": 4.0,
+      "lane": 2,
+      "sound": "chopsticks",
+      "pitch": 1.0
+    },
+    {
+      "beat": 5.0,
+      "lane": 1,
+      "sound": "note_harp",
+      "pitch": 1.498
+    },
+    {
+      "beat": 6.0,
+      "lane": 0,
+      "sound": "note_harp",
+      "pitch": 1.26
+    },
+    {
+      "beat": 7.0,
+      "lane": 1,
+      "sound": "boil",
+      "pitch": 1.1
+    },
+    {
+      "beat": 8.0,
+      "lane": 0,
+      "sound": "note_harp",
+      "pitch": 1.0
+    },
+    {
+      "beat": 9.0,
+      "lane": 1,
+      "sound": "note_harp",
+      "pitch": 1.122
+    },
+    {
+      "beat": 10.0,
+      "lane": 2,
+      "sound": "note_harp",
+      "pitch": 1.26
+    },
+    {
+      "beat": 11.0,
+      "lane": 3,
+      "sound": "chopsticks",
+      "pitch": 1.1
+    },
+    {
+      "beat": 12.0,
+      "lane": 2,
+      "sound": "note_chime",
+      "pitch": 1.498
+    },
+    {
+      "beat": 12.5,
+      "lane": 1,
+      "sound": "note_harp",
+      "pitch": 1.26
+    },
+    {
+      "beat": 13.0,
+      "lane": 0,
+      "sound": "note_harp",
+      "pitch": 1.0
+    },
+    {
+      "beat": 14.0,
+      "lane": 3,
+      "sound": "note_bell",
+      "pitch": 1.682
+    },
+    {
+      "beat": 15.0,
+      "lane": 2,
+      "sound": "chopsticks",
+      "pitch": 1.05
+    },
+    {
+      "beat": 16.0,
+      "lane": 1,
+      "sound": "note_harp",
+      "pitch": 1.498
+    },
+    {
+      "beat": 17.0,
+      "lane": 0,
+      "sound": "note_harp",
+      "pitch": 1.26
+    },
+    {
+      "beat": 18.0,
+      "lane": 1,
+      "sound": "note_harp",
+      "pitch": 1.122
+    },
+    {
+      "beat": 19.0,
+      "lane": 2,
+      "sound": "boil",
+      "pitch": 1.0
+    },
+    {
+      "beat": 20.0,
+      "lane": 3,
+      "sound": "note_chime",
+      "pitch": 1.498
+    },
+    {
+      "beat": 21.0,
+      "lane": 2,
+      "sound": "note_harp",
+      "pitch": 1.26
+    },
+    {
+      "beat": 22.0,
+      "lane": 1,
+      "sound": "note_harp",
+      "pitch": 1.122
+    },
+    {
+      "beat": 23.0,
+      "lane": 0,
+      "sound": "note_bell",
+      "pitch": 1.0
+    },
+    {
+      "beat": 24.0,
+      "lane": 0,
+      "sound": "note_chime",
+      "pitch": 1.498
+    },
+    {
+      "beat": 24.0,
+      "lane": 3,
+      "sound": "note_bell",
+      "pitch": 2.0
+    }
+  ]
+}

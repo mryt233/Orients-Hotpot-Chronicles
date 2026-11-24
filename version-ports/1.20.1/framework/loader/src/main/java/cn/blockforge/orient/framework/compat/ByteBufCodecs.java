@@ -8,6 +8,8 @@ import java.util.function.Function;
 
 /** 原版 VarInt 和有界 UTF-8 字符串的等价编码。作者：mryt233 */
 public final class ByteBufCodecs {
+    public static final StreamCodec<ByteBuf, Boolean> BOOL = StreamCodec.of(
+        (b, v) -> new FriendlyByteBuf(b).writeBoolean(v), b -> new FriendlyByteBuf(b).readBoolean());
     public static final StreamCodec<ByteBuf, Integer> VAR_INT = StreamCodec.of(
         (b, v) -> new FriendlyByteBuf(b).writeVarInt(v), b -> new FriendlyByteBuf(b).readVarInt());
     public static final StreamCodec<ByteBuf, String> STRING_UTF8 = stringUtf8(32767);

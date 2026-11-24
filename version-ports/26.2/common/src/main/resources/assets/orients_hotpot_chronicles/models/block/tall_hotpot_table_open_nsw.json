@@ -1,0 +1,140 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "orients_hotpot_chronicles:block/mat_slot_top_cap",
+    "top_cap": "orients_hotpot_chronicles:block/mat_slot_top_cap",
+    "top_side": "orients_hotpot_chronicles:block/mat_slot_top_side",
+    "base_cap": "orients_hotpot_chronicles:block/mat_slot_base_cap",
+    "base_side": "orients_hotpot_chronicles:block/mat_slot_base_side",
+    "tall_ring": "orients_hotpot_chronicles:block/mat_slot_tall_ring"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        19.0,
+        0
+      ],
+      "to": [
+        16,
+        23.0,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#top_side",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "east": {
+          "texture": "#top_side",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "south": {
+          "texture": "#top_side",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "west": {
+          "texture": "#top_side",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "up": {
+          "texture": "#top_cap",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#top_cap",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        16,
+        0
+      ],
+      "to": [
+        12,
+        19.0,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#tall_ring",
+          "uv": [
+            4,
+            13,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#tall_ring",
+          "uv": [
+            0,
+            13,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#tall_ring",
+          "uv": [
+            0,
+            13,
+            12,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#tall_ring",
+          "uv": [
+            0,
+            13,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#tall_ring",
+          "uv": [
+            0,
+            0,
+            12,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

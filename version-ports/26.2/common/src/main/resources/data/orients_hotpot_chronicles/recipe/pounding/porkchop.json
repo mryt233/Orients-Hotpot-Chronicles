@@ -10,7 +10,9 @@
     "id": "orients_hotpot_chronicles:pounded_meat",
     "components": {
       "minecraft:custom_model_data": {
-        "floats": [3]
+        "floats": [
+          3
+        ]
       }
     }
   },
@@ -18,7 +20,9 @@
     "id": "orients_hotpot_chronicles:pounded_meat",
     "components": {
       "minecraft:custom_model_data": {
-        "floats": [4]
+        "floats": [
+          4
+        ]
       }
     }
   }

@@ -1,0 +1,10 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#orients_hotpot_chronicles:has_wild_warm_crops",
+  "features": [
+    "orients_hotpot_chronicles:wild_tomato",
+    "orients_hotpot_chronicles:wild_chili_pepper",
+    "orients_hotpot_chronicles:wild_peanut"
+  ],
+  "step": "vegetal_decoration"
+}

@@ -1,0 +1,10 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/sauce_station_empty",
+  "textures": {
+    "side": "minecraft:block/jungle_planks",
+    "top": "minecraft:block/quartz_block_top",
+    "bowl": "orients_hotpot_chronicles:block/bowl_wood",
+    "inner": "orients_hotpot_chronicles:block/bowl_wood_inner",
+    "particle": "minecraft:block/jungle_planks"
+  }
+}

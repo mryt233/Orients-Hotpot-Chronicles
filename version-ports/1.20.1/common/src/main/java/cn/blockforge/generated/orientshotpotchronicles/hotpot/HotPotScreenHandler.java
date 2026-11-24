@@ -40,24 +40,26 @@ public class HotPotScreenHandler extends PlayerInventoryMenu {
     private final Container pot;
     private final Level world;
     private final HotPotBlockEntity serverBe;
+    private final BlockPos potPos;
     private final DataSlot[] properties;
     private final int[] clientData = new int[HotPotBlockEntity.PROP_COUNT];
 
     // 服务端构造
     public HotPotScreenHandler(int syncId, Inventory playerInventory, HotPotBlockEntity be) {
-        this(syncId, playerInventory, (Container) be, be);
+        this(syncId, playerInventory, (Container) be, be, be.getBlockPos());
     }
 
     // 客户端构造（扩展数据里只带方块坐标）
     public HotPotScreenHandler(int syncId, Inventory playerInventory, BlockPos pos) {
-        this(syncId, playerInventory, clientInventory(playerInventory, pos), null);
+        this(syncId, playerInventory, clientInventory(playerInventory, pos), null, pos);
     }
 
     private HotPotScreenHandler(int syncId, Inventory playerInventory, Container pot,
-                                HotPotBlockEntity be) {
+                                HotPotBlockEntity be, BlockPos pos) {
         super(HotPotContent.HOT_POT_SCREEN, syncId);
         this.pot = pot;
         this.serverBe = be;
+        this.potPos = pos == null ? BlockPos.ZERO : pos.immutable();
         this.world = playerInventory.player.level();
         // 客户端在服务端属性包到达前也应显示“无汤”，而不是误显示为第一种汤底。
         clientData[0] = -1;
@@ -91,6 +93,10 @@ public class HotPotScreenHandler extends PlayerInventoryMenu {
     }
 
     // ------------------------------------------------------------------ UI 数据
+
+    public BlockPos potPos() {
+        return potPos;
+    }
 
     public int baseId() {
         return properties[0].get();
@@ -289,8 +295,8 @@ public class HotPotScreenHandler extends PlayerInventoryMenu {
         DippingSauceItem.dipFromHands(player, eaten);
         HotPotHooks.onEating(world, player, eaten);
         player.eat(world, eaten.copy());
-        // 冷锅：没坐在烧着的灶台（或其他热源）上，吃了有概率反胃（mryt233 改：读取 Config.coldPot*，duration <= 0 时跳过）
-        int nauseaDuration = Config.coldPotNauseaDuration();
+        // 冷锅：没坐在烧着的灶台（或其他热源）上，吃了有概率反胃（mryt233 改：受 mode.penalties_enabled 与 Config.coldPot* 控制）
+        int nauseaDuration = Config.penaltiesEnabled() ? Config.coldPotNauseaDuration() : 0;
         if (!serverBe.isHeated() && nauseaDuration > 0 && world.random.nextFloat() < Config.coldPotNauseaChance()) {
             player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, nauseaDuration, 0));
             player.displayClientMessage(Component.translatable(HotPotBlockEntity.key("msg.cold_pot")), true);
@@ -298,10 +304,13 @@ public class HotPotScreenHandler extends PlayerInventoryMenu {
         if (!player.getAbilities().instabuild) {
             FoodCompat.returnContainer(player, eaten);
         }
-        // 嘴边迸出一小撮食物碎屑，像一口咬下去
+        // 嘴边迸出一小撮食物碎屑，像一口咬下去（mryt233 改：使用独立单份快照防异步编码空栈）
         if (world instanceof ServerLevel serverWorld) {
-            serverWorld.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, eaten),
-                player.getX(), player.getEyeY() - 0.15, player.getZ(), 8, 0.12, 0.06, 0.12, 0.05);
+            ItemParticleOption crumb = StoneMillBlockEntity.itemParticle(eaten);
+            if (crumb != null) {
+                serverWorld.sendParticles(crumb,
+                    player.getX(), player.getEyeY() - 0.15, player.getZ(), 8, 0.12, 0.06, 0.12, 0.05);
+            }
         }
         broadcastChanges();
     }

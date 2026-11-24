@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=south,mount=wall": {
+      "model": "orients_hotpot_chronicles:block/desktop_prep_rack"
+    },
+    "facing=south,mount=ceiling": {
+      "model": "orients_hotpot_chronicles:block/desktop_prep_rack"
+    },
+    "facing=west,mount=wall": {
+      "model": "orients_hotpot_chronicles:block/desktop_prep_rack",
+      "y": 90
+    },
+    "facing=west,mount=ceiling": {
+      "model": "orients_hotpot_chronicles:block/desktop_prep_rack",
+      "y": 90
+    },
+    "facing=north,mount=wall": {
+      "model": "orients_hotpot_chronicles:block/desktop_prep_rack",
+      "y": 180
+    },
+    "facing=north,mount=ceiling": {
+      "model": "orients_hotpot_chronicles:block/desktop_prep_rack",
+      "y": 180
+    },
+    "facing=east,mount=wall": {
+      "model": "orients_hotpot_chronicles:block/desktop_prep_rack",
+      "y": 270
+    },
+    "facing=east,mount=ceiling": {
+      "model": "orients_hotpot_chronicles:block/desktop_prep_rack",
+      "y": 270
+    }
+  }
+}

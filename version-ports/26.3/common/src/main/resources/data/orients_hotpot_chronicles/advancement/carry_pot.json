@@ -1,0 +1,31 @@
+{
+  "display": {
+    "icon": {
+      "id": "orients_hotpot_chronicles:copper_nine_grid_hotpot"
+    },
+    "title": {
+      "translate": "advancements.orients_hotpot_chronicles.carry_pot.title"
+    },
+    "description": {
+      "translate": "advancements.orients_hotpot_chronicles.carry_pot.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "carry": {
+      "trigger": "orients_hotpot_chronicles:hotpot",
+      "conditions": {
+        "event": "carry_pot"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "carry"
+    ]
+  ],
+  "parent": "orients_hotpot_chronicles:first_cooked"
+}

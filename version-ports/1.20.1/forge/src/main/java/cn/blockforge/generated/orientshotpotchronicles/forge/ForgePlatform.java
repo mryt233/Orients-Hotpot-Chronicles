@@ -1,6 +1,8 @@
 // 作者：mryt233；mryt233 改（2026-11-10）
 package cn.blockforge.generated.orientshotpotchronicles.forge;
 
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlockEntity;
+import cn.blockforge.generated.orientshotpotchronicles.mixin.BlockDropInvoker;
 import cn.blockforge.orient.framework.loader.Framework;
 import cn.blockforge.orient.framework.platform.forge.ForgeFrameworkPlatform;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -23,6 +25,7 @@ public final class ForgePlatform {
 
     /** Forge 只给建好的鱼池，专属访问器适配保留。 */
     public static void afterContentRegistration() {
+        StoveBlockEntity.installDropSpawner(BlockDropInvoker::hotpot$popResource);
         ForgeLootListeners.install();
     }
 }

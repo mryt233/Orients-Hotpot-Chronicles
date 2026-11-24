@@ -14,6 +14,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 /** 内置蘸料的不可变定义；旧枚举与位掩码保留兼容（mryt233 改：1.20.1 适配 MobEffect）。作者：mryt233 */
 public final class SeasoningDef {
@@ -107,7 +108,11 @@ public final class SeasoningDef {
     public float dotZ(int i) { return dots[i][1]; }
     public float dotSize() { return dotSize; }
     public boolean garnish() { return garnish; }
-    public Item raw() { return raws[0].get(); }
+    public Item raw() {
+        if (raws.length == 0) return Items.AIR;
+        Item item = raws[0].get();
+        return item != null ? item : Items.AIR;
+    }
     public List<Item> raws() {
         List<Item> items = rawList;
         if (items == null) {
@@ -123,7 +128,11 @@ public final class SeasoningDef {
         }
         return items;
     }
-    public Item rawShown(long millis) { return raws[(int)(millis / 1000 % raws.length)].get(); }
+    public Item rawShown(long millis) {
+        if (raws.length == 0) return Items.AIR;
+        Item item = raws[Math.floorMod((int) (millis / 1000L), raws.length)].get();
+        return item != null ? item : Items.AIR;
+    }
     public Component rawNames() {
         MutableComponent out = Component.empty();
         for (int i = 0; i < raws.length; i++) {

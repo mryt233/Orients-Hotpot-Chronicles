@@ -17,5 +17,10 @@ public final class NeoForgePlatform {
         NeoForgeFrameworkPlatform.install(modBus);
     }
     /** NeoForge 只给建好的鱼池，专属访问器适配保留。 */
-    public static void afterContentRegistration() { NeoForgeLootListeners.install(); }
+    public static void afterContentRegistration() {
+        // mryt233 改（2026-11-19）：保留原版及平台的掉落捕获/回滚流程。
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlockEntity.installDropSpawner(
+            cn.blockforge.generated.orientshotpotchronicles.mixin.BlockDropInvoker::hotpot$popResource);
+        NeoForgeLootListeners.install();
+    }
 }

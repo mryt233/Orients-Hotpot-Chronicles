@@ -94,12 +94,6 @@ def main():
     for mat, (item_id, _, _) in MATERIALS.items():
         lo, hi = f"{mat}_hotpot_table", f"{mat}_tall_hotpot_table"
         ids += [lo, hi]
-        write(DATA / MODID / f"recipe/{lo}.json", {
-            "type": "minecraft:crafting_shaped", "group": f"{MODID}:hotpot_table", "pattern": ["PPP", "PBP", "PPP"],
-            "key": {"P": {"item": item_id}, "B": {"item": "minecraft:brick"}}, "result": {"id": f"{MODID}:{lo}", "count": 4}})
-        write(DATA / MODID / f"recipe/{hi}.json", {
-            "type": "minecraft:crafting_shaped", "group": f"{MODID}:tall_hotpot_table", "pattern": ["PPP", "BBB"],
-            "key": {"P": {"item": item_id}, "B": {"item": "minecraft:bricks"}}, "result": {"id": f"{MODID}:{hi}", "count": 3}})
         write(DATA / MODID / f"loot_table/blocks/{lo}.json", loot(lo))
         write(DATA / MODID / f"loot_table/blocks/{hi}.json", loot(hi))
     f = DATA / "minecraft/tags/block/mineable/pickaxe.json"

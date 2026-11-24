@@ -115,8 +115,8 @@ public class DrinkCauldronBlock extends AbstractCauldronBlock implements ItemInt
     }
 
     @Override
-    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
-                                           Player player, InteractionHand hand, BlockHitResult hit) {
+    public ItemInteractionResult compatUseItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
+                                                 Player player, InteractionHand hand, BlockHitResult hit) {
         DrinkKind kind = state.getValue(KIND);
         int sips = state.getValue(SIPS);
         if (stack.getItem() instanceof DrinkItem || (stack.getItem() instanceof CupItem cup && cup.kind() != null)) {

@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "orients_hotpot_chronicles:dynamic",
+    "base": "orients_hotpot_chronicles:item/soup_bowl_display"
+  }
+}

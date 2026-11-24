@@ -54,6 +54,7 @@ public class HotPotConfigScreen extends Screen {
     private final ConfigValues values = new ConfigValues(() -> edited, Config::defaultsCopy);
     private int entryParticle = 100;
     private int tab;
+    private boolean modeDrawerOpen;
     private final Set<String> expanded = new HashSet<>();
     private final ConfigEditController editor = new ConfigEditController(values, TEXT, BAD);
 
@@ -88,6 +89,9 @@ public class HotPotConfigScreen extends Screen {
         public int scroll() { return scroll; }
         public Set<String> expanded() { return expanded; }
         public boolean confirmReset() { return confirmReset; }
+        public boolean modeDrawerOpen() { return modeDrawerOpen; }
+        public String activeModePreset() { return HotPotConfigScreen.this.activeModePreset(); }
+        public boolean modeIsCustom() { return HotPotConfigScreen.this.modeIsCustom(); }
         public List<int[]> clickRects() { return clickRects; }
         public List<Runnable> clickActions() { return clickActions; }
         public ConfigValues values() { return values; }
@@ -99,6 +103,8 @@ public class HotPotConfigScreen extends Screen {
         public void setResetRectIndex(int value) { resetRectIndex = value; }
         public void clearLayout() { HotPotConfigScreen.this.clearLayout(); }
         public void applyTab() { HotPotConfigScreen.this.applyTab(); }
+        public void toggleModeDrawer() { HotPotConfigScreen.this.toggleModeDrawer(); }
+        public void applyModePreset(String preset) { HotPotConfigScreen.this.applyModePreset(preset); }
         public int valueWidth() { return HotPotConfigScreen.this.valueWidth(); }
         public List<Object> layout() { return HotPotConfigScreen.this.layout(); }
         public int contentHeight() { return HotPotConfigScreen.this.contentHeight(); }
@@ -144,12 +150,13 @@ public class HotPotConfigScreen extends Screen {
             slider = null;
         }
         editor.commitEdit();
-        int contentTop = py + 48;
+        int contentTop = py + 64;
         if (tab == 0) {
             slider = new ParticleSlider(px + 10, contentTop, panelW - 20, 20);
             slider.syncFromIntensity(Config.particleIntensity());
             addRenderableWidget(slider);
-            listTop = contentTop + 52;
+            // mryt233 改（2026-11-09，r146a）：滑块 20 + 提示一行 12 + 快捷档一行 14，列表从 contentTop + 50 起。
+            listTop = contentTop + 50;
         } else {
             listTop = contentTop;
         }
@@ -165,7 +172,7 @@ public class HotPotConfigScreen extends Screen {
     private final ConfigListModel model = new ConfigListModel();
     private void clearLayout() { model.invalidate(); }
     private int valueWidth() { return ConfigListModel.valueWidth(listW); }
-    private List<Object> layout() { return model.layout(schema, edited, tab, expanded, panelW, listW, font); }
+    private List<Object> layout() { return model.layout(schema, edited, tab, modeDrawerOpen, expanded, panelW, listW, font); }
     private int contentHeight() { return ConfigListModel.contentHeight(layout()); }
     private int maxScroll() { return ConfigListModel.maxScroll(contentHeight(), listTop, listBottom); }
 
@@ -187,6 +194,7 @@ public class HotPotConfigScreen extends Screen {
         g.text(font, title, px + 12, py + 7, GuiKit.TITLE, true);
         g.fill(px + 12, py + 19, px + panelW - 12, py + 20, GuiKit.BRASS_DARK);
         painter.drawTabs(g, mouseX, mouseY);
+        painter.drawModeBar(g, mouseX, mouseY);
         if (tab == 0) {
             painter.drawParticleBlock(g, mouseX, mouseY);
         }
@@ -218,6 +226,48 @@ public class HotPotConfigScreen extends Screen {
     private void nudge(Field f, int dir) {
         values.nudge(f, dir, Minecraft.getInstance().hasShiftDown());
         editor.bad.remove(f.key());
+    }
+
+    private String activeModePreset() {
+        JsonObject mode = node(edited, new String[]{"mode"}, 1);
+        var el = mode.get("preset");
+        return el != null && el.isJsonPrimitive() && el.getAsJsonPrimitive().isString()
+            && Config.MODE_SIMPLE.equals(el.getAsString()) ? Config.MODE_SIMPLE : Config.MODE_FULL;
+    }
+
+    private boolean modeIsCustom() {
+        boolean expectFull = !Config.MODE_SIMPLE.equals(activeModePreset());
+        for (Field f : schema.modeFields()) {
+            boolean expected = "mode.simple_ui_collapse".equals(f.key()) ? !expectFull : expectFull;
+            if (values.boolValue(f) != expected) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void applyModePreset(String preset) {
+        editor.commitEdit();
+        editor.bad.keySet().removeIf(key -> key.startsWith("mode."));
+        Config.applyModePreset(edited, preset);
+        clearLayout();
+    }
+
+    private void toggleModeDrawer() {
+        editor.commitEdit();
+        if (tab == 0) {
+            modeDrawerOpen = !modeDrawerOpen;
+            if (modeDrawerOpen) {
+                scroll = 0;
+            }
+        } else {
+            String key = k("group.mode");
+            if (!expanded.remove(key)) {
+                expanded.add(key);
+                scroll = 0;
+            }
+        }
+        clearLayout();
     }
 
     /** 「恢复全部默认」点一次变确认态，再点一次才真的恢复（4 秒内有效）。 */
@@ -413,6 +463,12 @@ public class HotPotConfigScreen extends Screen {
             tab = 0;
             clearLayout();
             applyTab();
+        } else if ("mode_drawer".equals(action)) {
+            toggleModeDrawer();
+        } else if ("mode_simple".equals(action)) {
+            applyModePreset(Config.MODE_SIMPLE);
+        } else if ("mode_full".equals(action)) {
+            applyModePreset(Config.MODE_FULL);
         } else if (action.startsWith("expand:")) {
             int index = Integer.parseInt(action.substring("expand:".length()));
             List<Section> all = sections();

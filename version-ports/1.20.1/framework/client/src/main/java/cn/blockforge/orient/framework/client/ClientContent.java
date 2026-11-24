@@ -106,6 +106,30 @@ public interface ClientContent {
     default void blockOutline(BlockOutline callback) {
         throw new UnsupportedOperationException("block outline requires Runtime 0.1.6");
     }
+    /** mryt233 改（2026-11-16）：登记可换材质的跨端烘焙方块 / 物品模型包装规则。 */
+    default void wrappedModels(SwappableModelRule rule) {
+        throw new UnsupportedOperationException("wrappedModels requires Runtime 0.2.1");
+    }
+    /** mryt233 改（2026-11-16）：在客户端材质更新后请求区块重建与模型数据刷新。 */
+    default void refreshBlockModel(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) {
+        throw new UnsupportedOperationException("refreshBlockModel requires Runtime 0.2.1");
+    }
+    /** mryt233 改（2026-11-16）：客户端刻末回调。 */
+    default void clientTick(Runnable callback) {
+        throw new UnsupportedOperationException("clientTick requires Runtime 0.2.1");
+    }
+    @FunctionalInterface
+    interface HudRender {
+        void render(net.minecraft.client.gui.GuiGraphics graphics, float partialTick);
+    }
+    /** mryt233 改（2026-11-16）：客户端 HUD 覆层绘制回调。 */
+    default void hudRender(HudRender callback) {
+        throw new UnsupportedOperationException("hudRender requires Runtime 0.2.1");
+    }
+    /** mryt233 改（2026-11-16）：登记可改键快捷键绑定。 */
+    default void keyMappings(net.minecraft.client.KeyMapping... mappings) {
+        throw new UnsupportedOperationException("keyMappings requires Runtime 0.2.1");
+    }
 
     final class Installed {
         private static volatile ClientContent instance;

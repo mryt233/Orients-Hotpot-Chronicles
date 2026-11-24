@@ -255,7 +255,8 @@ public class SoupBowlItem extends Item implements TableItem {
             for (MobEffectInstance effect : def.dishBonusEffects(spicy)) {
                 user.addEffect(effect);
             }
-            int mouthFireTicks = Config.spicyMouthFireTicks();
+            // mryt233 改（第四批 4J）：改读 Config.spicyMouthFire* 与惩罚开关
+            int mouthFireTicks = Config.penaltiesEnabled() ? Config.spicyMouthFireTicks() : 0;
             if (def.spicy() && mouthFireTicks > 0 && spicy >= Config.spicyMouthFireFromLevel()
                 && !ClothApronItem.wornBy(user)) {
                 user.setRemainingFireTicks(Math.max(user.getRemainingFireTicks(), mouthFireTicks));

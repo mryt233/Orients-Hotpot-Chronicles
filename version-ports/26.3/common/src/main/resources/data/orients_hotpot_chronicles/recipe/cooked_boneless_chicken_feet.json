@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": "orients_hotpot_chronicles:boneless_chicken_feet",
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_boneless_chicken_feet"
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smoking",
+  "category": "food",
+  "ingredient": "orients_hotpot_chronicles:lotus_root_slice",
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_lotus_root_slice"
+  },
+  "experience": 0.35,
+  "cookingtime": 100
+}

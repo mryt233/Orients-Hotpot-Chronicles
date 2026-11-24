@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": "orients_hotpot_chronicles:sweet_potato_skin",
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_sweet_potato_skin"
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

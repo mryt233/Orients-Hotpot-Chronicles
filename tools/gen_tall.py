@@ -17,6 +17,7 @@ import json
 from pixkit.paths import MODID, RES
 from pixkit.templates import write_shared_model as write
 from pixkit.materials import ids
+from pixkit.model import apply_outer_cullface
 
 ASSET_ROOTS = [RES / "assets" / MODID]
 WOODS = ids("woods")
@@ -186,6 +187,8 @@ def tall_stove_base(src):
                 f["texture"] = "#side"   # 火口只在最下面那段；上面的墙用普通砖，免得对齐后又露出拱门
             if d in ("north", "east", "south", "west") and f["texture"] in ("#side", "#front"):
                 f["uv"] = aligned_uv(d, e["from"], e["to"])
+            # y1 <= 16 的齐平外砖补 cullface，伸入上方 proxy 格（y1 > 16）的一律不加 cullface
+            apply_outer_cullface(d, e["from"], e["to"], f)
     m["elements"] = els
     return m
 
@@ -261,10 +264,6 @@ def main():
         "result": {"id": f"{MODID}:tall_brick_stove", "count": 1}})
     write(data / MODID / "loot_table/blocks/tall_brick_stove.json", loot("tall_brick_stove"))
     for wood in WOODS:
-        write(data / MODID / f"recipe/{wood}_tall_hotpot_table.json", {
-            "type": "minecraft:crafting_shaped", "group": f"{MODID}:tall_hotpot_table", "pattern": ["PPP", "BBB"],
-            "key": {"P": {"item": f"minecraft:{wood}_planks"}, "B": {"item": "minecraft:bricks"}},
-            "result": {"id": f"{MODID}:{wood}_tall_hotpot_table", "count": 3}})
         write(data / MODID / f"recipe/{wood}_bench.json", {
             "type": "minecraft:crafting_shaped", "group": f"{MODID}:bench", "pattern": ["PPP", "S S", "S S"],
             "key": {"P": {"item": f"minecraft:{wood}_planks"}, "S": {"item": "minecraft:stick"}},

@@ -1,8 +1,13 @@
 // 作者：mryt233
 package cn.blockforge.generated.orientshotpotchronicles.client.guide;
 
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.ConditionalCraftingRecipe;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Config;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.RecipeSync;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoneMillRecipe;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.WoodenVatRecipe;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import net.minecraft.client.Minecraft;
@@ -44,6 +49,7 @@ public final class GuideRecipes {
     private static final int MUTED = 0xFF7A6040, NUMBER = 0xFF1E6E78;
 
     private Object recipeCacheKey;
+    private long recipeCacheConfigRevision = -1L;
     private Map<Item, RecipeHolder<? extends Recipe<?>>> recipeCache;
 
     @FunctionalInterface
@@ -69,14 +75,24 @@ public final class GuideRecipes {
         int idx = (int) ((now / 2000) % ids.size());
         Item item = BuiltInRegistries.ITEM.getOptional(ids.get(idx)).orElse(Items.BARRIER);
         ContextMap displayContext = SlotDisplayContext.fromLevel(minecraft.level);
-        RecipeDisplay display = findDisplay(minecraft, item, displayContext);
         RecipeHolder<? extends Recipe<?>> holder = findRecipe(minecraft, item);
-        boolean grid = display == null || display instanceof ShapedCraftingRecipeDisplay
-            || display instanceof ShapelessCraftingRecipeDisplay;
+        Recipe<?> rawRecipe = holder == null ? null : holder.value();
+        Recipe<?> recipe = rawRecipe instanceof ConditionalCraftingRecipe cond ? cond.inner() : rawRecipe;
+        RecipeDisplay display = recipe != null
+            ? recipe.display().stream().findFirst().orElse(null)
+            : findDisplay(minecraft, item, displayContext);
+        boolean grid = recipe == null || recipe instanceof CraftingRecipe;
         int gx = x + 10, gy = y + 1;
-        ItemStack out = display != null
-            ? display.result().resolveForStacks(displayContext).stream().findFirst().orElseGet(() -> new ItemStack(item))
-            : new ItemStack(item);
+        ItemStack out;
+        if (recipe instanceof StoneMillRecipe mill) {
+            out = mill.result();
+        } else if (recipe instanceof WoodenVatRecipe vat) {
+            out = vat.result();
+        } else if (display != null) {
+            out = display.result().resolveForStacks(displayContext).stream().findFirst().orElseGet(() -> new ItemStack(item));
+        } else {
+            out = new ItemStack(item);
+        }
         if (grid) {
             for (int r = 0; r < 3; r++) {
                 for (int c = 0; c < 3; c++) {
@@ -109,17 +125,45 @@ public final class GuideRecipes {
         } else {
             int sx = gx + 12, sy = gy + 4;
             g.blit(RenderPipelines.GUI_TEXTURED, TEX, sx, sy, 340, 0, 18, 18, TEX_W, TEX_H);
-            List<SlotDisplay> ings = display instanceof StonecutterRecipeDisplay cutting
-                ? List.of(cutting.input())
-                : display instanceof FurnaceRecipeDisplay smelting
-                ? List.of(smelting.ingredient())
-                : List.of();
-            if (!ings.isEmpty()) {
-                ItemStack[] stacks = ings.get(0).resolveForStacks(displayContext).toArray(ItemStack[]::new);
-                if (stacks.length > 0) {
-                    ItemStack in = stacks[(int) ((now / 1000) % stacks.length)];
+            if (recipe instanceof WoodenVatRecipe vat) {
+                if (WoodenVatRecipe.FLUID_SOYMILK.equals(vat.fluid())) {
+                    ItemStack in = new ItemStack(HotPotContent.SOYMILK_BUCKET);
                     g.item(in, sx + 1, sy + 1);
                     sink.track(sx + 1, sy + 1, 16, 16, in);
+                } else if (vat.ingredient().isPresent()) {
+                    List<ItemStack> stacks = vat.ingredient().get().items()
+                        .map(h -> new ItemStack(h, vat.ingredientCount()))
+                        .toList();
+                    if (!stacks.isEmpty()) {
+                        ItemStack in = stacks.get((int) ((now / 1000) % stacks.size()));
+                        g.item(in, sx + 1, sy + 1);
+                        g.itemDecorations(font, in, sx + 1, sy + 1);
+                        sink.track(sx + 1, sy + 1, 16, 16, in);
+                    }
+                }
+            } else if (recipe instanceof StoneMillRecipe mill) {
+                List<ItemStack> stacks = mill.ingredient().items()
+                    .map(h -> new ItemStack(h, mill.ingredientCount()))
+                    .toList();
+                if (!stacks.isEmpty()) {
+                    ItemStack in = stacks.get((int) ((now / 1000) % stacks.size()));
+                    g.item(in, sx + 1, sy + 1);
+                    g.itemDecorations(font, in, sx + 1, sy + 1);
+                    sink.track(sx + 1, sy + 1, 16, 16, in);
+                }
+            } else {
+                List<SlotDisplay> ings = display instanceof StonecutterRecipeDisplay cutting
+                    ? List.of(cutting.input())
+                    : display instanceof FurnaceRecipeDisplay smelting
+                    ? List.of(smelting.ingredient())
+                    : List.of();
+                if (!ings.isEmpty()) {
+                    ItemStack[] stacks = ings.get(0).resolveForStacks(displayContext).toArray(ItemStack[]::new);
+                    if (stacks.length > 0) {
+                        ItemStack in = stacks[(int) ((now / 1000) % stacks.length)];
+                        g.item(in, sx + 1, sy + 1);
+                        sink.track(sx + 1, sy + 1, 16, 16, in);
+                    }
                 }
             }
             g.blit(RenderPipelines.GUI_TEXTURED, TEX, sx + 26, sy + 5, 340, 18, 12, 8, TEX_W, TEX_H);
@@ -128,8 +172,16 @@ public final class GuideRecipes {
             g.item(out, ox + 1, oy + 1);
             g.itemDecorations(font, out, ox + 1, oy + 1);
             sink.track(ox + 1, oy + 1, 16, 16, out);
-            Component how = holder != null && holder.value().getType() == RecipeType.STONECUTTING
-                ? Blocks.STONECUTTER.getName() : Blocks.FURNACE.getName();
+            Component how;
+            if (holder != null && holder.value().getType() == StoneMillRecipe.TYPE) {
+                how = HotPotContent.STONE_MILL.getName();
+            } else if (holder != null && holder.value().getType() == WoodenVatRecipe.TYPE) {
+                how = HotPotContent.WOODEN_VAT.getName();
+            } else if (holder != null && holder.value().getType() == RecipeType.STONECUTTING) {
+                how = Blocks.STONECUTTER.getName();
+            } else {
+                how = Blocks.FURNACE.getName();
+            }
             String label = how.getString();
             g.text(font, label, x + (COL_W - font.width(label)) / 2, gy + 28, MUTED, false);
         }
@@ -149,33 +201,65 @@ public final class GuideRecipes {
             return null;
         }
         Object source = RecipeSync.source(minecraft.level);
-        if (recipeCache == null || recipeCacheKey != source) {
+        long rev = Config.revision();
+        if (recipeCache == null || recipeCacheKey != source || recipeCacheConfigRevision != rev) {
             Map<Item, RecipeHolder<? extends Recipe<?>>> cache = new HashMap<>();
             ContextMap displayContext = SlotDisplayContext.fromLevel(minecraft.level);
+            // putIfAbsent = 先找到的那一类优先；工作台条件配方生效时优先于默认配方
             index(minecraft, cache, RecipeType.CRAFTING, displayContext);
+            index(minecraft, cache, StoneMillRecipe.TYPE, displayContext);
+            index(minecraft, cache, WoodenVatRecipe.TYPE, displayContext);
             index(minecraft, cache, RecipeType.STONECUTTING, displayContext);
             index(minecraft, cache, RecipeType.SMELTING, displayContext);
             index(minecraft, cache, RecipeType.SMOKING, displayContext);
             index(minecraft, cache, RecipeType.CAMPFIRE_COOKING, displayContext);
             recipeCache = cache;
             recipeCacheKey = source;
+            recipeCacheConfigRevision = rev;
         }
         return recipeCache.get(item);
     }
 
+    @SuppressWarnings("unchecked")
     private static void index(Minecraft minecraft, Map<Item, RecipeHolder<? extends Recipe<?>>> cache,
                               RecipeType<? extends Recipe<?>> type, ContextMap displayContext) {
         for (RecipeHolder<?> holder : RecipeSync.recipes(minecraft.level)) {
-            if (holder.value().getType() != type) {
+            if (holder.value().getType() != type || !(holder.value() instanceof ConditionalCraftingRecipe cond)) {
                 continue;
             }
-            for (RecipeDisplay display : holder.value().display()) {
-                for (ItemStack result : display.result().resolveForStacks(displayContext)) {
-                    if (!result.isEmpty()) {
-                        @SuppressWarnings("unchecked")
-                        RecipeHolder<? extends Recipe<?>> typed = (RecipeHolder<? extends Recipe<?>>) holder;
-                        cache.putIfAbsent(result.getItem(), typed);
-                    }
+            if (!cond.isConditionMet()) {
+                continue;
+            }
+            indexDisplays(cache, (RecipeHolder<? extends Recipe<?>>) holder, cond.display(), displayContext);
+        }
+        for (RecipeHolder<?> holder : RecipeSync.recipes(minecraft.level)) {
+            if (holder.value().getType() != type || holder.value() instanceof ConditionalCraftingRecipe) {
+                continue;
+            }
+            RecipeHolder<? extends Recipe<?>> typed = (RecipeHolder<? extends Recipe<?>>) holder;
+            if (holder.value() instanceof StoneMillRecipe mill) {
+                ItemStack res = mill.result();
+                if (!res.isEmpty()) {
+                    cache.putIfAbsent(res.getItem(), typed);
+                }
+            } else if (holder.value() instanceof WoodenVatRecipe vat) {
+                ItemStack res = vat.result();
+                if (!res.isEmpty()) {
+                    cache.putIfAbsent(res.getItem(), typed);
+                }
+            } else {
+                indexDisplays(cache, typed, holder.value().display(), displayContext);
+            }
+        }
+    }
+
+    private static void indexDisplays(Map<Item, RecipeHolder<? extends Recipe<?>>> cache,
+                                      RecipeHolder<? extends Recipe<?>> holder,
+                                      List<RecipeDisplay> displays, ContextMap displayContext) {
+        for (RecipeDisplay display : displays) {
+            for (ItemStack result : display.result().resolveForStacks(displayContext)) {
+                if (!result.isEmpty()) {
+                    cache.putIfAbsent(result.getItem(), holder);
                 }
             }
         }
@@ -183,6 +267,9 @@ public final class GuideRecipes {
 
     private static RecipeDisplay findDisplay(Minecraft minecraft, Item item, ContextMap displayContext) {
         for (RecipeHolder<?> entry : RecipeSync.recipes(minecraft.level)) {
+            if (entry.value() instanceof ConditionalCraftingRecipe cond && !cond.isConditionMet()) {
+                continue;
+            }
             if (!(entry.value() instanceof CraftingRecipe) && entry.value().getType() != RecipeType.STONECUTTING
                 && !(entry.value() instanceof AbstractCookingRecipe)) {
                 continue;

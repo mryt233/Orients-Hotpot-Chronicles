@@ -1,3 +1,4 @@
+// mryt233 改：阶段二补齐 26.1 功能同步。
 // mryt233 改：26.1 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.client;
 
@@ -17,6 +18,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Config;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
@@ -56,6 +58,7 @@ public class GuideBookScreen extends Screen {
     private List<List<Elem>> columns = List.of();
     private final GuidePager pager = new GuidePager();
     private final GuideRecipes recipes = new GuideRecipes();
+    private long layoutRevision = -1L;
     private int bx, by;
     private boolean opened;
     private final List<int[]> hoverRects = new ArrayList<>();
@@ -80,6 +83,7 @@ public class GuideBookScreen extends Screen {
         by = Math.max(24, (height - BOOK_H) / 2 + 8);
         pager.init(cats, font, bx, by);
         columns = pager.columns;
+        layoutRevision = Config.revision();
         searchIndex = GuideSearch.build(cats);
         searchBox = new EditBox(font, searchX() + 29, searchY() + 11, SEARCH_W - 54, 12,
             Component.literal(ui("搜索", "搜尋", "Search")));
@@ -120,6 +124,12 @@ public class GuideBookScreen extends Screen {
     @Override
     public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         super.extractRenderState(g, mouseX, mouseY, delta);
+        long rev = Config.revision();
+        if (rev != layoutRevision && !cats.isEmpty()) {
+            pager.open(pager.cat, pager.entry);
+            columns = pager.columns;
+            layoutRevision = rev;
+        }
         hoverRects.clear();
         hoverStacks.clear();
         linkRects.clear();
@@ -189,6 +199,9 @@ public class GuideBookScreen extends Screen {
             String p = (pager.spread + 1) + " / " + pager.spreads();
             g.text(font, p, bx + RIGHT_X + COL_W / 2 - font.width(p) / 2, by + 160, MUTED, false);
         }
+        Component modeBadge = Component.translatable(
+            "text." + HotPot.MOD_ID + ".config.mode." + Config.modePreset());
+        g.text(font, modeBadge, bx + LEFT_X + COL_W / 2 - font.width(modeBadge) / 2, by + 160, MUTED, false);
         if (searchOpen) {
             renderSearchOverlay(g, mouseX, mouseY, delta);
         }

@@ -1,0 +1,7 @@
+{
+  "type": "orients_hotpot_chronicles:apron_recolor",
+  "category": "equipment",
+  "apron": "#orients_hotpot_chronicles:cloth_aprons",
+  "dye": "minecraft:white_dye",
+  "result": "orients_hotpot_chronicles:cloth_apron"
+}

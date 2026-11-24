@@ -45,6 +45,10 @@ public class SeatEntity extends Entity {
         return pos.equals(a) || pos.equals(b);
     }
 
+    public BlockPos anchorPos() {
+        return a;
+    }
+
     @Override
     public void tick() {
         super.tick();

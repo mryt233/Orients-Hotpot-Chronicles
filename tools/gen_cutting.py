@@ -285,7 +285,172 @@ def board_model():
 
 
 
-def main():
+# ---------------------------------------------------------------- 鸡爪与无骨鸡爪（mryt233 改：3 套候选方案，默认装入 1 号）
+CHICKEN_FEET_RAW_PAL = {
+    ".": (0, 0, 0, 0),
+    "o": (134, 82, 69, 255),      # 原版生鸡肉最深轮廓
+    "d": (180, 123, 101, 255),    # 暗部肉色
+    "m": (223, 169, 150, 255),    # 中间肉色
+    "l": (239, 188, 172, 255),    # 亮部肉色
+    "h": (255, 231, 220, 255),    # 高光
+    "s": (222, 170, 131, 255),    # 暖皮过渡
+    "b": (245, 236, 224, 255),    # 骨端 / 爪尖浅角质
+    "k": (212, 194, 172, 255),    # 筋腱 / 爪尖阴影
+}
+CHICKEN_FEET_COOKED_PAL = {
+    ".": (0, 0, 0, 0),
+    "o": (90, 44, 16, 255),       # 原版熟鸡肉烤焦轮廓
+    "d": (139, 68, 32, 255),      # 深焦糖皮色
+    "m": (172, 93, 49, 255),      # 熟鸡爪棕红
+    "l": (205, 125, 74, 255),     # 金棕表皮
+    "h": (230, 190, 164, 255),    # 脆皮高光
+    "s": (210, 142, 98, 255),     # 暖橙棕过渡
+    "b": (238, 202, 172, 255),    # 烤骨端
+    "k": (222, 170, 131, 255),    # 熟爪筋 / 趾尖
+}
+CHICKEN_FEET_V3_RAW_PAL = {
+    **CHICKEN_FEET_RAW_PAL,
+    "o": (124, 78, 42, 255),      # 鹅黄生鲜皮深描边
+    "d": (182, 132, 82, 255),     # 暖黄暗影
+    "m": (224, 178, 118, 255),    # 鹅黄表皮
+    "l": (242, 208, 152, 255),    # 鹅黄亮面
+    "h": (255, 238, 198, 255),    # 高光
+    "s": (239, 188, 172, 255),    # 顶部红肉切面
+}
+
+# mryt233 改（2026-11-21）：有骨鸡爪定案为 3 号鹅黄扇形四趾；无骨鸡爪基于 3 号形态重绘 3 套候选方案，默认装入 1 号。
+CHICKEN_FEET_V3 = {
+    "label": "定案 · 3 号鹅黄扇形四趾鸡爪",
+    "raw_pal": CHICKEN_FEET_V3_RAW_PAL,
+    "feet": [
+        "................",
+        "......oooo......",
+        ".....obbbbo.....",
+        ".....oosbdo.....",
+        ".....oolmdo.....",
+        "....oohllmoo....",
+        "....oolmmmdoo...",
+        "..ooollmmmmdoo..",
+        ".ookmmdoollmdoo.",
+        "..oooo.oolmddoo.",
+        "...oookoolmdokbo",
+        "..ookbdo.oldoooo",
+        "...oooo..okbo...",
+        "..........oo....",
+        "................",
+        "................",
+    ],
+}
+
+BONELESS_CHICKEN_FEET_VARIANTS = {
+    1: {
+        "label": "1 号 · 原位整只去骨凤爪（基于 3 号）",
+        "raw_pal": CHICKEN_FEET_V3_RAW_PAL,
+        "boneless": [
+            "................",
+            "....oooo.oooo...",
+            "...oolsooslloo..",
+            "...oolhsslmmmo..",
+            "....oolkllmmoo..",
+            "..ooolhlmmmmdoo.",
+            ".oolmmlmmmmddoo.",
+            ".oolmmdoollmdoo.",
+            "..ooooooolmddoo.",
+            "...oooloolmdomdo",
+            "..oolmdoooldoooo",
+            "...oooo..olmdo..",
+            "..........oooo..",
+            "................",
+            "................",
+            "................",
+        ],
+    },
+    2: {
+        "label": "2 号 · 中线剖开蝴蝶摊平掌（基于 3 号）",
+        "raw_pal": CHICKEN_FEET_V3_RAW_PAL,
+        "boneless": [
+            "................",
+            "....oooo.oooo...",
+            "...oohsooslloo..",
+            "..oollhkkllmmmo.",
+            ".oolllmkklmmmddo",
+            ".oolmmdkklmmddo.",
+            "..oooooollmddoo.",
+            "..ooolooolmdoldo",
+            ".oolmdooooldoooo",
+            "..ooooo..olmdo..",
+            "..........oooo..",
+            "................",
+            "................",
+            "................",
+            "................",
+            "................",
+        ],
+    },
+    3: {
+        "label": "3 号 · 去骨一分为二半掌双拼（基于 3 号）",
+        "raw_pal": CHICKEN_FEET_V3_RAW_PAL,
+        "boneless": [
+            "................",
+            "...oooooo.......",
+            "..oolhslloo.....",
+            ".oolhllmmmdo....",
+            ".oolmdoolmdo....",
+            "..oooo.olmdo....",
+            "........ooo.....",
+            ".......oooooo...",
+            "......oolhslloo.",
+            ".....oolhllmmmdo",
+            "....oolmdoolmddo",
+            "....oolmdo.oldo.",
+            ".....oooo..ooo..",
+            "................",
+            "................",
+            "................",
+        ],
+    },
+}
+
+DEFAULT_BONELESS_VARIANT = 1
+
+
+def _finalize_pixel_grid(grid):
+    """确保外缘像素描边完整且图案居中于 16x16 画布。"""
+    g = [list(r) for r in grid]
+    for y in range(16):
+        for x in range(16):
+            if g[y][x] != ".":
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    nx, ny = x + dx, y + dy
+                    if not (0 <= nx < 16 and 0 <= ny < 16) or g[ny][nx] == ".":
+                        g[y][x] = "o"
+                        break
+    pts = [(x, y) for y, r in enumerate(g) for x, c in enumerate(r) if c != "."]
+    x0, x1 = min(x for x, _ in pts), max(x for x, _ in pts)
+    y0, y1 = min(y for _, y in pts), max(y for _, y in pts)
+    dx = round(7.5 - (x0 + x1) / 2)
+    dy = round(7.5 - (y0 + y1) / 2)
+    out = [["."] * 16 for _ in range(16)]
+    for y in range(16):
+        for x in range(16):
+            if g[y][x] != "." and 0 <= x + dx < 16 and 0 <= y + dy < 16:
+                out[y + dy][x + dx] = g[y][x]
+    return ["".join(r) for r in out]
+
+
+def chicken_feet_texture(cooked=False, boneless=False, boneless_variant=DEFAULT_BONELESS_VARIANT):
+    spec = BONELESS_CHICKEN_FEET_VARIANTS[boneless_variant] if boneless else CHICKEN_FEET_V3
+    grid = _finalize_pixel_grid(spec["boneless" if boneless else "feet"])
+    pal = CHICKEN_FEET_COOKED_PAL if cooked else spec["raw_pal"]
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for y, row in enumerate(grid):
+        for x, ch in enumerate(row):
+            im.putpixel((x, y), pal[ch])
+    return im
+
+
+def main(boneless_variant=DEFAULT_BONELESS_VARIANT):
+    icons_dir = RES.parents[3] / "tutorial/img/icons"
     for root in ROOTS:
         tex = root / "textures"
         (tex / "item").mkdir(parents=True, exist_ok=True)
@@ -299,6 +464,17 @@ def main():
         slice_texture((156, 108, 92), (130, 86, 72), (180, 132, 112), (232, 214, 194), (80, 52, 42)).save(tex / "item/cooked_beef_loin_slice.png")
         for name in ("beef_loin", "cooked_beef_loin", "beef_loin_slice", "cooked_beef_loin_slice"):
             write(root / f"models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{MODID}:item/{name}"}})
+        for name, cooked, boneless in [
+            ("chicken_feet", False, False),
+            ("cooked_chicken_feet", True, False),
+            ("boneless_chicken_feet", False, True),
+            ("cooked_boneless_chicken_feet", True, True),
+        ]:
+            cf_im = chicken_feet_texture(cooked=cooked, boneless=boneless, boneless_variant=boneless_variant)
+            cf_im.save(tex / f"item/{name}.png")
+            write(root / f"models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{MODID}:item/{name}"}})
+            if icons_dir.is_dir():
+                cf_im.resize((32, 32), Image.Resampling.NEAREST).save(icons_dir / f"{MODID}__{name}.png")
         knife_texture().save(tex / "item/iron_kitchen_knife.png")
         # mryt233 改（2026-11-08）：模型不再带 display.gui 的旋转 / 翻转，朝向全在贴图里定死；
         # 物品栏、手持、指南、网页教程、查看器都用同一张图，不需要任何特殊处理。
@@ -345,6 +521,22 @@ def data_files():
         for kind, time, suffix in [("smelting", 100, ""), ("smoking", 50, "_from_smoking"), ("campfire_cooking", 300, "_from_campfire_cooking")]:
             write(rec / f"cooked_{roll}{suffix}.json", {"type": f"minecraft:{kind}", "category": "food", "ingredient": {"item": f"{MODID}:{roll}"},
                                                          "result": {"id": f"{MODID}:cooked_{roll}"}, "experience": 0.35, "cookingtime": time})
+    # 生鸡爪 → 1 份无骨鸡爪；生鸡爪/无骨鸡爪烤熟
+    write(rec / "boneless_chicken_feet_from_stonecutting.json", {
+        "type": "minecraft:stonecutting",
+        "ingredient": {"item": f"{MODID}:chicken_feet"},
+        "result": {"id": f"{MODID}:boneless_chicken_feet", "count": 1},
+    })
+    for feet_id in ("chicken_feet", "boneless_chicken_feet"):
+        for kind, time, suffix in [("smelting", 200, ""), ("smoking", 100, "_from_smoking"), ("campfire_cooking", 600, "_from_campfire_cooking")]:
+            write(rec / f"cooked_{feet_id}{suffix}.json", {
+                "type": f"minecraft:{kind}",
+                "category": "food",
+                "ingredient": {"item": f"{MODID}:{feet_id}"},
+                "result": {"id": f"{MODID}:cooked_{feet_id}"},
+                "experience": 0.35,
+                "cookingtime": time,
+            })
     # 牛脊肉 → 3 片吊龙（砧板也照这条切）；熟吊龙熔炉 50 / 烟熏 25 / 营火 150（涮得最快，肥牛卷的一半）
     write(rec / "beef_loin_slice_from_stonecutting.json", {"type": "minecraft:stonecutting", "ingredient": {"item": f"{MODID}:beef_loin"},
                                                           "result": {"id": f"{MODID}:beef_loin_slice", "count": 3}})
@@ -372,7 +564,7 @@ def data_files():
     # mryt233 改（2026-11-04）：豆腐改名分冷热（cold_tofu / hot_tofu），两种都能上砧板，旧 ID 不再写。
     if f"{MODID}:tofu" in tag["values"]:
         tag["values"].remove(f"{MODID}:tofu")   # mryt233 改（2026-11-04）：清掉改名前的旧条目
-    for v in ["minecraft:beef", "minecraft:mutton", "minecraft:porkchop", "minecraft:potato", f"{MODID}:cold_tofu", f"{MODID}:hot_tofu", f"{MODID}:beef_loin", f"{MODID}:shrimp"]:   # 虾、猪排由各自加工方案共用此标签
+    for v in ["minecraft:beef", "minecraft:mutton", "minecraft:porkchop", "minecraft:potato", f"{MODID}:cold_tofu", f"{MODID}:hot_tofu", f"{MODID}:beef_loin", f"{MODID}:shrimp", f"{MODID}:chicken_feet"]:   # 虾、猪排、鸡爪由各自加工方案共用此标签
         if v not in tag["values"]:
             tag["values"].append(v)
     write(f, tag)
@@ -388,7 +580,8 @@ def data_files():
     f = DATA / "minecraft/tags/item/meat.json"
     tag = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {"replace": False, "values": []}
     for i in ["fatty_beef_roll", "cooked_fatty_beef_roll", "mutton_roll", "cooked_mutton_roll",
-              "beef_loin", "cooked_beef_loin", "beef_loin_slice", "cooked_beef_loin_slice"]:
+              "beef_loin", "cooked_beef_loin", "beef_loin_slice", "cooked_beef_loin_slice",
+              "chicken_feet", "cooked_chicken_feet", "boneless_chicken_feet", "cooked_boneless_chicken_feet"]:
         if f"{MODID}:{i}" not in tag["values"]:
             tag["values"].append(f"{MODID}:{i}")
     write(f, tag)

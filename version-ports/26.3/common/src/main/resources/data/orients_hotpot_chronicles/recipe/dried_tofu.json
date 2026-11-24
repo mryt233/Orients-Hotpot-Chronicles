@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TT"
+  ],
+  "key": {
+    "T": "orients_hotpot_chronicles:cold_tofu"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:dried_tofu",
+    "count": 3
+  }
+}

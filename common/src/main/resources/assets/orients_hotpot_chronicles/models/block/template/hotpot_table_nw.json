@@ -1,5 +1,5 @@
 {
-  "credit": "\u4f5c\u8005\uff1amryt233\uff1bmryt233 \u6539\uff082026-11-10\uff09",
+  "credit": "\u4f5c\u8005\uff1amryt233\uff1bmryt233 \u6539\uff082026-11-20\uff09",
   "parent": "minecraft:block/block",
   "elements": [
     {
@@ -14,10 +14,16 @@
         16
       ],
       "faces": {
+        "north": {
+          "texture": "#top"
+        },
         "east": {
           "texture": "#top"
         },
         "south": {
+          "texture": "#top"
+        },
+        "west": {
           "texture": "#top"
         },
         "up": {
@@ -40,10 +46,16 @@
         12
       ],
       "faces": {
+        "north": {
+          "texture": "#base"
+        },
         "east": {
           "texture": "#base"
         },
         "south": {
+          "texture": "#base"
+        },
+        "west": {
           "texture": "#base"
         },
         "down": {

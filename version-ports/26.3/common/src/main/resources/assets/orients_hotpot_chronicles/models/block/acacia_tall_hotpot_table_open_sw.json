@@ -1,0 +1,8 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/tall_hotpot_table_open_sw",
+  "textures": {
+    "particle": "minecraft:block/acacia_planks",
+    "top": "minecraft:block/acacia_planks",
+    "base": "minecraft:block/acacia_planks"
+  }
+}

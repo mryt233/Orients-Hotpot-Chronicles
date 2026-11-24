@@ -84,17 +84,17 @@ public abstract class TopProxyBlock<T extends Enum<T> & StringRepresentable> ext
     }
 
     @Override
-    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
-                                           Player player, InteractionHand hand, BlockHitResult hit) {
+    public ItemInteractionResult compatUseItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
+                                                 Player player, InteractionHand hand, BlockHitResult hit) {
         BlockState below = world.getBlockState(pos.below());
-        return accepts(below) ? ItemInteractionBlock.useItemOn(below, stack, world, player, hand, toBelow(pos, hit))
+        return accepts(below) ? ItemInteractionBlock.compatUseItemOn(below, stack, world, player, hand, toBelow(pos, hit))
             : Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
     }
 
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult compatUseWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         BlockState below = world.getBlockState(pos.below());
-        return accepts(below) ? ItemInteractionBlock.useWithoutItem(below, world, player, toBelow(pos, hit))
+        return accepts(below) ? ItemInteractionBlock.compatUseWithoutItem(below, world, player, toBelow(pos, hit))
             : Use.blockEmpty(UseOutcome.PASS, world.isClientSide);
     }
 

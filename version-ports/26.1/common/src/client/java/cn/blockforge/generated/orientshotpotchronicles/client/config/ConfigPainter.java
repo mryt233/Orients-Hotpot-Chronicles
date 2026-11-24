@@ -1,3 +1,4 @@
+// mryt233 改：阶段二补齐 26.1 功能同步。
 // 作者：mryt233
 package cn.blockforge.generated.orientshotpotchronicles.client.config;
 
@@ -18,7 +19,7 @@ import static cn.blockforge.generated.orientshotpotchronicles.client.config.Conf
 
 /** 设置界面的绘制和命中表（mryt233 改：26.1 GuiGraphicsExtractor）。 */
 public final class ConfigPainter {
-    private static final int TAB_W = 100, TAB_H = 20, TAB_GAP = 4;
+    private static final int TAB_W = 100, TAB_H = 18, TAB_GAP = 4, MODE_H = 18;
     private static final int BTN = 16, RESET_W = 14, CTRL_GAP = 2;
     private static final int BOTTOM_H = 20, SCROLL_W = 5;
     private static final int TEXT = 0xFFE8C88A, MUTED = 0xFFA88C5C, HOVER = 0xFF6A4418, STRIPE = 0x18FFFFFF, PANEL_BG = 0xFF2A190C, BAD = 0xFFFF6A6A, CONFIRM = 0xFFFF9A5A;
@@ -36,6 +37,9 @@ public final class ConfigPainter {
         int scroll();
         Set<String> expanded();
         boolean confirmReset();
+        boolean modeDrawerOpen();
+        String activeModePreset();
+        boolean modeIsCustom();
         List<int[]> clickRects();
         List<Runnable> clickActions();
         ConfigValues values();
@@ -47,6 +51,8 @@ public final class ConfigPainter {
         void setResetRectIndex(int value);
         void clearLayout();
         void applyTab();
+        void toggleModeDrawer();
+        void applyModePreset(String preset);
         int valueWidth();
         List<Object> layout();
         int contentHeight();
@@ -59,21 +65,37 @@ public final class ConfigPainter {
     }
     private final Host host;
     public ConfigPainter(Host host) { this.host = host; }
-    /** 悬停说明：一句白话（管什么）+ 一行范围 / 默认值（= 配置文件的 _字段说明）。 */
+    /** 悬停说明：一句白话（管什么）+ 默认值 / 范围（= 配置文件的 _字段说明）。 */
     public List<FormattedCharSequence> tooltipFor(Field f) {
         List<FormattedCharSequence> lines = new java.util.ArrayList<>();
         lines.add(f.label().copy().withStyle(ChatFormatting.GOLD).getVisualOrderText());
         lines.addAll(host.font().split(Component.translatable(f.helpKey()).withStyle(ChatFormatting.GRAY), 200));
-        lines.add(Component.translatable(k("tooltip.range"),
-                formatValue(f, f.min()), formatValue(f, f.max()), formatValue(f, host.values().defaultValue(f)))
-            .withStyle(ChatFormatting.DARK_GRAY).getVisualOrderText());
+        switch (f.kind()) {
+            case BOOLEAN -> lines.add(Component.translatable(k("tooltip.default_value"),
+                    toggleComponent(host.values().boolDefaultValue(f)))
+                .withStyle(ChatFormatting.DARK_GRAY).getVisualOrderText());
+            case CHOICE -> lines.add(Component.translatable(k("tooltip.default_value"),
+                    choiceComponent(host.values().choiceDefaultValue(f)))
+                .withStyle(ChatFormatting.DARK_GRAY).getVisualOrderText());
+            case NUMBER -> lines.add(Component.translatable(k("tooltip.range"),
+                    formatValue(f, f.min()), formatValue(f, f.max()), formatValue(f, host.values().defaultValue(f)))
+                .withStyle(ChatFormatting.DARK_GRAY).getVisualOrderText());
+        }
         if (host.editor().bad.containsKey(f.key())) {
             lines.add(Component.translatable(k("msg.invalid_line")).withStyle(ChatFormatting.RED).getVisualOrderText());
         }
         return lines;
     }
 
-    /** 一行文字的提示（快捷档 / 编辑框 / ↺ 这些自绘小按钮用）。 */
+    private Component toggleComponent(boolean value) {
+        return Component.translatable(k(value ? "toggle.on" : "toggle.off"));
+    }
+
+    private Component choiceComponent(String option) {
+        return Component.translatable(k("mode." + option));
+    }
+
+    /** 一行文字的提示（快捷档 / 模式开关 / 编辑框 / ↺ 这些自绘小按钮用）。 */
     private static List<FormattedCharSequence> tip(String key) {
         return List.of(Component.translatable(key).getVisualOrderText());
     }
@@ -83,14 +105,14 @@ public final class ConfigPainter {
         int startX = host.px() + (host.panelW() - (TAB_W * 2 + TAB_GAP)) / 2;
         for (int i = 0; i < 2; i++) {
             int x = startX + i * (TAB_W + TAB_GAP);
-            int y = host.py() + 24;
+            int y = host.py() + 22;
             boolean hover = hit(mouseX, mouseY, x, y, TAB_W, TAB_H);
             boolean active = i == host.tab();
             copperButton(g, x, y, TAB_W, TAB_H, active ? HOVER : (hover ? 0xFF4A2E12 : PANEL_BG), active ? GuiKit.BRASS_HI : GuiKit.BRASS);
             if (active) {
                 g.fill(x, y + TAB_H - 2, x + TAB_W, y + TAB_H, GuiKit.BRASS_HI);
             }
-            fittedText(g, host.font(), Component.translatable(k("tab." + keys[i])), x + TAB_W / 2, y + 6, TAB_W - 8,
+            fittedText(g, host.font(), Component.translatable(k("tab." + keys[i])), x + TAB_W / 2, y + 5, TAB_W - 8,
                 active ? GuiKit.TITLE : TEXT);
             final int target = i;
             clickable(x, y, TAB_W, TAB_H, () -> {
@@ -104,11 +126,65 @@ public final class ConfigPainter {
         }
     }
 
+    /** 顶栏精简/完整模式切换条与「自定义细项」折叠开关。 */
+    public void drawModeBar(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+        int left = host.px() + 10;
+        int y = host.py() + 43;
+        int avail = host.panelW() - 20;
+        int labelW = 0;
+        if (host.panelW() >= 340) {
+            Component label = Component.translatable(k("mode.bar_label"));
+            g.text(host.font(), label, left + 2, y + 5, MUTED, false);
+            labelW = Math.min(54, host.font().width(label) + 8);
+        }
+        int barLeft = left + labelW;
+        int barW = Math.max(120, avail - labelW);
+        int gap = 4;
+        int btnW = (barW - gap * 2) / 3;
+        int drawerW = barW - (btnW + gap) * 2;
+        String activePreset = host.activeModePreset();
+        boolean custom = host.modeIsCustom();
+
+        drawModeButton(g, mouseX, mouseY, barLeft, y, btnW,
+            Component.translatable(k("mode.full")),
+            Config.MODE_FULL.equals(activePreset) && !custom,
+            false, k("tooltip.mode.full"),
+            () -> host.applyModePreset(Config.MODE_FULL));
+
+        drawModeButton(g, mouseX, mouseY, barLeft + btnW + gap, y, btnW,
+            Component.translatable(k("mode.simple")),
+            Config.MODE_SIMPLE.equals(activePreset) && !custom,
+            false, k("tooltip.mode.simple"),
+            () -> host.applyModePreset(Config.MODE_SIMPLE));
+
+        boolean drawerActive = host.tab() == 0 ? host.modeDrawerOpen() : host.expanded().contains(k("group.mode"));
+        String prefix = drawerActive ? "\u25BE " : "\u25B8 ";
+        Component drawerLabel = Component.literal(prefix)
+            .append(Component.translatable(k(custom ? "mode.custom_modified" : "mode.custom")));
+        drawModeButton(g, mouseX, mouseY, barLeft + (btnW + gap) * 2, y, drawerW,
+            drawerLabel, drawerActive, custom, k("tooltip.mode.custom"),
+            host::toggleModeDrawer);
+    }
+
+    private void drawModeButton(GuiGraphicsExtractor g, int mouseX, int mouseY, int x, int y, int w,
+                                Component label, boolean active, boolean highlightBorder,
+                                String tipKey, Runnable action) {
+        boolean hover = hit(mouseX, mouseY, x, y, w, MODE_H);
+        int bg = active ? HOVER : (hover ? 0xFF4A2E12 : PANEL_BG);
+        int border = active || highlightBorder ? GuiKit.BRASS_HI : GuiKit.BRASS;
+        copperButton(g, x, y, w, MODE_H, bg, border);
+        fittedText(g, host.font(), label, x + w / 2, y + 5, w - 8, active ? GuiKit.TITLE : TEXT);
+        clickable(x, y, w, MODE_H, action);
+        if (hover) {
+            host.setHoverTip(tip(tipKey));
+        }
+    }
+
     /** 粒子强度：滑块 + 一行白话提示 + 右侧三个快捷档（0 / 50 / 100%）。 */
     public void drawParticleBlock(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         // mryt233 改（2026-11-09，r146a）：提示独占一行、给满宽度（不再被快捷档挤到截断）；
         // 三个快捷档放到下面一行，右对齐。
-        int hintY = host.py() + 48 + 22;
+        int hintY = host.py() + 64 + 22;
         Component hint = Component.translatable(k("particles.hint"));
         g.text(host.font(), hint, host.px() + 12, hintY, MUTED, false);
         int qw = Math.max(36, Math.min(64, (host.panelW() - 24) / 6));
@@ -160,7 +236,8 @@ public final class ConfigPainter {
     }
 
     private void drawHeader(GuiGraphicsExtractor g, Header header, int y, int h, int mouseX, int mouseY) {
-        boolean open = host.expanded().contains(header.titleKey());
+        boolean drawerHeader = header.titleKey().equals(k("mode.drawer_header"));
+        boolean open = drawerHeader ? host.modeDrawerOpen() : host.expanded().contains(header.titleKey());
         boolean hover = hit(mouseX, mouseY, host.listX(), y, host.listW(), h);
         g.fill(host.listX(), y, host.listX() + host.listW(), y + h - 1, hover ? 0x30B47A1C : 0x204A2E12);
         g.fill(host.listX(), y + h - 1, host.listX() + host.listW(), y + h, GuiKit.BRASS_DARK);
@@ -168,6 +245,10 @@ public final class ConfigPainter {
         g.text(host.font(), mark + Component.translatable(header.titleKey()).getString()
             + "  (" + header.count() + ")", host.listX() + 6, y + (h - 8) / 2, GuiKit.TITLE, true);
         clickableInList(host.listX(), y, host.listW(), h, () -> {
+            if (drawerHeader) {
+                host.toggleModeDrawer();
+                return;
+            }
             if (!host.expanded().remove(header.titleKey())) {
                 host.expanded().add(header.titleKey());
             }
@@ -195,7 +276,7 @@ public final class ConfigPainter {
         drawFieldControls(g, f, y, h, mouseX, mouseY);
     }
 
-    /** 一行的控件：[-  数值  +  ↺]，纵向居中。 */
+    /** 一行的控件：数值为 [-  数值  +  ↺]，布尔/枚举为 [ 开关/选项  ↺]，纵向居中。 */
     private void drawFieldControls(GuiGraphicsExtractor g, Field f, int y, int h, int mouseX, int mouseY) {
         int vw = host.valueWidth();
         int resetX = host.listX() + host.listW() - 6 - RESET_W;
@@ -203,11 +284,28 @@ public final class ConfigPainter {
         int valueX = plusX - CTRL_GAP - vw;
         int minusX = valueX - CTRL_GAP - BTN;
         int by = y + (h - BTN) / 2;
-        drawButton(g, minusX, by, "-", hit(mouseX, mouseY, minusX, by, BTN, BTN));
-        clickableInList(minusX, by, BTN, BTN, () -> host.nudge(f, -1));
-        drawButton(g, plusX, by, "+", hit(mouseX, mouseY, plusX, by, BTN, BTN));
-        clickableInList(plusX, by, BTN, BTN, () -> host.nudge(f, 1));
-        drawValueBox(g, f, valueX, y + (h - 16) / 2, vw, mouseX, mouseY);
+        if (f.isNumeric()) {
+            drawButton(g, minusX, by, "-", hit(mouseX, mouseY, minusX, by, BTN, BTN));
+            clickableInList(minusX, by, BTN, BTN, () -> host.nudge(f, -1));
+            drawButton(g, plusX, by, "+", hit(mouseX, mouseY, plusX, by, BTN, BTN));
+            clickableInList(plusX, by, BTN, BTN, () -> host.nudge(f, 1));
+            drawValueBox(g, f, valueX, y + (h - 16) / 2, vw, mouseX, mouseY);
+        } else {
+            int pillW = plusX + BTN - minusX;
+            boolean hover = hit(mouseX, mouseY, minusX, by, pillW, BTN);
+            boolean activeVisual = f.kind() == Kind.BOOLEAN
+                ? host.values().boolValue(f)
+                : Config.MODE_SIMPLE.equals(host.values().choiceValue(f));
+            copperButton(g, minusX, by, pillW, BTN,
+                activeVisual ? HOVER : (hover ? 0xFF4A2E12 : PANEL_BG),
+                activeVisual ? GuiKit.BRASS_HI : GuiKit.BRASS);
+            Component pillText = f.kind() == Kind.BOOLEAN
+                ? toggleComponent(host.values().boolValue(f))
+                : choiceComponent(host.values().choiceValue(f));
+            fittedText(g, host.font(), pillText, minusX + pillW / 2, by + 4, pillW - 8,
+                activeVisual ? GuiKit.TITLE : MUTED);
+            clickableInList(minusX, by, pillW, BTN, () -> host.nudge(f, 1));
+        }
         // 只在当前值和默认值不同的时候才出「↺」
         if (!host.values().isDefault(f)) {
             boolean hover = hit(mouseX, mouseY, resetX, by, RESET_W, BTN);
@@ -215,7 +313,7 @@ public final class ConfigPainter {
             g.centeredText(host.font(), Component.literal("\u21BA"), resetX + RESET_W / 2, by + 3,
                 hover ? GuiKit.TITLE : MUTED);
             clickableInList(resetX, by, RESET_W, BTN, () -> {
-                host.values().setValue(f, host.values().defaultValue(f));
+                host.values().resetField(f);
                 host.editor().bad.remove(f.key());
             });
             if (hover) {

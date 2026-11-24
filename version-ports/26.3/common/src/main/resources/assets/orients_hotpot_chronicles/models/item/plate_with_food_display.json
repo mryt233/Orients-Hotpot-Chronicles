@@ -1,0 +1,7 @@
+{
+  "textures": {
+    "particle": "minecraft:block/quartz_block_side"
+  },
+  "display": {},
+  "gui_light": "side"
+}

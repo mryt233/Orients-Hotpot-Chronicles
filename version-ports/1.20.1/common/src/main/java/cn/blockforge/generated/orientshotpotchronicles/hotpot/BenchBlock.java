@@ -360,12 +360,12 @@ public class BenchBlock extends Block implements EntityBlock, ItemInteractionBlo
 
     /**
      * 手里拿着一格高条凳右键已放好的一格高条凳（不潜行时）：顺着这一摞往上找，直接叠到最顶上（最多 16 格），
-     * 叠好后就能当梯子爬；潜行或拿别的方块时照常按原版放置，空手或拿非方块物品交给 useWithoutItem 去坐。
+     * 叠好后就能当梯子爬；潜行或拿别的方块时照常按原版放置，空手或拿非方块物品交给 compatUseWithoutItem 去坐。
      * mryt233 改（2026-11-05，清单 #120）。
      */
     @Override
-    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
-                                           Player player, InteractionHand hand, BlockHitResult hit) {
+    public ItemInteractionResult compatUseItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
+                                                 Player player, InteractionHand hand, BlockHitResult hit) {
         if (this.tall && !player.isShiftKeyDown()
                 && stack.getItem() instanceof BlockItem held
                 && held.getBlock() instanceof BenchBlock heldBench && heldBench.tall) {
@@ -392,6 +392,7 @@ public class BenchBlock extends Block implements EntityBlock, ItemInteractionBlo
             }
         }
         return Use.blockItem(stack.getItem() instanceof BlockItem
+                && !(stack.getItem() instanceof ConfigurableFood)
             ? UseOutcome.SKIPPED
             : UseOutcome.PASS_TO_EMPTY, world.isClientSide);
     }
@@ -448,7 +449,7 @@ public class BenchBlock extends Block implements EntityBlock, ItemInteractionBlo
 
     /**
      * 条凳被拆、被活塞推走、被炸掉时，把落在这一格上的座位一起清掉（坐着的人当场被放下），
-     * 并且「凳塔中间层不坐人」由 {@link #useWithoutItem} 拦。
+     * 并且「凳塔中间层不坐人」由 {@link #compatUseWithoutItem} 拦。
      * mryt233 改（2026-11-05，清单 #120）。
      */
     @Override
@@ -471,8 +472,8 @@ public class BenchBlock extends Block implements EntityBlock, ItemInteractionBlo
     }
 
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player,
-                                            BlockHitResult hit) {
+    public InteractionResult compatUseWithoutItem(BlockState state, Level world, BlockPos pos, Player player,
+                                                    BlockHitResult hit) {
         if (player.isShiftKeyDown() || player.isPassenger()) {
             return Use.blockEmpty(UseOutcome.PASS, world.isClientSide);
         }

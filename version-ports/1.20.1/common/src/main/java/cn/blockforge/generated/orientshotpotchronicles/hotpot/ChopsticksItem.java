@@ -98,11 +98,11 @@ public class ChopsticksItem extends Item implements TableItem {
                 // 空白处没有盘子可放菜，所以夹着菜也照摆（r136b，2026-11-05 用户，新增）
                 return Use.item(TableObjects.placeInHolderOrOn(context, this), world.isClientSide);
             }
-            // mryt233 改：潜行绕过方块 useItemOn；夹菜点中心仍放菜/蘸料，点沿口连菜一起架放。
+            // mryt233 改：潜行绕过方块 compatUseItemOn；夹菜点中心仍放菜/蘸料，点沿口连菜一起架放。
             double dx = hx - plate.x, dz = hz - plate.z;
             boolean rim = Math.max(Math.abs(dx) / plate.halfX(), Math.abs(dz) / plate.halfZ()) >= 0.65;
             if (!Chopsticks.held(context.getItemInHand()).isEmpty() && !rim) {
-                return ((PlateHolderBlock) state.getBlock()).useItemOn(context.getItemInHand(), state, world,
+                return ((PlateHolderBlock) state.getBlock()).compatUseItemOn(context.getItemInHand(), state, world,
                     pos, player, context.getHand(), hit).result();
             }
             if (!plate.restsChopsticks() || !plate.chopsticks.isEmpty()) {

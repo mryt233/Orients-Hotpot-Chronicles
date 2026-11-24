@@ -57,6 +57,11 @@ public final class HotPotRecipes {
         registration.recipeSerializers().register(HotPot.id("soup_base"), SoupBaseRecipe.SERIALIZER);
         registration.recipeTypes().register(HotPot.id("seasoning"), SeasoningRecipe.TYPE);
         registration.recipeSerializers().register(HotPot.id("seasoning"), SeasoningRecipe.SERIALIZER);
+        registration.recipeTypes().register(HotPot.id("stone_mill"), StoneMillRecipe.TYPE);
+        registration.recipeSerializers().register(HotPot.id("stone_mill"), StoneMillRecipe.SERIALIZER);
+        registration.recipeTypes().register(HotPot.id("wooden_vat"), WoodenVatRecipe.TYPE);
+        registration.recipeSerializers().register(HotPot.id("wooden_vat"), WoodenVatRecipe.SERIALIZER);
+        ConditionalCraftingRecipe.register(registration);
     }
 
     static void clearCache() {
@@ -120,6 +125,24 @@ public final class HotPotRecipes {
         if (input.isEmpty()) return null;
         return all(level, PoundingRecipe.TYPE).stream()
             .filter(recipe -> recipe.ingredient().test(input)).findFirst().orElse(null);
+    }
+
+    public static StoneMillRecipe stoneMill(Level level, ItemStack input) {
+        if (input.isEmpty()) return null;
+        return all(level, StoneMillRecipe.TYPE).stream()
+            .filter(recipe -> recipe.ingredient().test(input)).findFirst().orElse(null);
+    }
+
+    public static WoodenVatRecipe woodenVat(Level level, String fluid, ItemStack input) {
+        if (fluid == null || fluid.isEmpty()) return null;
+        return all(level, WoodenVatRecipe.TYPE).stream()
+            .filter(recipe -> recipe.matchesState(fluid, input)).findFirst().orElse(null);
+    }
+
+    public static boolean woodenVatAcceptsFluid(Level level, String fluid) {
+        if (fluid == null || fluid.isEmpty()) return false;
+        return all(level, WoodenVatRecipe.TYPE).stream()
+            .anyMatch(recipe -> fluid.equals(recipe.fluid()));
     }
 
     /** 解析配方 JSON 里的物品栈：同时兼容 1.20.1 {"item","count","nbt"} 与 1.21 {"id","count","components"}。 */

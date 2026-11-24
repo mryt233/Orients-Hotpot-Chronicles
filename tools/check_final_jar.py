@@ -24,6 +24,8 @@ def registered_ids():
     source = content.CONTENT_JAVA.read_text(encoding="utf-8")
     items = set(content.registered_items(source))
     blocks = set(re.findall(r'\.blocks\(\)\.register\(\s*HotPot\.id\("([a-z0-9_]+)"\)', source))
+    blocks |= set(re.findall(r'registerCropBlock\(\s*registration\s*,\s*"[a-z0-9_]+"\s*,\s*"([a-z0-9_]+)"', source))
+    blocks |= set(re.findall(r'registerWildCrop\(\s*registration\s*,\s*"([a-z0-9_]+)"', source))
     materials = ids("woods") + ids("stone_tables")
     tables = {m + "_" + kind for m in materials for kind in ("hotpot_table", "tall_hotpot_table")}
     benches = {m + "_" + kind for m in ids("woods") for kind in ("stool", "bench")}
@@ -35,7 +37,11 @@ def registered_ids():
         code = (content.CONTENT_JAVA.parent / (name + ".java")).read_text(encoding="utf-8")
         blocks.update(re.findall(r'^\s*[A-Z_]+\(\s*"([a-z0-9_]+)"', code, re.M))
     blocks |= tables | benches | stations | plates
-    items |= tables | benches | stations | plates | {x for x in blocks if x not in ("plates", "bowl", "drink", "cup", "drink_cauldron", "tall_brick_stove_top", "sauce_station_top", "chopstick_rest")}
+    items |= tables | benches | stations | plates | {
+        x for x in blocks
+        if x not in ("plates", "bowl", "drink", "cup", "drink_cauldron", "tall_brick_stove_top", "sauce_station_top", "chopstick_rest", "sauce_bottle")
+        and not x.endswith("_crop")
+    }
     return {"item": items, "block": blocks}
 
 

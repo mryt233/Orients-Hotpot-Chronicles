@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "orients_hotpot_chronicles:block/stone_mill_base"
+    },
+    "facing=west": {
+      "model": "orients_hotpot_chronicles:block/stone_mill_base",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "orients_hotpot_chronicles:block/stone_mill_base",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "orients_hotpot_chronicles:block/stone_mill_base",
+      "y": 270
+    }
+  }
+}

@@ -1,3 +1,4 @@
+// mryt233 改：26.1 同代移植同步。
 package me.shedaniel.rei.api.client.gui.widgets;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -9,6 +10,6 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
  * 让插件源码可以零联网编译；成品 jar 会排除整个 {@code me/shedaniel} 目录，运行时用的是玩家真正安装的那份。
  * 作者：mryt233 */
 
-public interface Widget {
-    void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta);
+public abstract class Widget {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) { }
 }

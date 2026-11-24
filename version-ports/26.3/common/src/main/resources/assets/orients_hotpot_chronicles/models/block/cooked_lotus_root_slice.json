@@ -1,0 +1,77 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "tex": "orients_hotpot_chronicles:item/cooked_lotus_root_slice",
+    "particle": "orients_hotpot_chronicles:item/cooked_lotus_root_slice"
+  },
+  "elements": [
+    {
+      "from": [
+        4.0,
+        0,
+        4.0
+      ],
+      "to": [
+        12.0,
+        1.6,
+        12.0
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            14,
+            8,
+            16
+          ],
+          "texture": "#tex"
+        },
+        "east": {
+          "uv": [
+            0,
+            14,
+            8,
+            16
+          ],
+          "texture": "#tex"
+        },
+        "south": {
+          "uv": [
+            0,
+            14,
+            8,
+            16
+          ],
+          "texture": "#tex"
+        },
+        "west": {
+          "uv": [
+            0,
+            14,
+            8,
+            16
+          ],
+          "texture": "#tex"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#tex"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#tex"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,258 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "planks": "minecraft:block/mangrove_planks",
+    "particle": "minecraft:block/mangrove_planks"
+  },
+  "elements": [
+    {
+      "from": [
+        0.5,
+        14,
+        5
+      ],
+      "to": [
+        16,
+        16,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#planks"
+        },
+        "south": {
+          "texture": "#planks"
+        },
+        "west": {
+          "texture": "#planks"
+        },
+        "up": {
+          "texture": "#planks"
+        },
+        "down": {
+          "texture": "#planks"
+        }
+      }
+    },
+    {
+      "from": [
+        5.0,
+        2.5,
+        4.928571428571429
+      ],
+      "to": [
+        6.0,
+        3.5,
+        11.071428571428571
+      ],
+      "faces": {
+        "north": {
+          "texture": "#planks"
+        },
+        "east": {
+          "texture": "#planks"
+        },
+        "south": {
+          "texture": "#planks"
+        },
+        "west": {
+          "texture": "#planks"
+        },
+        "up": {
+          "texture": "#planks"
+        },
+        "down": {
+          "texture": "#planks"
+        }
+      }
+    },
+    {
+      "from": [
+        5.0,
+        7.0,
+        5.571428571428571
+      ],
+      "to": [
+        6.0,
+        8.0,
+        10.428571428571429
+      ],
+      "faces": {
+        "north": {
+          "texture": "#planks"
+        },
+        "east": {
+          "texture": "#planks"
+        },
+        "south": {
+          "texture": "#planks"
+        },
+        "west": {
+          "texture": "#planks"
+        },
+        "up": {
+          "texture": "#planks"
+        },
+        "down": {
+          "texture": "#planks"
+        }
+      }
+    },
+    {
+      "name": "bench_leg",
+      "from": [
+        4.5,
+        -0.1421,
+        5.75
+      ],
+      "to": [
+        6.5,
+        14.0,
+        7.25
+      ],
+      "rotation": {
+        "origin": [
+          4.5,
+          14.0,
+          6.5
+        ],
+        "axis": "x",
+        "angle": 8.1301
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.0,
+            14.1421
+          ],
+          "texture": "#planks"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.0,
+            14.1421
+          ],
+          "texture": "#planks"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            14.1421
+          ],
+          "texture": "#planks"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            14.1421
+          ],
+          "texture": "#planks"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.0,
+            1.5
+          ],
+          "texture": "#planks"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.0,
+            1.5
+          ],
+          "texture": "#planks"
+        }
+      }
+    },
+    {
+      "name": "bench_leg",
+      "from": [
+        4.5,
+        -0.1421,
+        8.75
+      ],
+      "to": [
+        6.5,
+        14.0,
+        10.25
+      ],
+      "rotation": {
+        "origin": [
+          4.5,
+          14.0,
+          9.5
+        ],
+        "axis": "x",
+        "angle": -8.1301
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.0,
+            14.1421
+          ],
+          "texture": "#planks"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.0,
+            14.1421
+          ],
+          "texture": "#planks"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            14.1421
+          ],
+          "texture": "#planks"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            14.1421
+          ],
+          "texture": "#planks"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.0,
+            1.5
+          ],
+          "texture": "#planks"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.0,
+            1.5
+          ],
+          "texture": "#planks"
+        }
+      }
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -54,9 +55,13 @@ public final class ConfigStore {
      *
      * <p>mryt233 改（2026-11-07）：两者一起构建、一起用 volatile 引用换掉，读侧要么看到旧的一对、
      * 要么看到新的一对，不会出现「JsonObject 已换、扁平表还是旧的」这种撕裂。
-     * 树依旧是 {@code JsonObject}（设置界面、同步包要用），{@code numbers} 是 {@link Map#copyOf} 出来的不可变表。</p>
+     * 树依旧是 {@code JsonObject}（设置界面、同步包要用），{@code numbers}/{@code booleans}/{@code strings} 是 {@link Map#copyOf} 出来的不可变表。
+     * mryt233 改（2026-11-15）：补充布尔与字符串扁平快照及 {@link NumericConfig.TypedRules} 支持。</p>
      */
-    private record Snapshot(JsonObject data, Map<String, Double> numbers) {
+    private record Snapshot(JsonObject data,
+                            Map<String, Double> numbers,
+                            Map<String, Boolean> booleans,
+                            Map<String, String> strings) {
     }
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -65,22 +70,30 @@ public final class ConfigStore {
     private final long maxBytes;
     private final String note;
     private final NumericConfig.Rules rules;
+    private final NumericConfig.TypedRules typedRules;
     private final Supplier<JsonObject> fieldHelp;
     private final Consumer<String> warn;
 
     private final JsonObject defaults = new JsonObject();
-    private volatile Snapshot server = new Snapshot(new JsonObject(), Map.of());
-    private volatile Snapshot client = new Snapshot(new JsonObject(), Map.of());
+    private volatile Snapshot server = new Snapshot(new JsonObject(), Map.of(), Map.of(), Map.of());
+    private volatile Snapshot client = new Snapshot(new JsonObject(), Map.of(), Map.of(), Map.of());
     private Path path;
     private boolean ready;
 
     public ConfigStore(String fileName, int format, long maxBytes, String note,
                        NumericConfig.Rules rules, Supplier<JsonObject> fieldHelp, Consumer<String> warn) {
+        this(fileName, format, maxBytes, note, rules, null, fieldHelp, warn);
+    }
+
+    public ConfigStore(String fileName, int format, long maxBytes, String note,
+                       NumericConfig.Rules rules, NumericConfig.TypedRules typedRules,
+                       Supplier<JsonObject> fieldHelp, Consumer<String> warn) {
         this.fileName = fileName;
         this.format = format;
         this.maxBytes = maxBytes;
         this.note = note;
         this.rules = rules;
+        this.typedRules = typedRules;
         this.fieldHelp = fieldHelp;
         this.warn = warn;
     }
@@ -136,12 +149,12 @@ public final class ConfigStore {
     }
 
     public Loaded parse(String text) {
-        NumericConfig.Result parsed = NumericConfig.parse(text, defaults, rules, format);
+        NumericConfig.Result parsed = NumericConfig.parse(text, defaults, rules, typedRules, format);
         return new Loaded(parsed.data(), parsed.warnings());
     }
 
     public boolean isValidDocument(String text) {
-        return NumericConfig.parse(text, defaults, rules, format).validDocument();
+        return NumericConfig.parse(text, defaults, rules, typedRules, format).validDocument();
     }
 
     /** 当前服务端快照（只读，不要修改；要改请用 {@link #replaceServer}）。 */
@@ -186,29 +199,63 @@ public final class ConfigStore {
     }
 
     /**
+     * 取一条布尔配置的扁平快照值；不是布尔或不存在时返回 {@code fallback}。
+     */
+    public boolean flag(JsonObject snapshot, String path, boolean fallback) {
+        Snapshot snap = snapshotFor(snapshot);
+        if (snap != null) {
+            Boolean value = snap.booleans().get(path);
+            return value == null ? fallback : value;
+        }
+        Boolean value = slowBooleanLookup(snapshot, path);
+        return value == null ? fallback : value;
+    }
+
+    /**
+     * 取一条字符串配置的扁平快照值；不是字符串或不存在时返回 {@code fallback}。
+     */
+    public String text(JsonObject snapshot, String path, String fallback) {
+        Snapshot snap = snapshotFor(snapshot);
+        if (snap != null) {
+            String value = snap.strings().get(path);
+            return value == null ? fallback : value;
+        }
+        String value = slowStringLookup(snapshot, path);
+        return value == null ? fallback : value;
+    }
+
+    /**
      * 这份快照里有没有这一项（不看类型；用来区分「没配」和「配成默认值」）。
      * 语义与原来的 {@code ConfigStore.read(root, path...).has(key)} 一致：这一层里存在这个键就算有，
      * 哪怕是文字 / 对象而不是数字（那种情况 {@link #real} / {@link #integer} 会回退默认值，但这里仍然算「有」）。
      */
     public boolean contains(JsonObject snapshot, String path) {
-        if (numbersOf(snapshot).containsKey(path)) {
+        Snapshot snap = snapshotFor(snapshot);
+        if (snap != null && (snap.numbers().containsKey(path)
+            || snap.booleans().containsKey(path)
+            || snap.strings().containsKey(path))) {
             return true;
         }
         JsonElement leaf = walk(snapshot, path);
         return leaf != null;
     }
 
-    /** 取快照对应的扁平表；只对当前这两份快照生效，其它对象返回空表（由调用方走慢路径）。 */
-    private Map<String, Double> numbersOf(JsonObject snapshot) {
+    private Snapshot snapshotFor(JsonObject snapshot) {
         Snapshot serverNow = server;
         if (serverNow.data() == snapshot) {
-            return serverNow.numbers();
+            return serverNow;
         }
         Snapshot clientNow = client;
         if (clientNow.data() == snapshot) {
-            return clientNow.numbers();
+            return clientNow;
         }
-        return Map.of();
+        return null;
+    }
+
+    /** 取快照对应的扁平表；只对当前这两份快照生效，其它对象返回空表（由调用方走慢路径）。 */
+    private Map<String, Double> numbersOf(JsonObject snapshot) {
+        Snapshot snap = snapshotFor(snapshot);
+        return snap == null ? Map.of() : snap.numbers();
     }
 
     public void resetServerToDefaults() {
@@ -335,22 +382,23 @@ public final class ConfigStore {
 
     // ------------------------------------------------------------------ 快照与扁平表
 
-    /** mryt233 改（2026-11-07）：把树摊平成「配置路径 → 数值」的不可变表，快照建立时算一次。 */
+    /** mryt233 改（2026-11-07）：把树摊平成「配置路径 → 值」的不可变表，快照建立时算一次。 */
     private static Snapshot snapshotOf(JsonObject data) {
-        return new Snapshot(data, flatten(data));
-    }
-
-    private static Map<String, Double> flatten(JsonObject root) {
         Map<String, Double> numbers = new HashMap<>(256);
-        collect(root, "", numbers);
-        return Map.copyOf(numbers);
+        Map<String, Boolean> booleans = new HashMap<>(16);
+        Map<String, String> strings = new HashMap<>(8);
+        collect(data, "", numbers, booleans, strings);
+        return new Snapshot(data, Map.copyOf(numbers), Map.copyOf(booleans), Map.copyOf(strings));
     }
 
     /**
-     * 递归收集数字项。键里出现 {@code .} 时路径会有歧义（食材 ID 由玩家 / 数据包决定），
+     * 递归收集基础类型叶节点。键里出现 {@code .} 时路径会有歧义（食材 ID 由玩家 / 数据包决定），
      * 这与原有规则表按前缀 / 后缀匹配的口径一致，不是这次改动引入的。
      */
-    private static void collect(JsonObject node, String prefix, Map<String, Double> out) {
+    private static void collect(JsonObject node, String prefix,
+                                Map<String, Double> numbers,
+                                Map<String, Boolean> booleans,
+                                Map<String, String> strings) {
         for (Map.Entry<String, JsonElement> entry : node.entrySet()) {
             JsonElement value = entry.getValue();
             if (value == null) {
@@ -358,12 +406,19 @@ public final class ConfigStore {
             }
             String path = prefix + entry.getKey();
             if (value.isJsonObject()) {
-                collect(value.getAsJsonObject(), path + ".", out);
-            } else if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isNumber()) {
-                try {
-                    out.put(path, value.getAsDouble());
-                } catch (RuntimeException ignored) {
-                    // 解析期已经校验过范围与整数性，这里理论上不会失败；真失败就当作没这一项（走默认值）
+                collect(value.getAsJsonObject(), path + ".", numbers, booleans, strings);
+            } else if (value.isJsonPrimitive()) {
+                JsonPrimitive primitive = value.getAsJsonPrimitive();
+                if (primitive.isNumber()) {
+                    try {
+                        numbers.put(path, primitive.getAsDouble());
+                    } catch (RuntimeException ignored) {
+                        // 解析期已经校验过范围与整数性，这里理论上不会失败；真失败就当作没这一项（走默认值）
+                    }
+                } else if (primitive.isBoolean()) {
+                    booleans.put(path, primitive.getAsBoolean());
+                } else if (primitive.isString()) {
+                    strings.put(path, primitive.getAsString());
                 }
             }
         }
@@ -380,6 +435,22 @@ public final class ConfigStore {
         } catch (RuntimeException error) {
             return null;
         }
+    }
+
+    private static Boolean slowBooleanLookup(JsonObject snapshot, String path) {
+        JsonElement leaf = walk(snapshot, path);
+        if (leaf == null || !leaf.isJsonPrimitive() || !leaf.getAsJsonPrimitive().isBoolean()) {
+            return null;
+        }
+        return leaf.getAsBoolean();
+    }
+
+    private static String slowStringLookup(JsonObject snapshot, String path) {
+        JsonElement leaf = walk(snapshot, path);
+        if (leaf == null || !leaf.isJsonPrimitive() || !leaf.getAsJsonPrimitive().isString()) {
+            return null;
+        }
+        return leaf.getAsString();
     }
 
     /** 按 {@code .} 拆开逐层走；任一层不是对象或没有这个键时返回 null。 */

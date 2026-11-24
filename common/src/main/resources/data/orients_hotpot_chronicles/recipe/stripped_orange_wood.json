@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "bark",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": {
+      "item": "orients_hotpot_chronicles:stripped_orange_log"
+    }
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:stripped_orange_wood",
+    "count": 3
+  }
+}

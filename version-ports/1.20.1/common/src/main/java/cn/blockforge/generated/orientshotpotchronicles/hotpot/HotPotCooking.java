@@ -38,12 +38,19 @@ public final class HotPotCooking {
     }
 
     private static void registerDefaultItemCookTicks() {
+        // 极快熟：吊龙、毛肚、金针菇、青菜（2.5 秒；后两样 mryt233 2026-11-06 加，r137）
         putItemCookTicks(50, "beef_loin_slice", "tripe", "enoki_mushroom", "greens");
+        // 快熟：肥牛卷、羊肉卷、土豆片、冷豆腐块、火腿肠片、虾仁（5 秒）
+        // r137 追加藕片、鱿鱼卷、腐竹、苕皮
         putItemCookTicks(100, "fatty_beef_roll", "mutton_roll", "potato_slice", "cold_tofu_cube",
             "ham_sausage_slice", "peeled_shrimp",
-            "lotus_root_slice", "squid_roll", "tofu_skin", "sweet_potato_skin");
+            "lotus_root_slice", "squid_roll", "tofu_skin", "sweet_potato_skin",
+            "boneless_chicken_feet");
+        // 中等：带壳虾、虾滑、生火腿肠（7.5 秒）；r137 追加豆干、宽粉、生酥肉、酥肉；鸡爪 7.5 秒
         putItemCookTicks(150, "shrimp", "shrimp_paste", "raw_ham_sausage",
-            "dried_tofu", "wide_noodles", "raw_crispy_pork", "crispy_pork");
+            "dried_tofu", "wide_noodles", "raw_crispy_pork", "crispy_pork",
+            "chicken_feet");
+        // 慢熟：整块牛脊肉 + 8 种丸子（10 秒）
         putItemCookTicks(200, "beef_loin", "beef_meatball", "pork_meatball", "mutton_meatball", "fish_ball",
             "cilantro_beef_meatball", "cilantro_pork_meatball", "cilantro_mutton_meatball", "cilantro_fish_ball",
             "zhe_er_gen_slice");
@@ -74,6 +81,9 @@ public final class HotPotCooking {
 
     public static final TagKey<Item> NOT_POT_INGREDIENT =
         TagKey.create(Registries.ITEM, HotPot.id("not_pot_ingredient"));
+    /** 开口大木桶豆腐点卤剂标签（含卤水瓶及扩展凝固剂，0.3.1-alpha）。 */
+    public static final TagKey<Item> TOFU_COAGULANTS =
+        TagKey.create(Registries.ITEM, HotPot.id("tofu_coagulants"));
 
     private HotPotCooking() {
     }
@@ -81,6 +91,7 @@ public final class HotPotCooking {
     private static final TagKey<Item> MEAT_TAG = TagKey.create(Registries.ITEM, new ResourceLocation("minecraft", "meat"));
 
     public static boolean acceptable(Level world, ItemStack stack) {
+        // mryt233 改（2026-11-11）：数据包标签优先于配方与子模组放行钩子。
         if (stack.isEmpty() || stack.is(NOT_POT_INGREDIENT)) {
             return false;
         }

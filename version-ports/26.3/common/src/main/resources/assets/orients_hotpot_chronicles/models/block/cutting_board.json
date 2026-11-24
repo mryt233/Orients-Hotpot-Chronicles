@@ -1,0 +1,214 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "top": "orients_hotpot_chronicles:block/cutting_board_top",
+    "side": "orients_hotpot_chronicles:block/cutting_board_side",
+    "particle": "orients_hotpot_chronicles:block/cutting_board_top"
+  },
+  "elements": [
+    {
+      "from": [
+        2,
+        0,
+        4
+      ],
+      "to": [
+        14,
+        3,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#side",
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#side",
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#side",
+          "uv": [
+            4,
+            13,
+            12,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#side",
+          "uv": [
+            4,
+            13,
+            12,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            2,
+            4,
+            14,
+            12
+          ]
+        },
+        "down": {
+          "texture": "#side",
+          "uv": [
+            2,
+            4,
+            14,
+            12
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        0,
+        2
+      ],
+      "to": [
+        12,
+        3,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#side",
+          "uv": [
+            4,
+            13,
+            12,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#side",
+          "uv": [
+            4,
+            13,
+            12,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#side",
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#side",
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            4,
+            2,
+            12,
+            14
+          ]
+        },
+        "down": {
+          "texture": "#side",
+          "uv": [
+            4,
+            2,
+            12,
+            14
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        0,
+        3
+      ],
+      "to": [
+        13,
+        3,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#side",
+          "uv": [
+            3,
+            13,
+            13,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#side",
+          "uv": [
+            3,
+            13,
+            13,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#side",
+          "uv": [
+            3,
+            13,
+            13,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#side",
+          "uv": [
+            3,
+            13,
+            13,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ]
+        },
+        "down": {
+          "texture": "#side",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ]
+        }
+      }
+    }
+  ]
+}

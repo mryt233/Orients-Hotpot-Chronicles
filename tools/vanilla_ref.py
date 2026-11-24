@@ -30,9 +30,9 @@ TEX = VANILLA / "textures"
 # (英文键, 中文名, 目录, 文件名正则, 是否排除 cooked_ 开头)
 CATEGORIES = [
     ("raw_meat", "生肉", "item",
-     r"^(beef|porkchop|mutton|chicken|rabbit|rotten_flesh)$|loin|_roll$|minced|^tripe$|meatball$|blood|liver|kidney|intestine|gizzard|^raw_ham_sausage$", True),
+     r"^(beef|porkchop|mutton|chicken|rabbit|rotten_flesh)$|loin|_roll$|minced|^tripe$|meatball$|blood|liver|kidney|intestine|gizzard|^raw_ham_sausage$|chicken_feet", True),
     ("cooked_meat", "熟肉", "item",
-     r"^cooked_(beef|porkchop|mutton|chicken|rabbit)$|^cooked_.*(beef|pork|mutton|tripe|meatball|roll|loin|blood|liver|kidney|intestine|gizzard)|^(cooked_)?ham_sausage", False),
+     r"^cooked_(beef|porkchop|mutton|chicken|rabbit)$|^cooked_.*(beef|pork|mutton|tripe|meatball|roll|loin|blood|liver|kidney|intestine|gizzard|chicken_feet)|^(cooked_)?ham_sausage", False),
     ("raw_fish", "生鱼海鲜", "item", r"^(cod|salmon|tropical_fish|pufferfish)$|shrimp|fish_ball$|squid", True),
     ("cooked_fish", "熟鱼海鲜", "item", r"^cooked_(cod|salmon)$|^cooked_.*(shrimp|fish_ball|squid)", False),
     ("vegetable", "蔬菜", "item",

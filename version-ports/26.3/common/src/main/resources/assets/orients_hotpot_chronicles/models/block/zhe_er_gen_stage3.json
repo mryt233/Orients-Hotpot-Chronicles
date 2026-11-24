@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/crop",
+  "textures": {
+    "crop": "orients_hotpot_chronicles:block/zhe_er_gen_stage3"
+  }
+}

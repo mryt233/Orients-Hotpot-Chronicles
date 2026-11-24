@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P",
+    "P"
+  ],
+  "key": {
+    "P": "orients_hotpot_chronicles:potato_slice"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:sweet_potato_skin",
+    "count": 3
+  }
+}

@@ -18,6 +18,7 @@ public final class ConfigListModel {
     private static final int ROW_MIN_H = 30, HEADER_H = 20;
     private List<Object> layoutCache;
     private int layoutTab = -1, layoutW = -1;
+    private boolean layoutDrawer;
     private JsonObject layoutDoc;
     private Set<String> layoutExpand;
 
@@ -25,6 +26,7 @@ public final class ConfigListModel {
         layoutCache = null;
         layoutTab = -1;
         layoutW = -1;
+        layoutDrawer = false;
         layoutDoc = null;
         layoutExpand = null;
     }
@@ -53,15 +55,27 @@ public final class ConfigListModel {
         return font.split(label, maxW);
     }
 
-    /** 当前页签的完整列表：分组标题 + （展开时的）数值行；行高按名字换行算。 */
+    /** 当前页签的完整列表：分组标题 + （展开时的）配置行；行高按名字换行算。 */
     public List<Object> layout(ConfigSchema schema, JsonObject edited, int tab, Set<String> expanded, int panelW, int listW, net.minecraft.client.gui.Font font) {
-        if (layoutCache != null && layoutTab == tab && layoutW == panelW && layoutDoc == edited
-            && layoutExpand != null && layoutExpand.equals(expanded)) {
+        return layout(schema, edited, tab, false, expanded, panelW, listW, font);
+    }
+
+    public List<Object> layout(ConfigSchema schema, JsonObject edited, int tab, boolean modeDrawerOpen,
+                               Set<String> expanded, int panelW, int listW, net.minecraft.client.gui.Font font) {
+        if (layoutCache != null && layoutTab == tab && layoutW == panelW && layoutDrawer == modeDrawerOpen
+            && layoutDoc == edited && layoutExpand != null && layoutExpand.equals(expanded)) {
             return layoutCache;
         }
         int labelW = labelAreaWidth(listW);
         List<Object> out = new ArrayList<>();
         if (tab == 0) {
+            if (modeDrawerOpen) {
+                List<Field> modeFields = schema.modeFields();
+                out.add(new Header(k("mode.drawer_header"), modeFields.size(), HEADER_H));
+                for (Field f : modeFields) {
+                    out.add(row(font, f, labelW));
+                }
+            }
             for (Field f : schema.commonFields(edited)) {
                 out.add(row(font, f, labelW));
             }
@@ -79,6 +93,7 @@ public final class ConfigListModel {
         layoutCache = out;
         layoutTab = tab;
         layoutW = panelW;
+        layoutDrawer = modeDrawerOpen;
         layoutDoc = edited;
         layoutExpand = new HashSet<>(expanded);
         return out;

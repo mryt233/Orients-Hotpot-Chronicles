@@ -32,9 +32,38 @@ public final class ClientTooltips {
     public static void append(ItemStack stack, List<Component> lines) {
         SharedClientSetup.appendPotTooltip(stack, lines);
         appendDipped(stack, lines);
-        appendCookedSoup(stack, lines);   // mryt233 改（2026-11-05，清单 #117）：菜是在哪种汤底里煮的
+        appendCookedSoup(stack, lines);   // mryt233 改（2026-11-05）：菜是在哪种汤底里煮的（r136a）
+        appendTableMaterials(stack, lines);
         appendFlavor(stack, lines);
         SharedClientSetup.appendPlateTooltip(stack, lines);
+    }
+
+    /** 0.3.1 Phase 4：展示桌子与备菜架当前使用的定制材质方块名（未知模组 ID 原样灰度显示）。 */
+    public static void appendTableMaterials(ItemStack stack, List<Component> lines) {
+        TableMaterialData data = HotPotContent.TABLE_MATERIALS == null
+            ? null : ItemData.get(stack, HotPotContent.TABLE_MATERIALS);
+        if (data == null || !data.hasAny()) {
+            return;
+        }
+        boolean isRack = stack.getItem() instanceof net.minecraft.world.item.BlockItem bi
+            && bi.getBlock() instanceof PrepRackBlock;
+        if (!data.top().isEmpty()) {
+            lines.add(Component.translatable(
+                HotPotBlockEntity.key(isRack ? "tooltip.rack_material" : "tooltip.table_top"),
+                materialName(data.top())).withStyle(ChatFormatting.GRAY));
+        }
+        if (!isRack && !data.base().isEmpty()) {
+            lines.add(Component.translatable(
+                HotPotBlockEntity.key("tooltip.table_base"),
+                materialName(data.base())).withStyle(ChatFormatting.GRAY));
+        }
+    }
+
+    private static Component materialName(String id) {
+        var block = TableMaterials.resolveBlock(id);
+        return block != null
+            ? block.getName()
+            : Component.literal(id).withStyle(ChatFormatting.DARK_GRAY);
     }
 
     /**

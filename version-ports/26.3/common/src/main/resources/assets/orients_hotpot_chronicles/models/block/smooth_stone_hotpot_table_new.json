@@ -1,0 +1,9 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/stone_hotpot_table_new",
+  "textures": {
+    "planks": "minecraft:block/smooth_stone_slab_side",
+    "particle": "minecraft:block/smooth_stone_slab_side",
+    "top": "minecraft:block/smooth_stone",
+    "bricks": "minecraft:block/bricks"
+  }
+}

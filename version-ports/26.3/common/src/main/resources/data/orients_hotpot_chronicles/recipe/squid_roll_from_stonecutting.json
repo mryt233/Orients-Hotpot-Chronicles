@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "orients_hotpot_chronicles:raw_squid",
+  "result": {
+    "id": "orients_hotpot_chronicles:squid_roll",
+    "count": 3
+  }
+}

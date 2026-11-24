@@ -1,0 +1,9 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/stone_tall_hotpot_table_w",
+  "textures": {
+    "planks": "minecraft:block/cut_copper",
+    "bricks": "minecraft:block/bricks",
+    "particle": "minecraft:block/cut_copper",
+    "top": "minecraft:block/cut_copper"
+  }
+}

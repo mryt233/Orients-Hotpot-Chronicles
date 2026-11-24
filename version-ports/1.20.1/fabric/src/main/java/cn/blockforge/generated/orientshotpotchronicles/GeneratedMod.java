@@ -2,6 +2,7 @@
 package cn.blockforge.generated.orientshotpotchronicles;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTracks;
 import cn.blockforge.generated.orientshotpotchronicles.platform.FabricPlatform;
 import cn.blockforge.orient.framework.loader.ClientHooks;
 import net.fabricmc.api.ModInitializer;
@@ -45,6 +46,7 @@ public final class GeneratedMod implements ModInitializer {
 
             @Override
             public void onResourceManagerReload(ResourceManager manager) {
+                HotPotTracks.reload(manager);
                 HotpotContentModule.HOST.reload();
             }
         });

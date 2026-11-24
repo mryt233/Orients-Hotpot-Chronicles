@@ -5,6 +5,7 @@
   "package": "cn.blockforge.generated.orientshotpotchronicles.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "BlockDropInvoker",
     "BlockStateTableDecorMixin",
     "BowlItemMixin",
     "EntityRaycastMixin",
@@ -16,6 +17,7 @@
     "CreativeInventoryScreenAccessor",
     "CreativeInventoryScreenMixin",
     "HandledScreenMixin",
+    "ParticleEnginePartMixin",
     "SplashManagerMixin"
   ],
   "injectors": {

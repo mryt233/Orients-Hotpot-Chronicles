@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "stage=0": {
+      "model": "orients_hotpot_chronicles:block/orange_leaves_stage0"
+    },
+    "stage=1": {
+      "model": "orients_hotpot_chronicles:block/orange_leaves_stage1"
+    },
+    "stage=2": {
+      "model": "orients_hotpot_chronicles:block/orange_leaves_stage2"
+    },
+    "stage=3": {
+      "model": "orients_hotpot_chronicles:block/orange_leaves_stage3"
+    }
+  }
+}

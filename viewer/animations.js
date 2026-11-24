@@ -7,6 +7,7 @@
 // Animated block textures (boiling soup etc.) come from the models themselves.
 // mryt233 改（2026-11-11）：Java 方块图集查询移至 client/RenderSprites；此处绘制参数不变。
 // mryt233 改（2026-11-13）：支持 other 通用自定义汤底预览与沸腾配色兜底。
+// mryt233 改（2026-11-16）：新增 Phase 4 三种备菜架（prep_racks）与统一火锅桌换材质（table_materials）场景。
 import * as THREE from "three";
 import { BoxBatch, Particles, TexBoxBatch, hash, frac, easeOutCubic, easeInOutSine, mc, rand } from "/anim.js";
 
@@ -208,10 +209,12 @@ async function buildScene(ctx, s, kind) {
 
   // clientHeat survives rebuilds (toggling the fire swaps the block model), so the ramp is visible
   let heat = s._heat ?? (lit && hasSoup ? 1 : 0);
-  // = HotPotBlockEntity.bubbleSeconds / cycleAngle：每刻按当前热度累加，换档不跳（2026-11-01 同步 B4/B5）
+  let prevHeat = heat;
   let bubbleT = s._bubbleT ?? 0;
+  let prevBubbleT = bubbleT;
   let cycleAngle = s._cycleAngle ?? 0;
-  const cycleRate = () => (hasSoup && heat < 0.5 ? COLD_OMEGA : OMEGA);
+  let prevCycleAngle = cycleAngle;
+  const cycleRate = () => (hasSoup ? COLD_OMEGA + (OMEGA - COLD_OMEGA) * Math.max(0, Math.min(1, heat)) : OMEGA);
   const target = () => (s.fire === "on" && hasSoup ? 1 : 0);
   const salt = 0x1d3; // a fixed "block position" seed
 
@@ -219,6 +222,9 @@ async function buildScene(ctx, s, kind) {
     object: root,
     // once per game tick (20/s)
     tick() {
+      prevHeat = heat;
+      prevBubbleT = bubbleT;
+      prevCycleAngle = cycleAngle;
       heat += (target() - heat) * 0.08;
       s._heat = heat;
       bubbleT += (0.7 + 0.5 * heat) / 20;
@@ -261,11 +267,13 @@ async function buildScene(ctx, s, kind) {
     // every render frame; ticks = game time in ticks (fractional), partial = progress into the current tick
     frame(ticks, partial) {
       batch.begin();
-      const bt = bubbleT + (partial * (0.7 + 0.5 * heat)) / 20;   // 带这一刻内的插值（B5）
-      if (hasSoup && !shape) boilingEffects(batch, s.soup, pot, heat, bt, salt);
+      const h = prevHeat + partial * (heat - prevHeat);
+      const bt = prevBubbleT + partial * (bubbleT - prevBubbleT);
+      const baseAngle = prevCycleAngle + partial * (cycleAngle - prevCycleAngle);
+      if (hasSoup && !shape) boilingEffects(batch, s.soup, pot, h, bt, salt);
       if (hasSoup && shape) {
         for (let side = 0; side < shape[2]; side++) {
-          boilingEffects(batch, sideSoups[side], pot, heat, bt, salt + side * 97,   // = HotPotBlockEntityRenderer（2026-11-01 对齐，原来是 101）
+          boilingEffects(batch, sideSoups[side], pot, h, bt, salt + side * 97,   // = HotPotBlockEntityRenderer（2026-11-01 对齐，原来是 101）
             (x, z) => yySide(shape[0], (x - pot.innerMin) / pot.innerSize, (z - pot.innerMin) / pot.innerSize) === side);
         }
       }
@@ -274,12 +282,10 @@ async function buildScene(ctx, s, kind) {
         const n = items.length;
         const col = cell % 3, row = Math.floor(cell / 3);
         const phase = cell * 1.37; // per big cell only, so swapping foods never jumps the rhythm
-        const angle = OMEGA * ticks + phase;
-        const coldAngle = COLD_OMEGA * ticks + phase;
-        const cold = hasSoup ? 1 - heat : 0;
-        // a new food each bob, swapped at the low point (sin = -1); slow rhythm in a cold pot.
-        // 轮换相位用累计的 cycleAngle（= HotPotBlockEntity.cycleAngle），点火 / 熄火不跳（B4）
-        const cycle = (cycleAngle + partial * cycleRate() + phase - 1.5 * Math.PI) / (2 * Math.PI);
+        const angle = baseAngle + phase;
+        const cold = hasSoup ? 1 - h : 0;
+        // a new food each bob, swapped at the low point (sin = -1) along the unified continuous angle
+        const cycle = (angle - 1.5 * Math.PI) / (2 * Math.PI);
         const idx = ((Math.floor(cycle) % n) + n) % n;
         let dip = 0;
         if (n > 1) {
@@ -287,9 +293,10 @@ async function buildScene(ctx, s, kind) {
           const edge = Math.min(f, 1 - f);
           if (edge < 0.15) dip = Math.pow(1 - edge / 0.15, 2);
         }
-        const yOffset = AMPLITUDE * heat * Math.sin(angle) + COLD_AMPLITUDE * cold * Math.sin(coldAngle);
-        const drift = 0.006 * heat * Math.cos(OMEGA * 0.7 * ticks + phase);
-        const tilt = 3.5 * heat * Math.sin(OMEGA * 0.55 * ticks + phase) + 1.0 * cold * Math.sin(COLD_OMEGA * 0.6 * ticks + phase);
+        const amp = hasSoup ? COLD_AMPLITUDE * cold + AMPLITUDE * h : 0;
+        const yOffset = amp * Math.sin(angle);
+        const drift = 0.006 * h * Math.cos(angle * 0.7);
+        const tilt = (hasSoup ? 1.0 * cold + 3.5 * h : 0) * Math.sin(angle * 0.55);
         const c = shape ? YY_LAYOUT[shape[0]].centers[cell] : [(col + 0.5) / 3 * 13, (row + 0.5) / 3 * 13];   // = PotLayout.cellCenter（像素 / 13）
         const x = pot.innerMin + (pot.innerSize * c[0]) / 13 + drift;
         const z = pot.innerMin + (pot.innerSize * c[1]) / 13 - drift;
@@ -492,21 +499,23 @@ async function buildPlates(ctx, s) {
       // floor at its free end, kept inside the rim); the bowls pile straight, each one turned 15° clockwise
       const cells = cols * rows, layers = 3;
       const count = s.fill === "full" ? cells * layers : cells;
-      // RISE: how much higher each next item sits. Item models are 1/16 thick → 0.25 px at this size; a smaller
-      // rise lets neighbours sink into each other a little (never all the way through), which reads right from
-      // every angle and keeps the slope gentle (r90 user feedback: "翘得太高")
-      const FOOD = 4, RISE = 0.15;
-      // r135b (mryt233): the 1x1 dish's well is only 4×4 px, so a 4 px item already pokes past the 5×5 rim once it is
-      // turned (layer 3's diagonal reaches 5.66 px). Its food shrinks to 3.0 px and turns 12° per layer: even at 24°
-      // the turned item's half-width is 1.98 px, so all three layers stay inside the well (±2 px).
+      // r152（mryt233 改）：零穿插轻错层，与 Java PlateFoodLayout 完全一致
+      const FOOD = 4, FLOOR_GAP = 0.02, PILE_STEP_SMALL = 0.22, PILE_STEP_STANDARD = 0.28;
+      const SHINGLE_RISE = 0.50, CELL_STAGGER = 0.04, MAX_SLOPE_TAN = 0.025;
       const SMALL_DISH_FOOD = 3.0, SMALL_DISH_SPIN = -12;
       const smallDish = size === "1x1";
       const foodSize = smallDish ? SMALL_DISH_FOOD : FOOD;
+      const thickness = foodSize / 16;
       const inner = { x0: 8 - innerL / 2 + (px - 8), x1: 8 + innerL / 2 + (px - 8) };
+      const clampShingleX = (base, k, nInCell) => {
+        const raw = base + (k - (nInCell - 1) / 2) * (FOOD / 2);
+        return Math.min(inner.x1 - FOOD / 2, Math.max(inner.x0 + FOOD / 2, raw));
+      };
       for (let i = 0; i < count; i++) {
-        const c = i % cells, layer = Math.floor(i / cells);
-        let cx = 8 - innerL / 2 + innerL / cols * (c % cols + 0.5) + (px - 8);
-        const cz = 8 - innerW / 2 + innerW / rows * (Math.floor(c / cols) + 0.5) + (pz - 8);
+        const c = i % cells, col = c % cols, row = Math.floor(c / cols), layer = Math.floor(i / cells);
+        const baseCx = 8 - innerL / 2 + innerL / cols * (col + 0.5) + (px - 8);
+        let cx = baseCx;
+        const cz = 8 - innerW / 2 + innerW / rows * (row + 0.5) + (pz - 8);
         const item = await ctx.buildItem(PLATE_FOODS[food++ % PLATE_FOODS.length]);
         const fixed = new THREE.Group();
         fixed.rotation.y = Math.PI; // item/generated "fixed" display: rotation [0, 180, 0]
@@ -515,28 +524,26 @@ async function buildPlates(ctx, s) {
         holder.add(fixed);
         holder.rotation.order = "YXZ";
         holder.scale.setScalar(foodSize / 16);
-        let y = 1 - drop + 0.002;
+        let y = 1 - drop + thickness / 2 + FLOOR_GAP;
         let tiltZ = 0;
         if (smallDish) {
-          // straight pile, centred, turned 12° clockwise per layer (seen from above) — PlateFoodRenderer r135b
           const spin = SMALL_DISH_SPIN * layer;
           holder.rotation.x = Math.PI / 2;
           holder.rotation.y = (spin * Math.PI) / 180;
-          y += layer * RISE;
+          y += layer * PILE_STEP_SMALL;
         } else if (s.stack !== "shingle") {
-          // straight pile: each one a little higher, turned 15° clockwise (seen from above) from the one below
           holder.rotation.x = Math.PI / 2;
           holder.rotation.y = (-15 * layer * Math.PI) / 180;
-          y += layer * RISE;
+          y += layer * PILE_STEP_STANDARD;
         } else {
           const n = Math.min(layers, Math.ceil((count - c) / cells));
-          cx += (layer - (n - 1) / 2) * (FOOD / 2);
-          // keep the whole item inside the rim
-          cx = Math.min(inner.x1 - FOOD / 2, Math.max(inner.x0 + FOOD / 2, cx));
+          cx = clampShingleX(baseCx, layer, n);
+          const cellLevel = rows === 1 ? (col % 3) : ((col & 1) + 2 * (row & 1));
+          y += cellLevel * CELL_STAGGER + layer * SHINGLE_RISE;
           if (layer > 0) {
-            // back half rests on the previous item, front half drops to the floor: slope down along +x
-            tiltZ = -Math.atan2(RISE, FOOD / 2);
-            y += layer * RISE - RISE / 2;
+            const prevCx = clampShingleX(baseCx, layer - 1, n);
+            const actualShift = Math.max(0, cx - prevCx);
+            tiltZ = -Math.atan(MAX_SLOPE_TAN * Math.min(1, actualShift / (FOOD / 2)));
           }
           holder.rotation.x = Math.PI / 2;
         }
@@ -544,7 +551,7 @@ async function buildPlates(ctx, s) {
         const tilt = new THREE.Group();
         tilt.add(holder);
         tilt.rotation.z = tiltZ;
-        tilt.position.set(bx + mc(cx / 16), mc(y / 16 + layer * 0.001), bz + mc(cz / 16));
+        tilt.position.set(bx + mc(cx / 16), mc(y / 16), bz + mc(cz / 16));
         root.add(tilt);
       }
     }
@@ -612,7 +619,7 @@ async function buildBowls(ctx, s) {
         holder.scale.setScalar(4 / 16);
         holder.rotation.x = Math.PI / 2;
         holder.rotation.y = (-15 * layer * Math.PI) / 180;
-        holder.position.set(bx + ox / 16, mc((lift + 1 + 0.002 + layer * 0.15) / 16 + layer * 0.001), bz);
+        holder.position.set(bx + ox / 16, mc((lift + 1 + 0.25 / 2 + 0.02 + layer * 0.28) / 16), bz);
         root.add(holder);
       }
     }
@@ -935,11 +942,723 @@ async function buildYuanyang(ctx, s) {
   return { object: root, tick() {}, frame() {} };
 }
 
+// ---------------------------------------------------------------- Phase 4: 三种备菜架 & 统一火锅桌换材质 (mryt233)
+const TOP_MAT_PRESETS = {
+  default: { cap: `${NS}:block/mat_slot_top_cap`, side: `${NS}:block/mat_slot_top_side` },
+  quartz: { cap: "minecraft:block/quartz_block_top", side: "minecraft:block/quartz_block_side" },
+  deepslate: { cap: "minecraft:block/polished_deepslate", side: "minecraft:block/polished_deepslate" },
+  copper: { cap: "minecraft:block/cut_copper", side: "minecraft:block/cut_copper" },
+  cherry: { cap: "minecraft:block/cherry_planks", side: "minecraft:block/cherry_planks" },
+};
+const BASE_MAT_PRESETS = {
+  default: { cap: `${NS}:block/mat_slot_base_cap`, side: `${NS}:block/mat_slot_base_side`, ring: `${NS}:block/mat_slot_tall_ring` },
+  oak: { cap: "minecraft:block/oak_planks", side: "minecraft:block/oak_planks", ring: "minecraft:block/oak_planks" },
+  blackstone: { cap: "minecraft:block/polished_blackstone", side: "minecraft:block/polished_blackstone", ring: "minecraft:block/polished_blackstone" },
+  smooth_stone: { cap: "minecraft:block/smooth_stone", side: "minecraft:block/smooth_stone", ring: "minecraft:block/smooth_stone" },
+  quartz: { cap: "minecraft:block/quartz_block_top", side: "minecraft:block/quartz_block_side", ring: "minecraft:block/quartz_block_side" },
+};
+
+async function buildSwappedModel(ctx, modelId, overrides) {
+  const base = await ctx.resolveModel(modelId);
+  return ctx.buildElements({ ...base, textures: { ...base.textures, ...overrides } });
+}
+
+async function addRackDish(ctx, parent, xPx, shelfTopPx, zPx, scale = 0.85) {
+  const dish = await ctx.buildBlock("quartz_small_dish", { axis: "x" });
+  dish.scale.setScalar(scale);
+  dish.position.set(xPx * PX, shelfTopPx * PX - 0.5 * (1 - scale), zPx * PX);
+  parent.add(dish);
+}
+
+async function addRackItem(ctx, parent, itemId, xPx, yPx, zPx, scale, hanging = false) {
+  const item = await ctx.buildItem(itemId);
+  item.scale.setScalar(scale);
+  if (hanging) item.rotation.z = Math.PI;
+  item.position.set(xPx * PX, mc(yPx * PX), zPx * PX);
+  parent.add(item);
+}
+
+async function populateDesktopRack(ctx, parent) {
+  const ns = ctx.modid;
+  await addRackDish(ctx, parent, -3.0, 1.5, 2.15, 0.85);
+  await addRackDish(ctx, parent, 3.0, 1.5, 2.15, 0.85);
+  await addRackItem(ctx, parent, `${ns}:tripe`, -3.0, 8.5, -2.1, 0.28);
+  await addRackItem(ctx, parent, `${ns}:lotus_root_slice`, 3.0, 8.5, -2.1, 0.28);
+}
+
+async function buildPrepRacks(ctx, s) {
+  const ns = ctx.modid;
+  const root = new THREE.Group();
+
+  // 1. 多层落地菜架（6 格：底层放小碟，中上两层放备菜食材）
+  const multi = new THREE.Group();
+  multi.position.set(-1.25, 0, 0);
+  multi.add(await ctx.buildBlock("multi_tier_prep_rack", { facing: "south", mount: "wall" }));
+  await addRackDish(ctx, multi, -3.2, 1.5, 0, 0.88);
+  await addRackDish(ctx, multi, 3.2, 1.5, 0, 0.88);
+  await addRackItem(ctx, multi, `${ns}:fatty_beef_roll`, -3.2, 9.85, 1.2, 0.30);
+  await addRackItem(ctx, multi, `${ns}:beef_loin_slice`, 3.2, 9.85, 1.2, 0.30);
+  await addRackItem(ctx, multi, `${ns}:cold_tofu`, -3.2, 15.35, 1.2, 0.30);
+  await addRackItem(ctx, multi, `${ns}:enoki_mushroom`, 3.2, 15.35, 1.2, 0.30);
+  root.add(multi);
+
+  // 2. 桌面备菜架（4 格：支持贴面抬高/下沉贴合矮桌与高桌）
+  const desktopLift = s.table === "low" ? -5 * PX : s.table === "tall" ? 7 * PX : 0;
+  if (s.table === "low") {
+    const t = await ctx.buildBlock("hotpot_table", { north: "false", east: "false", south: "false", west: "false" });
+    t.position.set(0, -1, 0);
+    root.add(t);
+  } else if (s.table === "tall") {
+    const t = await ctx.buildBlock("tall_hotpot_table", { north: "false", east: "false", south: "false", west: "false", open: "false" });
+    t.position.set(0, -1, 0);
+    root.add(t);
+  }
+  const desktop = new THREE.Group();
+  desktop.position.set(0, desktopLift, 0);
+  desktop.add(await ctx.buildBlock("desktop_prep_rack", { facing: "south", mount: "wall" }));
+  await populateDesktopRack(ctx, desktop);
+  root.add(desktop);
+
+  // 3. 挂架（4 格双态：wall 靠墙 / ceiling 吸顶，挂布围裙与厨具）
+  const ceiling = s.mount === "ceiling";
+  const hanging = new THREE.Group();
+  hanging.position.set(1.25, 0, 0);
+  hanging.add(await ctx.buildBlock("hanging_prep_rack", { facing: "south", mount: s.mount }));
+  const hangItems = [`${ns}:cloth_apron`, `${ns}:blue_print_cloth_apron`, `${ns}:iron_kitchen_knife`, `${ns}:rolling_pin`];
+  for (let i = 0; i < hangItems.length; i++) {
+    await addRackItem(ctx, hanging, hangItems[i], -4.5 + i * 3.0, ceiling ? 6.4 : 7.8, ceiling ? 0.0 : -5.2, 0.30, true);
+  }
+  root.add(hanging);
+
+  return { object: root, tick() {}, frame() {} };
+}
+
+async function buildTableMaterials(ctx, s) {
+  const ns = ctx.modid;
+  const root = new THREE.Group();
+  const top = TOP_MAT_PRESETS[s.top] || TOP_MAT_PRESETS.default;
+  const base = BASE_MAT_PRESETS[s.base] || BASE_MAT_PRESETS.default;
+  const overrides = {
+    particle: top.cap,
+    top_cap: top.cap,
+    top_side: top.side,
+    base_cap: base.cap,
+    base_side: base.side,
+    tall_ring: base.ring,
+  };
+
+  const low = await buildSwappedModel(ctx, `${ns}:block/hotpot_table_e`, overrides);
+  low.position.set(-0.5, 0, 0);
+  root.add(low);
+
+  const tallName = s.open === "true" ? "tall_hotpot_table_open_w" : "tall_hotpot_table_w";
+  const tall = await buildSwappedModel(ctx, `${ns}:block/${tallName}`, overrides);
+  tall.position.set(0.5, 0, 0);
+  root.add(tall);
+
+  const desktop = new THREE.Group();
+  desktop.position.set(-0.5, 11 * PX, 0);
+  desktop.add(await ctx.buildBlock("desktop_prep_rack", { facing: "south", mount: "wall" }));
+  await populateDesktopRack(ctx, desktop);
+  root.add(desktop);
+
+  return { object: root, tick() {}, frame() {} };
+}
+
+// mryt233 改（2026-11-20）：采样位置由真实 Java 导出；这里定格首帧，不伪造后续世界碰撞。
+async function buildPotBreakFrame(ctx, s) {
+  if (!ctx.projectId) throw new Error("当前查看器缺少项目标识，请刷新查看器");
+  const data = await fetch(`/api/file?p=${encodeURIComponent(ctx.projectId)}&f=viewer/pot_break_samples.json`, { cache: "no-store" }).then(r => r.json());
+  const lift = s.height === "tall" ? data.tall_lift : 0;
+  const block = lift ? "tall_brick_stove" : "brick_stove";
+  const state = { lit: "false", facing: "north", pot: s.pot, soup: "none", pot_axis: s.axis };
+  const root = new THREE.Group();
+  root.add(await ctx.buildBlock(block, { ...state, pot: s.phase === "whole" ? s.pot : "none" }));
+  if (s.phase === "whole") return { object: root, tick() {}, frame() {} };
+  if (s.phase === "drop") {
+    const item = await ctx.buildItem(`${NS}:${s.pot}_nine_grid_hotpot`);
+    item.scale.setScalar(.25);
+    item.position.set(0, mc(data.drop_y + lift), 0);
+    root.add(item);
+    return { object: root, tick() {}, frame() {} };
+  }
+  const samples = data[s.axis];
+  const particles = new Particles(samples.length);
+  const texture = await ctx.texture(`${NS}:block/hot_pot_${s.pot}_side`);
+  for (const sprite of particles.pool) {
+    const fragment = texture.clone();
+    fragment.repeat.set(.25, .25);
+    fragment.offset.set(rand() * .75, rand() * .75);
+    fragment.needsUpdate = true;
+    sprite.material.map = fragment;
+  }
+  for (const [x, y, z] of samples) particles.spawn({ x: mc(x), y: mc(y + lift), z: mc(z),
+    vx: 0, vy: 0, vz: 0, life: 1, size0: .07, size1: .07, color: 0x999999 });
+  root.add(particles);
+  particles.draw(0);
+  return { object: root, tick() {}, frame() { particles.draw(0); } };
+}
+
+// mryt233 改（2026-11-21）：新版小石磨仍限查看器；整像素模型和静态预览共用同一份尺寸。
+async function buildStoneMillPreview(ctx, s) {
+  const faces = (tex) => ({ north: { texture: tex }, south: { texture: tex }, west: { texture: tex }, east: { texture: tex }, up: { texture: tex }, down: { texture: tex } });
+  const el = (from, to, tex) => ({ from, to, faces: faces(tex) });
+  let textures = { stone: "minecraft:block/cobblestone", top: "minecraft:block/cobblestone", wood: `${NS}:block/stone_mill_wood` };
+  let slot = { ring: [2.4, 3.4, 12.6, 13.6], floor: 5.8, seam: 9, mouth: [6, 10, 16] };
+
+  let baseElements = [
+    el([2.5, 0, 2.5], [4.5, 4, 4.5], "#wood"),
+    el([11.5, 0, 2.5], [13.5, 4, 4.5], "#wood"),
+    el([2.5, 0, 11.5], [4.5, 4, 13.5], "#wood"),
+    el([11.5, 0, 11.5], [13.5, 4, 13.5], "#wood"),
+    el([3.5, 2.2, 3.5], [12.5, 4, 12.5], "#wood"),
+    el([1.4, 4.0, 1.4], [14.6, 5.8, 14.6], "#stone"),
+    el([1.4, 5.8, 1.4], [14.6, 8.0, 2.4], "#stone"),
+    el([1.4, 5.8, 2.4], [2.4, 8.0, 13.6], "#stone"),
+    el([13.6, 5.8, 2.4], [14.6, 8.0, 13.6], "#stone"),
+    el([1.4, 5.8, 13.6], [6.0, 8.0, 14.6], "#stone"),
+    el([10.0, 5.8, 13.6], [14.6, 8.0, 14.6], "#stone"),
+    el([3.4, 5.8, 3.4], [12.6, 9.0, 12.6], "#stone"),
+    el([5.0, 5.0, 14.6], [11.0, 5.8, 16.0], "#stone"),
+    el([5.0, 5.8, 14.6], [6.0, 7.6, 16.0], "#stone"),
+    el([10.0, 5.8, 14.6], [11.0, 7.6, 16.0], "#stone"),
+  ];
+  const rim = [2.8, 3.5, 4.2, 11.8, 12.5, 13.2];
+  const inset = [1.4, 0.7, 0.0, 0.7, 1.4];
+  let topElements = [
+    el([3.6, 9.0, 3.6], [12.4, 9.25, 12.4], "#top"),
+    ...inset.map((d, i) => el([2.8 + d, 9.25, rim[i]], [13.2 - d, 12.8, rim[i + 1]], "#top")),
+    el([5.2, 12.8, 5.2], [10.8, 13.6, 6.4], "#top"),
+    el([5.2, 12.8, 9.6], [10.8, 13.6, 10.8], "#top"),
+    el([5.2, 12.8, 6.4], [6.4, 13.6, 9.6], "#top"),
+    el([9.6, 12.8, 6.4], [10.8, 13.6, 9.6], "#top"),
+    el([10.6, 12.8, 7.1], [12.6, 13.5, 8.9], "#wood"),
+    el([11.1, 13.5, 7.3], [12.4, 15.8, 8.7], "#wood"),
+  ];
+
+  const aligned = s.shape !== "fractional";
+  if (aligned) {
+    const data = await fetch(`/api/file?p=${encodeURIComponent(ctx.projectId)}&f=viewer/stone_mill_pixel_preview.json`, { cache: "no-store" }).then(r => {
+      if (!r.ok) throw new Error(`无法读取小石磨整像素预览：${r.status}`);
+      return r.json();
+    });
+    const fromRow = row => el(row.slice(0, 3), row.slice(3, 6), `#${row[6]}`);
+    textures = data.textures;
+    slot = data.slot;
+    baseElements = data.base.map(fromRow);
+    topElements = data.top.map(fromRow);
+  }
+  const { floor, seam } = slot;
+  const [outerL, innerL, innerR, outerR] = slot.ring;
+  const [mouthL, mouthR, mouthZ] = slot.mouth;
+  const a = outerL + .03, b = innerL - .03, c = innerR + .03, d = outerR - .03;
+  const lipFloor = floor + .02;
+  const grainY = aligned ? seam + 4.4 : 13.15;
+
+  const root = new THREE.Group();
+  const mill = new THREE.Group();
+  // 默认把 +Z 导流嘴转朝查看器前方，打开即可直视导流槽与磨盘动作
+  mill.rotation.y = Math.PI;
+  root.add(mill);
+
+  const [base, top] = await Promise.all([
+    ctx.buildElements({ textures, elements: baseElements }),
+    ctx.buildElements({ textures, elements: topElements }),
+  ]);
+  mill.add(base, top);
+
+  let grain = null;
+  if (s.kind !== "water") {
+    grain = await ctx.buildItem(s.kind === "dry" ? `${NS}:peanut` : `${NS}:soybean`);
+    grain.scale.setScalar(0.24);
+    grain.rotation.x = Math.PI / 2;
+    grain.position.set(0, mc(grainY / 16), 0);
+    top.add(grain);
+  }
+
+  const isLiquid = s.kind !== "dry";
+  const isWater = s.kind === "water";
+  const flowBands = [];
+  const liquidGroup = new THREE.Group();
+  mill.add(liquidGroup);
+
+  let spoutLip = null;
+  let fallColumn = null;
+  let fallBridge = null;
+  let puddle = null;
+  let fallTex = null;
+  let bridgeTex = null;
+  let dryLayer = null;
+
+  const cloneTex = (baseTex, repX, repY) => {
+    const tex = baseTex.clone();
+    tex.image = baseTex.image;
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.magFilter = THREE.NearestFilter;
+    tex.minFilter = THREE.NearestFilter;
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.repeat.set(repX, repY);
+    tex.needsUpdate = true;
+    return tex;
+  };
+
+  if (isLiquid) {
+    const srcTex = await ctx.texture(isWater ? "minecraft:block/water_still" : `${NS}:block/soymilk_still`);
+    const tint = isWater ? 0x3f76e4 : 0xffffff;
+    const opacity = isWater ? 0.84 : 0.96;
+
+    // 7 段零重叠液面，精确贴合四周环形集浆槽与前侧导流嘴通道，按真实汇流方向滚动 UV
+    const segs = [
+      { x0: a, x1: 8, z0: a, z1: b, vx: -0.24, vy: 0, tag: "ring" },
+      { x0: 8, x1: d, z0: a, z1: b, vx: 0.24, vy: 0, tag: "ring" },
+      { x0: a, x1: b, z0: b, z1: d, vx: 0, vy: 0.34, tag: "ring" },
+      { x0: c, x1: d, z0: b, z1: d, vx: 0, vy: 0.34, tag: "ring" },
+      { x0: b, x1: mouthL + .02, z0: c, z1: d, vx: 0.38, vy: 0, tag: "ring" },
+      { x0: mouthR - .02, x1: c, z0: c, z1: d, vx: -0.38, vy: 0, tag: "ring" },
+      { x0: mouthL + .02, x1: mouthR - .02, z0: c, z1: mouthZ - .04, vx: 0, vy: 0.56, tag: "spout" },
+    ];
+    for (const seg of segs) {
+      const wPx = seg.x1 - seg.x0, dPx = seg.z1 - seg.z0;
+      const tex = cloneTex(srcTex, wPx / 16, dPx / 16);
+      const geo = new THREE.PlaneGeometry(wPx * PX, dPx * PX);
+      geo.rotateX(-Math.PI / 2);
+      const mat = new THREE.MeshBasicMaterial({ map: tex, color: tint, transparent: true, opacity, side: THREE.DoubleSide });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(mc((seg.x0 + seg.x1) / 32), mc((floor + 0.8) / 16), mc((seg.z0 + seg.z1) / 32));
+      liquidGroup.add(mesh);
+      flowBands.push({ mesh, tex, vx: seg.vx, vy: seg.vy, tag: seg.tag, z0: seg.z0, z1: seg.z1 });
+    }
+
+    // 导流嘴出口液流断面（z = 15.96）
+    const lipTex = cloneTex(srcTex, 3.96 / 16, 1 / 16);
+    const lipGeo = new THREE.PlaneGeometry(3.96 * PX, 1.0 * PX);
+    spoutLip = new THREE.Mesh(lipGeo, new THREE.MeshBasicMaterial({ map: lipTex, color: tint, transparent: true, opacity, side: THREE.DoubleSide }));
+    spoutLip.position.set(0, mc((lipFloor + .38) / 16), mc((mouthZ - .04) / 16));
+    liquidGroup.add(spoutLip);
+    flowBands.push({ mesh: spoutLip, tex: lipTex, vx: 0, vy: 0.6, tag: "lip" });
+
+    // 嘴口弯折过渡与向下垂落的像素液柱（在 z = 15.95..16.75 悬空垂落至 y = 0.02，不穿任何木腿）
+    bridgeTex = cloneTex(srcTex, 2.2 / 16, 1.1 / 16);
+    fallBridge = new THREE.Mesh(
+      new THREE.BoxGeometry(2.2 * PX, 0.75 * PX, 1.05 * PX),
+      new THREE.MeshBasicMaterial({ map: bridgeTex, color: tint, transparent: true, opacity }),
+    );
+    fallBridge.position.set(mc(8 / 16), mc((floor + 0.45) / 16), mc(16.12 / 16));
+    liquidGroup.add(fallBridge);
+
+    const fallH = floor + 0.4;
+    fallTex = cloneTex(srcTex, 1.85 / 16, fallH / 16);
+    fallColumn = new THREE.Mesh(
+      new THREE.BoxGeometry(1.85 * PX, fallH * PX, 1.05 * PX),
+      new THREE.MeshBasicMaterial({ map: fallTex, color: tint, transparent: true, opacity }),
+    );
+    fallColumn.position.set(mc(8 / 16), mc((fallH / 2) / 16), mc(16.38 / 16));
+    liquidGroup.add(fallColumn);
+
+    const puddleTex = cloneTex(srcTex, 4.2 / 16, 4.2 / 16);
+    const puddleGeo = new THREE.PlaneGeometry(4.2 * PX, 4.2 * PX);
+    puddleGeo.rotateX(-Math.PI / 2);
+    puddle = new THREE.Mesh(puddleGeo, new THREE.MeshBasicMaterial({ map: puddleTex, color: tint, transparent: true, opacity: opacity * 0.78 }));
+    puddle.position.set(mc(8 / 16), mc(0.05 / 16), mc(16.45 / 16));
+    liquidGroup.add(puddle);
+    flowBands.push({ mesh: puddle, tex: puddleTex, vx: 0, vy: 0.2, tag: "puddle" });
+  } else {
+    // 干磨槽底细碎花生粉层
+    dryLayer = new THREE.Group();
+    const powderMat = new THREE.MeshBasicMaterial({ color: 0xd9b36c, transparent: true, opacity: 0.94 });
+    const parts = [
+      [a, d, a, b], [a, b, b, d], [c, d, b, d],
+      [b, c, c, d], [mouthL + .05, mouthR - .05, d, mouthZ - .15],
+    ];
+    for (const [x0, x1, z0, z1] of parts) {
+      const m = new THREE.Mesh(new THREE.BoxGeometry((x1 - x0) * PX, 0.35 * PX, (z1 - z0) * PX), powderMat);
+      m.position.set(mc((x0 + x1) / 32), mc((floor + .18) / 16), mc((z0 + z1) / 32));
+      dryLayer.add(m);
+    }
+    mill.add(dryLayer);
+  }
+
+  const batch = new BoxBatch(400);
+  const particles = new Particles(120);
+  mill.add(batch, particles);
+
+  const pxBox = (x0, y0, z0, x1, y1, z1, topCol, sideCol, alpha = 1) =>
+    batch.box(mc(x0 / 16), mc(y0 / 16), mc(z0 / 16), mc(x1 / 16), mc(y1 / 16), mc(z1 / 16), topCol, sideCol, alpha);
+
+  // 槽内波纹依次走侧槽、前槽和导流嘴，跟随所选模型的槽心。
+  const sideTrack = (outerL + innerL) / 2;
+  const frontTrack = (outerR + innerR) / 2;
+  const channelPoint = (side, u) => {
+    const x = side < 0 ? sideTrack : 16 - sideTrack;
+    const endX = 8 + side * .6;
+    if (u < .48) return [x, sideTrack + (frontTrack - sideTrack) * u / .48];
+    if (u < .72) return [x + (endX - x) * (u - .48) / .24, frontTrack];
+    return [endX - side * .25 * (u - .72) / .28, frontTrack + (mouthZ - .1 - frontTrack) * (u - .72) / .28];
+  };
+  const nearSide = innerL - .26, farSide = innerR + .26;
+  const seamSites = [
+    [5, farSide], [8, farSide], [11, farSide],
+    [nearSide, 6.2], [nearSide, 10.2], [farSide, 6.2], [farSide, 10.2], [8, nearSide],
+  ];
+  let lastFlowT = 0;
+  let flowPhase = 0;
+  let lastFill = 1;
+  let lastEffort = 0;
+
+  return {
+    object: root,
+    tick() {
+      // 20 TPS 粒子：磨缝细沫 + 导流嘴底部落点微型水花（干磨则只落颗粒）
+      if (isLiquid) {
+        if (lastEffort > 0.25 && rand() < 0.45) {
+          const ang = rand() * Math.PI * 2;
+          const r = 4.9 / 16;
+          particles.spawn({
+            x: mc(0.5 + Math.cos(ang) * r), y: mc((seam + .05) / 16), z: mc(0.5 + Math.sin(ang) * r),
+            vx: Math.cos(ang) * 0.008, vy: 0.006, vz: Math.sin(ang) * 0.008,
+            gravity: 0.0045, life: 10, size0: 0.032, size1: 0.014,
+            color: isWater ? 0x99ccff : 0xfffaf0, opacity: 0.85,
+          });
+        }
+        if (lastFill > 0.62 && rand() < 0.75) {
+          const ang = rand() * Math.PI * 2;
+          const spd = 0.012 + rand() * 0.014;
+          particles.spawn({
+            x: mc((8 + (rand() - 0.5) * 1.3) / 16), y: mc(0.25 / 16), z: mc((16.38 + (rand() - 0.5) * 0.7) / 16),
+            vx: Math.cos(ang) * spd, vy: 0.022 + rand() * 0.016, vz: Math.sin(ang) * spd,
+            gravity: 0.0042, life: 12, size0: 0.042, size1: 0.015,
+            color: isWater ? 0xbce0ff : 0xfffdf6, color1: isWater ? 0x4b87f0 : 0xe5dac2, opacity: 0.9,
+          });
+        }
+      } else if (lastEffort > 0.2 && rand() < 0.65) {
+        const ang = rand() * Math.PI * 2;
+        const r = 4.9 / 16;
+        particles.spawn({
+          x: mc(0.5 + Math.cos(ang) * r), y: mc((seam + .05) / 16), z: mc(0.5 + Math.sin(ang) * r),
+          vx: Math.cos(ang) * 0.009, vy: 0.004, vz: Math.sin(ang) * 0.009,
+          gravity: 0.005, life: 13, size0: 0.038, size1: 0.018, color: 0xe3be78, color1: 0xb88f46,
+        });
+      }
+      particles.tick();
+    },
+    frame(t, partial) {
+      const dt = Math.max(0, Math.min(0.1, t - lastFlowT));
+      lastFlowT = t;
+
+      // 上磨盘推磨节奏：每 1.05 秒发力顺时针推 1/4 圈（带加速发力与惯性微停）
+      const turnRate = 0.95;
+      const turnPos = t * turnRate;
+      const step = Math.floor(turnPos);
+      const u = frac(turnPos);
+      const pushU = Math.min(1, u / 0.72);
+      const eased = easeOutCubic(pushU);
+      const effort = u < 0.72 ? Math.pow(1 - pushU, 1.5) : 0;
+      lastEffort = effort;
+      top.rotation.y = -(step + eased) * (Math.PI / 2);
+
+      // 完整 4 圈蓄满循环或满槽持续流浆
+      const cycle = frac(turnPos / 4.5);
+      const fill = s.stage === "filling"
+        ? (cycle < 0.84 ? Math.min(1, cycle / 0.72) : Math.max(0, 1 - (cycle - 0.84) / 0.16))
+        : 1.0;
+      lastFill = fill;
+
+      if (grain) {
+        const sink = s.stage === "filling" ? fill * 0.32 : frac(turnPos / 4) * 0.22;
+        grain.position.y = mc((grainY - sink + Math.sin(t * 18) * 0.04 * effort) / 16);
+      }
+
+      const flowSpeed = (0.65 + 0.75 * effort) * (0.35 + 0.65 * fill);
+      flowPhase += dt * flowSpeed;
+
+      batch.begin();
+
+      if (isLiquid) {
+        const pulse = Math.sin(t * 7.5) * 0.05 + effort * 0.1;
+        const liquidY = floor + .06 + fill * .96 + pulse * Math.min(1, fill * 2);
+        const spoutOverflow = Math.max(0, Math.min(1, (fill - 0.58) / 0.24));
+
+        for (const b of flowBands) {
+          if (b.tag === "ring" || b.tag === "spout") {
+            const visible = b.tag === "spout" ? fill > 0.22 : fill > 0.05;
+            b.mesh.visible = visible;
+            b.mesh.position.y = mc(liquidY / 16);
+            if (b.tag === "spout") {
+              const reach = Math.min(1, Math.max(0.15, (fill - 0.18) / 0.45));
+              b.mesh.scale.z = reach;
+              const len = (b.z1 - b.z0) * reach;
+              b.mesh.position.z = mc((b.z0 + len / 2) / 16);
+            }
+          } else if (b.tag === "lip") {
+            const lipH = Math.max(0.05, liquidY - lipFloor);
+            b.mesh.visible = spoutOverflow > 0.05;
+            b.mesh.scale.y = lipH;
+            b.mesh.position.y = mc((lipFloor + lipH / 2) / 16);
+          } else if (b.tag === "puddle") {
+            b.mesh.visible = spoutOverflow > 0.1;
+            const sP = 0.65 + 0.35 * spoutOverflow + Math.sin(t * 8) * 0.06;
+            b.mesh.scale.set(sP, 1, sP);
+          }
+          // UV 滚动：平面绕 X 转 -90° 后，+Y 偏移对应向 +Z（导流嘴）流，-X 偏移对应向 +X 流
+          b.tex.offset.x = frac(-b.vx * flowPhase);
+          b.tex.offset.y = frac(b.vy * flowPhase);
+          if (isWater) b.tex.needsUpdate = true;
+        }
+
+        // 垂落液柱与弯折嘴口
+        const streamW = (0.45 + 0.55 * spoutOverflow) * (0.9 + 0.18 * effort + 0.08 * Math.sin(t * 14));
+        fallBridge.visible = spoutOverflow > 0.08;
+        fallBridge.scale.set(streamW, Math.max(0.25, (liquidY - lipFloor) / 0.9), 1);
+        fallBridge.position.y = mc((liquidY - 0.38) / 16);
+        bridgeTex.offset.y = frac(flowPhase * 0.9);
+        if (isWater) bridgeTex.needsUpdate = true;
+
+        const colTop = Math.max(0.4, liquidY - 0.25);
+        fallColumn.visible = spoutOverflow > 0.1;
+        fallColumn.scale.set(streamW, colTop / fallH, 0.72 + 0.28 * spoutOverflow);
+        fallColumn.position.y = mc((colTop / 2 + 0.02) / 16);
+        fallTex.offset.y = frac(flowPhase * 1.45);
+        if (isWater) fallTex.needsUpdate = true;
+
+        const topCol = isWater ? 0xb5e2ff : 0xfffef8;
+        const sideCol = isWater ? 0x5c9cf5 : 0xe8ddc6;
+
+        // 磨缝液滴沿承托石心外侧落入集浆槽。
+        for (let i = 0; i < seamSites.length; i++) {
+          const [sx, sz] = seamSites[i];
+          const p = frac(t * (0.95 + 0.25 * hash(i, 7)) + i * 0.17);
+          const yTop = seam + .02 - p * (seam + .02 - liquidY);
+          const dropH = 0.55 + 0.35 * effort;
+          const yBot = Math.max(liquidY - 0.08, yTop - dropH);
+          const r = 0.24 + 0.08 * effort;
+          pxBox(sx - r, yBot, sz - r, sx + r, yTop, sz + r, topCol, sideCol, (1 - 0.35 * p) * Math.min(1, fill * 3 + 0.35));
+        }
+
+        // 2. 环形集浆槽与导流嘴表面前进的像素浮沫/波纹小块，直观标示流向
+        if (fill > 0.12) {
+          for (const side of [-1, 1]) {
+            for (let i = 0; i < 4; i++) {
+              const p = frac(flowPhase * 0.26 + i * 0.25 + (side < 0 ? 0 : 0.12));
+              if (p > 0.72 && fill < 0.35) continue;
+              const [cx, cz] = channelPoint(side, p);
+              const alongZ = p < 0.48 || p >= 0.72;
+              const wx = alongZ ? 0.28 : 0.55;
+              const wz = alongZ ? 0.58 : 0.28;
+              pxBox(cx - wx, liquidY + 0.01, cz - wz, cx + wx, liquidY + 0.18, cz + wz, topCol, sideCol, 0.88);
+            }
+          }
+        }
+
+        // 3. 垂落液柱内加速下坠的亮色液滴珠
+        if (spoutOverflow > 0.12) {
+          for (let i = 0; i < 4; i++) {
+            const p = frac(t * 1.45 + i * 0.25);
+            const dy = colTop * (1 - p * p);
+            const dx = 8.0 + (hash(i, 19) - 0.5) * 0.9;
+            const dz = 16.38 + (hash(i, 23) - 0.5) * 0.35;
+            pxBox(dx - 0.24, Math.max(0.05, dy - 0.55), dz - 0.24, dx + 0.24, dy + 0.15, dz + 0.24, topCol, sideCol, spoutOverflow);
+          }
+        }
+      } else {
+        // 干磨：花生碎粉层高度随进度累积，颗粒从磨缝簌簌落入槽中并少量从嘴口滑出
+        const hScale = Math.max(0.15, fill);
+        dryLayer.visible = fill > 0.06;
+        dryLayer.scale.y = hScale;
+        dryLayer.position.y = mc((floor + .18 * hScale) / 16) - mc((floor + .18) / 16) * hScale;
+
+        for (let i = 0; i < 10; i++) {
+          const p = frac(t * (1.2 + 0.4 * hash(i, 3)) + i * 0.13);
+          const ang = top.rotation.y + i * 0.63;
+          const r = 4.65 + p * 0.75;
+          const gx = 8 + Math.cos(ang) * r;
+          const gz = 8 + Math.sin(ang) * r;
+          const gy = (seam + 0.05) - p * p * (seam - floor + 0.05);
+          pxBox(gx - 0.2, gy, gz - 0.2, gx + 0.2, gy + 0.36, gz + 0.2, 0xe8c47a, 0xc2984f, 1 - 0.4 * p);
+        }
+        if (fill > 0.45) {
+          for (let i = 0; i < 3; i++) {
+            const p = frac(t * 0.85 + i * 0.33);
+            const gx = 7.2 + i * 0.8;
+            const gz = 14.0 + p * 2.2;
+            const gy = gz < 15.95 ? (floor + 0.18) : (floor + 0.18) - Math.pow((gz - 15.95) * 2.8, 2) * 3.2;
+            if (gy > 0.1) pxBox(gx - 0.22, gy, gz - 0.22, gx + 0.22, gy + 0.32, gz + 0.22, 0xe8c47a, 0xc2984f, 0.92);
+          }
+        }
+      }
+
+      batch.end();
+      particles.draw(partial);
+    },
+  };
+}
+
+// mryt233 改：按 StoneMillRenderer / StoneMillMotion 重放已同步的游戏状态，支持 1.5 格支架紧邻大木桶自动流浆。
+async function buildStoneMillGame(ctx, s) {
+  const ns = ctx.modid;
+  const root = new THREE.Group();
+  root.rotation.y = Math.PI;
+  const intoVat = s.kind === "vat";
+  const [base, top, geometry, vatModel] = await Promise.all([
+    ctx.buildModel(`${ns}:block/stone_mill_base`),
+    ctx.buildModel(`${ns}:block/stone_mill_top`),
+    fetch(`/api/file?p=${encodeURIComponent(ctx.projectId)}&f=viewer/stone_mill_pixel_preview.json`, { cache: "no-store" }).then(r => r.json()),
+    intoVat ? ctx.buildModel(`${ns}:block/wooden_vat`) : Promise.resolve(null),
+  ]);
+  root.add(base, top);
+  if (vatModel) {
+    vatModel.position.set(0, 0, 1);
+    root.add(vatModel);
+    root.position.set(0, 0, 0.45);
+  }
+  const { ring: [outerL, innerL, innerR, outerR], floor, mouth: [mouthL, mouthR, mouthZ], seam } = geometry.slot;
+  const wetRecipe = s.kind === "wet" || intoVat;
+  const idle = s.kind === "idle";
+  const a = outerL + .03, b = innerL - .03, c = innerR + .03, d = outerR - .03;
+  const left = mouthL + .02, right = mouthR - .02;
+  const sideTrack = (outerL + innerL) / 2, frontTrack = (outerR + innerR) / 2;
+  const sites = [[5, innerR + .26], [10.5, innerR + .26], [innerL - .26, 7], [innerR + .26, 9], [8, innerL - .26]];
+  const [grain, water, milk] = await Promise.all([
+    idle ? null : ctx.buildItem(`${ns}:${wetRecipe ? "soybean" : "peanut"}`),
+    idle || wetRecipe ? ctx.texture("minecraft:block/water_still") : null,
+    wetRecipe ? ctx.texture(`${ns}:block/soymilk_still`) : null,
+  ]);
+  if (grain) {
+    grain.scale.setScalar(.24);
+    grain.rotation.x = Math.PI / 2;
+    grain.position.set(0, mc((seam + 4.4) / 16), 0);
+    top.add(grain);
+  }
+  const liquids = new THREE.Group();
+  root.add(liquids);
+  let vatLiq = null;
+  if (intoVat && milk) {
+    const vatGeo = new THREE.PlaneGeometry(11 * PX, 11 * PX);
+    vatGeo.rotateX(-Math.PI / 2);
+    vatLiq = new THREE.Mesh(vatGeo, new THREE.MeshBasicMaterial({
+      map: milk.texture || milk, color: 0xf3ecd8, side: THREE.DoubleSide,
+    }));
+    vatLiq.position.set(0, mc(11.63 / 16), 1);
+    vatLiq.visible = false;
+    root.add(vatLiq);
+  }
+  const makeSurface = () => {
+    const geo = new THREE.PlaneGeometry(1, 1);
+    geo.rotateX(-Math.PI / 2);
+    const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
+    liquids.add(mesh);
+    return mesh;
+  };
+  const surfaces = water ? Array.from({ length: 6 }, makeSurface) : [];
+  const batch = new BoxBatch(42);
+  root.add(batch);
+  const px = n => mc(n / 16);
+  const box = (x0, y0, z0, x1, y1, z1, color, alpha=1) => batch.box(px(x0), px(y0), px(z0), px(x1), px(y1), px(z1), color, color, alpha);
+  const drawSurface = (m, x0, z0, x1, z1, y, isMilk) => {
+    const uv = m.geometry.attributes.uv;
+    uv.setXY(0, x0 / 16, 1 - z0 / 16); uv.setXY(1, x1 / 16, 1 - z0 / 16);
+    uv.setXY(2, x0 / 16, 1 - z1 / 16); uv.setXY(3, x1 / 16, 1 - z1 / 16);
+    uv.needsUpdate = true;
+    const map = isMilk ? milk : water;
+    if (m.material.map !== map) {
+      m.material.map = map;
+      m.material.transparent = !isMilk;
+      m.material.opacity = isMilk ? 1 : .8;
+      m.material.color.setHex(isMilk ? 0xf3ecd8 : 0x3f76e4);
+      m.material.needsUpdate = true;
+    }
+    m.position.set(px((x0 + x1) / 2), px(y), px((z0 + z1) / 2));
+    m.scale.set((x1 - x0) / 16, 1, (z1 - z0) / 16);
+  };
+  const unit = v => Math.max(0, Math.min(1, v));
+  const events = [16, 34, 52, 70]; // 四次推磨，最后一次出浆，紧邻大木桶时直接越过桶沿倾泻入桶。
+  return {
+    object: root,
+    tick() {},
+    frame(t) {
+      const k = (t * 20) % 128;
+      const turns = idle ? 0 : events.filter(at => k >= at).length;
+      const age = turns ? k - events[turns - 1] : Infinity;
+      const finished = wetRecipe && turns === events.length;
+      const pending = finished && (intoVat ? age < 20 : k < 106);
+      const wet = wetRecipe && (!finished || pending) ? unit((age + 1) / 3) * unit((13 - age) / 5) : 0;
+      const spill = pending ? unit((age - 3) / 3) * unit((20 - age) / 7) : 0;
+      const angle = turns ? turns - 1 + easeOutCubic(unit(age / 9)) : 0;
+      top.rotation.y = -angle * Math.PI / 2;
+      if (grain) grain.visible = turns < events.length;
+      if (vatLiq) vatLiq.visible = intoVat && k >= 74 && k < 114;
+      const color = 0xf3ecd8;
+      const y = floor + (pending ? .8 : .18) + wet * .18;
+      if (water) {
+        const isMilk = wet > 0 || pending;
+        const reach = spill > .02 ? mouthZ : d + (pending ? .65 : wet * .5);
+        [[a,a,d,b],[a,b,b,d],[c,b,d,d],[b,c,left,d],[right,c,c,d],[left,c,right,reach]]
+          .forEach(([x0,z0,x1,z1], i) => drawSurface(surfaces[i], x0,z0,x1,z1,y,isMilk));
+      }
+      batch.begin();
+      if (wet > .02) {
+        sites.forEach(([x, z], i) => {
+          const f = frac(age * .16 + i * .21), py = seam - f * (seam - y), r = .11 + .13 * wet;
+          box(x-r, Math.max(y,py-.55), z-r, x+r, py, z+r, color);
+        });
+        for (const side of [-1, 1]) for (let i = 0; i < 3; i++) {
+          const p = frac(age * .06 + i / 3 + side * .07), fromSide = p < .55;
+          const x0 = side < 0 ? sideTrack : 16 - sideTrack, x1 = 8 + side * .55;
+          const x = fromSide ? x0 : x0 + (x1 - x0) * (p - .55) / .45;
+          const z = fromSide ? sideTrack + (frontTrack - sideTrack) * p / .55 : frontTrack;
+          const w = fromSide ? .15 : .35, dz = fromSide ? .35 : .15;
+          box(x-w, y+.025, z-dz, x+w, y+.05, z+dz, 0xffffff);
+        }
+      }
+      if (spill > .02) {
+        const w = .18 + .61 * spill;
+        if (intoVat) {
+          const jetBottom = Math.max(14.18, y - 0.35);
+          box(8 - w, jetBottom, mouthZ - 0.15, 8 + w, y + 0.02, mouthZ + 3.15, color);
+          box(8 - w * 0.82, 14.2 - 2.65 * spill, mouthZ + 2.65, 8 + w * 0.82, Math.max(14.22, y - 0.15), mouthZ + 3.15, color);
+        } else {
+          box(8-w, y-.23, mouthZ-.22, 8+w, y+.02, mouthZ+.36, color);
+          box(8-w*.82, y-1.1-3.6*spill, mouthZ+.04, 8+w*.82, y-.16, mouthZ+.36, color);
+        }
+      }
+      if (!idle && !wetRecipe && age < 9) {
+        for (let i=0; i<6; i++) {
+          const u = frac(age / 9 + i * .2), theta = i * Math.PI / 3;
+          const x = 8 + Math.cos(theta) * (3.9 + u * 1.3), z = 8 + Math.sin(theta) * (3.9 + u * 1.3);
+          const py = seam - u * 2.2;
+          box(x-.22,py,z-.22,x+.22,py+.4,z+.22,0xd8b26e,1-u);
+        }
+      }
+      batch.end();
+    },
+  };
+}
+
 export const blockExtras = [
   { match: ["*_bench"], build: (ctx, id, state) => benchLegs(ctx, id.replace(/_bench$/, ""), state) },
 ];
 
 export default [
+  {
+    id: "stone_mill_preview",
+    name: "小石磨磨制与液流（新版预览）",
+    desc: "圆石不调色；可切换整像素与旧小数坐标，近看磨盘转角、进料口和导流槽；持续流展示不是游戏行为。",
+    params: [
+      { key: "shape", label: "模型轮廓", options: [["aligned", "整像素版"], ["fractional", "上一版对照"]], default: "aligned" },
+      { key: "kind", label: "研磨状态", options: [["soymilk", "黄豆湿磨豆浆"], ["water", "清水测试导流"], ["dry", "花生干磨出粉"]], default: "soymilk" },
+      { key: "stage", label: "演示阶段", options: [["flowing", "满槽连续流浆"], ["filling", "从空槽逐步蓄满"]], default: "flowing" },
+    ],
+    build: buildStoneMillPreview,
+  },
+  {
+    id: "pot_break_frame", name: "拆锅粒子与掉落位置（首帧定格）",
+    desc: "位置直接来自 Java 真实锅形状的破坏采样；可核对矮/高、X/Z 锅耳及铜铁材质。定格首帧和掉落生成点，不模拟之后的世界碰撞，也不代替游戏验收。",
+    params: [POT,
+      { key: "height", label: "灶台高度", options: [["low", "矮灶台"], ["tall", "高灶台"]], default: "tall" },
+      { key: "axis", label: "锅耳方向", options: [["x", "东西"], ["z", "南北"]], default: "x" },
+      { key: "phase", label: "核对内容", options: [["whole", "完整锅"], ["particles", "碎屑首帧"], ["drop", "掉落生成点"]], default: "particles" }],
+    build: buildPotBreakFrame,
+  },
   {
     id:"table_chopsticks",name:"桌上竹筷 + 筷架",
     desc:"两根 8.5 像素的平行竹条，尾端贴桌，前端由横放的白瓷鞍形筷架托住；四向筷尖朝外，占地 9.5×4.5 像素（r146e）。",
@@ -1056,5 +1775,180 @@ export default [
     desc: "没装锅的灶台：点火后炉口火光贴图和火苗粒子",
     params: [FIRE],
     build: (ctx, s) => buildScene(ctx, s, "stoveOnly"),
+  },
+  {
+    id: "stone_mill",
+    name: "小石磨研磨（游戏效果）",
+    desc: "1.5 格高木架抬高出料口以齐平开口大木桶沿；每次成功推磨转四分之一圈，最后一次湿磨从导流嘴短暂出浆：紧挨大木桶时直接越过桶沿流进桶内，单摆则留槽等待空桶。干磨不出液。",
+    params: [
+      { key: "kind", label: "配方", options: [["vat", "紧挨大木桶自动接浆"], ["wet", "黄豆湿磨并接取"], ["dry", "花生干磨"], ["idle", "加水待机"]], default: "vat" },
+    ],
+    build: buildStoneMillGame,
+  },
+  {
+    id: "wooden_vat",
+    name: "开口大木桶 + 3D 木压板（Phase 3.2）",
+    desc: "敞口箍铁木桶：支持「豆浆 + 卤水 + 3D 木压板下压成豆腐（冷）」；右侧并排展示独立 3D 木压板（八角倒角拼板 + 双反翘横档 + 拱形木提手，对应 WoodenVatRenderer）",
+    params: [
+      { key: "mode", label: "压制状态", options: [["pressing", "木压板压制动画中"], ["done", "压制完成"]], default: "pressing" },
+      { key: "extra", label: "旁摆对照", options: [["both", "桶 + 独立 3D 木压板"], ["vat", "仅看木桶"], ["lid", "特写 3D 木压板"]], default: "both" },
+    ],
+    build: async (ctx, s) => {
+      const ns = ctx.modid;
+      const root = new THREE.Group();
+      let lid = null;
+      let liq = null;
+
+      if (s.extra !== "lid") {
+        const vat = await ctx.buildModel(`${ns}:block/wooden_vat`);
+        root.add(vat);
+
+        const tex = await ctx.texture(`${ns}:block/soymilk_still`);
+        const liqGeo = new THREE.PlaneGeometry(11 * PX, 11 * PX);
+        liqGeo.rotateX(-Math.PI / 2);
+        const liqMat = new THREE.MeshBasicMaterial({
+          map: tex.texture || tex,
+          color: 0xfaf3df,
+          transparent: false,
+          opacity: 1,
+          side: THREE.DoubleSide,
+        });
+        liq = new THREE.Mesh(liqGeo, liqMat);
+        liq.position.set(0, mc((11.2 - 0.15) * PX), 0);
+        root.add(liq);
+
+        lid = await ctx.buildModel(`${ns}:block/wooden_vat_lid`);
+        root.add(lid);
+      }
+
+      if (s.extra === "both" || s.extra === "lid") {
+        const soloLid = await ctx.buildModel(`${ns}:block/wooden_vat_lid`);
+        if (s.extra === "both") {
+          soloLid.position.set(1.1, 0, 0);
+        } else {
+          soloLid.scale.setScalar(1.35);
+        }
+        root.add(soloLid);
+      }
+      if (s.extra === "both") {
+        root.position.x = -0.45;
+      }
+
+      return {
+        object: root,
+        tick() {},
+        frame(t) {
+          const cycle = s.mode === "done" ? 1 : (Math.sin(t * 1.4 - Math.PI / 2) + 1) / 2;
+          const baseLidY = 11.2 - cycle * 1.4;
+          if (lid) {
+            lid.position.y = baseLidY * PX;
+          }
+          if (liq) {
+            liq.position.y = mc((baseLidY - 0.15) * PX);
+          }
+        },
+      };
+    },
+  },
+  {
+    id: "orange_tree",
+    name: "独立橙子树（1 格露底 + 3×3×2 树冠 + 顶叶）",
+    desc: "对应 worldgen/configured_feature/orange_tree.json（2 格树干：底部露 1 格 + 3×3×2 紧凑树冠，顶上允许长出 1 格顶叶）；橙子树叶随原版流畅/高品质画质开关切换镂空与不透明。",
+    params: [
+      { key: "topLeaf", label: "顶部顶叶", options: [["on", "顶上带 1 格树叶（4 格高）"], ["off", "平顶 3×3×2（3 格高）"]], default: "on" },
+      { key: "stage", label: "树叶阶段", options: [["mix", "自然花果混生（5:2:2:3）"], ["3", "满树熟橙 (stage 3)"], ["2", "青幼果期 (stage 2)"], ["1", "满树橘花 (stage 1)"], ["0", "纯绿叶 (stage 0)"]], default: "mix" },
+    ],
+    build: async (ctx, s) => {
+      const ns = ctx.modid;
+      const root = new THREE.Group();
+
+      const grassProto = await ctx.buildModel("minecraft:block/moss_block");
+      for (let gx = -2; gx <= 2; gx++) {
+        for (let gz = -2; gz <= 2; gz++) {
+          const g = grassProto.clone();
+          g.position.set(gx, -1, gz);
+          root.add(g);
+        }
+      }
+
+      const logProto = await ctx.buildModel(`${ns}:block/orange_log`);
+      for (let y = 0; y < 2; y++) {
+        const log = logProto.clone();
+        log.position.set(0, y, 0);
+        root.add(log);
+      }
+
+      const leafProtos = await Promise.all([0, 1, 2, 3].map((st) => ctx.buildModel(`${ns}:block/orange_leaves_stage${st}`)));
+      const pickStage = (x, y, z) => {
+        if (s.stage !== "mix") return Number(s.stage);
+        const r = Math.floor(hash(x * 13 + y * 29 + z * 43 + 7) * 12);
+        return r < 5 ? 0 : (r < 7 ? 1 : (r < 9 ? 2 : 3));
+      };
+
+      // 对应 OrangeFoliagePlacer（radius=1, height=2, top_leaf_chance=0.65, upper_corner_skip_chance=0.45）
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          if (dx === 0 && dz === 0) continue; // Y=1 中心保留树干保证不凋零
+          const low = leafProtos[pickStage(dx, 1, dz)].clone();
+          low.position.set(dx, 1, dz);
+          root.add(low);
+        }
+      }
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          if (Math.abs(dx) === 1 && Math.abs(dz) === 1 && hash(dx * 17 + dz * 31 + 3) < 0.45) continue;
+          const high = leafProtos[pickStage(dx, 2, dz)].clone();
+          high.position.set(dx, 2, dz);
+          root.add(high);
+        }
+      }
+      if (s.topLeaf !== "off") {
+        const cap = leafProtos[pickStage(0, 3, 0)].clone();
+        cap.position.set(0, 3, 0);
+        root.add(cap);
+      }
+
+      const saplingPad = grassProto.clone();
+      saplingPad.position.set(-3.2, -1, 1.2);
+      root.add(saplingPad);
+      const sapling = await ctx.buildModel(`${ns}:block/orange_sapling`);
+      sapling.position.set(-3.2, 0, 1.2);
+      root.add(sapling);
+
+      const strippedPad = grassProto.clone();
+      strippedPad.position.set(3.2, -1, 1.2);
+      root.add(strippedPad);
+      const stripped = await ctx.buildModel(`${ns}:block/stripped_orange_log`);
+      stripped.position.set(3.2, 0, 1.2);
+      root.add(stripped);
+
+      root.position.y = -0.8;
+      return {
+        object: root,
+        tick() {},
+        frame() {},
+      };
+    },
+  },
+  {
+    id: "prep_racks",
+    name: "三种备菜架（Phase 4）",
+    desc: "并排展示 6 格多层落地菜架（小碟 + 肥牛卷 / 吊龙 / 冷豆腐 / 金针菇）、4 格桌面备菜架（加入 table_decorations 自动贴面抬高/下沉贴桌）与 4 格双态挂架（wall 靠墙 / ceiling 吸顶，挂布围裙与铁菜刀 / 擀面杖；对应 PrepRackRenderer）。",
+    params: [
+      { key: "mount", label: "挂架形态", options: [["wall", "靠墙 wall"], ["ceiling", "吸顶 ceiling"]], default: "wall" },
+      { key: "table", label: "桌面架摆在", options: [["low", "矮火锅桌上"], ["tall", "高火锅桌上"], ["ground", "地上"]], default: "low" },
+    ],
+    build: buildPrepRacks,
+  },
+  {
+    id: "table_materials",
+    name: "统一火锅桌分部位换材质（Phase 4）",
+    desc: "展示 40→2 收束后的通用矮火锅桌与高火锅桌互相连接，支持桌面（上半）与底座（下半）分部位换材质预览，桌面备菜架自动贴合桌面。",
+    params: [
+      { key: "top", label: "桌面材质", options: [["default", "默认木板"], ["quartz", "石英块"], ["deepslate", "磨制深板岩"], ["copper", "切制铜块"], ["cherry", "樱花木板"]], default: "quartz" },
+      { key: "base", label: "底座材质", options: [["default", "默认红砖"], ["oak", "橡木木板"], ["blackstone", "磨制黑石"], ["smooth_stone", "平滑石头"], ["quartz", "石英块"]], default: "blackstone" },
+      { key: "open", label: "高桌朝灶口", options: [["false", "封闭底座"], ["true", "敞口（仅留上圈）"]], default: "false" },
+    ],
+    build: buildTableMaterials,
   },
 ];

@@ -56,6 +56,8 @@ def registered_items(src: str) -> list[str]:
     ids = set(re.findall(r"Registries\.ITEM,\s*HotPot\.id\(\"([a-z0-9_]+)\"\)", src))
     # P1 第三批起走分域 Registrar：reg().items().register(HotPot.id("x"), ...)
     ids |= set(re.findall(r'\.items\(\)\.register\(\s*HotPot\.id\("([a-z0-9_]+)"\)', src))
+    ids |= set(re.findall(r'registerBlockItem\(\s*registration\s*,\s*"([a-z0-9_]+)"', src))
+    ids |= set(re.findall(r'registerWildCrop\(\s*registration\s*,\s*"([a-z0-9_]+)"', src))
     ids |= set(re.findall(r'foodItem\(\s*(?:registration\s*,\s*)?"([a-z0-9_]+)"', src))
     soup = (MOD / "common/src/main/java/cn/blockforge/generated/orientshotpotchronicles/hotpot/SoupBase.java")
     if soup.is_file():
@@ -65,7 +67,11 @@ def registered_items(src: str) -> list[str]:
         ids |= set(re.findall(r'^\s*[A-Z_]+\("soup\.[a-z0-9_]+",\s*"([a-z0-9_]+)"', text, re.M))
         for block in re.findall(r"public String bowlId\(\)\s*\{(.*?)\n    \}", text, re.S):
             ids |= set(re.findall(r'->\s*"([a-z0-9_]+)"', block))
-    ids |= {p.stem for p in (ASSETS / "textures/item").glob("*.png")}
+    tex_item_dir = ASSETS / "textures/item"
+    ids |= {
+        p.stem for p in tex_item_dir.glob("*.png")
+        if not (p.stem.endswith(("_n", "_s")) and (tex_item_dir / f"{p.stem[:-2]}.png").is_file())
+    }
     return sorted(ids)
 
 
@@ -81,6 +87,8 @@ def recipe_results() -> dict[str, list[str]]:
             data = json.loads(path.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             continue
+        if isinstance(data, dict) and str(data.get("type", "")).endswith(":conditional_crafting") and isinstance(data.get("recipe"), dict):
+            data = data["recipe"]
         result = data.get("result")
         rid = None
         if isinstance(result, dict):

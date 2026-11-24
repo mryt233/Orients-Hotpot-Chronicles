@@ -1,3 +1,4 @@
+// mryt233 改：26.2 移植同步。
 // mryt233 改：26.2 原版 API。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
@@ -188,7 +189,9 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
             Map.entry(HotPotContent.LOTUS_ROOT, new ItemStack(HotPotContent.LOTUS_ROOT_SLICE, 3)),
             Map.entry(HotPotContent.RAW_SQUID, new ItemStack(HotPotContent.SQUID_ROLL, 3)),
             // mryt233 改（2026-11-06，r139）：折耳根一刀切成 3 段（整根 → 折耳根段，下锅涮的食材）。
-            Map.entry(HotPotContent.ZHE_ER_GEN, new ItemStack(HotPotContent.ZHE_ER_GEN_SLICE, 3))
+            Map.entry(HotPotContent.ZHE_ER_GEN, new ItemStack(HotPotContent.ZHE_ER_GEN_SLICE, 3)),
+            // mryt233 改（2026-11-15，0.3.1-alpha）：生鸡爪菜刀剔骨 → 无骨鸡爪。
+            Map.entry(HotPotContent.CHICKEN_FEET, new ItemStack(HotPotContent.BONELESS_CHICKEN_FEET, 1))
             // ==== tools/new_item.py：新的砧板切配插在这行上面（别删这行）====
         );
 
@@ -284,7 +287,7 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
                 Containers.dropItemStack(world, pos.getX() + 0.5, pos.getY() + TOP + 0.1, pos.getZ() + 0.5, result);
                 stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
                 world.playSound((Player) null, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 0.7F, 1.5F);
-                ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(cut)),
+                ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(cut.copyWithCount(1))),
                     pos.getX() + 0.5, pos.getY() + TOP + 0.05, pos.getZ() + 0.5, 8, 0.15, 0.05, 0.15, 0.05);
             }
             return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
@@ -323,7 +326,7 @@ public class CuttingBoardBlock extends Block implements EntityBlock, PartOutline
             stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
             world.playSound((Player) null, pos, SoundEvents.WOOD_HIT, SoundSource.BLOCKS, 1.0F, 0.7F);
             world.playSound((Player) null, pos, SoundEvents.SLIME_SQUISH_SMALL, SoundSource.BLOCKS, 0.6F, 0.9F);
-            ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(meat)),
+            ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(meat.copyWithCount(1))),
                 pos.getX() + 0.5, pos.getY() + TOP + 0.05, pos.getZ() + 0.5, 6, 0.15, 0.05, 0.15, 0.04);
         }
         return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());

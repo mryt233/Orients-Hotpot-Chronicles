@@ -5,6 +5,7 @@ package cn.blockforge.generated.orientshotpotchronicles.client;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.*;
+import cn.blockforge.generated.orientshotpotchronicles.network.MinigameSyncPayload;
 import cn.blockforge.orient.framework.client.ClientContent;
 import cn.blockforge.orient.framework.client.ClientNetwork;
 import cn.blockforge.orient.framework.client.PartOutlineDrawing;
@@ -25,7 +26,21 @@ public final class HotPotClientContent {
         ChopsticksAimClient.install();
         GuideBookItem.clientOpen = () -> Minecraft.getInstance().setScreen(new GuideBookScreen());
         SauceStationBlock.openOverview = (pos, title) -> Minecraft.getInstance().setScreen(new SauceOverviewScreen(pos, title));
-        client.onDisconnect(Config::clearClient);
+        HotPotTableBlockEntity.clientRefresh = client::refreshBlockModel;
+        PrepRackBlockEntity.clientRefresh = client::refreshBlockModel;
+        MinigameSyncPayload.clientReceiver = HotPotMinigameClient::acceptServerJson;
+        // mryt233 改（2026-11-19）：独立状态快照，不依赖客户端此刻是否还显示锅。
+        cn.blockforge.generated.orientshotpotchronicles.network.PotBreakEffectPayload.clientReceiver = BlockPartParticles::potBroken;
+        client.wrappedModels(new TableModelRule());
+        client.wrappedModels(new StoveModelRule());
+        client.onDisconnect(() -> {
+            Config.clearClient();
+            HotPotMinigameClient.onDisconnect();
+        });
+        client.keyMappings(HotPotKeybinds.all());
+        client.clientTick(HotPotMinigameClient::onClientTick);
+        client.clientTick(IrisShaderCompat::onClientTick);
+        client.hudRender(HotPotMinigameClient::renderHud);
         client.menu(HotPotContent.HOT_POT_SCREEN, HotPotScreen::new);
         client.menu(HotPotContent.STOVE_SCREEN, StoveScreen::new);
         client.menu(HotPotContent.SAUCE_STATION_SCREEN, SauceStationScreen::new);
@@ -35,10 +50,14 @@ public final class HotPotClientContent {
         client.blockEntityRenderer(HotPotContent.CUTTING_BOARD_BE, CuttingBoardRenderer::new);
         client.blockEntityRenderer(HotPotContent.PLATE_HOLDER_BE, PlateHolderRenderer::new);
         client.blockEntityRenderer(HotPotContent.BENCH_BE, BenchLegsRenderer::new);
+        client.blockEntityRenderer(HotPotContent.STONE_MILL_BE, StoneMillRenderer::new);
+        client.blockEntityRenderer(HotPotContent.WOODEN_VAT_BE, WoodenVatRenderer::new);
+        client.blockEntityRenderer(HotPotContent.PREP_RACK_BE, PrepRackRenderer::new);
         client.entityRenderer(HotPotContent.SEAT, NoopRenderer::new);
         client.armorModels((entity, stack, slot, original) -> ApronModel.get(), HotPotContent.CLOTH_APRONS.toArray(Item[]::new));
         client.tooltip((stack, context, flag, lines) -> ClientTooltips.append(stack, lines));
         client.cutout(HotPotContent.SAUCE_STATIONS.toArray(Block[]::new));
+        client.cutout(HotPotContent.CUTOUT_BLOCKS.toArray(Block[]::new));
         client.screens((screen, add) -> {
             if (!(screen instanceof CreativeModeInventoryScreen creative)) return null;
             var hooks = CreativeSubTabs.init(creative, creative.width, creative.height, add);

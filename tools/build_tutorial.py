@@ -41,6 +41,11 @@ WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "
 WOOD_ZH = {"oak": "橡木", "spruce": "云杉木", "birch": "白桦木", "jungle": "丛林木", "acacia": "金合欢木", "dark_oak": "深色橡木",
            "mangrove": "红树木", "cherry": "樱花木", "bamboo": "竹", "crimson": "绯红木", "warped": "诡异木"}
 TAG_ICON = {"minecraft:logs": ("minecraft:oak_log", "任意原木"),
+            "minecraft:planks": ("minecraft:oak_planks", "任意木板"),
+            "minecraft:stone_crafting_materials": ("minecraft:cobblestone", "任意圆石/石材"),
+            "minecraft:wooden_slabs": ("minecraft:oak_slab", "任意木台阶"),
+            "orients_hotpot_chronicles:orange_logs": ("orients_hotpot_chronicles:orange_log", "任意橙木原木"),
+            "orients_hotpot_chronicles:tofu_coagulants": ("orients_hotpot_chronicles:brine_bottle", "卤水瓶（点卤材料）"),
             # mryt233 改（2026-11-09，r146b）：布围裙换款配方的材料是 #cloth_aprons 标签，
             # 代表图标用米白款，提示文字写「任意一款布围裙」
             "orients_hotpot_chronicles:cloth_aprons": ("orients_hotpot_chronicles:cloth_apron", "任意一款布围裙")}
@@ -50,7 +55,7 @@ PAGES = [  # (文件名, 导航标题, 分组)
     ("install", "下载、安装与反馈", "开始"),
     ("quickstart", "十分钟吃上火锅", "开始"),
     ("hotpot", "灶台与火锅", "玩法"),
-    ("tables", "桌子与凳子", "玩法"),
+    ("tables", "桌子、备菜架与凳子", "玩法"),
     ("tableware", "盘子、碗与饮料", "玩法"),
     ("ingredients", "食材与切菜", "玩法"),
     ("sauce", "蘸料", "玩法"),
@@ -146,10 +151,23 @@ def chip(i):
 
 
 # ---------------- 配方 ----------------
+def unwrap_recipe(r):
+    if isinstance(r, dict) and str(r.get("type", "")).endswith(":conditional_crafting") and isinstance(r.get("recipe"), dict):
+        inner = dict(r["recipe"])
+        inner["_cond_flag"] = r.get("flag")
+        inner["_cond_expected"] = r.get("expected")
+        return inner
+    return r
+
+
 def load_recipes():
     out = {}
-    for f in sorted(glob.glob(os.path.join(RECIPES, "*.json"))):
-        out[os.path.basename(f)[:-5]] = json.load(open(f, encoding="utf-8"))
+    for sub in ("", "stone_mill", "wooden_vat"):
+        folder = os.path.join(RECIPES, sub) if sub else RECIPES
+        for f in sorted(glob.glob(os.path.join(folder, "*.json"))):
+            name = os.path.basename(f)[:-5]
+            key = "%s/%s" % (sub, name) if sub else name
+            out[key] = unwrap_recipe(json.load(open(f, encoding="utf-8")))
     return out
 
 
@@ -157,6 +175,7 @@ RECIPE_DB = load_recipes()
 
 
 def result_id(r):
+    r = unwrap_recipe(r)
     res = r.get("result")
     if isinstance(res, dict):
         return full_id(res.get("id") or res.get("item"))
@@ -164,6 +183,7 @@ def result_id(r):
 
 
 def result_count(r):
+    r = unwrap_recipe(r)
     res = r.get("result")
     return res.get("count", 1) if isinstance(res, dict) else r.get("count", 1)
 
@@ -229,8 +249,30 @@ def grid_recipe(r):
     cols = keep_c[-1] - keep_c[0] + 1
     rid = result_id(r)
     label = "合成" if shaped else "合成（无序，随便摆）"
+    if r.get("_cond_flag") == "mode.detailed_tofu_processing" and r.get("_cond_expected") is False:
+        label += " · 仅精简模式（关闭细致豆腐时）"
     return ('<div class="rcp"><div class="rlabel">%s</div><div class="rbody"><div class="grid" style="--cols:%d">%s</div>%s%s</div></div>'
             % (label, cols, grid, ARROW, slot((rid, name_of(rid)), result_count(r))))
+
+
+def stone_mill_recipe(r):
+    ing = ing_ref(r["ingredient"])
+    cnt = r.get("ingredient_count", 1)
+    turns = r.get("turns", 3)
+    label = ("%s · %d 圈" % ("小石磨（湿磨 · 需加水）" if r.get("requires_water") else "小石磨（干磨）", turns))
+    rid = result_id(r)
+    return ('<div class="rcp"><div class="rlabel">%s</div><div class="rbody">%s%s%s</div></div>'
+            % (label, slot(ing, cnt if cnt > 1 else None), ARROW, slot((rid, name_of(rid)), result_count(r))))
+
+
+def wooden_vat_recipe(r):
+    secs = "%g" % round(r.get("ticks", 80) / 20, 2)
+    label = "开口大木桶（倒入豆浆 + 点卤 + 盖木压板，仅完整/细致豆腐模式） · %s 秒" % secs
+    soy = ("%s:soymilk_bucket" % MOD, name_of("%s:soymilk_bucket" % MOD))
+    ing = ing_ref(r["ingredient"])
+    rid = result_id(r)
+    return ('<div class="rcp"><div class="rlabel">%s</div><div class="rbody"><div class="grid" style="--cols:2">%s%s</div>%s%s</div></div>'
+            % (label, slot(soy), slot(ing), ARROW, slot((rid, name_of(rid)), result_count(r))))
 
 
 def cook_block(raw_id, entries):
@@ -285,7 +327,13 @@ RELEASE_RES = RES
 
 def use_release_recipes():
     base_dir = os.path.join(RELEASE_RES, "data", MOD, "recipe")
-    base = {os.path.basename(f)[:-5]: json.load(open(f, encoding="utf-8")) for f in sorted(glob.glob(os.path.join(base_dir, "*.json")))}
+    base = {}
+    for sub in ("", "stone_mill", "wooden_vat"):
+        folder = os.path.join(base_dir, sub) if sub else base_dir
+        for f in sorted(glob.glob(os.path.join(folder, "*.json"))):
+            name = os.path.basename(f)[:-5]
+            key = "%s/%s" % (sub, name) if sub else name
+            base[key] = unwrap_recipe(json.load(open(f, encoding="utf-8")))
     if not base:
         warnings.append("找不到已发布版的配方（%s），按开发版的配方画" % base_dir)
         return
@@ -320,8 +368,9 @@ def recipes_for(item_id):
         short = t.rsplit(":", 1)[-1]
         # 模组自己的合成类型（如汤底桶 soup_bucket）有 pattern / ingredients 的，也按工作台格子画（2026-10-27）
         # 布围裙换款配方（apron_recolor）字段是 apron / dye / result，也认成工作台配方，画成「两格无序」。
+        # mryt233 改（2026-11-22，0.3.1-alpha）：补入石磨与开口大木桶正文配方渲染。
         if (t in ("crafting_shaped", "crafting_shapeless", "stonecutting")
-                or "pattern" in r or "ingredients" in r or short == "apron_recolor") and result_id(r) == item_id:
+                or "pattern" in r or "ingredients" in r or short in ("apron_recolor", "stone_mill", "wooden_vat")) and result_id(r) == item_id:
             out.append(r)
     return out
 
@@ -335,6 +384,10 @@ def recipe_html(item_id):
             parts.append(recolour_recipe(r))
         elif t == "stonecutting":
             parts.append(stonecut(r))
+        elif t == "stone_mill":
+            parts.append(stone_mill_recipe(r))
+        elif t == "wooden_vat":
+            parts.append(wooden_vat_recipe(r))
         else:
             parts.append(grid_recipe(r))
     for raw, c in COOK.items():
@@ -461,7 +514,7 @@ def cat_of(rid):
 
 RECIPE_SECTIONS = [
     ("灶台、锅与筷子", lambda i: i in ("brick_stove", "tall_brick_stove", "bamboo_chopsticks") or i.endswith("_hotpot") and "grid" in i or "yuanyang" in i or i.endswith("four_grid_hotpot")),
-    ("火锅桌与凳子", lambda i: i.endswith("hotpot_table") or i.endswith("_stool") or i.endswith("_bench")),
+    ("火锅桌、凳子与备菜架", lambda i: i.endswith("hotpot_table") or i.endswith("_prep_rack") or i.endswith("_stool") or i.endswith("_bench")),
     ("盘子", lambda i: any(s in i for s in ("small_dish", "plate", "platter"))),
     ("蘸料台", lambda i: "sauce_station" in i),
     ("厨具与食材", lambda i: True),
@@ -473,13 +526,15 @@ def build_recipes_page():
     by_result = {}
     for rid, r in RECIPE_DB.items():
         t = r["type"].replace("minecraft:", "")
-        if t.rsplit(":", 1)[-1] in ("crafting_shaped", "crafting_shapeless", "stonecutting", "apron_recolor"):
-            by_result.setdefault(result_id(r).split(":")[1], []).append(r)
+        res = result_id(r)
+        if res.startswith(MOD + ":") and t.rsplit(":", 1)[-1] in ("crafting_shaped", "crafting_shapeless", "stonecutting", "apron_recolor"):
+            by_result.setdefault(res.split(":")[1], []).append(r)
     ids = sorted(by_result)
     out = ["<h1>配方大全</h1>",
            "<p>这一页由脚本<b>直接读游戏里的配方文件</b>画出来，和游戏永远一致。鼠标放到格子上能看到物品名。</p>",
            '<div class="callout tip"><div class="ct">木头 / 材质省略规则</div>'
-           "<p>11 种木头的火锅桌、高火锅桌、板凳、条凳、蘸料台配方都一样，只是把木板换成对应的木板，这里只画<b>橡木</b>的。"
+           "<p>板凳、条凳与蘸料台各有 11 种木头款式，配方完全相同只是替换对应木板，这里只画<b>橡木</b>示范。"
+           "火锅桌与高火锅桌现已统一为两张通用桌，做好基础款后持任意实心方块即可自由换材质。"
            "盘子五种材质（石英、竹、红陶、铜、铁）的<b>小碟</b>各自单列，大盘子只画石英的，其他材质把小碟换成对应材质的小碟。</p></div>"]
     placed = set()
     for title, pred in RECIPE_SECTIONS:
@@ -515,19 +570,21 @@ def build_recipes_page():
 
 def build_items_page():
     groups = [
-        ("灶台与锅", lambda i: i in ("brick_stove", "tall_brick_stove") or "hotpot" in i and "table" not in i),
-        ("火锅桌", lambda i: i.endswith("hotpot_table")),
+        ("灶台与锅", lambda i: i in ("brick_stove", "tall_brick_stove") or ("hotpot" in i and "table" not in i and "guide" not in i and "base" not in i)),
+        ("火锅桌与备菜架", lambda i: i in ("hotpot_table", "tall_hotpot_table") or i.endswith("_prep_rack")),
         ("凳子", lambda i: i.endswith("_stool") or i.endswith("_bench")),
         ("盘子", lambda i: any(s in i for s in ("small_dish", "plate", "platter"))),
         ("蘸料台", lambda i: "sauce_station" in i),
-        ("汤碗与饮料", lambda i: "broth_bowl" in i or "drink" in i or i == "dipping_sauce"),
-        ("工具", lambda i: i in ("bamboo_chopsticks", "iron_kitchen_knife", "rolling_pin", "cutting_board")),
+        ("汤碗与饮料", lambda i: any(s in i for s in ("broth_bowl", "soup_bowl", "soup_bucket", "hotpot_base", "drink", "cola")) or i in ("glass_cup", "water_cup", "milk_cup", "soymilk_bucket", "dipping_sauce")),
+        ("厨具、加工与穿戴", lambda i: i in ("hotpot_guide", "bamboo_chopsticks", "iron_kitchen_knife", "rolling_pin", "cutting_board", "stone_mill", "wooden_vat", "wooden_press_lid", "brine_bottle") or "cloth_apron" in i),
+        ("橙子树与野生植株", lambda i: i in ("orange_log", "orange_wood", "stripped_orange_log", "stripped_orange_wood", "orange_leaves", "orange_sapling") or i.startswith("wild_")),
         ("食材", lambda i: True),
     ]
     all_ids = sorted({k.split(":")[1] for k in NAMES} - {"plates"})
-    # mryt233 改：饮料炼药锅只有方块状态，没有可列入图鉴的独立物品。
-    hide = {"plates", "sauce_station_top", "tall_brick_stove_top", "bowl", "drink", "drink_cauldron", "sauce_bottle"}
-    all_ids = [i for i in all_ids if i not in hide]
+    # mryt233 改：纯放置方块形态（无独立物品）不列为图鉴/给物 ID；旧 40 张预设桌仅做存档迁移兼容。
+    hide = {"plates", "sauce_station_top", "tall_brick_stove_top", "bowl", "drink", "drink_cauldron", "sauce_bottle", "cup", "chopstick_rest"}
+    all_ids = [i for i in all_ids if i not in hide and not i.endswith("_crop")
+               and not (i.endswith("hotpot_table") and i not in ("hotpot_table", "tall_hotpot_table"))]
     seen = set()
     out = ["<h1>物品图鉴</h1>", "<p>模组里所有物品和方块（自动生成）。<code>ID</code> 是指令里用的名字，例如 <code>/give @s orients_hotpot_chronicles:brick_stove</code>。</p>"]
     for title, pred in groups:
@@ -656,7 +713,7 @@ def check_coverage(bodies):
     released = release_item_ids()
     for full, zh in NAMES.items():
         i = full.split(":")[1]
-        if i in hide or (released is not None and i not in released):
+        if i in hide or i.endswith("_crop") or (released is not None and i not in released):
             continue
         # 木头 / 材质变种由「一类」代表，只要求代表出现
         base = i
@@ -674,13 +731,15 @@ def check_coverage(bodies):
             continue
         if i.startswith("cooked_") and (NAMES.get(MOD + ":" + i[7:], "") in text_all or i[7:] in text_all):
             continue
-        if re.match(r"^(?:smooth_stone|polished_\w+|quartz|cut_copper|iron)_(?:tall_)?hotpot_table$", i) and i != "smooth_stone_hotpot_table":
-            continue   # 18 张石料 / 金属桌由「平滑石头火锅桌」代表（正文写了「9 种桌面」）
+        if i.endswith("hotpot_table") and i not in ("hotpot_table", "tall_hotpot_table"):
+            continue   # 40 张旧预设桌已收束迁移至统一火锅桌（hotpot_table / tall_hotpot_table）
         if i in ("empty_orange_drink_bottle", "empty_plant_protein_drink_bottle") or i.endswith(("_drink_cup", "_cola_cup")):
             continue   # 饮料的空瓶、一杯装，归在「饮料」一节里讲
         if i.startswith("iron_") and ("yuanyang" in i or "four_grid" in i):
             continue
         if "cilantro_" in i and ("meatball" in i or "fish_ball" in i) and "香菜丸子" in text_all:
+            continue
+        if i.startswith("wild_") and "野生" in text_all:
             continue
         if zh not in text_all and i not in text_all:
             warnings.append("教程正文没提到：%s（%s）——去 tutorial/content/ 补上" % (zh, i))

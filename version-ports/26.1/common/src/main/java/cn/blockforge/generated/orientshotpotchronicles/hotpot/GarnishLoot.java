@@ -14,29 +14,26 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCon
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 /**
- * 打草掉小葱、香菜（r103，用户：打草掉落，概率「多一点」= 各 25%）。和原版打草掉小麦种子一样：用剪刀剪下来的是草本身，
- * 不掉这两样；高草只算下半格，免得一株掉两次。
- * 2026-10-23 加黄豆（做豆腐用，用户：打草掉，以后再考虑做成作物）：15%，比小葱 / 香菜少一点，打草已经掉得够多了。
- * mryt233 改（2026-11-05）：辣椒（r136a）也打草掉，概率同大蒜 15%。
- * mryt233 改（2026-11-06）：花生、青菜（r137）也打草掉，同样 15%。
- * 作者：mryt233 */
-// mryt233 改（2026-11-11）：第三批 3F 合并重复实现，保留各入口原有行为。
+ * 9 种配菜在短草 / 高草中的稀疏兜底掉落：
+ * <ul>
+ *   <li>完整模式（{@code mode.crops_replace_grass = true}，默认）：默认仅 {@code 0.02}（2%）作野外找种兜底，
+ *       主力获取交给耕地种植与野生植株。</li>
+ *   <li>若关闭 {@code mode.crops_replace_grass} 且对应配置键仍为 {@code 0.02} 默认值，
+ *       {@code /reload} 后自动抬回旧版打草掉率（小葱/香菜 {@code 0.25}、其余 {@code 0.15}）。</li>
+ * </ul>
+ */
 public final class GarnishLoot {
-    public static final float CHANCE = 0.25F;
-    public static final float SOYBEAN_CHANCE = 0.15F;
-    /** 大蒜（2026-10-25 用户：和小葱、黄豆、香菜一样打草掉）：同黄豆 15%。 */
-    public static final float GARLIC_CHANCE = 0.15F;
-    /** 辣椒（mryt233 改 2026-11-05，r136a）：同大蒜 15%。 */
-    public static final float CHILI_CHANCE = 0.15F;
-    /** 番茄（mryt233 改 2026-11-13，4K）：从大蒜拆出独立配置键，默认 15%。 */
-    public static final float TOMATO_CHANCE = 0.15F;
-    /** mryt233 改（2026-11-06，r137）：花生、青菜也打草掉，概率同黄豆 / 大蒜 15%。 */
-    public static final float PEANUT_CHANCE = 0.15F;
-    public static final float GREENS_CHANCE = 0.15F;
-    /** mryt233 改（2026-11-06，r139）：折耳根也打草掉（西南田埂上到处是），概率同青菜 15%。 */
-    public static final float ZHE_ER_GEN_CHANCE = 0.15F;
+    public static final float DEFAULT_CHANCE = 0.02F;
+    public static final float CHANCE = DEFAULT_CHANCE;
+    public static final float SOYBEAN_CHANCE = DEFAULT_CHANCE;
+    public static final float GARLIC_CHANCE = DEFAULT_CHANCE;
+    public static final float CHILI_CHANCE = DEFAULT_CHANCE;
+    public static final float TOMATO_CHANCE = DEFAULT_CHANCE;
+    public static final float PEANUT_CHANCE = DEFAULT_CHANCE;
+    public static final float GREENS_CHANCE = DEFAULT_CHANCE;
+    public static final float ZHE_ER_GEN_CHANCE = DEFAULT_CHANCE;
 
-    private record GarnishDrop(Item item, String id, float fallback) {
+    private record GarnishDrop(Item item, String id, float legacyChance) {
     }
 
     private GarnishLoot() {
@@ -44,16 +41,23 @@ public final class GarnishLoot {
 
     private static GarnishDrop[] drops() {
         return new GarnishDrop[]{
-            new GarnishDrop(HotPotContent.SCALLION, "scallion", CHANCE),
-            new GarnishDrop(HotPotContent.CILANTRO, "cilantro", CHANCE),
-            new GarnishDrop(HotPotContent.SOYBEAN, "soybean", SOYBEAN_CHANCE),
-            new GarnishDrop(HotPotContent.GARLIC, "garlic", GARLIC_CHANCE),
-            new GarnishDrop(HotPotContent.TOMATO, "tomato", TOMATO_CHANCE),
-            new GarnishDrop(HotPotContent.CHILI_PEPPER, "chili_pepper", CHILI_CHANCE),
-            new GarnishDrop(HotPotContent.PEANUT, "peanut", PEANUT_CHANCE),
-            new GarnishDrop(HotPotContent.GREENS, "greens", GREENS_CHANCE),
-            new GarnishDrop(HotPotContent.ZHE_ER_GEN, "zhe_er_gen", ZHE_ER_GEN_CHANCE)
+            new GarnishDrop(HotPotContent.SCALLION, "scallion", 0.25F),
+            new GarnishDrop(HotPotContent.CILANTRO, "cilantro", 0.25F),
+            new GarnishDrop(HotPotContent.SOYBEAN, "soybean", 0.15F),
+            new GarnishDrop(HotPotContent.GARLIC, "garlic", 0.15F),
+            new GarnishDrop(HotPotContent.TOMATO, "tomato", 0.15F),
+            new GarnishDrop(HotPotContent.CHILI_PEPPER, "chili_pepper", 0.15F),
+            new GarnishDrop(HotPotContent.PEANUT, "peanut", 0.15F),
+            new GarnishDrop(HotPotContent.GREENS, "greens", 0.15F),
+            new GarnishDrop(HotPotContent.ZHE_ER_GEN, "zhe_er_gen", 0.15F)
         };
+    }
+
+    static float effectiveChance(String id, float configured, float legacyChance, boolean cropsReplaceGrass) {
+        if (!cropsReplaceGrass && Math.abs(configured - DEFAULT_CHANCE) < 1.0E-6F) {
+            return legacyChance;
+        }
+        return Math.max(0F, Math.min(1F, configured));
     }
 
     public static void register() {
@@ -67,13 +71,10 @@ public final class GarnishLoot {
             if (!shortGrass && !tallGrass) {
                 return;
             }
-            // mryt233 改（2026-11-05）：辣椒（r136a）加进打草掉落，和番茄、大蒜一样 15%。
-            // mryt233 改（2026-11-06）：花生、青菜（r137）也打草掉，同样是 15%。
-            // mryt233 改（2026-11-06，r139）：折耳根也进打草掉落，15%。
-            // mryt233 改（2026-11-13，4K）：9 种配菜改读各自配置键，番茄独立为 loot.garnish.tomato.chance；
-            // 概率为 0 时仍保留池子仅条件不中，便于 /reload 恢复。
+            boolean replaceGrass = Config.cropsReplaceGrass();
             for (GarnishDrop drop : drops()) {
-                float chance = Math.max(0F, Math.min(1F, Config.lootGarnishChance(drop.id(), drop.fallback())));
+                float chance = effectiveChance(
+                    drop.id(), Config.lootGarnishChance(drop.id(), DEFAULT_CHANCE), drop.legacyChance(), replaceGrass);
                 LootPool.Builder pool = LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1))
                     .when(HotPotLoot.withoutShears())
@@ -81,7 +82,8 @@ public final class GarnishLoot {
                     .add(LootItem.lootTableItem(drop.item()));
                 if (tallGrass) {
                     pool.when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(Blocks.TALL_GRASS)
-                        .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER)));
+                        .setProperties(StatePropertiesPredicate.Builder.properties()
+                            .hasProperty(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER)));
                 }
                 tableBuilder.withPool(pool);
             }

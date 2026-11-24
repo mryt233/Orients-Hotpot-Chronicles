@@ -1,0 +1,12 @@
+{
+  "type": "forge:add_features",
+  "biomes": "#orients_hotpot_chronicles:has_wild_temperate_crops",
+  "features": [
+    "orients_hotpot_chronicles:wild_scallion",
+    "orients_hotpot_chronicles:wild_cilantro",
+    "orients_hotpot_chronicles:wild_soybean",
+    "orients_hotpot_chronicles:wild_garlic",
+    "orients_hotpot_chronicles:wild_greens"
+  ],
+  "step": "vegetal_decoration"
+}

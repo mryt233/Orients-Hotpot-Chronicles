@@ -1,0 +1,16 @@
+{
+  "orient_framework.config.json_invalid": "配置文件不是合法的 JSON，全部使用默认值；原文件保留",
+  "orient_framework.config.root_not_object": "配置文件最外层必须是对象，全部使用默认值；原文件保留",
+  "orient_framework.config.format_unsupported": "不支持的配置格式版本，全部使用默认值；原文件保留",
+  "orient_framework.config.format_invalid": "配置格式版本无效，全部使用默认值；原文件保留",
+  "orient_framework.config.unknown_key": "不认识的配置项 %s，已忽略",
+  "orient_framework.config.not_object": "%s 必须是对象，已保留默认值",
+  "orient_framework.config.not_number": "%s 必须是数字，已回退默认值",
+  "orient_framework.config.not_integer": "%s 必须是整数，已回退默认值",
+  "orient_framework.config.out_of_range": "%s 必须在 %s～%s 之间，已回退默认值",
+  "orient_framework.config.too_large": "配置文件太大，全部使用默认值；原文件保留",
+  "orient_framework.config.read_failed": "读取配置失败（%s），全部使用默认值；原文件保留",
+  "orient_framework.config.write_failed": "写入配置失败（%s），原文件保留",
+  "orient_framework.disconnect.protocol": "Orient 框架网络协议不一致（服务端 %s，客户端 %s）。请安装和服务器相同版本的模组。",
+  "orient_framework.disconnect.missing_channels": "服务器需要的网络通道你的客户端没有：%s。请安装和服务器相同版本的模组。"
+}

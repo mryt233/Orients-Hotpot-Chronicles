@@ -1,0 +1,8 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/bench_middle",
+  "textures": {
+    "planks": "minecraft:block/dark_oak_planks",
+    "particle": "minecraft:block/dark_oak_planks"
+  },
+  "_说明": "斜腿由 BenchLegsRenderer 在游戏里绘制，模型文件里没有；完整造型见 preview_models/assets/orients_hotpot_chronicles/models/block/dark_oak_bench_middle.json。作者：mryt233"
+}

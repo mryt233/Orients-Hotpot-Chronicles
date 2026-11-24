@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "B",
+    "S"
+  ],
+  "key": {
+    "B": "minecraft:bricks",
+    "S": "orients_hotpot_chronicles:brick_stove"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:tall_brick_stove",
+    "count": 1
+  }
+}

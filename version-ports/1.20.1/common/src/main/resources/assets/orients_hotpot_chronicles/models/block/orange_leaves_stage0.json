@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "orients_hotpot_chronicles:block/orange_leaves_stage0"
+  }
+}

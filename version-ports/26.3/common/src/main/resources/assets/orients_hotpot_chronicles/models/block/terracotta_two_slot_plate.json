@@ -1,0 +1,8 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/plate_two_slot_plate",
+  "textures": {
+    "plate": "minecraft:block/terracotta",
+    "rim": "minecraft:block/terracotta",
+    "particle": "minecraft:block/terracotta"
+  }
+}

@@ -38,6 +38,15 @@ public interface RuntimeEvents {
     default void beforeBlockBreak(BlockBreak callback) {
         throw new UnsupportedOperationException("block breaking requires Runtime 0.1.6");
     }
+    /** mryt233 改（2026-11-16）：服务端区块加载完成回调，供旧存档方块与实体无损迁移使用。 */
+    default void onChunkLoad(java.util.function.BiConsumer<net.minecraft.server.level.ServerLevel,
+            net.minecraft.world.level.chunk.LevelChunk> callback) {
+        throw new UnsupportedOperationException("chunk load requires Runtime 0.2.1");
+    }
+    /** mryt233 改（2026-11-16）：服务端刻末回调，供会话定时结算与限时邀约超时使用。 */
+    default void onServerTick(Consumer<MinecraftServer> callback) {
+        throw new UnsupportedOperationException("server tick requires Runtime 0.2.1");
+    }
 
     void onCommands(CommandRegistration callback);
 

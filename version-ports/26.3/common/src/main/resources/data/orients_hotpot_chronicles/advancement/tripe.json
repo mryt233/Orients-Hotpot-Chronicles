@@ -1,0 +1,31 @@
+{
+  "display": {
+    "icon": {
+      "id": "orients_hotpot_chronicles:cooked_tripe"
+    },
+    "title": {
+      "translate": "advancements.orients_hotpot_chronicles.tripe.title"
+    },
+    "description": {
+      "translate": "advancements.orients_hotpot_chronicles.tripe.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "tripe": {
+      "trigger": "orients_hotpot_chronicles:hotpot",
+      "conditions": {
+        "event": "eat:orients_hotpot_chronicles:cooked_tripe"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "tripe"
+    ]
+  ],
+  "parent": "orients_hotpot_chronicles:first_cooked"
+}

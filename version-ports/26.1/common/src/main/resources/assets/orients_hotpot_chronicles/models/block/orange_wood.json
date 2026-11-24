@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "orients_hotpot_chronicles:block/orange_log"
+  }
+}

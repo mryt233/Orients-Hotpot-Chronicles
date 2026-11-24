@@ -38,9 +38,11 @@
 
 ## 复现
 
+先将 `JAVA_HOME` 设为本机 JDK 21 的安装目录（mryt233 改）。
+
 ```bash
-JAVA_HOME="C:/Users/10536/.jdks/jdk-21.0.12.1+1" ./gradlew :fabric:runServer -PhotpotExpreg=true
-JAVA_HOME="C:/Users/10536/.jdks/jdk-21.0.12.1+1" ./gradlew :neoforge:runServer -PhotpotExpreg=true
+./gradlew :fabric:runServer -PhotpotExpreg=true
+./gradlew :neoforge:runServer -PhotpotExpreg=true
 # 重复注册崩溃实验（仅 NeoForge，会故意崩启动）：
 ./gradlew :neoforge:runServer -PhotpotExpreg=true -Dhotpot.expreg.duplicate=true  # 需在 gradle 里加 property 转发
 ```

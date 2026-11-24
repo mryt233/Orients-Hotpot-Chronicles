@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "ingredient": "orients_hotpot_chronicles:peeled_shrimp",
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_peeled_shrimp"
+  },
+  "experience": 0.35,
+  "cookingtime": 300
+}

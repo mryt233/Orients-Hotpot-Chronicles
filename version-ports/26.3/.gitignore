@@ -1,0 +1,6 @@
+# 作者：mryt233
+.gradle/
+build/
+run*/
+logs/
+*.log

@@ -5,10 +5,13 @@ license="MIT"
 
 [[mods]]
 modId="orient_framework"
-version="0.2.0"
+version="0.2.2"
 displayName="Orient Framework"
 authors="mryt233"
 description='''Shared runtime for Orient content mods.'''
+
+[[mixins]]
+config="orient_framework.mixins.json"
 
 [[dependencies.orient_framework]]
 modId="neoforge"

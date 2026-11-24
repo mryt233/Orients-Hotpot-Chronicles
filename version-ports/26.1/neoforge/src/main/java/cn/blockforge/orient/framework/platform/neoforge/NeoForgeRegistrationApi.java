@@ -1,4 +1,4 @@
-// mryt233 改：26.1 原版标识符类型与 0.2.0 注册表窗口对齐。
+// mryt233 改：26.2 原版标识符类型与 0.2.0 注册表窗口对齐。
 package cn.blockforge.orient.framework.platform.neoforge;
 
 import cn.blockforge.orient.framework.loader.RegistrationApi;
@@ -75,6 +75,7 @@ public final class NeoForgeRegistrationApi implements RegistrationApi {
     private final List<Entry<CriterionTrigger<?>>> criteria = new ArrayList<>();
     private final List<Entry<SoundEvent>> sounds = new ArrayList<>();
     private final List<Entry<ParticleType<?>>> particles = new ArrayList<>();
+    private final List<Entry<net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType<?>>> foliagePlacers = new ArrayList<>();
 
     private static <T> void flush(Registry<T> registry, List<Entry<T>> queue) {
         for (Entry<T> entry : queue) {
@@ -116,6 +117,8 @@ public final class NeoForgeRegistrationApi implements RegistrationApi {
             flushAndClose(key, BuiltInRegistries.SOUND_EVENT, sounds);
         } else if (key.equals(Registries.PARTICLE_TYPE)) {
             flushAndClose(key, BuiltInRegistries.PARTICLE_TYPE, particles);
+        } else if (key.equals(Registries.FOLIAGE_PLACER_TYPE)) {
+            flushAndClose(key, BuiltInRegistries.FOLIAGE_PLACER_TYPE, foliagePlacers);
         }
     }
 
@@ -279,6 +282,23 @@ public final class NeoForgeRegistrationApi implements RegistrationApi {
                     requireValue(Registries.PARTICLE_TYPE, id, value),
                     RegistrationGuard.owner(id.getNamespace())));
                 return value;
+            }
+        };
+    }
+
+    // mryt233 改（2026-11-23）：0.2.2 注册自定义树冠生成器。
+    @Override
+    public FoliagePlacerRegistrar foliagePlacers() {
+        return new FoliagePlacerRegistrar() {
+            @Override
+            public <P extends net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer>
+            net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType<P> register(
+                Identifier id, com.mojang.serialization.MapCodec<P> codec) {
+                requireOpen(Registries.FOLIAGE_PLACER_TYPE, id);
+                var type = new net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType<>(
+                    requireValue(Registries.FOLIAGE_PLACER_TYPE, id, codec));
+                foliagePlacers.add(new Entry<>(id, type, RegistrationGuard.owner(id.getNamespace())));
+                return type;
             }
         };
     }

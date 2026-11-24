@@ -4,14 +4,26 @@ package cn.blockforge.generated.orientshotpotchronicles.compat.jade;
 // mryt233 改（2026-11-11）：限定类名改用 import，逻辑不变。
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.ChopstickRestBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SauceBottleBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoneMillBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoneMillBlockEntity;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoneMillRecipe;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.WoodenVatBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.WoodenVatBlockEntity;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.WoodenVatRecipe;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTableBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTableBlockEntity;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PrepRackBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PrepRackBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveTopBlock;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.TableMaterialData;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.TableMaterials;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Chopsticks;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.DippingSauceItem;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PlateHolderBlock;
@@ -33,6 +45,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
@@ -66,6 +79,10 @@ public final class HotPotJadePlugin implements IWailaPlugin {
     public void registerClient(IWailaClientRegistration registration) {
         registration.registerItemStorageClient(new StoveStorageClient());
         registration.registerBlockComponent(new PlateHolderComponentProvider(), PlateHolderBlock.class);
+        registration.registerBlockComponent(new StoneMillComponentProvider(), StoneMillBlock.class);
+        registration.registerBlockComponent(new WoodenVatComponentProvider(), WoodenVatBlock.class);
+        registration.registerBlockComponent(HotPotTableComponentProvider.INSTANCE, HotPotTableBlock.class);
+        registration.registerBlockComponent(PrepRackComponentProvider.INSTANCE, PrepRackBlock.class);
         registration.addBeforeTooltipCollectCallback((theme, accessor) -> {
             if (!accessor.isServerConnected()) {
                 HotPotBlockEntity pot = aimedPot(accessor);
@@ -353,6 +370,137 @@ public final class HotPotJadePlugin implements IWailaPlugin {
             }
             for (Component line : lines) {
                 tooltip.add(line);
+            }
+        }
+    }
+
+    private static final class StoneMillComponentProvider implements IBlockComponentProvider {
+        @Override
+        public ResourceLocation getUid() {
+            return HotPot.id("stone_mill_info");
+        }
+
+        @Override
+        public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+            if (!(accessor.getBlockEntity() instanceof StoneMillBlockEntity mill)) {
+                return;
+            }
+            if (mill.waterUses() > 0) {
+                tooltip.add(Component.translatable("text.orients_hotpot_chronicles.jade.stone_mill.water",
+                    mill.waterUses()).withStyle(ChatFormatting.AQUA));
+            }
+            if (!mill.troughResult().isEmpty()) {
+                tooltip.add(Component.translatable("text.orients_hotpot_chronicles.jade.stone_mill.ready",
+                    mill.troughResult().getHoverName()).withStyle(ChatFormatting.GREEN));
+            } else if (!mill.input().isEmpty()) {
+                StoneMillRecipe r = cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotRecipes.stoneMill(
+                    accessor.getLevel(), mill.input());
+                int goal = r != null ? r.effectiveTurns() : StoneMillRecipe.DEFAULT_TURNS;
+                tooltip.add(Component.translatable("text.orients_hotpot_chronicles.jade.stone_mill.progress",
+                    mill.input().getHoverName(), mill.input().getCount(), mill.turns(), goal)
+                    .withStyle(ChatFormatting.GOLD));
+            }
+        }
+    }
+
+    private static final class WoodenVatComponentProvider implements IBlockComponentProvider {
+        @Override
+        public ResourceLocation getUid() {
+            return HotPot.id("wooden_vat_info");
+        }
+
+        @Override
+        public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+            if (!(accessor.getBlockEntity() instanceof WoodenVatBlockEntity vat)) {
+                return;
+            }
+            if (!vat.fluid().isEmpty() && vat.fluidUses() > 0) {
+                tooltip.add(Component.translatable("text.orients_hotpot_chronicles.jade.wooden_vat.soymilk")
+                    .withStyle(ChatFormatting.WHITE));
+            }
+            if (!vat.output().isEmpty()) {
+                tooltip.add(Component.translatable("text.orients_hotpot_chronicles.jade.wooden_vat.ready",
+                    vat.output().getHoverName(), vat.output().getCount()).withStyle(ChatFormatting.GREEN));
+            } else if (!vat.input().isEmpty()) {
+                WoodenVatRecipe r = cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotRecipes.woodenVat(
+                    accessor.getLevel(), vat.fluid(), vat.input());
+                if (r != null && r.needsLid() && !vat.hasLid()) {
+                    tooltip.add(Component.translatable("text.orients_hotpot_chronicles.jade.wooden_vat.need_lid")
+                        .withStyle(ChatFormatting.YELLOW));
+                } else if (vat.totalTicks() > 0) {
+                    int pct = Math.round(vat.progressRatio() * 100F);
+                    tooltip.add(Component.translatable("text.orients_hotpot_chronicles.jade.wooden_vat.progress",
+                        vat.input().getHoverName(), pct).withStyle(ChatFormatting.GOLD));
+                }
+            }
+        }
+    }
+
+    private static Component materialLabel(String id, Component defaultName) {
+        if (id == null || id.isEmpty()) {
+            return defaultName;
+        }
+        Block resolved = TableMaterials.resolveBlock(id);
+        return resolved != null
+            ? resolved.getName()
+            : Component.literal(id).withStyle(ChatFormatting.DARK_GRAY);
+    }
+
+    private enum HotPotTableComponentProvider implements IBlockComponentProvider {
+        INSTANCE;
+        private static final ResourceLocation UID = HotPot.id("table");
+
+        @Override
+        public ResourceLocation getUid() {
+            return UID;
+        }
+
+        @Override
+        public void appendTooltip(ITooltip tooltip, BlockAccessor block, IPluginConfig config) {
+            if (block.getBlockEntity() instanceof HotPotTableBlockEntity table) {
+                TableMaterialData data = table.materials();
+                if (!data.top().isEmpty()) {
+                    tooltip.add(Component.translatable("text.orients_hotpot_chronicles.tooltip.table_top",
+                        materialLabel(data.top(), Component.empty())).withStyle(ChatFormatting.GRAY));
+                }
+                if (!data.base().isEmpty()) {
+                    tooltip.add(Component.translatable("text.orients_hotpot_chronicles.tooltip.table_base",
+                        materialLabel(data.base(), Component.empty())).withStyle(ChatFormatting.GRAY));
+                }
+            }
+        }
+    }
+
+    private enum PrepRackComponentProvider implements IBlockComponentProvider {
+        INSTANCE;
+        private static final ResourceLocation UID = HotPot.id("prep_rack");
+
+        @Override
+        public ResourceLocation getUid() {
+            return UID;
+        }
+
+        @Override
+        public void appendTooltip(ITooltip tooltip, BlockAccessor block, IPluginConfig config) {
+            if (block.getBlockEntity() instanceof PrepRackBlockEntity rack
+                && block.getBlockState().getBlock() instanceof PrepRackBlock rackBlock) {
+                if (!rack.materials().top().isEmpty()) {
+                    tooltip.add(Component.translatable("text.orients_hotpot_chronicles.tooltip.rack_material",
+                        materialLabel(rack.materials().top(), Component.empty())).withStyle(ChatFormatting.GRAY));
+                }
+                int aimed = rackBlock.slotAt(block.getBlockState(), block.getPosition(),
+                    block.getHitResult().getLocation(), block.getLevel());
+                for (int i = 0; i < rack.slotCount(); i++) {
+                    ItemStack st = rack.itemAt(i);
+                    boolean isAimed = i == aimed;
+                    if (!st.isEmpty() || isAimed) {
+                        Component itemLabel = st.isEmpty()
+                            ? Component.translatable("text.orients_hotpot_chronicles.jade.rack_empty").withStyle(ChatFormatting.DARK_GRAY)
+                            : st.getHoverName().copy().withStyle(isAimed ? ChatFormatting.GOLD : ChatFormatting.WHITE);
+                        tooltip.add(Component.translatable("text.orients_hotpot_chronicles.jade.rack_slot",
+                            i + 1, itemLabel).withStyle(isAimed ? ChatFormatting.YELLOW : ChatFormatting.GRAY));
+                    }
+                }
             }
         }
     }

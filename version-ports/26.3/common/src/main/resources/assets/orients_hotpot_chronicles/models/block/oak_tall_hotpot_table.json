@@ -1,0 +1,9 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/tall_hotpot_table",
+  "textures": {
+    "bricks": "minecraft:block/bricks",
+    "particle": "minecraft:block/oak_planks",
+    "top": "minecraft:block/oak_planks",
+    "base": "minecraft:block/oak_planks"
+  }
+}

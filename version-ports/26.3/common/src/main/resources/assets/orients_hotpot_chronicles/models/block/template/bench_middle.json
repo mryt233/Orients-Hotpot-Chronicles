@@ -1,0 +1,32 @@
+{
+  "credit": "\u4f5c\u8005\uff1amryt233\uff1bmryt233 \u6539\uff082026-11-10\uff09",
+  "parent": "minecraft:block/block",
+  "elements": [
+    {
+      "from": [
+        0,
+        14,
+        5
+      ],
+      "to": [
+        16,
+        16,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#planks"
+        },
+        "south": {
+          "texture": "#planks"
+        },
+        "up": {
+          "texture": "#planks"
+        },
+        "down": {
+          "texture": "#planks"
+        }
+      }
+    }
+  ]
+}

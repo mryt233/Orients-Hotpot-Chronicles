@@ -1,0 +1,115 @@
+{
+  "credit": "\u4f5c\u8005\uff1amryt233\uff1bmryt233 \u6539\uff082026-11-10\uff09",
+  "parent": "minecraft:block/block",
+  "elements": [
+    {
+      "from": [
+        0,
+        19.0,
+        0
+      ],
+      "to": [
+        16,
+        23.0,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#top",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "east": {
+          "texture": "#top",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "south": {
+          "texture": "#top",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "west": {
+          "texture": "#top",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "up": {
+          "texture": "#top"
+        },
+        "down": {
+          "texture": "#top"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        16,
+        0
+      ],
+      "to": [
+        12,
+        19.0,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#base",
+          "uv": [
+            4,
+            13.0,
+            12,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#base",
+          "uv": [
+            4,
+            13.0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#base",
+          "uv": [
+            4,
+            13.0,
+            12,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#base",
+          "uv": [
+            0,
+            13.0,
+            12,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#base"
+        }
+      }
+    }
+  ]
+}

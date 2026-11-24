@@ -85,10 +85,8 @@ Minecraft texture, authentic vanilla Minecraft art style, designed on an exact {
 1. **先输出到 `tools/out/`**，不要直接写进 `src/`。
 2. 放大预览（最近邻放大 8–16 倍）检查：轮廓是否清晰、相邻部件有没有粘连、平铺有没有接缝。
 3. 不满意就改「单独补充」，或在末尾追加第 6 节的反面提示后重新生成；多次出现的共性问题再改 `base.txt`。
-4. 满意后复制到资源目录。**本模组的客户端资源有两份，必须同步**：
-   - `src/main/resources/assets/orients_hotpot_chronicles/textures/...`
-   - `src/main/resources/resourcepacks/hotpot_assets/assets/orients_hotpot_chronicles/textures/...`（若该路径下存在同名文件）
-5. `./gradlew build` 后进游戏看实际效果；方块贴图在游戏光照下会比预览暗一些。
+4. 满意后复制到 `mod/common/src/main/resources/assets/orients_hotpot_chronicles/textures/...`（自 `r122` 起全部版本客户端与服务端共用这一份核心资源目录）。
+5. `./gradlew :fabric:runClient` 或 `./gradlew :neoforge:runClient` 进游戏看实际效果；方块贴图在游戏光照下会比预览暗一些。
 
 ## 5. 现有贴图规格
 
@@ -110,3 +108,12 @@ Minecraft texture, authentic vanilla Minecraft art style, designed on an exact {
 | 出现 3D 透视 | `strictly flat 2D, no isometric, no 3D` |
 | 颜色太艳 | `muted earthy colors like vanilla Minecraft` |
 | 出现文字或签名 | `absolutely no letters, numbers or signatures` |
+
+## 7. LabPBR 1.3 光影副图管线（`pbr_materials.json` / `gen_pbr.py`）
+
+0.3.1 起为硬表面（铜/铁火锅、灶台、桌面木/石材质、石磨、木桶、备菜架）、汤面与液体、瓷瓶玻璃杯瓶及非扁平厨具生成 `LabPBR 1.3` 副图（`*_n.png`、`*_s.png`）；**普通扁平食材贴图暂不生成副图以控制包体与显存**。
+
+- **通道约定**：
+  - `<name>_n.png`（RGBA）：`R/G` 切线空间法线（**DirectX top-down**，`128,128` 为平），`B` 材质 AO（`255` 无遮挡），`A` 高度图（`1..255`，POM 用）。
+  - `<name>_s.png`（RGBA）：`R` 感知光滑度（`0..255`），`G` F0 / 硬编码金属 ID（`230` 铁、`234` 铜，`238..254` 为保留段禁用），`B` 孔隙度（`0..64`）或次表面散射 SSS（`65..255`），`A` 线性自发光（`0..254`，`255` 为关闭自发光）。
+- **动画与校验**：竖叠多帧动画贴图自动逐帧计算法线，并同步生成同名 `*_n.png.mcmeta` / `*_s.png.mcmeta`；改动 [pbr_materials.json](pbr_materials.json) 后运行 `python mod/tools/gen_pbr.py`，再用 `python mod/tools/check_textures.py --strict` 与 `python mod/tools/check_all.py --source-only --strict` 检查生成物哈希、尺寸、模式、Alpha、法线长度与 F0 合规性。

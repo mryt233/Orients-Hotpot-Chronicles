@@ -29,7 +29,9 @@
     ]
   },
   "mixins": [
-    "orients_hotpot_chronicles.mixins.json"
+    "orients_hotpot_chronicles.mixins.json",
+    "orients_hotpot_chronicles.fabric.mixins.json",
+    "orient_framework.fabric.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.15.11",

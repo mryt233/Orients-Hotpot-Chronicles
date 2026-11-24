@@ -4,6 +4,10 @@
     "orients_hotpot_chronicles:zhe_er_gen",
     "orients_hotpot_chronicles:zhe_er_gen_slice",
     "orients_hotpot_chronicles:cooked_zhe_er_gen_slice",
-    "orients_hotpot_chronicles:minced_zhe_er_gen"
+    "orients_hotpot_chronicles:minced_zhe_er_gen",
+    "orients_hotpot_chronicles:chicken_feet",
+    "orients_hotpot_chronicles:cooked_chicken_feet",
+    "orients_hotpot_chronicles:boneless_chicken_feet",
+    "orients_hotpot_chronicles:cooked_boneless_chicken_feet"
   ]
 }

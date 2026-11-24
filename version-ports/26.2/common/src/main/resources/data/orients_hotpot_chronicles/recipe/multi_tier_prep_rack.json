@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P P",
+    "III",
+    "P P"
+  ],
+  "key": {
+    "P": "#minecraft:planks",
+    "I": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:multi_tier_prep_rack",
+    "count": 1
+  }
+}

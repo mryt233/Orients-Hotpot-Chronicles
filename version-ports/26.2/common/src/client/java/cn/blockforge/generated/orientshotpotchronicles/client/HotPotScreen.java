@@ -5,17 +5,20 @@ package cn.blockforge.generated.orientshotpotchronicles.client;
 import java.util.ArrayList;
 import java.util.function.BiPredicate;
 
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Config;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotContent;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotCooking;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotMaterial;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PotLayout;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PotScreenAnim;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotScreenHandler;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupDef;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.SoupIds;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Soups;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.inventory.Slot;
@@ -47,6 +50,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
 
     private static final int BAR_BG = 0xE0120B08;
     private static final int BAR_DONE = 0xFF63D14C;
+    private final PotScreenAnim anim = new PotScreenAnim();
 
     public HotPotScreen(HotPotScreenHandler handler, Inventory inventory, Component title) {
         // 鸳鸯 / 田字锅标题用锅自己的名字，九宫格锅照旧「九宫格火锅」
@@ -91,9 +95,9 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
         return Math.min(1F, menu.burnTicks() / (float) total);
     }
 
-    /** 0 = 汤面平静；有汤且灶火在烧时 0.45~1，随剩余燃料变旺。 */
-    private double heat() {
-        return menu.hasSoup() && menu.burnTicks() > 0 ? 0.45 + 0.55 * burnRatio() : 0;
+    /** 有汤且灶火燃烧时固定热度；燃料百分比只影响进度条。 */
+    private double targetHeat() {
+        return menu.hasSoup() && menu.burnTicks() > 0 ? 1.0 : 0.0;
     }
 
     // ------------------------------------------------------------- 背景
@@ -101,7 +105,8 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
     @Override
     public void extractBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         super.extractBackground(context, mouseX, mouseY, delta);
-        double t = Util.getMillis() / 1000.0;
+        anim.advance(Util.getMillis(), targetHeat());
+        double t = anim.elapsedSec();
         context.pose().pushMatrix();
         context.pose().translate(this.leftPos, this.topPos);
 
@@ -111,6 +116,11 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
         context.fill(6, 4, W - 6, 17, 0xE01A0F07);
         context.fill(6, 17, W - 6, 18, BRASS_DARK);
         context.fill(8, 5, W - 8, 6, 0x30FFF0C0);
+        if (Config.minigamesEnabled()) {
+            boolean chHover = hit(mouseX - leftPos, mouseY - topPos, W - 56, 5, 46, 11);
+            copperButton(context, W - 56, 5, 46, 11, chHover ? COPPER : 0xFF5A3114, BRASS_HI);
+            fittedText(context, font, Component.literal("开吃挑战"), W - 33, 6, 42, 0xFFFFE6A3);
+        }
 
         int gx = HotPotScreenHandler.GRID_X;
         int gy = HotPotScreenHandler.GRID_Y;
@@ -120,7 +130,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
         if (!menu.layout().multiSoup()) {
             drawDividers(context, gx, gy);   // 鸳鸯 / 田字锅不画九宫格隔条，隔板就是露出来的锅底金属
         }
-        if (heat() > 0) {
+        if (anim.smoothHeat() > 0.01) {
             drawSteam(context, gx, gy, t);
         }
 
@@ -209,7 +219,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
         if (soupId < 0) {
             return;
         }
-        double heat = heat();
+        double heat = anim.smoothHeat();
         double cx = gx + GW / 2.0;
         double cy = gy + GW / 2.0;
 
@@ -227,13 +237,13 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
             c.fill(x, y, x + 14, y + 2, alpha(0xFFFFF4D8, 0.13 * a));
             c.fill(x + 3, y + 2, x + 10, y + 3, alpha(0xFFFFF4D8, 0.09 * a));
         }
-        // 配料随对流打转：越靠里转得越快，火越旺转得越快，叠一点慢摆动
-        double spin = 0.1 + 0.6 * heat;
+        // 配料随对流打转：用连续累计相位 anim.spinPhase()，热度渐变时不倒转/不抽搐
         int[] bits = soup.bits();
+        double spinPhase = anim.spinPhase();
         for (int i = 0; i < 22; i++) {
             double r = 14 + hash(i, 1) * 66;
             double ang = hash(i, 2) * Math.PI * 2
-                + t * spin * (0.6 + 0.8 * hash(i, 3)) * (i % 2 == 1 ? 1 : -1) * (30 / r)
+                + spinPhase * (0.6 + 0.8 * hash(i, 3)) * (i % 2 == 1 ? 1 : -1) * (30 / r)
                 + 0.35 * Math.sin(t * 0.7 + i);
             int x = (int) Math.round(cx + Math.cos(ang) * r);
             int y = (int) Math.round(cy + Math.sin(ang) * r * 0.96);
@@ -242,13 +252,16 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
             }
             c.fill(x, y, x + 2, y + (i % 3 == 0 ? 2 : 1), bits[i % bits.length]);
         }
-        // 气泡：整锅随机冒出一簇簇小泡，外加几个单独的大泡；
-        // 每个泡鼓起→停留并随对流漂一点→很快缩没，溅出一两滴
-        if (heat > 0) {
-            int clusters = (int) Math.round(4 + 8 * heat);
-            for (int k = 0; k < clusters; k++) {
-                double period = (0.9 + 0.5 * hash(k, 21)) / (0.7 + 0.5 * heat);
-                double tt = t / period + hash(k, 22);
+        // 气泡：按累计相位 anim.boilPhase() 除以恒定基础周期，并按 grow 连续渐入，不随热度跳相
+        if (heat > 0.01) {
+            double boilPhase = anim.boilPhase();
+            for (int k = 0; k < PotScreenAnim.MAX_CLUSTERS; k++) {
+                double grow = PotScreenAnim.clusterGrow(heat, k);
+                if (grow <= 0) {
+                    continue;
+                }
+                double period = 0.9 + 0.5 * hash(k, 21);
+                double tt = boilPhase / period + hash(k, 22);
                 int cyc = (int) Math.floor(tt);
                 double cc = frac(tt);
                 double kx = gx + 5 + hash(k, cyc * 2) * (GW - 10);
@@ -267,13 +280,16 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
                     double ang = hash(k * 7 + j, cyc + 33) * Math.PI * 2;
                     double dist = j == 0 ? 0 : 2 + 4 * hash(k * 7 + j, cyc + 34);
                     drawBoilBubble(c, gx, gy, kx + Math.cos(ang) * dist, ky + Math.sin(ang) * dist,
-                        bubbleSize(hash(k * 7 + j, cyc + 35), false), u, soup, k * 31 + j);
+                        bubbleSize(hash(k * 7 + j, cyc + 35), false) * grow, u, soup, k * 31 + j);
                 }
             }
-            int lone = (int) Math.round(2 + 4 * heat);
-            for (int i = 0; i < lone; i++) {
-                double period = (0.7 + 0.4 * hash(i, 61)) / (0.7 + 0.5 * heat);
-                double tt = t / period + hash(i, 62);
+            for (int i = 0; i < PotScreenAnim.MAX_LONE; i++) {
+                double grow = PotScreenAnim.loneGrow(heat, i);
+                if (grow <= 0) {
+                    continue;
+                }
+                double period = 0.7 + 0.4 * hash(i, 61);
+                double tt = boilPhase / period + hash(i, 62);
                 int cyc = (int) Math.floor(tt);
                 double u = frac(tt);
                 double x = gx + 7 + hash(i, cyc * 2 + 70) * (GW - 14);
@@ -281,7 +297,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
                 if (keep != null && !keep.test(x, y)) {
                     continue;
                 }
-                drawBoilBubble(c, gx, gy, x, y, bubbleSize(hash(i, cyc + 72), true), u, soup, 500 + i);
+                drawBoilBubble(c, gx, gy, x, y, bubbleSize(hash(i, cyc + 72), true) * grow, u, soup, 500 + i);
             }
         }
     }
@@ -292,7 +308,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
     }
 
     /** 一个泡的一生 u (0..1)：缓出鼓起 → 停留微颤并随对流漂 → 迅速缩没，溅出一两滴。 */
-    private static void drawBoilBubble(GuiGraphicsExtractor c, int gx, int gy, double x, double y, int rMax,
+    private static void drawBoilBubble(GuiGraphicsExtractor c, int gx, int gy, double x, double y, double rMax,
                                        double u, Soup soup, int seed) {
         double r;
         if (u < 0.35) {
@@ -352,17 +368,21 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
         c.fill(hx, hy, hx + hl, hy + hl, soup.hi());
     }
 
-    /** 半透明蒸汽团：缓出上飘、左右摆、逐渐变大后散掉。 */
+    /** 半透明蒸汽团：缓出上飘、左右摆、逐渐变大后散掉，按 grow 连续渐入渐出。 */
     private void drawSteam(GuiGraphicsExtractor c, int gx, int gy, double t) {
-        int m = (int) Math.round(3 + 5 * heat());
-        for (int i = 0; i < m; i++) {
+        double heat = anim.smoothHeat();
+        for (int i = 0; i < PotScreenAnim.MAX_STEAM; i++) {
+            double grow = PotScreenAnim.steamGrow(heat, i);
+            if (grow <= 0) {
+                continue;
+            }
             double life = 1.3 + hash(i, 41) * 0.8;
             int cyc = (int) Math.floor(t / life + hash(i, 42));
             double u = frac(t / life + hash(i, 42));
             int x = (int) Math.round(gx + 12 + hash(i, cyc * 7) * (GW - 24) + 3 * Math.sin(u * Math.PI * 2 + i));
             int y = (int) Math.round(gy + 30 + hash(i, cyc * 7 + 1) * (GW - 40) - 22 * easeOutQuad(u));
             int sz = 2 + (int) Math.round(4 * easeOutCubic(u));
-            int color = alpha(0xFFFFFFFF, 0.2 * Math.pow(Math.sin(Math.PI * u), 1.5));
+            int color = alpha(0xFFFFFFFF, 0.2 * grow * Math.pow(Math.sin(Math.PI * u), 1.5));
             c.fill(x - sz, y - (sz >> 1), x + sz, y + (sz >> 1), color);
             c.fill(x - (sz >> 1), y - sz, x + (sz >> 1), y + sz, color);
         }
@@ -398,7 +418,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor context, int mouseX, int mouseY) {
-        double t = Util.getMillis() / 1000.0;
+        double t = anim.elapsedSec();
         Soup soup = soup(menu.baseId());
         SoupDef soupBase = Soups.byIndex(menu.baseId());
 
@@ -543,7 +563,7 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
         }
         if (menu.isCooked(slot.getContainerSlot())) {
             // 熟了：绿框平滑呼吸 + 右上角一个小勾
-            double t = Util.getMillis() / 1000.0;
+            double t = anim.elapsedSec();
             double pulse = easeInOutSine(0.5 + 0.5 * Math.sin(t * Math.PI * 1.2));
             int glow = mix(0xFF4FAE3A, 0xFF9CFF7E, pulse);
             context.fill(sx, sy, sx + 18, sy + 1, glow);
@@ -614,5 +634,17 @@ public class HotPotScreen extends AbstractContainerScreen<HotPotScreenHandler> {
             lines.add(Component.translatable(HotPotBlockEntity.key("screen.hint.chopsticks_eat")).withStyle(ChatFormatting.AQUA));
         }
         context.setTooltipForNextFrame(font, lines, Optional.empty(), mouseX, mouseY);
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (event.button() == 0 && Config.minigamesEnabled()
+            && hit(event.x() - leftPos, event.y() - topPos, W - 56, 5, 46, 11)) {
+            if (minecraft != null) {
+                minecraft.gui.setScreen(new MinigameLobbyScreen(menu.potPos()));
+            }
+            return true;
+        }
+        return super.mouseClicked(event, doubleClick);
     }
 }

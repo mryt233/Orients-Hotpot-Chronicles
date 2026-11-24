@@ -189,8 +189,8 @@ public class HotPotBlock extends Block implements EntityBlock, ItemInteractionBl
     }
 
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player,
-                                            BlockHitResult hit) {
+    public InteractionResult compatUseWithoutItem(BlockState state, Level world, BlockPos pos, Player player,
+                                                    BlockHitResult hit) {
         if (!(world.getBlockEntity(pos) instanceof HotPotBlockEntity be)) {
             return Use.blockEmpty(UseOutcome.PASS, world.isClientSide);
         }
@@ -220,8 +220,8 @@ public class HotPotBlock extends Block implements EntityBlock, ItemInteractionBl
     }
 
     @Override
-    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
-                                           Player player, InteractionHand hand, BlockHitResult hit) {
+    public ItemInteractionResult compatUseItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
+                                                 Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(world.getBlockEntity(pos) instanceof HotPotBlockEntity be)) {
             return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide);
         }

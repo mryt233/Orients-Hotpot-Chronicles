@@ -97,8 +97,8 @@ public final class BenchLegsRenderer implements BlockEntityRenderer<BenchBlockEn
                              float nx, float ny, float nz, float uw, float vh,
                              float x0, float y0, float z0, float x1, float y1, float z1,
                              float x2, float y2, float z2, float x3, float y3, float z3) {
-        float u0 = s.getU(0F), u1 = s.getU(Math.min(1F, uw / 16F));
-        float v0 = s.getV(0F), v1 = s.getV(Math.min(1F, vh / 16F));
+        float u0 = s.getU(0F), u1 = s.getU(Math.min(16F, uw));
+        float v0 = s.getV(0F), v1 = s.getV(Math.min(16F, vh));
         vertex(vc, e, x0, y0, z0, u0, v0, light, nx, ny, nz);
         vertex(vc, e, x1, y1, z1, u1, v0, light, nx, ny, nz);
         vertex(vc, e, x2, y2, z2, u1, v1, light, nx, ny, nz);

@@ -1,0 +1,204 @@
+// mryt233 改：26.2 原版 API。
+package cn.blockforge.generated.orientshotpotchronicles.hotpot;
+
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.UseOutcome;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.component.Consumable;
+import net.minecraft.world.item.component.Consumables;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+
+/**
+ * 竹筷（r103 起有自己的类）：夹着能吃的菜时，对着空气按住右键就把菜吃掉（用户同意的吃法），
+ * 吃法、饱食度、声音全走原版 eatFood；菜蘸过蘸料的话效果在 LivingEntityEatMixin 里生效。
+ * Shift+右键锅开锅界面在这里（useOnBlock）；夹菜 / 放菜 / 蘸桌上的蘸料在各个方块里处理。
+ * Shift+右键桌面（或任何顶面能放东西的方块）的空白位置：把这双筷子（连同夹着的菜）直接摆到桌上，
+ * 渲染器会在筷尖下方画一个迷你筷架（r136b，2026-11-05 用户，新增）。
+ * 作者：mryt233 */
+public class ChopsticksItem extends Item implements TableItem {
+    public ChopsticksItem(Item.Properties properties) {
+        super(properties.stacksTo(1).rarity(Rarity.COMMON));
+    }
+
+    @Override
+    public PlateBlock tableBlock(ItemStack stack) {
+        return HotPotContent.CHOPSTICK_REST_BLOCK;
+    }
+
+    @Override
+    public boolean autoPlace(ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public void playAddSound(Level world, BlockPos pos, ItemStack stack) {
+        world.playSound(null, pos, SoundEvents.BAMBOO_PLACE, SoundSource.BLOCKS, 0.6F, 1.4F);
+    }
+
+    private static FoodProperties heldFood(ItemStack stack) {
+        ItemStack held = Chopsticks.held(stack);
+        return held.isEmpty() ? null : ConfiguredFoodItem.food(held);
+    }
+
+    /** 主手筷子、副手容器时的食物（面条碗等）。 */
+    private static FoodProperties offhandFood(ItemStack stack, LivingEntity user) {
+        return HotPotHooks.offhandFood(stack, user);
+    }
+
+    /**
+     * 拿筷子 Shift+右键锅 = 开锅界面（2026-10-25 用户定，代替原来的直接右键开锅；直接右键改成夹菜，见 HotPotBlock / StoveBlock）。
+     * 潜行又拿着东西时原版不调方块的右键，只调物品的 useOnBlock，所以放在这里。新增。
+     */
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
+        if (player == null) {
+            return Use.item(UseOutcome.PASS, context.getLevel().isClientSide());
+        }
+        Level world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        BlockHitResult hit = new BlockHitResult(context.getClickLocation(), context.getClickedFace(), pos, context.isInside());
+        // 其他模组的方块先处理，比如面条锅用它打开自己的界面（见 HotPotHooks）
+        InteractionResult hooked = HotPotHooks.chopsticksUse(world, player, context.getHand(), context.getItemInHand(),
+            pos, world.getBlockState(pos), hit);
+        if (hooked != null) {
+            return hooked;
+        }
+        if (!player.isShiftKeyDown()) {
+            return Use.item(UseOutcome.PASS, world.isClientSide());
+        }
+        if (world.getBlockState(pos).is(HotPotContent.STOVE_TOP)) {
+            // 高灶台的上半截：当成点在下面的灶台上
+            pos = pos.below();
+            hit = new BlockHitResult(hit.getLocation(), hit.getDirection(), pos, hit.isInside());
+        }
+        BlockState state = world.getBlockState(pos);
+        // Shift+右键桌上的碗 / 盘子：筷子（连夹着的菜）架在碗沿上（2026-10-27 用户：只架碗和盘子，不架锅）
+        if (state.is(HotPotContent.PLATE_HOLDER) && world.getBlockEntity(pos) instanceof PlateHolderBlockEntity holder) {
+            double hx = (context.getClickLocation().x - pos.getX()) * 16;
+            double hz = (context.getClickLocation().z - pos.getZ()) * 16;
+            PlateHolderBlockEntity.Placed plate = holder.at(hx, hz);
+            if (plate == null) {
+                return Use.item(TableObjects.placeInHolderOrOn(context, this), world.isClientSide());
+            }
+            double dx = hx - plate.x, dz = hz - plate.z;
+            boolean rim = Math.max(Math.abs(dx) / plate.halfX(), Math.abs(dz) / plate.halfZ()) >= 0.65;
+            if (!Chopsticks.held(context.getItemInHand()).isEmpty() && !rim) {
+                return ((PlateHolderBlock) state.getBlock()).useItemOn(context.getItemInHand(), state, world,
+                    pos, player, context.getHand(), hit);
+            }
+            if (!plate.restsChopsticks() || !plate.chopsticks.isEmpty()) {
+                return Use.item(UseOutcome.PASS, world.isClientSide());
+            }
+            if (!world.isClientSide()) {
+                plate.chopsticks = context.getItemInHand().copy();
+                double yaw = rim ? Math.toDegrees(Math.atan2(dx, -dz)) : player.getYRot();
+                plate.chopsticksYaw = (float) ((Math.round(yaw / 22.5) * 22.5 % 360 + 360) % 360);
+                player.setItemInHand(context.getHand(), ItemStack.EMPTY);
+                holder.changed();
+                world.playSound(null, pos, SoundEvents.BAMBOO_PLACE, SoundSource.BLOCKS, 0.6F, 1.4F);
+            }
+            return Use.item(UseOutcome.SUCCESS_SOFT, world.isClientSide());
+        }
+        boolean pot = state.getBlock() instanceof HotPotBlock
+            || (StoveBlock.isStove(state) && StoveBlock.isPotHit(state, pos, hit));
+        if (pot && world.getBlockEntity(pos) instanceof HotPotBlockEntity be && be.hasPot()) {
+            if (!world.isClientSide()) {
+                be.useWithChopsticks(player);
+            }
+            return Use.item(UseOutcome.SUCCESS_SOFT, world.isClientSide());
+        }
+        // 锅、灶台（含没架锅的灶台、高灶台的上半截）上不摆筷子
+        if (state.getBlock() instanceof HotPotBlock || StoveBlock.isStove(state) || state.getBlock() instanceof StoveTopBlock) {
+            return Use.item(UseOutcome.PASS, world.isClientSide());
+        }
+        return Use.item(TableObjects.placeInHolderOrOn(context, this), world.isClientSide());
+    }
+
+    @Override
+    public InteractionResult use(Level world, Player user, InteractionHand hand) {
+        ItemStack stack = user.getItemInHand(hand);
+        FoodProperties food = heldFood(stack);
+        if (food == null && hand == InteractionHand.MAIN_HAND) {
+            food = HotPotHooks.offhandFood(stack, user);
+        }
+        if (food == null || !user.canEat(true)) {
+            return Use.itemUse(UseOutcome.PASS, stack, world.isClientSide());
+        }
+        user.startUsingItem(hand);
+        return Use.itemUse(UseOutcome.CONSUME, stack, world.isClientSide());
+    }
+
+    @Override
+    public ItemUseAnimation getUseAnimation(ItemStack stack) {
+        return heldFood(stack) != null || Chopsticks.held(stack).isEmpty() ? ItemUseAnimation.EAT : ItemUseAnimation.NONE;
+    }
+
+    @Override
+    public int getUseDuration(ItemStack stack, LivingEntity user) {
+        FoodProperties food = heldFood(stack);
+        if (food == null) {
+            food = HotPotHooks.offhandFood(stack, user);
+        }
+        return food == null ? 0 : FoodConsumption.consumeTicks(Chopsticks.held(stack));
+    }
+
+    @Override
+    public void onUseTick(Level level, LivingEntity user, ItemStack stack, int ticksRemaining) {
+        // 筷子自己没有 CONSUMABLE：碎渣、咀嚼声用夹着的那道菜自己的（颜色跟着菜走）。
+        ItemStack held = Chopsticks.held(stack);
+        if (held.isEmpty()) {
+            return;
+        }
+        Consumable consumable = held.getOrDefault(DataComponents.CONSUMABLE, Consumables.DEFAULT_FOOD);
+        if (consumable.shouldEmitParticlesAndSounds(ticksRemaining)) {
+            consumable.emitParticlesAndSounds(user.getRandom(), user, held, 5);
+        }
+    }
+
+    @Override
+    public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity user) {
+        ItemStack held = Chopsticks.held(stack);
+        if (held.isEmpty()) {
+            if (offhandFood(stack, user) != null) {
+                HotPotHooks.beforeEating(stack, user);
+            }
+            return stack;
+        }
+        FoodProperties food = heldFood(stack);
+        if (food == null) {
+            return stack;
+        }
+        if (HotPotHooks.beforeEating(stack, user)) {
+            return stack;
+        }
+        ItemStack eaten = held.copy();
+        if (!world.isClientSide()) {
+            DippingSauceItem.dipFromHands(user, eaten);
+        }
+        HotPotHooks.onEating(world, user, eaten);   // 结算前通知外部（物品栈还没变）
+        FoodConsumption.consume(world, user, eaten, food);
+        if (!world.isClientSide()) {
+            Chopsticks.hold(stack, ItemStack.EMPTY);
+            if (user instanceof Player player && !player.hasInfiniteMaterials()) {
+                FoodConsumption.returnRemainder(eaten, player);
+            }
+        }
+        return stack;
+    }
+}

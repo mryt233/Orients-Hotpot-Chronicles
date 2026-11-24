@@ -52,6 +52,12 @@ public final class HotPotJeiPlugin implements IModPlugin {
     /** 擀面杖拍打分类。 */
     public static final RecipeType<HotPotRecipeViewerData.PoundingEntry> POUNDING =
         RecipeType.create(HotPot.MOD_ID, "pounding", HotPotRecipeViewerData.PoundingEntry.class);
+    /** 小石磨研磨分类（0.3.1 Phase 3.1）。 */
+    public static final RecipeType<HotPotRecipeViewerData.StoneMillEntry> STONE_MILL =
+        RecipeType.create(HotPot.MOD_ID, "stone_mill", HotPotRecipeViewerData.StoneMillEntry.class);
+    /** 开口大木桶压制与泡发分类（0.3.1 Phase 3.2）。 */
+    public static final RecipeType<HotPotRecipeViewerData.WoodenVatEntry> WOODEN_VAT =
+        RecipeType.create(HotPot.MOD_ID, "wooden_vat", HotPotRecipeViewerData.WoodenVatEntry.class);
 
 
     @Override
@@ -65,15 +71,20 @@ public final class HotPotJeiPlugin implements IModPlugin {
         registration.addRecipeCategories(
             new CookingCategory(guiHelper),
             new CuttingCategory(guiHelper),
-            new PoundingCategory(guiHelper));
+            new PoundingCategory(guiHelper),
+            new StoneMillCategory(guiHelper),
+            new WoodenVatCategory(guiHelper));
     }
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         // mryt233 改（2026-11-11）：枚举当前客户端配方与配置，实际界面重建由查看器生命周期负责。
-        registration.addRecipes(COOKING, HotPotRecipeViewerData.cookingRecipes(Minecraft.getInstance().level));
+        var level = Minecraft.getInstance().level;
+        registration.addRecipes(COOKING, HotPotRecipeViewerData.cookingRecipes(level));
         registration.addRecipes(CUTTING, HotPotRecipeViewerData.cuttingRecipes());
-        registration.addRecipes(POUNDING, HotPotRecipeViewerData.poundingRecipes(Minecraft.getInstance().level));
+        registration.addRecipes(POUNDING, HotPotRecipeViewerData.poundingRecipes(level));
+        registration.addRecipes(STONE_MILL, HotPotRecipeViewerData.stoneMillRecipes(level));
+        registration.addRecipes(WOODEN_VAT, HotPotRecipeViewerData.woodenVatRecipes(level));
     }
 
     @Override
@@ -86,6 +97,12 @@ public final class HotPotJeiPlugin implements IModPlugin {
         }
         for (ItemStack catalyst : HotPotRecipeViewerData.poundingCatalysts()) {
             registration.addRecipeCatalyst(catalyst, POUNDING);
+        }
+        for (ItemStack catalyst : HotPotRecipeViewerData.stoneMillCatalysts()) {
+            registration.addRecipeCatalyst(catalyst, STONE_MILL);
+        }
+        for (ItemStack catalyst : HotPotRecipeViewerData.woodenVatCatalysts()) {
+            registration.addRecipeCatalyst(catalyst, WOODEN_VAT);
         }
     }
 
@@ -267,6 +284,70 @@ public final class HotPotJeiPlugin implements IModPlugin {
                          GuiGraphics guiGraphics, double mouseX, double mouseY) {
             Component hits = poundingHint(recipe);
             drawLine(guiGraphics, hits, 8, 4, HINT, 134);
+        }
+    }
+
+    private static final class StoneMillCategory implements IRecipeCategory<HotPotRecipeViewerData.StoneMillEntry> {
+        private final IDrawable icon;
+
+        private StoneMillCategory(IGuiHelper guiHelper) {
+            this.icon = guiHelper.createDrawableItemStack(new ItemStack(HotPotContent.STONE_MILL_ITEM));
+        }
+
+        @Override public RecipeType<HotPotRecipeViewerData.StoneMillEntry> getRecipeType() { return STONE_MILL; }
+        @Override public Component getTitle() { return recipeText("stone_mill"); }
+        @Override public int getWidth() { return 150; }
+        @Override public int getHeight() { return 50; }
+        @Override public IDrawable getIcon() { return icon; }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, HotPotRecipeViewerData.StoneMillEntry recipe, IFocusGroup focuses) {
+            builder.addSlot(RecipeIngredientRole.INPUT, 8, 20).addItemStack(recipe.input());
+            if (!recipe.fluidHint().isEmpty()) {
+                builder.addSlot(RecipeIngredientRole.INPUT, 34, 20).addItemStack(recipe.fluidHint());
+            }
+            if (!recipe.containerHint().isEmpty()) {
+                builder.addSlot(RecipeIngredientRole.CATALYST, 68, 20).addItemStack(recipe.containerHint());
+            }
+            builder.addSlot(RecipeIngredientRole.OUTPUT, 118, 20).addItemStack(recipe.output());
+        }
+
+        @Override
+        public void draw(HotPotRecipeViewerData.StoneMillEntry recipe, IRecipeSlotsView recipeSlotsView,
+                         GuiGraphics guiGraphics, double mouseX, double mouseY) {
+            drawLine(guiGraphics, stoneMillHint(recipe), 8, 4, HINT, 134);
+        }
+    }
+
+    private static final class WoodenVatCategory implements IRecipeCategory<HotPotRecipeViewerData.WoodenVatEntry> {
+        private final IDrawable icon;
+
+        private WoodenVatCategory(IGuiHelper guiHelper) {
+            this.icon = guiHelper.createDrawableItemStack(new ItemStack(HotPotContent.WOODEN_VAT_ITEM));
+        }
+
+        @Override public RecipeType<HotPotRecipeViewerData.WoodenVatEntry> getRecipeType() { return WOODEN_VAT; }
+        @Override public Component getTitle() { return recipeText("wooden_vat"); }
+        @Override public int getWidth() { return 150; }
+        @Override public int getHeight() { return 50; }
+        @Override public IDrawable getIcon() { return icon; }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, HotPotRecipeViewerData.WoodenVatEntry recipe, IFocusGroup focuses) {
+            builder.addSlot(RecipeIngredientRole.INPUT, 8, 20).addItemStack(recipe.fluidInput());
+            if (!recipe.input().isEmpty()) {
+                builder.addSlot(RecipeIngredientRole.INPUT, 34, 20).addItemStack(recipe.input());
+            }
+            if (!recipe.lidHint().isEmpty()) {
+                builder.addSlot(RecipeIngredientRole.CATALYST, 68, 20).addItemStack(recipe.lidHint());
+            }
+            builder.addSlot(RecipeIngredientRole.OUTPUT, 118, 20).addItemStack(recipe.output());
+        }
+
+        @Override
+        public void draw(HotPotRecipeViewerData.WoodenVatEntry recipe, IRecipeSlotsView recipeSlotsView,
+                         GuiGraphics guiGraphics, double mouseX, double mouseY) {
+            drawLine(guiGraphics, woodenVatHint(recipe), 8, 4, HINT, 134);
         }
     }
 }

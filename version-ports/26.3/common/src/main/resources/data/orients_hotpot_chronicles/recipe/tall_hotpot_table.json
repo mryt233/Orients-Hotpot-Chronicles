@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "PPP",
+    "BBB"
+  ],
+  "key": {
+    "P": "#minecraft:planks",
+    "B": "minecraft:bricks"
+  },
+  "result": {
+    "id": "orients_hotpot_chronicles:tall_hotpot_table",
+    "count": 3
+  }
+}

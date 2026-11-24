@@ -8,6 +8,7 @@ import cn.blockforge.orient.framework.compat.mixin.CriteriaTriggersAccessor;
 import cn.blockforge.orient.framework.loader.RegistrationApi;
 import cn.blockforge.orient.framework.pure.RegistrationGuard;
 import cn.blockforge.orient.framework.pure.RegistrationWindow;
+import com.mojang.serialization.Codec;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.advancements.CriterionTrigger;
 import net.minecraft.core.Registry;
@@ -28,6 +29,8 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.network.IContainerFactory;
 import net.minecraftforge.registries.RegisterEvent;
@@ -83,6 +86,7 @@ public final class ForgeRegistrationApi implements RegistrationApi {
     private final List<Entry<RecipeType<?>>> recipeTypes = new ArrayList<>();
     private final List<Entry<SoundEvent>> sounds = new ArrayList<>();
     private final List<Entry<ParticleType<?>>> particles = new ArrayList<>();
+    private final List<Entry<FoliagePlacerType<?>>> foliagePlacers = new ArrayList<>();
 
     void queueRecipeSerializer(ResourceLocation id, RecipeSerializer<?> serializer) {
         recipeSerializers().register(id, serializer);
@@ -131,6 +135,8 @@ public final class ForgeRegistrationApi implements RegistrationApi {
             flushAndClose(event, key, BuiltInRegistries.SOUND_EVENT, sounds);
         } else if (key.equals(Registries.PARTICLE_TYPE)) {
             flushAndClose(event, key, BuiltInRegistries.PARTICLE_TYPE, particles);
+        } else if (key.equals(Registries.FOLIAGE_PLACER_TYPE)) {
+            flushAndClose(event, key, BuiltInRegistries.FOLIAGE_PLACER_TYPE, foliagePlacers);
         }
     }
 
@@ -289,6 +295,20 @@ public final class ForgeRegistrationApi implements RegistrationApi {
                 requireOpen(Registries.PARTICLE_TYPE, id);
                 T checked = requireValue(Registries.PARTICLE_TYPE, id, value);
                 particles.add(new Entry<>(id, checked, RegistrationGuard.owner(id.getNamespace())));
+                return checked;
+            }
+        };
+    }
+
+    @Override
+    public FoliagePlacerRegistrar foliagePlacers() {
+        return new FoliagePlacerRegistrar() {
+            @Override
+            public <P extends FoliagePlacer> FoliagePlacerType<P> register(ResourceLocation id, Codec<P> codec) {
+                requireOpen(Registries.FOLIAGE_PLACER_TYPE, id);
+                FoliagePlacerType<P> checked = requireValue(Registries.FOLIAGE_PLACER_TYPE, id,
+                    new FoliagePlacerType<>(Objects.requireNonNull(codec, "codec")));
+                foliagePlacers.add(new Entry<>(id, checked, RegistrationGuard.owner(id.getNamespace())));
                 return checked;
             }
         };

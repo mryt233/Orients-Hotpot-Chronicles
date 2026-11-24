@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SCS",
+    "SSS",
+    "P P"
+  ],
+  "key": {
+    "S": {
+      "tag": "minecraft:stone_crafting_materials"
+    },
+    "C": {
+      "item": "minecraft:stick"
+    },
+    "P": {
+      "tag": "minecraft:planks"
+    }
+  },
+  "result": {
+    "item": "orients_hotpot_chronicles:stone_mill"
+  }
+}

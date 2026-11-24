@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "ingredient": "orients_hotpot_chronicles:beef_meatball",
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_beef_meatball"
+  },
+  "experience": 0.35,
+  "cookingtime": 300
+}

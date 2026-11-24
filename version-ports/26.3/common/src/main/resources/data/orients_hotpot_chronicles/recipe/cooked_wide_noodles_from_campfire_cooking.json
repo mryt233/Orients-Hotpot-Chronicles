@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "ingredient": "orients_hotpot_chronicles:wide_noodles",
+  "result": {
+    "id": "orients_hotpot_chronicles:cooked_wide_noodles"
+  },
+  "experience": 0.35,
+  "cookingtime": 600
+}

@@ -1,3 +1,4 @@
+// mryt233 改：26.2 移植同步。
 // mryt233 改：26.2 原版 API；第三批 3F 合并重复实现，保留各入口原有行为。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
@@ -37,22 +38,24 @@ public class HotPotScreenHandler extends PlayerInventoryMenu {
     private final Container pot;
     private final Level world;
     private final HotPotBlockEntity serverBe;
+    private final BlockPos potPos;
     private final DataSlot[] properties;
     private final int[] clientData = new int[HotPotBlockEntity.PROP_COUNT];
 
     public HotPotScreenHandler(int syncId, Inventory playerInventory, HotPotBlockEntity be) {
-        this(syncId, playerInventory, (Container) be, be);
+        this(syncId, playerInventory, (Container) be, be, be.getBlockPos());
     }
 
     public HotPotScreenHandler(int syncId, Inventory playerInventory, BlockPos pos) {
-        this(syncId, playerInventory, clientInventory(playerInventory, pos), null);
+        this(syncId, playerInventory, clientInventory(playerInventory, pos), null, pos);
     }
 
     private HotPotScreenHandler(int syncId, Inventory playerInventory, Container pot,
-                                HotPotBlockEntity be) {
+                                HotPotBlockEntity be, BlockPos pos) {
         super(HotPotContent.HOT_POT_SCREEN, syncId);
         this.pot = pot;
         this.serverBe = be;
+        this.potPos = pos == null ? BlockPos.ZERO : pos.immutable();
         this.world = playerInventory.player.level();
         clientData[0] = -1;
         for (int i = HotPotBlockEntity.PROP_EXTRA_BASES; i < HotPotBlockEntity.PROP_COUNT; i++) {
@@ -81,6 +84,11 @@ public class HotPotScreenHandler extends PlayerInventoryMenu {
         return new SimpleContainer(HotPotBlockEntity.SLOTS);
     }
 
+    // ------------------------------------------------------------------ UI 数据
+
+    public BlockPos potPos() {
+        return potPos;
+    }
     public int baseId() {
         return properties[0].get();
     }
@@ -250,7 +258,8 @@ public class HotPotScreenHandler extends PlayerInventoryMenu {
         DippingSauceItem.dipFromHands(player, eaten);
         HotPotHooks.onEating(world, player, eaten);
         FoodConsumption.consume(world, player, eaten, ConfiguredFoodItem.food(eaten));
-        int nauseaDuration = Config.coldPotNauseaDuration();
+        // 冷锅：没坐在烧着的灶台（或其他热源）上，吃了有概率反胃（mryt233 改：受 mode.penalties_enabled 与 Config.coldPot* 控制）
+        int nauseaDuration = Config.penaltiesEnabled() ? Config.coldPotNauseaDuration() : 0;
         if (!serverBe.isHeated() && nauseaDuration > 0 && world.getRandom().nextFloat() < Config.coldPotNauseaChance()) {
             player.addEffect(new MobEffectInstance(MobEffects.NAUSEA, nauseaDuration, 0));
             player.sendOverlayMessage(Component.translatable(HotPotBlockEntity.key("msg.cold_pot")));
@@ -259,7 +268,7 @@ public class HotPotScreenHandler extends PlayerInventoryMenu {
             FoodConsumption.returnRemainder(eaten, player);
         }
         if (world instanceof ServerLevel serverWorld) {
-            serverWorld.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(eaten)),
+            serverWorld.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(eaten.copyWithCount(1))),
                 player.getX(), player.getEyeY() - 0.15, player.getZ(), 8, 0.12, 0.06, 0.12, 0.05);
         }
         broadcastChanges();

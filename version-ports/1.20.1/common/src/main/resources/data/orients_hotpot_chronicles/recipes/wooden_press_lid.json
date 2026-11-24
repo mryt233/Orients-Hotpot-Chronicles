@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " T ",
+    "WWW"
+  ],
+  "key": {
+    "T": {
+      "item": "minecraft:stick"
+    },
+    "W": {
+      "tag": "minecraft:wooden_slabs"
+    }
+  },
+  "result": {
+    "item": "orients_hotpot_chronicles:wooden_press_lid"
+  }
+}

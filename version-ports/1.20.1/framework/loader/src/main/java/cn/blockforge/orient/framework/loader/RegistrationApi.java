@@ -3,6 +3,7 @@ package cn.blockforge.orient.framework.loader;
 // mryt233 改（2026-11-10）：第三批 3C 补充平台能力。
 
 import cn.blockforge.orient.framework.compat.ItemDataKey;
+import com.mojang.serialization.Codec;
 import net.minecraft.advancements.CriterionTrigger;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
@@ -23,6 +24,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
 
 import java.util.function.Supplier;
 
@@ -128,5 +131,13 @@ public interface RegistrationApi {
 
     interface ParticleRegistrar {
         <T extends ParticleType<?>> T register(ResourceLocation id, T value);
+    }
+
+    default FoliagePlacerRegistrar foliagePlacers() {
+        throw new UnsupportedOperationException("foliagePlacers requires Runtime 0.2.2");
+    }
+
+    interface FoliagePlacerRegistrar {
+        <P extends FoliagePlacer> FoliagePlacerType<P> register(ResourceLocation id, Codec<P> codec);
     }
 }

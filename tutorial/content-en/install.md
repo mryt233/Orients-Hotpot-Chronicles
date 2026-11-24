@@ -1,88 +1,91 @@
-<!-- 作者：mryt233；英文翻译，原文：mryt233。发布前由 mryt233 同步并审核。 -->
-<!-- mryt233 改，2026-11-08：同步 0.2.2-alpha 多版本发布说明；保留原译者署名。 -->
+<!-- 作者：mryt233；英文翻译，原文：mryt233。 -->
+<!-- mryt233 改（2026-11-22）：全量按 0.3.1-alpha 五版本十包同步发布口径更新英文安装说明，含 26.3。 -->
 # Downloads, Installation & Feedback
 
 ## Supported versions {#versions}
 
-The latest build, **0.3.0-alpha**, simultaneously supports **Minecraft 1.21.1, 1.20.1, 26.1.x, and 26.2**. Every jar **bundles the required `orient_framework 0.2.0` library**, so just put one in your `mods` folder:
+The latest release **0.3.1-alpha** simultaneously supports **5 Minecraft version lines (10 packages): 1.21.1, 1.20.1, 26.1.x, 26.2, and 26.3**. Every JAR **bundles `orient_framework 0.2.2`**, so just drop the matching single JAR into `mods`:
 
 | Minecraft | Loader | Java | Also required |
 | --- | --- | --- | --- |
-| **1.21.1** | **Fabric** (used in this guide, **0.3.0-alpha**) | 21 or later | Fabric Loader 0.15.11+ and **Fabric API** (0.116.14+1.21.1) |
-| **1.21.1** | **NeoForge** (**0.3.0-alpha**) | 21 or later | NeoForge 21.1.186 or later |
-| **1.20.1** | **Fabric** (**0.3.0-alpha**) | 17 or later | Fabric Loader 0.14.21+ and **Fabric API** (0.83.0+1.20.1+, tested up to 0.92.12) |
-| **1.20.1** | **Forge** (**0.3.0-alpha**) | 17 or later | Forge 47.0.0+ (tested with 47.0.0 and 47.4.28) |
-| **26.1 / 26.1.1 / 26.1.2** | **Fabric** (**0.3.0-alpha**) | 25 or later | Fabric Loader 0.18.4+ and **Fabric API** (0.143.12+ for your 26.1.x) |
-| **26.1.2** | **NeoForge** (**0.3.0-alpha**) | 25 or later | NeoForge 26.1.2.71+ |
-| **26.2** | **Fabric / NeoForge** (**0.3.0-alpha**) | 25 or later | Fabric Loader 0.18.4+ + **Fabric API** (0.148.3+), or NeoForge 26.2.0.57+ |
+| **1.21.1** | **Fabric** (used in this guide, **0.3.1-alpha**) | 21 or newer | Fabric Loader 0.15.11+, matching **Fabric API** (tested with 0.101.2+1.21.1 / 0.116.14+1.21.1) |
+| **1.21.1** | **NeoForge** (**0.3.1-alpha**) | 21 or newer | NeoForge 21.1.186 or newer |
+| **1.20.1** | **Fabric** (**0.3.1-alpha**) | 17 or newer | Fabric Loader 0.14.21+, **Fabric API** 0.89.0+ for 1.20.1 (tested with 0.89.0 and 0.92.12) |
+| **1.20.1** | **Forge** (**0.3.1-alpha**) | 17 or newer | Forge 47.0.0+ (47.0.0 dedicated server; 47.4.28 on both sides) |
+| **26.1 / 26.1.1 / 26.1.2** | **Fabric** (**0.3.1-alpha**) | 25 or newer | Fabric Loader 0.19.5+ and **Fabric API** 0.145.0+ for your 26.1.x patch |
+| **26.1.2** | **NeoForge** (**0.3.1-alpha**) | 25 or newer | NeoForge 26.1.2.71 or newer |
+| **26.2** | **Fabric / NeoForge** (**0.3.1-alpha**) | 25 or newer | Fabric Loader 0.19.5+ and **Fabric API** 0.152.0+ for 26.2, or NeoForge 26.2.0.57+ |
+| **26.3** | **Fabric / NeoForge** (**0.3.1-alpha**) | 25 or newer | Fabric Loader 0.19.5+ and **Fabric API** 0.160.3+ for 26.3, or NeoForge 26.3.0.76+ |
 
 :::tip
-**This guide demonstrates 1.21.1 Fabric.** In 0.3.0-alpha, all supported versions share the same gameplay, ingredients, seasonings, furniture, open registration, and configuration features; minor engine differences are listed under [How the ports differ](#ports).
+**This guide demonstrates 1.21.1 Fabric.** Starting in 0.3.1-alpha, gameplay, ingredients, crafting, minigames, swappable tables/racks, config options, and open registration stay synchronized across all five version lines. Minor vanilla-layer differences are listed under [Differences between versions](#ports) below.
 :::
 
-- **World & config compatibility:** 0.3.0-alpha stores full string IDs for broths and seasonings and automatically upgrades `0.2.2-alpha` saves and configs (`tofu` and legacy bitmasks), while keeping unknown add-on IDs intact if packs are removed; backing up your world before upgrading is still recommended.
-- 1.20.4 Fabric remains on the old 0.1.1-alpha build and is no longer maintained.
-- **Multiplayer requirement:** because broth and seasoning sync packets now carry full ID lists, **clients and servers must both run `0.3.0-alpha`**.
+- **Automatic world & config compatibility**:
+  - Upgrading from `0.2.2-alpha` / `0.3.0-alpha` automatically and losslessly migrates **all 40 legacy preset hotpot tables** (both placed blocks when chunks load and items in player inventories on login, plus chested legacy tables when placed) into universal hotpot tables while keeping their original appearance — no purple-and-black blocks or lost saves;
+  - Broth, seasoning, and removed dry-goods soaking config keys (`soaked_*` / `dry_goods_soaking`) are silently migrated and cleaned up on load with zero reload warnings; backing up worlds before upgrading is still recommended.
+- **1.20.4 Fabric** remains on legacy 0.1.1-alpha and is no longer maintained.
+- **Multiplayer requirement**: because `0.3.1-alpha` syncs gameplay mode flags, custom rhythm track datapacks, and string broth/seasoning IDs over the network, **clients and servers must both run `0.3.1-alpha`** — do not mix versions.
 
 ## Where to download {#download}
 
-| Source | Link | Notes |
+| Source | URL | Notes |
 | --- | --- | --- |
-| **CurseForge** | <https://www.curseforge.com/minecraft/mc-mods/orients-hotpot-chronicles> | Available normally |
-| **Modrinth** | <https://modrinth.com/mod/orients-hotpot-chronicles> | **If the page does not open, it is still awaiting approval.** Use another source for now. |
-| **MC百科 (MCMod)** | <https://www.mcmod.cn/class/32185.html> | Chinese mod encyclopedia: overview and discussion |
-| **GitHub Releases** | <https://github.com/mryt233/Orients-Hotpot-Chronicles/releases> | One page per mod release, with jars for the supported loaders |
+| **CurseForge** | <https://www.curseforge.com/minecraft/mc-mods/orients-hotpot-chronicles> | Available |
+| **Modrinth** | <https://modrinth.com/mod/orients-hotpot-chronicles> | **If unavailable, it is under review** — use another source |
+| **MCMOD** | <https://www.mcmod.cn/class/32185.html> | Chinese mod encyclopedia: overview and community discussion |
+| **GitHub Releases** | <https://github.com/mryt233/Orients-Hotpot-Chronicles/releases> | One page per release with all loader JARs |
 
-**Check both the Minecraft version and the loader before downloading.** They appear in the filename, for example `orients_hotpot_chronicles-1.21.1-fabric-0.3.0-alpha.jar` or `orients_hotpot_chronicles-1.21.1-neoforge-0.3.0-alpha.jar`. Choosing the wrong version or loader will stop the game from launching.
+**Check two details before downloading: Minecraft version and mod loader.** Both are shown in the filename, e.g. `orients_hotpot_chronicles-1.21.1-fabric-0.3.1-alpha.jar`, `orients_hotpot_chronicles-1.21.1-neoforge-0.3.1-alpha.jar`, or `orients_hotpot_chronicles-26.3-fabric-0.3.1-alpha.jar`. The wrong build will fail to load.
 
-## Installation {#install}
+## How to install {#install}
 
-### Fabric (1.21.1 / 1.20.1 / 26.1.x / 26.2)
+### Fabric (1.21.1 / 1.20.1 / 26.1.x / 26.2 / 26.3)
 
-1. Use [Fabric Loader](https://fabricmc.net/use/) to create a game profile for the matching Minecraft version.
-2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for **that same Minecraft version**.
-3. Put both Fabric API and this mod's jar in `.minecraft/mods`, then launch the game. (Install **Mod Menu** as well if you want to open the visual settings screen from the mod list.)
+1. Install [Fabric Loader](https://fabricmc.net/use/) for your Minecraft version.
+2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for the **same** Minecraft version.
+3. Put both Fabric API and this mod's JAR into `.minecraft/mods` and launch the game. (Install **Mod Menu** as well if you want an in-game Config button.)
 
-### NeoForge (1.21.1 / 26.1.x / 26.2)
+### NeoForge (1.21.1 / 26.1.x / 26.2 / 26.3)
 
-1. Install [NeoForge](https://neoforged.net/) for your Minecraft version (21.1.186+ on 1.21.1).
-2. Put this mod's NeoForge jar in `mods` and launch. **Fabric API is not required.**
+1. Install [NeoForge](https://neoforged.net/) for your Minecraft version (21.1.186+ on 1.21.1, or the corresponding NeoForge build on 26.x).
+2. Put this mod's NeoForge JAR into `mods` and launch the game. **Fabric API is not needed.**
 
 ### Forge (1.20.1)
 
-1. Install [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) for 1.20.1 (47.0.0+; tested with 47.0.0 and 47.4.28).
-2. Put this mod's Forge jar in `mods` and launch. **Fabric API is not required.**
+1. Install [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html) 1.20.1 (47.0.0+, tested on 47.0.0 and 47.4.28).
+2. Put this mod's Forge JAR into `mods` and launch the game. **Fabric API is not needed.**
 
-In Creative mode, look for the **Orient's Hotpot Chronicles** tab. The smaller tabs on the left sort items into All, Kitchenware, Tableware, Furniture, and Food.
+Once installed, open the Creative inventory tab **Orient's Hotpot Chronicles**, with left-side filter subtabs (All / Kitchenwares / Tableware / Tables & Seats / Food); open the mod config screen anytime to switch between **Full Mode** and **Simple Mode**.
 
 :::warn
-The mod is still in **alpha** and has **only had preliminary testing**. Worlds from 0.1.0-alpha.1 may lose modded items or show changed appearances after upgrading. **Back up your world first; a new world is recommended.**
+This mod is still in **alpha**. Upgrading worlds from very early builds like `0.1.0-alpha.1` may lose or alter blocks, so **back up saves first** and prefer a fresh world when upgrading across major eras.
 :::
 
-## How the ports differ {#ports}
+## Differences between versions {#ports}
 
-In 0.3.0-alpha, **1.21.1, 1.20.1, 26.1.x, and 26.2** all include the same gameplay and content, with only tiny vanilla-engine differences on 1.20.1:
+`0.3.1-alpha` aligns gameplay and content across **1.21.1, 1.20.1, 26.1.x, 26.2, and 26.3**, with only tiny vanilla-engine differences:
 
-| Feature | 1.21.1 / 26.1.x / 26.2 | 1.20.1 (Fabric / Forge) |
+| Item | 1.21.1 / 26.1.x / 26.2 / 26.3 | 1.20.1 (Fabric / Forge) |
 | --- | --- | --- |
-| Steam above the pot | White smoke particles | Cloud particles (also white and rising, slightly larger) |
-| Returning bowls after soups/stews | Reads the food's own properties | Follows vanilla and mod bowl-return rules |
+| Steam particles from the pot | White smoke particles | Cloud particles (white rising puffs, slightly larger) |
+| Bowl return after eating | Uses food item properties | Uses vanilla and mod return rules |
 
-## Feedback and community {#feedback}
+## Feedback and contact {#feedback}
 
-Found a bug, have a question, or want to suggest something? Contact the author:
+Found a bug, or have a question or suggestion? Reach the author here:
 
 | Channel | Contact |
 | --- | --- |
-| **GitHub Issues** | [Send feedback](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose) (forms for bug reports, suggestions, and questions) |
-| **QQ group** | **248314791** (if the author does not reply, they are probably asleep) |
-| **Bilibili** | 蘧白川 (Orient) |
+| **GitHub Issues** | [Open an issue](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose) (bugs, suggestions, questions) |
+| **QQ Group** | **248314791** (no reply usually means the author is asleep) |
+| **Bilibili** | 蘧白川 |
 | **Email** | orientcheung233@gmail.com |
-| Project homepage | <https://github.com/mryt233/Orients-Hotpot-Chronicles> |
+| Repository | <https://github.com/mryt233/Orients-Hotpot-Chronicles> |
 
-**When reporting a bug, include:**
-1. Your Minecraft version, loader (Fabric / Forge / NeoForge), and mod version.
-2. What you did and exactly where the problem occurred.
-3. A screenshot if possible; for crashes, attach `latest.log` or the crash report.
+**When reporting a bug, please include:**
+1. Minecraft version, loader (Fabric / Forge / NeoForge), and mod version;
+2. What you were doing and which step went wrong;
+3. Screenshots if possible, plus `latest.log` or the crash report for crashes.
 
-Mod author: **Orient** (蘧白川 / 之晗; these all refer to the same person). Code is licensed under MIT; original textures, models, and other assets are licensed under CC BY-NC-SA 4.0.
+Author: **蘧白川 / Orient** (Chinese and English names of the same author). Code is licensed under MIT; original textures and models are CC BY-NC-SA 4.0.

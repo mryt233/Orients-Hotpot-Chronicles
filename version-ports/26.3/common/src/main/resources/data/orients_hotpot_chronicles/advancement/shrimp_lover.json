@@ -1,0 +1,46 @@
+{
+  "display": {
+    "icon": {
+      "id": "orients_hotpot_chronicles:cooked_shrimp"
+    },
+    "title": {
+      "translate": "advancements.orients_hotpot_chronicles.shrimp_lover.title"
+    },
+    "description": {
+      "translate": "advancements.orients_hotpot_chronicles.shrimp_lover.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "cooked": {
+      "trigger": "orients_hotpot_chronicles:hotpot",
+      "conditions": {
+        "event": "cook_shrimp"
+      }
+    },
+    "item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "orients_hotpot_chronicles:cooked_shrimp",
+              "orients_hotpot_chronicles:cooked_peeled_shrimp",
+              "orients_hotpot_chronicles:cooked_shrimp_paste"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "cooked",
+      "item"
+    ]
+  ],
+  "parent": "orients_hotpot_chronicles:first_cooked"
+}

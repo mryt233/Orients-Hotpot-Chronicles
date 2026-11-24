@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "orients_hotpot_chronicles:lotus_root",
+  "result": {
+    "id": "orients_hotpot_chronicles:lotus_root_slice",
+    "count": 3
+  }
+}

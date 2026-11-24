@@ -1,0 +1,8 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/hotpot_table_new",
+  "textures": {
+    "particle": "minecraft:block/mangrove_planks",
+    "top": "minecraft:block/mangrove_planks",
+    "base": "minecraft:block/mangrove_planks"
+  }
+}

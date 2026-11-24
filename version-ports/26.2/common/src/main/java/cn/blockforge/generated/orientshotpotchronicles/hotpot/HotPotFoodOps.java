@@ -248,4 +248,53 @@ final class HotPotFoodOps {
     static void grantTakeXp(HotPotBlockEntity be, Player player, int slot, int count) {
         HotPotCookingRun.grantTakeXp(be, player, slot, count);
     }
+
+    static int countCooked(HotPotBlockEntity be) {
+        if (be == null || !be.hasPot()) {
+            return 0;
+        }
+        int total = 0;
+        for (int s = 0; s < SLOTS; s++) {
+            if (be.slots.cooked()[s]) {
+                ItemStack stack = be.slots.ingredients().getItem(s);
+                if (!stack.isEmpty()) {
+                    total += stack.getCount();
+                }
+            }
+        }
+        return total;
+    }
+
+    /** 小游戏实时消耗 1 份锅内熟食：原子取出 1 件并结算出锅经验，避免刷物。 */
+    static ItemStack consumeOneCooked(HotPotBlockEntity be, Player player) {
+        if (be == null || be.getLevel() == null || be.getLevel().isClientSide() || !be.hasPot()) {
+            return ItemStack.EMPTY;
+        }
+        for (int slot = 0; slot < SLOTS; slot++) {
+            if (!be.slots.cooked()[slot]) {
+                continue;
+            }
+            ItemStack stored = be.slots.ingredients().getItem(slot);
+            if (stored.isEmpty()) {
+                be.resetSlot(slot, ItemStack.EMPTY);
+                continue;
+            }
+            float slotXp = be.slots.xpValue()[slot];
+            ItemStack single = stored.copyWithCount(1);
+            HotPotCookingRun.fireTakeCriteria(player, stored);
+            if (stored.getCount() > 1) {
+                ItemStack rest = stored.copyWithCount(stored.getCount() - 1);
+                be.slots.ingredients().setItem(slot, rest);
+                be.slots.tracked()[slot] = rest.copy();
+            } else {
+                be.slots.ingredients().setItem(slot, ItemStack.EMPTY);
+                be.resetSlot(slot, ItemStack.EMPTY);
+            }
+            HotPotCookingRun.grantExperience(be, slotXp, 1);
+            HotPotCriterion.fire(player, "pot_cooked");
+            be.finishCollection();
+            return single;
+        }
+        return ItemStack.EMPTY;
+    }
 }

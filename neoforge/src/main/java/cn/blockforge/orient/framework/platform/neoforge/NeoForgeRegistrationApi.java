@@ -11,7 +11,11 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import com.mojang.serialization.MapCodec;
+import java.util.Objects;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
 import cn.blockforge.orient.framework.pure.RegistrationWindow;
 
 import cn.blockforge.orient.framework.loader.RegistrationApi;
@@ -87,6 +91,7 @@ public final class NeoForgeRegistrationApi implements RegistrationApi {
     private final List<Entry<ArmorMaterial>> armorMaterials = new ArrayList<>();
     private final List<Entry<SoundEvent>> sounds = new ArrayList<>();
     private final List<Entry<ParticleType<?>>> particles = new ArrayList<>();
+    private final List<Entry<FoliagePlacerType<?>>> foliagePlacers = new ArrayList<>();
 
     private static <T> void flush(Registry<T> registry, List<Entry<T>> queue) {
         for (Entry<T> entry : queue) {
@@ -130,6 +135,8 @@ public final class NeoForgeRegistrationApi implements RegistrationApi {
             flushAndClose(key, BuiltInRegistries.SOUND_EVENT, sounds);
         } else if (key.equals(Registries.PARTICLE_TYPE)) {
             flushAndClose(key, BuiltInRegistries.PARTICLE_TYPE, particles);
+        } else if (key.equals(Registries.FOLIAGE_PLACER_TYPE)) {
+            flushAndClose(key, BuiltInRegistries.FOLIAGE_PLACER_TYPE, foliagePlacers);
         }
     }
 
@@ -295,6 +302,21 @@ public final class NeoForgeRegistrationApi implements RegistrationApi {
                 particles.add(new Entry<ParticleType<?>>(id, requireValue(Registries.PARTICLE_TYPE, id, value),
                     RegistrationGuard.owner(id.getNamespace())));
                 return value;
+            }
+        };
+    }
+
+    @Override
+    public FoliagePlacerRegistrar foliagePlacers() {
+        return new FoliagePlacerRegistrar() {
+            @Override
+            public <P extends FoliagePlacer> FoliagePlacerType<P> register(ResourceLocation id, MapCodec<P> codec) {
+                requireOpen(Registries.FOLIAGE_PLACER_TYPE, id);
+                FoliagePlacerType<P> type = new FoliagePlacerType<>(Objects.requireNonNull(codec, "codec"));
+                foliagePlacers.add(new Entry<FoliagePlacerType<?>>(id,
+                    requireValue(Registries.FOLIAGE_PLACER_TYPE, id, type),
+                    RegistrationGuard.owner(id.getNamespace())));
+                return type;
             }
         };
     }

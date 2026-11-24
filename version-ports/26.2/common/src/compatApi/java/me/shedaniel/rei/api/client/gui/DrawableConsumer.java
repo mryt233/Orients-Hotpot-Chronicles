@@ -1,6 +1,7 @@
+// mryt233 改：26.2 移植同步。
 package me.shedaniel.rei.api.client.gui;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import me.shedaniel.rei.api.client.gui.compat.GuiGraphics;
 
 /**
  * 自定义绘制回调（REI 的 createDrawableWidget 用它画自由内容）。
@@ -11,5 +12,5 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 @FunctionalInterface
 public interface DrawableConsumer {
-    void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta);
+    void render(GuiGraphics graphics, int mouseX, int mouseY, float delta);
 }

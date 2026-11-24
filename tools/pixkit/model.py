@@ -65,3 +65,25 @@ def block_model(elements, textures, parent="minecraft:block/block"):
     tex = dict(textures)
     tex.setdefault("particle", next(iter(textures.values())))
     return {"parent": parent, "textures": tex, "elements": elements}
+
+
+def apply_outer_cullface(face, frm, to, face_obj):
+    """为落在本格 [0,16]^3 外表面且高度未超出本方块顶面(y1<=16)的面设置 cullface；高出本格的面移除 cullface。"""
+    x0, y0, z0 = frm
+    x1, y1, z1 = to
+    cull = None
+    if y1 <= 16.0:
+        if face == "north" and z0 == 0:
+            cull = "north"
+        elif face == "south" and z1 == 16:
+            cull = "south"
+        elif face == "west" and x0 == 0:
+            cull = "west"
+        elif face == "east" and x1 == 16:
+            cull = "east"
+        elif face == "down" and y0 == 0:
+            cull = "down"
+    if cull is not None:
+        face_obj["cullface"] = cull
+    else:
+        face_obj.pop("cullface", None)

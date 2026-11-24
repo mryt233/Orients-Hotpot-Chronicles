@@ -1,0 +1,77 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "tex": "orients_hotpot_chronicles:item/sesame_paste",
+    "particle": "orients_hotpot_chronicles:item/sesame_paste"
+  },
+  "elements": [
+    {
+      "from": [
+        3.4000000000000004,
+        0,
+        3.4000000000000004
+      ],
+      "to": [
+        12.6,
+        2.0,
+        12.6
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            14,
+            9,
+            16
+          ],
+          "texture": "#tex"
+        },
+        "east": {
+          "uv": [
+            0,
+            14,
+            9,
+            16
+          ],
+          "texture": "#tex"
+        },
+        "south": {
+          "uv": [
+            0,
+            14,
+            9,
+            16
+          ],
+          "texture": "#tex"
+        },
+        "west": {
+          "uv": [
+            0,
+            14,
+            9,
+            16
+          ],
+          "texture": "#tex"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#tex"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#tex"
+        }
+      }
+    }
+  ]
+}

@@ -18,10 +18,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -38,9 +42,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
 import net.minecraft.world.level.material.MapColor;
 
 /** 作者：mryt233；mryt233 改（2026-11-10）。注册中心：灶台、锅、筷子、方块实体、屏幕与独立创造标签页（1.20.1 适配）。 */
@@ -87,6 +93,20 @@ public final class HotPotContent {
         {"iron", "iron_block"}};
     public static final List<HotPotTableBlock> HOTPOT_TABLES = new ArrayList<>();
     public static final List<BlockItem> HOTPOT_TABLE_ITEMS = new ArrayList<>();
+    /** 0.3.1 Phase 4：40→2 统一基础火锅桌与 3 种备菜架（支持换材质、旧档无损迁移）。 */
+    public static HotPotTableBlock HOTPOT_TABLE;
+    public static BlockItem HOTPOT_TABLE_ITEM;
+    public static TallHotPotTableBlock TALL_HOTPOT_TABLE;
+    public static BlockItem TALL_HOTPOT_TABLE_ITEM;
+    public static ItemDataKey<TableMaterialData> TABLE_MATERIALS;
+    public static BlockEntityType<HotPotTableBlockEntity> HOTPOT_TABLE_BE;
+    public static PrepRackBlock MULTI_TIER_PREP_RACK;
+    public static BlockItem MULTI_TIER_PREP_RACK_ITEM;
+    public static PrepRackBlock DESKTOP_PREP_RACK;
+    public static BlockItem DESKTOP_PREP_RACK_ITEM;
+    public static PrepRackBlock HANGING_PREP_RACK;
+    public static BlockItem HANGING_PREP_RACK_ITEM;
+    public static BlockEntityType<PrepRackBlockEntity> PREP_RACK_BE;
     /** 板凳（矮）：同样每种原版木板一种，能坐。 */
     public static final List<BenchBlock> BENCHES = new ArrayList<>();
     public static final List<BlockItem> BENCH_ITEMS = new ArrayList<>();
@@ -259,6 +279,63 @@ public final class HotPotContent {
     /** 三款布围裙（创造栏 / 换款配方 / 成就共用）。 */
     public static List<Item> CLOTH_APRONS;
 
+    /** 鸡爪（成年鸡掉落）、熟鸡爪、无骨鸡爪（砧板/切石机剔骨）、熟无骨鸡爪。 */
+    public static Item CHICKEN_FEET;
+    public static Item COOKED_CHICKEN_FEET;
+    public static Item BONELESS_CHICKEN_FEET;
+    public static Item COOKED_BONELESS_CHICKEN_FEET;
+
+    /** 独立橙子树方块族（0.3.1 Phase 2.1）：原版橡木不再掉落橙子。 */
+    public static OrangeLogBlock ORANGE_LOG;
+    public static OrangeLogBlock ORANGE_WOOD;
+    public static RotatedPillarBlock STRIPPED_ORANGE_LOG;
+    public static RotatedPillarBlock STRIPPED_ORANGE_WOOD;
+    public static OrangeLeavesBlock ORANGE_LEAVES;
+    public static OrangeSaplingBlock ORANGE_SAPLING;
+    public static FoliagePlacerType<OrangeFoliagePlacer> ORANGE_FOLIAGE_PLACER;
+    public static BlockItem ORANGE_LOG_ITEM;
+    public static BlockItem ORANGE_WOOD_ITEM;
+    public static BlockItem STRIPPED_ORANGE_LOG_ITEM;
+    public static BlockItem STRIPPED_ORANGE_WOOD_ITEM;
+    public static BlockItem ORANGE_LEAVES_ITEM;
+    public static BlockItem ORANGE_SAPLING_ITEM;
+
+    /** 小石磨与开口大木桶：豆制品 2～3 步细化工序与干货泡发（0.3.1 Phase 3）。 */
+    public static StoneMillBlock STONE_MILL;
+    public static BlockItem STONE_MILL_ITEM;
+    public static BlockEntityType<StoneMillBlockEntity> STONE_MILL_BE;
+    public static WoodenVatBlock WOODEN_VAT;
+    public static BlockItem WOODEN_VAT_ITEM;
+    public static BlockEntityType<WoodenVatBlockEntity> WOODEN_VAT_BE;
+    public static SoymilkBucketItem SOYMILK_BUCKET;
+    public static Item BRINE_BOTTLE;
+    public static Item WOODEN_PRESS_LID;
+
+    /** 9 种独立耕地作物（直接以同名食材成品播种，不新增多余种子物品）与野外自然生成植株簇（0.3.1 Phase 2.2）。 */
+    public static HotPotCropBlock SCALLION_CROP;
+    public static HotPotCropBlock CILANTRO_CROP;
+    public static HotPotCropBlock SOYBEAN_CROP;
+    public static HotPotCropBlock GARLIC_CROP;
+    public static HotPotCropBlock TOMATO_CROP;
+    public static HotPotCropBlock CHILI_PEPPER_CROP;
+    public static HotPotCropBlock PEANUT_CROP;
+    public static HotPotCropBlock GREENS_CROP;
+    public static HotPotCropBlock ZHE_ER_GEN_CROP;
+
+    public static WildCropBlock WILD_SCALLION;
+    public static WildCropBlock WILD_CILANTRO;
+    public static WildCropBlock WILD_SOYBEAN;
+    public static WildCropBlock WILD_GARLIC;
+    public static WildCropBlock WILD_TOMATO;
+    public static WildCropBlock WILD_CHILI_PEPPER;
+    public static WildCropBlock WILD_PEANUT;
+    public static WildCropBlock WILD_GREENS;
+    public static WildCropBlock WILD_ZHE_ER_GEN;
+    public static final List<WildCropBlock> WILD_CROPS = new ArrayList<>();
+    public static final List<BlockItem> WILD_CROP_ITEMS = new ArrayList<>();
+    public static final List<Block> CUTOUT_BLOCKS = new ArrayList<>();
+    private static final Map<String, HotPotCropBlock> CROPS_BY_FOOD = new LinkedHashMap<>();
+
     // ==== tools/new_item.py：新物品的注册插在这行上面（mryt233 2026-11-01，别删这行）====
     public static Item TOMATO;
     public static Item CHILI_PEPPER;
@@ -293,9 +370,37 @@ public final class HotPotContent {
 
     private static Item foodItem(RegistrationApi registration, String id, int nutrition, float saturation) {
         Config.rememberFood(id, nutrition, saturation);
+        FoodProperties food = new FoodProperties.Builder()
+            .nutrition(nutrition).saturationMod(saturation).alwaysEat().build();
+        HotPotCropBlock crop = CROPS_BY_FOOD.get(id);
+        if (crop != null) {
+            ConfiguredCropItem cropItem = new ConfiguredCropItem(crop, id, new Item.Properties().food(food));
+            return registration.items().register(HotPot.id(id), cropItem);
+        }
         return registration.items().register(HotPot.id(id),
-            new ConfiguredFoodItem(id, new Item.Properties().food(new FoodProperties.Builder()
-                .nutrition(nutrition).saturationMod(saturation).alwaysEat().build())));
+            new ConfiguredFoodItem(id, new Item.Properties().food(food)));
+    }
+
+    private static BlockItem registerBlockItem(RegistrationApi registration, String id, Block block) {
+        return registration.items().register(HotPot.id(id), new BlockItem(block, new Item.Properties()));
+    }
+
+    private static HotPotCropBlock registerCropBlock(RegistrationApi registration, String foodId, String blockId,
+                                                     Supplier<Item> seed) {
+        HotPotCropBlock crop = registration.blocks().register(HotPot.id(blockId),
+            new HotPotCropBlock(seed, BlockBehaviour.Properties.copy(Blocks.WHEAT)));
+        CROPS_BY_FOOD.put(foodId, crop);
+        CUTOUT_BLOCKS.add(crop);
+        return crop;
+    }
+
+    private static WildCropBlock registerWildCrop(RegistrationApi registration, String blockId) {
+        WildCropBlock block = registration.blocks().register(HotPot.id(blockId),
+            new WildCropBlock(BlockBehaviour.Properties.copy(Blocks.DANDELION)));
+        WILD_CROPS.add(block);
+        WILD_CROP_ITEMS.add(registerBlockItem(registration, blockId, block));
+        CUTOUT_BLOCKS.add(block);
+        return block;
     }
 
     private static SauceBottleItem sauceBottle(RegistrationApi registration, SauceBottleKind kind, int nutrition, float saturation) {
@@ -396,6 +501,8 @@ public final class HotPotContent {
     public static void fillCreativeTab(CreativeModeTab.ItemDisplayParameters context, CreativeModeTab.Output entries) {
         entries.accept(STOVE_ITEM);
         entries.accept(TALL_STOVE_ITEM);
+        // 锅：先铁锅全部、再铜锅全部，每种按 九宫格 / S / O / 方心 / 直隔 / 田字（用户 2026-10-24 定）
+        // mryt233 改（2026-11-10，r147）：12 行手写改成按创造栏专用顺序循环（逐项和以前一致）
         for (HotPotMaterial material : CREATIVE_POT_ORDER) {
             entries.accept(POT_ITEMS.get(material));
         }
@@ -428,6 +535,7 @@ public final class HotPotContent {
         entries.accept(HAM_SAUSAGE);
         entries.accept(HAM_SAUSAGE_SLICE);
         entries.accept(COOKED_HAM_SAUSAGE_SLICE);
+        // mryt233 改（2026-11-06）：r137 的 22 样新食材，接在火腿肠片后面，按生 → 熟成对排列。
         for (Item food : new Item[]{RAW_CRISPY_PORK, CRISPY_PORK, BOILED_CRISPY_PORK,
             DRIED_TOFU, COOKED_DRIED_TOFU, TOFU_SKIN, COOKED_TOFU_SKIN,
             WIDE_NOODLES, COOKED_WIDE_NOODLES, SWEET_POTATO_SKIN, COOKED_SWEET_POTATO_SKIN,
@@ -436,17 +544,28 @@ public final class HotPotContent {
             RAW_SQUID, SQUID_ROLL, COOKED_SQUID_ROLL, EGG_FRIED_RICE}) {
             entries.accept(food);
         }
+        // mryt233 改（2026-11-06）：r139 折耳根四样（生 / 段 / 熟段 / 碎）接在 r137 食材后面，按生 → 熟的顺序。
         for (Item zheErGen : new Item[]{ZHE_ER_GEN, ZHE_ER_GEN_SLICE, COOKED_ZHE_ER_GEN_SLICE, MINCED_ZHE_ER_GEN}) {
             entries.accept(zheErGen);
         }
+        // 布围裙：防溅油装备，排在厨具（菜刀 / 擀面杖 / 砧板）后面
+        // mryt233 改（2026-11-09，r146b）：三款布围裙都进创造栏
         for (Item apron : CLOTH_APRONS) {
             entries.accept(apron);
+        }
+        for (Item feet : new Item[]{CHICKEN_FEET, COOKED_CHICKEN_FEET, BONELESS_CHICKEN_FEET, COOKED_BONELESS_CHICKEN_FEET}) {
+            entries.accept(feet);
         }
         // ==== tools/new_item.py：新物品进创造栏插在这行上面（别删这行）====
         entries.accept(HOTPOT_GUIDE);
         entries.accept(KITCHEN_KNIFE);
         entries.accept(ROLLING_PIN);
         entries.accept(CUTTING_BOARD_ITEM);
+        entries.accept(STONE_MILL_ITEM);
+        entries.accept(WOODEN_VAT_ITEM);
+        entries.accept(WOODEN_PRESS_LID);
+        entries.accept(BRINE_BOTTLE);
+        entries.accept(SOYMILK_BUCKET);
         SOUP_BOWLS.forEach(entries::accept);
         entries.accept(ORANGE_DRINK);
         entries.accept(EMPTY_ORANGE_DRINK_BOTTLE);
@@ -467,7 +586,8 @@ public final class HotPotContent {
         entries.accept(GARLIC_PASTE);
         entries.accept(COOKED_KELP);
         entries.accept(TOMATO);
-        entries.accept(CHILI_PEPPER);
+        entries.accept(CHILI_PEPPER);   // mryt233 改（2026-11-05）：辣椒（r136a）排在番茄后面
+        // mryt233 改（2026-11-06）：r137 的 5 种蘸料原料，接在辣椒后面（都是能在蘸料台上用的原料）。
         for (Item raw : new Item[]{OYSTER_SAUCE, SESAME_PASTE, PEANUT, CRUSHED_PEANUTS, MILLET_CHILI}) {
             entries.accept(raw);
         }
@@ -475,12 +595,25 @@ public final class HotPotContent {
         entries.accept(THREE_FRESH_HOTPOT_BASE);
         entries.accept(TOMATO_SOUP_BUCKET);
         entries.accept(THREE_FRESH_SOUP_BUCKET);
-        HOTPOT_TABLE_ITEMS.forEach(entries::accept);
+        // mryt233 改（2026-11-04）：不再放空的蘸料。默认物品没有 sauce 组件，显示「蘸料 · 还能蘸 0 口」，
+        // 玩家截图报过；蘸料本来就只能在蘸料台上打，创造栏不放。
+        // 万一还有地方拿到空蘸料，DippingSauceItem 会把它换成空碗（见那边的兜底）。
+        entries.accept(HOTPOT_TABLE_ITEM);
+        entries.accept(TALL_HOTPOT_TABLE_ITEM);
+        entries.accept(MULTI_TIER_PREP_RACK_ITEM);
+        entries.accept(DESKTOP_PREP_RACK_ITEM);
+        entries.accept(HANGING_PREP_RACK_ITEM);
         BENCH_ITEMS.forEach(entries::accept);
-        TALL_TABLE_ITEMS.forEach(entries::accept);
         TALL_BENCH_ITEMS.forEach(entries::accept);
         PLATE_ITEMS.forEach(entries::accept);
         SAUCE_STATION_ITEMS.forEach(entries::accept);
+        entries.accept(ORANGE_LOG_ITEM);
+        entries.accept(ORANGE_WOOD_ITEM);
+        entries.accept(STRIPPED_ORANGE_LOG_ITEM);
+        entries.accept(STRIPPED_ORANGE_WOOD_ITEM);
+        entries.accept(ORANGE_LEAVES_ITEM);
+        entries.accept(ORANGE_SAPLING_ITEM);
+        WILD_CROP_ITEMS.forEach(entries::accept);
     }
 
     private HotPotContent() {
@@ -559,6 +692,8 @@ public final class HotPotContent {
         }
         HELD_FOOD = registration.components().register(HotPot.id("held_food"),
             new ItemDataKey<>("orients_hotpot_chronicles:held_food", HeldFood.CODEC));
+        TABLE_MATERIALS = registration.components().register(HotPot.id("table_materials"),
+            new ItemDataKey<>("orients_hotpot_chronicles:table_materials", TableMaterialData.CODEC));
 
         for (PlateMaterial material : PLATE_MATERIALS) {
             for (PlateSize size : PlateSize.values()) {
@@ -588,6 +723,53 @@ public final class HotPotContent {
             HotPot.id("drink_cauldron"), new DrinkCauldronBlock());
         PLATE_HOLDER = registration.blocks().register(
             HotPot.id("plates"), new PlateHolderBlock());
+        CUTOUT_BLOCKS.clear();
+        WILD_CROPS.clear();
+        WILD_CROP_ITEMS.clear();
+        CROPS_BY_FOOD.clear();
+        STRIPPED_ORANGE_LOG = registration.blocks().register(HotPot.id("stripped_orange_log"),
+            new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG)));
+        ORANGE_LOG = registration.blocks().register(HotPot.id("orange_log"),
+            new OrangeLogBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG), () -> STRIPPED_ORANGE_LOG));
+        STRIPPED_ORANGE_WOOD = registration.blocks().register(HotPot.id("stripped_orange_wood"),
+            new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_WOOD)));
+        ORANGE_WOOD = registration.blocks().register(HotPot.id("orange_wood"),
+            new OrangeLogBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD), () -> STRIPPED_ORANGE_WOOD));
+        ORANGE_LEAVES = registration.blocks().register(HotPot.id("orange_leaves"),
+            new OrangeLeavesBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LEAVES).noCollission()));
+        ORANGE_SAPLING = registration.blocks().register(HotPot.id("orange_sapling"),
+            new OrangeSaplingBlock(BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
+        ORANGE_LOG_ITEM = registerBlockItem(registration, "orange_log", ORANGE_LOG);
+        ORANGE_WOOD_ITEM = registerBlockItem(registration, "orange_wood", ORANGE_WOOD);
+        STRIPPED_ORANGE_LOG_ITEM = registerBlockItem(registration, "stripped_orange_log", STRIPPED_ORANGE_LOG);
+        STRIPPED_ORANGE_WOOD_ITEM = registerBlockItem(registration, "stripped_orange_wood", STRIPPED_ORANGE_WOOD);
+        ORANGE_LEAVES_ITEM = registerBlockItem(registration, "orange_leaves", ORANGE_LEAVES);
+        ORANGE_SAPLING_ITEM = registerBlockItem(registration, "orange_sapling", ORANGE_SAPLING);
+        // mryt233 改：ORANGE_LEAVES 继承 LeavesBlock，不再固定加入 CUTOUT_BLOCKS，以随原版画质开关自动切换流畅(solid)/高品质(cutout_mipped)。
+        CUTOUT_BLOCKS.add(ORANGE_SAPLING);
+        ORANGE_FOLIAGE_PLACER = registration.foliagePlacers().register(
+            HotPot.id("orange_foliage_placer"), OrangeFoliagePlacer.CODEC);
+
+        SCALLION_CROP = registerCropBlock(registration, "scallion", "scallion_crop", () -> SCALLION);
+        CILANTRO_CROP = registerCropBlock(registration, "cilantro", "cilantro_crop", () -> CILANTRO);
+        SOYBEAN_CROP = registerCropBlock(registration, "soybean", "soybean_crop", () -> SOYBEAN);
+        GARLIC_CROP = registerCropBlock(registration, "garlic", "garlic_crop", () -> GARLIC);
+        TOMATO_CROP = registerCropBlock(registration, "tomato", "tomato_crop", () -> TOMATO);
+        CHILI_PEPPER_CROP = registerCropBlock(registration, "chili_pepper", "chili_pepper_crop", () -> CHILI_PEPPER);
+        PEANUT_CROP = registerCropBlock(registration, "peanut", "peanut_crop", () -> PEANUT);
+        GREENS_CROP = registerCropBlock(registration, "greens", "greens_crop", () -> GREENS);
+        ZHE_ER_GEN_CROP = registerCropBlock(registration, "zhe_er_gen", "zhe_er_gen_crop", () -> ZHE_ER_GEN);
+
+        WILD_SCALLION = registerWildCrop(registration, "wild_scallion");
+        WILD_CILANTRO = registerWildCrop(registration, "wild_cilantro");
+        WILD_SOYBEAN = registerWildCrop(registration, "wild_soybean");
+        WILD_GARLIC = registerWildCrop(registration, "wild_garlic");
+        WILD_TOMATO = registerWildCrop(registration, "wild_tomato");
+        WILD_CHILI_PEPPER = registerWildCrop(registration, "wild_chili_pepper");
+        WILD_PEANUT = registerWildCrop(registration, "wild_peanut");
+        WILD_GREENS = registerWildCrop(registration, "wild_greens");
+        WILD_ZHE_ER_GEN = registerWildCrop(registration, "wild_zhe_er_gen");
+
         SEAT = registration.entityTypes().register(HotPot.id("seat"),
             EntityType.Builder.<SeatEntity>of(SeatEntity::new, MobCategory.MISC)
                 .sized(0.25F, 0.01F)
@@ -596,10 +778,32 @@ public final class HotPotContent {
                 .clientTrackingRange(10)
                 .build(HotPot.id("seat").toString()));
 
+        HOTPOT_TABLE = registration.blocks().register(HotPot.id("hotpot_table"),
+            new HotPotTableBlock(Blocks.OAK_PLANKS, false, true));
+        HOTPOT_TABLE_ITEM = registerBlockItem(registration, "hotpot_table", HOTPOT_TABLE);
+        TALL_HOTPOT_TABLE = registration.blocks().register(HotPot.id("tall_hotpot_table"),
+            new TallHotPotTableBlock(Blocks.OAK_PLANKS, false, true));
+        TALL_HOTPOT_TABLE_ITEM = registerBlockItem(registration, "tall_hotpot_table", TALL_HOTPOT_TABLE);
+        MULTI_TIER_PREP_RACK = registration.blocks().register(HotPot.id("multi_tier_prep_rack"),
+            new PrepRackBlock(PrepRackBlock.Kind.MULTI_TIER,
+                BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(2.0F, 3.0F).noOcclusion()));
+        MULTI_TIER_PREP_RACK_ITEM = registerBlockItem(registration, "multi_tier_prep_rack", MULTI_TIER_PREP_RACK);
+        DESKTOP_PREP_RACK = registration.blocks().register(HotPot.id("desktop_prep_rack"),
+            new PrepRackBlock(PrepRackBlock.Kind.DESKTOP,
+                BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(2.0F, 3.0F).noOcclusion()));
+        DESKTOP_PREP_RACK_ITEM = registerBlockItem(registration, "desktop_prep_rack", DESKTOP_PREP_RACK);
+        HANGING_PREP_RACK = registration.blocks().register(HotPot.id("hanging_prep_rack"),
+            new PrepRackBlock(PrepRackBlock.Kind.HANGING,
+                BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(2.0F, 3.0F).noOcclusion()));
+        HANGING_PREP_RACK_ITEM = registerBlockItem(registration, "hanging_prep_rack", HANGING_PREP_RACK);
+        CUTOUT_BLOCKS.add(MULTI_TIER_PREP_RACK);
+        CUTOUT_BLOCKS.add(DESKTOP_PREP_RACK);
+        CUTOUT_BLOCKS.add(HANGING_PREP_RACK);
+
         for (String wood : TABLE_WOODS) {
             Block planks = BuiltInRegistries.BLOCK.get(new ResourceLocation(wood + "_planks"));
             HotPotTableBlock table = registration.blocks().register(
-                HotPot.id(wood + "_hotpot_table"), new HotPotTableBlock(planks));
+                HotPot.id(wood + "_hotpot_table"), new LegacyTableBlock(planks, false));
             HOTPOT_TABLES.add(table);
             HOTPOT_TABLE_ITEMS.add(registration.items().register(
                 HotPot.id(wood + "_hotpot_table"), new BlockItem(table, new Item.Properties())));
@@ -615,7 +819,7 @@ public final class HotPotContent {
         for (String wood : TABLE_WOODS) {
             Block planks = BuiltInRegistries.BLOCK.get(new ResourceLocation(wood + "_planks"));
             TallHotPotTableBlock table = registration.blocks().register(
-                HotPot.id(wood + "_tall_hotpot_table"), new TallHotPotTableBlock(planks));
+                HotPot.id(wood + "_tall_hotpot_table"), new LegacyTallTableBlock(planks, false));
             TALL_TABLES.add(table);
             TALL_TABLE_ITEMS.add(registration.items().register(
                 HotPot.id(wood + "_tall_hotpot_table"), new BlockItem(table, new Item.Properties())));
@@ -625,15 +829,16 @@ public final class HotPotContent {
             TALL_BENCH_ITEMS.add(registration.items().register(
                 HotPot.id(wood + "_bench"), new BlockItem(bench, new Item.Properties())));
         }
+        // 石料 / 金属桌面的火锅桌旧预设占位保留（兼容旧存档迁移升级）。
         for (String[] m : STONE_TABLES) {
             Block material = BuiltInRegistries.BLOCK.get(new ResourceLocation(m[1]));
             HotPotTableBlock table = registration.blocks().register(
-                HotPot.id(m[0] + "_hotpot_table"), new HotPotTableBlock(material, true));
+                HotPot.id(m[0] + "_hotpot_table"), new LegacyTableBlock(material, true));
             HOTPOT_TABLES.add(table);
             HOTPOT_TABLE_ITEMS.add(registration.items().register(
                 HotPot.id(m[0] + "_hotpot_table"), new BlockItem(table, new Item.Properties())));
             TallHotPotTableBlock tall = registration.blocks().register(
-                HotPot.id(m[0] + "_tall_hotpot_table"), new TallHotPotTableBlock(material, true));
+                HotPot.id(m[0] + "_tall_hotpot_table"), new LegacyTallTableBlock(material, true));
             TALL_TABLES.add(tall);
             TALL_TABLE_ITEMS.add(registration.items().register(
                 HotPot.id(m[0] + "_tall_hotpot_table"), new BlockItem(tall, new Item.Properties())));
@@ -689,6 +894,24 @@ public final class HotPotContent {
                 .dynamicShape()));
         CUTTING_BOARD_ITEM = registration.items().register(HotPot.id("cutting_board"),
             new BlockItem(CUTTING_BOARD, new Item.Properties()));
+        STONE_MILL = registration.blocks().register(HotPot.id("stone_mill"),
+            new StoneMillBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.STONE)
+                .instrument(net.minecraft.world.level.block.state.properties.NoteBlockInstrument.BASEDRUM)
+                .strength(1.5F, 6.0F)
+                .sound(SoundType.STONE)
+                .dynamicShape()
+                .noOcclusion()));
+        STONE_MILL_ITEM = registerBlockItem(registration, "stone_mill", STONE_MILL);
+        WOODEN_VAT = registration.blocks().register(HotPot.id("wooden_vat"),
+            new WoodenVatBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(2.0F, 3.0F).noOcclusion()));
+        WOODEN_VAT_ITEM = registerBlockItem(registration, "wooden_vat", WOODEN_VAT);
+        SOYMILK_BUCKET = registration.items().register(HotPot.id("soymilk_bucket"),
+            new SoymilkBucketItem());
+        BRINE_BOTTLE = registration.items().register(HotPot.id("brine_bottle"),
+            new Item(new Item.Properties().stacksTo(16).craftRemainder(Items.GLASS_BOTTLE)));
+        WOODEN_PRESS_LID = registration.items().register(HotPot.id("wooden_press_lid"),
+            new Item(new Item.Properties().stacksTo(16)));
         POTATO_SLICE = foodItem(registration, "potato_slice", 1, 0.3F);
         COOKED_POTATO_SLICE = foodItem(registration, "cooked_potato_slice", 2, 0.6F);
         SOYBEAN = foodItem(registration, "soybean", 1, 0.1F);
@@ -749,6 +972,10 @@ public final class HotPotContent {
             HotPot.id("brown_trim_cloth_apron"), new ClothApronItem(registration, ClothApronItem.Style.BROWN_TRIM));
         CLOTH_APRONS = List.of(
             CLOTH_APRON, BLUE_PRINT_CLOTH_APRON, BROWN_TRIM_CLOTH_APRON);
+        CHICKEN_FEET = foodItem(registration, "chicken_feet", 1, 0.2F);
+        COOKED_CHICKEN_FEET = foodItem(registration, "cooked_chicken_feet", 3, 0.6F);
+        BONELESS_CHICKEN_FEET = foodItem(registration, "boneless_chicken_feet", 1, 0.2F);
+        COOKED_BONELESS_CHICKEN_FEET = foodItem(registration, "cooked_boneless_chicken_feet", 4, 0.7F);
         // ==== tools/new_item.py：新物品的登记赋值插在这行上面（mryt233 2026-11-10）====
         TOMATO = foodItem(registration, "tomato", 2, 0.3F);
         CHILI_PEPPER = foodItem(registration, "chili_pepper", 1, 0.1F);
@@ -859,6 +1086,8 @@ public final class HotPotContent {
             (syncId, inventory, pos) -> new SauceStationScreenHandler(syncId, inventory, pos));
         PLATE_HOLDER_BE = registration.blockEntities().register(HotPot.id("plates"), PlateHolderBlockEntity::new, PLATE_HOLDER);
         CUTTING_BOARD_BE = registration.blockEntities().register(HotPot.id("cutting_board"), CuttingBoardBlockEntity::new, CUTTING_BOARD);
+        STONE_MILL_BE = registration.blockEntities().register(HotPot.id("stone_mill"), StoneMillBlockEntity::new, STONE_MILL);
+        WOODEN_VAT_BE = registration.blockEntities().register(HotPot.id("wooden_vat"), WoodenVatBlockEntity::new, WOODEN_VAT);
         SAUCE_STATION_BE = registration.blockEntities().register(HotPot.id("sauce_station"), SauceStationBlockEntity::new,
             SAUCE_STATIONS.toArray(new Block[0]));
         HOT_POT_BE = registration.blockEntities().register(HotPot.id("hot_pot"), HotPotBlockEntity::new,
@@ -866,6 +1095,11 @@ public final class HotPotContent {
         STOVE_BE = registration.blockEntities().register(HotPot.id("stove"), StoveBlockEntity::new, STOVE, TALL_STOVE);
         BENCH_BE = registration.blockEntities().register(HotPot.id("bench"), BenchBlockEntity::new,
             TALL_BENCHES.toArray(new Block[0]));
+        HOTPOT_TABLE_BE = registration.blockEntities().register(HotPot.id("hotpot_table"),
+            HotPotTableBlockEntity::new, HOTPOT_TABLE, TALL_HOTPOT_TABLE);
+        PREP_RACK_BE = registration.blockEntities().register(HotPot.id("prep_rack"),
+            PrepRackBlockEntity::new, MULTI_TIER_PREP_RACK, DESKTOP_PREP_RACK, HANGING_PREP_RACK);
+        // 触碰静态字段，明确让物品组在客户端和服务端都完成初始化。
         ITEM_GROUP.getDisplayName();
         verifyPlateMaterials();
         TripeLoot.register();
@@ -900,6 +1134,10 @@ public final class HotPotContent {
             throw new IllegalStateException("锅材质 " + material + " 没有注册物品；加锅型时要在 POT_ORDER 里补上。");
         }
         return item;
+    }
+
+    public static Collection<HotPotCropBlock> cropBlocks() {
+        return Collections.unmodifiableCollection(CROPS_BY_FOOD.values());
     }
 
     public static ResourceLocation id(String path) {

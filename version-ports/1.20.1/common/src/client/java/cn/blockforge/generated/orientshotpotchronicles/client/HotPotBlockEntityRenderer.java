@@ -146,10 +146,7 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
         float soupY = lift + (onStove ? STOVE_SURFACE : STANDALONE_SURFACE);
         float floorY = lift + (onStove ? STOVE_FLOOR : STANDALONE_FLOOR);
         float surfaceY = be.hasSoup() ? soupY : floorY;
-        float heat = be.clientHeat();
-        // 用 double：世界时间从存档创建起一直累加，存成 float 时老存档里（几百万刻以上）
-        // 一刻内的 tickDelta 会被精度吃掉，食材浮动 / 气泡只能每刻跳一下，看起来像锁在 20 帧
-        double ticks = be.getLevel().getGameTime() + (double) tickDelta;
+        float heat = be.clientHeat(tickDelta);
         PotLayout layout = be.layout();
         boolean rotated = HotPotInteraction.rotated(be.getBlockState());
         if (layout.multiSoup()) {
@@ -196,13 +193,12 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
             float cellY = cellSoup ? soupY : floorY;
             double[] cc = layout.cellCenter(bigCell);   // 以前这一句里调了两次，每次都 new 一个 double[2]
             double[] center = PotLayout.toWorld(cc[0], cc[1], rotated && layout.multiSoup());
-            // 相位只跟大格有关：九个大格各自错开浮动，换食材时节奏不会跳
+            // 相位与轮换共用同一条连续插值后的 cycleAngle，换食材与冷/沸过渡均在波谷无缝衔接（mryt233 改，r153）
             float phase = bigCell * 1.37F;
-            double angle = OMEGA * ticks + phase;
-            double coldAngle = COLD_OMEGA * ticks + phase;
+            double angle = be.cycleAngle(side, tickDelta) + phase;
             float cold = cellSoup ? 1F - heat : 0F;
 
-            // 一格里有几样食材就轮流显示：每个浮动周期在最低点（sin = -1）换下一样；冷锅按慢节奏换
+            // 一格里有几样食材就轮流显示：每个浮动周期在最低点（sin = -1）换下一样
             double cycle = displayCycle(be, side, bigCell, tickDelta);
             int slot = cellSlots[bigCell][Math.floorMod((int) Math.floor(cycle), n)];
             ItemStack stack = be.getItem(slot);
@@ -216,12 +212,10 @@ public final class HotPotBlockEntityRenderer<T extends HotPotBlockEntity>
                 }
             }
 
-            // yOffset = A * sin(omega * tick + phi_grid)，九个大格相位各不相同。
-            float yOffset = AMPLITUDE * heat * (float) Math.sin(angle)
-                + COLD_AMPLITUDE * cold * (float) Math.sin(coldAngle);
-            float drift = 0.006F * heat * (float) Math.cos(OMEGA * 0.7F * ticks + phase);
-            float tilt = 3.5F * heat * (float) Math.sin(OMEGA * 0.55F * ticks + phase)
-                + 1.0F * cold * (float) Math.sin(COLD_OMEGA * 0.6F * ticks + phase);
+            float amp = cellSoup ? COLD_AMPLITUDE * cold + AMPLITUDE * heat : 0F;
+            float yOffset = amp * (float) Math.sin(angle);
+            float drift = 0.006F * heat * (float) Math.cos(angle * 0.7);
+            float tilt = (cellSoup ? 1.0F * cold + 3.5F * heat : 0F) * (float) Math.sin(angle * 0.55);
             float x = innerMin + innerSize * (float) center[0] + drift;
             float z = innerMin + innerSize * (float) center[1] - drift;
             // 有汤：沸腾时压进汤面 0.007，冷锅浮在上面 COLD_FLOAT；没汤：抬离锅底一点，免得和锅底打架

@@ -239,6 +239,78 @@ class ConfigMigrationTest {
         assertArrayEquals(before, Files.readAllBytes(file));
     }
 
+    // ---------------------------------------------------------------- r156：干货泡发已移除旧键
+
+    @Test
+    void dropsLegacyDryGoodsSoakingKeysWhileKeepingValidSiblings() throws IOException {
+        write("""
+            {
+              "_format": 1,
+              "mode": {"detailed_tofu_processing": true, "dry_goods_soaking": true},
+              "food": {
+                "kelp": {"hunger": 2},
+                "soaked_kelp": {"hunger": 3},
+                "soaked_tofu_skin": {"hunger": 3},
+                "soaked_wide_noodles": {"hunger": 3},
+                "soaked_sweet_potato_skin": {"hunger": 3}
+              },
+              "cooking": {
+                "items": {
+                  "kelp": {"cook_ticks": 160},
+                  "soaked_kelp": {"cook_ticks": 160},
+                  "soaked_tofu_skin": {"cook_ticks": 160},
+                  "soaked_sweet_potato_skin": {"cook_ticks": 160},
+                  "soaked_wide_noodles": {"cook_ticks": 160}
+                }
+              }
+            }
+            """);
+
+        List<String> moved = migrate();
+
+        assertEquals(9, moved.size());
+        JsonObject doc = read();
+        JsonObject mode = doc.getAsJsonObject("mode");
+        assertFalse(mode.has("dry_goods_soaking"));
+        assertTrue(mode.get("detailed_tofu_processing").getAsBoolean());
+
+        JsonObject food = doc.getAsJsonObject("food");
+        assertTrue(food.has("kelp"));
+        for (String id : List.of("soaked_kelp", "soaked_tofu_skin", "soaked_wide_noodles", "soaked_sweet_potato_skin")) {
+            assertFalse(food.has(id));
+            assertTrue(moved.contains("food." + id + " (dropped)"));
+        }
+
+        JsonObject items = doc.getAsJsonObject("cooking").getAsJsonObject("items");
+        assertTrue(items.has("kelp"));
+        for (String id : List.of("soaked_kelp", "soaked_tofu_skin", "soaked_sweet_potato_skin", "soaked_wide_noodles")) {
+            assertFalse(items.has(id));
+            assertTrue(moved.contains("cooking.items." + id + " (dropped)"));
+        }
+        assertTrue(moved.contains("mode.dry_goods_soaking (dropped)"));
+        assertTrue(warnings.isEmpty());
+        // 第二次运行应完全幂等
+        byte[] after = Files.readAllBytes(file);
+        assertTrue(migrate().isEmpty());
+        assertArrayEquals(after, Files.readAllBytes(file));
+    }
+
+    @Test
+    void dropsLegacySoakingKeysEvenWithoutFoodObject() throws IOException {
+        write("""
+            {
+              "mode": {"dry_goods_soaking": false},
+              "cooking": {"items": {"soaked_kelp": {"cook_ticks": 160}}}
+            }
+            """);
+
+        List<String> moved = migrate();
+
+        assertEquals(List.of("cooking.items.soaked_kelp (dropped)", "mode.dry_goods_soaking (dropped)"), moved);
+        assertFalse(read().getAsJsonObject("mode").has("dry_goods_soaking"));
+        assertFalse(read().getAsJsonObject("cooking").getAsJsonObject("items").has("soaked_kelp"));
+    }
+
     private List<String> migrate() {
         return ConfigMigration.migrate(file, MAX_BYTES, valid, warnings::add);
     }

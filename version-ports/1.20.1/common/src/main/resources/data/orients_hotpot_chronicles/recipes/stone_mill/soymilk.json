@@ -1,0 +1,14 @@
+{
+  "type": "orients_hotpot_chronicles:stone_mill",
+  "ingredient": {
+    "item": "orients_hotpot_chronicles:soybean"
+  },
+  "ingredient_count": 2,
+  "requires_water": true,
+  "container": "minecraft:bucket",
+  "result": {
+    "item": "orients_hotpot_chronicles:soymilk_bucket"
+  },
+  "turns": 4,
+  "color": "#F3ECD8"
+}

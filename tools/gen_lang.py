@@ -4608,6 +4608,183 @@ R148_CONFIG_4K2_PLACEHOLDERS = {
     "text.orients_hotpot_chronicles.config.help.loot_looting_bonus": "Extra beef loin drop chance per Looting level when slaying cows or mooshrooms (requires /reload)",
     "text.orients_hotpot_chronicles.config.help.loot_shrimp_fishing_weight": "Weight for catching raw shrimp while fishing (0 = disabled; requires /reload)",
 }
+
+# mryt233 改（2026-11-15，0.3.1-alpha Phase 1）：精简/完整模式开关、鸡爪掉率与命令文本英文占位，留待统一翻译。
+ALPHA031_PHASE1_PLACEHOLDERS = {
+    "text.orients_hotpot_chronicles.config.help.loot_chicken_chance": "Base chance for adult chickens to drop extra chicken feet (0 = disabled; requires /reload)",
+    "text.orients_hotpot_chronicles.config.help.loot_chicken_looting_bonus": "Extra chicken feet drop chance per Looting level when slaying adult chickens (requires /reload)",
+    "text.orients_hotpot_chronicles.config.group.mode": "Play Mode & Toggles",
+    "text.orients_hotpot_chronicles.config.mode.bar_label": "Mode:",
+    "text.orients_hotpot_chronicles.config.mode.full": "Full Mode",
+    "text.orients_hotpot_chronicles.config.mode.simple": "Simple Mode",
+    "text.orients_hotpot_chronicles.config.mode.custom": "Custom Toggles",
+    "text.orients_hotpot_chronicles.config.mode.custom_modified": "Custom Toggles *",
+    "text.orients_hotpot_chronicles.config.mode.drawer_header": "Custom Mode Toggles",
+    "text.orients_hotpot_chronicles.config.toggle.on": "Enabled",
+    "text.orients_hotpot_chronicles.config.toggle.off": "Disabled",
+    "text.orients_hotpot_chronicles.config.tooltip.default_value": "Default: %s",
+    "text.orients_hotpot_chronicles.config.tooltip.mode.full": "Switch to Full Mode preset: detailed processing, crops, minigames, and feedback penalties",
+    "text.orients_hotpot_chronicles.config.tooltip.mode.simple": "Switch to Simple Mode preset: quick recipes, no penalties or minigames, collapsed advanced UI",
+    "text.orients_hotpot_chronicles.config.tooltip.mode.custom": "Expand or collapse the 6 individual mode toggles (never unregisters any items or blocks)",
+    "text.orients_hotpot_chronicles.config.prop.mode_preset": "Mode Preset",
+    "text.orients_hotpot_chronicles.config.prop.mode_detailed_tofu": "Detailed Tofu Processing",
+    "text.orients_hotpot_chronicles.config.prop.mode_penalties_enabled": "Gameplay Penalties",
+    "text.orients_hotpot_chronicles.config.prop.mode_crops_replace_grass": "Crops Replace Grass Drops",
+    "text.orients_hotpot_chronicles.config.prop.mode_minigames_enabled": "Instant Minigames",
+    "text.orients_hotpot_chronicles.config.prop.mode_rack_swap_materials": "Table & Rack Swapping",
+    "text.orients_hotpot_chronicles.config.prop.mode_simple_ui_collapse": "Collapse Complex UI",
+    "text.orients_hotpot_chronicles.config.prop.loot_chicken_chance": "Chicken Base Drop Chance",
+    "text.orients_hotpot_chronicles.config.help.mode_preset": "Choose between Full Mode and Simple Mode presets, or override individual toggles below",
+    "text.orients_hotpot_chronicles.config.help.mode_detailed_tofu_processing": "When enabled, tofu follows detailed processing; when disabled, quick crafting recipes become active",
+    "text.orients_hotpot_chronicles.config.help.mode_penalties_enabled": "When enabled, cold-pot nausea, extreme-spicy hunger, and mouth fire apply; when disabled, all are skipped",
+    "text.orients_hotpot_chronicles.config.help.mode_crops_replace_grass": "When enabled, dedicated crops supply ingredients with sparse grass fallback; when disabled, keeps grass drops",
+    "text.orients_hotpot_chronicles.config.help.mode_minigames_enabled": "When enabled, interactive hotpot and processing minigames can trigger; when disabled, they are skipped",
+    "text.orients_hotpot_chronicles.config.help.mode_rack_swap_materials": "When enabled, hotpot tables and prep racks allow swapping block materials",
+    "text.orients_hotpot_chronicles.config.help.mode_simple_ui_collapse": "When enabled, Guide Book and viewers collapse complex steps and prioritize core usage",
+    "text.orients_hotpot_chronicles.msg.mode_current": "Current hotpot mode: %s (detailedTofu=%s, penalties=%s, crops=%s, minigames=%s, swapMaterials=%s, collapseUI=%s)",
+    "text.orients_hotpot_chronicles.msg.mode_switched": "Switched hotpot mode to %s and synced to clients (%s warning(s)).",
+    "item.orients_hotpot_chronicles.chicken_feet": "Raw Chicken Feet",
+    "item.orients_hotpot_chronicles.cooked_chicken_feet": "Cooked Chicken Feet",
+    "item.orients_hotpot_chronicles.boneless_chicken_feet": "Boneless Chicken Feet",
+    "item.orients_hotpot_chronicles.cooked_boneless_chicken_feet": "Cooked Boneless Chicken Feet",
+}
+
+# mryt233 改（2026-11-16，0.3.1-alpha Phase 5）：即时小游戏（连打 / 4 轨音游）按键、曲名、成就与设置占位。
+ALPHA031_PHASE5_PLACEHOLDERS = {
+    "advancements.orients_hotpot_chronicles.minigame_rush.title": "Hotpot Speed Eater",
+    "advancements.orients_hotpot_chronicles.minigame_rush.description": "Finish a round of the Hotpot Speed Eating rush challenge",
+    "advancements.orients_hotpot_chronicles.minigame_rhythm.title": "Rhythm of the Broth",
+    "advancements.orients_hotpot_chronicles.minigame_rhythm.description": "Complete a 4-track Hotpot Rhythm song",
+    "advancements.orients_hotpot_chronicles.table_feast.title": "Grand Table Feast",
+    "advancements.orients_hotpot_chronicles.table_feast.description": "Complete a multiplayer hotpot minigame battle with tablemates",
+    "key.categories.orients_hotpot_chronicles": "Orient's Hotpot Chronicles",
+    "key.orients_hotpot_chronicles.minigame_challenge": "Start / Accept Hotpot Minigame",
+    "key.orients_hotpot_chronicles.minigame_lane_0": "Rhythm Lane 1 (Left)",
+    "key.orients_hotpot_chronicles.minigame_lane_1": "Rhythm Lane 2 (Down)",
+    "key.orients_hotpot_chronicles.minigame_lane_2": "Rhythm Lane 3 (Up)",
+    "key.orients_hotpot_chronicles.minigame_lane_3": "Rhythm Lane 4 (Right)",
+    "track.orients_hotpot_chronicles.midnight_boil": "Midnight Boil",
+    "track.orients_hotpot_chronicles.bamboo_chopsticks": "Bamboo Chopsticks",
+    "track.orients_hotpot_chronicles.red_soup_rush": "Red Soup Rush",
+    "text.orients_hotpot_chronicles.config.group.minigame": "Instant Minigames (Rush / Rhythm)",
+    "text.orients_hotpot_chronicles.config.prop.minigame_allow_virtual_plate": "Allow Virtual Practice Plate",
+    "text.orients_hotpot_chronicles.config.prop.minigame_invite_timeout": "Invite Countdown Duration",
+    "text.orients_hotpot_chronicles.config.prop.minigame_invite_range": "Tablemate Invite Range",
+    "text.orients_hotpot_chronicles.config.prop.minigame_rush_duration": "Speed-Eating Duration",
+    "text.orients_hotpot_chronicles.config.prop.minigame_rush_max_cps": "Anti-Macro Max CPS",
+    "text.orients_hotpot_chronicles.config.prop.minigame_rush_hits_per_bite": "Hits Per Bite",
+    "text.orients_hotpot_chronicles.config.prop.minigame_rhythm_perfect": "Rhythm Perfect Window (ms)",
+    "text.orients_hotpot_chronicles.config.prop.minigame_rhythm_good": "Rhythm Good Window (ms)",
+    "text.orients_hotpot_chronicles.config.prop.minigame_rhythm_miss": "Rhythm Miss Window (ms)",
+    "text.orients_hotpot_chronicles.config.prop.minigame_rhythm_combo_mult": "Rhythm Combo Multiplier",
+    "text.orients_hotpot_chronicles.config.help.minigame_allow_virtual_plate": "Allow switching to Virtual Practice Plate to play without consuming cooked pot food",
+    "text.orients_hotpot_chronicles.config.help.minigame_invite_timeout_ticks": "How long multiplayer challenge invites wait for replies (20 ticks = 1s; default 300 = 15s). Range 60-1200",
+    "text.orients_hotpot_chronicles.config.help.minigame_invite_range": "Search radius in blocks for inviting tablemates to a multiplayer challenge. Range 2-32",
+    "text.orients_hotpot_chronicles.config.help.minigame_rush_duration_ticks": "Match duration for Speed Eating mode (20 ticks = 1s; default 200 = 10s). Range 60-1200",
+    "text.orients_hotpot_chronicles.config.help.minigame_rush_max_cps": "Server-side anti-macro cap on accepted clicks per second. Range 4-40",
+    "text.orients_hotpot_chronicles.config.help.minigame_rush_hits_per_bite": "Accepted presses required to eat 1 cooked dish in Speed Eating mode. Range 1-30",
+    "text.orients_hotpot_chronicles.config.help.minigame_rhythm_perfect_ms": "Maximum timing offset in ms for a Perfect judgement. Range 15-150",
+    "text.orients_hotpot_chronicles.config.help.minigame_rhythm_good_ms": "Maximum timing offset in ms for a Good judgement. Range 30-300",
+    "text.orients_hotpot_chronicles.config.help.minigame_rhythm_miss_ms": "Maximum timing window in ms before a note misses. Range 80-500",
+    "text.orients_hotpot_chronicles.config.help.minigame_rhythm_combo_multiplier": "Score multiplier applied per combo streak (1 = standard scaling, 0 = flat score). Range 0-5",
+    "text.orients_hotpot_chronicles.msg.minigame_disabled": "Instant minigames are disabled in settings (toggle mode.minigames_enabled)",
+    "text.orients_hotpot_chronicles.msg.minigame_busy": "You are already inside a minigame session or pending invite",
+    "text.orients_hotpot_chronicles.msg.minigame_need_pot": "Look at a Hotpot or sit near one first",
+    "text.orients_hotpot_chronicles.msg.minigame_virtual_disabled": "Virtual Practice Plate is disabled on this server; consuming real cooked food",
+    "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "No cooked food in the pot yet! Cook some food first or enable Virtual Practice Plate",
+}
+
+# mryt233 改（2026-11-16，0.3.1-alpha Phase 4）：统一可换材质火锅桌与三种备菜架英文占位，留待统一翻译。
+ALPHA031_PHASE4_PLACEHOLDERS = {
+    "block.orients_hotpot_chronicles.hotpot_table": "Hotpot Table",
+    "block.orients_hotpot_chronicles.tall_hotpot_table": "Tall Hotpot Table",
+    "block.orients_hotpot_chronicles.multi_tier_prep_rack": "Multi-Tier Prep Rack",
+    "block.orients_hotpot_chronicles.desktop_prep_rack": "Desktop Prep Rack",
+    "block.orients_hotpot_chronicles.hanging_prep_rack": "Hanging Prep Rack",
+    "text.orients_hotpot_chronicles.config.group.table_materials": "Table & Rack Materials",
+    "text.orients_hotpot_chronicles.config.prop.table_materials_mode": "Table Material Scope",
+    "text.orients_hotpot_chronicles.config.help.table_materials_mode": "Controls which blocks can swap onto tables and prep racks: any opaque solid block / datapack allow tag only / disabled",
+    "text.orients_hotpot_chronicles.config.mode.any_solid": "Any Solid Block",
+    "text.orients_hotpot_chronicles.config.mode.tag_only": "Tag Allowlist Only",
+    "text.orients_hotpot_chronicles.config.mode.off": "Disabled",
+    "text.orients_hotpot_chronicles.msg.table_same_material": "This part already uses this material",
+    "text.orients_hotpot_chronicles.msg.table_legacy_locked": "Legacy preset material cannot be popped out; apply a new block directly",
+    "text.orients_hotpot_chronicles.tooltip.table_top": "Tabletop: %s",
+    "text.orients_hotpot_chronicles.tooltip.table_base": "Base: %s",
+    "text.orients_hotpot_chronicles.tooltip.rack_material": "Frame: %s",
+    "text.orients_hotpot_chronicles.jade.rack_slot": "Slot %s: %s",
+    "text.orients_hotpot_chronicles.jade.rack_empty": "Empty (Right-click to store/take)",
+    "tag.block.orients_hotpot_chronicles.table_materials_allow": "Swappable Table Materials Allowlist",
+    "tag.block.orients_hotpot_chronicles.table_materials_deny": "Swappable Table Materials Denylist",
+    "tag.item.orients_hotpot_chronicles.rack_plates": "Prep Rack Plates",
+    "tag.item.orients_hotpot_chronicles.rack_hangables": "Hanging Prep Rack Items",
+}
+
+# mryt233 改（2026-11-16，0.3.1-alpha Phase 3）：小石磨、开口大木桶与豆腐加工英文占位，留待统一翻译。
+ALPHA031_PHASE3_PLACEHOLDERS = {
+    "block.orients_hotpot_chronicles.stone_mill": "Stone Mill",
+    "block.orients_hotpot_chronicles.wooden_vat": "Open Wooden Vat",
+    "item.orients_hotpot_chronicles.soymilk_bucket": "Soymilk Bucket",
+    "item.orients_hotpot_chronicles.brine_bottle": "Brine Bottle",
+    "item.orients_hotpot_chronicles.wooden_press_lid": "Wooden Press Lid",
+    "text.orients_hotpot_chronicles.config.group.processing": "Mill & Vat Processing",
+    "text.orients_hotpot_chronicles.config.prop.processing_mill_turns": "Stone Mill Turn Multiplier",
+    "text.orients_hotpot_chronicles.config.prop.processing_vat_time": "Wooden Vat Time Multiplier",
+    "text.orients_hotpot_chronicles.config.prop.processing_mill_water_uses": "Mill Uses Per Water Bucket",
+    "text.orients_hotpot_chronicles.config.help.processing_mill_turns": "Multiplier for Stone Mill grinding pushes; lower values finish faster. Range 0.25-5",
+    "text.orients_hotpot_chronicles.config.help.processing_vat_time": "Time multiplier for tofu pressing in the Open Wooden Vat. Range 0.1-5",
+    "text.orients_hotpot_chronicles.config.help.processing_mill_water_uses": "How many wet grinding batches one Water Bucket fuels on a Stone Mill. Range 1-16",
+    "text.orients_hotpot_chronicles.msg.stone_mill_need_container": "Mill trough is full; collect with %s",
+    "text.orients_hotpot_chronicles.msg.stone_mill_need_more": "Not enough ingredients (%s / %s)",
+    "text.orients_hotpot_chronicles.msg.stone_mill_need_water": "This recipe requires pouring water into the mill first",
+    "text.orients_hotpot_chronicles.msg.vat_need_coagulant": "Pour soymilk and add a coagulant before placing the Wooden Press Lid",
+    "text.orients_hotpot_chronicles.msg.vat_need_more": "Need %s items",
+    "text.orients_hotpot_chronicles.recipe.stone_mill": "Stone Mill Grinding",
+    "text.orients_hotpot_chronicles.recipe.stone_mill.dry": "Dry grind · %s pushes",
+    "text.orients_hotpot_chronicles.recipe.stone_mill.wet": "Wet grind · %s pushes",
+    "text.orients_hotpot_chronicles.recipe.wooden_vat": "Open Wooden Vat Processing",
+    "text.orients_hotpot_chronicles.recipe.wooden_vat.coagulate": "Coagulate & press %ss",
+    "text.orients_hotpot_chronicles.jade.stone_mill.water": "Water remaining: %s uses",
+    "text.orients_hotpot_chronicles.jade.stone_mill.ready": "Trough ready: %s",
+    "text.orients_hotpot_chronicles.jade.stone_mill.progress": "Grinding %s x%s: %s / %s",
+    "text.orients_hotpot_chronicles.jade.wooden_vat.soymilk": "Filled with Soymilk",
+    "text.orients_hotpot_chronicles.jade.wooden_vat.ready": "Ready: %s x%s",
+    "text.orients_hotpot_chronicles.jade.wooden_vat.need_lid": "Coagulated — place Wooden Press Lid",
+    "text.orients_hotpot_chronicles.jade.wooden_vat.progress": "Processing %s: %s%%",
+}
+
+# mryt233 改（2026-11-15，0.3.1-alpha Phase 2）：独立橙子树、9 种耕地/野生作物与作物配置英文占位，留待统一翻译。
+ALPHA031_PHASE2_PLACEHOLDERS = {
+    "text.orients_hotpot_chronicles.config.group.crops": "Crops & Orange Tree",
+    "text.orients_hotpot_chronicles.config.prop.crops_growth_rate": "Crop & Tree Growth Multiplier",
+    "text.orients_hotpot_chronicles.config.prop.crops_bonemeal_enabled": "Allow Bone Meal",
+    "text.orients_hotpot_chronicles.config.help.crops_growth_rate": "Natural growth rate multiplier for the 9 crops, orange saplings, and orange leaves fruiting (0 = pause natural growth). Range 0-10",
+    "text.orients_hotpot_chronicles.config.help.crops_bonemeal_enabled": "When enabled, Bone Meal works on all 9 hotpot crops, orange saplings, and orange leaves",
+    "block.orients_hotpot_chronicles.orange_log": "Orange Log",
+    "block.orients_hotpot_chronicles.orange_wood": "Orange Wood",
+    "block.orients_hotpot_chronicles.stripped_orange_log": "Stripped Orange Log",
+    "block.orients_hotpot_chronicles.stripped_orange_wood": "Stripped Orange Wood",
+    "block.orients_hotpot_chronicles.orange_leaves": "Orange Leaves",
+    "block.orients_hotpot_chronicles.orange_sapling": "Orange Sapling",
+    "block.orients_hotpot_chronicles.scallion_crop": "Scallion Crop",
+    "block.orients_hotpot_chronicles.cilantro_crop": "Cilantro Crop",
+    "block.orients_hotpot_chronicles.soybean_crop": "Soybean Crop",
+    "block.orients_hotpot_chronicles.garlic_crop": "Garlic Crop",
+    "block.orients_hotpot_chronicles.tomato_crop": "Tomato Crop",
+    "block.orients_hotpot_chronicles.chili_pepper_crop": "Chili Pepper Crop",
+    "block.orients_hotpot_chronicles.peanut_crop": "Peanut Crop",
+    "block.orients_hotpot_chronicles.greens_crop": "Greens Crop",
+    "block.orients_hotpot_chronicles.zhe_er_gen_crop": "Zhe Er Gen Crop",
+    "block.orients_hotpot_chronicles.wild_scallion": "Wild Scallion",
+    "block.orients_hotpot_chronicles.wild_cilantro": "Wild Cilantro",
+    "block.orients_hotpot_chronicles.wild_soybean": "Wild Soybean",
+    "block.orients_hotpot_chronicles.wild_garlic": "Wild Garlic",
+    "block.orients_hotpot_chronicles.wild_tomato": "Wild Tomato",
+    "block.orients_hotpot_chronicles.wild_chili_pepper": "Wild Chili Pepper",
+    "block.orients_hotpot_chronicles.wild_peanut": "Wild Peanut",
+    "block.orients_hotpot_chronicles.wild_greens": "Wild Greens",
+    "block.orients_hotpot_chronicles.wild_zhe_er_gen": "Wild Zhe Er Gen",
+}
 RETIRED_KEYS = ['resourcePack.orients_hotpot_chronicles.hotpot_assets', 'text.orients_hotpot_chronicles.screen.base', 'text.orients_hotpot_chronicles.screen.temp', 'text.orients_hotpot_chronicles.screen.stove.seconds', 'text.orients_hotpot_chronicles.screen.stove.waiting.short', 'text.orients_hotpot_chronicles.msg.aim_at_pot', 'text.orients_hotpot_chronicles.msg.detach_hint', 'text.orients_hotpot_chronicles.msg.scoop_need_bowl', 'text.orients_hotpot_chronicles.msg.station_out', 'text.orients_hotpot_chronicles.screen.sauce.hint']
 
 
@@ -4672,6 +4849,11 @@ def main():
             "text.orients_hotpot_chronicles.screen.sauce.next_page": "Next page",
         })
         by_full.update(R148_CONFIG_4K2_PLACEHOLDERS)
+        by_full.update(ALPHA031_PHASE1_PLACEHOLDERS)
+        by_full.update(ALPHA031_PHASE2_PLACEHOLDERS)
+        by_full.update(ALPHA031_PHASE3_PLACEHOLDERS)
+        by_full.update(ALPHA031_PHASE4_PLACEHOLDERS)
+        by_full.update(ALPHA031_PHASE5_PLACEHOLDERS)
         by_full.update(dict(zip(TAG_KEYS, TAG_TEXT[code])))
         by_full[cauldron_key] = DRINK_CAULDRON_TEXT[code]
         by_full.update(BOARD_MSG_TEXT[code])
@@ -4723,6 +4905,8 @@ def sync_r146e_tutorial_placeholders():
     end = ware.index("{{icons:bamboo_chopsticks,chopstick_rest}}", start)
     bullets = ware[start:end]
     preview = (source / "preview.md").read_text(encoding="utf-8")
+    if "## 竹筷摆桌与架碗 {#r146e}" not in preview:
+        return
     start = preview.index("## 竹筷摆桌与架碗 {#r146e}")
     end = preview.index("\n## ", start + 3)
     section = preview[start:end]

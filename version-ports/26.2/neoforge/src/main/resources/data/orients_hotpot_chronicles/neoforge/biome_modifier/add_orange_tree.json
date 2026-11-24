@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#orients_hotpot_chronicles:has_orange_tree",
+  "features": "orients_hotpot_chronicles:orange_tree_checked",
+  "step": "vegetal_decoration"
+}

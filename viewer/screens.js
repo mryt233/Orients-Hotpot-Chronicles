@@ -332,13 +332,36 @@ const hotpot = {
     const layout = LAYOUTS[s.layout] || LAYOUTS.nine;
     const sideSoups = [s.soup, s.soup2, s.soup3, s.soup4].slice(0, layout.sides);
     const hasSoup = sideSoups.some((x) => !!x);
-    const ratio = burnTotal > 0 ? Math.min(1, burnTicks / burnTotal) : 0;
     // soupOf(slot) = HotPotScreenHandler.soupOfSlot
     const multi = layout.sides > 1;
     const yy = multi ? yyLayout(s.layout) : null;
     const sideOf = (i) => (multi ? yy.slotSides[i] : layout.cells[cellOf(i)]);   // = PotLayout.sideOfSlot
     const soupOf = (i) => { const side = sideOf(i); return side < 0 ? "" : sideSoups[side] || ""; };
-    return { hasSoup, soup: s.soup, layout, multi, yy, shape: s.layout, sideOf, sideSoups, soupOf, burnTotal, burnTicks, heat: hasSoup && burnTicks > 0 ? 0.45 + 0.55 * ratio : 0 };
+    return { hasSoup, soup: s.soup, layout, multi, yy, shape: s.layout, sideOf, sideSoups, soupOf, burnTotal, burnTicks, heat: hasSoup && burnTicks > 0 ? 1 : 0 };
+  },
+
+  advanceAnim(s, nowMs, targetHeat) {
+    const target = clamp01(targetHeat);
+    let a = s._anim;
+    if (!a) {
+      a = { lastMs: nowMs, elapsedSec: 0, smoothHeat: target, spinPhase: 0, boilPhase: 0 };
+      s._anim = a;
+      return a;
+    }
+    if (nowMs < a.lastMs) {
+      a.lastMs = nowMs;
+      return a;
+    }
+    const dt = Math.max(0, Math.min(0.05, (nowMs - a.lastMs) / 1000));
+    a.lastMs = nowMs;
+    if (dt > 0) {
+      a.smoothHeat += (target - a.smoothHeat) * (1 - Math.exp(-4 * dt));
+      if (Math.abs(target - a.smoothHeat) < 1e-4) a.smoothHeat = target;
+      a.elapsedSec += dt;
+      a.spinPhase += (0.1 + 0.6 * a.smoothHeat) * dt;
+      a.boilPhase += (0.7 + 0.5 * a.smoothHeat) * dt;
+    }
+    return a;
   },
 
   slots(s) {
@@ -366,7 +389,9 @@ const hotpot = {
 
   background(g, s, w, h, time) {
     const d = this.derive(s);
-    const t = time / 1000;
+    const anim = this.advanceAnim(s, time, d.heat);
+    d.anim = anim;
+    const t = anim.elapsedSec;
     frame(g, w, h, 4, false);
     rivet(g, 6, h - 10);
     // header plaque
@@ -379,7 +404,7 @@ const hotpot = {
     g.fill(gx - 2, gy - 2, gx + GW + 2, gy + GW + 2, INNER_SHADOW);
     this.soups(g, d, gx, gy, t, METALS[s.pot] || METALS.copper);
     if (!d.multi) this.dividers(g, gx, gy, METALS[s.pot] || METALS.copper);
-    if (d.heat > 0) this.steam(g, d, gx, gy, t);
+    if (anim.smoothHeat > 0.01) this.steam(g, d, gx, gy, t);
 
     // status card
     const px0 = HP.PANEL_X, px1 = w - 6;
@@ -458,25 +483,28 @@ const hotpot = {
       g.fill(x, y, x + 14, y + 2, alpha(0xfffff4d8, 0.13 * a));
       g.fill(x + 3, y + 2, x + 10, y + 3, alpha(0xfffff4d8, 0.09 * a));
     }
-    // garnish riding the convection: angular speed grows with heat, with a slow wobble
-    const spin = 0.1 + 0.6 * d.heat;
+    // garnish riding the convection: accumulated continuous phase (matches HotPotScreen + PotScreenAnim)
+    const anim = d.anim || { elapsedSec: t, smoothHeat: d.heat, spinPhase: t * (0.1 + 0.6 * d.heat), boilPhase: t * (0.7 + 0.5 * d.heat) };
+    const heat = anim.smoothHeat;
+    const spinPhase = anim.spinPhase;
     for (let i = 0; i < 22; i++) {
       const r = 14 + hash(i, 1) * 66;
-      const ang = hash(i, 2) * Math.PI * 2 + t * spin * (0.6 + 0.8 * hash(i, 3)) * (i % 2 ? 1 : -1) * (30 / r) + 0.35 * Math.sin(t * 0.7 + i);
+      const ang = hash(i, 2) * Math.PI * 2 + spinPhase * (0.6 + 0.8 * hash(i, 3)) * (i % 2 ? 1 : -1) * (30 / r) + 0.35 * Math.sin(t * 0.7 + i);
       const x = Math.round(cx + Math.cos(ang) * r);
       const y = Math.round(cy + Math.sin(ang) * r * 0.96);
       const c = soup.bits[i % soup.bits.length];
       if (keep && !keep(x + 1, y + 0.5)) continue;
       g.fill(x, y, x + 2, y + (i % 3 === 0 ? 2 : 1), c);
     }
-    // bubbles: froth clusters popping up all over the pot, plus a few lone big bubbles.
-    // each one swells, sits and drifts with the convection, then shrinks away with a droplet or two.
-    if (d.heat > 0) {
+    // bubbles: continuous accumulated boilPhase & fade-in grow weights
+    if (heat > 0.01) {
       const sizeOf = (h, big) => (big ? 3 + Math.floor(h * 2.99) : 1 + Math.floor(Math.pow(h, 2.2) * 3.99)); // mostly 1-2 px
-      const clusters = Math.round(4 + 8 * d.heat);
-      for (let k = 0; k < clusters; k++) {
-        const period = (0.9 + 0.5 * hash(k, 21)) / (0.7 + 0.5 * d.heat);
-        const tt = t / period + hash(k, 22);
+      const boilPhase = anim.boilPhase;
+      for (let k = 0; k < 12; k++) {
+        const grow = clamp01(4 + 8 * heat - k);
+        if (grow <= 0) continue;
+        const period = 0.9 + 0.5 * hash(k, 21);
+        const tt = boilPhase / period + hash(k, 22);
         const cyc = Math.floor(tt), c = frac(tt);
         const cx = gx + 5 + hash(k, cyc * 2) * (GW - 10);
         const cy = gy + 5 + hash(k, cyc * 2 + 1) * (GW - 10);
@@ -489,18 +517,19 @@ const hotpot = {
           if (u < 0 || u > 1) continue;
           const ang = hash(k * 7 + j, cyc + 33) * Math.PI * 2;
           const dist = j === 0 ? 0 : 2 + 4 * hash(k * 7 + j, cyc + 34);
-          this.boilBubble(g, gx, gy, cx + Math.cos(ang) * dist, cy + Math.sin(ang) * dist, sizeOf(hash(k * 7 + j, cyc + 35), false), u, soup, k * 31 + j);
+          this.boilBubble(g, gx, gy, cx + Math.cos(ang) * dist, cy + Math.sin(ang) * dist, sizeOf(hash(k * 7 + j, cyc + 35), false) * grow, u, soup, k * 31 + j);
         }
       }
-      const lone = Math.round(2 + 4 * d.heat);
-      for (let i = 0; i < lone; i++) {
-        const period = (0.7 + 0.4 * hash(i, 61)) / (0.7 + 0.5 * d.heat);
-        const tt = t / period + hash(i, 62);
+      for (let i = 0; i < 6; i++) {
+        const grow = clamp01(2 + 4 * heat - i);
+        if (grow <= 0) continue;
+        const period = 0.7 + 0.4 * hash(i, 61);
+        const tt = boilPhase / period + hash(i, 62);
         const cyc = Math.floor(tt), u = frac(tt);
         const x = gx + 7 + hash(i, cyc * 2 + 70) * (GW - 14);
         const y = gy + 7 + hash(i, cyc * 2 + 71) * (GW - 14);
         if (keep && !keep(x, y)) continue;
-        this.boilBubble(g, gx, gy, x, y, sizeOf(hash(i, cyc + 72), true), u, soup, 500 + i);
+        this.boilBubble(g, gx, gy, x, y, sizeOf(hash(i, cyc + 72), true) * grow, u, soup, 500 + i);
       }
     }
   },
@@ -549,17 +578,19 @@ const hotpot = {
     g.fill(hx, hy, hx + hl, hy + hl, soup.hi);
   },
 
-  // translucent steam puffs drifting up and dissolving
+  // translucent steam puffs drifting up and dissolving (continuous grow fade-in/out)
   steam(g, d, gx, gy, t) {
-    const m = Math.round(3 + 5 * d.heat);
-    for (let i = 0; i < m; i++) {
+    const heat = d.anim ? d.anim.smoothHeat : d.heat;
+    for (let i = 0; i < 8; i++) {
+      const grow = heat <= 0.01 ? 0 : clamp01(3 + 5 * heat - i);
+      if (grow <= 0) continue;
       const life = 1.3 + hash(i, 41) * 0.8;
       const cyc = Math.floor(t / life + hash(i, 42));
       const u = frac(t / life + hash(i, 42));
       const x = Math.round(gx + 12 + hash(i, cyc * 7) * (GW - 24) + 3 * Math.sin(u * Math.PI * 2 + i));
       const y = Math.round(gy + 30 + hash(i, cyc * 7 + 1) * (GW - 40) - 22 * easeOutQuad(u));
       const sz = 2 + Math.round(4 * easeOutCubic(u));
-      const c = alpha(0xffffffff, 0.2 * Math.pow(Math.sin(Math.PI * u), 1.5));
+      const c = alpha(0xffffffff, 0.2 * grow * Math.pow(Math.sin(Math.PI * u), 1.5));
       g.fill(x - sz, y - (sz >> 1), x + sz, y + (sz >> 1), c);
       g.fill(x - (sz >> 1), y - sz, x + (sz >> 1), y + sz, c);
     }
@@ -597,7 +628,8 @@ const hotpot = {
     if (!slot.item) return;
     if (slot.cooked) {
       // smooth breathing glow instead of a hard blink
-      const pulse = easeInOutSine(0.5 + 0.5 * Math.sin((time / 1000) * Math.PI * 1.2));
+      const t = s._anim ? s._anim.elapsedSec : time / 1000;
+      const pulse = easeInOutSine(0.5 + 0.5 * Math.sin(t * Math.PI * 1.2));
       const glow = mix(0xff4fae3a, 0xff9cff7e, pulse);
       g.fill(sx, sy, sx + 18, sy + 1, glow);
       g.fill(sx, sy + 17, sx + 18, sy + 18, glow);
@@ -657,7 +689,7 @@ const hotpot = {
       g.text(name, nameX, 27, F.WHITE, true);
     }
     // fire: flickering icon + remaining-fuel bar, no numbers
-    this.fireIcon(g, x + 1, 39, d.burnTicks > 0, time / 1000);
+    this.fireIcon(g, x + 1, 39, d.burnTicks > 0, s._anim ? s._anim.elapsedSec : time / 1000);
     g.text(g.tr(key("screen.fire")), x + 13, 41, LABEL, true);
     const bx = x + 40;
     g.fill(bx, 42, right, 48, RIM_LINE);
@@ -1508,8 +1540,8 @@ const guideBook = {
 // [- 数值 +]（Shift 一次走 10 步）、点数值可直接键入（输错标红、不让保存）、↺ 只在当前值 ≠ 默认值时出现、
 // 「恢复默认」点一次变确认态再点一次才生效。字段表对应 ConfigSchema；默认值 / 范围照 Config.rememberXxx 和 Config.rule()。
 // 网页预览不写任何配置文件：改过的数值只存在本界面的 preview state 里；键入沿用 canvas 的 key 事件（Java 是 EditBox）。
-const CF = { W: 520, H: 390, TAB_W: 100, TAB_H: 20, TAB_GAP: 4, BTN: 16, VALUE_W: 108, RESET_W: 14,
-  CTRL_GAP: 2, ROW_MIN_H: 30, HEADER_H: 20, BOTTOM_H: 20, SCROLL_W: 5, SCROLL_STEP: 24, LIST_TOP: 60 };
+const CF = { W: 520, H: 390, TAB_W: 100, TAB_H: 18, TAB_GAP: 4, MODE_H: 18, BTN: 16, VALUE_W: 108, RESET_W: 14,
+  CTRL_GAP: 2, ROW_MIN_H: 30, HEADER_H: 20, BOTTOM_H: 20, SCROLL_W: 5, SCROLL_STEP: 24, LIST_TOP: 64 };
 const CF_COL = { text: 0xffe8c88a, muted: 0xffa88c5c, hover: 0xff6a4418, stripe: 0x18ffffff,
   panel: 0xff2a190c, bad: 0xffff6a6a, confirm: 0xffff9a5a, valueBg: 0xff1a0e05, valueBgHover: 0xff3a2410,
   typedBg: 0xff3a2410 };
@@ -1560,9 +1592,42 @@ const CF_HELP = {
   loot_garnish_chance: "打短草或高草掉落这种配菜的基础概率（0 = 不掉，修改后需 /reload 生效）。",
   loot_chance: "采集对应原版方块掉落该食材的概率（0 = 不掉，修改后需 /reload 生效）。",
   loot_cow_chance: "击杀牛或哞菇额外掉落牛脊肉的基础概率（修改后需 /reload 生效）。",
-  loot_looting_bonus: "击杀牛或哞菇时，抢夺附魔每级追加多少牛脊肉掉落概率（需 /reload 生效）。",
+  loot_looting_bonus: "击杀牛或哞菇时，抢夺附魔每级追加多少掉落概率（修改后需 /reload 生效）。",
+  loot_chicken_chance: "击杀成年鸡掉落鸡爪的基础概率（修改后需 /reload 生效）。",
   loot_shrimp_fishing_weight: "钓鱼获得带壳虾的权重，0 = 钓不到（修改后需 /reload 生效）。",
+  mode_preset: "模组游玩模式预设：完整模式体验全部细化工序，精简模式跳过惩罚、使用快捷配方。",
+  mode_detailed_tofu_processing: "开启后豆腐走细化工序，关闭后使用工作台快捷直合配方。",
+  mode_penalties_enabled: "开启冷锅反胃、特辣饥饿与嘴上冒火等负面效果；关闭后全部跳过。",
+  mode_crops_replace_grass: "开启后独立作物接管对应配菜获取；关闭后恢复高概率打草获取。",
+  mode_minigames_enabled: "开启即时火锅小游戏与奖励增益；关闭后不触发小游戏。",
+  mode_rack_swap_materials: "开启火锅桌与备菜架换材质功能；关闭后保持默认木色外观。",
+  mode_simple_ui_collapse: "开启后在指南与配方查看中折叠复杂工序，优先展示常用基础用法。",
+  crops_growth_rate: "9 种独立作物、橙子树苗与橙叶挂果的自然生长速度倍率；0 = 暂停自然生长（仍可用骨粉）。范围 0～10。",
+  crops_bonemeal_enabled: "开启后允许对 9 种火锅作物、橙子树苗与橙叶使用骨粉催熟。",
+  processing_mill_turns: "小石磨研磨所需推动圈数倍率；调高更偏写实，调低更省力。范围 0.25～5。",
+  processing_vat_time: "开口大木桶豆腐压制的耗时倍率；越小越快。范围 0.1～5。",
+  processing_mill_water_uses: "向小石磨倒入一桶水后可连续用于湿磨的次数（水瓶固定 +1 次）。范围 1～16。",
+  table_materials_mode: "火锅桌与备菜架换材质规则：any_solid = 任何完整不透明非容器固体方块（受黑/白名单标签控制），tag_only = 仅允许白名单标签，off = 关闭换材质。",
+  minigame_allow_virtual_plate: "开启后允许开局切换「虚拟练习盘」不消耗锅内真实熟食。",
+  minigame_invite_timeout_ticks: "多人邀约应战等待时长（20 tick = 1 秒，默认 300 = 15 秒）。范围 60～1200。",
+  minigame_invite_range: "发起多人火锅对战邀约时搜索周围玩家的半径（格）。范围 2～32。",
+  minigame_rush_duration_ticks: "连打吃菜模式单局总时长（20 tick = 1 秒，默认 200 = 10 秒）。范围 60～1200。",
+  minigame_rush_max_cps: "服务端允许的每秒最高有效敲击次数（超出将被防宏限速拦截）。范围 4～40。",
+  minigame_rush_hits_per_bite: "连打模式下每有效敲击多少下吃下 1 份熟食。范围 1～30。",
+  minigame_rhythm_perfect_ms: "音游 Perfect 判定允许的最大毫秒偏差。范围 15～150。",
+  minigame_rhythm_good_ms: "音游 Good 判定允许的最大毫秒偏差。范围 30～300。",
+  minigame_rhythm_miss_ms: "音游判定与自动漏拍归为 Miss 的毫秒窗口阈值。范围 80～500。",
+  minigame_rhythm_combo_multiplier: "音游连击加成倍率系数（1 = 标准递增，0 = 不计连击加分）。范围 0～5。",
 };
+// 细项模式开关列表（= ConfigSchema.modeFields()）
+const CF_MODE_FLAGS = [
+  { path: ["mode", "detailed_tofu_processing"], name: "细致豆腐工序", kind: "toggle", def: true, help: "mode_detailed_tofu_processing" },
+  { path: ["mode", "penalties_enabled"], name: "负面惩罚机制", kind: "toggle", def: true, help: "mode_penalties_enabled" },
+  { path: ["mode", "crops_replace_grass"], name: "独立作物替代打草", kind: "toggle", def: true, help: "mode_crops_replace_grass" },
+  { path: ["mode", "minigames_enabled"], name: "即时互动小游戏", kind: "toggle", def: true, help: "mode_minigames_enabled" },
+  { path: ["mode", "rack_swap_materials"], name: "桌与架换材质", kind: "toggle", def: true, help: "mode_rack_swap_materials" },
+  { path: ["mode", "simple_ui_collapse"], name: "精简界面折叠", kind: "toggle", def: false, help: "mode_simple_ui_collapse" },
+];
 // 常用页：粒子强度（滑块）+ 这几项（= Java commonFields()）
 // help = 悬停那句白话的键（= 游戏里 config.help.<key>，同步至语言文件与 Config.fieldHelp）
 const CF_COMMON = [
@@ -1588,6 +1653,7 @@ const CF_ITEMS = [
   ["squid_roll", 100],
   ["tofu_skin", 100],
   ["sweet_potato_skin", 100],
+  ["boneless_chicken_feet", 100],
   ["shrimp", 150],
   ["shrimp_paste", 150],
   ["raw_ham_sausage", 150],
@@ -1595,6 +1661,7 @@ const CF_ITEMS = [
   ["wide_noodles", 150],
   ["raw_crispy_pork", 150],
   ["crispy_pork", 150],
+  ["chicken_feet", 150],
   ["beef_loin", 200],
   ["beef_meatball", 200],
   ["pork_meatball", 200],
@@ -1690,6 +1757,10 @@ const CF_FOODS = [
   ["cooked_cilantro_fish_ball", 4, 0.6],
   ["scallion", 1, 0.1],
   ["cilantro", 1, 0.1],
+  ["chicken_feet", 1, 0.2],
+  ["cooked_chicken_feet", 3, 0.6],
+  ["boneless_chicken_feet", 1, 0.2],
+  ["cooked_boneless_chicken_feet", 4, 0.7],
 ];
 const CF_SOUPS = [["clear", "清汤"], ["rich_stock", "高汤"], ["mushroom", "菌汤"], ["spicy", "红汤"],
   ["tomato", "番茄汤"], ["three_fresh", "三鲜汤"]];
@@ -1715,19 +1786,21 @@ const CF_DRINKS = [["orange_drink", "橙子饮料", 300, 0], ["plant_protein_dri
   ["orient_cola", "之晗可乐", 300, 0]];
 // 战利品掉落概率与钓鱼权重默认项（mryt233 改，4K-2：[路径数组, 物品 ID, 展示名, 默认值, 帮助键, 上限, 步长]）
 const CF_LOOTS = [
-  [["loot", "garnish", "scallion", "chance"], "scallion", "小葱 · 打草掉落概率", 0.25, "loot_garnish_chance"],
-  [["loot", "garnish", "cilantro", "chance"], "cilantro", "香菜 · 打草掉落概率", 0.25, "loot_garnish_chance"],
-  [["loot", "garnish", "soybean", "chance"], "soybean", "黄豆 · 打草掉落概率", 0.15, "loot_garnish_chance"],
-  [["loot", "garnish", "garlic", "chance"], "garlic", "大蒜 · 打草掉落概率", 0.15, "loot_garnish_chance"],
-  [["loot", "garnish", "tomato", "chance"], "tomato", "番茄 · 打草掉落概率", 0.15, "loot_garnish_chance"],
-  [["loot", "garnish", "chili_pepper", "chance"], "chili_pepper", "辣椒 · 打草掉落概率", 0.15, "loot_garnish_chance"],
-  [["loot", "garnish", "peanut", "chance"], "peanut", "花生 · 打草掉落概率", 0.15, "loot_garnish_chance"],
-  [["loot", "garnish", "greens", "chance"], "greens", "青菜 · 打草掉落概率", 0.15, "loot_garnish_chance"],
-  [["loot", "garnish", "zhe_er_gen", "chance"], "zhe_er_gen", "折耳根 · 打草掉落概率", 0.15, "loot_garnish_chance"],
+  [["loot", "garnish", "scallion", "chance"], "scallion", "小葱 · 打草掉落概率", 0.02, "loot_garnish_chance"],
+  [["loot", "garnish", "cilantro", "chance"], "cilantro", "香菜 · 打草掉落概率", 0.02, "loot_garnish_chance"],
+  [["loot", "garnish", "soybean", "chance"], "soybean", "黄豆 · 打草掉落概率", 0.02, "loot_garnish_chance"],
+  [["loot", "garnish", "garlic", "chance"], "garlic", "大蒜 · 打草掉落概率", 0.02, "loot_garnish_chance"],
+  [["loot", "garnish", "tomato", "chance"], "tomato", "番茄 · 打草掉落概率", 0.02, "loot_garnish_chance"],
+  [["loot", "garnish", "chili_pepper", "chance"], "chili_pepper", "辣椒 · 打草掉落概率", 0.02, "loot_garnish_chance"],
+  [["loot", "garnish", "peanut", "chance"], "peanut", "花生 · 打草掉落概率", 0.02, "loot_garnish_chance"],
+  [["loot", "garnish", "greens", "chance"], "greens", "青菜 · 打草掉落概率", 0.02, "loot_garnish_chance"],
+  [["loot", "garnish", "zhe_er_gen", "chance"], "zhe_er_gen", "折耳根 · 打草掉落概率", 0.02, "loot_garnish_chance"],
   [["loot", "lily_pad", "lotus_root", "chance"], "lotus_root", "莲藕 · 打睡莲掉落概率", 0.5, "loot_chance"],
   [["loot", "mushroom", "enoki", "chance"], "enoki_mushroom", "金针菇 · 采蘑菇掉落概率", 0.5, "loot_chance"],
   [["loot", "cow", "beef_loin", "chance"], "beef_loin", "牛脊肉 · 杀牛基础掉落概率", 0.25, "loot_cow_chance"],
   [["loot", "cow", "beef_loin", "looting_bonus"], "beef_loin", "牛脊肉 · 抢夺每级额外概率", 0.1, "loot_looting_bonus"],
+  [["loot", "chicken", "chicken_feet", "chance"], "chicken_feet", "鸡爪 · 杀成年鸡基础掉落概率", 0.5, "loot_chicken_chance"],
+  [["loot", "chicken", "chicken_feet", "looting_bonus"], "chicken_feet", "鸡爪 · 抢夺每级额外概率", 0.1, "loot_looting_bonus"],
   [["loot", "shrimp_fishing", "weight"], "shrimp", "带壳虾 · 钓鱼权重", 20, "loot_shrimp_fishing_weight", 1000, 5],
 ];
 // 高级页的分组（= Java sections()）
@@ -1736,6 +1809,34 @@ function cfGroupDefs() {
   const rangeOf = (k2) => k2 === "saturation" ? [0, 10, 0.05] : k2.endsWith("amplifier") ? [0, 9, 1]
     : k2 === "hunger" ? [0, 100, 1] : [0, 100000, 20];
   return [
+    { id: "mode", title: "游玩模式与细项开关", fields: [
+      { path: ["mode", "preset"], name: "模组模式预设", kind: "choice", options: ["full", "simple"], def: "full", help: "mode_preset" },
+      ...CF_MODE_FLAGS,
+    ] },
+    { id: "crops", title: "作物与果树", fields: [
+      { path: ["crops", "growth_rate"], name: "作物与果树生长倍率", def: 1.0, min: 0, max: 10, step: 0.1, unit: "multiplier", help: "crops_growth_rate" },
+      { path: ["crops", "bonemeal_enabled"], name: "允许骨粉催熟", kind: "toggle", def: true, help: "crops_bonemeal_enabled" },
+    ] },
+    { id: "processing", title: "食材加工（石磨 / 木桶）", fields: [
+      { path: ["processing", "mill_turns_multiplier"], name: "石磨研磨圈数倍率", def: 1.0, min: 0.25, max: 5, step: 0.25, unit: "multiplier", help: "processing_mill_turns" },
+      { path: ["processing", "vat_time_multiplier"], name: "木桶压制豆腐耗时倍率", def: 1.0, min: 0.1, max: 5, step: 0.1, unit: "multiplier", help: "processing_vat_time" },
+      { path: ["processing", "mill_water_uses"], name: "单桶水可湿磨次数", def: 3, min: 1, max: 16, step: 1, unit: "plain", integer: true, help: "processing_mill_water_uses" },
+    ] },
+    { id: "table_materials", title: "火锅桌与备菜架材质", fields: [
+      { path: ["table_materials", "mode"], name: "换材质开放范围", kind: "choice", options: ["any_solid", "tag_only", "off"], def: "any_solid", help: "table_materials_mode" },
+    ] },
+    { id: "minigame", title: "即时小游戏（连打 / 音游）", fields: [
+      { path: ["minigame", "allow_virtual_plate"], name: "允许虚拟练习盘", kind: "toggle", def: true, help: "minigame_allow_virtual_plate" },
+      { path: ["minigame", "invite_timeout_ticks"], name: "对战邀约倒计时", def: 300, min: 60, max: 1200, step: 20, unit: "tick", integer: true, help: "minigame_invite_timeout_ticks" },
+      { path: ["minigame", "invite_range"], name: "同桌邀请搜索半径", def: 8, min: 2, max: 32, step: 1, unit: "block", integer: true, help: "minigame_invite_range" },
+      { path: ["minigame", "rush_duration_ticks"], name: "连打挑战总时长", def: 200, min: 60, max: 1200, step: 20, unit: "tick", integer: true, help: "minigame_rush_duration_ticks" },
+      { path: ["minigame", "rush_max_cps"], name: "连打防宏上限 (CPS)", def: 16, min: 4, max: 40, step: 1, unit: "", integer: true, help: "minigame_rush_max_cps" },
+      { path: ["minigame", "rush_hits_per_bite"], name: "每吃 1 口所需敲击", def: 5, min: 1, max: 30, step: 1, unit: "", integer: true, help: "minigame_rush_hits_per_bite" },
+      { path: ["minigame", "rhythm_perfect_ms"], name: "音游 Perfect 窗口 (ms)", def: 60, min: 15, max: 150, step: 5, unit: "", integer: true, help: "minigame_rhythm_perfect_ms" },
+      { path: ["minigame", "rhythm_good_ms"], name: "音游 Good 窗口 (ms)", def: 130, min: 30, max: 300, step: 10, unit: "", integer: true, help: "minigame_rhythm_good_ms" },
+      { path: ["minigame", "rhythm_miss_ms"], name: "音游 Miss 窗口 (ms)", def: 220, min: 80, max: 500, step: 10, unit: "", integer: true, help: "minigame_rhythm_miss_ms" },
+      { path: ["minigame", "rhythm_combo_multiplier"], name: "音游连击倍率系数", def: 1.0, min: 0, max: 5, step: 0.1, unit: "multiplier", help: "minigame_rhythm_combo_multiplier" },
+    ] },
     { id: "cooking", title: "涮煮时间", fields: [
       { path: ["cooking", "fallback_ticks"], name: "涮煮兜底时间", def: 200, min: 1, max: 100000, step: 10, unit: "tick", help: "fallback_ticks" },
       { path: ["cooking", "fallback_xp"], name: "无配方出锅经验", def: 0.15, min: 0, max: 100, step: 0.05, unit: "point", help: "fallback_xp" },
@@ -1829,12 +1930,41 @@ function cfState(s) {
   if (!s.bad) s.bad = {};
   if (!s.expanded) s.expanded = [];
   if (!s.tab) s.tab = "common";
+  if (s.modeDrawer == null) s.modeDrawer = false;
   if (s.particles == null) s.particles = 100;
   return s;
+}
+function cfModePreset(s) {
+  return s.values["mode.preset"] === "simple" ? "simple" : "full";
+}
+function cfModeIsCustom(s) {
+  const full = cfModePreset(s) !== "simple";
+  return CF_MODE_FLAGS.some((f) => cfValue(s, f) !== (f.path[1] === "simple_ui_collapse" ? !full : full));
+}
+function cfApplyModePreset(s, preset) {
+  const full = preset !== "simple";
+  s.values["mode.preset"] = full ? "full" : "simple";
+  for (const f of CF_MODE_FLAGS) {
+    s.values[cfFieldKey(f)] = f.path[1] === "simple_ui_collapse" ? !full : full;
+  }
 }
 function cfValue(s, f) {
   const key = cfFieldKey(f);
   return key in s.values ? s.values[key] : f.def;
+}
+function cfFormatAny(f, v) {
+  if (f.kind === "toggle") return v ? "已开启" : "已关闭";
+  if (f.kind === "choice") {
+    const labels = {
+      full: "完整模式",
+      simple: "精简模式",
+      any_solid: "全部完整方块（黑白名单标签除外）",
+      tag_only: "仅白名单标签",
+      off: "关闭换材质",
+    };
+    return labels[v] || String(v);
+  }
+  return cfFormat(f, v);
 }
 // 单位字：语言文件里还没有这个键时不显示（网页先看得懂就行，游戏里是翻译好的）
 function cfUnit(g, f) {
@@ -1881,8 +2011,13 @@ function cfLayout(g, s, w) {
     out.push({ kind: "row", f, lines, h: Math.max(CF.ROW_MIN_H, lines.length * 10 + 10) });
   };
   s._fields = {};
-  if (s.tab === "common") CF_COMMON.forEach(push);
-  else {
+  if (s.tab === "common") {
+    if (s.modeDrawer) {
+      out.push({ kind: "header", grp: { id: "__mode_drawer__", title: "模式自定义细项", fields: CF_MODE_FLAGS }, h: CF.HEADER_H });
+      CF_MODE_FLAGS.forEach(push);
+    }
+    CF_COMMON.forEach(push);
+  } else {
     if (!s._groups) s._groups = cfGroupDefs();
     s._groups.forEach((grp) => {
       out.push({ kind: "header", grp, h: CF.HEADER_H });
@@ -1892,11 +2027,9 @@ function cfLayout(g, s, w) {
   return out;
 }
 // 列表上边界跟着页签走（= Java applyTab() 里的 listTop）：
-// 常用页上面有粒子滑块（48..68）+ 提示（70）+ 快捷档（68..80），列表从 88 起；高级页直接从 48 起。
-// 2026-11-09 r146a 修：以前写死 CF.LIST_TOP=60，常用页第一行会压在快捷档上。
+// 页签 y=22..40 + 模式条 y=43..61；常用页加滑块后列表从 114 起，高级页从 64 起。
 function cfListArea(s) {
-  // 常用页：滑块 48..68 + 提示 70 + 快捷档 83..95，列表从 100 起（= Java listTop = contentTop + 52）
-  const top = s && s.tab === "advanced" ? 48 : 100;
+  const top = s && s.tab === "advanced" ? 64 : 114;
   // mryt233 改（2026-11-10）：保存失败回执持续显示，列表为回执让出位置。
   const bottom = CF.H - CF.BOTTOM_H - 16 - (s._noticeHeight || 0);
   return { top, bottom, view: Math.max(1, bottom - top) };
@@ -1911,13 +2044,19 @@ function fittedText(g, text, cx, y, max, color) {
   g.textScaled(text, cx - (g.width(text) * k) / 2, y + (1 - k) * 4, k, color, true);
 }
 function cfHeaderRow(g, s, el, lx, y, lw, mouse) {
-  const open = s.expanded.indexOf(el.grp.id) >= 0;
+  const drawerHeader = el.grp.id === "__mode_drawer__";
+  const open = drawerHeader ? !!s.modeDrawer : s.expanded.indexOf(el.grp.id) >= 0;
   const hover = inRect(mouse, lx, y, lw, el.h);
   g.fill(lx, y, lx + lw, y + el.h - 1, hover ? 0x30b47a1c : 0x204a2e12);
   g.fill(lx, y + el.h - 1, lx + lw, y + el.h, BRASS_DARK);
   g.text((open ? "\u25BE " : "\u25B8 ") + el.grp.title + "  (" + el.grp.fields.length + ")", lx + 6,
     y + (el.h - 8) / 2, TITLE, true);
   s._acts.push({ x: lx, y, w: lw, h: el.h, run: () => {
+    if (drawerHeader) {
+      s.modeDrawer = !s.modeDrawer;
+      s._tip = s.modeDrawer ? "展开模式细项" : "收起模式细项";
+      return;
+    }
     if (open) s.expanded = s.expanded.filter((id) => id !== el.grp.id);
     else s.expanded = s.expanded.concat([el.grp.id]);
     s._tip = (open ? "收起 " : "展开 ") + el.grp.title;
@@ -1943,41 +2082,57 @@ function cfFieldRow(g, s, el, lx, y, lw, mouse) {
   const minusX = valueX - CF.CTRL_GAP - CF.BTN;
   const by = y + Math.floor((el.h - CF.BTN) / 2);
   const visible = (yy, hh) => yy >= area.top && yy + hh <= area.bottom;
-  [[minusX, "-", -1], [plusX, "+", 1]].forEach(([bx, mark, dir]) => {
-    const hot = inRect(mouse, bx, by, CF.BTN, CF.BTN);
-    copperButton(g, bx, by, CF.BTN, CF.BTN, hot ? CF_COL.hover : CF_COL.panel, BRASS);
-    cfCentre(g, mark, bx + CF.BTN / 2, by + 4, hot ? TITLE : CF_COL.text);
-    if (!visible(by, CF.BTN)) return;
-    s._acts.push({ x: bx, y: by, w: CF.BTN, h: CF.BTN, run: () => {
-      const step = f.step * (s.shift === "on" ? 10 : 1) * dir;
-      s.values[key] = Math.round(Math.max(f.min, Math.min(f.max, cfValue(s, f) + step)) * 100) / 100;
-      delete s.bad[key];
-      s.editing = null;
-      s._tip = f.name + "：" + cfFormat(f, s.values[key]) + (s.shift === "on" ? "（Shift 按着，一次 10 步）" : "");
-    } });
-  });
-  const valueY = y + Math.floor((el.h - 16) / 2);
-  const vHover = inRect(mouse, valueX, valueY, vw, 16);
-  const editing = s.editing === key;
-  valueBox(g, valueX, valueY, vw, 16, editing ? CF_COL.typedBg : (vHover ? CF_COL.valueBgHover : CF_COL.valueBg), vHover || editing ? BRASS_HI : BRASS_DARK);
-  if (editing) {
-    // 正在键入：把玩家敲的原文画在框里，不合法的标红（Java 里是 EditBox 的文字色）
-    const typed = String(s.typed == null ? "" : s.typed);
-    const ok = cfParse(f, typed) != null;
-    cfCentre(g, typed + "|", valueX + vw / 2, valueY + 4, ok ? TITLE : CF_COL.bad);
-  } else if (s.bad[key] != null) {
-    cfCentre(g, s.bad[key], valueX + vw / 2, valueY + 4, CF_COL.bad);
+  if (f.kind === "toggle" || f.kind === "choice") {
+    const pillW = plusX + CF.BTN - minusX;
+    const hot = inRect(mouse, minusX, by, pillW, CF.BTN);
+    const cur = cfValue(s, f);
+    const activeVisual = f.kind === "toggle" ? !!cur : cur === "simple";
+    copperButton(g, minusX, by, pillW, CF.BTN, activeVisual ? CF_COL.hover : (hot ? 0xff4a2e12 : CF_COL.panel), activeVisual ? BRASS_HI : BRASS);
+    fittedText(g, cfFormatAny(f, cur), minusX + pillW / 2, by + 4, pillW - 8, activeVisual ? TITLE : CF_COL.muted);
+    if (visible(by, CF.BTN)) {
+      s._acts.push({ x: minusX, y: by, w: pillW, h: CF.BTN, run: () => {
+        s.values[key] = f.kind === "toggle" ? !cur : (cur === "simple" ? "full" : "simple");
+        s._tip = f.name + "：" + cfFormatAny(f, s.values[key]);
+      } });
+    }
   } else {
-    cfCentre(g, cfValueText(g, s, f, vw), valueX + vw / 2, valueY + 4, RIVET);
+    [[minusX, "-", -1], [plusX, "+", 1]].forEach(([bx, mark, dir]) => {
+      const hot = inRect(mouse, bx, by, CF.BTN, CF.BTN);
+      copperButton(g, bx, by, CF.BTN, CF.BTN, hot ? CF_COL.hover : CF_COL.panel, BRASS);
+      cfCentre(g, mark, bx + CF.BTN / 2, by + 4, hot ? TITLE : CF_COL.text);
+      if (!visible(by, CF.BTN)) return;
+      s._acts.push({ x: bx, y: by, w: CF.BTN, h: CF.BTN, run: () => {
+        const step = f.step * (s.shift === "on" ? 10 : 1) * dir;
+        s.values[key] = Math.round(Math.max(f.min, Math.min(f.max, cfValue(s, f) + step)) * 100) / 100;
+        delete s.bad[key];
+        s.editing = null;
+        s._tip = f.name + "：" + cfFormat(f, s.values[key]) + (s.shift === "on" ? "（Shift 按着，一次 10 步）" : "");
+      } });
+    });
+    const valueY = y + Math.floor((el.h - 16) / 2);
+    const vHover = inRect(mouse, valueX, valueY, vw, 16);
+    const editing = s.editing === key;
+    valueBox(g, valueX, valueY, vw, 16, editing ? CF_COL.typedBg : (vHover ? CF_COL.valueBgHover : CF_COL.valueBg), vHover || editing ? BRASS_HI : BRASS_DARK);
+    if (editing) {
+      const typed = String(s.typed == null ? "" : s.typed);
+      const ok = cfParse(f, typed) != null;
+      cfCentre(g, typed + "|", valueX + vw / 2, valueY + 4, ok ? TITLE : CF_COL.bad);
+    } else if (s.bad[key] != null) {
+      cfCentre(g, s.bad[key], valueX + vw / 2, valueY + 4, CF_COL.bad);
+    } else {
+      cfCentre(g, cfValueText(g, s, f, vw), valueX + vw / 2, valueY + 4, RIVET);
+    }
+    if (visible(valueY, 16)) {
+      s._acts.push({ x: valueX, y: valueY, w: vw, h: 16, run: () => {
+        s.editing = key;
+        s.typed = key in s.bad ? s.bad[key] : cfFormat(f, cfValue(s, f));
+      } });
+    }
   }
-  if (visible(valueY, 16)) {
-    s._acts.push({ x: valueX, y: valueY, w: vw, h: 16, run: () => {
-      s.editing = key;
-      s.typed = key in s.bad ? s.bad[key] : cfFormat(f, cfValue(s, f));
-    } });
-  }
-  // ↺：只在当前值 ≠ 默认值（或输错了）时出现（= Java drawFieldControls）
-  if (Math.abs(cfValue(s, f) - f.def) >= 5e-4 || s.bad[key] != null) {
+  const isDiff = f.kind === "toggle" || f.kind === "choice"
+    ? cfValue(s, f) !== f.def
+    : Math.abs(cfValue(s, f) - f.def) >= 5e-4 || s.bad[key] != null;
+  if (isDiff) {
     const hot = inRect(mouse, resetX, by, CF.RESET_W, CF.BTN);
     copperButton(g, resetX, by, CF.RESET_W, CF.BTN, hot ? CF_COL.hover : CF_COL.panel, BRASS);
     cfCentre(g, "\u21BA", resetX + CF.RESET_W / 2, by + 3, hot ? TITLE : CF_COL.muted);
@@ -1986,16 +2141,16 @@ function cfFieldRow(g, s, el, lx, y, lw, mouse) {
         s.values[key] = f.def;
         delete s.bad[key];
         s.editing = null;
-        s._tip = "只恢复这一项：" + f.name + " = " + cfFormat(f, f.def);
+        s._tip = "只恢复这一项：" + f.name + " = " + cfFormatAny(f, f.def);
       } });
     }
   }
-  if (hover && !editing) {
-    // 悬停说明 = 一句白话（管什么）+ 范围 / 默认值（= Java tooltipFor 的两行）
+  if (hover && s.editing !== key) {
     const help = CF_HELP[f.help] || "";
-    s._tips = [help, f.name + "｜范围 " + cfFormat(f, f.min) + "～" + cfFormat(f, f.max) + "，默认 " + cfFormat(f, f.def),
-      "配置键：" + cfFieldKey(f)]
-      .filter(Boolean);
+    const meta = f.kind === "toggle" || f.kind === "choice"
+      ? f.name + "｜默认 " + cfFormatAny(f, f.def)
+      : f.name + "｜范围 " + cfFormat(f, f.min) + "～" + cfFormat(f, f.max) + "，默认 " + cfFormat(f, f.def);
+    s._tips = [help, meta, "配置键：" + cfFieldKey(f)].filter(Boolean);
   }
 }
 
@@ -2040,19 +2195,48 @@ const configScreen = {
     // 页签：常用 / 高级
     const startX = Math.floor((w - (CF.TAB_W * 2 + CF.TAB_GAP)) / 2);
     [["common", "常用"], ["advanced", "高级"]].forEach(([id, label], i) => {
-      const x = startX + i * (CF.TAB_W + CF.TAB_GAP), y = 24;
+      const x = startX + i * (CF.TAB_W + CF.TAB_GAP), y = 22;
       const active = tab === id, hover = inRect(s._mouse, x, y, CF.TAB_W, CF.TAB_H);
       copperButton(g, x, y, CF.TAB_W, CF.TAB_H, active ? CF_COL.hover : (hover ? 0xff4a2e12 : CF_COL.panel), active ? BRASS_HI : BRASS);
       if (active) g.fill(x, y + CF.TAB_H - 2, x + CF.TAB_W, y + CF.TAB_H, BRASS_HI);
       const key = CF_KEY("tab." + id);
-      fittedText(g, g.tr(key) === key ? label : g.tr(key), x + CF.TAB_W / 2, y + 6, CF.TAB_W - 8,
+      fittedText(g, g.tr(key) === key ? label : g.tr(key), x + CF.TAB_W / 2, y + 5, CF.TAB_W - 8,
         active ? TITLE : CF_COL.text);
       s._acts.push({ x, y, w: CF.TAB_W, h: CF.TAB_H, run: () => { s.tab = id; s._scroll = 0; s.editing = null; } });
+    });
+    // 模式切换条：完整模式 / 精简模式 / 自定义细项
+    const mLeft = 10, mY = 43, mAvail = w - 20;
+    const mLabel = "模式：";
+    g.text(mLabel, mLeft + 2, mY + 5, CF_COL.muted, false);
+    const mLabelW = Math.min(54, g.width(mLabel) + 8);
+    const barLeft = mLeft + mLabelW, barW = Math.max(120, mAvail - mLabelW), mGap = 4;
+    const mBtnW = Math.floor((barW - mGap * 2) / 3), mDrawerW = barW - (mBtnW + mGap) * 2;
+    const preset = cfModePreset(s), custom = cfModeIsCustom(s);
+    const drawerActive = tab === "common" ? !!s.modeDrawer : s.expanded.indexOf("mode") >= 0;
+    [
+      { x: barLeft, bw: mBtnW, label: "完整模式", active: preset === "full" && !custom, borderHi: false,
+        run: () => { cfApplyModePreset(s, "full"); s._tip = "切换到完整模式预设"; } },
+      { x: barLeft + mBtnW + mGap, bw: mBtnW, label: "精简模式", active: preset === "simple" && !custom, borderHi: false,
+        run: () => { cfApplyModePreset(s, "simple"); s._tip = "切换到精简模式预设"; } },
+      { x: barLeft + (mBtnW + mGap) * 2, bw: mDrawerW,
+        label: (drawerActive ? "\u25BE " : "\u25B8 ") + (custom ? "自定义细项 *" : "自定义细项"),
+        active: drawerActive, borderHi: custom,
+        run: () => {
+          if (tab === "common") { s.modeDrawer = !s.modeDrawer; if (s.modeDrawer) s._scroll = 0; }
+          else if (s.expanded.indexOf("mode") >= 0) s.expanded = s.expanded.filter((id) => id !== "mode");
+          else { s.expanded = s.expanded.concat(["mode"]); s._scroll = 0; }
+        } },
+    ].forEach((b) => {
+      const hover = inRect(s._mouse, b.x, mY, b.bw, CF.MODE_H);
+      copperButton(g, b.x, mY, b.bw, CF.MODE_H, b.active ? CF_COL.hover : (hover ? 0xff4a2e12 : CF_COL.panel),
+        b.active || b.borderHi ? BRASS_HI : BRASS);
+      fittedText(g, b.label, b.x + b.bw / 2, mY + 5, b.bw - 8, b.active ? TITLE : CF_COL.text);
+      s._acts.push({ x: b.x, y: mY, w: b.bw, h: CF.MODE_H, run: b.run });
     });
     s._slider = null;
     if (tab === "common") {
       // 粒子强度滑块 + 一行提示 + 右侧三个快捷档（= Java drawParticleBlock）
-      const sy = 48, hintY = sy + 22;
+      const sy = 64, hintY = sy + 22;
       g.fill(10, sy, w - 10, sy + 20, BRASS_DARK);
       g.fill(11, sy + 1, w - 11, sy + 19, CF_COL.panel);
       const knobW = 10;

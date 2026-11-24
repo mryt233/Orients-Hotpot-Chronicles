@@ -55,10 +55,12 @@ public class HotPotBlockEntity extends SyncedBlockEntity
      * 刚倒进红汤默认 1 档（中辣，用户定）；拿辣椒右键升档、拿冰降档，见 HotPotBlock / StoveBlock。
      */
     final int[] spicyLevels = {1, 1, 1, 1};
-    /** 客户端缓动热度，用于让食材起伏和蒸汽自然启停。 */
+    /** 客户端缓动热度，用于让食材起伏和蒸汽自然启停；同步记录上一刻值做帧间插值。 */
     private float clientHeat = 0F;
+    private float prevClientHeat = 0F;
     /** 气泡累计相位（秒）：随热度连续累加，避免用「全局时间÷随热度变化的周期」造成相位跳变（2026-10-30）。 */
     private double bubbleSeconds;
+    private double prevBubbleSeconds;
     /** 食材浮动角速度（弧度 / 刻）：沸腾 / 冷锅两档，渲染器和这里共用。 */
     public static final float BOB_OMEGA = 0.22F;
     public static final float BOB_COLD_OMEGA = 0.05F;
@@ -67,6 +69,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
      * 速度一换，几百万刻乘出来的结果直接跳，显示的菜突然换成另一样，筷子也可能夹错（mryt233 2026-11-01，代码检查 B4）。
      */
     private final double[] cycleAngle = new double[PotLayout.MAX_SIDES];
+    private final double[] prevCycleAngle = new double[PotLayout.MAX_SIDES];
     /** 新旧存档首次进入服务端 tick 时修复新增的汤底方块状态。 */
     boolean needsVisualRepair = true;
     /** 玩家破坏回调与状态替换回调之间的一次性防重复标记。 */
@@ -106,8 +109,12 @@ public class HotPotBlockEntity extends SyncedBlockEntity
         HotPotCookingRun.tick(this, level);
     }
 
-    /** 客户端粒子表现：具体逻辑在 {@link HotPotEffects}。 */
+    /** 客户端粒子表现：具体逻辑在 {@link HotPotEffects}；推进前先快照上一刻状态以供帧间插值。 */
     protected void clientTick(Level level, BlockPos blockPos, BlockState state) {
+        prevClientHeat = clientHeat;
+        prevBubbleSeconds = bubbleSeconds;
+        System.arraycopy(cycleAngle, 0, prevCycleAngle, 0, cycleAngle.length);
+
         clientHeat = HotPotEffects.tick(this, level, blockPos, state, clientHeat);
         // 相位按「原始瞬时速度」积分：每 tick 增量 = (0.7 + 0.5*heat)/20；
         // 渲染端周期已去掉热度分母（见 BoilingEffects），两者相乘正好还原原来的速度，且连续不跳变
@@ -117,19 +124,30 @@ public class HotPotBlockEntity extends SyncedBlockEntity
         }
     }
 
-    /** 这一边轮换相位每刻走多少：那边有汤且锅是冷的走慢档，否则快档（同渲染器原来的判断）。 */
+    /** 连续食材角速度：按热度在冷/沸之间线性插值，取消 heat==0.5 处的硬跳变（mryt233 改，r153）。 */
+    public static float cycleRateFor(boolean hasSoup, float heat) {
+        if (!hasSoup) {
+            return BOB_OMEGA;
+        }
+        float clamped = Math.max(0F, Math.min(1F, heat));
+        return BOB_COLD_OMEGA + (BOB_OMEGA - BOB_COLD_OMEGA) * clamped;
+    }
+
     private float cycleRate(int side) {
-        return baseOfSide(side) != SoupIds.EMPTY && clientHeat < 0.5F ? BOB_COLD_OMEGA : BOB_OMEGA;
+        return cycleRateFor(baseOfSide(side) != SoupIds.EMPTY, clientHeat);
     }
 
     /** 某一边轮换相位，partial = 这一刻已经过去的比例（渲染插值用）。 */
     public double cycleAngle(int side, float partial) {
-        return side < 0 || side >= cycleAngle.length ? 0 : cycleAngle[side] + partial * cycleRate(side);
+        if (side < 0 || side >= cycleAngle.length) {
+            return 0;
+        }
+        return prevCycleAngle[side] + partial * (cycleAngle[side] - prevCycleAngle[side]);
     }
 
-    /** 世界气泡用的累计时间（秒），带这一刻内的插值：只按刻累加的话高帧率下气泡 20 次 / 秒地跳（代码检查 B5）。 */
+    /** 世界气泡用的累计时间（秒），带这一刻内的帧间插值。 */
     public double bubbleSeconds(float partial) {
-        return bubbleSeconds + partial * (0.7 + 0.5 * clientHeat) / 20.0;
+        return prevBubbleSeconds + partial * (bubbleSeconds - prevBubbleSeconds);
     }
 
     // ------------------------------------------------------------------ 灶台联动
@@ -419,6 +437,14 @@ public class HotPotBlockEntity extends SyncedBlockEntity
         HotPotFoodOps.grantTakeXp(this, player, slot, count);
     }
 
+    public int countCookedForMinigame() {
+        return HotPotFoodOps.countCooked(this);
+    }
+
+    public ItemStack consumeOneCookedForMinigame(Player player) {
+        return HotPotFoodOps.consumeOneCooked(this, player);
+    }
+
     // ------------------------------------------------------------------ 槽位管理
 
     void trackSlotChanges() {
@@ -461,6 +487,10 @@ public class HotPotBlockEntity extends SyncedBlockEntity
 
     public float clientHeat() {
         return clientHeat;
+    }
+
+    public float clientHeat(float partial) {
+        return prevClientHeat + partial * (clientHeat - prevClientHeat);
     }
 
     /** 世界气泡用的累计时间（秒），不会因热度变化而跳相位。 */
@@ -660,6 +690,11 @@ public class HotPotBlockEntity extends SyncedBlockEntity
         return handled;
     }
 
+    /** mryt233 改（2026-11-19）：派生灶台只改生成位置，保留同一份内容清空逻辑。 */
+    protected void dropPotResource(ItemStack stack) {
+        Block.popResource(level, worldPosition, stack);
+    }
+
     /** 掉落所有食材，不改变锅/灶台本体状态。 */
     public void dropContents() {
         dropContents(PotLayout.NONE);
@@ -678,7 +713,7 @@ public class HotPotBlockEntity extends SyncedBlockEntity
             }
             ItemStack stack = slots.ingredients().getItem(i);
             if (!stack.isEmpty()) {
-                Block.popResource(level, worldPosition, stack);
+                dropPotResource(stack);
                 slots.ingredients().setItem(i, ItemStack.EMPTY);
                 resetSlot(i, ItemStack.EMPTY);
             }

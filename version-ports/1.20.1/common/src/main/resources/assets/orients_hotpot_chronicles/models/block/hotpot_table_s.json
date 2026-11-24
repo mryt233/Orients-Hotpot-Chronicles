@@ -1,0 +1,140 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "orients_hotpot_chronicles:block/mat_slot_top_cap",
+    "top_cap": "orients_hotpot_chronicles:block/mat_slot_top_cap",
+    "top_side": "orients_hotpot_chronicles:block/mat_slot_top_side",
+    "base_cap": "orients_hotpot_chronicles:block/mat_slot_base_cap",
+    "base_side": "orients_hotpot_chronicles:block/mat_slot_base_side"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        7,
+        0
+      ],
+      "to": [
+        16,
+        11,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#top_side",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "east": {
+          "texture": "#top_side",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "south": {
+          "texture": "#top_side",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "west": {
+          "texture": "#top_side",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "up": {
+          "texture": "#top_cap",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#top_cap",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        0,
+        4
+      ],
+      "to": [
+        12,
+        7,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#base_side",
+          "uv": [
+            4,
+            9,
+            12,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#base_side",
+          "uv": [
+            0,
+            9,
+            12,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#base_side",
+          "uv": [
+            4,
+            9,
+            12,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#base_side",
+          "uv": [
+            4,
+            9,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#base_cap",
+          "uv": [
+            4,
+            4,
+            12,
+            16
+          ],
+          "cullface": "down"
+        }
+      }
+    }
+  ]
+}

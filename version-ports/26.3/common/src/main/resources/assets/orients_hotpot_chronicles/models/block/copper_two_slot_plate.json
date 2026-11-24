@@ -1,0 +1,8 @@
+{
+  "parent": "orients_hotpot_chronicles:block/template/plate_two_slot_plate",
+  "textures": {
+    "plate": "minecraft:block/copper_block",
+    "rim": "minecraft:block/copper_block",
+    "particle": "minecraft:block/copper_block"
+  }
+}

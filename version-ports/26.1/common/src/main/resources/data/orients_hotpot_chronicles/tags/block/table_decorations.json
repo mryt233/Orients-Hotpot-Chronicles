@@ -16,6 +16,7 @@
     "minecraft:brewing_stand",
     "minecraft:torch",
     "minecraft:soul_torch",
-    "minecraft:redstone_torch"
+    "minecraft:redstone_torch",
+    "orients_hotpot_chronicles:desktop_prep_rack"
   ]
 }

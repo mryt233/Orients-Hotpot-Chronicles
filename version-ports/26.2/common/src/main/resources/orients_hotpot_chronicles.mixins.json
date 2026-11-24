@@ -4,6 +4,7 @@
   "package": "cn.blockforge.generated.orientshotpotchronicles.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
+    "BlockDropInvoker",
     "BlockStateTableDecorMixin",
     "BowlItemMixin",
     "EntityRaycastMixin",

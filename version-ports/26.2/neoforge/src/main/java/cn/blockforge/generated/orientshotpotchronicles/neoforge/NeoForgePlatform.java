@@ -28,6 +28,8 @@ public final class NeoForgePlatform {
 
     /** NeoForge 原生事件只给已建好的鱼池，专属访问器适配保留。 */
     public static void afterContentRegistration() {
+        cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlockEntity.installDropSpawner(
+            cn.blockforge.generated.orientshotpotchronicles.mixin.BlockDropInvoker::hotpot$popResource);
         NeoForgeLootListeners.install();
     }
 }

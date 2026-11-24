@@ -9,6 +9,7 @@ import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
 import cn.blockforge.generated.orientshotpotchronicles.HotpotContentModule;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTracks;
 import cn.blockforge.orient.framework.loader.ClientHooks;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -43,7 +44,10 @@ public final class HotPotNeoForge {
                 @Override protected Void prepare(ResourceManager manager,
                     ProfilerFiller profiler) { return null; }
                 @Override protected void apply(Void unused, ResourceManager manager,
-                    ProfilerFiller profiler) { HotpotContentModule.HOST.reload(); }
+                    ProfilerFiller profiler) {
+                    HotPotTracks.reload(manager);
+                    HotpotContentModule.HOST.reload();
+                }
             }));
     }
     static void clientHooks(ClientHooks hooks) { HotpotContentModule.HOST.client(hooks); }

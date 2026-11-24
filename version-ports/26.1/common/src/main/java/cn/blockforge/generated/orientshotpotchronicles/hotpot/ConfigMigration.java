@@ -1,3 +1,4 @@
+// mryt233 改：26.1 同代移植同步。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import com.google.gson.Gson;
@@ -90,6 +91,7 @@ final class ConfigMigration {
         // mryt233 改（2026-11-09，r146c）：桌上蘸料瓶改成「只摆放」，sauce_bottle.<调料>.uses 整组作废，
         // 直接从老配置里删掉（否则每次 reload 都报「不认识的配置项」）。
         migrateSauceBottleKeys(root, moved);
+        migrateDryGoodsSoakingKeys(root, moved);
         JsonObject food = child(root, "food");
         if (food == null) {
             return moved;
@@ -148,6 +150,32 @@ final class ConfigMigration {
             }
         } else {
             moved.add("sauce_bottle (dropped)");
+        }
+    }
+
+    /** mryt233 改：仅清理已移除的九个泡发配置项，保留同组其他设置。 */
+    private static void migrateDryGoodsSoakingKeys(JsonObject root, List<String> moved) {
+        String[] soakedIds = {"soaked_kelp", "soaked_tofu_skin", "soaked_sweet_potato_skin", "soaked_wide_noodles"};
+        JsonObject food = child(root, "food");
+        if (food != null) {
+            for (String id : soakedIds) {
+                if (food.remove(id) != null) {
+                    moved.add("food." + id + " (dropped)");
+                }
+            }
+        }
+        JsonObject cooking = child(root, "cooking");
+        JsonObject items = cooking != null ? child(cooking, "items") : null;
+        if (items != null) {
+            for (String id : soakedIds) {
+                if (items.remove(id) != null) {
+                    moved.add("cooking.items." + id + " (dropped)");
+                }
+            }
+        }
+        JsonObject mode = child(root, "mode");
+        if (mode != null && mode.remove("dry_goods_soaking") != null) {
+            moved.add("mode.dry_goods_soaking (dropped)");
         }
     }
 

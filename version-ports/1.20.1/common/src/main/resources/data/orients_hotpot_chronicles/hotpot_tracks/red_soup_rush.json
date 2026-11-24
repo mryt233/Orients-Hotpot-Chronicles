@@ -1,0 +1,324 @@
+{
+  "title": {
+    "translate": "track.orients_hotpot_chronicles.red_soup_rush"
+  },
+  "author": "mryt233",
+  "bpm": 144,
+  "lead_in_ms": 1200,
+  "duration_ms": 18000,
+  "difficulty": "hard",
+  "notes": [
+    {
+      "beat": 0.0,
+      "lane": 0,
+      "sound": "sizzle",
+      "pitch": 1.0
+    },
+    {
+      "beat": 0.5,
+      "lane": 1,
+      "sound": "note_pling",
+      "pitch": 1.0
+    },
+    {
+      "beat": 1.0,
+      "lane": 2,
+      "sound": "note_pling",
+      "pitch": 1.189
+    },
+    {
+      "beat": 1.5,
+      "lane": 3,
+      "sound": "note_pling",
+      "pitch": 1.498
+    },
+    {
+      "beat": 2.0,
+      "lane": 0,
+      "sound": "chopsticks",
+      "pitch": 1.0
+    },
+    {
+      "beat": 2.0,
+      "lane": 3,
+      "sound": "chopsticks",
+      "pitch": 1.25
+    },
+    {
+      "beat": 3.0,
+      "lane": 2,
+      "sound": "note_chime",
+      "pitch": 1.335
+    },
+    {
+      "beat": 3.5,
+      "lane": 1,
+      "sound": "note_chime",
+      "pitch": 1.189
+    },
+    {
+      "beat": 4.0,
+      "lane": 0,
+      "sound": "note_pling",
+      "pitch": 1.0
+    },
+    {
+      "beat": 4.5,
+      "lane": 2,
+      "sound": "note_pling",
+      "pitch": 1.26
+    },
+    {
+      "beat": 5.0,
+      "lane": 1,
+      "sound": "note_pling",
+      "pitch": 1.122
+    },
+    {
+      "beat": 5.5,
+      "lane": 3,
+      "sound": "note_pling",
+      "pitch": 1.498
+    },
+    {
+      "beat": 6.0,
+      "lane": 1,
+      "sound": "sizzle",
+      "pitch": 1.1
+    },
+    {
+      "beat": 6.0,
+      "lane": 2,
+      "sound": "note_bell",
+      "pitch": 1.682
+    },
+    {
+      "beat": 7.0,
+      "lane": 0,
+      "sound": "note_pling",
+      "pitch": 1.0
+    },
+    {
+      "beat": 7.5,
+      "lane": 1,
+      "sound": "note_pling",
+      "pitch": 1.122
+    },
+    {
+      "beat": 8.0,
+      "lane": 2,
+      "sound": "note_pling",
+      "pitch": 1.26
+    },
+    {
+      "beat": 8.5,
+      "lane": 3,
+      "sound": "note_pling",
+      "pitch": 1.498
+    },
+    {
+      "beat": 9.0,
+      "lane": 2,
+      "sound": "note_pling",
+      "pitch": 1.26
+    },
+    {
+      "beat": 9.5,
+      "lane": 1,
+      "sound": "note_pling",
+      "pitch": 1.122
+    },
+    {
+      "beat": 10.0,
+      "lane": 0,
+      "sound": "chopsticks",
+      "pitch": 1.0
+    },
+    {
+      "beat": 10.5,
+      "lane": 3,
+      "sound": "chopsticks",
+      "pitch": 1.2
+    },
+    {
+      "beat": 11.0,
+      "lane": 1,
+      "sound": "boil",
+      "pitch": 1.15
+    },
+    {
+      "beat": 11.5,
+      "lane": 2,
+      "sound": "boil",
+      "pitch": 1.25
+    },
+    {
+      "beat": 12.0,
+      "lane": 0,
+      "sound": "note_chime",
+      "pitch": 1.498
+    },
+    {
+      "beat": 12.0,
+      "lane": 1,
+      "sound": "note_pling",
+      "pitch": 1.26
+    },
+    {
+      "beat": 13.0,
+      "lane": 2,
+      "sound": "note_chime",
+      "pitch": 1.682
+    },
+    {
+      "beat": 13.0,
+      "lane": 3,
+      "sound": "note_pling",
+      "pitch": 1.498
+    },
+    {
+      "beat": 14.0,
+      "lane": 3,
+      "sound": "note_pling",
+      "pitch": 1.782
+    },
+    {
+      "beat": 14.5,
+      "lane": 2,
+      "sound": "note_pling",
+      "pitch": 1.682
+    },
+    {
+      "beat": 15.0,
+      "lane": 1,
+      "sound": "note_pling",
+      "pitch": 1.498
+    },
+    {
+      "beat": 15.5,
+      "lane": 0,
+      "sound": "note_pling",
+      "pitch": 1.26
+    },
+    {
+      "beat": 16.0,
+      "lane": 0,
+      "sound": "sizzle",
+      "pitch": 1.1
+    },
+    {
+      "beat": 16.5,
+      "lane": 1,
+      "sound": "chopsticks",
+      "pitch": 1.05
+    },
+    {
+      "beat": 17.0,
+      "lane": 2,
+      "sound": "chopsticks",
+      "pitch": 1.15
+    },
+    {
+      "beat": 17.5,
+      "lane": 3,
+      "sound": "sizzle",
+      "pitch": 1.25
+    },
+    {
+      "beat": 18.0,
+      "lane": 1,
+      "sound": "note_bell",
+      "pitch": 1.498
+    },
+    {
+      "beat": 18.5,
+      "lane": 2,
+      "sound": "note_bell",
+      "pitch": 1.682
+    },
+    {
+      "beat": 19.0,
+      "lane": 0,
+      "sound": "note_pling",
+      "pitch": 1.26
+    },
+    {
+      "beat": 19.5,
+      "lane": 3,
+      "sound": "note_pling",
+      "pitch": 1.782
+    },
+    {
+      "beat": 20.0,
+      "lane": 0,
+      "sound": "note_chime",
+      "pitch": 1.0
+    },
+    {
+      "beat": 20.0,
+      "lane": 2,
+      "sound": "note_pling",
+      "pitch": 1.498
+    },
+    {
+      "beat": 21.0,
+      "lane": 1,
+      "sound": "note_chime",
+      "pitch": 1.189
+    },
+    {
+      "beat": 21.0,
+      "lane": 3,
+      "sound": "note_pling",
+      "pitch": 1.682
+    },
+    {
+      "beat": 22.0,
+      "lane": 2,
+      "sound": "note_pling",
+      "pitch": 1.498
+    },
+    {
+      "beat": 22.5,
+      "lane": 1,
+      "sound": "note_pling",
+      "pitch": 1.335
+    },
+    {
+      "beat": 23.0,
+      "lane": 0,
+      "sound": "note_bell",
+      "pitch": 1.498
+    },
+    {
+      "beat": 23.0,
+      "lane": 3,
+      "sound": "note_bell",
+      "pitch": 2.0
+    },
+    {
+      "beat": 24.0,
+      "lane": 0,
+      "sound": "sizzle",
+      "pitch": 1.2
+    },
+    {
+      "beat": 24.0,
+      "lane": 1,
+      "sound": "note_chime",
+      "pitch": 1.498
+    },
+    {
+      "beat": 24.0,
+      "lane": 2,
+      "sound": "note_pling",
+      "pitch": 1.782
+    },
+    {
+      "beat": 24.0,
+      "lane": 3,
+      "sound": "note_bell",
+      "pitch": 2.0
+    }
+  ]
+}

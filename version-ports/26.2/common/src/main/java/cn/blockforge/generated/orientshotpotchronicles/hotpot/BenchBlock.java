@@ -408,6 +408,7 @@ public class BenchBlock extends Block implements EntityBlock {
             }
         }
         return Use.blockItem(stack.getItem() instanceof BlockItem
+                && !(stack.getItem() instanceof ConfigurableFood)
             ? UseOutcome.SKIPPED
             : UseOutcome.PASS_TO_EMPTY, world.isClientSide());
     }

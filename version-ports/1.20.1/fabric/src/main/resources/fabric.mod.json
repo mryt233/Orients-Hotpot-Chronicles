@@ -34,14 +34,15 @@
     ]
   },
   "mixins": [
-    "orients_hotpot_chronicles.mixins.json"
+    "orients_hotpot_chronicles.mixins.json",
+    "orients_hotpot_chronicles.fabric.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.14.21",
     "minecraft": "1.20.1",
     "java": ">=17",
-    "fabric-api": ">=0.83.0",
-    "orient_framework": ">=0.2.0 <0.3.0"
+    "fabric-api": ">=0.89.0",
+    "orient_framework": ">=0.2.2 <0.3.0"
   },
   "suggests": {
     "farmersdelight": "*",

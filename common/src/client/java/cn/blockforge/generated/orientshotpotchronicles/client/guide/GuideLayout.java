@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.blockforge.generated.orientshotpotchronicles.client.guide.GuideContent.Entry;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.Config;
 
 /** 作者：mryt233；2026-11-11：指南块排版，字体显式传入。 */
 public final class GuideLayout {
@@ -94,7 +95,11 @@ public final class GuideLayout {
         flow.add(new Elem(Kind.HEADER, Math.max(24, title.size() * 9 + 10)).lines(title).icon(e.icon()));
         if (j.has("blocks")) {
             for (JsonElement b : j.getAsJsonArray("blocks")) {
-                block(font, flow, b.getAsJsonObject());
+                JsonObject bo = b.getAsJsonObject();
+                if (!blockVisible(bo)) {
+                    continue;
+                }
+                block(font, flow, bo);
             }
         } else {
             legacy(font, flow, j);   // 旧版 guide_content.py 写出来的条目照样能看
@@ -274,6 +279,16 @@ public final class GuideLayout {
             }
         }
         return cols;
+    }
+
+    private static boolean blockVisible(JsonObject bo) {
+        if (bo.has("requires_flag")) {
+            boolean expected = !bo.has("expected") || bo.get("expected").getAsBoolean();
+            if (!Config.modeCondition(bo.get("requires_flag").getAsString(), expected)) {
+                return false;
+            }
+        }
+        return !(bo.has("simple_collapse") && bo.get("simple_collapse").getAsBoolean() && Config.simpleUiCollapse());
     }
 
     /** 一块比一页高就按行切开（提示框、列表、表格行、标题、代码），一排图标按行切。 */

@@ -128,8 +128,8 @@ abstract class LivingEntityEatMixin {
                 }
                 // 变态辣且没解辣：嘴上冒火苗，纯节目效果（前面刚给了抗火，不扣血）
                 // mryt233 改（2026-11-06，r139）：穿着布围裙就不点嘴上这簇火——布围裙挡的是溅起来的滚油与明火。
-                // mryt233 改（2026-11-10）：红汤判断改成 isSpicy() 属性；mryt233 改（第四批 4J）：改读 Config.spicyMouthFire*
-                int mouthFireTicks = Config.spicyMouthFireTicks();
+                // mryt233 改（2026-11-10）：红汤判断改成 isSpicy() 属性；mryt233 改（第四批 4J）：改读 Config.spicyMouthFire* 与惩罚开关
+                int mouthFireTicks = Config.penaltiesEnabled() ? Config.spicyMouthFireTicks() : 0;
                 if (soup.spicy()
                     && mouthFireTicks > 0 && spicy >= Config.spicyMouthFireFromLevel()
                     && !calmSpicy

@@ -1,12 +1,10 @@
-// mryt233 改：26.1 原版标识符与 Trigger 类型。
+// mryt233 改：26.1 原版标识符类型。
 package cn.blockforge.orient.framework.loader;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,11 +16,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.Function;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 /** 分域注册能力：每个 registrar 只在其注册表窗口内生效；平台负责窗口与去重预检。作者：mryt233 */
 public interface RegistrationApi {
@@ -141,5 +141,16 @@ public interface RegistrationApi {
 
     interface ParticleRegistrar {
         <T extends net.minecraft.core.particles.ParticleType<?>> T register(Identifier id, T value);
+    }
+
+    // mryt233 改（2026-11-23）：0.2.2 新增树冠生成器注册域；旧实现保留默认抛出。
+    default FoliagePlacerRegistrar foliagePlacers() {
+        throw new UnsupportedOperationException("foliagePlacers requires Runtime 0.2.2");
+    }
+
+    interface FoliagePlacerRegistrar {
+        <P extends net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer>
+        net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType<P> register(
+            Identifier id, com.mojang.serialization.MapCodec<P> codec);
     }
 }

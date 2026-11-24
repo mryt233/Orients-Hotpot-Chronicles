@@ -6,6 +6,7 @@ import cn.blockforge.orient.framework.loader.ClientHooks;
 import org.slf4j.Logger;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTracks;
 import cn.blockforge.generated.orientshotpotchronicles.platform.FabricPlatform;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -32,7 +33,10 @@ public final class GeneratedMod implements ModInitializer {
         // 资源重载监听器的原生类型属于 Fabric，公共生命周期只接收一次 reload 通知。
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
             @Override public ResourceLocation getFabricId() { return id("content_reload"); }
-            @Override public void onResourceManagerReload(ResourceManager manager) { HotpotContentModule.HOST.reload(); }
+            @Override public void onResourceManagerReload(ResourceManager manager) {
+                HotPotTracks.reload(manager);
+                HotpotContentModule.HOST.reload();
+            }
         });
         // /hpt 注册入口使用 Fabric 命令事件，只在开发源码存在。
         HotpotContentModule.development("FabricDevTests", "register", new Class<?>[0]);

@@ -62,7 +62,7 @@ abstract class FoodConsumeMixin {
                     }
                     user.addEffect(effect);
                 }
-                int mouthFireTicks = Config.spicyMouthFireTicks();
+                int mouthFireTicks = Config.penaltiesEnabled() ? Config.spicyMouthFireTicks() : 0;
                 if (soup.spicy()
                     && mouthFireTicks > 0 && spicy >= Config.spicyMouthFireFromLevel()
                     && !calmSpicy

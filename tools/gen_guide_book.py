@@ -130,9 +130,105 @@ HEAD_RE = re.compile(r"^(#{1,6})\s+(.*)$")
 FENCE_RE = re.compile(r"^\s*`")
 RULE_RE = re.compile(r"^\s*(?:-{3,}|\*{3,}|_{3,})\s*$")
 SEP_CELL = re.compile(r"^:?-{3,}:?$")
+DIRECTIVE_RE = re.compile(r"^<!--(/?guide-(?:flag|collapse|fallback)(?::([^>\s]+))?)-->$")
+
+# mryt233 改（2026-11-22，0.3.1-alpha）：游戏内指南在精简模式下（关闭对应开关时）展示的回退说明，
+# 仅注入游戏内 guide/<lang>.json，不影响网页全量教程。
+GUIDE_FALLBACKS = {
+    "minigames_off": {
+        "flag": "mode.minigames_enabled",
+        "expected": False,
+        "items": [
+            ("note", "tip",
+             ("精简模式提示", "精簡模式提示", "Simple Mode"),
+             [("当前模式已关闭「即时小游戏」功能；如需单人或同桌挑战连打吃菜 / 4 轨音游，可在设置「模式与细项」中开启，或执行 /orientshotpot mode full。",
+               "目前模式已關閉「即時小遊戲」功能；如需單人或同桌挑戰連打吃菜／4 軌音遊，可在設定「模式與細項」中開啟，或執行 /orientshotpot mode full。",
+               "Instant Minigames are disabled in the current mode. Re-enable them in Settings -> Mode & Options or run /orientshotpot mode full to play Rush or 4-Lane Rhythm.")]),
+        ],
+    },
+    "penalties_red_off": {
+        "flag": "mode.penalties_enabled",
+        "expected": False,
+        "items": [
+            ("note", "tip",
+             ("精简模式提示", "精簡模式提示", "Simple Mode"),
+             [("当前模式已关闭惩罚开关：吃 3 级特辣菜或红汤碗不会再触发饥饿效果，嘴上也不会冒火；力量、速度与抗火加成仍照常保留。",
+               "目前模式已關閉懲罰開關：吃 3 級特辣菜或紅湯碗不會再觸發飢餓效果，嘴上也不會冒火；力量、速度與抗火加成仍照常保留。",
+               "Penalties are currently disabled: Extra Hot spicy food no longer inflicts Hunger or sets your mouth briefly on fire, while Strength, Speed, and Fire Resistance remain active.")]),
+        ],
+    },
+    "penalties_cold_off": {
+        "flag": "mode.penalties_enabled",
+        "expected": False,
+        "items": [
+            ("note", "tip",
+             ("精简模式提示", "精簡模式提示", "Simple Mode"),
+             [("当前模式已关闭惩罚开关：吃冷锅里的熟菜不会再触发反胃效果；不过冷锅依然不能把生食材煮熟，需要点着灶台或篝火。",
+               "目前模式已關閉懲罰開關：吃冷鍋裡的熟菜不會再觸發反胃效果；不過冷鍋依然不能把生食材煮熟，需要點著灶台或營火。",
+               "Penalties are currently disabled: eating from an unheated pot will not inflict Nausea, though unheated pots still cannot cook raw food.")]),
+        ],
+    },
+    "tofu_simple": {
+        "flag": "mode.detailed_tofu_processing",
+        "expected": False,
+        "items": [
+            ("note", "tip",
+             ("精简豆腐工艺", "精簡豆腐工藝", "Simple Tofu Crafting"),
+             [("当前已关闭「细致豆腐工序」：无需大木桶压制，在工作台用 2 颗或 3 颗黄豆 + 水桶即可快捷合成冷豆腐；小石磨与开口大木桶仍可合成体验干磨与压豆腐。",
+               "目前已關閉「細緻豆腐工序」：無須大木桶壓製，在工作台用 2 顆或 3 顆黃豆 + 水桶即可快捷合成冷豆腐；小石磨與開口大木桶仍可合成體驗乾磨與壓豆腐。",
+               "Detailed Tofu Processing is disabled: craft Cold Tofu directly on a crafting grid with 2 or 3 Soybeans + a Water Bucket. The Stone Mill and Open Wooden Vat still work normally.")]),
+            ("recipes", ["orients_hotpot_chronicles:cold_tofu"]),
+        ],
+    },
+    "crops_grass_fallback": {
+        "flag": "mode.crops_replace_grass",
+        "expected": False,
+        "items": [
+            ("note", "tip",
+             ("精简模式提示", "精簡模式提示", "Simple Mode"),
+             [("当前已关闭「独立作物替代打草」：破坏短草 / 高草已恢复旧版高掉率（15%～25%）；9 种作物仍可在耕地种植并保留野生植株。",
+               "目前已關閉「獨立作物替代打草」：破壞矮草／芒草已恢復舊版高掉率（15%～25%）；9 種作物仍可在耕地種植並保留野生植株。",
+               "Crops Replace Grass Drops is disabled: breaking short/tall grass uses the classic higher drop rates (15%-25%), while farming and wild crops still work.")]),
+        ],
+    },
+    "rack_swap_off": {
+        "flag": "mode.rack_swap_materials",
+        "expected": False,
+        "items": [
+            ("note", "tip",
+             ("精简模式提示", "精簡模式提示", "Simple Mode"),
+             [("当前模式已关闭「备菜架换材质」开关，三种备菜架放取盘具、围裙与厨具完全照常使用。",
+               "目前模式已關閉「備菜架換材質」開關，三種備菜架放取盤具、圍裙與廚具完全照常使用。",
+               "Prep-rack material swapping is disabled in this mode; storing and taking plates, utensils, and aprons still works normally.")]),
+        ],
+    },
+}
+
+
+def fallback_blocks(key, lang):
+    spec = GUIDE_FALLBACKS.get(key)
+    if not spec:
+        warnings.append("未知的指南回退标记：%s" % key)
+        return []
+    li = {"zh_cn": 0, "zh_tw": 1, "en": 2}.get(lang, 2)
+    out = []
+    for item in spec["items"]:
+        if item[0] == "note":
+            _, style, titles, lines = item
+            blk = {"k": "note", "t": titles[li], "b": [ln[li] for ln in lines], "s": style,
+                   "requires_flag": spec["flag"]}
+        elif item[0] == "recipes":
+            blk = {"k": "recipes", "ids": [full(x) for x in item[1]], "requires_flag": spec["flag"]}
+        else:
+            continue
+        if not spec.get("expected", True):
+            blk["expected"] = False
+        out.append(blk)
+    return out
 
 
 def heading_text(s):
+    s = re.sub(r"<!--.*?-->", "", s)
     s = re.sub(r"\{#[^}]*\}", "", s)
     s = re.sub(r"\{\{[^}]*\}\}", "", s)
     return s.strip().rstrip("#").strip()
@@ -228,16 +324,48 @@ def flatten(blocks):
     return [x for x in lines if x]
 
 
-def md_blocks(md):
-    """一段条目正文的 Markdown → 按源文件顺序排列的块。"""
-    md = re.sub(r"<!--.*?-->", "", md, flags=re.S)
+def md_blocks(md, lang="zh_cn"):
+    """一段条目正文的 Markdown → 按源文件顺序排列的块。支持 guide-flag / guide-collapse / guide-fallback 标记。"""
+    md = re.sub(r"<!--(?!(?:/?guide-(?:flag|collapse|fallback)\b)).*?-->", "", md, flags=re.S)
+    md = re.sub(r"[ \t]*(<!--/?guide-(?:flag|collapse|fallback)(?::[^>\s]+)?-->)[ \t]*", r"\n\1\n", md)
     lines = md.splitlines()
     out = []
+    flag_stack = []
+    collapse_depth = 0
+
+    def emit(blk):
+        if flag_stack:
+            fname, fexp = flag_stack[-1]
+            blk["requires_flag"] = fname
+            if not fexp:
+                blk["expected"] = False
+        if collapse_depth > 0:
+            blk["simple_collapse"] = True
+        out.append(blk)
+
     i, n = 0, len(lines)
     while i < n:
         raw = lines[i]
         s = raw.strip()
         if not s:
+            i += 1
+            continue
+        dm = DIRECTIVE_RE.match(s)
+        if dm:
+            cmd = dm.group(1)
+            arg = dm.group(2) or ""
+            if cmd.startswith("guide-flag:"):
+                exp = not arg.startswith("!")
+                flag_stack.append((arg[1:] if not exp else arg, exp))
+            elif cmd == "/guide-flag" and flag_stack:
+                flag_stack.pop()
+            elif cmd == "guide-collapse":
+                collapse_depth += 1
+            elif cmd == "/guide-collapse" and collapse_depth > 0:
+                collapse_depth -= 1
+            elif cmd.startswith("guide-fallback:"):
+                for fb in fallback_blocks(arg, lang):
+                    out.append(fb)
             i += 1
             continue
         # 提示框
@@ -252,7 +380,7 @@ def md_blocks(md):
             title = {"tip": NOTE_TITLE.get("tip", "小提示"), "warn": NOTE_TITLE.get("warn", "注意"),
                      "dev": L("开发版预览（还没正式发布，名字和数值以后可能会变）")}.get(
                          kind, NOTE_TITLE.get("tip", "小提示"))
-            out.append({"k": "note", "t": title, "b": flatten(md_blocks("\n".join(body))), "s": kind})
+            emit({"k": "note", "t": title, "b": flatten(md_blocks("\n".join(body), lang)), "s": kind})
             continue
         # 代码块
         if FENCE_RE.match(raw):
@@ -263,13 +391,13 @@ def md_blocks(md):
                 i += 1
             i += 1
             if body:
-                out.append({"k": "code", "l": body})
+                emit({"k": "code", "l": body})
             continue
         # 整行的指令
         b = standalone(s)
         if b is not False:
             if b:
-                out.append(b)
+                emit(b)
             i += 1
             continue
         # 表格
@@ -278,7 +406,8 @@ def md_blocks(md):
             while i < n and lines[i].strip().startswith("|"):
                 body.append(lines[i])
                 i += 1
-            out.extend(table_blocks(body))
+            for tb in table_blocks(body):
+                emit(tb)
             continue
         # 标题
         m = HEAD_RE.match(s)
@@ -286,7 +415,7 @@ def md_blocks(md):
             level = len(m.group(1))
             text = inline(heading_text(m.group(2)), [])
             if text:
-                out.append({"k": "sub", "t": ("◆ " if level >= 3 else "") + text, "l": level})
+                emit({"k": "sub", "t": ("◆ " if level >= 3 else "") + text, "l": level})
             i += 1
             continue
         # 引用
@@ -295,11 +424,11 @@ def md_blocks(md):
             while i < n and lines[i].strip().startswith(">"):
                 body.append(lines[i].strip()[1:].strip())
                 i += 1
-            out.append({"k": "note", "t": "", "b": [inline(x, []) for x in body if x], "s": "quote"})
+            emit({"k": "note", "t": "", "b": [inline(x, []) for x in body if x], "s": "quote"})
             continue
         # 分隔线
         if RULE_RE.match(raw):
-            out.append({"k": "rule"})
+            emit({"k": "rule"})
             i += 1
             continue
         # 列表
@@ -321,7 +450,7 @@ def md_blocks(md):
                     blk = {"k": "num", "t": text, "n": num, "d": indent}
                 if its:                     # 这一项提到的物品，在左边摆一个小图标
                     blk["icon"] = its[0]
-                out.append(blk)
+                emit(blk)
                 i += 1
             continue
         # 段落：一直收到空行 / 另一个块开头
@@ -331,11 +460,12 @@ def md_blocks(md):
             nxt = lines[i]
             t = nxt.strip()
             if (not t or t.startswith(("|", ">", ":::", "`")) or HEAD_RE.match(t) or LIST_RE.match(nxt)
-                    or RULE_RE.match(nxt) or standalone(t) is not False):
+                    or RULE_RE.match(nxt) or DIRECTIVE_RE.match(t) or standalone(t) is not False):
                 break
             body.append(nxt)
             i += 1
-        out.extend(paragraph_block(body))
+        for pb in paragraph_block(body):
+            emit(pb)
     return out
 
 
@@ -371,14 +501,14 @@ def build_entries(lang, cat_title, cat_icon, sources, cat_i):
     entries = []
     for slug, by_h2 in sources:
         if slug == "@recipes":
-            for title, icon, blocks in recipe_sections():
+            for title, icon, blocks in recipe_sections(lang):
                 entries.append({"icon": full(icon), "title": title, "blocks": blocks})
             continue
         if slug == "@items":
             entries.append({"icon": full("minecraft:book"), "title": L("物品图鉴"), "blocks": items_blocks()})
             continue
         if slug == "@changelog":
-            for title, icon, blocks in changelog_entries():
+            for title, icon, blocks in changelog_entries(lang):
                 entries.append({"icon": full(icon), "title": title, "blocks": blocks})
             continue
         md = open(os.path.join(bt.CONTENT, slug + ".md"), encoding="utf-8").read()
@@ -386,7 +516,7 @@ def build_entries(lang, cat_title, cat_icon, sources, cat_i):
             head = section_heading(sec)
             title = L(btb.ENTRY_TITLES.get((slug, si), "")) or btb.entry_title(head) or L(cat_title)
             icon = btb.ENTRY_ICONS.get((slug, si)) or btb.first_item(sec) or cat_icon
-            blocks = md_blocks(sec)
+            blocks = md_blocks(sec, lang)
             # 条目标题在书里由「图标 + 标题 + 一道线」画，正文开头的一级 / 二级标题去掉
             if blocks and blocks[0]["k"] == "sub" and blocks[0].get("l", 3) <= 2:
                 blocks = blocks[1:]
@@ -407,11 +537,40 @@ def build_entries(lang, cat_title, cat_icon, sources, cat_i):
 
 
 # ---------------------------------------------------------------- 查阅：合成表大全
-def recipe_sections():
+def _tr(lang, zh_cn, zh_tw, en):
+    return {"zh_cn": zh_cn, "zh_tw": zh_tw, "en": en}.get(lang, en)
+
+
+def recipe_sections(lang="zh_cn"):
     """「查阅」分类的合成表大全：读游戏配方，按网页书本同样的分组和顺序生成。"""
     groups, cooking, cutting = {}, [], []
+    pounding, milling, vatting, boiling = [], [], [], []
     for k, r, dev in btb.load_recipes_all():
         t = r["type"].split(":")[1]
+        if t == "conditional_crafting":
+            r = r.get("recipe", r)
+            t = r["type"].split(":")[1]
+        if t == "pounding":
+            raw = bt.ing_ref(r["ingredient"])[0]
+            pounding.append((raw, bt.result_id(r), bt.result_count(r), r.get("hits", 3)))
+            continue
+        if t == "stone_mill":
+            raw = bt.ing_ref(r["ingredient"])[0]
+            milling.append((raw, r.get("ingredient_count", 1), bt.result_id(r), bt.result_count(r),
+                            bool(r.get("requires_water")), r.get("turns", 3)))
+            continue
+        if t == "wooden_vat":
+            vatting.append((bt.result_id(r), bt.result_count(r), round(r.get("ticks", 80) / 20, 2)))
+            continue
+        if t == "pot_boiling":
+            raw = bt.ing_ref(r["ingredient"])[0]
+            ticks = r.get("cook_ticks", 200)
+            over = r.get("overcook_result") or {}
+            oid = over.get("id") or over.get("item")
+            boiling.append((raw, bt.result_id(r), round(ticks / 20, 2),
+                            oid and bt.full_id(oid),
+                            round(r.get("overcook_ticks", 0) / 20, 2) if oid else 0))
+            continue
         if t in ("smelting", "smoking", "campfire_cooking"):
             raw = bt.ing_ref(r["ingredient"])[0]
             cooking.append((raw, bt.result_id(r), t, round(r.get("cookingtime", 200) / 20, 2)))
@@ -430,7 +589,8 @@ def recipe_sections():
         groups.setdefault(btb.base_of(rid.split(":")[1]), []).append((rid, dev))
 
     order = ["brick_stove", "tall_brick_stove", "nine_grid_hotpot", "split_pot", "chopsticks",
-             "hotpot_table", "tall_hotpot_table", "stool", "bench", "small_dish"]
+             "hotpot_table", "tall_hotpot_table", "multi_tier_prep_rack", "desktop_prep_rack", "hanging_prep_rack",
+             "stool", "bench", "small_dish"]
     out, used = [], set()
     for title, icon, pred in btb.RG_SECTIONS:
         cards = []
@@ -456,6 +616,60 @@ def recipe_sections():
         out.append((L("切石机"), full("minecraft:stonecutter"),
                     [{"k": "sub", "t": btb.count_title(L("切石机"), len(cut)), "l": 3},
                      {"k": "recipes", "ids": cut}]))
+    if pounding:
+        rows = [{"k": "sub", "t": btb.count_title(L("擀面杖捣制"), len(pounding)), "l": 3}]
+        for raw, out_id, cnt, hits in sorted(pounding):
+            text = _tr(lang, "%s ×%d（砧板捣 %d 下）", "%s ×%d（砧板搗 %d 下）", "%s ×%d (pound %d× on board)") % (
+                item_name(out_id), cnt, hits)
+            rows.append({"k": "tr", "icon": full(raw), "t": text})
+        out.append((L("擀面杖捣制"), full("rolling_pin"), rows))
+    if milling:
+        rows = [{"k": "sub", "t": btb.count_title(L("小石磨研磨"), len(milling)), "l": 3}]
+        for raw, cnt, out_id, out_cnt, water, turns in sorted(milling):
+            cond = (_tr(lang, "×%d · 需加水 · %d 圈", "×%d · 需加水 · %d 圈", "×%d · water · %d turns")
+                    if water else
+                    _tr(lang, "×%d · 干磨 · %d 圈", "×%d · 乾磨 · %d 圈", "×%d · dry · %d turns")) % (cnt, turns)
+            rows.append({"k": "tr", "icon": full(raw), "t": "%s ×%d（%s）" % (item_name(out_id), out_cnt, cond)})
+        rows.append({"k": "note", "s": "tip", "t": _tr(lang, "自动流浆", "自動流漿", "Auto-Pour"),
+                     "b": [_tr(lang, "小石磨出料口正对空开口大木桶时，湿磨豆浆完成后自动流入木桶。",
+                               "小石磨出料口正對空開口大木桶時，濕磨豆漿完成後自動流入木桶。",
+                               "Aim the Stone Mill spout at an empty Open Wooden Vat to pour soymilk straight in automatically.")]})
+        out.append((L("小石磨研磨"), full("stone_mill"), rows))
+    if vatting:
+        rows = [{"k": "sub", "t": btb.count_title(L("开口大木桶"), len(vatting)), "l": 3}]
+        for out_id, out_cnt, secs in vatting:
+            rows.append({
+                "k": "tr",
+                "icon": full("soymilk_bucket"),
+                "t": _tr(lang, "%s ×%d（+ 卤水瓶 + 木压板 · %g 秒）", "%s ×%d（+ 滷水瓶 + 木壓板 · %g 秒）",
+                         "%s ×%d (+ Brine Bottle + Press Lid · %g s)") % (item_name(out_id), out_cnt, secs),
+                "requires_flag": "mode.detailed_tofu_processing",
+            })
+        rows.append({
+            "k": "note", "s": "tip",
+            "t": _tr(lang, "精简豆腐工艺", "精簡豆腐工藝", "Simple Tofu Mode"),
+            "b": [_tr(lang, "当前已关闭细致豆腐工序，可直接用黄豆 + 水桶在工作台合成冷豆腐。",
+                      "目前已關閉細緻豆腐工序，可直接用黃豆 + 水桶在工作台合成冷豆腐。",
+                      "Detailed Tofu Processing is off; craft Cold Tofu directly on a grid with Soybeans + Water Bucket.")],
+            "requires_flag": "mode.detailed_tofu_processing",
+            "expected": False,
+        })
+        rows.append({"k": "recipes", "ids": [full("cold_tofu")]})
+        out.append((L("开口大木桶"), full("wooden_vat"), rows))
+    if boiling:
+        rows = [{"k": "sub", "t": btb.count_title(L("锅中专煮"), len(boiling)), "l": 3}]
+        for raw, out_id, secs, over_id, over_secs in sorted(boiling):
+            if over_id:
+                if lang == "en":
+                    line = "%s (%g s; breaks into %s at %g s)" % (item_name(out_id), secs, item_name(over_id), over_secs)
+                else:
+                    txt = _tr(lang, "%s（%g 秒；煮满 %g 秒碎成%s）", "%s（%g 秒；煮滿 %g 秒碎成%s）", "")
+                    line = txt % (item_name(out_id), secs, over_secs, item_name(over_id))
+            else:
+                line = _tr(lang, "%s（仅锅中涮煮 · %g 秒）", "%s（僅鍋中涮煮 · %g 秒）",
+                           "%s (hotpot only · %g s)") % (item_name(out_id), secs)
+            rows.append({"k": "tr", "icon": full(raw), "t": line})
+        out.append((L("锅中专煮"), full("iron_nine_grid_hotpot"), rows))
     # 烹饪：生 → 熟，按原料一行，写清熔炉 / 烟熏炉 / 营火各要几秒
     if cooking:
         by_raw = {}
@@ -474,19 +688,21 @@ def recipe_sections():
 # ---------------------------------------------------------------- 查阅：物品图鉴
 def items_blocks():
     groups = [
-        ("灶台与锅", lambda i: i in ("brick_stove", "tall_brick_stove") or "hotpot" in i and "table" not in i),
-        ("火锅桌", lambda i: i.endswith("hotpot_table")),
+        ("灶台与锅", lambda i: i in ("brick_stove", "tall_brick_stove") or ("hotpot" in i and "table" not in i and "guide" not in i and "base" not in i)),
+        ("火锅桌与备菜架", lambda i: i in ("hotpot_table", "tall_hotpot_table") or i.endswith("_prep_rack")),
         ("凳子", lambda i: i.endswith("_stool") or i.endswith("_bench")),
         ("盘子", lambda i: any(s in i for s in ("small_dish", "plate", "platter"))),
         ("蘸料台", lambda i: "sauce_station" in i),
-        ("汤碗与饮料", lambda i: "broth_bowl" in i or "drink" in i or i == "dipping_sauce"),
-        ("工具", lambda i: i in ("bamboo_chopsticks", "iron_kitchen_knife", "rolling_pin", "cutting_board")),
+        ("汤碗与饮料", lambda i: any(s in i for s in ("broth_bowl", "soup_bowl", "soup_bucket", "hotpot_base", "drink", "cola")) or i in ("glass_cup", "water_cup", "milk_cup", "soymilk_bucket", "dipping_sauce")),
+        ("厨具、加工与穿戴", lambda i: i in ("hotpot_guide", "bamboo_chopsticks", "iron_kitchen_knife", "rolling_pin", "cutting_board", "stone_mill", "wooden_vat", "wooden_press_lid", "brine_bottle") or "cloth_apron" in i),
+        ("橙子树与野生植株", lambda i: i in ("orange_log", "orange_wood", "stripped_orange_log", "stripped_orange_wood", "orange_leaves", "orange_sapling") or i.startswith("wild_")),
         ("食材", lambda i: True),
     ]
     all_ids = sorted({k.split(":")[1] for k in bt.NAMES} - {"plates"})
-    # mryt233 改：饮料炼药锅只有方块状态，没有可列入图鉴的独立物品。
-    hide = {"plates", "sauce_station_top", "tall_brick_stove_top", "bowl", "drink", "drink_cauldron", "sauce_bottle"}
-    all_ids = [i for i in all_ids if i not in hide]
+    # mryt233 改：纯放置方块形态（无独立物品）不列为图鉴/给物 ID；旧 40 张预设桌仅做存档迁移兼容。
+    hide = {"plates", "sauce_station_top", "tall_brick_stove_top", "bowl", "drink", "drink_cauldron", "sauce_bottle", "cup", "chopstick_rest"}
+    all_ids = [i for i in all_ids if i not in hide and not i.endswith("_crop")
+               and not (i.endswith("hotpot_table") and i not in ("hotpot_table", "tall_hotpot_table"))]
     ex = "/give @s %s:brick_stove" % MODID
     blocks = [{"k": "p", "t": inline(L("模组里所有物品和方块（自动生成）。<code>ID</code> 是指令里用的名字，例如 ")
                                     + "<code>" + ex + "</code>。", [])}]
@@ -507,7 +723,7 @@ def items_blocks():
 
 
 # ---------------------------------------------------------------- 关于：更新日志
-def changelog_entries():
+def changelog_entries(lang="zh_cn"):
     """和网页书本一样：各正式版合成「更新日志」一条（维护提示框不进书）。"""
     md = open(os.path.join(bt.CONTENT, "changelog.md"), encoding="utf-8").read()
     secs = btb.split_sections(md, True)
@@ -515,7 +731,7 @@ def changelog_entries():
     preview_title = "## " + L("开发版预览")
     preview = [x for x in secs[1:] if x.lstrip().startswith(preview_title)]
     rest = [x for x in secs[1:] if x not in preview]
-    blocks = md_blocks(intro + "\n\n" + "\n\n".join(rest))
+    blocks = md_blocks(intro + "\n\n" + "\n\n".join(rest), lang)
     if blocks and blocks[0]["k"] == "sub" and blocks[0].get("l", 3) <= 2:
         blocks = blocks[1:]
     return [(L("更新日志"), full("minecraft:written_book"), blocks)]
@@ -583,6 +799,21 @@ def check(book, vanilla):
             check_id(e["icon"], "%s 第 %d 条图标" % (cat["title"], ei + 1))
             if not e["blocks"]:
                 warnings.append("%s / %s 没有内容" % (cat["title"], e["title"]))
+            for mode_name, flags in (
+                ("完整模式", {"mode.minigames_enabled": True, "mode.detailed_tofu_processing": True,
+                          "mode.penalties_enabled": True, "mode.crops_replace_grass": True,
+                          "mode.rack_swap_materials": True, "mode.simple_ui_collapse": False}),
+                ("精简模式", {"mode.minigames_enabled": False, "mode.detailed_tofu_processing": False,
+                          "mode.penalties_enabled": False, "mode.crops_replace_grass": False,
+                          "mode.rack_swap_materials": False, "mode.simple_ui_collapse": True}),
+            ):
+                vis = [
+                    b for b in e["blocks"]
+                    if not (b.get("simple_collapse") and flags["mode.simple_ui_collapse"])
+                    and (not b.get("requires_flag") or flags.get(b["requires_flag"], False) == b.get("expected", True))
+                ]
+                if not vis:
+                    warnings.append("%s / %s 在 %s 下没有任何可见内容" % (cat["title"], e["title"], mode_name))
             for bi, b in enumerate(e["blocks"]):
                 where = "%s / %s 第 %d 块" % (cat["title"], e["title"], bi + 1)
                 if b.get("icon"):
