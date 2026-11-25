@@ -13,7 +13,7 @@
        "k": "note",
        "t": "Tip",
        "b": [
-        "This guide covers packaged 0.3.1-alpha, demonstrated on Minecraft 1.21.1 Fabric (1.21.1 NeoForge, 1.20.1 Fabric / Forge, and Fabric / NeoForge on 26.1.x, 26.2, and 26.3 play the same; see Downloads, Installation & Feedback). This release introduces Full Mode / Simple Mode switching, Chicken Feet & Boneless Chicken Feet, Standalone Orange Trees (1+3×3×2(+1) compact trees, azalea-style transparent orange leaves, shader waving, and light 1/5 pass-through slowdown), 9 farmland crops & wild clusters, a Stone Mill (1.5-block stand with automatic pour into adjacent wooden vats), an Open Wooden Vat tofu workflow, 40 legacy tables consolidated into 2 universal material-swappable Hotpot Tables, 3 GUI-less Prep Racks, Speed Eating & 4-Track Rhythm minigames, LabPBR 1.3 shader maps for hard surfaces, and REI 16 / shader / rendering / migration fixes."
+        "This guide covers packaged 0.3.2-alpha, demonstrated on Minecraft 1.21.1 Fabric (1.21.1 NeoForge, 1.20.1 Fabric / Forge, and Fabric / NeoForge on 26.1.x, 26.2, and 26.3 play the same; see Downloads, Installation & Feedback). This update highlights universal item placement on prep racks, per-item shelf stacking, and five display modes (3-layer data separation with prep_rack_rules/*.json datapack hot-reload, configurable visual draw cap, main/off-hand & sneak interaction routing, and flush ceiling hooks), alongside the 1.20.1 Jade 11.x compatibility fix and drop / model-cache safety hardening across all five version lines; it also carries forward 0.3.1-alpha's Full/Simple Mode switching, chicken feet & standalone orange trees, 9 crops, Stone Mill & Wooden Vat tofu, material-swappable universal hotpot tables, real-time minigames, and LabPBR 1.3 shader maps."
        ],
        "s": "tip"
       },
@@ -120,7 +120,7 @@
       {
        "k": "tr",
        "icon": "orients_hotpot_chronicles:hotpot_guide",
-       "t": "Supported versions and downloads　0.3.1-alpha targets Minecraft 1.21…",
+       "t": "Supported versions and downloads　0.3.2-alpha simultaneously support…",
        "go": [
         0,
         3
@@ -148,7 +148,7 @@
       },
       {
        "k": "bul",
-       "t": "Tables, Racks & Seating: universal low and tall hotpot tables (default plank top + brick base; swap tabletop and base materials independently with any solid block, uniformly non-flammable) and three GUI-less prep racks (floor / desktop / wall-or-ceiling hanging rack); 11 wood styles of stools and benches connecting up to 3 blocks and stacking as ladders.",
+       "t": "Tables, Racks & Seating: universal low and tall hotpot tables (default plank top + brick base; swap tabletop and base materials independently with any solid block, uniformly non-flammable) and three GUI-less prep racks (floor / desktop / wall-or-ceiling hanging rack, supporting any item and per-item shelf stacking); 11 wood styles of stools and benches connecting up to 3 blocks and stacking as ladders.",
        "d": 0
       },
       {
@@ -163,7 +163,7 @@
       },
       {
        "k": "bul",
-       "t": "Sauces & Modes: self-service sauce station with 15 stackable seasonings; lit pots grant ongoing Regeneration within 6 blocks; one-click Full Mode / Simple Mode presets and 18 hot-reloadable config groups, alongside deep support for shaders (LabPBR 1.3 maps, transparent waving orange leaves) and JEI / REI 16 / Jade.",
+       "t": "Sauces & Modes: self-service sauce station with 15 stackable seasonings; lit pots grant ongoing Regeneration within 6 blocks; one-click Full Mode / Simple Mode presets and 19 hot-reloadable config groups, alongside deep support for shaders (LabPBR 1.3 maps, transparent waving orange leaves) and JEI / REI 16 / Jade.",
        "d": 0
       },
       {
@@ -198,13 +198,13 @@
      "blocks": [
       {
        "k": "p",
-       "t": "0.3.1-alpha targets Minecraft 1.21.1 (Fabric, NeoForge), 1.20.1 (Fabric, Forge), 26.1.x (Fabric, NeoForge), 26.2 (Fabric, NeoForge), and 26.3 (Fabric, NeoForge) simultaneously; this guide demonstrates 1.21.1 Fabric. See Downloads, Installation & Feedback for download links (CurseForge, Modrinth, MCMOD, GitHub), installation steps, and contact info (GitHub, QQ group)."
+       "t": "0.3.2-alpha simultaneously supports Minecraft 1.21.1 (Fabric, NeoForge), 1.20.1 (Fabric, Forge), 26.1.x (Fabric, NeoForge), 26.2 (Fabric, NeoForge), and 26.3 (Fabric, NeoForge); this guide demonstrates 1.21.1 Fabric. See Downloads, Installation & Feedback for download links (CurseForge, Modrinth, MCMOD, GitHub), installation steps, and contact info (GitHub, QQ group)."
       },
       {
        "k": "note",
        "t": "Note",
        "b": [
-        "This mod is still in alpha. 0.3.1-alpha losslessly migrates the 40 legacy preset tables in existing worlds to universal hotpot tables and silently cleans up removed legacy config keys; still, if upgrading from very early builds such as 0.1.0-alpha.1, always back up your world first."
+        "This mod is still in alpha. Upgrading from 0.3.1-alpha / 0.3.0-alpha / 0.2.2-alpha to 0.3.2-alpha smoothly preserves existing prep rack inventories, automatically migrates legacy preset tables, and silently cleans up deprecated config keys; however, if upgrading from very early builds such as 0.1.0-alpha.1, always back up your world first."
        ],
        "s": "warn"
       },
@@ -3819,7 +3819,7 @@
       {
        "k": "tr",
        "icon": "orients_hotpot_chronicles:multi_tier_prep_rack",
-       "t": "Three prep racks　Prep racks store plates, ingredien…",
+       "t": "Three prep racks　All three prep racks support GUI-l…",
        "go": [
         5,
         5
@@ -4063,25 +4063,53 @@
       },
       {
        "k": "p",
-       "t": "Prep racks store plates, ingredients, cloth aprons, and handy utensils with GUI-less slot-targeted direct placement and retrieval (right-click a slot to place, spilling to the next free slot if occupied; empty-hand right-click removes; breaking drops all contents). When enabled, all racks also support whole-rack material swapping via solid blocks (sneak + empty hand pops the block back; controlled by mode.rack_swap_materials and table_materials.mode):"
+       "t": "All three prep racks support GUI-less slot-targeted direct placement and retrieval, and starting in 0.3.2-alpha they are no longer restricted to ingredients and plates — any non-empty item can be placed on display with per-category stacking styles:"
       },
       {
        "k": "bul",
-       "t": "Multi-Tier Prep Rack (6-slot floor rack): 3-tier iron-and-wood floor frame with 2 slots per shelf (6 slots total), holding plates/bowls (#rack_plates and tabletop items) plus cookable or edible ingredients.",
+       "t": "Multi-Tier Prep Rack (6-slot floor rack): 3-tier iron-and-wood floor frame with 2 slots per shelf (6 slots total). Ingredients stack up to 16 per slot by default (arranged compactly front-to-back), plates/bowls stack upward (default 4), drinks and seasoning bottles stand upright side-by-side (default 4), and blocks/large items display singly facing forward.",
        "d": 0,
        "icon": "orients_hotpot_chronicles:multi_tier_prep_rack"
       },
       {
        "k": "bul",
-       "t": "Desktop Prep Rack (4-slot desktop rack): two-step tabletop organizer (2 lower front slots + 2 upper rear slots, 4 slots total). Tagged under table_decorations, so placing it on low or tall hotpot tables automatically aligns it flush with the tabletop.",
+       "t": "Desktop Prep Rack (4-slot desktop rack): two-step tabletop organizer (2 lower front slots + 2 upper rear slots, 4 slots total). Tagged under table_decorations, so placing it on a low or tall hotpot table automatically raises or lowers it flush with the tabletop; ingredients stack up to 12 per slot by default.",
        "d": 0,
        "icon": "orients_hotpot_chronicles:desktop_prep_rack"
       },
       {
        "k": "bul",
-       "t": "Hanging Prep Rack (4-slot wall / ceiling rack): 4 hanging hooks that auto-select wall (against block sides) or ceiling (under ceilings) upon placement. Designed for #rack_hangables tools (iron kitchen knife, rolling pin, bamboo chopsticks, wooden press lid, shears, buckets) plus all 3 cloth aprons (Linen Cloth Apron, Blue Print Cloth Apron, Brown Trim Cloth Apron).",
+       "t": "Hanging Prep Rack (4-slot dual-mode hanging rack): 4 iron hooks that place as wall (wall-mounted) on block sides or ceiling (ceiling-mounted) under ceilings. #rack_hangables kitchenware (iron kitchen knife, rolling pin, bamboo chopsticks, wooden press lid, shears, buckets) and all 3 cloth aprons (Linen Cloth Apron, Blue Print Cloth Apron, Brown Trim Cloth Apron) still hang vertically tucked against the hooks, while all other items scale down and display upright as single items (large blocks won't hang upside down).",
        "d": 0,
        "icon": "orients_hotpot_chronicles:hanging_prep_rack"
+      },
+      {
+       "k": "p",
+       "t": "Controls & interaction routing (0.3.2-alpha+):"
+      },
+      {
+       "k": "num",
+       "t": "Placing & taking items: normal right-click places 1 item into the targeted slot (merging automatically when the item and its data match; if the targeted slot is full or holds a different item, it looks for the nearest mergeable slot first, then the nearest empty slot); empty main-hand right-click takes 1 item back (even if your off hand holds a shield, torch, etc., without accidentally storing your off-hand item; when the entire rack is empty, off-hand interactions pass through as usual).",
+       "n": 1,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "Material swapping & building against racks: sneak + right-click with an eligible solid block swaps the rack frame material (1-in-1-out lossless refund, controlled by mode.rack_swap_materials and table_materials.mode); sneak + right-click with both hands empty ejects the custom material; sneak + right-click with non-material items such as torches, lanterns, or another prep rack places them against the rack normally instead of storing them inside.",
+       "n": 2,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "Middle-click & breaking: middle-clicking an item in a slot copies that item directly, while middle-clicking the frame copies the rack itself with its custom material intact; breaking a rack clears its slots before dropping all stored items in valid stacks alongside the rack.",
+       "n": 3,
+       "d": 0
+      },
+      {
+       "k": "num",
+       "t": "Datapack & config customization (3-layer data separation): datapacks at data//prep_rack_rules/*.json can fine-tune stack limits, display modes (row_depth / flat_pile / upright / single / hanging), visual counts, and scale/rotation by exact item, item tag (#rack_foods, #rack_plates, #rack_bottles, #rack_hangables, etc.), or category (hot-reloaded via /reload and synced to multiplayer clients; lowering limits keeps existing items in older saves untouched). In Config under \"Advanced → Prep Racks\", you can also adjust the fallback slot capacity rack.rack_default_max_stack (default 12) and max items drawn per slot rack.rack_max_visual_items (default 8, range 1–16; lower values improve performance without reducing actual capacity).",
+       "n": 4,
+       "d": 0
       },
       {
        "k": "note",

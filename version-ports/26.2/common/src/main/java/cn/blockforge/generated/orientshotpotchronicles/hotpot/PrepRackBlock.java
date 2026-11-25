@@ -1,4 +1,4 @@
-// 作者：mryt233
+// 作者：mryt233；mryt233 改（2026-11-26）：适配 26.2 方块右键、掉落与 getCloneItemStack。
 package cn.blockforge.generated.orientshotpotchronicles.hotpot;
 
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.adapter.Use;
@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
@@ -31,7 +32,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import cn.blockforge.orient.framework.game.PartOutline;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -41,7 +45,7 @@ import org.jetbrains.annotations.Nullable;
  * 食材架 / 备菜架统一基类（多层落地菜架 6 格、桌面备菜架 4 格、挂架两态 4 格）。
  * 全面复用火锅桌同款换材质架构、{@link TableMaterials} 规则及无 GUI 准星分格直接放取。作者：mryt233
  */
-public class PrepRackBlock extends Block implements EntityBlock {
+public class PrepRackBlock extends Block implements EntityBlock, PartOutline {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final EnumProperty<Mount> MOUNT = EnumProperty.create("mount", Mount.class);
 
@@ -131,6 +135,16 @@ public class PrepRackBlock extends Block implements EntityBlock {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+        VoxelShape frame = frameShape(state);
+        if (kind != Kind.HANGING || !(world.getBlockEntity(pos) instanceof PrepRackBlockEntity rack) || rack.isRemoved()) return frame;
+        // 挂件可垂到架体以下；只扩大射线形状，不扩大碰撞。
+        for (int i=0; i<kind.slots(); i++) if (!rack.itemAt(i).isEmpty()) {
+            frame = Shapes.or(frame, PrepRackGeometry.shape(PrepRackGeometry.cell(kind,state.getValue(MOUNT),i),state.getValue(FACING),0));
+        }
+        return frame;
+    }
+
+    private VoxelShape frameShape(BlockState state) {
         Direction f = state.getValue(FACING);
         return switch (kind) {
             case MULTI_TIER -> f.getAxis() == Direction.Axis.Z ? MULTI_SHAPE_Z : MULTI_SHAPE_X;
@@ -148,7 +162,7 @@ public class PrepRackBlock extends Block implements EntityBlock {
 
     @Override
     protected VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        return getShape(state, world, pos, context);
+        return frameShape(state);
     }
 
     @Override
@@ -158,22 +172,10 @@ public class PrepRackBlock extends Block implements EntityBlock {
 
     /** 将世界命中坐标转换成局部坐标系 [0..1]（X 向右、Z 向前、Y 向上），按架型精确选择最近子格。 */
     public int slotAt(BlockState state, BlockPos pos, Vec3 hit, @Nullable BlockGetter world) {
-        Direction f = state.getValue(FACING);
-        double lift = world == null ? 0.0 : TableDecor.liftOf(world, pos, state);
-        double dx = hit.x - pos.getX() - 0.5;
-        double dz = hit.z - pos.getZ() - 0.5;
-        double ly = hit.y - pos.getY() - lift;
-        // 旋转回基准朝向（facing=SOUTH：前侧 +Z、左侧 -X）
-        double rx;
-        double rz;
-        switch (f) {
-            case NORTH -> { rx = -dx; rz = -dz; }
-            case EAST -> { rx = -dz; rz = dx; }
-            case WEST -> { rx = dz; rz = -dx; }
-            default -> { rx = dx; rz = dz; }
-        }
-        double lx = rx + 0.5;
-        double lz = rz + 0.5;
+        Vec3 local = localPoint(state, pos, hit, world);
+        double ly = local.y;
+        double lx = local.x + .5;
+        double lz = local.z + .5;
         return switch (kind) {
             case MULTI_TIER -> {
                 int tier = ly < (6.5 / 16.0) ? 0 : (ly < (12.5 / 16.0) ? 1 : 2);
@@ -192,62 +194,102 @@ public class PrepRackBlock extends Block implements EntityBlock {
         };
     }
 
-    public boolean canPlaceItem(Level world, ItemStack stack) {
-        if (stack.isEmpty()) {
-            return false;
-        }
-        if (kind == Kind.HANGING) {
-            return stack.is(RACK_HANGABLES_TAG) || ClothApronItem.isApron(stack);
-        }
-        if (stack.is(RACK_PLATES_TAG) || TableObjects.item(stack) != null) {
-            return true;
-        }
-        boolean edible = stack.has(DataComponents.FOOD) || stack.getItem() instanceof ConfigurableFood;
-        if (edible) {
-            return true;
-        }
-        if (stack.getItem() instanceof BlockItem) {
-            return false;
-        }
-        return HotPotCooking.acceptable(world, stack);
+    Vec3 localPoint(BlockState state, BlockPos pos, Vec3 hit, @Nullable BlockGetter world) {
+        double lift = world == null ? 0 : TableDecor.liftOf(world,pos,state);
+        return PrepRackGeometry.local(state.getValue(FACING),pos,lift,hit);
     }
 
+    public boolean canPlaceItem(Level world, ItemStack stack) { return !stack.isEmpty(); }
+
+    /** mryt233 改：空主手优先取菜；取不到时，副手照常使用而不被塞上架。 */
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
-                                          Player player, InteractionHand hand, BlockHitResult hit) {
+                                              Player player, InteractionHand hand, BlockHitResult hit) {
+        if (stack.isEmpty()) return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide());
         if (player.isSecondaryUseActive()) {
-            return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide());
+            return isSwapMaterial(stack) && swapMaterial(world,pos,player,stack)
+                ? Use.blockItem(UseOutcome.SUCCESS_SOFT,world.isClientSide())
+                : InteractionResult.PASS;
         }
-        if (!(world.getBlockEntity(pos) instanceof PrepRackBlockEntity rack)) {
-            return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide());
+        if (hand == InteractionHand.OFF_HAND && player.getMainHandItem().isEmpty()) {
+            return InteractionResult.PASS;
         }
-        int slot = slotAt(state, pos, hit.getLocation(), world);
-        if (canPlaceItem(world, stack) && rack.tryInsert(player, hand, stack, slot)) {
-            return Use.blockItem(UseOutcome.SUCCESS, world.isClientSide());
-        }
-        if (stack.getItem() instanceof BlockItem blockItem && Config.rackSwapMaterials()) {
-            Block targetBlock = blockItem.getBlock();
-            BlockState candidate = targetBlock.defaultBlockState();
-            if (!candidate.is(TableDecor.TABLE_DECORATIONS) && TableMaterials.accepts(candidate)) {
-                if (rack.applyMaterial(player, stack, targetBlock)) {
-                    return Use.blockItem(UseOutcome.SUCCESS_SOFT, world.isClientSide());
-                }
+        if (world.getBlockEntity(pos) instanceof PrepRackBlockEntity rack && !rack.isRemoved() && !world.isClientSide()) {
+            int slot = slotAt(state,pos,hit.getLocation(),world);
+            if (!rack.tryInsert(player,hand,stack,slot,localPoint(state,pos,hit.getLocation(),world))) {
+                player.sendOverlayMessage(net.minecraft.network.chat.Component.translatableWithFallback(
+                    HotPotBlockEntity.key("msg.prep_rack_full"),"No available space on this rack"));
             }
         }
-        return Use.blockItem(UseOutcome.PASS_TO_EMPTY, world.isClientSide());
+        // 始终交由服务端判定，不用可能过期的客户端上限挡住原版使用包。
+        return Use.blockItem(UseOutcome.SUCCESS_SOFT,world.isClientSide());
+    }
+
+    /** 平台在原版潜行跳过方块分支前，仅为合格材质接管备菜架交互。 */
+    public static InteractionResult onSneakUse(Player player, Level world, InteractionHand hand, BlockHitResult hit) {
+        BlockPos pos = hit.getBlockPos();
+        ItemStack held = player.getItemInHand(hand);
+        if (!player.isSecondaryUseActive() || player.isSpectator()
+            || !(world.getBlockState(pos).getBlock() instanceof PrepRackBlock) || !isSwapMaterial(held)) return InteractionResult.PASS;
+        if (!world.mayInteract(player,pos)) return InteractionResult.FAIL;
+        return swapMaterial(world,pos,player,held) ? Use.blockEmpty(UseOutcome.SUCCESS_SOFT,world.isClientSide()) : InteractionResult.PASS;
+    }
+
+    static boolean isSwapMaterial(ItemStack stack) {
+        if (stack.isEmpty() || !Config.rackSwapMaterials() || !(stack.getItem() instanceof BlockItem item)) return false;
+        BlockState candidate = item.getBlock().defaultBlockState();
+        return !candidate.is(TableDecor.TABLE_DECORATIONS) && TableMaterials.accepts(candidate);
+    }
+
+    private static boolean swapMaterial(Level world, BlockPos pos, Player player, ItemStack stack) {
+        if (!(world.getBlockEntity(pos) instanceof PrepRackBlockEntity rack) || rack.isRemoved()) return false;
+        return world.isClientSide() || rack.applyMaterial(player,stack,((BlockItem) stack.getItem()).getBlock());
+    }
+
+    static boolean canUseEmptyHand(boolean sneaking, ItemStack main, ItemStack off) {
+        return main.isEmpty() && (!sneaking || off.isEmpty());
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos,
-                                             Player player, BlockHitResult hit) {
-        if (!(world.getBlockEntity(pos) instanceof PrepRackBlockEntity rack)) {
-            return Use.blockEmpty(UseOutcome.PASS, world.isClientSide());
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        boolean sneaking = player.isSecondaryUseActive();
+        if (!canUseEmptyHand(sneaking,player.getMainHandItem(),player.getOffhandItem())) return InteractionResult.PASS;
+        if (!(world.getBlockEntity(pos) instanceof PrepRackBlockEntity rack) || rack.isRemoved()) return InteractionResult.PASS;
+        boolean used;
+        if (sneaking) used = rack.tryPopMaterial(player);
+        else if (world.isClientSide()) used = rack.hasStoredItems();
+        else used = rack.tryTake(player,slotAt(state,pos,hit.getLocation(),world),localPoint(state,pos,hit.getLocation(),world));
+        return used ? Use.blockEmpty(UseOutcome.SUCCESS_SOFT,world.isClientSide()) : InteractionResult.PASS;
+    }
+
+    private int aimedItem(BlockState state, BlockGetter world, BlockPos pos, Player player, PrepRackBlockEntity rack) {
+        if (rack.isRemoved()) return -1;
+        double reach = player.blockInteractionRange();
+        if (!(player.pick(reach,1,false) instanceof BlockHitResult hit) || hit.getType()!=HitResult.Type.BLOCK
+            || !hit.getBlockPos().equals(pos)) return -1;
+        Vec3 eye = player.getEyePosition();
+        Vec3 start = localPoint(state,pos,eye,world);
+        Vec3 end = localPoint(state,pos,eye.add(player.getViewVector(1).scale(reach)),world);
+        int best = -1;
+        double distance = Double.MAX_VALUE;
+        for (int i=0; i<kind.slots(); i++) {
+            if (rack.itemAt(i).isEmpty()) continue;
+            var clip = PrepRackGeometry.cell(kind,state.getValue(MOUNT),i).box().clip(start,end);
+            if (clip.isPresent() && start.distanceToSqr(clip.get())<distance) {
+                best=i;
+                distance=start.distanceToSqr(clip.get());
+            }
         }
-        if (player.isSecondaryUseActive()) {
-            return Use.blockEmpty(rack.tryPopMaterial(player) ? UseOutcome.SUCCESS : UseOutcome.PASS, world.isClientSide());
-        }
-        int slot = slotAt(state, pos, hit.getLocation(), world);
-        return Use.blockEmpty(rack.tryTake(player, slot) ? UseOutcome.SUCCESS : UseOutcome.PASS, world.isClientSide());
+        return best;
+    }
+
+    @Override public VoxelShape aimedPart(BlockState state, BlockGetter world, BlockPos pos, Player player) {
+        if (!(world.getBlockEntity(pos) instanceof PrepRackBlockEntity rack)) return null;
+        int slot = aimedItem(state,world,pos,player,rack);
+        double lift = TableDecor.liftOf(world,pos,state);
+        if (slot < 0) return frameShape(state).move(0,lift,0);
+        // mryt233 改：分部描边直接画返回形状，必须和桌面抬升后的渲染处在同一高度。
+        return PrepRackGeometry.shape(PrepRackGeometry.cell(kind,state.getValue(MOUNT),slot),state.getValue(FACING),lift);
     }
 
     @Override
@@ -257,7 +299,7 @@ public class PrepRackBlock extends Block implements EntityBlock {
             && !rack.materials().top().isEmpty()) {
             BlockState matState = rack.frameBlockState();
             world.playSound(null, pos, matState.getSoundType().getPlaceSound(),
-                net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                SoundSource.BLOCKS, 1.0F, 1.0F);
         }
     }
 
@@ -278,8 +320,11 @@ public class PrepRackBlock extends Block implements EntityBlock {
     @Override
     public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
         ItemStack stack = new ItemStack(this);
-        if (world.getBlockEntity(pos) instanceof PrepRackBlockEntity rack && rack.materials().hasAny()) {
-            stack.set(HotPotContent.TABLE_MATERIALS, rack.materials());
+        if (world.getBlockEntity(pos) instanceof PrepRackBlockEntity rack && !rack.isRemoved()) {
+            Player player = PlateHolderBlock.pickPlayer.get();
+            int slot = player == null ? -1 : aimedItem(state,world,pos,player,rack);
+            if (slot >= 0) return rack.itemAt(slot).copyWithCount(1);
+            if (rack.materials().hasAny()) stack.set(HotPotContent.TABLE_MATERIALS,rack.materials());
         }
         return stack;
     }

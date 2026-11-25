@@ -1,6 +1,7 @@
 # 材质贴图生成手册
 
-用 [gen_image.py](gen_image.py) 调用中转站的 GPT 图像模型，为本模组生成 Minecraft 风格贴图。
+<!-- mryt233 改：模型由运行环境指定，手册不绑定服务商或模型。 -->
+用 [gen_image.py](gen_image.py) 调用已配置的图像生成接口，为本模组生成 Minecraft 风格贴图。
 
 ## 1. 提示词结构
 

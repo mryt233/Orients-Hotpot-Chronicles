@@ -73,11 +73,13 @@ public final class HotPotRuntime {
             Config.setServer(server);
             HotPotRecipes.setServer(server);
             HotPotHooks.freezeRegistries();
+            RackRules.start(server); // mryt233 改：在首轮标签绑定后读取。
         });
         events.onPlayerJoin(player -> {
             TableMigration.migrateInventory(player);
             HotPotNetwork.sendConfig(player);
             HotPotNetwork.sendTracks(player);
+            HotPotNetwork.sendRackRules(player);
         });
         events.onChunkLoad(TableMigration::migrateChunk);
         events.onPlayerLeave(player -> {
@@ -92,6 +94,7 @@ public final class HotPotRuntime {
             CuttingBoardBlock.clearCache();
         });
         events.onServerStopped(server -> {
+            RackRules.stop(server);
             activeServer = null;
             Config.setServer(null);
             HotPotRecipes.setServer(null);

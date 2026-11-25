@@ -3,11 +3,11 @@ package cn.blockforge.orient.framework.client;
 
 import cn.blockforge.orient.framework.client.mixin.ItemStackRenderStateAccessor;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.Sheets;
@@ -35,8 +35,28 @@ public final class BakedQuadRemap {
     public record QuadSwapKey(BakedQuad original, TextureAtlasSprite target) {
     }
 
-    private static final Map<BlockStateModel, EnumMap<Direction, TextureAtlasSprite>> SPRITE_CACHE =
-        Collections.synchronizedMap(new WeakHashMap<>());
+    // mryt233 改：按模型、状态、方向及兜底的身份分键，资源重载时一起清空。
+    private static final int SPRITE_LIMIT = 2048, LOOKUP_DEPTH_LIMIT = 8;
+    private static final Object CACHE_LOCK = new Object();
+    private static final Map<SpriteKey, TextureAtlasSprite> SPRITE_CACHE = new LinkedHashMap<>(32, .75F, true);
+    private static final ThreadLocal<Lookup> LOOKUP = new ThreadLocal<>();
+    private static long generation;
+
+    private record SpriteKey(BlockStateModel model, BlockState state, Direction face, BlockState fallback) {
+        @Override public boolean equals(Object other) {
+            return other instanceof SpriteKey key && model == key.model && state == key.state
+                && face == key.face && fallback == key.fallback;
+        }
+        @Override public int hashCode() {
+            int hash = 31 * System.identityHashCode(model) + System.identityHashCode(state);
+            return 31 * (31 * hash + System.identityHashCode(face)) + System.identityHashCode(fallback);
+        }
+    }
+
+    private static final class Lookup {
+        final Map<BlockStateModel, Boolean> active = new IdentityHashMap<>();
+        boolean tripped;
+    }
 
     private BakedQuadRemap() {
     }
@@ -235,33 +255,42 @@ public final class BakedQuadRemap {
         return to.getV(rel);
     }
 
-    /** 从任意已烘焙方块模型中安全提取指定朝向面的主贴图精灵（缺失面自动退回无剔除面或粒子精灵）。 */
+    /** mryt233 改：重入回退到缺失精灵，不再访问被包装模型。 */
     public static TextureAtlasSprite resolveFaceSprite(BlockState state, Direction face, @Nullable BlockState fallback) {
-        BlockStateModelSet modelSet = Minecraft.getInstance().getModelManager().getBlockStateModelSet();
-        BlockStateModel model = modelSet.get(state);
-        if (model == null) {
-            return modelSet.get(fallback != null ? fallback : Blocks.OAK_PLANKS.defaultBlockState())
-                .particleMaterial().sprite();
+        BlockStateModelSet models = Minecraft.getInstance().getModelManager().getBlockStateModelSet();
+        BlockState safe = fallback != null ? fallback : Blocks.OAK_PLANKS.defaultBlockState();
+        BlockStateModel model = models.get(state);
+        SpriteKey key = new SpriteKey(model, state, face, safe);
+        Lookup lookup = LOOKUP.get();
+        if (lookup != null && (lookup.active.size() >= LOOKUP_DEPTH_LIMIT || lookup.active.containsKey(model))) {
+            lookup.tripped = true;
+            return models.missingModel().particleMaterial().sprite();
         }
-        synchronized (SPRITE_CACHE) {
-            EnumMap<Direction, TextureAtlasSprite> map = SPRITE_CACHE.computeIfAbsent(
-                model, m -> new EnumMap<>(Direction.class));
-            TextureAtlasSprite cached = map.get(face);
-            if (cached != null) {
-                return cached;
+        long start;
+        synchronized (CACHE_LOCK) {
+            TextureAtlasSprite cached = SPRITE_CACHE.get(key);
+            if (cached != null) return cached;
+            start = generation;
+        }
+        if (lookup == null) { lookup = new Lookup(); LOOKUP.set(lookup); }
+        lookup.active.put(model, Boolean.TRUE);
+        try {
+            TextureAtlasSprite result = model == null ? null : findFaceSpriteUncached(model, face);
+            if (result == null) result = state == safe ? models.missingModel().particleMaterial().sprite() : resolveFaceSprite(safe, face, safe);
+            synchronized (CACHE_LOCK) {
+                if (!lookup.tripped && start == generation) {
+                    SPRITE_CACHE.put(key, result);
+                    if (SPRITE_CACHE.size() > SPRITE_LIMIT) SPRITE_CACHE.remove(SPRITE_CACHE.keySet().iterator().next());
+                }
             }
+            return result;
+        } finally {
+            lookup.active.remove(model);
+            if (lookup.active.isEmpty()) LOOKUP.remove();
         }
-        TextureAtlasSprite resolved = findFaceSpriteUncached(modelSet, model, face, fallback);
-        synchronized (SPRITE_CACHE) {
-            SPRITE_CACHE.computeIfAbsent(model, m -> new EnumMap<>(Direction.class)).put(face, resolved);
-        }
-        return resolved;
     }
 
-    private static TextureAtlasSprite findFaceSpriteUncached(BlockStateModelSet modelSet,
-                                                             BlockStateModel model,
-                                                             Direction face,
-                                                             @Nullable BlockState fallback) {
+    private static @Nullable TextureAtlasSprite findFaceSpriteUncached(BlockStateModel model, Direction face) {
         List<BlockStateModelPart> parts = new ArrayList<>();
         model.collectParts(RandomSource.create(42L), parts);
         for (BlockStateModelPart part : parts) {
@@ -282,15 +311,18 @@ public final class BakedQuadRemap {
             }
         }
         Material.Baked particle = model.particleMaterial();
-        if (particle != null && particle.sprite() != null) {
-            return particle.sprite();
-        }
-        BlockState safe = fallback != null ? fallback : Blocks.OAK_PLANKS.defaultBlockState();
-        return modelSet.get(safe).particleMaterial().sprite();
+        return particle == null ? null : particle.sprite();
+    }
+
+    public static long spriteGeneration() {
+        synchronized (CACHE_LOCK) { return generation; }
     }
 
     public static void clearSpriteCache() {
-        SPRITE_CACHE.clear();
+        synchronized (CACHE_LOCK) {
+            generation++;
+            SPRITE_CACHE.clear();
+        }
     }
 
     private static float clamp01(float v) {

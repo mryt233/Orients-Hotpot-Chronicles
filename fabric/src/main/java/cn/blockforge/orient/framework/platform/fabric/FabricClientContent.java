@@ -161,13 +161,16 @@ final class FabricClientContent implements ClientContent {
     @Override
     public void wrappedModels(SwappableModelRule rule) {
         Objects.requireNonNull(rule);
-        ModelLoadingPlugin.register(pluginCtx -> pluginCtx.modifyModelAfterBake().register((model, context) -> {
-            ModelResourceLocation id = context.topLevelId();
-            if (model == null || id == null || !rule.matches(id.id())) {
-                return model;
-            }
-            return new FabricSwappableModel(model, rule, atlasLookup(context));
-        }));
+        ModelLoadingPlugin.register(pluginCtx -> {
+            cn.blockforge.orient.framework.client.BakedQuadRemap.clearSpriteCache(); // mryt233 改：清图集代缓存。
+            pluginCtx.modifyModelAfterBake().register((model, context) -> {
+                ModelResourceLocation id = context.topLevelId();
+                if (model == null || id == null || !rule.matches(id.id())) {
+                    return model;
+                }
+                return new FabricSwappableModel(model, rule, atlasLookup(context));
+            });
+        });
     }
 
     @Override

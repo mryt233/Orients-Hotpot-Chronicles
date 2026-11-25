@@ -1,0 +1,16 @@
+{
+  "category": "food",
+  "max_stack": 16,
+  "layout": "row_depth",
+  "max_visual": 10,
+  "scale": 0.26,
+  "overrides": {
+    "desktop": {
+      "max_stack": 12
+    },
+    "hanging": {
+      "max_stack": 2,
+      "layout": "single"
+    }
+  }
+}

@@ -4,7 +4,8 @@
   "package": "cn.blockforge.orient.framework.client.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "ItemStackRenderStateAccessor"
+    "ItemStackRenderStateAccessor",
+    "LayerRenderStateAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

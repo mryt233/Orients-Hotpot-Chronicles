@@ -774,5 +774,11 @@
   "text.orients_hotpot_chronicles.msg.minigame_busy": "你目前已在小遊戲對局或邀約中",
   "text.orients_hotpot_chronicles.msg.minigame_need_pot": "請先準星對準一口火鍋，或坐在火鍋旁再發起挑戰",
   "text.orients_hotpot_chronicles.msg.minigame_virtual_disabled": "服主已關閉虛擬練習盤，已自動切換為真實消耗熟食",
-  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "鍋裡還沒有熟食！請先煮熟食材，或勾選「虛擬練習盤」開局"
+  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "鍋裡還沒有熟食！請先煮熟食材，或勾選「虛擬練習盤」開局",
+  "text.orients_hotpot_chronicles.config.group.rack": "備菜架",
+  "text.orients_hotpot_chronicles.config.prop.rack_default_max_stack": "預設單格容量",
+  "text.orients_hotpot_chronicles.config.help.rack_default_max_stack": "沒有專用規則的小件每格能放多少件（1～64，受原生堆疊上限約束）",
+  "text.orients_hotpot_chronicles.config.prop.rack_max_visual_items": "每格最多顯示",
+  "text.orients_hotpot_chronicles.config.help.rack_max_visual_items": "每格最多繪製多少件（1～16）；調低更省效能，不影響實際容量",
+  "text.orients_hotpot_chronicles.msg.prep_rack_full": "備菜架沒有可放這個物品的格子"
 }

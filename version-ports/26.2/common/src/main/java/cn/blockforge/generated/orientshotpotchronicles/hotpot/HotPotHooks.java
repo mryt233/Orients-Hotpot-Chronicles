@@ -93,7 +93,11 @@ public final class HotPotHooks {
      * （都是 {@code HotPotRuntime} 的 {@code onServerStarting} 回调；mryt233 改 2026-11-11 更正旧注释里的
      * {@code ServerAboutToStartEvent}）。</p>
      */
+    /** mryt233 改：登记备菜架数据规则；同 ID 可由数据包覆写。 */
+    public static void registerRackRule(RackRuleDef rule) { RackRules.register(rule); }
+
     public static void freezeRegistries() {
+        RackRules.freeze();
         HotPotCooking.freezeRegistries();
         SoupBase.freezeSources();
         Soups.freeze();   // mryt233 改（2026-11-11，4B-1）：汤底登记表

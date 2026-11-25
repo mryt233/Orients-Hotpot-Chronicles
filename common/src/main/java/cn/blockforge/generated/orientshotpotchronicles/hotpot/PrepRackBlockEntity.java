@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -68,67 +69,77 @@ public class PrepRackBlockEntity extends SyncedBlockEntity implements MaterialRe
         }
     }
 
-    /** 往准星选中格放入 1 件物品；目标格已有物时自动寻找最近空槽，放满则返回 false。 */
+    private PrepRackBlock.Kind kind() {
+        return getBlockState().getBlock() instanceof PrepRackBlock rack ? rack.kind() : PrepRackBlock.Kind.MULTI_TIER;
+    }
+
+    private PrepRackGeometry.Cell cell(int slot) { return PrepRackGeometry.cell(kind(),getBlockState().getValue(PrepRackBlock.MOUNT),slot); }
+
+    private Vec3 center(int slot) {
+        var cell=cell(Math.max(0,Math.min(slotCount()-1,slot)));
+        return new Vec3(cell.x(),cell.y(),cell.z());
+    }
+
     public boolean tryInsert(Player player, InteractionHand hand, ItemStack held, int preferredSlot) {
-        int count = slotCount();
-        int target = findEmptySlot(preferredSlot, count);
-        if (target < 0 || held.isEmpty()) {
-            return false;
-        }
-        if (level != null && !level.isClientSide) {
-            items.set(target, held.copyWithCount(1));
-            if (!player.getAbilities().instabuild) {
-                held.shrink(1);
-            }
-            level.playSound(null, worldPosition, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, 0.7F, 1.05F);
-            sync();
-        }
+        return tryInsert(player,hand,held,preferredSlot,center(preferredSlot));
+    }
+
+    public boolean tryInsert(Player player, InteractionHand hand, ItemStack held, int preferredSlot, Vec3 hit) {
+        if (held.isEmpty() || isRemoved() || level == null || level.isClientSide) return false;
+        int capacity = RackRules.capacity(level,held,kind());
+        int target = insertionSlot(items,slotCount(),held,capacity,preferredSlot,i -> cell(i).distance(hit));
+        if (target < 0) return false;
+        ItemStack old = items.get(target);
+        items.set(target,old.isEmpty() ? held.copyWithCount(1) : old.copyWithCount(old.getCount()+1));
+        if (!player.getAbilities().instabuild) held.shrink(1);
+        level.playSound(null,worldPosition,SoundEvents.ITEM_FRAME_ADD_ITEM,SoundSource.BLOCKS,.7F,1.05F);
+        sync();
         return true;
     }
 
-    /** 空手右键优先从准星格取回物品；准星格为空则取最近非空槽。 */
-    public boolean tryTake(Player player, int preferredSlot) {
-        int count = slotCount();
-        int target = findOccupiedSlot(preferredSlot, count);
-        if (target < 0) {
-            return false;
+    /** mryt233 改：准星格优先，其次最近的可合并格，再其次最近空格。 */
+    static int insertionSlot(java.util.List<ItemStack> slots, int count, ItemStack held, int capacity, int preferred,
+                             java.util.function.IntToDoubleFunction distance) {
+        if (held.isEmpty() || capacity<1) return -1;
+        int s = Math.max(0,Math.min(count-1,preferred));
+        if (slots.get(s).isEmpty() || canMerge(slots.get(s),held,capacity)) return s;
+        int nearest = nearest(count, distance, i -> canMerge(slots.get(i),held,capacity));
+        return nearest >= 0 ? nearest : nearest(count,distance,i -> slots.get(i).isEmpty());
+    }
+
+    private static boolean canMerge(ItemStack old, ItemStack held, int capacity) {
+        return !old.isEmpty() && old.getCount()<capacity && ItemStack.isSameItemSameComponents(old,held);
+    }
+
+    private static int nearest(int count, java.util.function.IntToDoubleFunction distance, java.util.function.IntPredicate test) {
+        double best=Double.POSITIVE_INFINITY;
+        int slot=-1;
+        for(int i=0;i<count;i++) if (test.test(i)) {
+            double next=distance.applyAsDouble(i);
+            if (next<best) { best=next; slot=i; }
         }
-        if (level != null && !level.isClientSide) {
-            ItemStack taken = items.get(target).copy();
-            items.set(target, ItemStack.EMPTY);
-            if (!player.getInventory().add(taken)) {
-                player.drop(taken, false);
-            }
-            level.playSound(null, worldPosition, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 0.7F, 1.05F);
-            sync();
-        }
+        return slot;
+    }
+
+    boolean hasStoredItems() {
+        for (int i = 0, count = slotCount(); i < count; i++) if (!items.get(i).isEmpty()) return true;
+        return false;
+    }
+
+    public boolean tryTake(Player player,int preferredSlot) { return tryTake(player,preferredSlot,center(preferredSlot)); }
+
+    public boolean tryTake(Player player,int preferredSlot,Vec3 hit) {
+        if (isRemoved() || level == null || level.isClientSide) return false;
+        int p=Math.max(0,Math.min(slotCount()-1,preferredSlot));
+        int slot=items.get(p).isEmpty() ? nearest(slotCount(), i -> cell(i).distance(hit), i -> !items.get(i).isEmpty()) : p;
+        if (slot<0) return false;
+        ItemStack old=items.get(slot);
+        ItemStack taken=old.copyWithCount(1);
+        items.set(slot,old.getCount()==1 ? ItemStack.EMPTY : old.copyWithCount(old.getCount()-1));
+        if (!player.getInventory().add(taken) && !taken.isEmpty()) player.drop(taken,false);
+        level.playSound(null,worldPosition,SoundEvents.ITEM_FRAME_REMOVE_ITEM,SoundSource.BLOCKS,.7F,1.05F);
+        sync();
         return true;
-    }
-
-    private int findEmptySlot(int preferred, int count) {
-        int p = Math.max(0, Math.min(count - 1, preferred));
-        if (items.get(p).isEmpty()) {
-            return p;
-        }
-        for (int i = 0; i < count; i++) {
-            if (items.get(i).isEmpty()) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private int findOccupiedSlot(int preferred, int count) {
-        int p = Math.max(0, Math.min(count - 1, preferred));
-        if (!items.get(p).isEmpty()) {
-            return p;
-        }
-        for (int i = count - 1; i >= 0; i--) {
-            if (!items.get(i).isEmpty()) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     public boolean applyMaterial(Player player, ItemStack stack, Block targetBlock) {
@@ -192,12 +203,18 @@ public class PrepRackBlockEntity extends SyncedBlockEntity implements MaterialRe
         if (level == null || level.isClientSide) {
             return;
         }
+        // mryt233 改：外部掉落实体回调可同步重入；先转移每格所有权，再派发掉落。
+        Level dropLevel = level;
         for (int i = 0; i < items.size(); i++) {
-            ItemStack st = items.get(i);
-            if (!st.isEmpty()) {
-                Containers.dropItemStack(level, worldPosition.getX() + 0.5, worldPosition.getY() + 0.4,
-                    worldPosition.getZ() + 0.5, st.copy());
-                items.set(i, ItemStack.EMPTY);
+            ItemStack stack = items.set(i, ItemStack.EMPTY);
+            if (stack.isEmpty()) continue;
+            int limit = Math.max(1, Math.min(64, stack.getMaxStackSize()));
+            int left = stack.getCount();
+            while (left > 0) {
+                int count = Math.min(left, limit);
+                left -= count;
+                Containers.dropItemStack(dropLevel, worldPosition.getX() + .5, worldPosition.getY() + .4,
+                    worldPosition.getZ() + .5, stack.copyWithCount(count));
             }
         }
     }

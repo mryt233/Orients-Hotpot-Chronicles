@@ -32,6 +32,11 @@ public final class RenderFrame {
                      PoseStack pose, Level level, int seed) {
         ItemStackRenderState state = new ItemStackRenderState();
         Minecraft.getInstance().getItemModelResolver().updateForTopItem(state, stack, mode, level, null, seed);
+        item(state, light, overlay, pose);
+    }
+
+    /** mryt233 改：同一物品状态可供测量与多次提交，保留 26.3 顶点格式。 */
+    public void item(ItemStackRenderState state, int light, int overlay, PoseStack pose) {
         Matrix4f transform = new Matrix4f(pose.last().pose());
         commands.add((root, collector, dynamicLight, dynamicOverlay) -> {
             root.pushPose();

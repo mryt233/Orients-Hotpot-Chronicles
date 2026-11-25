@@ -1607,6 +1607,8 @@ const CF_HELP = {
   processing_mill_turns: "小石磨研磨所需推动圈数倍率；调高更偏写实，调低更省力。范围 0.25～5。",
   processing_vat_time: "开口大木桶豆腐压制的耗时倍率；越小越快。范围 0.1～5。",
   processing_mill_water_uses: "向小石磨倒入一桶水后可连续用于湿磨的次数（水瓶固定 +1 次）。范围 1～16。",
+  rack_default_max_stack: "没有专用规则的小件每格最多放多少件（1～64，受物品原生上限约束）。",
+  rack_max_visual_items: "每格最多绘制几件（1～16），只影响显示，不改变实际库存。",
   table_materials_mode: "火锅桌与备菜架换材质规则：any_solid = 任何完整不透明非容器固体方块（受黑/白名单标签控制），tag_only = 仅允许白名单标签，off = 关闭换材质。",
   minigame_allow_virtual_plate: "开启后允许开局切换「虚拟练习盘」不消耗锅内真实熟食。",
   minigame_invite_timeout_ticks: "多人邀约应战等待时长（20 tick = 1 秒，默认 300 = 15 秒）。范围 60～1200。",
@@ -1821,6 +1823,10 @@ function cfGroupDefs() {
       { path: ["processing", "mill_turns_multiplier"], name: "石磨研磨圈数倍率", def: 1.0, min: 0.25, max: 5, step: 0.25, unit: "multiplier", help: "processing_mill_turns" },
       { path: ["processing", "vat_time_multiplier"], name: "木桶压制豆腐耗时倍率", def: 1.0, min: 0.1, max: 5, step: 0.1, unit: "multiplier", help: "processing_vat_time" },
       { path: ["processing", "mill_water_uses"], name: "单桶水可湿磨次数", def: 3, min: 1, max: 16, step: 1, unit: "plain", integer: true, help: "processing_mill_water_uses" },
+    ] },
+    { id: "rack", title: "备菜架", fields: [
+      { path: ["rack", "rack_default_max_stack"], name: "默认单格容量", kind: "num", min: 1, max: 64, step: 1, def: 12, help: "rack_default_max_stack" },
+      { path: ["rack", "rack_max_visual_items"], name: "每格最多显示", kind: "num", min: 1, max: 16, step: 1, def: 8, help: "rack_max_visual_items" },
     ] },
     { id: "table_materials", title: "火锅桌与备菜架材质", fields: [
       { path: ["table_materials", "mode"], name: "换材质开放范围", kind: "choice", options: ["any_solid", "tag_only", "off"], def: "any_solid", help: "table_materials_mode" },

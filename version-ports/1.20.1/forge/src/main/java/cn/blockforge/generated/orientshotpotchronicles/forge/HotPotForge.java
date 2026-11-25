@@ -4,11 +4,15 @@ package cn.blockforge.generated.orientshotpotchronicles.forge;
 import cn.blockforge.generated.orientshotpotchronicles.HotpotContentModule;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTracks;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PrepRackBlock;
 import cn.blockforge.orient.framework.loader.ClientHooks;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.InteractionResult;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
@@ -42,6 +46,15 @@ public final class HotPotForge {
         if (FMLEnvironment.dist.isClient()) {
             new ForgeClient(modBus);
         }
+        // mryt233 改：保护模组可先禁止方块交互；不截获非材质物品。
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, (PlayerInteractEvent.RightClickBlock event) -> {
+            if (event.isCanceled() || event.getUseBlock() == Event.Result.DENY) return;
+            var result = PrepRackBlock.onSneakUse(event.getEntity(), event.getLevel(), event.getHand(), event.getHitVec());
+            if (result != InteractionResult.PASS) {
+                event.setCancellationResult(result);
+                event.setCanceled(true);
+            }
+        });
         // 开发命令依赖原生事件参数，正式包不携带实现。
         MinecraftForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> HotpotContentModule.development(
             "ForgeDevTests", "register", new Class<?>[]{RegisterCommandsEvent.class}, event));

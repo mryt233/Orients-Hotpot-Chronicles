@@ -2,6 +2,7 @@ package cn.blockforge.generated.orientshotpotchronicles.devtest;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import java.util.StringJoiner;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.commands.arguments.item.ItemArgument;
@@ -162,7 +163,8 @@ public final class DevTestCommands {
                     .then(Commands.argument("pos", BlockPosArgument.blockPos())
                         .then(Commands.argument("hit", Vec3Argument.vec3(false))
                             .then(Commands.argument("sneak", BoolArgumentType.bool())
-                                .executes(DevTestCommands::use)))))
+                                .executes(DevTestCommands::use)
+                                .then(Commands.literal("both").executes(DevTestCommands::useBothHands))))))
                 .then(Commands.literal("aim")
                     .then(Commands.argument("pos", BlockPosArgument.blockPos())
                         .then(Commands.argument("slot", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 80))
@@ -307,6 +309,35 @@ public final class DevTestCommands {
         }
         p.setShiftKeyDown(false);
         return report(ctx, text);
+    }
+
+    /** mryt233 改：按客户端主手→副手的顺序，用真实服务端入口取证；不直接操作架库存。 */
+    private static int useBothHands(CommandContext<CommandSourceStack> ctx) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        ServerPlayer p = player(ctx);
+        BlockPos pos = BlockPosArgument.getBlockPos(ctx, "pos");
+        Vec3 hit = Vec3Argument.getVec3(ctx, "hit");
+        boolean sneaking = BoolArgumentType.getBool(ctx, "sneak");
+        p.moveTo(hit.x, hit.y + 1.0 - p.getEyeHeight(), hit.z + 1.5, 180, 25);
+        p.setShiftKeyDown(sneaking);
+        var target = new BlockHitResult(hit, Direction.UP, pos, false);
+        var log = new StringJoiner(" | ", "use both: ", "");
+        try {
+            for (InteractionHand hand : InteractionHand.values()) {
+                ItemStack stack = p.getItemInHand(hand);
+                InteractionResult blockResult = p.gameMode.useItemOn(p, p.serverLevel(), stack, hand, target);
+                log.add(hand + "=" + blockResult);
+                if (blockResult.consumesAction() || blockResult == InteractionResult.FAIL) break;
+                if (!stack.isEmpty()) {
+                    InteractionResult itemResult = p.gameMode.useItem(p, p.serverLevel(), stack, hand);
+                    log.add("item=" + itemResult);
+                    if (itemResult.consumesAction()) break;
+                }
+            }
+            return report(ctx, log.toString());
+        } finally {
+            p.stopUsingItem();
+            p.setShiftKeyDown(false);
+        }
     }
 
     /** 模拟客户端的 ChopsticksAimPayload：「我看到这口锅那格浮着的是第 slot 小格」，紧接着的 use 用它。 */

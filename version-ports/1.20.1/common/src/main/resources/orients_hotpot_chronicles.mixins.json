@@ -10,7 +10,8 @@
     "BowlItemMixin",
     "EntityRaycastMixin",
     "LivingEntityEatMixin",
-    "LootPoolAccessor"
+    "LootPoolAccessor",
+    "RackReloadMixin"
   ],
   "client": [
     "ClientPlayerInteractionManagerMixin",

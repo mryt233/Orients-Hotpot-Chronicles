@@ -318,5 +318,11 @@
   "text.orients_hotpot_chronicles.msg.minigame_busy": "Você já está em uma partida de minijogo ou possui um convite pendente",
   "text.orients_hotpot_chronicles.msg.minigame_need_pot": "Mire em um hotpot ou sente-se perto de um antes de iniciar um desafio",
   "text.orients_hotpot_chronicles.msg.minigame_virtual_disabled": "O prato de treino virtual está desativado neste servidor; consumindo comida cozida real",
-  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "Ainda não há comida cozida na panela! Cozinhe algo antes ou ative o «Prato de treino virtual»"
+  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "Ainda não há comida cozida na panela! Cozinhe algo antes ou ative o «Prato de treino virtual»",
+  "text.orients_hotpot_chronicles.config.group.rack": "Suportes de ingredientes",
+  "text.orients_hotpot_chronicles.config.prop.rack_default_max_stack": "Capacidade padrão do compartimento",
+  "text.orients_hotpot_chronicles.config.help.rack_default_max_stack": "Capacidade padrão por compartimento para itens sem regra específica (1–64, limitada pelo tamanho máximo de pilha do item)",
+  "text.orients_hotpot_chronicles.config.prop.rack_max_visual_items": "Itens exibidos por compartimento",
+  "text.orients_hotpot_chronicles.config.help.rack_max_visual_items": "Máximo de itens renderizados por compartimento (1–16); valores menores melhoram o desempenho sem reduzir a capacidade",
+  "text.orients_hotpot_chronicles.msg.prep_rack_full": "Não há compartimento disponível para este item no suporte"
 }

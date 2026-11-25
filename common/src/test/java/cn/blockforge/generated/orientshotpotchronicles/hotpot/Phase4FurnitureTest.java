@@ -52,6 +52,28 @@ class Phase4FurnitureTest {
     }
 
     @Test
+    void rackEmptyMainHandTakesWithOffhandOccupiedButDoesNotStripWhileSneaking() {
+        var shield = new ItemStack(Items.SHIELD);
+        assertTrue(PrepRackBlock.canUseEmptyHand(false, ItemStack.EMPTY, shield));
+        assertFalse(PrepRackBlock.canUseEmptyHand(true, ItemStack.EMPTY, shield));
+        assertTrue(PrepRackBlock.canUseEmptyHand(true, ItemStack.EMPTY, ItemStack.EMPTY));
+        assertFalse(PrepRackBlock.canUseEmptyHand(false, shield, ItemStack.EMPTY));
+    }
+
+    @Test
+    void rackSneakSwapLetsRackAndTorchPassButAcceptsSpruce(@TempDir Path dir) throws Exception {
+        resetConfig(dir);
+        assertTrue(PrepRackBlock.isSwapMaterial(new ItemStack(Items.SPRUCE_PLANKS)));
+        assertFalse(PrepRackBlock.isSwapMaterial(new ItemStack(Items.TORCH)));
+        assertFalse(PrepRackBlock.isSwapMaterial(new ItemStack(Items.LANTERN)));
+        assertFalse(PrepRackBlock.isSwapMaterial(new ItemStack(Items.STICK)));
+        for (var kind : PrepRackBlock.Kind.values()) {
+            // 单测环境未注册这些方块：用与 isSwapMaterial 相同的材质校验内核。
+            assertFalse(TableMaterials.acceptsWithTags(stateFor(allocateRack(kind)), Config.TABLE_MAT_ANY_SOLID, true, false));
+        }
+    }
+
+    @Test
     void acceptsWithTagsEnforcesModesBlockPropertiesAndDenyPriority(@TempDir Path dir) throws Exception {
         BlockState oak = Blocks.OAK_PLANKS.defaultBlockState();
         BlockState quartz = Blocks.QUARTZ_BLOCK.defaultBlockState();
@@ -444,6 +466,18 @@ class Phase4FurnitureTest {
             assertEquals(3, hanging.slotAt(facingState, pos, rackHit(pos, facing, 0.875, 0.7, 0.5), null));
             assertEquals(0, hanging.slotAt(facingState, pos, rackHit(pos, facing, -0.25, 0.7, 0.5), null));
             assertEquals(3, hanging.slotAt(facingState, pos, rackHit(pos, facing, 1.25, 0.7, 0.5), null));
+        }
+    }
+
+    @Test
+    void prepRackAcceptsBlocksToolsAndFoodForEveryExistingKind() throws Exception {
+        // mryt233 改：旧槽号/架型不变，允许任意物品不影响空栈检查。
+        for (var kind : PrepRackBlock.Kind.values()) {
+            var rack = allocateRack(kind);
+            assertFalse(rack.canPlaceItem(null, net.minecraft.world.item.ItemStack.EMPTY));
+            assertTrue(rack.canPlaceItem(null, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.COPPER_BLOCK)));
+            assertTrue(rack.canPlaceItem(null, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_PICKAXE)));
+            assertTrue(rack.canPlaceItem(null, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.BREAD)));
         }
     }
 

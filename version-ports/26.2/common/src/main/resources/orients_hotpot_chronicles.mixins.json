@@ -11,7 +11,8 @@
     "LivingEntityEatMixin",
     "LootPoolAccessor",
     "LootTableAccessor",
-    "FoodConsumeMixin"
+    "FoodConsumeMixin",
+    "RackReloadMixin"
   ],
   "client": [
     "ClientPlayerInteractionManagerMixin",

@@ -101,6 +101,7 @@ public final class HotPotHooks {
         Soups.freeze();   // mryt233 改（2026-11-11，4B-1）：汤底登记表
         Seasonings.freeze();   // mryt233 改（4C）：蘸料登记表
         HotPotFuel.freezeSources();
+        RackRules.freeze(); // mryt233 改：声明式备菜架规则只在启动期登记。
         if (!HotPotCooking.registriesFrozen()) {
             throw new IllegalStateException("登记表冻结失败");
         }
@@ -108,7 +109,7 @@ public final class HotPotHooks {
 
     /** 诊断：登记表现在冻结了没有。 */
     public static boolean registriesFrozen() {
-        return HotPotCooking.registriesFrozen();
+        return HotPotCooking.registriesFrozen() && RackRules.frozen();
     }
 
     private static final Hooks<BlockUse> BLOCK_USES = new Hooks<>();
@@ -128,6 +129,9 @@ public final class HotPotHooks {
      * 登记时机：这些钩子在启动期登记（模组初始化 / FMLCommonSetupEvent），之后一直有效；
      * 返回的 {@link Hooks.Registration} 可以注销。
      */
+
+    /** mryt233 改：Java 起始规则和数据包共用校验器、覆盖优先级与同步快照。 */
+    public static void registerRackRule(RackRuleDef rule) { RackRules.register(rule); }
 
     public static Hooks.Registration registerBlockUse(BlockUse hook) {
         return BLOCK_USES.add(hook);

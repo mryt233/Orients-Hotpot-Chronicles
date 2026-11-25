@@ -26,20 +26,23 @@ final class FabricModelPluginV1 {
     }
 
     static void register(SwappableModelRule rule, WrapperFactory factory) {
-        ModelLoadingPlugin.register(pluginCtx -> pluginCtx.modifyModelAfterBake().register((model, context) -> {
-            ResourceLocation rawId = context.id();
-            if (model == null || rawId == null) {
-                return model;
-            }
-            // 1.20.1 中 ModelResourceLocation 继承 ResourceLocation 且覆盖 equals/hashCode 包含 variant，须先提取基础 ID。
-            ResourceLocation baseId = rawId instanceof ModelResourceLocation
-                ? ResourceLocation.tryBuild(rawId.getNamespace(), rawId.getPath())
-                : rawId;
-            if (!rule.matches(baseId)) {
-                return model;
-            }
-            return factory.wrap(model, rule, atlasLookup(context));
-        }));
+        ModelLoadingPlugin.register(pluginCtx -> {
+            cn.blockforge.orient.framework.client.BakedQuadRemap.clearSpriteCache(); // mryt233 改：清图集代缓存。
+            pluginCtx.modifyModelAfterBake().register((model, context) -> {
+                ResourceLocation rawId = context.id();
+                if (model == null || rawId == null) {
+                    return model;
+                }
+                // 1.20.1 中 ModelResourceLocation 继承 ResourceLocation 且覆盖 equals/hashCode 包含 variant，须先提取基础 ID。
+                ResourceLocation baseId = rawId instanceof ModelResourceLocation
+                    ? ResourceLocation.tryBuild(rawId.getNamespace(), rawId.getPath())
+                    : rawId;
+                if (!rule.matches(baseId)) {
+                    return model;
+                }
+                return factory.wrap(model, rule, atlasLookup(context));
+            });
+        });
     }
 
     /** 烘培回调的 context 会被复用于后续模型，提前取出 textureGetter 防止后续覆盖。 */

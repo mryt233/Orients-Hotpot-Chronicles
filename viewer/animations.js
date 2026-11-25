@@ -963,27 +963,80 @@ async function buildSwappedModel(ctx, modelId, overrides) {
   return ctx.buildElements({ ...base, textures: { ...base.textures, ...overrides } });
 }
 
-async function addRackDish(ctx, parent, xPx, shelfTopPx, zPx, scale = 0.85) {
-  const dish = await ctx.buildBlock("quartz_small_dish", { axis: "x" });
-  dish.scale.setScalar(scale);
-  dish.position.set(xPx * PX, shelfTopPx * PX - 0.5 * (1 - scale), zPx * PX);
-  parent.add(dish);
+// mryt233 改：与 PrepRackGeometry 一样，以层板内部的像素净空排布，不按库存次数无限复制。
+const RACK_DESK = [ [-3.15,3.5,2.7,2.85,1.75,2.30], [3.15,3.5,2.7,2.85,1.75,2.30],
+  [-3.15,8.1,-2.1,2.85,1.75,2.35], [3.15,8.1,-2.1,2.85,1.75,2.35] ];
+
+// mryt233 改：与游戏一致，用薄模型挤出侧面的真边缘求挂点，不拿透明贴图框当挂点。
+function rackRim(item, centerX) {
+  let minX=Infinity, maxX=-Infinity, bottom, top;
+  item.traverse(mesh => {
+    const pos=mesh.geometry?.attributes.position;
+    if (!pos || pos.count%4 !== 0) return;
+    const v=new THREE.Vector3();
+    for (let i=0;i<pos.count;i+=4) {
+      let loX=Infinity,loY=Infinity,loZ=Infinity,hiX=-Infinity,hiY=-Infinity,hiZ=-Infinity;
+      for (let j=i;j<i+4;j++) {
+        v.fromBufferAttribute(pos,j).applyMatrix4(mesh.matrixWorld);
+        loX=Math.min(loX,v.x); loY=Math.min(loY,v.y); loZ=Math.min(loZ,v.z);
+        hiX=Math.max(hiX,v.x); hiY=Math.max(hiY,v.y); hiZ=Math.max(hiZ,v.z);
+      }
+      if (hiZ-loZ<=1e-5 || (hiY-loY>1e-5 && hiX-loX>1e-5)) continue;
+      minX=Math.min(minX,loX); maxX=Math.max(maxX,hiX);
+      if (hiY-loY>1e-5 || hiX-loX<=1e-5) continue;
+      const edge={x:(loX+hiX)*.5,y:loY};
+      if (!bottom || edge.y<bottom.y || edge.y===bottom.y && Math.abs(edge.x-centerX)<Math.abs(bottom.x-centerX)) bottom=edge;
+      if (!top || edge.y>top.y || edge.y===top.y && Math.abs(edge.x-centerX)<Math.abs(top.x-centerX)) top=edge;
+    }
+  });
+  return bottom && top && bottom.y<top.y && minX<maxX ? {minX,maxX,bottom,top} : null;
 }
 
-async function addRackItem(ctx, parent, itemId, xPx, yPx, zPx, scale, hanging = false) {
-  const item = await ctx.buildItem(itemId);
-  item.scale.setScalar(scale);
-  if (hanging) item.rotation.z = Math.PI;
-  item.position.set(xPx * PX, mc(yPx * PX), zPx * PX);
-  parent.add(item);
+async function addRackStack(ctx, parent, id, cell, count, layout, cap = 8, mount = null) {
+  const item = await ctx.buildItem(`${ctx.modid}:${id}`);
+  item.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(item), dims = box.getSize(new THREE.Vector3());
+  if (box.isEmpty() || !Number.isFinite(dims.x + dims.y + dims.z)) return;
+  const center = box.getCenter(new THREE.Vector3());
+  const [x,y,z,w,h,d] = cell.map(v=>v*PX);
+  const gap = .0035, roomW = 2*w-gap, roomH = 2*h-gap, roomD = 2*d-gap;
+  if (layout === 'row' && dims.z > .24) layout = 'single';
+  const n = Math.min(count,cap,layout==='row'?10:layout==='pile'?4:layout==='up'?3:1);
+  const tilt = layout==='row'?8*Math.PI/180:layout==='pile'&&dims.z<.24?Math.PI/2:0;
+  const rim = mount==='ceiling' && n===1 && tilt===0 && dims.z<=.24 ? rackRim(item,center.x) : null;
+  const anchor = !rim ? null : layout==='hang' ? rim.bottom : rim.top;
+  const height = rim ? Math.max(.02,rim.top.y-rim.bottom.y) : Math.max(.02, Math.abs(dims.y*Math.cos(tilt))+Math.abs(dims.z*Math.sin(tilt)));
+  const depth = Math.max(.02, Math.abs(dims.z*Math.cos(tilt))+Math.abs(dims.y*Math.sin(tilt)));
+  const width = anchor ? Math.max(.02,2*Math.max(anchor.x-rim.minX,rim.maxX-anchor.x)) : Math.max(.02,dims.x);
+  let scale = Math.min(layout==='row'?.27:.30,roomW/width,roomH/height,roomD/depth);
+  const along = layout==='row'?[roomD,depth]:layout==='pile'?[roomH,height]:layout==='up'?[roomW,width]:null;
+  if (along) scale=Math.min(scale,(along[0]-(n-1)*gap)/(n*along[1]));
+  const step = along&&n>1?Math.min((along[0]-along[1]*scale)/(n-1),Math.max(along[1]*scale+gap,.042)):0;
+  for (let i=0;i<n;i++) {
+    const off=(i-(n-1)*.5)*step;
+    const rise=layout==='row'?(n-1-i)*Math.min(.007,Math.max(0,roomH-height*scale-gap)/Math.max(1,n-1)):0;
+    const pose=new THREE.Group(), copy=item.clone(true);
+    copy.position.sub(center);
+    pose.add(copy);
+    pose.position.set(x+(layout==='up'?off:0),mc(y-h+height*scale*.5+gap+rise+(layout==='pile'?i*step:0)),z+(layout==='row'?off:0));
+    if (mount === 'ceiling' && n === 1) {
+      const sign=layout==='hang' ? -1 : 1;
+      if (anchor) pose.position.x-=sign*(anchor.x-center.x)*scale;
+      pose.position.y=mc(y+h-(anchor ? sign*(anchor.y-center.y) : height*.5)*scale);
+    } else if (mount === 'wall') pose.position.y = mc(y);
+    pose.rotation.x=tilt;
+    if (layout==='hang') pose.rotation.z=Math.PI;
+    pose.scale.setScalar(scale);
+    parent.add(pose);
+  }
 }
 
-async function populateDesktopRack(ctx, parent) {
-  const ns = ctx.modid;
-  await addRackDish(ctx, parent, -3.0, 1.5, 2.15, 0.85);
-  await addRackDish(ctx, parent, 3.0, 1.5, 2.15, 0.85);
-  await addRackItem(ctx, parent, `${ns}:tripe`, -3.0, 8.5, -2.1, 0.28);
-  await addRackItem(ctx, parent, `${ns}:lotus_root_slice`, 3.0, 8.5, -2.1, 0.28);
+async function populateDesktopRack(ctx, parent, cap = 8) {
+  const samples=[['quartz_small_dish',4,'pile'],['orient_cola',3,'up'],['chicken_feet',12,'row'],['lotus_root_slice',12,'row']];
+  for (let i=0;i<samples.length;i++) {
+    const [id,n,layout]=samples[i];
+    await addRackStack(ctx,parent,id,RACK_DESK[i],n,layout,cap);
+  }
 }
 
 async function buildPrepRacks(ctx, s) {
@@ -994,12 +1047,14 @@ async function buildPrepRacks(ctx, s) {
   const multi = new THREE.Group();
   multi.position.set(-1.25, 0, 0);
   multi.add(await ctx.buildBlock("multi_tier_prep_rack", { facing: "south", mount: "wall" }));
-  await addRackDish(ctx, multi, -3.2, 1.5, 0, 0.88);
-  await addRackDish(ctx, multi, 3.2, 1.5, 0, 0.88);
-  await addRackItem(ctx, multi, `${ns}:fatty_beef_roll`, -3.2, 9.85, 1.2, 0.30);
-  await addRackItem(ctx, multi, `${ns}:beef_loin_slice`, 3.2, 9.85, 1.2, 0.30);
-  await addRackItem(ctx, multi, `${ns}:cold_tofu`, -3.2, 15.35, 1.2, 0.30);
-  await addRackItem(ctx, multi, `${ns}:enoki_mushroom`, 3.2, 15.35, 1.2, 0.30);
+  const cap=Math.max(1,Math.min(16,Number(s.visual)||8));
+  const samples=[['quartz_two_slot_plate',4,'pile'],['empty_orange_drink_bottle',3,'up'],['chicken_feet',16,'row'],
+    ['beef_loin_slice',16,'row'],['wooden_vat',1,'single'],['iron_kitchen_knife',1,'single']];
+  const levels=[[1.65,6.3],[7.65,11.85],[13.15,15.9]];
+  for (let i=0;i<samples.length;i++) {
+    const [lo,hi]=levels[Math.floor(i/2)], [id,n,layout]=samples[i];
+    await addRackStack(ctx,multi,id,[i%2?3.15:-3.15,(lo+hi)/2,.2,2.85,(hi-lo)/2,4.85],n,layout,cap);
+  }
   root.add(multi);
 
   // 2. 桌面备菜架（4 格：支持贴面抬高/下沉贴合矮桌与高桌）
@@ -1016,7 +1071,7 @@ async function buildPrepRacks(ctx, s) {
   const desktop = new THREE.Group();
   desktop.position.set(0, desktopLift, 0);
   desktop.add(await ctx.buildBlock("desktop_prep_rack", { facing: "south", mount: "wall" }));
-  await populateDesktopRack(ctx, desktop);
+  await populateDesktopRack(ctx, desktop, cap);
   root.add(desktop);
 
   // 3. 挂架（4 格双态：wall 靠墙 / ceiling 吸顶，挂布围裙与厨具）
@@ -1024,9 +1079,10 @@ async function buildPrepRacks(ctx, s) {
   const hanging = new THREE.Group();
   hanging.position.set(1.25, 0, 0);
   hanging.add(await ctx.buildBlock("hanging_prep_rack", { facing: "south", mount: s.mount }));
-  const hangItems = [`${ns}:cloth_apron`, `${ns}:blue_print_cloth_apron`, `${ns}:iron_kitchen_knife`, `${ns}:rolling_pin`];
-  for (let i = 0; i < hangItems.length; i++) {
-    await addRackItem(ctx, hanging, hangItems[i], -4.5 + i * 3.0, ceiling ? 6.4 : 7.8, ceiling ? 0.0 : -5.2, 0.30, true);
+  const hangItems=['cloth_apron','iron_kitchen_knife','orange_drink','wooden_vat'];
+  for (let i=0;i<hangItems.length;i++) {
+    const cell=[-4.5+i*3,ceiling?7.70:7.9,ceiling?0:-4.55,1.35,ceiling?1.20:1.62,ceiling?1.65:1.35];
+    await addRackStack(ctx,hanging,hangItems[i],cell,1,i<2?'hang':'single',cap,s.mount);
   }
   root.add(hanging);
 
@@ -1416,7 +1472,8 @@ async function buildStoneMillPreview(ctx, s) {
 
         const colTop = Math.max(0.4, liquidY - 0.25);
         fallColumn.visible = spoutOverflow > 0.1;
-        fallColumn.scale.set(streamW, colTop / fallH, 0.72 + 0.28 * spoutOverflow);
+        // mryt233 改：帧回调不读取初始化分支的局部变量，否则会中止后续场景切换渲染。
+        fallColumn.scale.set(streamW, colTop / (floor + 0.4), 0.72 + 0.28 * spoutOverflow);
         fallColumn.position.y = mc((colTop / 2 + 0.02) / 16);
         fallTex.offset.y = frac(flowPhase * 1.45);
         if (isWater) fallTex.needsUpdate = true;
@@ -1932,9 +1989,10 @@ export default [
   },
   {
     id: "prep_racks",
-    name: "三种备菜架（Phase 4）",
-    desc: "并排展示 6 格多层落地菜架（小碟 + 肥牛卷 / 吊龙 / 冷豆腐 / 金针菇）、4 格桌面备菜架（加入 table_decorations 自动贴面抬高/下沉贴桌）与 4 格双态挂架（wall 靠墙 / ceiling 吸顶，挂布围裙与铁菜刀 / 擀面杖；对应 PrepRackRenderer）。",
+    name: "备菜架：纵深堆叠与混摆",
+    desc: "对照三种架体的净空：鸡爪和肉片沿纵深排队，盘子叠放，瓶子正立，大件和工具单件展示。挂架兼有垂挂和正向展示。",
     params: [
+      { key: "visual", label: "每格视觉上限", options: [["4","4 件"],["8","8 件（默认）"],["16","16 件"]], default: "8" },
       { key: "mount", label: "挂架形态", options: [["wall", "靠墙 wall"], ["ceiling", "吸顶 ceiling"]], default: "wall" },
       { key: "table", label: "桌面架摆在", options: [["low", "矮火锅桌上"], ["tall", "高火锅桌上"], ["ground", "地上"]], default: "low" },
     ],

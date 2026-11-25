@@ -24,6 +24,7 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTableBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTableBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PrepRackBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PrepRackBlockEntity;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.RackRules;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveTopBlock;
@@ -473,7 +474,11 @@ public final class HotPotJadePlugin implements IWailaPlugin {
 
         @Override
         public void appendTooltip(ITooltip tooltip, BlockAccessor block, IPluginConfig config) {
-            if (block.getBlockEntity() instanceof PrepRackBlockEntity rack
+            if (block.getBlockEntity() instanceof PrepRackBlockEntity rack && !rack.isRemoved()
+                && rack.getBlockPos().equals(block.getPosition())
+                && block.getLevel().getBlockEntity(block.getPosition()) == rack
+                && rack.getBlockState() == block.getBlockState()
+                && block.getLevel().getBlockState(block.getPosition()) == block.getBlockState()
                 && block.getBlockState().getBlock() instanceof PrepRackBlock rackBlock) {
                 if (!rack.materials().top().isEmpty()) {
                     tooltip.add(Component.translatable("text.orients_hotpot_chronicles.tooltip.rack_material",
@@ -488,6 +493,15 @@ public final class HotPotJadePlugin implements IWailaPlugin {
                         Component itemLabel = st.isEmpty()
                             ? Component.translatable("text.orients_hotpot_chronicles.jade.rack_empty").withStyle(ChatFormatting.DARK_GRAY)
                             : st.getHoverName().copy().withStyle(isAimed ? ChatFormatting.GOLD : ChatFormatting.WHITE);
+                        // mryt233 改：未收到服务端规则时只报真实数量，不猜上限。
+                        if (!st.isEmpty()) {
+                            var label = itemLabel.copy().append(" ×" + st.getCount());
+                            if (RackRules.clientReady()) {
+                                int cap = RackRules.capacity(block.getLevel(), st, rackBlock.kind());
+                                label.append(" / " + cap);
+                            }
+                            itemLabel = label;
+                        }
                         tooltip.add(Component.translatable("text.orients_hotpot_chronicles.jade.rack_slot",
                             i + 1, itemLabel).withStyle(isAimed ? ChatFormatting.YELLOW : ChatFormatting.GRAY));
                     }

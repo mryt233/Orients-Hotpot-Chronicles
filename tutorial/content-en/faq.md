@@ -1,5 +1,5 @@
 <!-- 作者：mryt233；英文翻译，原文：mryt233。 -->
-<!-- mryt233 改（2026-11-22）：按 0.3.1-alpha 正式版重写英文常见问题，补充模式切换、石磨木桶、橙子树/作物、光影/REI16 兼容与指令说明。 -->
+<!-- mryt233 改（2026-11-26）：按 0.3.2-alpha 更新备菜架数据包规则、配置分组与 1.20.1 Jade 兼容说明。 -->
 # Frequently Asked Questions
 
 ## Pots and stoves
@@ -71,20 +71,20 @@ Only sliceable or poundable raw ingredients go on the board: slicing handles bee
 - Orange leaves follow vanilla **Fast / Fancy** graphics between solid foliage and transparent cutouts, and automatically inject Iris foliage-waving properties for orange leaves, saplings, all 9 crops, and wild plants.
 
 **Q: Are JEI, REI 16, Jade, and Axiom supported?**
-Fully supported: JEI and **REI 16** (Fabric & NeoForge) show all 5 categories (hotpot simmering, board cutting, rolling-pin pounding, stone mill, wooden vat) plus Sauce Station exclusion zones; **Jade** inspects pot broth/progress/spice, swapped table/rack materials, and vat liquid levels; Creative filter subtabs dodge Axiom and external mod buttons cleanly.
+Fully supported: JEI and **REI 16** (Fabric & NeoForge) show all 5 categories (hotpot simmering, board cutting, rolling-pin pounding, stone mill, wooden vat) plus Sauce Station exclusion zones; **Jade** (including the 1.20.1 Jade 11.x fix) inspects pot broth/progress/spice, per-part table/rack materials, prep rack slot item counts and capacities, and vat liquid levels; Creative filter subtabs dodge Axiom and external mod buttons cleanly.
 
 ## Saves & versions
 
-**Q: Can old saves upgrade cleanly to 0.3.1-alpha?**
-- `0.2.2-alpha` / `0.3.0-alpha` worlds and configs **upgrade seamlessly**: all 40 legacy tables migrate cleanly while retaining their appearance, and removed `soaked_*` config keys are silently pruned with zero reload warnings;
+**Q: Can old saves upgrade cleanly to 0.3.2-alpha?**
+- `0.2.2-alpha` / `0.3.0-alpha` / `0.3.1-alpha` worlds and configs **upgrade seamlessly**: all 40 legacy preset tables migrate cleanly to universal hotpot tables while retaining their appearance, existing prep rack slot saves (`Slot0..Slot5`) remain compatible intact, and removed `soaked_*` config keys are silently pruned with zero warnings;
 - Still back up before leaping from ultra-early `0.1.0-alpha.1` worlds.
 
 **Q: What integration & datapack hooks exist?**
 - Blocks in `#orients_hotpot_chronicles:heat_sources` heat pots; `#not_pot_ingredient` blocks pot insertion;
-- Datapacks can add or override **broths** (`recipe/soup/`), **seasonings** (`recipe/seasoning/`), **pot boiling** (`pot_boiling`), **pounding** (`pounding`), **Stone Mill / Wooden Vat** (`stone_mill` / `wooden_vat`), and **rhythm tracks** (`hotpot_tracks/*.json`).
+- Datapacks can add or override **broths** (`recipe/soup/`), **seasonings** (`recipe/seasoning/`), **pot boiling** (`pot_boiling`), **pounding** (`pounding`), **Stone Mill / Wooden Vat** (`stone_mill` / `wooden_vat`), **rhythm tracks** (`hotpot_tracks/*.json`), and **prep rack stacking & display rules** (`prep_rack_rules/*.json`; add-on mods can also call `HotPotHooks.registerRackRule` during startup).
 
 **Q: How do 1.20.1, 26.1.x, 26.2, and 26.3 compare with 1.21.1?**
-In `0.3.1-alpha`, **1.21.1 (Fabric / NeoForge), 1.20.1 (Fabric / Forge), 26.1.x (Fabric / NeoForge), 26.2 (Fabric / NeoForge), and 26.3 (Fabric / NeoForge)** share identical gameplay and content — see [Downloads, Installation & Feedback](install.html#ports).
+`0.3.2-alpha` continues the five-version sync strategy — **1.21.1 (Fabric / NeoForge), 1.20.1 (Fabric / Forge), 26.1.x (Fabric / NeoForge), 26.2 (Fabric / NeoForge), and 26.3 (Fabric / NeoForge)** all update together with identical gameplay and content. See [Downloads, Installation & Feedback](install.html#ports).
 
 **Q: Where do I report bugs?**
 Open an Issue on GitHub <https://github.com/mryt233/Orients-Hotpot-Chronicles> (or join **QQ group 248314791**; see [install details](install.html#feedback)). Include Minecraft version, loader, mod version, reproduction steps, screenshots, and `latest.log`.
@@ -98,7 +98,7 @@ Yes — select the mod in **Mods** (needs Mod Menu on Fabric; built-in on NeoFor
 - **Editing JSON directly**: edit `config/orients_hotpot_chronicles.json` and run **`/orientshotpot reload`** (removed legacy keys clean up automatically).
 - **Multiplayer**: edit the server file only; changes sync automatically on join, mode switches, and reloads.
 - Bad keys fall back safely with warnings while preserving broken files intact.
-- Datapack recipes, tracks, and `loot.*` drop edits apply after running vanilla `/reload`.
+- Datapack recipes, tracks, and prep rack rules (`prep_rack_rules/*.json`) apply after running vanilla `/reload`; `loot.*` drop edits also require vanilla `/reload` to rebuild loot pools.
 - Reloading preserves cooking timers on food already in the pot; `cooking.items.<item>` governs this mod's ingredients only.
 
 ### Using the settings screen {#screen}
@@ -106,7 +106,7 @@ Yes — select the mod in **Mods** (needs Mod Menu on Fabric; built-in on NeoFor
 {{since:0.2.2-alpha}}Below the top **Mode Presets & Custom Toggles drawer**, settings split into **Common** (opens first) and **Advanced**:
 
 - **Common**: **Smoke Particle Intensity** slider (with 0% / 50% / 100% shortcuts), **Coal Stove Power**, **Fallback Cook Time**, and **Spicy / Clear / Rich Stock Speed Multipliers**.
-- **Advanced**: organizes remaining entries into **18 collapsible groups** (Modes & Mechanics, Crops & Fruit Trees, Ingredient Processing, Tables & Rack Materials, Real-Time Minigames, Cooking Times, Item Cooking Times, Broth Speed Multipliers, Fuel Grades, Soup Bowls, Seasonings, Drinks, Food Nutrition, Pot Warmth, Cold-Pot Nausea, Cheers, Spicy Broth, Loot Drop Chances).
+- **Advanced**: organizes remaining entries into **19 collapsible groups** (Modes & Mechanics, Crops & Fruit Trees, Ingredient Processing, Prep Racks, Table & Rack Materials, Real-Time Minigames, Cooking Times, Item Cooking Times, Broth Speed Multipliers, Fuel Grades, Soup Bowls, Seasonings, Drinks, Food Nutrition, Pot Warmth, Cold-Pot Nausea, Cheers, Spicy Broth, Loot Drop Chances), collapsed by default — click a group header to expand.
 - **Controls**: `- value unit +` steps by 1 (**Shift-click** steps by 10), or click boxes directly to type numbers (invalid values highlight red and block saving).
 - **Units**: time in ticks (20 ticks = 1 s, plus seconds where space fits), multipliers as `×`, hunger/XP in points, effect levels, and radii in blocks.
 - **Reset**: modified rows show per-row **↺** reset; bottom Reset requires a 4-second second click to reset everything cleanly.

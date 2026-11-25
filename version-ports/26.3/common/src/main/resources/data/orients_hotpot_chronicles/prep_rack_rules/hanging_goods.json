@@ -1,0 +1,11 @@
+{
+  "tag": "#orients_hotpot_chronicles:rack_hangables",
+  "priority": 30,
+  "layout": "single",
+  "overrides": {
+    "hanging": {
+      "max_stack": 1,
+      "layout": "hanging"
+    }
+  }
+}

@@ -4,6 +4,7 @@ package cn.blockforge.generated.orientshotpotchronicles.network;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.Config;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTracks;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.RackRules;
 import cn.blockforge.orient.framework.loader.Framework;
 import cn.blockforge.orient.framework.loader.ProtocolPolicy;
 import com.google.gson.JsonParser;
@@ -16,6 +17,9 @@ public final class HotPotNetwork {
 
     public static void register() {
         var network = Framework.platform().network();
+        // mryt233 改：规则快照独立走可选单向通道，不改变原协议或阻拦服务端存取。
+        network.registerS2C(SyncRackRulesPayload.ID, SyncRackRulesPayload.CODEC,
+            (payload, context) -> RackRules.acceptClient(payload.json()), ProtocolPolicy.OPTIONAL);
         network.registerS2C(ConfigPayload.ID, ConfigPayload.CODEC,
             (payload, context) -> acceptClient(payload), ProtocolPolicy.OPTIONAL);
         network.registerC2S(ChopsticksAimPayload.ID, ChopsticksAimPayload.CODEC,
@@ -69,6 +73,18 @@ public final class HotPotNetwork {
 
     public static void broadcast(MinecraftServer server) {
         server.getPlayerList().getPlayers().forEach(HotPotNetwork::sendConfig);
+    }
+
+    public static void sendRackRules(ServerPlayer player) {
+        var network = Framework.platform().network();
+        if (network.canSendTo(player, SyncRackRulesPayload.ID)) {
+            network.sendToPlayer(player, new SyncRackRulesPayload(RackRules.wireSnapshot()));
+        }
+    }
+
+    public static void broadcastRackRules(MinecraftServer server) {
+        var players = server.getPlayerList(); // 首次标签加载时玩家列表可能尚未初始化。
+        if (players != null) players.getPlayers().forEach(HotPotNetwork::sendRackRules);
     }
 
     public static void sendTracks(ServerPlayer player) {

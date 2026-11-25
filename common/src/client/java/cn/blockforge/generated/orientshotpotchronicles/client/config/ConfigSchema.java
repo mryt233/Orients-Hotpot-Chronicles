@@ -91,6 +91,13 @@ public final class ConfigSchema {
             prop("table_materials_mode"), "table_materials_mode"));
         out.add(new Section(k("group.table_materials"), tableMat));
 
+        // mryt233 改：单格兜底容量与视觉预算分开，按原配置通道提交。
+        out.add(new Section(k("group.rack"), List.of(
+            field("rack.rack_default_max_stack", true, 1, 64, 1, Unit.PLAIN,
+                prop("rack_default_max_stack"), "rack_default_max_stack"),
+            field("rack.rack_max_visual_items", true, 1, 16, 1, Unit.PLAIN,
+                prop("rack_max_visual_items"), "rack_max_visual_items"))));
+
         List<Field> minigame = new ArrayList<>();
         minigame.add(toggle("minigame.allow_virtual_plate", prop("minigame_allow_virtual_plate"), "minigame_allow_virtual_plate"));
         minigame.add(field("minigame.invite_timeout_ticks", true, 60, 1200, 20, Unit.TICK,

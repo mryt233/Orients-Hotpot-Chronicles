@@ -16,6 +16,10 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.common.util.TriState;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PrepRackBlock;
+import net.minecraft.world.InteractionResult;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
 /** NeoForge 保留注册表解冻窗口及原生资源重载事件。 */
@@ -38,6 +42,15 @@ public final class HotPotNeoForge {
             "NeoForgeDevTests", "register", new Class<?>[]{RegisterCommandsEvent.class}, event));
         if (Boolean.getBoolean("hotpot.expreg")) HotpotContentModule.development("NeoForgeRegProbe", "register", new Class<?>[]{IEventBus.class}, modBus);
         if (Boolean.getBoolean("hotpot.opt3c")) HotpotContentModule.development("Opt3cNeoForgeProbe", "install", new Class<?>[]{IEventBus.class}, modBus);
+        // mryt233 改：只处理未被保护模组拒绝的架体潜行交互。
+        NeoForge.EVENT_BUS.addListener((PlayerInteractEvent.RightClickBlock event) -> {
+            if (event.isCanceled() || event.getUseBlock()==TriState.FALSE) return;
+            var result = PrepRackBlock.onSneakUse(event.getEntity(),event.getLevel(),event.getHand(),event.getHitVec());
+            if (result != InteractionResult.PASS) {
+                event.setCancellationResult(result);
+                event.setCanceled(true);
+            }
+        });
         // 两端原生资源重载 API 不同，统一通知公共宿主。
         NeoForge.EVENT_BUS.addListener((AddReloadListenerEvent event) ->
             event.addListener(new SimplePreparableReloadListener<Void>() {

@@ -701,6 +701,12 @@ public final class Config {
         return flag("mode.minigames_enabled", DEFAULT_MODE_MINIGAMES_ENABLED);
     }
 
+    public static final int DEFAULT_RACK_STACK = 12;
+    public static final int DEFAULT_RACK_VISUAL = 8;
+
+    public static int rackDefaultMaxStack() { return integer("rack.rack_default_max_stack", DEFAULT_RACK_STACK); }
+    public static int rackMaxVisualItems() { return integer("rack.rack_max_visual_items", DEFAULT_RACK_VISUAL); }
+
     public static boolean rackSwapMaterials() {
         return flag("mode.rack_swap_materials", DEFAULT_MODE_RACK_SWAP_MATERIALS);
     }
@@ -999,6 +1005,13 @@ public final class Config {
     }
 
     /** 桌架可换材质开关默认值。 */
+    public static void rememberRackDefaults() {
+        defaultNumbers = null;
+        JsonObject rack = ConfigStore.make(STORE.defaults(), "rack");
+        rack.addProperty("rack_default_max_stack", DEFAULT_RACK_STACK);
+        rack.addProperty("rack_max_visual_items", DEFAULT_RACK_VISUAL);
+    }
+
     public static void rememberTableMaterialsDefaults() {
         defaultNumbers = null;
         ConfigStore.make(STORE.defaults(), "table_materials")
@@ -1025,6 +1038,7 @@ public final class Config {
         rememberCropsDefaults();
         rememberProcessingDefaults();
         rememberTableMaterialsDefaults();
+        rememberRackDefaults();
         rememberMinigameDefaults();
         rememberWarmth(DEFAULT_WARMTH_INTERVAL_TICKS, DEFAULT_WARMTH_RANGE,
             DEFAULT_WARMTH_DURATION, DEFAULT_WARMTH_AMPLIFIER);
@@ -1076,6 +1090,8 @@ public final class Config {
     }
 
     static NumericConfig.Rule rule(String path) {
+        if (path.equals("rack.rack_default_max_stack")) return new NumericConfig.Rule(1, RackRuleDef.STACK_LIMIT, true);
+        if (path.equals("rack.rack_max_visual_items")) return new NumericConfig.Rule(1, RackRuleDef.VISUAL_LIMIT, true);
         // mryt233 改（2026-11-05，r135e）：客户端粒子强度百分比 0～100 整数，0=关闭粒子
         if (path.equals("client.particle_intensity")) return new NumericConfig.Rule(0, 100, true);
         if (path.equals("crops.growth_rate")) return new NumericConfig.Rule(0, 10, false);
@@ -1194,6 +1210,8 @@ public final class Config {
         help.addProperty("spicy.hunger_top_bonus", "红汤最高档（3 档变态辣）时负面饥饿额外延长的时长（仅 hunger_duration > 0 时生效），20 tick = 1 秒。范围 0～10000");
         help.addProperty("spicy.mouth_fire_from_level", "红汤从第几档辣度起吃下会在嘴上冒无伤火苗（4 = 不冒火）。范围 1～4");
         help.addProperty("spicy.mouth_fire_ticks", "红汤嘴上冒火苗的持续时长，0 = 关闭，20 tick = 1 秒。范围 0～1200");
+        help.addProperty("rack.rack_default_max_stack", "未命中特定规则的小件单格最多放几件，范围 1～64；还受物品原生堆叠上限约束");
+        help.addProperty("rack.rack_max_visual_items", "备菜架每格最多绘制几件，范围 1～16；调低可减少绘制，不减少实际库存");
         help.addProperty("loot.shrimp_fishing.weight", "原版钓鱼鱼池中钓到虾的权重，0 = 钓不到（改后需 /reload 生效）。范围 0～1000");
         help.addProperty("loot.garnish.<配菜>.chance", "打草掉落该配菜的概率（0 = 不掉，1 = 必掉；改后需 /reload 生效）。范围 0～1");
         help.addProperty("loot.lily_pad.lotus_root.chance", "破坏睡莲（非剪刀）掉落莲藕的概率（改后需 /reload 生效）。范围 0～1");

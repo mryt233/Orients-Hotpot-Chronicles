@@ -36,6 +36,7 @@ public final class HotPotClientContent {
         client.wrappedModels(new StoveModelRule());
         client.onDisconnect(() -> {
             Config.clearClient();
+            RackRules.clearClient(); // mryt233 改：断线不保留远端的架体快照。
             HotPotMinigameClient.onDisconnect();
         });
         client.keyMappings(HotPotKeybinds.all());

@@ -786,15 +786,15 @@ public final class HotPotContent {
         TALL_HOTPOT_TABLE_ITEM = registerBlockItem(registration, "tall_hotpot_table", TALL_HOTPOT_TABLE);
         MULTI_TIER_PREP_RACK = registration.blocks().register(HotPot.id("multi_tier_prep_rack"),
             new PrepRackBlock(PrepRackBlock.Kind.MULTI_TIER,
-                BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(2.0F, 3.0F).noOcclusion()));
+                BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(2.0F, 3.0F).noOcclusion().dynamicShape()));
         MULTI_TIER_PREP_RACK_ITEM = registerBlockItem(registration, "multi_tier_prep_rack", MULTI_TIER_PREP_RACK);
         DESKTOP_PREP_RACK = registration.blocks().register(HotPot.id("desktop_prep_rack"),
             new PrepRackBlock(PrepRackBlock.Kind.DESKTOP,
-                BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(2.0F, 3.0F).noOcclusion()));
+                BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(2.0F, 3.0F).noOcclusion().dynamicShape()));
         DESKTOP_PREP_RACK_ITEM = registerBlockItem(registration, "desktop_prep_rack", DESKTOP_PREP_RACK);
         HANGING_PREP_RACK = registration.blocks().register(HotPot.id("hanging_prep_rack"),
             new PrepRackBlock(PrepRackBlock.Kind.HANGING,
-                BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(2.0F, 3.0F).noOcclusion()));
+                BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(2.0F, 3.0F).noOcclusion().dynamicShape()));
         HANGING_PREP_RACK_ITEM = registerBlockItem(registration, "hanging_prep_rack", HANGING_PREP_RACK);
         CUTOUT_BLOCKS.add(MULTI_TIER_PREP_RACK);
         CUTOUT_BLOCKS.add(DESKTOP_PREP_RACK);

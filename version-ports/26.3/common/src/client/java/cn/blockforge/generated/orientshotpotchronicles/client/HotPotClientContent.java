@@ -36,6 +36,7 @@ public final class HotPotClientContent {
         client.wrappedModels(new StoveModelRule());
         client.onDisconnect(() -> {
             Config.clearClient();
+            RackRules.clearClient(); // mryt233 改：断线清除远端规则。
             HotPotMinigameClient.onDisconnect();
         });
         client.keyMappings(HotPotKeybinds.all());

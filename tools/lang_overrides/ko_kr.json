@@ -331,5 +331,11 @@
   "text.orients_hotpot_chronicles.msg.minigame_busy": "이미 미니게임 진행 중이거나 초대를 받은 상태입니다",
   "text.orients_hotpot_chronicles.msg.minigame_need_pot": "먼저 조준점을 훠궈 냄비에 맞추거나 훠궈 냄비 옆에 앉은 후 도전을 시작하세요",
   "text.orients_hotpot_chronicles.msg.minigame_virtual_disabled": "서버 관리자가 가상 연습용 접시를 비활성화하여, 실제 익은 음식을 소모하도록 자동 전환되었습니다",
-  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "냄비에 아직 익은 음식이 없습니다! 먼저 재료를 익히거나 '가상 연습용 접시'를 체크하고 시작하세요"
+  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "냄비에 아직 익은 음식이 없습니다! 먼저 재료를 익히거나 '가상 연습용 접시'를 체크하고 시작하세요",
+  "text.orients_hotpot_chronicles.config.group.rack": "재료 선반",
+  "text.orients_hotpot_chronicles.config.prop.rack_default_max_stack": "기본 슬롯 용량",
+  "text.orients_hotpot_chronicles.config.help.rack_default_max_stack": "별도 규칙이 없는 소품의 슬롯당 최대 보관 개수입니다 (1~64, 아이템 자체의 최대 중첩 수로 제한)",
+  "text.orients_hotpot_chronicles.config.prop.rack_max_visual_items": "슬롯당 최대 표시 수",
+  "text.orients_hotpot_chronicles.config.help.rack_max_visual_items": "슬롯당 화면에 그릴 최대 개수입니다 (1~16). 값을 낮추면 성능 부담을 줄일 수 있으며 실제 보관 용량에는 영향을 주지 않습니다",
+  "text.orients_hotpot_chronicles.msg.prep_rack_full": "재료 선반에 이 아이템을 놓을 빈 슬롯이 없습니다"
 }

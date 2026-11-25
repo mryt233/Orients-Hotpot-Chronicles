@@ -15,6 +15,8 @@ import sys
 
 from PIL import Image, ImageDraw, ImageFont
 
+from pixkit.text import windows_fonts
+
 MOD = Path(__file__).resolve().parent.parent
 OUT = MOD / "tools/out/sausage"
 VANILLA = MOD.parent / "viewer/cache/1.21.1/assets/minecraft/textures/item"
@@ -524,8 +526,10 @@ def minced_pork() -> Image.Image:
 
 
 def font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
-    windows = Path("C:/Windows/Fonts") / ("msyhbd.ttc" if bold else "msyh.ttc")
-    candidates = [windows, Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")]
+    windows = windows_fonts()  # mryt233 改：使用当前系统的字体目录。
+    candidates = [Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")]
+    if windows is not None:
+        candidates.insert(0, windows / ("msyhbd.ttc" if bold else "msyh.ttc"))
     for path in candidates:
         if path.exists():
             return ImageFont.truetype(str(path), size)

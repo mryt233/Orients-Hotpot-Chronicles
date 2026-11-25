@@ -337,5 +337,11 @@
   "text.orients_hotpot_chronicles.msg.minigame_busy": "すでにミニゲームのプレイ中、または招待の保留中です",
   "text.orients_hotpot_chronicles.msg.minigame_need_pot": "照準を火鍋に合わせるか、火鍋のそばに座ってから挑戦を開始してください",
   "text.orients_hotpot_chronicles.msg.minigame_virtual_disabled": "サーバー管理者によって仮想練習皿が無効化されているため、実際の料理を消費するように自動で切り替わりました",
-  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "鍋の中に煮えた料理がありません！先に具材を煮るか、「仮想練習皿」にチェックを入れて開始してください"
+  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "鍋の中に煮えた料理がありません！先に具材を煮るか、「仮想練習皿」にチェックを入れて開始してください",
+  "text.orients_hotpot_chronicles.config.group.rack": "食材ラック",
+  "text.orients_hotpot_chronicles.config.prop.rack_default_max_stack": "デフォルトのスロット容量",
+  "text.orients_hotpot_chronicles.config.help.rack_default_max_stack": "専用ルールがない小物アイテムを1スロットに収納できる最大数（1～64、アイテム本来のスタック上限まで）",
+  "text.orients_hotpot_chronicles.config.prop.rack_max_visual_items": "1スロットの最大表示数",
+  "text.orients_hotpot_chronicles.config.help.rack_max_visual_items": "1スロットあたりに描画する最大数（1～16）。値を下げると負荷を抑えられ、実際の容量には影響しません",
+  "text.orients_hotpot_chronicles.msg.prep_rack_full": "食材ラックにこのアイテムを置ける空きスロットがありません"
 }

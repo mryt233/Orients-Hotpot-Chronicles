@@ -5,12 +5,17 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.WeakHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
@@ -25,8 +30,60 @@ import net.minecraft.world.level.block.state.BlockState;
 public final class BakedQuadRemap {
     private static final int VERTEX_STRIDE = Math.max(8, DefaultVertexFormat.BLOCK.getVertexSize() / 4);
     private static final int UV_OFFSET = computeUvOffset();
-    private static final Map<BakedModel, EnumMap<Direction, TextureAtlasSprite>> SPRITE_CACHE =
-        Collections.synchronizedMap(new WeakHashMap<>());
+    // mryt233 改：不同状态与回退材质分别缓存；图集代际和第三方模型回调分离。
+    private static final Object CACHE_LOCK = new Object();
+    private static final int MAX_SPRITES = 2048;
+    private static final int MAX_ITEM_MODELS = 128;
+    private static final Map<SpriteKey, TextureAtlasSprite> SPRITE_CACHE = new LinkedHashMap<>(128, .75F, true);
+    private static final Set<ItemCache> ITEM_CACHES = Collections.newSetFromMap(new WeakHashMap<>());
+    private static final ThreadLocal<Lookup> LOOKUP = new ThreadLocal<>();
+    private static volatile long generation;
+
+    /** mryt233 改：客户端几何缓存随图集一并失效。 */
+    public static long spriteGeneration() { return generation; }
+
+    private record SpriteKey(BakedModel model, BlockState state, Direction face, BlockState fallback) {
+        @Override public boolean equals(Object other) {
+            return other instanceof SpriteKey key && model == key.model && state == key.state
+                && face == key.face && fallback == key.fallback;
+        }
+        @Override public int hashCode() {
+            return Objects.hash(System.identityHashCode(model), state, face, fallback);
+        }
+    }
+
+    private static final class Lookup {
+        final BakedModel[] active = new BakedModel[8];
+        int size;
+        boolean reentered;
+    }
+
+    /** 按实际精灵映射缓存物品包装，容量固定；重烘焙时清空仍存活的旧包装。 */
+    public static final class ItemCache {
+        private final Map<Map<TextureAtlasSprite, TextureAtlasSprite>, BakedModel> values =
+            new LinkedHashMap<>(16, .75F, true);
+
+        public ItemCache() {
+            synchronized (CACHE_LOCK) {
+                ITEM_CACHES.add(this);
+            }
+        }
+
+        public BakedModel getOrCreate(Map<TextureAtlasSprite, TextureAtlasSprite> swaps,
+                                      Function<Map<TextureAtlasSprite, TextureAtlasSprite>, BakedModel> factory) {
+            synchronized (CACHE_LOCK) {
+                BakedModel cached = values.get(swaps);
+                if (cached != null) return cached;
+                var copy = new LinkedHashMap<TextureAtlasSprite, TextureAtlasSprite>();
+                swaps.forEach((from, to) -> { if (from != null && to != null) copy.put(from, to); });
+                var key = Collections.unmodifiableMap(copy);
+                BakedModel next = factory.apply(key); // 本地包装构造器，不得回调外部模型。
+                if (values.size() >= MAX_ITEM_MODELS) values.remove(values.keySet().iterator().next());
+                values.put(key, next);
+                return next;
+            }
+        }
+    }
 
     private BakedQuadRemap() {
     }
@@ -119,55 +176,77 @@ public final class BakedQuadRemap {
         return to.getV(rel);
     }
 
-    /** 从任意已烘焙方块模型中安全提取指定朝向面的主贴图精灵（缺失面自动退回无剔除面或粒子精灵）。 */
+    /** 同一线程不重复进入同个模型；循环分支使用图集的缺失精灵，而不再次调用模型。 */
     public static TextureAtlasSprite resolveFaceSprite(BlockState state, Direction face, BlockState fallback) {
-        var dispatcher = Minecraft.getInstance().getBlockRenderer();
-        BakedModel model = dispatcher.getBlockModel(state);
-        if (model == null) {
-            return dispatcher.getBlockModel(fallback != null ? fallback : Blocks.OAK_PLANKS.defaultBlockState())
-                .getParticleIcon();
+        BlockState safe = fallback != null ? fallback : Blocks.OAK_PLANKS.defaultBlockState();
+        if (state == null) state = safe;
+        var minecraft = Minecraft.getInstance();
+        BakedModel model = minecraft.getBlockRenderer().getBlockModel(state);
+        var key = new SpriteKey(model, state, face, safe);
+        long before;
+        synchronized (CACHE_LOCK) {
+            TextureAtlasSprite cached = SPRITE_CACHE.get(key);
+            if (cached != null) return cached;
+            before = generation;
         }
-        synchronized (SPRITE_CACHE) {
-            EnumMap<Direction, TextureAtlasSprite> map = SPRITE_CACHE.computeIfAbsent(
-                model, m -> new EnumMap<>(Direction.class));
-            TextureAtlasSprite cached = map.get(face);
-            if (cached != null) {
-                return cached;
+        Lookup lookup = LOOKUP.get();
+        if (lookup == null) {
+            lookup = new Lookup();
+            LOOKUP.set(lookup);
+        }
+        for (int i = 0; i < lookup.size; i++) {
+            if (lookup.active[i] == model) {
+                lookup.reentered = true;
+                return missingSprite(minecraft);
             }
         }
-        TextureAtlasSprite resolved = findFaceSpriteUncached(model, state, face, fallback);
-        synchronized (SPRITE_CACHE) {
-            SPRITE_CACHE.computeIfAbsent(model, m -> new EnumMap<>(Direction.class)).put(face, resolved);
+        if (lookup.size == lookup.active.length) {
+            lookup.reentered = true;
+            return missingSprite(minecraft);
         }
-        return resolved;
+        lookup.active[lookup.size++] = model;
+        try {
+            TextureAtlasSprite resolved = model == null ? null : findFaceSpriteUncached(model, state, face);
+            if (resolved == null) resolved = state == safe ? missingSprite(minecraft) : resolveFaceSprite(safe, face, safe);
+            if (!lookup.reentered) {
+                synchronized (CACHE_LOCK) {
+                    if (before == generation) {
+                        if (SPRITE_CACHE.size() >= MAX_SPRITES) SPRITE_CACHE.remove(SPRITE_CACHE.keySet().iterator().next());
+                        SPRITE_CACHE.put(key, resolved);
+                    }
+                }
+            }
+            return resolved;
+        } finally {
+            lookup.active[--lookup.size] = null;
+            if (lookup.size == 0) LOOKUP.remove();
+        }
+    }
+
+    private static TextureAtlasSprite missingSprite(Minecraft minecraft) {
+        return minecraft.getModelManager().getAtlas(TextureAtlas.LOCATION_BLOCKS)
+            .getSprite(MissingTextureAtlasSprite.getLocation());
     }
 
     private static TextureAtlasSprite findFaceSpriteUncached(BakedModel model, BlockState state,
-                                                             Direction face, BlockState fallback) {
+                                                             Direction face) {
         RandomSource rand = RandomSource.create(42L);
         List<BakedQuad> quads = model.getQuads(state, face, rand);
-        if (!quads.isEmpty()) {
-            return quads.get(0).getSprite();
-        }
+        if (!quads.isEmpty()) return quads.get(0).getSprite();
         List<BakedQuad> general = model.getQuads(state, null, rand);
         if (!general.isEmpty()) {
-            for (BakedQuad q : general) {
-                if (q.getDirection() == face) {
-                    return q.getSprite();
-                }
-            }
+            for (BakedQuad q : general) if (q.getDirection() == face) return q.getSprite();
             return general.get(0).getSprite();
         }
-        TextureAtlasSprite particle = model.getParticleIcon();
-        if (particle != null) {
-            return particle;
-        }
-        BlockState safe = fallback != null ? fallback : Blocks.OAK_PLANKS.defaultBlockState();
-        return Minecraft.getInstance().getBlockRenderer().getBlockModel(safe).getParticleIcon();
+        return model.getParticleIcon();
     }
 
     public static void clearSpriteCache() {
-        SPRITE_CACHE.clear();
+        synchronized (CACHE_LOCK) {
+            generation++;
+            SPRITE_CACHE.clear();
+            for (ItemCache cache : ITEM_CACHES) cache.values.clear();
+        }
     }
 
     private static float clamp01(float v) {

@@ -30,8 +30,18 @@ public final class RenderFrame {
 
     public void item(ItemStack stack, ItemDisplayContext mode, int light, int overlay,
                      PoseStack pose, Level level, int seed) {
+        ItemStackRenderState state = resolveItem(stack, mode, level, seed);
+        item(state, light, overlay, pose);
+    }
+
+    /** mryt233 改：同一份提取结果可供测量和多次提交，避免重复解析动态模型。 */
+    public static ItemStackRenderState resolveItem(ItemStack stack, ItemDisplayContext mode, Level level, int seed) {
         ItemStackRenderState state = new ItemStackRenderState();
         Minecraft.getInstance().getItemModelResolver().updateForTopItem(state, stack, mode, level, null, seed);
+        return state;
+    }
+
+    public void item(ItemStackRenderState state, int light, int overlay, PoseStack pose) {
         Matrix4f transform = new Matrix4f(pose.last().pose());
         commands.add((root, collector, dynamicLight, dynamicOverlay) -> {
             root.pushPose();

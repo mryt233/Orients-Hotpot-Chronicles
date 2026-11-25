@@ -3,5 +3,5 @@ package snownee.jade.api;
 import net.minecraft.world.item.ItemStack;
 import snownee.jade.api.view.IServerExtensionProvider;
 public interface IWailaCommonRegistration {
-    <T> void registerItemStorage(IServerExtensionProvider<ItemStack> provider, Class<? extends T> type);
+    <T> void registerItemStorage(IServerExtensionProvider<T, ItemStack> provider, Class<? extends T> type);
 }

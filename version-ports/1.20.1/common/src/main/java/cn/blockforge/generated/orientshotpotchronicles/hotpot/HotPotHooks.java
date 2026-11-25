@@ -45,7 +45,13 @@ public final class HotPotHooks {
         }
     }
 
+    /** mryt233 改：启动期登记声明式规则，数据包可用同 ID 覆盖。 */
+    public static void registerRackRule(RackRuleDef rule) {
+        RackRules.register(rule);
+    }
+
     public static void freezeRegistries() {
+        RackRules.freeze();
         HotPotCooking.freezeRegistries();
         SoupBase.freezeSources();
         Soups.freeze();

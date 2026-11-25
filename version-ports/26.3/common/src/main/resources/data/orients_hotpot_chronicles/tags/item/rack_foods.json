@@ -1,0 +1,19 @@
+{
+  "replace": false,
+  "values": [
+    "orients_hotpot_chronicles:chicken_feet",
+    "orients_hotpot_chronicles:cooked_chicken_feet",
+    "orients_hotpot_chronicles:boneless_chicken_feet",
+    "orients_hotpot_chronicles:cooked_boneless_chicken_feet",
+    "orients_hotpot_chronicles:fatty_beef_roll",
+    "orients_hotpot_chronicles:beef_loin_slice",
+    "orients_hotpot_chronicles:lotus_root_slice",
+    "orients_hotpot_chronicles:tripe",
+    "orients_hotpot_chronicles:greens",
+    "minecraft:bread",
+    "minecraft:cookie",
+    "minecraft:carrot",
+    "minecraft:beef",
+    "minecraft:porkchop"
+  ]
+}

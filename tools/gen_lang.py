@@ -4696,6 +4696,12 @@ ALPHA031_PHASE5_PLACEHOLDERS = {
 
 # mryt233 改（2026-11-16，0.3.1-alpha Phase 4）：统一可换材质火锅桌与三种备菜架英文占位，留待统一翻译。
 ALPHA031_PHASE4_PLACEHOLDERS = {
+    "text.orients_hotpot_chronicles.config.group.rack": "Prep Racks",
+    "text.orients_hotpot_chronicles.config.prop.rack_default_max_stack": "Default Slot Capacity",
+    "text.orients_hotpot_chronicles.config.help.rack_default_max_stack": "Fallback slot capacity for items without a specific rule (1–64, limited by the item stack size)",
+    "text.orients_hotpot_chronicles.config.prop.rack_max_visual_items": "Items Shown per Slot",
+    "text.orients_hotpot_chronicles.config.help.rack_max_visual_items": "Maximum items drawn per slot (1–16). Lower values reduce drawing cost without reducing storage",
+    "text.orients_hotpot_chronicles.msg.prep_rack_full": "No available space for this item on the rack",
     "block.orients_hotpot_chronicles.hotpot_table": "Hotpot Table",
     "block.orients_hotpot_chronicles.tall_hotpot_table": "Tall Hotpot Table",
     "block.orients_hotpot_chronicles.multi_tier_prep_rack": "Multi-Tier Prep Rack",

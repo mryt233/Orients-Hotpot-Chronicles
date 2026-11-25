@@ -433,7 +433,7 @@ def embed_imgs(body):
 
 # ---------------- 合成表大全（同一类的配方合成一张卡，材料自动轮换，点材料看做出来的东西） ----------------
 BASE_RES = bt.RES   # mryt233 改，2026-11-22：0.3.1-alpha 正式版 = 当前主工程
-BASE_VERSION = "0.3.1-alpha"
+BASE_VERSION = "0.3.2-alpha"  # mryt233 改：教程跟随本轮五线归档。
 VARIANT_PREFIXES = sorted(bt.WOODS + ["quartz", "bamboo", "terracotta", "copper", "iron", "cut_copper", "smooth_stone",
                                       "polished_andesite", "polished_blackstone", "polished_deepslate", "polished_diorite", "polished_granite"],
                           key=len, reverse=True)

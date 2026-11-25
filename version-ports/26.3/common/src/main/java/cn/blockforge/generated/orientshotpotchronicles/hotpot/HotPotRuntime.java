@@ -81,11 +81,13 @@ public final class HotPotRuntime {
             Config.setServer(server);
             HotPotRecipes.setServer(server); // mryt233 改（2026-11-11）
             HotPotHooks.freezeRegistries();
+            RackRules.start(server); // mryt233 改：标签就绪后应用备菜架规则。
         });
         events.onPlayerJoin(player -> {
             TableMigration.migrateInventory(player);
             HotPotNetwork.sendConfig(player);
             HotPotNetwork.sendTracks(player);
+            HotPotNetwork.sendRackRules(player);
         });
         events.onChunkLoad(TableMigration::migrateChunk);
         events.onPlayerLeave(player -> {
@@ -100,6 +102,7 @@ public final class HotPotRuntime {
             CuttingBoardBlock.clearCache();
         });
         events.onServerStopped(server -> {
+            RackRules.stop(server);
             activeServer = null;
             Config.setServer(null);
             HotPotRecipes.setServer(null);

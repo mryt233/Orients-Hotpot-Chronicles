@@ -10,7 +10,8 @@
     "EntityRaycastMixin",
     "LivingEntityEatMixin",
     "LootPoolAccessor",
-    "LootTableAccessor"
+    "LootTableAccessor",
+    "RackReloadMixin"
   ],
   "client": [
     "ClientPlayerInteractionManagerMixin",

@@ -4,7 +4,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import snownee.jade.api.callback.JadeRayTraceCallback;
-import snownee.jade.api.callback.JadeBeforeTooltipCollectCallback;
 import snownee.jade.api.view.IClientExtensionProvider;
 import snownee.jade.api.view.ItemView;
 public interface IWailaClientRegistration {
@@ -12,8 +11,6 @@ public interface IWailaClientRegistration {
     CompoundTag getServerData();
     default void addRayTraceCallback(JadeRayTraceCallback callback) { addRayTraceCallback(0, callback); }
     void addRayTraceCallback(int priority, JadeRayTraceCallback callback);
-    default void addBeforeTooltipCollectCallback(JadeBeforeTooltipCollectCallback callback) { addBeforeTooltipCollectCallback(0, callback); }
-    void addBeforeTooltipCollectCallback(int priority, JadeBeforeTooltipCollectCallback callback);
     void registerItemStorageClient(IClientExtensionProvider<ItemStack, ItemView> provider);
-    void registerBlockComponent(IComponentProvider<BlockAccessor> provider, Class<? extends Block> blockClass);
+    void registerBlockComponent(IBlockComponentProvider provider, Class<? extends Block> blockClass);
 }

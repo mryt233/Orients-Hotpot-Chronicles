@@ -9,6 +9,7 @@
     "BowlItemMixin",
     "EntityRaycastMixin",
     "LivingEntityEatMixin",
+    "RackReloadMixin",
     "LootPoolAccessor",
     "LootTableAccessor",
     "FoodConsumeMixin"

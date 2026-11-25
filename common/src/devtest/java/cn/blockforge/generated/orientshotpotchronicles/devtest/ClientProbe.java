@@ -335,6 +335,15 @@ public final class ClientProbe {
     private static void snapshot(Minecraft mc, String id) {
         var report = new com.google.gson.JsonObject();
         report.addProperty("id", id);
+        // mryt233 改：隔离验收分别读实际堆、进服规则和全局配置，不在生产版记录。
+        var runtime = Runtime.getRuntime();
+        report.addProperty("rack_heap_used", runtime.totalMemory() - runtime.freeMemory());
+        report.addProperty("rack_heap_committed", runtime.totalMemory());
+        report.addProperty("rack_rules_ready", cn.blockforge.generated.orientshotpotchronicles.hotpot.RackRules.clientReady());
+        report.addProperty("rack_visual_cap", cn.blockforge.generated.orientshotpotchronicles.hotpot.Config.rackMaxVisualItems());
+        if (mc.level != null) report.addProperty("rack_bread_cap", cn.blockforge.generated.orientshotpotchronicles.hotpot.RackRules.capacity(
+            mc.level, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.BREAD),
+            cn.blockforge.generated.orientshotpotchronicles.hotpot.PrepRackBlock.Kind.MULTI_TIER));
         report.addProperty("overlay", mc.getOverlay() == null ? "none" : mc.getOverlay().getClass().getName());
         report.addProperty("window_focused", org.lwjgl.glfw.GLFW.glfwGetWindowAttrib(mc.getWindow().getWindow(),
             org.lwjgl.glfw.GLFW.GLFW_FOCUSED) != 0);

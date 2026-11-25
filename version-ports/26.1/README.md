@@ -1,10 +1,12 @@
 # Orient's Hotpot Chronicles · 之晗的火锅物语
 
-<!-- 本文件由 version-ports/tools/gen_port_readme.py 生成；要改请改脚本里的数据再生成。 -->
+<!-- 作者：mryt233；本文件由移植说明生成脚本维护。 -->
 
-**Minecraft 26.1.x · Fabric + NeoForge · 0.3.1-alpha**
+**Minecraft 26.1.x · Fabric + NeoForge · 0.3.2-alpha**
 
-[Download / 下载](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.3.1-alpha) · [Full gameplay guide / 完整玩法](https://github.com/mryt233/Orients-Hotpot-Chronicles#readme) · [Report an issue / 反馈问题](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
+[Releases / 发布页](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases) · [Full gameplay guide / 完整玩法](https://github.com/mryt233/Orients-Hotpot-Chronicles#readme) · [Report an issue / 反馈问题](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose)
+
+**0.3.2-alpha：本地归档，待终审。 / Archived locally, pending final review.**
 
 > **Alpha / 测试版**
 > Compatibility with other mods and potential bugs have not been thoroughly verified. Back up your saves, try it in a new world first, and report any issues.
@@ -18,10 +20,10 @@
 
 ## Requirements · 运行要求
 
-| Loader / 加载器 | Minecraft | Requirement / 要求 | Java | 0.3.1-alpha test configurations / 实测组合 |
+| Loader / 加载器 | Minecraft | Requirement / 要求 | Java | 0.3.2-alpha dedicated server / 独立服 |
 | --- | --- | --- | --- | --- |
-| Fabric | 26.1, 26.1.1, 26.1.2 | Fabric Loader **0.19.5+**, [Fabric API](https://modrinth.com/mod/fabric-api) **0.145.0+** for your 26.1.x patch<br>Fabric Loader **0.19.5+**，且使用对应 MC 小版本的 [Fabric API](https://modrinth.com/mod/fabric-api) **0.145.0+** | 25+ | MC `26.1`: `0.19.5` + `0.145.0+26.1`; MC `26.1.2`: `0.20.1` + `0.155.3+26.1.2` |
-| NeoForge | 26.1.2 only / 仅 26.1.2 | NeoForge **26.1.2.71+** (no Fabric API)<br>NeoForge **26.1.2.71+**（不需要 Fabric API） | 25+ | `26.1.2.71` (server + official patched ABI / 独立服＋官方补丁 ABI); `26.1.2.126` (both / 双端) |
+| Fabric | 26.1, 26.1.1, 26.1.2 | Fabric Loader **0.19.5+**, [Fabric API](https://modrinth.com/mod/fabric-api) **0.145.0+** for your 26.1.x patch<br>Fabric Loader **0.19.5+**，且使用对应 MC 小版本的 [Fabric API](https://modrinth.com/mod/fabric-api) **0.145.0+** | 25+ | MC `26.1.2` · `0.20.1` + `0.155.3+26.1.2` |
+| NeoForge | 26.1.2 only / 仅 26.1.2 | NeoForge **26.1.2.71+** (no Fabric API)<br>NeoForge **26.1.2.71+**（不需要 Fabric API） | 25+ | MC `26.1.2` · `26.1.2.126` |
 
 Install on **both client and server**. The prerequisite **orient_framework 0.2.2** is bundled inside each JAR; no separate download is needed.
 
@@ -29,17 +31,21 @@ Install on **both client and server**. The prerequisite **orient_framework 0.2.2
 
 ## Installation · 安装
 
-1. **Fabric**: install the Fabric loader and Fabric API for your Minecraft version, put `orients_hotpot_chronicles-26.1-fabric-0.3.1-alpha.jar` into `mods`, and launch with Java 25+.
-2. **NeoForge**: install the NeoForge loader for your Minecraft version, put `orients_hotpot_chronicles-26.1-neoforge-0.3.1-alpha.jar` into `mods`, and launch with Java 25+.
+1. **Fabric**: install the Fabric loader and Fabric API for your Minecraft version, put `orients_hotpot_chronicles-26.1-fabric-0.3.2-alpha.jar` into `mods`, and launch with Java 25+.
+2. **NeoForge**: install the NeoForge loader for your Minecraft version, put `orients_hotpot_chronicles-26.1-neoforge-0.3.2-alpha.jar` into `mods`, and launch with Java 25+.
 
-1. **Fabric**：安装对应 Minecraft 版本的 Fabric 加载器和 Fabric API，把 `orients_hotpot_chronicles-26.1-fabric-0.3.1-alpha.jar` 放进 `mods` 文件夹，用 Java 25+ 启动。
-2. **NeoForge**：安装对应 Minecraft 版本的 NeoForge 加载器，把 `orients_hotpot_chronicles-26.1-neoforge-0.3.1-alpha.jar` 放进 `mods` 文件夹，用 Java 25+ 启动。
+1. **Fabric**：安装对应 Minecraft 版本的 Fabric 加载器和 Fabric API，把 `orients_hotpot_chronicles-26.1-fabric-0.3.2-alpha.jar` 放进 `mods` 文件夹，用 Java 25+ 启动。
+2. **NeoForge**：安装对应 Minecraft 版本的 NeoForge 加载器，把 `orients_hotpot_chronicles-26.1-neoforge-0.3.2-alpha.jar` 放进 `mods` 文件夹，用 Java 25+ 启动。
 
 ## About this port · 移植说明
 
-This is the **Minecraft 26.1.x** port of **0.3.1-alpha** (main build: Minecraft 1.21.1). It includes: Simple and Full gameplay modes (/orientshotpot mode); 4 chicken-feet items; orange trees, 9 crops and 9 wild plants; 1.5-block stone mill with automatic soymilk drainage into the adjacent open wooden vat, and a 3D wooden press lid for making 2 cold tofu; 40 old hotpot table presets consolidated into 2 universal IDs with independently swappable tops and bases and old-save migration; all hotpot tables and 3 prep racks (multi-tier, desktop, hanging) fireproof; a fast-eating challenge and a four-lane rhythm game with 3 data-pack tracks; 71 LabPBR normal/specular texture sets; ambient-occlusion preservation, stove top sync and part-scoped break particles.
+This is the **Minecraft 26.1.x** port of **0.3.2-alpha** (main build: Minecraft 1.21.1). It includes: Simple and Full gameplay modes (/orientshotpot mode); 4 chicken-feet items; orange trees, 9 crops and 9 wild plants; 1.5-block stone mill with automatic soymilk drainage into the adjacent open wooden vat, and a 3D wooden press lid for making 2 cold tofu; 40 old hotpot table presets consolidated into 2 universal IDs with independently swappable tops and bases and old-save migration; all hotpot tables and 3 prep racks (multi-tier, desktop, hanging) fireproof; a fast-eating challenge and a four-lane rhythm game with 3 data-pack tracks; 71 LabPBR normal/specular texture sets; ambient-occlusion preservation, stove top sync and part-scoped break particles.
 
-本版是 **0.3.1-alpha**（主版本为 Minecraft 1.21.1）的 **Minecraft 26.1.x 移植版**，包含：精简模式与完整模式切换（/orientshotpot mode）；4 款鸡爪物品；独立橙子树、9 种耕地作物与 9 种野植；1.5 格高小石磨（紧邻空大木桶自动流浆）与带 3D 木压板的开口大木桶（一次压出 2 块冷豆腐，已取消干货泡发）；40 种旧桌预设整合为 2 个通用 ID（桌面与底座可独立换材质，旧桌自动迁移）；全桌与 3 种备菜架（多层、桌面、壁挂）不可燃；快手抢吃与四轨音游，内置 3 首数据包曲目；71 套 LabPBR 法线与高光贴图；材质替换保留环境光遮蔽、高灶顶层同步与局部敲击粒子。
+本版是 **0.3.2-alpha**（主版本为 Minecraft 1.21.1）的 **Minecraft 26.1.x 移植版**，包含：精简模式与完整模式切换（/orientshotpot mode）；4 款鸡爪物品；独立橙子树、9 种耕地作物与 9 种野植；1.5 格高小石磨（紧邻空大木桶自动流浆）与带 3D 木压板的开口大木桶（一次压出 2 块冷豆腐，已取消干货泡发）；40 种旧桌预设整合为 2 个通用 ID（桌面与底座可独立换材质，旧桌自动迁移）；全桌与 3 种备菜架（多层、桌面、壁挂）不可燃；快手抢吃与四轨音游，内置 3 首数据包曲目；71 套 LabPBR 法线与高光贴图；材质替换保留环境光遮蔽、高灶顶层同步与局部敲击粒子。
+
+The three prep racks accept any non-empty item, stack identical items, and use five display layouts. Capacity and layout come from reloadable data-pack rules; drawing limits are configurable. Sneaking with a valid material changes only the rack material. Breaking a rack drops its inventory and the rack separately.
+
+三种备菜架可存任意非空物品、合并同物同数据的堆叠，并按五种布局展示。容量与布局支持数据包热重载，绘制上限可配置；潜行持合格材质只换材质。破坏时库存与架体分别掉落。
 
 Differences from the 1.21.1 build / 和 1.21.1 主版本的差异：
 
@@ -47,32 +53,32 @@ Differences from the 1.21.1 build / 和 1.21.1 主版本的差异：
 
 ## Test status · 测试范围
 
-303 unit tests passed. Four dedicated-server configurations passed restart, registry and save-persistence checks. Five muted single-player smoke runs covered both loaders at the newer versions (Fast and Fancy) plus the minimum Fabric combination (Fast). The minimum Forge-family version was checked against official patched libraries and run on a dedicated server; its client was not launched. REI 26.1.819: 23/23 binary references resolved on each loader, not an in-game integration test. Shaders, live REI/JEI/Jade/Axiom integration, and extended sessions with several real players were not tested.
+311 unit tests passed. Both final JARs were started on dedicated servers; seven prep-rack rules compiled, both rack settings loaded, and the servers saved and exited normally. The table lists the runs made on these exact JARs, not the minimum configurations. The requirements carry forward the package metadata and the previous release's compatibility checks.
 
-303 项单测通过。四套独立服均通过两次启动、注册与存档持久化核验；五轮静音单人冒烟覆盖两个加载器的较新版（流畅和高品质），以及 Fabric 最低组合（流畅）。Forge 系最低档核对官方补丁库并通过独立服，未启动最低档客户端。REI 26.1.819 两端各核对 23/23 个二进制调用成员，不是实机联动。未测光影、装入 REI/JEI/Jade/Axiom 的游戏联动或多真人长时间联机。
+311 项单测通过。双端均用落盘终包启动独立服，读到 7 条备菜架规则和两项配置，正常保存退出。表中只列这两份终包实跑的档位，不把旧版最低组合当作本版实测；下限沿用包内声明及上版兼容验证。
 
-Client and server must both use 0.3.1-alpha; versions cannot be mixed. Back up saves before upgrading from 0.3.0-alpha.
+Client and server must both use 0.3.2-alpha; versions cannot be mixed. Back up saves before upgrading.
 
-客户端和服务端必须同用 0.3.1-alpha，不能混连；从 0.3.0-alpha 升级前请备份存档。
+客户端和服务端必须同用 0.3.2-alpha，不能混连；升级前请备份存档。
 
 ## Other builds · 其他版本
 
-All 0.3.1-alpha files are on [one release page](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.3.1-alpha). Choose the JAR matching your Minecraft version and loader.
+All ten JARs are prepared for a single 0.3.2-alpha release. Choose the JAR matching your Minecraft version and loader.
 
-0.3.1-alpha 的所有文件都在[同一个发布页](https://github.com/mryt233/Orients-Hotpot-Chronicles/releases/tag/v0.3.1-alpha)，按 Minecraft 版本和加载器选择对应的 JAR。
+十个 JAR 已按 0.3.2-alpha 的同一发布页备齐，终审前不会上传；请选择对应 Minecraft 版本和加载器。
 
 | Minecraft | Loader / 加载器 | File / 文件 | Java |
 | --- | --- | --- | --- |
-| 1.21.1 | Fabric (main / 主版本) | `orients_hotpot_chronicles-1.21.1-fabric-0.3.1-alpha.jar` | 21+ |
-| 1.21.1 | NeoForge | `orients_hotpot_chronicles-1.21.1-neoforge-0.3.1-alpha.jar` | 21+ |
-| 26.3 | Fabric | `orients_hotpot_chronicles-26.3-fabric-0.3.1-alpha.jar` | 25+ |
-| 26.3 | NeoForge | `orients_hotpot_chronicles-26.3-neoforge-0.3.1-alpha.jar` | 25+ |
-| 26.2 | Fabric | `orients_hotpot_chronicles-26.2-fabric-0.3.1-alpha.jar` | 25+ |
-| 26.2 | NeoForge | `orients_hotpot_chronicles-26.2-neoforge-0.3.1-alpha.jar` | 25+ |
-| 26.1 – 26.1.2 | Fabric | `orients_hotpot_chronicles-26.1-fabric-0.3.1-alpha.jar` | 25+ |
-| 26.1.2 | NeoForge | `orients_hotpot_chronicles-26.1-neoforge-0.3.1-alpha.jar` | 25+ |
-| 1.20.1 | Fabric | `orients_hotpot_chronicles-1.20.1-fabric-0.3.1-alpha.jar` | 17+ |
-| 1.20.1 | Forge | `orients_hotpot_chronicles-1.20.1-forge-0.3.1-alpha.jar` | 17+ |
+| 1.21.1 | Fabric (main / 主版本) | `orients_hotpot_chronicles-1.21.1-fabric-0.3.2-alpha.jar` | 21+ |
+| 1.21.1 | NeoForge | `orients_hotpot_chronicles-1.21.1-neoforge-0.3.2-alpha.jar` | 21+ |
+| 26.3 | Fabric | `orients_hotpot_chronicles-26.3-fabric-0.3.2-alpha.jar` | 25+ |
+| 26.3 | NeoForge | `orients_hotpot_chronicles-26.3-neoforge-0.3.2-alpha.jar` | 25+ |
+| 26.2 | Fabric | `orients_hotpot_chronicles-26.2-fabric-0.3.2-alpha.jar` | 25+ |
+| 26.2 | NeoForge | `orients_hotpot_chronicles-26.2-neoforge-0.3.2-alpha.jar` | 25+ |
+| 26.1 – 26.1.2 | Fabric | `orients_hotpot_chronicles-26.1-fabric-0.3.2-alpha.jar` | 25+ |
+| 26.1.2 | NeoForge | `orients_hotpot_chronicles-26.1-neoforge-0.3.2-alpha.jar` | 25+ |
+| 1.20.1 | Fabric | `orients_hotpot_chronicles-1.20.1-fabric-0.3.2-alpha.jar` | 17+ |
+| 1.20.1 | Forge | `orients_hotpot_chronicles-1.20.1-forge-0.3.2-alpha.jar` | 17+ |
 
 Fabric builds need Fabric API for the same Minecraft version; Forge and NeoForge builds do not.
 
@@ -80,10 +86,10 @@ Fabric 版需要同 Minecraft 版本的 Fabric API；Forge 和 NeoForge 版不�
 
 ## Release files · 发行文件
 
-| File / 文件 | SHA-256 |
-| --- | --- |
-| `orients_hotpot_chronicles-26.1-fabric-0.3.1-alpha.jar` | `7af651338be8e229735dea6c1572ad353c0c8a1c845c2a51f97aaa8447a28d6a` |
-| `orients_hotpot_chronicles-26.1-neoforge-0.3.1-alpha.jar` | `94fb78ba1e02127d61966b721b04b23e50869695611f60369bdefecd11691f4b` |
+| File / 文件 | Bytes / 字节 | SHA-256 |
+| --- | ---: | --- |
+| `orients_hotpot_chronicles-26.1-fabric-0.3.2-alpha.jar` | 3,474,363 | `cd3c03fa04d45a4c64712a2a4c2ccf56729b53927588dc7a44bae2bd936b8b01` |
+| `orients_hotpot_chronicles-26.1-neoforge-0.3.2-alpha.jar` | 3,348,535 | `3ce7bf1c87c76f43b827ae6ca9568b16d2b042f114c81f0965eaa478cba678cc` |
 
 ## Build · 构建
 

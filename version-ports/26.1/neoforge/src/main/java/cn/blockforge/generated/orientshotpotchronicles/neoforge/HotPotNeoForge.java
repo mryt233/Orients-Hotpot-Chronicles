@@ -4,12 +4,17 @@ package cn.blockforge.generated.orientshotpotchronicles.neoforge;
 import cn.blockforge.generated.orientshotpotchronicles.HotpotContentModule;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTracks;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PrepRackBlock;
 import cn.blockforge.orient.framework.loader.ClientHooks;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.EventPriority;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.util.TriState;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
@@ -33,6 +38,15 @@ public class HotPotNeoForge {
             HotpotContentModule.HOST.runtime(callback -> NeoForge.EVENT_BUS.addListener(
                 (ServerStartedEvent e) -> callback.run()));
             NeoForgePlatform.afterContentRegistration();
+        });
+        // mryt233 改：保护模组先决定是否允许方块交互。
+        NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, (PlayerInteractEvent.RightClickBlock event) -> {
+            if (event.isCanceled() || event.getUseBlock() == TriState.FALSE) return;
+            var result = PrepRackBlock.onSneakUse(event.getEntity(), event.getLevel(), event.getHand(), event.getHitVec());
+            if (result != InteractionResult.PASS) {
+                event.setCancellationResult(result);
+                event.setCanceled(true);
+            }
         });
         // 开发命令依赖原生事件参数，正式包不携带实现。
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> HotpotContentModule.development(

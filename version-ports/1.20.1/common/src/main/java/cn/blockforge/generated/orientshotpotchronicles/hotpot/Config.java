@@ -701,6 +701,13 @@ public final class Config {
         return flag("mode.minigames_enabled", DEFAULT_MODE_MINIGAMES_ENABLED);
     }
 
+    // mryt233 改：仅通用平衡兜底和展示预算进配置；每物品规则在数据包里。
+    public static final int DEFAULT_RACK_STACK = 12;
+    public static final int DEFAULT_RACK_VISUAL = 8;
+
+    public static int rackDefaultMaxStack() { return integer("rack.rack_default_max_stack", DEFAULT_RACK_STACK); }
+    public static int rackMaxVisualItems() { return integer("rack.rack_max_visual_items", DEFAULT_RACK_VISUAL); }
+
     public static boolean rackSwapMaterials() {
         return flag("mode.rack_swap_materials", DEFAULT_MODE_RACK_SWAP_MATERIALS);
     }
@@ -1005,6 +1012,14 @@ public final class Config {
             .addProperty("mode", DEFAULT_TABLE_MATERIALS_MODE);
     }
 
+    /** mryt233 改：登记备菜架容量与显示预算默认值。 */
+    public static void rememberRackDefaults() {
+        defaultNumbers = null;
+        JsonObject rack = ConfigStore.make(STORE.defaults(), "rack");
+        rack.addProperty("rack_default_max_stack", DEFAULT_RACK_STACK);
+        rack.addProperty("rack_max_visual_items", DEFAULT_RACK_VISUAL);
+    }
+
     /** 即时小游戏（连打吃菜 + 4 轨音游）默认值。 */
     public static void rememberMinigameDefaults() {
         defaultNumbers = null;
@@ -1025,6 +1040,7 @@ public final class Config {
         rememberCropsDefaults();
         rememberProcessingDefaults();
         rememberTableMaterialsDefaults();
+        rememberRackDefaults();
         rememberMinigameDefaults();
         rememberWarmth(DEFAULT_WARMTH_INTERVAL_TICKS, DEFAULT_WARMTH_RANGE,
             DEFAULT_WARMTH_DURATION, DEFAULT_WARMTH_AMPLIFIER);
@@ -1076,6 +1092,9 @@ public final class Config {
     }
 
     static NumericConfig.Rule rule(String path) {
+        // mryt233 改：与备菜架数据规则的硬上限保持一致。
+        if (path.equals("rack.rack_default_max_stack")) return new NumericConfig.Rule(1, RackRuleDef.STACK_LIMIT, true);
+        if (path.equals("rack.rack_max_visual_items")) return new NumericConfig.Rule(1, RackRuleDef.VISUAL_LIMIT, true);
         // mryt233 改（2026-11-05，r135e）：客户端粒子强度百分比 0～100 整数，0=关闭粒子
         if (path.equals("client.particle_intensity")) return new NumericConfig.Rule(0, 100, true);
         if (path.equals("crops.growth_rate")) return new NumericConfig.Rule(0, 10, false);
@@ -1143,6 +1162,9 @@ public final class Config {
 
     private static JsonObject fieldHelp() {
         JsonObject help = new JsonObject();
+        // mryt233 改：说明默认容量与展示数量各自的范围和作用。
+        help.addProperty("rack.rack_default_max_stack", "未命中特定规则的小件单格最多放几件，范围 1～64；还受物品原生堆叠上限约束");
+        help.addProperty("rack.rack_max_visual_items", "备菜架每格最多绘制几件，范围 1～16；调低可减少绘制，不减少实际库存");
         help.addProperty("food.<物品>.hunger", "吃下去回多少饥饿点数；2 点 = 一个鸡腿图标。范围 0～100");
         help.addProperty("food.<物品>.saturation", "回多少饱和度系数（不是点数），越大越顶饿。范围 0～10");
         help.addProperty("soup_bowl.<汤底>.hunger", "喝完这碗汤回多少饥饿点数；2 点 = 一个鸡腿图标。范围 0～100");

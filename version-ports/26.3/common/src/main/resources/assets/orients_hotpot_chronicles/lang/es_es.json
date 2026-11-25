@@ -774,5 +774,11 @@
   "text.orients_hotpot_chronicles.msg.minigame_busy": "Ya estás en una partida de minijuego o tienes una invitación pendiente",
   "text.orients_hotpot_chronicles.msg.minigame_need_pot": "Apunta a un hotpot o siéntate cerca de uno antes de iniciar un desafío",
   "text.orients_hotpot_chronicles.msg.minigame_virtual_disabled": "El plato de práctica virtual está desactivado en este servidor; se consumirá comida cocinada real",
-  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "¡Aún no hay comida cocinada en la olla! Cocina algo primero o activa el «Plato de práctica virtual»"
+  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "¡Aún no hay comida cocinada en la olla! Cocina algo primero o activa el «Plato de práctica virtual»",
+  "text.orients_hotpot_chronicles.config.group.rack": "Estantes de ingredientes",
+  "text.orients_hotpot_chronicles.config.prop.rack_default_max_stack": "Capacidad predeterminada por casilla",
+  "text.orients_hotpot_chronicles.config.help.rack_default_max_stack": "Capacidad de reserva por casilla para objetos sin regla específica (1–64, limitada por el tamaño máximo de pila del objeto)",
+  "text.orients_hotpot_chronicles.config.prop.rack_max_visual_items": "Objetos visibles por casilla",
+  "text.orients_hotpot_chronicles.config.help.rack_max_visual_items": "Máximo de objetos renderizados por casilla (1–16); un valor menor ahorra rendimiento sin reducir la capacidad",
+  "text.orients_hotpot_chronicles.msg.prep_rack_full": "No hay ninguna casilla disponible en el estante para este objeto"
 }

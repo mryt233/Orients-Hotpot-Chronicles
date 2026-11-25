@@ -774,5 +774,11 @@
   "text.orients_hotpot_chronicles.msg.minigame_busy": "Du nimmst bereits an einem Minispiel oder einer offenen Einladung teil",
   "text.orients_hotpot_chronicles.msg.minigame_need_pot": "Visiere einen Hotpot an oder setze dich in seine Nähe, bevor du eine Herausforderung startest",
   "text.orients_hotpot_chronicles.msg.minigame_virtual_disabled": "Der virtuelle Übungsteller ist auf diesem Server deaktiviert; es wird echtes gegartes Essen verbraucht",
-  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "Noch kein gegartes Essen im Topf! Gare zuerst Zutaten oder aktiviere den „Virtuellen Übungsteller“"
+  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "Noch kein gegartes Essen im Topf! Gare zuerst Zutaten oder aktiviere den „Virtuellen Übungsteller“",
+  "text.orients_hotpot_chronicles.config.group.rack": "Zutatenregale",
+  "text.orients_hotpot_chronicles.config.prop.rack_default_max_stack": "Standard-Fachkapazität",
+  "text.orients_hotpot_chronicles.config.help.rack_default_max_stack": "Standard-Fachkapazität für Gegenstände ohne eigene Regel (1–64, begrenzt durch die maximale Stapelgröße)",
+  "text.orients_hotpot_chronicles.config.prop.rack_max_visual_items": "Max. Anzeige pro Fach",
+  "text.orients_hotpot_chronicles.config.help.rack_max_visual_items": "Maximale Anzahl dargestellter Gegenstände pro Fach (1–16). Niedrigere Werte sparen Leistung, ohne die Lagerkapazität zu verringern",
+  "text.orients_hotpot_chronicles.msg.prep_rack_full": "Im Regal ist kein passendes Fach für diesen Gegenstand frei"
 }

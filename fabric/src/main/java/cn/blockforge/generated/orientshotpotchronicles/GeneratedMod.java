@@ -9,6 +9,8 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPot;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTracks;
 import cn.blockforge.generated.orientshotpotchronicles.platform.FabricPlatform;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.PrepRackBlock;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
@@ -30,6 +32,7 @@ public final class GeneratedMod implements ModInitializer {
         if (Boolean.getBoolean("hotpot.opt3c")) HotpotContentModule.development("Opt3cFabricProbe", "install", new Class<?>[0]);
         HotpotContentModule.HOST.runtime(callback -> ServerLifecycleEvents.SERVER_STARTED.register(server -> callback.run()));
         FabricPlatform.afterContentRegistration();
+        UseBlockCallback.EVENT.register(PrepRackBlock::onSneakUse); // mryt233 改：原版潜行会跳过方块。
         // 资源重载监听器的原生类型属于 Fabric，公共生命周期只接收一次 reload 通知。
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
             @Override public ResourceLocation getFabricId() { return id("content_reload"); }

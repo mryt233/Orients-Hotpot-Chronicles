@@ -1,9 +1,9 @@
 <!-- 作者：mryt233；英文翻译，原文：mryt233。 -->
-<!-- mryt233 改（2026-11-22）：按 0.3.1-alpha 正式版重写英文首页总览与版本支持范围。 -->
+<!-- mryt233 改（2026-11-26）：按 0.3.2-alpha 正式版更新首页总览与版本覆盖范围。 -->
 # Minecraft [Orient's Hotpot Chronicles] Mod — Gameplay Guide
 
 :::tip
-**This guide covers packaged 0.3.1-alpha, demonstrated on Minecraft 1.21.1 Fabric** (1.21.1 NeoForge, 1.20.1 Fabric / Forge, and Fabric / NeoForge on 26.1.x, 26.2, and 26.3 play the same; see [Downloads, Installation & Feedback](install.html)). This release introduces **Full Mode / Simple Mode** switching, **Chicken Feet & Boneless Chicken Feet**, **Standalone Orange Trees** (`1+3×3×2(+1)` compact trees, azalea-style transparent orange leaves, shader waving, and light 1/5 pass-through slowdown), **9 farmland crops & wild clusters**, a **Stone Mill** (1.5-block stand with automatic pour into adjacent wooden vats), an **Open Wooden Vat** tofu workflow, **40 legacy tables consolidated into 2 universal material-swappable Hotpot Tables**, **3 GUI-less Prep Racks**, **Speed Eating & 4-Track Rhythm minigames**, **LabPBR 1.3** shader maps for hard surfaces, and REI 16 / shader / rendering / migration fixes.
+**This guide covers packaged 0.3.2-alpha, demonstrated on Minecraft 1.21.1 Fabric** (1.21.1 NeoForge, 1.20.1 Fabric / Forge, and Fabric / NeoForge on 26.1.x, 26.2, and 26.3 play the same; see [Downloads, Installation & Feedback](install.html)). This update highlights **universal item placement on prep racks, per-item shelf stacking, and five display modes** (3-layer data separation with `prep_rack_rules/*.json` datapack hot-reload, configurable visual draw cap, main/off-hand & sneak interaction routing, and flush ceiling hooks), alongside the **1.20.1 Jade 11.x compatibility fix** and drop / model-cache safety hardening across all five version lines; it also carries forward 0.3.1-alpha's Full/Simple Mode switching, chicken feet & standalone orange trees, 9 crops, Stone Mill & Wooden Vat tofu, material-swappable universal hotpot tables, real-time minigames, and LabPBR 1.3 shader maps.
 :::
 
 {{icons:brick_stove,iron_nine_grid_hotpot,bamboo_chopsticks,hotpot_table,multi_tier_prep_rack,oak_stool,quartz_eight_slot_platter,oak_sauce_station,stone_mill,wooden_vat,cutting_board,orange_sapling}}
@@ -31,10 +31,10 @@ The guide has two parts: **How to Play** and **Reference**:
 ## Mod overview
 
 - **Stoves & Hotpots**: short and tall stoves; copper and iron pots (nine-grid, multiple Yuanyang dividers, four-grid); 6 broths and 4 Spicy Red Broth heat levels; fuel with wood, coal, lava buckets, or lit campfires, plus press `G` to start Speed Eating or 4-Track Rhythm minigames.
-- **Tables, Racks & Seating**: universal low and tall hotpot tables (default plank top + brick base; swap tabletop and base materials independently with any solid block, uniformly non-flammable) and three GUI-less prep racks (floor / desktop / wall-or-ceiling hanging rack); 11 wood styles of stools and benches connecting up to 3 blocks and stacking as ladders.
+- **Tables, Racks & Seating**: universal low and tall hotpot tables (default plank top + brick base; swap tabletop and base materials independently with any solid block, uniformly non-flammable) and three GUI-less prep racks (floor / desktop / wall-or-ceiling hanging rack, supporting any item and per-item shelf stacking); 11 wood styles of stools and benches connecting up to 3 blocks and stacking as ladders.
 - **Tableware & Aprons**: 5 materials × 6 plate sizes; vanilla bowls plus 6 flavored soup bowls and a generic soup bowl; three drinks, glass cups, and toasting; three recolorable cloth aprons blocking spice flames and nearby splashes; bamboo chopsticks (with mini tabletop rests or rim resting).
 - **Ingredients & Farming**: tripe, fatty beef rolls, mutton rolls, beef loin slices, chicken feet & boneless chicken feet, shrimp paste, ham sausage, crispy pork, dried tofu / tofu skin / wide noodles / sweet potato skin, egg fried rice, and more; Full Mode uses the Stone Mill (auto-pouring into an adjacent empty vat) and Open Wooden Vat to press cold tofu, while Simple Mode restores quick crafting; plus standalone orange trees and 9 farmland crops with wild clusters.
-- **Sauces & Modes**: self-service sauce station with 15 stackable seasonings; lit pots grant ongoing Regeneration within 6 blocks; one-click **Full Mode / Simple Mode** presets and 18 hot-reloadable config groups, alongside deep support for shaders (LabPBR 1.3 maps, transparent waving orange leaves) and JEI / REI 16 / Jade.
+- **Sauces & Modes**: self-service sauce station with 15 stackable seasonings; lit pots grant ongoing Regeneration within 6 blocks; one-click **Full Mode / Simple Mode** presets and 19 hot-reloadable config groups, alongside deep support for shaders (LabPBR 1.3 maps, transparent waving orange leaves) and JEI / REI 16 / Jade.
 
 :::tip
 Every **recipe card** and **catalog entry** in this guide is generated directly from the game's recipes and language files so nothing goes out of sync. Version badges beside headings show **when each feature was added**.
@@ -49,10 +49,10 @@ Shapelessly craft **Iron Kitchen Knife + Book** to make the Hotpot Guide (consum
 
 ## Supported versions and downloads
 
-**0.3.1-alpha** targets **Minecraft 1.21.1 (Fabric, NeoForge)**, **1.20.1 (Fabric, Forge)**, **26.1.x (Fabric, NeoForge)**, **26.2 (Fabric, NeoForge)**, and **26.3 (Fabric, NeoForge)** simultaneously; **this guide demonstrates 1.21.1 Fabric**. See [Downloads, Installation & Feedback](install.html) for download links (CurseForge, Modrinth, MCMOD, GitHub), installation steps, and contact info (GitHub, QQ group).
+**0.3.2-alpha** simultaneously supports **Minecraft 1.21.1 (Fabric, NeoForge)**, **1.20.1 (Fabric, Forge)**, **26.1.x (Fabric, NeoForge)**, **26.2 (Fabric, NeoForge)**, and **26.3 (Fabric, NeoForge)**; **this guide demonstrates 1.21.1 Fabric**. See [Downloads, Installation & Feedback](install.html) for download links (CurseForge, Modrinth, MCMOD, GitHub), installation steps, and contact info (GitHub, QQ group).
 
 :::warn
-This mod is still in **alpha**. `0.3.1-alpha` losslessly migrates the 40 legacy preset tables in existing worlds to universal hotpot tables and silently cleans up removed legacy config keys; still, if upgrading from very early builds such as `0.1.0-alpha.1`, **always back up your world first**.
+This mod is still in **alpha**. Upgrading from `0.3.1-alpha` / `0.3.0-alpha` / `0.2.2-alpha` to `0.3.2-alpha` smoothly preserves existing prep rack inventories, automatically migrates legacy preset tables, and silently cleans up deprecated config keys; however, if upgrading from very early builds such as `0.1.0-alpha.1`, **always back up your world first**.
 :::
 
 **Questions or suggestions?** Join QQ group **248314791** or open an issue on [GitHub](https://github.com/mryt233/Orients-Hotpot-Chronicles/issues/new/choose).

@@ -774,5 +774,11 @@
   "text.orients_hotpot_chronicles.msg.minigame_busy": "You are already inside a minigame session or pending invite",
   "text.orients_hotpot_chronicles.msg.minigame_need_pot": "Aim at a hotpot or sit near one before starting a challenge",
   "text.orients_hotpot_chronicles.msg.minigame_virtual_disabled": "Virtual Practice Plate is disabled on this server; consuming real cooked food",
-  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "No cooked food in the pot yet! Cook some food first or enable Virtual Practice Plate"
+  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "No cooked food in the pot yet! Cook some food first or enable Virtual Practice Plate",
+  "text.orients_hotpot_chronicles.config.group.rack": "Prep Racks",
+  "text.orients_hotpot_chronicles.config.prop.rack_default_max_stack": "Default Slot Capacity",
+  "text.orients_hotpot_chronicles.config.help.rack_default_max_stack": "Fallback slot capacity for items without a specific rule (1–64, capped by the item's max stack size)",
+  "text.orients_hotpot_chronicles.config.prop.rack_max_visual_items": "Items Shown per Slot",
+  "text.orients_hotpot_chronicles.config.help.rack_max_visual_items": "Maximum items rendered per slot (1–16); lower values improve performance without reducing capacity",
+  "text.orients_hotpot_chronicles.msg.prep_rack_full": "No available slot for this item on the prep rack"
 }

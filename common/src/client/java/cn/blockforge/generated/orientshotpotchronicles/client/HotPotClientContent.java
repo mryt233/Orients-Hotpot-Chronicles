@@ -34,6 +34,7 @@ public final class HotPotClientContent {
         client.wrappedModels(new TableModelRule());
         client.wrappedModels(new StoveModelRule());
         client.onDisconnect(() -> {
+            RackRules.clearClient();
             Config.clearClient();
             HotPotMinigameClient.onDisconnect();
         });

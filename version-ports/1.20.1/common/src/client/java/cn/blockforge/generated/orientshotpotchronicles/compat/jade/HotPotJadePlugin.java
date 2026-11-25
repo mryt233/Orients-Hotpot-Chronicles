@@ -19,6 +19,7 @@ import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTableBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.HotPotTableBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PrepRackBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.PrepRackBlockEntity;
+import cn.blockforge.generated.orientshotpotchronicles.hotpot.RackRules;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlock;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveBlockEntity;
 import cn.blockforge.generated.orientshotpotchronicles.hotpot.StoveTopBlock;
@@ -37,13 +38,14 @@ import cn.blockforge.generated.orientshotpotchronicles.client.ClientTooltips;
 import cn.blockforge.generated.orientshotpotchronicles.client.SharedClientSetup;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -57,7 +59,6 @@ import snownee.jade.api.IWailaPlugin;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
-import snownee.jade.api.JadeIds;
 import snownee.jade.api.WailaPlugin;
 import snownee.jade.api.view.ClientViewGroup;
 import snownee.jade.api.view.IClientExtensionProvider;
@@ -68,7 +69,9 @@ import snownee.jade.api.view.ViewGroup;
 @WailaPlugin
 public final class HotPotJadePlugin implements IWailaPlugin {
     private static final ResourceLocation STOVE_STORAGE = HotPot.id("stove_item_storage");
-    private static final String ITEM_STORAGE = JadeIds.UNIVERSAL_ITEM_STORAGE.toString();
+    // mryt233 改：Jade 11 以两个独立键承载物品组和客户端扩展 ID。
+    private static final String ITEM_STORAGE = "JadeItemStorage";
+    private static final String STORAGE_UID = "JadeItemStorageUid";
 
     @Override
     public void register(IWailaCommonRegistration registration) {
@@ -83,24 +86,6 @@ public final class HotPotJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(new WoodenVatComponentProvider(), WoodenVatBlock.class);
         registration.registerBlockComponent(HotPotTableComponentProvider.INSTANCE, HotPotTableBlock.class);
         registration.registerBlockComponent(PrepRackComponentProvider.INSTANCE, PrepRackBlock.class);
-        registration.addBeforeTooltipCollectCallback((theme, accessor) -> {
-            if (!accessor.isServerConnected()) {
-                HotPotBlockEntity pot = aimedPot(accessor);
-                if (pot != null && !accessor.getServerData().contains(ITEM_STORAGE) && !pot.isEmpty()) {
-                    accessor.getServerData().put(ITEM_STORAGE, accessor.encodeAsNbt(
-                        StorageCodec.STREAM_CODEC, Map.entry(STOVE_STORAGE, collectPotGroups(pot))));
-                }
-                PlateHolderBlockEntity.Placed plate = aimedPlate(accessor);
-                if (plate != null && !accessor.getServerData().contains(ITEM_STORAGE)) {
-                    List<ViewGroup<ItemStack>> groups = collectPlateGroups(plate);
-                    if (!groups.isEmpty()) {
-                        accessor.getServerData().put(ITEM_STORAGE, accessor.encodeAsNbt(
-                            StorageCodec.STREAM_CODEC, Map.entry(STOVE_STORAGE, groups)));
-                    }
-                }
-            }
-            return true;
-        });
         registration.addRayTraceCallback((hit, accessor, original) -> {
             if (!(accessor instanceof BlockAccessor block)) {
                 return accessor;
@@ -113,13 +98,13 @@ public final class HotPotJadePlugin implements IWailaPlugin {
                 state = block.getLevel().getBlockState(pos);
             }
             if (!(state.getBlock() instanceof StoveBlock)
-                    || !(block.getLevel().getBlockEntity(pos) instanceof StoveBlockEntity stove)) {
-                return accessor;
+                    || !(block.getLevel().getBlockEntity(pos) instanceof StoveBlockEntity stove) || stove.isRemoved()) {
+                return previewStorage(registration, block);
             }
             boolean potHit = stove.hasPot() && stove.potMaterial() != null
                 && StoveBlock.isPotHit(state, pos, block.getHitResult());
             if (!upper && !potHit) {
-                return accessor;
+                return previewStorage(registration, block);
             }
             BlockHitResult redirectedHit = new BlockHitResult(block.getHitResult().getLocation(),
                 block.getHitResult().getDirection(), pos, block.getHitResult().isInside());
@@ -133,7 +118,7 @@ public final class HotPotJadePlugin implements IWailaPlugin {
                     && data.getInt("z") == pos.getZ()) {
                 builder.serverData(data);
             }
-            return builder.requireVerification().build();
+            return previewStorage(registration, builder.requireVerification().build());
         });
     }
 
@@ -142,36 +127,44 @@ public final class HotPotJadePlugin implements IWailaPlugin {
         if (!(accessor instanceof BlockAccessor block)) {
             return null;
         }
-        if (block.getBlockEntity() instanceof StoveBlockEntity stove) {
+        if (block.getBlockEntity() instanceof StoveBlockEntity stove && !stove.isRemoved()) {
             BlockState state = stove.getBlockState();
             return stove.getBlockPos().equals(block.getPosition()) && state.getBlock() instanceof StoveBlock
                 && stove.hasPot() && (block.isFakeBlock()
                     || StoveBlock.isPotHit(state, stove.getBlockPos(), block.getHitResult())) ? stove : null;
         }
         return block.getBlockEntity() instanceof HotPotBlockEntity pot
-            && pot.getBlockPos().equals(block.getPosition())
+            && !pot.isRemoved() && pot.getBlockPos().equals(block.getPosition())
             && pot.getBlockState().getBlock() instanceof HotPotBlock ? pot : null;
     }
 
-    @Nullable
-    private static HotPotBlockEntity potTarget(Accessor<?> accessor) {
-        if (!(accessor instanceof BlockAccessor block)) {
-            return null;
+    private static BlockAccessor previewStorage(IWailaClientRegistration registration, BlockAccessor block) {
+        if (block.isServerConnected()) return block;
+        var pot = aimedPot(block);
+        var holder = plateHolderTarget(block);
+        if (pot == null && holder == null) return block;
+        var data = block.getServerData();
+        CompoundTag clean = data == null ? new CompoundTag() : data.copy();
+        if (STOVE_STORAGE.toString().equals(clean.getString(STORAGE_UID))) {
+            clean.remove(STORAGE_UID);
+            clean.remove(ITEM_STORAGE);
         }
-        if (block.getBlockEntity() instanceof HotPotBlockEntity pot && !(pot instanceof StoveBlockEntity)) {
-            return pot;
+        if (!clean.contains(ITEM_STORAGE)) {
+            var groups = pot != null ? collectPotGroups(pot) : collectPlateGroups(aimedPlate(block));
+            if (ViewGroup.saveList(clean, ITEM_STORAGE, groups, HotPotJadePlugin::writeStorageStack)) {
+                clean.putString(STORAGE_UID, STOVE_STORAGE.toString());
+            }
         }
-        BlockPos pos = block.getPosition();
-        var entity = block.getBlockEntity();
-        if (!(entity instanceof StoveBlockEntity)) {
-            entity = block.getLevel().getBlockEntity(pos);
+        return registration.blockAccessor().from(block).serverData(clean).build();
+    }
+
+    private static CompoundTag writeStorageStack(ItemStack stack) {
+        CompoundTag tag = stack.save(new CompoundTag());
+        if (stack.getCount() > 64) {
+            tag.putByte("Count", (byte) 1);
+            tag.putInt("NewCount", stack.getCount());
         }
-        if (!(entity instanceof StoveBlockEntity)
-                && block.getLevel().getBlockState(pos).getBlock() instanceof StoveTopBlock) {
-            entity = block.getLevel().getBlockEntity(pos.below());
-        }
-        // 服务端按实体提供完整数据；准星部位仅在客户端过滤，避免同格灶身缓存空食材。
-        return entity instanceof StoveBlockEntity stove && stove.hasPot() ? stove : null;
+        return tag;
     }
 
     private static List<ViewGroup<ItemStack>> collectPotGroups(HotPotBlockEntity pot) {
@@ -202,7 +195,7 @@ public final class HotPotJadePlugin implements IWailaPlugin {
     private static PlateHolderBlockEntity plateHolderTarget(Accessor<?> accessor) {
         return accessor instanceof BlockAccessor block
             && block.getBlockEntity() instanceof PlateHolderBlockEntity holder
-            && holder.getBlockPos().equals(block.getPosition()) ? holder : null;
+            && !holder.isRemoved() && holder.getBlockPos().equals(block.getPosition()) ? holder : null;
     }
 
     @Nullable
@@ -253,46 +246,22 @@ public final class HotPotJadePlugin implements IWailaPlugin {
         return merged.isEmpty() ? List.of() : List.of(new ViewGroup<>(merged));
     }
 
-    // 专用服只注册扩展；编码器留到客户端实际补数据时初始化。
-    private static final class StorageCodec {
-        /**
-         * mryt233 改（0.2.2-alpha，1.20.1 适配）：1.20.1 没有 {@code StreamCodec} / {@code RegistryFriendlyByteBuf} /
-         * {@code ItemStack.OPTIONAL_STREAM_CODEC}，这里用 {@link Accessor.Encoder}（FriendlyByteBuf 写入）
-         * 提供等价的「ResourceLocation + 若干组 ItemStack」编码。服务端与客户端都用这一份，所以自洽。
-         */
-        private static final Accessor.Encoder<Map.Entry<ResourceLocation, List<ViewGroup<ItemStack>>>> STREAM_CODEC =
-            (buf, entry) -> {
-                buf.writeResourceLocation(entry.getKey());
-                buf.writeVarInt(entry.getValue().size());
-                for (ViewGroup<ItemStack> group : entry.getValue()) {
-                    buf.writeVarInt(group.views.size());
-                    for (ItemStack stack : group.views) {
-                        buf.writeItem(stack);
-                    }
-                }
-            };
-    }
-
-    private static final class StoveStorage implements IServerExtensionProvider<ItemStack> {
-        @Override
-        public ResourceLocation getUid() {
-            return STOVE_STORAGE;
-        }
+    private static final class StoveStorage implements IServerExtensionProvider<BlockEntity, ItemStack> {
+        @Override public ResourceLocation getUid() { return STOVE_STORAGE; }
 
         @Override
-        public List<ViewGroup<ItemStack>> getGroups(Accessor<?> accessor) {
-            HotPotBlockEntity pot = potTarget(accessor);
-            if (pot != null) {
-                return collectPotGroups(pot);
+        public List<ViewGroup<ItemStack>> getGroups(ServerPlayer player, ServerLevel level, BlockEntity target,
+                                                    boolean showDetails) {
+            if (target.isRemoved() || target.getLevel() != level) return null;
+            if (target instanceof StoveBlockEntity stove) return stove.hasPot() ? collectPotGroups(stove) : null;
+            if (target instanceof HotPotBlockEntity pot) return collectPotGroups(pot);
+            if (target instanceof PlateHolderBlockEntity holder) {
+                var groups = collectAllPlateHolderGroups(holder);
+                if (!groups.isEmpty() || holder.plates().isEmpty()) return groups;
+                // 旧版空组不会建立物品提示；客户端扩展只渲染瞄准盘，丢弃这个标记。
+                return List.of(new ViewGroup<>(List.of(new ItemStack(net.minecraft.world.item.Items.STICK))));
             }
-            // mryt233 改：整格非空即激活存储扩展，避免先指空盘后在限流窗口内漏显其他餐具。
-            PlateHolderBlockEntity holder = plateHolderTarget(accessor);
-            return holder == null ? null : collectAllPlateHolderGroups(holder);
-        }
-
-        @Override
-        public boolean shouldRequestData(Accessor<?> accessor) {
-            return potTarget(accessor) != null || plateHolderTarget(accessor) != null;
+            return null;
         }
     }
 
@@ -313,7 +282,7 @@ public final class HotPotJadePlugin implements IWailaPlugin {
             if (pot == null) {
                 return List.of();
             }
-            return ClientViewGroup.map(groups == null ? List.of() : groups, ItemView::new, null);
+            return ClientViewGroup.map(groups == null ? collectPotGroups(pot) : groups, ItemView::new, null);
         }
     }
 
@@ -482,7 +451,11 @@ public final class HotPotJadePlugin implements IWailaPlugin {
 
         @Override
         public void appendTooltip(ITooltip tooltip, BlockAccessor block, IPluginConfig config) {
-            if (block.getBlockEntity() instanceof PrepRackBlockEntity rack
+            if (block.getBlockEntity() instanceof PrepRackBlockEntity rack && !rack.isRemoved()
+                && rack.getBlockPos().equals(block.getPosition())
+                && block.getLevel().getBlockEntity(block.getPosition()) == rack
+                && rack.getBlockState() == block.getBlockState()
+                && block.getLevel().getBlockState(block.getPosition()) == block.getBlockState()
                 && block.getBlockState().getBlock() instanceof PrepRackBlock rackBlock) {
                 if (!rack.materials().top().isEmpty()) {
                     tooltip.add(Component.translatable("text.orients_hotpot_chronicles.tooltip.rack_material",
@@ -497,6 +470,15 @@ public final class HotPotJadePlugin implements IWailaPlugin {
                         Component itemLabel = st.isEmpty()
                             ? Component.translatable("text.orients_hotpot_chronicles.jade.rack_empty").withStyle(ChatFormatting.DARK_GRAY)
                             : st.getHoverName().copy().withStyle(isAimed ? ChatFormatting.GOLD : ChatFormatting.WHITE);
+                        // mryt233 改：未收到服务端规则时只报真实数量，不猜上限。
+                        if (!st.isEmpty()) {
+                            var label = itemLabel.copy().append(" ×" + st.getCount());
+                            if (RackRules.clientReady()) {
+                                int cap = RackRules.capacity(block.getLevel(), st, rackBlock.kind());
+                                label.append(" / " + cap);
+                            }
+                            itemLabel = label;
+                        }
                         tooltip.add(Component.translatable("text.orients_hotpot_chronicles.jade.rack_slot",
                             i + 1, itemLabel).withStyle(isAimed ? ChatFormatting.YELLOW : ChatFormatting.GRAY));
                     }

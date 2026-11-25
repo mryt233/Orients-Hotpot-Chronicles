@@ -2,16 +2,23 @@
 <!-- mryt233 改，2026-10-30：补齐 #30–#71 正式版记录；r130 单列开发版。 -->
 # Changelog
 
-This page is updated with each release, **newest first**. The Development Preview describes completed work that is not yet released. **Gameplay in this guide follows packaged 0.3.1-alpha.**
+This page is updated with each release, **newest first**. The Development Preview describes completed work that is not yet released. **Gameplay in this guide follows packaged 0.3.2-alpha.**
 
 :::tip
 **Maintenance note (players can skip this):** every game change gets a numbered entry in the unreleased section of `docs/移植同步清单.md`. The `<!--清单#N-->` markers in `preview.md` link to those entries. `python tools/build_tutorial.py` checks for omissions. At release time, move the preview into the release history and start a new preview.
 :::
 
-<!-- mryt233 改，2026-11-22：0.3.1-alpha 收口，开发版预览改名为 0.3.1-alpha，再开一段空的预览。 -->
+<!-- mryt233 改，2026-11-26：0.3.2-alpha 收口，清单 #184–#185 并入 0.3.2-alpha，再开一段空的预览。 -->
 ## Development Preview {{dev}} {#unreleased}
 
-*No unreleased development entries yet (new changes after 0.3.1-alpha will appear here).*
+*No unreleased development entries yet (changes made after 0.3.2-alpha will be listed here).*
+
+## 0.3.2-alpha{{since:0.3.2-alpha}} {#v032}
+
+Packaged on 2026-11-26 (checklist `#184–#185`). **Simultaneous 10-JAR release across 5 Minecraft version lines: 1.21.1 (Fabric, NeoForge), 1.20.1 (Fabric, Forge), 26.1.x (Fabric 26.1–26.1.2 / NeoForge 26.1.2), 26.2 (Fabric, NeoForge), and 26.3 (Fabric, NeoForge)** — every JAR bundles `orient_framework 0.2.2`. Seamlessly compatible with `0.3.1-alpha` and earlier saves, keeping existing prep rack slot keys (`Slot0..Slot5`) intact; because this update adds an S2C sync channel for prep rack rules, clients and servers must both run `0.3.2-alpha`.
+
+- **Universal prep rack placement, per-item shelf stacking & 3-layer data separation**: floor racks (6 slots), desktop racks (4 slots), and wall/ceiling hanging racks (4 slots) now accept **any non-empty item**; normal right-click places 1 item and empty-hand right-click takes 1 item, automatically stacking when the item and data match. Ingredients pack tightly front-to-back (default 16 on floor, 12 on desktop), plates/bowls pile upward, bottles stand upright side-by-side, hanging kitchenware and cloth aprons dangle from hooks, and other items scale down to display upright as single items. Rules are controlled across three layers: `data/<namespace>/prep_rack_rules/*.json` datapacks (supporting `/reload` hot-reload and S2C sync, preserving existing items when limits decrease), `rack.rack_default_max_stack` / `rack.rack_max_visual_items` config options (defaults 12 / 8, max 64 / 16), and `HotPotHooks.registerRackRule` (see [Tables, Prep Racks & Seating](tables.html#prep_racks)).<!--清单#184-->
+- **Prep rack main/off-hand & sneak interaction routing, flush ceiling hooks & compatibility hardening**: empty main-hand right-click takes an item without interference from an off-hand shield or torch, passing off-hand actions through when the rack is empty; sneaking swaps material only with an eligible solid block, places torches, lanterns, or another prep rack normally against the rack when held, and removes custom material only when both hands are empty; ceiling-hung items align by their visible silhouette to the bottom of the hook. Also fixed the **1.20.1 Jade 11.x plugin registration linkage error** and added Jade slot item-count and capacity tooltips across all five version lines, hardened rack breaking to clear slots before dropping items against re-entrancy, made the sprite bounds LRU cache re-entrancy-safe, and guarded Forge/NeoForge `ModelData` against nulls.<!--清单#185-->
 
 ## 0.3.1-alpha{{since:0.3.1-alpha}} {#v031}
 

@@ -1,0 +1,10 @@
+{
+  "category": "other",
+  "layout": "row_depth",
+  "overrides": {
+    "hanging": {
+      "max_stack": 2,
+      "layout": "single"
+    }
+  }
+}

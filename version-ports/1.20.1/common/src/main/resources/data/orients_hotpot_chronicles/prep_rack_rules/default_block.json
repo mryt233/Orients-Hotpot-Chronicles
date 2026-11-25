@@ -1,0 +1,10 @@
+{
+  "category": "block",
+  "max_stack": 2,
+  "layout": "single",
+  "overrides": {
+    "hanging": {
+      "max_stack": 1
+    }
+  }
+}

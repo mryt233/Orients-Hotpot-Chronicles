@@ -1,0 +1,13 @@
+{
+  "tag": "#orients_hotpot_chronicles:rack_plates",
+  "priority": 20,
+  "max_stack": 4,
+  "layout": "flat_pile",
+  "max_visual": 4,
+  "overrides": {
+    "hanging": {
+      "max_stack": 2,
+      "layout": "single"
+    }
+  }
+}

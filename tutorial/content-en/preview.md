@@ -2,7 +2,7 @@
 # Development Preview
 
 :::tip
-**All features and fixes completed prior to `0.3.1-alpha` (checklist `#160–#183`) have now been officially released and merged into their corresponding chapters and [Changelog · 0.3.1-alpha](changelog.html#v031).**
+**All features and fixes completed prior to `0.3.2-alpha` (checklist `#184–#185`) are now released and integrated into the gameplay chapters and [Changelog · 0.3.2-alpha](changelog.html#v032).**
 :::
 
-Future in-development features and polish completed after `0.3.1-alpha` will appear here. There are currently no new unreleased preview entries.
+Upcoming additions and fixes developed after `0.3.2-alpha` will be recorded here as they land. There are currently no unreleased development entries.

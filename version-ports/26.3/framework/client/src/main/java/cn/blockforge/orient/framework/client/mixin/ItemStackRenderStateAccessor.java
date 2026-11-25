@@ -19,5 +19,15 @@ public interface ItemStackRenderStateAccessor {
     interface LayerAccessor {
         @Accessor("quads")
         net.minecraft.client.resources.model.geometry.ItemQuads orient$quads();
+
+        // mryt233 改：复用 26.3 层访问器测量物品真实几何。
+        @Accessor("specialRenderer")
+        net.minecraft.client.renderer.special.SpecialModelRenderer<?> orient$specialRenderer();
+
+        @Accessor("usesBlockLight")
+        boolean orient$usesBlockLight();
+
+        @org.spongepowered.asm.mixin.gen.Invoker("applyTransform")
+        void orient$applyTransform(com.mojang.blaze3d.vertex.PoseStack.Pose pose);
     }
 }

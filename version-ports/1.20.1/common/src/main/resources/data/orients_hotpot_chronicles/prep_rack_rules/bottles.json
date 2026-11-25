@@ -1,0 +1,13 @@
+{
+  "tag": "#orients_hotpot_chronicles:rack_bottles",
+  "priority": 20,
+  "max_stack": 4,
+  "layout": "upright",
+  "max_visual": 3,
+  "overrides": {
+    "hanging": {
+      "max_stack": 2,
+      "layout": "single"
+    }
+  }
+}

@@ -774,5 +774,11 @@
   "text.orients_hotpot_chronicles.msg.minigame_busy": "Vous êtes déjà dans une session de mini-jeu ou une invitation en attente",
   "text.orients_hotpot_chronicles.msg.minigame_need_pot": "Visez un hotpot ou asseyez-vous près d'un hotpot avant de lancer un défi",
   "text.orients_hotpot_chronicles.msg.minigame_virtual_disabled": "L'assiette d'entraînement virtuelle est désactivée sur ce serveur ; la vraie nourriture cuite est consommée",
-  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "Pas encore d'aliments cuits dans la marmite ! Faites d'abord cuire des ingrédients ou activez l'« Assiette d'entraînement virtuelle »"
+  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "Pas encore d'aliments cuits dans la marmite ! Faites d'abord cuire des ingrédients ou activez l'« Assiette d'entraînement virtuelle »",
+  "text.orients_hotpot_chronicles.config.group.rack": "Dessertes de préparation",
+  "text.orients_hotpot_chronicles.config.prop.rack_default_max_stack": "Capacité d'emplacement par défaut",
+  "text.orients_hotpot_chronicles.config.help.rack_default_max_stack": "Capacité par défaut d'un emplacement pour les objets sans règle dédiée (1–64, limitée par la pile maximale de l'objet)",
+  "text.orients_hotpot_chronicles.config.prop.rack_max_visual_items": "Objets affichés par emplacement",
+  "text.orients_hotpot_chronicles.config.help.rack_max_visual_items": "Nombre maximal d'objets affichés par emplacement (1–16) ; une valeur plus basse économise les performances sans réduire la capacité",
+  "text.orients_hotpot_chronicles.msg.prep_rack_full": "Aucun emplacement disponible pour cet objet sur la desserte"
 }

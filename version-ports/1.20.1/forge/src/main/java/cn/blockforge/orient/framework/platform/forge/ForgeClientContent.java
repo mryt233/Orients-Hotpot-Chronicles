@@ -68,7 +68,6 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
@@ -258,6 +257,7 @@ final class ForgeClientContent implements ClientContent {
     }
 
     private void onModifyBakingResult(ModelEvent.ModifyBakingResult event) {
+        BakedQuadRemap.clearSpriteCache(); // mryt233 改：新图集代次不复用旧精灵。
         if (modelRules.isEmpty()) {
             return;
         }
@@ -306,7 +306,7 @@ final class ForgeClientContent implements ClientContent {
     private static final class ForgeSwappableModel extends BakedModelWrapper<BakedModel> {
         private final SwappableModelRule rule;
         private final Function<ResourceLocation, TextureAtlasSprite> blockAtlas;
-        private final Map<Map<TextureAtlasSprite, TextureAtlasSprite>, BakedModel> itemCache = new ConcurrentHashMap<>();
+        private final BakedQuadRemap.ItemCache itemCache = new BakedQuadRemap.ItemCache();
         private final ItemOverrides itemOverrides;
 
         private ForgeSwappableModel(BakedModel originalModel, SwappableModelRule rule,
@@ -322,7 +322,7 @@ final class ForgeClientContent implements ClientContent {
                     if (swaps == null || swaps.isEmpty()) {
                         return originalModel;
                     }
-                    return itemCache.computeIfAbsent(swaps, key -> new ForgeSwappableItemModel(originalModel, key));
+                    return itemCache.getOrCreate(swaps, key -> new ForgeSwappableItemModel(originalModel, key));
                 }
             };
         }
@@ -332,15 +332,17 @@ final class ForgeClientContent implements ClientContent {
 
         @Override
         public ModelData getModelData(BlockAndTintGetter level, BlockPos pos, BlockState state, ModelData tileData) {
+            // mryt233 改：保留被包装模型派生的属性，再叠加本模组材质快照。
+            ModelData input = tileData == null ? ModelData.EMPTY : tileData;
+            ModelData base = originalModel.getModelData(level, pos, state, input);
+            if (base == null) base = input;
             if (level.getBlockEntity(pos) instanceof MaterialRenderHost host) {
                 Object snap = host.materialRenderData();
                 if (snap != null) {
-                    return (tileData != null ? tileData.derive() : ModelData.builder())
-                        .with(SNAPSHOT_PROP, snap)
-                        .build();
+                    return base.derive().with(SNAPSHOT_PROP, snap).build();
                 }
             }
-            return tileData;
+            return base;
         }
 
         @Override
@@ -353,6 +355,7 @@ final class ForgeClientContent implements ClientContent {
         @Override
         public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource rand,
                                         ModelData data, RenderType renderType) {
+            if (data == null) data = ModelData.EMPTY;
             Object snap = data.get(SNAPSHOT_PROP);
             Map<TextureAtlasSprite, TextureAtlasSprite> swaps = rule.resolveSwaps(snap, null, state, blockAtlas);
             List<BakedQuad> remapped = BakedQuadRemap.remapQuads(
@@ -384,6 +387,7 @@ final class ForgeClientContent implements ClientContent {
 
         @Override
         public TextureAtlasSprite getParticleIcon(ModelData data) {
+            if (data == null) data = ModelData.EMPTY;
             TextureAtlasSprite s = rule.particleSprite(data.get(SNAPSHOT_PROP), null, blockAtlas);
             return s != null ? s : super.getParticleIcon(data);
         }

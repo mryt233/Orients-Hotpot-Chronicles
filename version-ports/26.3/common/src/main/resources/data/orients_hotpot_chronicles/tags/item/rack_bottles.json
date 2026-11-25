@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "values": [
+    "orients_hotpot_chronicles:orange_drink",
+    "orients_hotpot_chronicles:plant_protein_drink",
+    "orients_hotpot_chronicles:orient_cola",
+    "orients_hotpot_chronicles:empty_orange_drink_bottle",
+    "orients_hotpot_chronicles:empty_plant_protein_drink_bottle",
+    "orients_hotpot_chronicles:empty_orient_cola_bottle",
+    "orients_hotpot_chronicles:sesame_paste",
+    "orients_hotpot_chronicles:oyster_sauce",
+    "minecraft:glass_bottle",
+    "minecraft:honey_bottle",
+    "minecraft:potion"
+  ]
+}

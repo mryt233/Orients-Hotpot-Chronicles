@@ -18,6 +18,7 @@ from check_textures import check_image
 from pixkit import io
 from pixkit.paths import ASSETS, MOD
 from pixkit.texstats import stats
+from pixkit.text import windows_fonts
 
 
 TEXTURES = ASSETS / "textures"
@@ -176,8 +177,11 @@ def validate(images: dict[str, dict[str, Image.Image]], cooked: Image.Image) -> 
 
 
 def font(size: int) -> ImageFont.ImageFont:
-    for p in (Path("C:/Windows/Fonts/msyh.ttc"), Path("C:/Windows/Fonts/simhei.ttf"),
-              Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")):
+    windows = windows_fonts()  # mryt233 改：使用当前系统的字体目录。
+    candidates = [Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")]
+    if windows is not None:
+        candidates[:0] = [windows / "msyh.ttc", windows / "simhei.ttf"]
+    for p in candidates:
         if p.is_file():
             return ImageFont.truetype(str(p), size)
     return ImageFont.load_default()

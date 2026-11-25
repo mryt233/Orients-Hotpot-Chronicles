@@ -774,5 +774,11 @@
   "text.orients_hotpot_chronicles.msg.minigame_busy": "Вы уже находитесь в мини-игре или ожидаете ответа на приглашение",
   "text.orients_hotpot_chronicles.msg.minigame_need_pot": "Наведите прицел на котёл хого или сядьте рядом с ним перед началом",
   "text.orients_hotpot_chronicles.msg.minigame_virtual_disabled": "Тренировочная тарелка отключена на сервере; расходуется настоящая еда из котла",
-  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "В котле ещё нет готовой еды! Сначала сварите ингредиенты или включите «Тренировочную тарелку»"
+  "text.orients_hotpot_chronicles.msg.minigame_no_cooked": "В котле ещё нет готовой еды! Сначала сварите ингредиенты или включите «Тренировочную тарелку»",
+  "text.orients_hotpot_chronicles.config.group.rack": "Стойки для блюд",
+  "text.orients_hotpot_chronicles.config.prop.rack_default_max_stack": "Базовая вместимость ячейки",
+  "text.orients_hotpot_chronicles.config.help.rack_default_max_stack": "Вместимость ячейки по умолчанию для предметов без отдельного правила (1–64, ограничена размером стака предмета)",
+  "text.orients_hotpot_chronicles.config.prop.rack_max_visual_items": "Видимых предметов в ячейке",
+  "text.orients_hotpot_chronicles.config.help.rack_max_visual_items": "Максимум отрисовываемых предметов в ячейке (1–16). Меньшее значение снижает нагрузку на графику без уменьшения вместимости",
+  "text.orients_hotpot_chronicles.msg.prep_rack_full": "На стойке нет подходящей ячейки для этого предмета"
 }
